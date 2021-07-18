@@ -1,46 +1,29 @@
-import PropTypes from 'prop-types'
 import React, { useEffect, useState } from "react"
-import MetaTags from 'react-meta-tags';
+import MetaTags from "react-meta-tags"
+import { Link } from "react-router-dom"
 import {
-  Container,
-  Row,
-  Col,
   Button,
   Card,
   CardBody,
+  Col,
+  Container,
   Input,
+  Media,
   Modal,
-  ModalHeader,
   ModalBody,
   ModalFooter,
-  Media,
+  ModalHeader,
+  Row,
   Table,
 } from "reactstrap"
-import { Link } from "react-router-dom"
-
-//import Charts
-import StackedColumnChart from "./StackedColumnChart"
-
-import modalimage1 from "../../assets/images/product/img-7.png"
 import modalimage2 from "../../assets/images/product/img-4.png"
-
-// Pages Components
-import WelcomeComp from "./WelcomeComp"
-import MonthlyEarning from "./MonthlyEarning"
-import SocialSource from "./SocialSource"
-import ActivityComp from "./ActivityComp"
-import TopCities from "./TopCities"
-import LatestTranaction from "./LatestTranaction"
-
+import modalimage1 from "../../assets/images/product/img-7.png"
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb"
-
-//i18n
 import { withTranslation } from "react-i18next"
 
 const Dashboard = props => {
   const [modal, setmodal] = useState(false)
-  const [subscribemodal, setSubscribemodal] = useState(false)
 
   const reports = [
     { title: "Orders", iconClass: "bx-copy-alt", description: "1,235" },
@@ -57,13 +40,6 @@ const Dashboard = props => {
     { title: "Year", linkto: "#", isActive: true },
   ]
 
-
-  useEffect(() => {
-    setTimeout(() => {
-      setSubscribemodal(true)
-    }, 2000);
-  }, [])
-
   return (
     <React.Fragment>
       <div className="page-content">
@@ -78,10 +54,6 @@ const Dashboard = props => {
           />
 
           <Row>
-            <Col xl="4">
-              <WelcomeComp />
-              <MonthlyEarning />
-            </Col>
             <Col xl="8">
               <Row>
                 {/* Reports Render */}
@@ -133,81 +105,12 @@ const Dashboard = props => {
                       </ul>
                     </div>
                   </div>
-                  {/* <div className="clearfix"></div> */}
-                  <StackedColumnChart />
-
                 </CardBody>
               </Card>
             </Col>
           </Row>
-
-          <Row>
-            <Col xl="4">
-              <SocialSource />
-            </Col>
-            <Col xl="4">
-              <ActivityComp />
-            </Col>
-
-            <Col xl="4">
-              <TopCities />
-            </Col>
-          </Row>
-
-          <Row>
-            <Col lg="12">
-              <LatestTranaction />
-            </Col>
-          </Row>
         </Container>
       </div>
-
-      {/* subscribe ModalHeader */}
-      <Modal
-        isOpen={subscribemodal}
-        role="dialog"
-        autoFocus={true}
-        centered
-        data-toggle="modal"
-        toggle={() => {
-          setSubscribemodal(!subscribemodal)
-        }}
-      >
-        <div className="modal-content">
-          <div className="modal-header border-bottom-0">
-            <ModalHeader
-              toggle={() => {
-                setSubscribemodal(!subscribemodal)
-              }}
-            >
-            </ModalHeader>
-          </div>
-          <div className="modal-body">
-            <div className="text-center mb-4">
-              <div className="avatar-md mx-auto mb-4">
-                {/* style={{ backgroundColor:"#eff2f7" }}  */}
-                <div className="avatar-title bg-light  rounded-circle text-primary h1">
-                  <i className="mdi mdi-email-open"></i>
-                </div>
-              </div>
-
-              <div className="row justify-content-center">
-                <div className="col-xl-10">
-                  <h4 className="text-primary">Subscribe !</h4>
-                  <p className="text-muted font-size-14 mb-4">Subscribe our newletter and get notification to stay update.</p>
-
-                  <div className="input-group rounded" style={{ backgroundColor: "#eff2f7" }}>
-                    <Input type="email" className="form-control bg-transparent border-0" placeholder="Enter Email address" />
-                    <Button color="primary" type="button" id="button-addon2">
-                      <i className="bx bxs-paper-plane"></i>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Modal>
 
       <Modal
         isOpen={modal}
@@ -315,10 +218,6 @@ const Dashboard = props => {
       </Modal>
     </React.Fragment>
   )
-}
-
-Dashboard.propTypes = {
-  t: PropTypes.any
 }
 
 export default withTranslation()(Dashboard)

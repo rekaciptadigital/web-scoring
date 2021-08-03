@@ -9,7 +9,7 @@ import {
   DropdownToggle,
 } from "reactstrap"
 // users
-import user1 from "../../../../assets/images/users/avatar-1.jpg"
+import user1 from "../../assets/images/users/avatar-1.jpg"
 
 const ProfileMenu = props => {
   // Declare a new state variable, which we'll call "menu"

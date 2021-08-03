@@ -1,6 +1,6 @@
 import React from "react"
 import { BrowserRouter as Router, Switch, Redirect } from "react-router-dom"
-import { AuthLayout, DashboardLayout } from "./layouts"
+import { AuthLayout, DashboardHorizontalLayout, DashboardLayout, DashboardVerticalLayout } from "./layouts"
 import { authenticationRoutes, dashboardRoutes, workingRoutes } from "./routes"
 import { AuthenticationMiddleware } from "./middlewares"
 import "./assets/scss/theme.scss"
@@ -24,7 +24,7 @@ const App = props => {
           {dashboardRoutes.map((route, idx) => (
             <AuthenticationMiddleware
               path={route.path}
-              layout={DashboardLayout}
+              layout={DashboardHorizontalLayout}
               component={route.component}
               key={idx}
               isAuthProtected={true}

@@ -1,22 +1,17 @@
+import { AvField, AvForm } from "availity-reactstrap-validation"
 import React from "react"
 import MetaTags from 'react-meta-tags'
 import { Link } from "react-router-dom"
-import { AvForm, AvField } from "availity-reactstrap-validation"
 import {
   Card,
   CardBody,
   Col,
-  Container,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Row,
+  Container, Row
 } from "reactstrap"
-
+import logo from "../../../assets/images/logo.svg"
 // import images
 import profile from "../../../assets/images/profile-img.png"
-import logo from "../../../assets/images/logo.svg"
+
 
 const RecoverPassword = () => {
   return (

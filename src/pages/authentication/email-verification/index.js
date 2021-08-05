@@ -1,18 +1,20 @@
-import React from "react"
-import MetaTags from 'react-meta-tags';
-import { Link } from "react-router-dom"
-import { Card, CardBody, Col, Container, Row } from "reactstrap"
+import React from "react";
+import MetaTags from "react-meta-tags";
+import { Link } from "react-router-dom";
+import { Card, CardBody, Col, Container, Row } from "reactstrap";
 
 // import images
-import logodark from "../../../assets/images/logo-dark.png"
-import logolight from "../../../assets/images/logo-light.png"
+import logodark from "../../../assets/images/logo-dark.png";
+import logolight from "../../../assets/images/logo-light.png";
 
 const EmailVerification = () => {
   return (
     <React.Fragment>
       <div className="account-pages my-5 pt-sm-5">
-      <MetaTags>
-          <title>Email Verification | Skote - React Admin & Dashboard Template</title>
+        <MetaTags>
+          <title>
+            Email Verification | Skote - React Admin & Dashboard Template
+          </title>
         </MetaTags>
         <Container>
           <Row>
@@ -53,16 +55,13 @@ const EmailVerification = () => {
                           We have sent you verification email{" "}
                           <span className="font-weight-semibold">
                             example@abc.com
-                            </span>
-                            , Please check it
-                          </p>
+                          </span>
+                          , Please check it
+                        </p>
                         <div className="mt-4">
-                          <a
-                            href="/"
-                            className="btn btn-success w-md"
-                          >
+                          <a href="/" className="btn btn-success w-md">
                             Verify email
-                            </a>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -71,22 +70,22 @@ const EmailVerification = () => {
               </Card>
               <div className="mt-5 text-center">
                 <p>
-                  Did't receive an email ?{" "}
+                  {`Did't receive an email ? `}
                   <a href="#" className="fw-medium text-primary">
                     {" "}
-                      Resend{" "}
+                    Resend{" "}
                   </a>{" "}
                 </p>
                 <p>
                   © {new Date().getFullYear()} Skote. Crafted with{" "}
                   <i className="mdi mdi-heart text-danger"></i> by Themesbrand
-                  </p>
+                </p>
               </div>
             </Col>
           </Row>
         </Container>
       </div>
     </React.Fragment>
-  )
-}
-export default EmailVerification
+  );
+};
+export default EmailVerification;

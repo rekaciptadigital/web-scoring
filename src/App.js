@@ -1,11 +1,11 @@
-import React from "react"
-import { BrowserRouter as Router, Switch, Redirect } from "react-router-dom"
-import { AuthLayout, DashboardHorizontalLayout, DashboardLayout, DashboardVerticalLayout } from "./layouts"
-import { authenticationRoutes, dashboardRoutes, workingRoutes } from "./routes"
-import { AuthenticationMiddleware } from "./middlewares"
-import "./assets/scss/theme.scss"
+import React from "react";
+import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
+import "./assets/scss/theme.scss";
+import { AuthLayout, DashboardHorizontalLayout } from "./layouts";
+import { AuthenticationMiddleware } from "./middlewares";
+import { authenticationRoutes, dashboardRoutes, workingRoutes } from "./routes";
 
-const App = props => {
+const App = () => {
   return (
     <React.Fragment>
       <Router>
@@ -45,7 +45,7 @@ const App = props => {
         </Switch>
       </Router>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default App
+export default App;

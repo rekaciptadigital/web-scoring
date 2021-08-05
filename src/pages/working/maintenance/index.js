@@ -71,7 +71,7 @@ const Maintenance = () => {
                     </h5>
                     <p className="text-muted mb-0">
                       If you are going to use a passage of Lorem Ipsum, you need
-                      to be sure there isn't anything embar..
+                      to be sure there is not anything embar..
                       <Link
                         to="mailto:no-reply@domain.com"
                         className="text-decoration-underline"

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import * as AuthenticationStore from "store/slice/authentication"
 import { useHistory } from "react-router-dom"
 
-const Logout = props => {
+const Logout = () => {
   const dispatch = useDispatch()
   const history = useHistory()
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)

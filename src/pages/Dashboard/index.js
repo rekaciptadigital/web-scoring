@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
+import { withTranslation } from "react-i18next"
 import MetaTags from "react-meta-tags"
 import { Link } from "react-router-dom"
 import {
@@ -6,21 +7,19 @@ import {
   Card,
   CardBody,
   Col,
-  Container,
-  Input,
-  Media,
+  Container, Media,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
   Row,
-  Table,
+  Table
 } from "reactstrap"
+import { AuthenticationService } from "services"
 import modalimage2 from "../../assets/images/product/img-4.png"
 import modalimage1 from "../../assets/images/product/img-7.png"
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb"
-import { withTranslation } from "react-i18next"
 
 const Dashboard = props => {
   const [modal, setmodal] = useState(false)
@@ -39,6 +38,10 @@ const Dashboard = props => {
     { title: "Month", linkto: "#", isActive: false },
     { title: "Year", linkto: "#", isActive: true },
   ]
+
+  const test = async () => {
+    await AuthenticationService.login({})
+  }
 
   return (
     <React.Fragment>
@@ -68,7 +71,7 @@ const Dashboard = props => {
                             </p>
                             <h4 className="mb-0">{report.description}</h4>
                           </Media>
-                          <div className="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
+                          <div className="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon" onClick={() => test()}>
                             <span className="avatar-title rounded-circle bg-primary">
                               <i
                                 className={

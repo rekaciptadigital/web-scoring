@@ -7,20 +7,19 @@ import React, { useEffect, useState } from "react"
 import MetaTags from "react-meta-tags"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useHistory } from "react-router-dom"
-import { Alert, Card, CardBody, Col, Container, Row } from "reactstrap"
+import { Card, CardBody, Col, Container, Row } from "reactstrap"
+import { AuthenticationService } from "services"
 //Import config
 import * as AuthenticationStore from "store/slice/authentication"
-import { AuthenticationService } from "services"
 import toastr from "toastr"
 
-const Login = props => {
+const Login = () => {
   const dispatch = useDispatch()
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
   let history = useHistory()
   const [loginErrors, setLoginErrors] = useState()
 
   const handleValidSubmit = async (event, values) => {
-    console.log(event)
     const { data, errors, message, success } =
       await AuthenticationService.login(values)
     if (success) {

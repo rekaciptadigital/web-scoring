@@ -1,14 +1,12 @@
-import React from "react"
-import MetaTags from 'react-meta-tags';
-import { Link } from "react-router-dom"
-import { Container, Row, Col } from "reactstrap"
-
+import React from "react";
 //Import Countdown
-import Countdown from "react-countdown"
-
+import Countdown from "react-countdown";
+import MetaTags from 'react-meta-tags';
+import { Link } from "react-router-dom";
+import { Col, Container, Row } from "reactstrap";
+import maintanence from "../../../assets/images/coming-soon.svg";
 //Import Images
-import logo from "../../../assets/images/logo-dark.png"
-import maintanence from "../../../assets/images/coming-soon.svg"
+import logo from "../../../assets/images/logo-dark.png";
 
 const Comingsoon = () => {
   const renderer = ({ days, hours, minutes, seconds, completed }) => {
@@ -65,7 +63,7 @@ const Comingsoon = () => {
                     </div>
                   </Col>
                 </Row>
-                <h4 className="mt-5">Let's get started with Skote</h4>
+                <h4 className="mt-5">Lets get started with Skote</h4>
                 <p className="text-muted">
                   It will be as simple as Occidental in fact it will be
                   Occidental.

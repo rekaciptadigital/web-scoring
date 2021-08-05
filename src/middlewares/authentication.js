@@ -11,6 +11,7 @@ const AuthenticationMiddleware = ({
   ...rest
 }) => {
   const { isLoggedIn } = useSelector(getAuthenticationStore)
+  
   return (
     <Route
       {...rest}

@@ -1,41 +1,25 @@
-import PropTypes from "prop-types"
-import React, { useState } from "react"
-
-import { connect } from "react-redux"
-import { Row, Col } from "reactstrap"
-import ReactDrawer from "react-drawer"
-import { Link } from "react-router-dom"
-
-// Reactstrap
-import { Dropdown, DropdownToggle, DropdownMenu } from "reactstrap"
-
-// Import menuDropdown
-import LanguageDropdown from "../../components/TopbarDropdown/LanguageDropdown"
-import NotificationDropdown from "../../components/TopbarDropdown/NotificationDropdown"
-import ProfileMenu from "../../components/TopbarDropdown/ProfileMenu"
-import megamenuImg from "../../assets/images/megamenu-img.png"
-
+import React, { useState } from "react";
 //i18n
-import { withTranslation } from "react-i18next"
+import { withTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { Col, Dropdown, DropdownMenu, DropdownToggle, Row } from "reactstrap";
+import megamenuImg from "../../assets/images/megamenu-img.png";
+// Import menuDropdown
+import LanguageDropdown from "../../components/TopbarDropdown/LanguageDropdown";
+import NotificationDropdown from "../../components/TopbarDropdown/NotificationDropdown";
+import ProfileMenu from "../../components/TopbarDropdown/ProfileMenu";
 
 const Header = props => {
-  const [search, setsearch] = useState(false)
-  const [megaMenu, setmegaMenu] = useState(false)
-  const [socialDrp, setsocialDrp] = useState(false)
+  const [search, setsearch] = useState(false);
+  const [megaMenu, setmegaMenu] = useState(false);
 
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-
-  const [position, setPosition] = useState()
-  const [open, setOpen] = useState(false)
+  const [, setPosition] = useState();
+  const [open, setOpen] = useState(false);
 
   const toggleTopDrawer = () => {
-    setPosition("right")
-    setOpen(!open)
-  }
-
-  const onDrawerClose = () => {
-    setOpen(false)
-  }
+    setPosition("right");
+    setOpen(!open);
+  };
 
   function toggleFullscreen() {
     if (
@@ -45,29 +29,29 @@ const Header = props => {
     ) {
       // current working methods
       if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen()
+        document.documentElement.requestFullscreen();
       } else if (document.documentElement.mozRequestFullScreen) {
-        document.documentElement.mozRequestFullScreen()
+        document.documentElement.mozRequestFullScreen();
       } else if (document.documentElement.webkitRequestFullscreen) {
         document.documentElement.webkitRequestFullscreen(
           Element.ALLOW_KEYBOARD_INPUT
-        )
+        );
       }
     } else {
       if (document.cancelFullScreen) {
-        document.cancelFullScreen()
+        document.cancelFullScreen();
       } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen()
+        document.mozCancelFullScreen();
       } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen()
+        document.webkitCancelFullScreen();
       }
     }
   }
 
   function tToggle() {
-    var body = document.body
-    body.classList.toggle("vertical-collpsed")
-    body.classList.toggle("sidebar-enable")
+    var body = document.body;
+    body.classList.toggle("vertical-collpsed");
+    body.classList.toggle("sidebar-enable");
   }
 
   return (
@@ -78,7 +62,7 @@ const Header = props => {
             <button
               type="button"
               onClick={() => {
-                tToggle()
+                tToggle();
               }}
               className="btn btn-sm px-3 font-size-16 header-item "
               id="vertical-menu-btn"
@@ -101,7 +85,7 @@ const Header = props => {
               className="dropdown-mega d-none d-lg-block ms-2"
               isOpen={megaMenu}
               toggle={() => {
-                setmegaMenu(!megaMenu)
+                setmegaMenu(!megaMenu);
               }}
             >
               <DropdownToggle className="btn header-item " caret tag="button">
@@ -247,7 +231,7 @@ const Header = props => {
             <div className="dropdown d-inline-block d-lg-none ms-2">
               <button
                 onClick={() => {
-                  setsearch(!search)
+                  setsearch(!search);
                 }}
                 type="button"
                 className="btn header-item noti-icon "
@@ -289,7 +273,7 @@ const Header = props => {
               <button
                 type="button"
                 onClick={() => {
-                  toggleFullscreen()
+                  toggleFullscreen();
                 }}
                 className="btn header-item noti-icon "
                 data-toggle="fullscreen"
@@ -317,7 +301,7 @@ const Header = props => {
         </div>
       </header>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default withTranslation()(Header)
+export default withTranslation()(Header);

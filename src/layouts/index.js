@@ -1,4 +1,3 @@
-export {default as DashboardLayout} from './dashboard';
 export {default as DashboardHorizontalLayout} from './dashboard-horizontal';
 export {default as DashboardVerticalLayout} from './dashboard-vertical';
 export {default as AuthLayout} from './auth';

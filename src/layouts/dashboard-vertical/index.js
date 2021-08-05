@@ -1,13 +1,9 @@
-import PropTypes from 'prop-types'
 import React, { Component } from "react"
-
-import { connect } from "react-redux"
 import { withRouter } from "react-router-dom"
-
+import Footer from "./Footer"
 // Layout Related Components
 import Header from "./Header"
 import Sidebar from "./Sidebar"
-import Footer from "./Footer"
 
 class Layout extends Component {
   constructor(props) {

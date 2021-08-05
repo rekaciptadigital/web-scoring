@@ -1,13 +1,9 @@
-import PropTypes from "prop-types"
-import React, { useState, useEffect } from "react"
-import { Row, Col, Collapse } from "reactstrap"
-import { Link, withRouter } from "react-router-dom"
 import classname from "classnames"
-
+import React, { useEffect, useState } from "react"
 //i18n
 import { withTranslation } from "react-i18next"
-
-import { connect } from "react-redux"
+import { Link, withRouter } from "react-router-dom"
+import { Col, Collapse, Row } from "reactstrap"
 
 const Navbar = props => {
   const [dashboard, setdashboard] = useState(false)

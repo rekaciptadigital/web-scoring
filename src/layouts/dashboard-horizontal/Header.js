@@ -1,38 +1,28 @@
-import React, { useState } from "react"
-import ReactDrawer from 'react-drawer';
-import { Link } from "react-router-dom"
-
-// reactstrap
-import { Row, Col, Dropdown, DropdownToggle, DropdownMenu } from "reactstrap"
-
-// Import menuDropdown
-import LanguageDropdown from "../../components/TopbarDropdown/LanguageDropdown"
-import NotificationDropdown from "../../components//TopbarDropdown/NotificationDropdown"
-import ProfileMenu from "../../components//TopbarDropdown/ProfileMenu"
-
-import megamenuImg from "../../assets/images/megamenu-img.png"
-import logo from "../../assets/images/logo.svg"
-import logoLight from "../../assets/images/logo-light.png"
-import logoLightSvg from "../../assets/images/logo-light.svg"
-import logoDark from "../../assets/images/logo-dark.png"
-
+import React, { useState } from "react";
 //i18n
-import { withTranslation } from "react-i18next"
+import { withTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+// reactstrap
+import { Col, Dropdown, DropdownMenu, DropdownToggle, Row } from "reactstrap";
+import logoDark from "../../assets/images/logo-dark.png";
+import logoLight from "../../assets/images/logo-light.png";
+import logoLightSvg from "../../assets/images/logo-light.svg";
+import logo from "../../assets/images/logo.svg";
+import megamenuImg from "../../assets/images/megamenu-img.png";
+import NotificationDropdown from "../../components//TopbarDropdown/NotificationDropdown";
+import ProfileMenu from "../../components//TopbarDropdown/ProfileMenu";
+// Import menuDropdown
+import LanguageDropdown from "../../components/TopbarDropdown/LanguageDropdown";
 
 const Header = props => {
   const [menu, setMenu] = useState(false)
   const [isSearch, setSearch] = useState(false)
-  const [socialDrp, setsocialDrp] = useState(false)
-  const [position, setPosition] = useState();
+  const [, setPosition] = useState();
   const [open, setOpen] = useState(false);
 
   const toggleTopDrawer = () => {
     setPosition('right');
     setOpen(!open)
-  }
-
-  const onDrawerClose = () => {
-    setOpen(false);
   }
 
   function toggleFullscreen() {

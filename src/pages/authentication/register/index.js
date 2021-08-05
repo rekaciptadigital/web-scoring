@@ -5,17 +5,17 @@ import MetaTags from "react-meta-tags"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useHistory } from "react-router-dom"
 import { Alert, Card, CardBody, Col, Container, Row } from "reactstrap"
+import * as AuthenticationStore from "store/slice/authentication"
 import logoImg from "../../../assets/images/logo.svg"
 // import images
 import profileImg from "../../../assets/images/profile-img.png"
-import * as AuthenticationStore from "store/slice/authentication"
 
 const Register = props => {
   const dispatch = useDispatch()
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
   let history = useHistory();
   
-  const handleValidSubmit = (event, values) => {
+  const handleValidSubmit = () => {
     dispatch(AuthenticationStore.register())
   }
 

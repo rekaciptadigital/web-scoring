@@ -1,28 +1,28 @@
-import React, { useState } from "react"
-import { withTranslation } from "react-i18next"
-import MetaTags from "react-meta-tags"
-import { Link } from "react-router-dom"
+import React, { useState } from "react";
+import MetaTags from "react-meta-tags";
+import { Link } from "react-router-dom";
 import {
   Button,
   Card,
   CardBody,
   Col,
-  Container, Media,
+  Container,
+  Media,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
   Row,
-  Table
-} from "reactstrap"
-import { AuthenticationService } from "services"
-import modalimage2 from "../../assets/images/product/img-4.png"
-import modalimage1 from "../../assets/images/product/img-7.png"
+  Table,
+} from "reactstrap";
+import { AuthenticationService } from "services";
+import modalimage2 from "../../assets/images/product/img-4.png";
+import modalimage1 from "../../assets/images/product/img-7.png";
 //Import Breadcrumb
-import Breadcrumbs from "../../components/Common/Breadcrumb"
+import Breadcrumbs from "../../components/Common/Breadcrumb";
 
-const Dashboard = props => {
-  const [modal, setmodal] = useState(false)
+const Dashboard = () => {
+  const [modal, setmodal] = useState(false);
 
   const reports = [
     { title: "Orders", iconClass: "bx-copy-alt", description: "1,235" },
@@ -32,16 +32,16 @@ const Dashboard = props => {
       iconClass: "bx-purchase-tag-alt",
       description: "$16.2",
     },
-  ]
+  ];
   const email = [
     { title: "Week", linkto: "#", isActive: false },
     { title: "Month", linkto: "#", isActive: false },
     { title: "Year", linkto: "#", isActive: true },
-  ]
+  ];
 
   const test = async () => {
-    await AuthenticationService.login({})
-  }
+    await AuthenticationService.login({});
+  };
 
   return (
     <React.Fragment>
@@ -51,10 +51,7 @@ const Dashboard = props => {
         </MetaTags>
         <Container fluid>
           {/* Render Breadcrumb */}
-          <Breadcrumbs
-            title={props.t("Dashboards")}
-            breadcrumbItem={props.t("Dashboard")}
-          />
+          <Breadcrumbs title="Dashboards" breadcrumbItem="Dashboard" />
 
           <Row>
             <Col xl="8">
@@ -71,7 +68,10 @@ const Dashboard = props => {
                             </p>
                             <h4 className="mb-0">{report.description}</h4>
                           </Media>
-                          <div className="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon" onClick={() => test()}>
+                          <div
+                            className="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon"
+                            onClick={() => test()}
+                          >
                             <span className="avatar-title rounded-circle bg-primary">
                               <i
                                 className={
@@ -123,13 +123,13 @@ const Dashboard = props => {
         className="exampleModal"
         tabIndex="-1"
         toggle={() => {
-          setmodal(!modal)
+          setmodal(!modal);
         }}
       >
         <div className="modal-content">
           <ModalHeader
             toggle={() => {
-              setmodal(!modal)
+              setmodal(!modal);
             }}
           >
             Order Details
@@ -211,7 +211,7 @@ const Dashboard = props => {
               type="button"
               color="secondary"
               onClick={() => {
-                setmodal(!modal)
+                setmodal(!modal);
               }}
             >
               Close
@@ -220,7 +220,7 @@ const Dashboard = props => {
         </div>
       </Modal>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default withTranslation()(Dashboard)
+export default Dashboard;

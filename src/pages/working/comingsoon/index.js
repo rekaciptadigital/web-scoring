@@ -36,7 +36,7 @@ const Comingsoon = () => {
   return (
     <React.Fragment>
      <MetaTags>
-          <title>Coming Soon | Skote - React Admin & Dashboard Template</title>
+          <title>Coming Soon | MyArchery</title>
         </MetaTags>
       <div className="home-btn d-none d-sm-block">
         <Link to="/" className="text-white">
@@ -63,7 +63,7 @@ const Comingsoon = () => {
                     </div>
                   </Col>
                 </Row>
-                <h4 className="mt-5">Lets get started with Skote</h4>
+                <h4 className="mt-5">Lets get started with MyArchery</h4>
                 <p className="text-muted">
                   It will be as simple as Occidental in fact it will be
                   Occidental.

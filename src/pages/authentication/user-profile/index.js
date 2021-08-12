@@ -5,8 +5,7 @@ import MetaTags from 'react-meta-tags';
 import {
   Alert, Button, Card, CardBody, Col, Container, Media, Row
 } from "reactstrap";
-import avatar from "../../../assets/images/users/avatar-1.jpg";
-//Import Breadcrumb
+import avatar from "../../../assets/images/users/avatar-man.png";
 import Breadcrumb from "../../components/Common/Breadcrumb";
 
 const UserProfile = props => {
@@ -43,11 +42,10 @@ const UserProfile = props => {
     <React.Fragment>
       <div className="page-content">
         <MetaTags>
-          <title>Profile | Skote - React Admin & Dashboard Template</title>
+          <title>Profile | MyArchery</title>
         </MetaTags>
         <Container fluid>
-          {/* Render Breadcrumb */}
-          <Breadcrumb title="Skote" breadcrumbItem="Profile" />
+          <Breadcrumb title="MyArchery" breadcrumbItems={[{title: "Profile"}]} />
 
           <Row>
             <Col lg="12">

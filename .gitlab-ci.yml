@@ -41,7 +41,7 @@ update_production:
 deploy_production:
   stage: deploy
   script:
-    - ssh -p22 root@$IP_HOST "sudo npm install --prefix /var/www/web-archery && sudo npm run build --prefix /var/www/web-archery"
+    - ssh -p22 root@$IP_HOST "sudo /root/.nvm/versions/node/v14.16.0/bin/npm install --prefix /var/www/web-archery && sudo /root/.nvm/versions/node/v14.16.0/bin/npm run build --prefix /var/www/web-archery"
     - echo "Build Success, Apps running for Production"
   only:
     - master

@@ -1,0 +1,47 @@
+before_script: 
+  - apt-get update -qq
+  - apt-get install -qq git
+  # Setup SSH deploy keys
+  - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$PRIVATEKEY_ARCHERY")
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+ 
+stages:
+  - update
+  - deploy
+  
+# update_staging:
+#   stage: update
+#   script:
+#     - echo "Updating staging"
+#     - ssh -p22 root@$IP_HOST "GIT_DIR=/var/www/web-dashboard-staging/.git GIT_WORK_TREE=/var/www/web-dashboard-staging git checkout development && GIT_DIR=/var/www/web-dashboard-staging/.git GIT_WORK_TREE=/var/www/web-dashboard-staging git fetch origin development && GIT_DIR=/var/www/web-dashboard-staging/.git GIT_WORK_TREE=/var/www/web-dashboard-staging git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-dashboard-staging/.git GIT_WORK_TREE=/var/www/web-dashboard-staging git pull origin development"
+#     - echo "Code Updated"
+#   only:
+#     - development
+
+# deploy_staging:
+#   stage: deploy
+#   script:
+#     - ssh -p22 root@$IP_HOST "sudo npm install --prefix /var/www/web-dashboard-staging --legacy-peer-deps && sudo npm run build --prefix /var/www/web-dashboard-staging"
+#     - echo "Build Success, Apps running for Staging"
+#   only:
+#     - development
+
+update_production:
+  stage: update
+  script:
+    - echo "Updating develop"
+    - ssh -p22 root@$IP_HOST "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master"
+    - echo "Code Updated"
+  only:
+    - master
+
+deploy_production:
+  stage: deploy
+  script:
+    - ssh -p22 root@$IP_HOST "sudo npm install --prefix /var/www/web-archery && sudo npm run build --prefix /var/www/web-archery"
+    - echo "Build Success, Apps running for Production"
+  only:
+    - master

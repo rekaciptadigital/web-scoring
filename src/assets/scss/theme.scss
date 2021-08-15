@@ -352,3 +352,21 @@ span.flatpickr-weekday {
 .css-sourceMap-modules-importLoaders-1-localIdentName-ReactDrawer__overlay___2QFmC-sass {
   background: rgba(0, 0, 0, 0.15) !important;
 }
+
+div[class^="col"],
+div[class*=" col"] {
+  margin-bottom: 10px;
+}
+
+.date-input,
+.datetime-input {
+  .form-control:disabled,
+  .form-control[readonly] {
+    background-color: #fff;
+  }
+}
+
+.input-group .btn {
+  position: relative;
+  z-index: 0;
+}

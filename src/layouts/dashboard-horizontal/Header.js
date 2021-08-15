@@ -2,55 +2,18 @@ import React, { useState } from "react";
 //i18n
 import { withTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-// reactstrap
-import { Col, Dropdown, DropdownMenu, DropdownToggle, Row } from "reactstrap";
 import logoDark from "../../assets/images/logo-dark.png";
 import logoLight from "../../assets/images/logo-light.png";
 import logoLightSvg from "../../assets/images/logo-light.svg";
 import logo from "../../assets/images/logo.svg";
-import megamenuImg from "../../assets/images/megamenu-img.png";
 import NotificationDropdown from "../../components//TopbarDropdown/NotificationDropdown";
 import ProfileMenu from "../../components//TopbarDropdown/ProfileMenu";
 // Import menuDropdown
 import LanguageDropdown from "../../components/TopbarDropdown/LanguageDropdown";
 
 const Header = props => {
-  const [menu, setMenu] = useState(false)
-  const [isSearch, setSearch] = useState(false)
-  const [, setPosition] = useState();
-  const [open, setOpen] = useState(false);
+  const [isSearch, setSearch] = useState(false);
 
-  const toggleTopDrawer = () => {
-    setPosition('right');
-    setOpen(!open)
-  }
-
-  function toggleFullscreen() {
-    if (
-      !document.fullscreenElement &&
-      /* alternative standard method */ !document.mozFullScreenElement &&
-      !document.webkitFullscreenElement
-    ) {
-      // current working methods
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen()
-      } else if (document.documentElement.mozRequestFullScreen) {
-        document.documentElement.mozRequestFullScreen()
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen(
-          Element.ALLOW_KEYBOARD_INPUT
-        )
-      }
-    } else {
-      if (document.cancelFullScreen) {
-        document.cancelFullScreen()
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen()
-      } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen()
-      }
-    }
-  }
   return (
     <React.Fragment>
       <header id="page-topbar">
@@ -81,7 +44,7 @@ const Header = props => {
               className="btn btn-sm px-3 font-size-16 d-lg-none header-item"
               data-toggle="collapse"
               onClick={() => {
-                props.toggleLeftmenu(!props.leftMenu)
+                props.toggleLeftmenu(!props.leftMenu);
               }}
               data-target="#topnav-menu-content"
             >
@@ -98,153 +61,6 @@ const Header = props => {
                 <span className="bx bx-search-alt" />
               </div>
             </form>
-
-            <Dropdown
-              className="dropdown-mega d-none d-lg-block ms-2"
-              isOpen={menu}
-              toggle={() => setMenu(!menu)}
-            >
-              <DropdownToggle
-                className="btn header-item "
-                caret
-                tag="button"
-              >
-                {props.t("Mega Menu")} <i className="mdi mdi-chevron-down" />
-              </DropdownToggle>
-              <DropdownMenu className="dropdown-megamenu">
-                <Row>
-                  <Col sm={8}>
-                    <Row>
-                      <Col md={4}>
-                        <h5 className="font-size-14 mt-0">
-                          {props.t("UI Components")}
-                        </h5>
-                        <ul className="list-unstyled megamenu-list">
-                          <li>
-                            <Link to="#">{props.t("Lightbox")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Range Slider")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Sweet Alert")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Rating")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Forms")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Tables")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Charts")}</Link>
-                          </li>
-                        </ul>
-                      </Col>
-
-                      <Col md={4}>
-                        <h5 className="font-size-14 mt-0">
-                          {props.t("Applications")}
-                        </h5>
-                        <ul className="list-unstyled megamenu-list">
-                          <li>
-                            <Link to="#">{props.t("Ecommerce")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Calendar")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Email")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Projects")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Tasks")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Contacts")}</Link>
-                          </li>
-                        </ul>
-                      </Col>
-
-                      <Col md={4}>
-                        <h5 className="font-size-14 mt-0">
-                          {props.t("Extra Pages")}
-                        </h5>
-                        <ul className="list-unstyled megamenu-list">
-                          <li>
-                            <Link to="#">{props.t("Light Sidebar")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Compact Sidebar")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Horizontal layout")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#"> {props.t("Maintenance")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Coming Soon")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Timeline")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("FAQs")}</Link>
-                          </li>
-                        </ul>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col sm={4}>
-                    <Row>
-                      <Col sm={6}>
-                        <h5 className="font-size-14 mt-0">
-                          {props.t("UI Components")}
-                        </h5>
-                        <ul className="list-unstyled megamenu-list">
-                          <li>
-                            <Link to="#">{props.t("Lightbox")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Range Slider")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Sweet Alert")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Rating")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Forms")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Tables")}</Link>
-                          </li>
-                          <li>
-                            <Link to="#">{props.t("Charts")}</Link>
-                          </li>
-                        </ul>
-                      </Col>
-
-                      <Col sm={5}>
-                        <div>
-                          <img
-                            src={megamenuImg}
-                            alt=""
-                            className="img-fluid mx-auto d-block"
-                          />
-                        </div>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </DropdownMenu>
-            </Dropdown>
           </div>
 
           <div className="d-flex">
@@ -287,37 +103,14 @@ const Header = props => {
 
             <LanguageDropdown />
 
-            <div className="dropdown d-none d-lg-inline-block ms-1">
-              <button
-                type="button"
-                className="btn header-item noti-icon "
-                onClick={() => {
-                  toggleFullscreen()
-                }}
-                data-toggle="fullscreen"
-              >
-                <i className="bx bx-fullscreen" />
-              </button>
-            </div>
-
             <NotificationDropdown />
 
             <ProfileMenu />
-
-            <div className="dropdown d-inline-block">
-              <button
-                onClick={toggleTopDrawer} disabled={open}
-                type="button"
-                className="btn header-item noti-icon right-bar-toggle "
-              >
-                <i className="bx bx-cog bx-spin" />
-              </button>
-            </div>
           </div>
         </div>
       </header>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default (withTranslation()(Header))
+export default withTranslation()(Header);

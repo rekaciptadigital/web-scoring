@@ -2,26 +2,10 @@ import i18n from "i18next"
 import detector from "i18next-browser-languagedetector"
 import { initReactI18next } from "react-i18next"
 
-import translationGr from "./translations/gr/translation.json"
-import translationIT from "./translations/it/translation.json"
-import translationRS from "./translations/rs/translation.json"
-import translationSP from "./translations/sp/translation.json"
 import translationEN from "./translations/en/translation.json"
 
 // the translations
 const resources = {
-  gr: {
-    translation: translationGr,
-  },
-  it: {
-    translation: translationIT,
-  },
-  rs: {
-    translation: translationRS,
-  },
-  sp: {
-    translation: translationSP,
-  },
   en: {
     translation: translationEN,
   },

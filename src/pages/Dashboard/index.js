@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import MetaTags from "react-meta-tags";
 import { Link } from "react-router-dom";
 import {
   Button,
@@ -18,7 +17,6 @@ import {
 import { AuthenticationService } from "services";
 import modalimage2 from "../../assets/images/product/img-4.png";
 import modalimage1 from "../../assets/images/product/img-7.png";
-//Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 
 const Dashboard = () => {
@@ -46,12 +44,8 @@ const Dashboard = () => {
   return (
     <React.Fragment>
       <div className="page-content">
-        <MetaTags>
-          <title>Dashboard | Skote - React Admin & Dashboard Template</title>
-        </MetaTags>
         <Container fluid>
-          {/* Render Breadcrumb */}
-          <Breadcrumbs title="Dashboards" breadcrumbItem="Dashboard" />
+          <Breadcrumbs title="Dashboards" breadcrumbItems={[{title: "Dashboard"}]} />
 
           <Row>
             <Col xl="8">

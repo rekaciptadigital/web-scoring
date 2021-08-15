@@ -1,5 +1,5 @@
 {
-  "name": "skote-react-hook",
+  "name": "my-archery",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -57,6 +57,7 @@
     "react-color": "^2.19.3",
     "react-countdown": "^2.3.1",
     "react-cropper": "^2.1.4",
+    "react-currency-format": "^1.0.0",
     "react-date-picker": "^8.0.6",
     "react-datepicker": "^3.4.1",
     "react-dom": "^17.0.2",

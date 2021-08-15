@@ -31,7 +31,7 @@
 
 
 ####New Deployment######
-image: nodejs:14
+image: tetraweb/php
 
 before_script:
   - apt-get update

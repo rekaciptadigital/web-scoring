@@ -37,7 +37,7 @@ before_script:
   - apt-get update
   - apt-get install zip unzip
   - npm install
-  - npm run deploy
+  - npm run build
   - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
   - mkdir -p ~/.ssh
   - eval $(ssh-agent -s)

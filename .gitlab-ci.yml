@@ -47,8 +47,8 @@ stage_deploy:
   artifacts:
     paths:
       - build/
-  only:
-    - dev
+  # only:
+  #   - dev
   script:
     - ssh-add <(echo "$PRIVATEKEY_ARCHERY")
     - ssh -p22 root@IP_HOST "mkdir /opt/archery-web/_tmp"

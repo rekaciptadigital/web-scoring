@@ -7,7 +7,7 @@ import ModalDistances from "./ModalDistances";
 import ModalTeamCategories from "./ModalTeamCategories";
 import styles from "./style";
 
-export const EventFormStep3 = ({onFormFieldChange}) => {
+export const EventFormStep3 = ({ onFormFieldChange }) => {
   const [categories, setCategories] = useState([
     {
       id: 1,
@@ -58,8 +58,8 @@ export const EventFormStep3 = ({onFormFieldChange}) => {
   }
   //   function handleRemoveCompetitionCategory(id) {}
 
-  const handleChange = ({key, value}) => {
-    console.log({key, value})
+  const handleChange = ({ key, value }) => {
+    console.log({ key, value });
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
 
@@ -71,10 +71,14 @@ export const EventFormStep3 = ({onFormFieldChange}) => {
             <Label>Kategori Kelas</Label>
             <div className="row">
               <Col lg={3}>
-                <SelectInput options={dummyConstants.eventAgeCategories} onChange={handleChange} />
+                <SelectInput
+                  options={dummyConstants.eventAgeCategories}
+                  onChange={handleChange}
+                  name={`eventCategories.${idx}.ageCategories`}
+                />
               </Col>
               <Col lg={3}>
-                <DateInput />
+                <DateInput name="maxDateOfBirth" onChange={handleChange} />
               </Col>
               <Col lg={3}>
                 <SelectInput />

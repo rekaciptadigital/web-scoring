@@ -40,6 +40,7 @@ const SelectInput = ({
         onChange={handleChange}
         options={selectOptions}
         classNamePrefix="select2-selection"
+        className={`${error?.[name] ? "is-invalid" : ""}`}
       />
       {error?.[name]?.map(message => (
         <div className="invalid-feedback" key={message}>

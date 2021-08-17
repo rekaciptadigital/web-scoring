@@ -61,7 +61,7 @@ const FileUpload = ({
         multiple={multiple}
       >
         {({ getRootProps, getInputProps }) => (
-          <div className="dropzone">
+          <div className={`dropzone ${error?.[name] ? "is-invalid" : ""}`}>
             <div className="dz-message needsclick mt-2" {...getRootProps()}>
               <input {...getInputProps()} />
               <div className="mb-3">

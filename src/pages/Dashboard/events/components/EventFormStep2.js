@@ -3,9 +3,9 @@ import React from "react";
 import { Col, Row } from "reactstrap";
 import { selectConstants } from "../../../../constants";
 
-export const EventFormStep2 = ({onFormFieldChange}) => {
-  const handleChange = ({key, value}) => {
-    console.log({key, value})
+export const EventFormStep2 = ({ onFormFieldChange }) => {
+  const handleChange = ({ key, value }) => {
+    console.log({ key, value });
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
 
@@ -17,6 +17,7 @@ export const EventFormStep2 = ({onFormFieldChange}) => {
             label="Biaya Registrasi pertandingan yang tersedia"
             options={selectConstants.eventAvailableRegistrationFee}
             inline
+            name="registrationFee"
           />
         </Col>
       </Row>
@@ -37,12 +38,17 @@ export const EventFormStep2 = ({onFormFieldChange}) => {
             options={selectConstants.confirmation}
             inline
             onChange={handleChange}
+            error={{isEachCategoryPriceSame: ['isEachCategoryPriceSame invalid']}}
           />
         </Col>
       </Row>
       <Row>
         <Col lg={3}>
-          <CurrencyInput label="Early Bird" horizontal />
+          <CurrencyInput
+            label="Early Bird"
+            name="registrationFee.0.price"
+            horizontal
+          />
         </Col>
         <Col lg={3}>
           <CurrencyInput label="Normal" horizontal />

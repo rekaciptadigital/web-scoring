@@ -25,7 +25,7 @@ const TextInput = ({
       <InputGroup>
         <Input
           type="text"
-          className="form-control"
+          className={`form-control ${error?.[name] ? "is-invalid" : ""}`}
           id={id}
           onChange={handleChange}
           value={value}

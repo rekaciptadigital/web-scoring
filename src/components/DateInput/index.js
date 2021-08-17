@@ -26,7 +26,7 @@ const DateInput = ({
       {label && <Label htmlFor={id}>{label}</Label>}
       <InputGroup>
         <Flatpickr
-          className="form-control d-block"
+          className={`form-control d-block ${error?.[name] ? "is-invalid" : ""}`}
           placeholder="Tanggal/Bulan/Tahun"
           options={{
             altInput: true,

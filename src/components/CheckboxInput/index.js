@@ -15,6 +15,7 @@ const CheckboxInput = ({
   inline = false,
   error,
 }) => {
+  console.log(error);
   const [newOptions, setNewOptions] = useState([]);
 
   const handleChange = (e, option) => {
@@ -43,7 +44,7 @@ const CheckboxInput = ({
           {options.map(option => {
             return (
               <div
-                className="form-check"
+                className={`form-check ${error?.[name] ? "is-invalid" : ""}`}
                 key={option.id}
                 style={{ display: "inline-block", marginRight: 10 }}
               >
@@ -74,7 +75,10 @@ const CheckboxInput = ({
       <Label>{label}</Label>
       {options.map(option => {
         return (
-          <div className="form-check" key={option.id}>
+          <div
+            className={`form-check ${error?.[name] ? "is-invalid" : ""}`}
+            key={option.id}
+          >
             <Input
               type="checkbox"
               className="form-check-Input"

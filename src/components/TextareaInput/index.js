@@ -29,6 +29,7 @@ const TextareaInput = ({
         placeholder={label}
         value={value}
         onChange={handleChange}
+        className={`${error?.[name] ? "is-invalid" : ""}`}
       />
       {error?.[name]?.map(message => (
         <div className="invalid-feedback" key={message}>

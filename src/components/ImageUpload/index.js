@@ -8,7 +8,7 @@ const ImageUpload = ({
   label,
   onChange,
   multiple = false,
-  thumbnail = true,
+  thumbnail = false,
   error,
 }) => {
   const [uploadedImage, setUploadedImage] = useState();
@@ -30,17 +30,22 @@ const ImageUpload = ({
       )}
       {thumbnail && (
         <div className="input-file-thumbnail">
-          <label className="label" htmlFor={id}>
+          <label
+            className={`label ${error?.[name] ? "is-invalid" : ""}`}
+            htmlFor={id}
+          >
             {uploadedImage ? (
               <img src={uploadedImage} width="100%" className="icon" />
             ) : (
-              <><i className="bx bx-camera icon" /></>
+              <>
+                <i className="bx bx-camera icon" />
+              </>
             )}
           </label>
         </div>
       )}
       <Input
-        className="form-control"
+        className={`form-control ${error?.[name] ? "is-invalid" : ""}`}
         id={id}
         type="file"
         onChange={handleChange}

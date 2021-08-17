@@ -33,15 +33,15 @@ const CurrencyInput = ({
             prefix={"Rp "}
             onValueChange={e => handleChange(e)}
             decimalSeparator={","}
-            className="form-control"
+            className={`form-control ${error?.[name] ? "is-invalid" : ""}`}
             id={id}
           />
+          {error?.[name]?.map(message => (
+            <div className="invalid-feedback" key={message}>
+              {message}
+            </div>
+          ))}
         </Col>
-        {error?.[name]?.map(message => (
-          <div className="invalid-feedback" key={message}>
-            {message}
-          </div>
-        ))}
       </div>
     );
   }
@@ -55,7 +55,7 @@ const CurrencyInput = ({
         prefix={"Rp "}
         onChange={() => handleChange()}
         decimalSeparator={","}
-        className="form-control"
+        className={`form-control ${error?.[name] ? "is-invalid" : ""}`}
         id={id}
       />
       {error?.[name]?.map(message => (

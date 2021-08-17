@@ -31,7 +31,7 @@ const RadioInput = ({
           {options.map(option => {
             return (
               <div
-                className="form-check form-radio-primary"
+                className={`form-check form-radio-primary ${error?.[name] ? "is-invalid" : ""}`}
                 key={option.id}
                 style={{ display: "inline-block", marginRight: 10 }}
               >

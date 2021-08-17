@@ -37,7 +37,7 @@ const RadioButtonInput = ({
         onChange={e => handleChange(e, { id, label })}
         checked={id === checkedOption?.id}
       />
-      <label className="btn btn-secondary" htmlFor={id}>
+      <label className={`btn ${error?.[name] ? 'btn-outline-danger' : 'btn-outline-primary'}`} htmlFor={id}>
         {label}
       </label>
     </>
@@ -49,7 +49,7 @@ const RadioButtonInput = ({
   }, []);
 
   return (
-    <div>
+    <div className="radio-button-input">
       {label && <Label className="form-label">{label}</Label>}
       <div
         className="btn-group"

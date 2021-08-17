@@ -37,7 +37,7 @@ const TextEditor = ({
   }, []);
 
   return (
-    <>
+    <div className={`${error?.[name] ? "is-invalid" : ""}`}>
       {label && <Label htmlFor={id}>{label}</Label>}
       <Editor
         name={name}
@@ -53,7 +53,7 @@ const TextEditor = ({
           {message}
         </div>
       ))}
-    </>
+    </div>
   );
 };
 

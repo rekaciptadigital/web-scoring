@@ -3,27 +3,38 @@ import { Input, Label } from "reactstrap";
 import stringUtil from "utils/stringUtil";
 
 const TextareaInput = ({
+  name,
   id = stringUtil.createRandom(),
-  label = "Text Input",
-  value = "",
-  onChange = null,
+  label,
+  value,
+  onChange,
+  error,
 }) => {
-  const handleChange = () => {
-    if (onChange) onChange();
+  const handleChange = (e) => {
+    if (onChange)
+      onChange({
+        key: name,
+        value: e.target.value,
+      });
   };
 
   return (
     <div>
-      <Label htmlFor={id}>{label}</Label>
+      {label && <Label htmlFor={id}>{label}</Label>}
       <Input
         type="textarea"
         id={id}
         maxLength="225"
         rows="3"
-        placeholder="This textarea has a limit of 225 chars."
+        placeholder={label}
         value={value}
-        onChange={() => handleChange()}
+        onChange={handleChange}
       />
+      {error?.[name]?.map(message => (
+        <div className="invalid-feedback" key={message}>
+          {message}
+        </div>
+      ))}
     </div>
   );
 };

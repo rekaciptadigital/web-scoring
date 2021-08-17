@@ -16,7 +16,7 @@ import { EventFormStep2 } from "./EventFormStep2";
 import { EventFormStep3 } from "./EventFormStep3";
 import { EventFormStep4 } from "./EventFormStep4";
 
-const FormWizard = () => {
+const FormWizard = ({ onFormFieldChange }) => {
   const [activeTab, setactiveTab] = useState(1);
 
   function toggleTab(tab) {
@@ -80,16 +80,16 @@ const FormWizard = () => {
               <div className="content clearfix mt-4">
                 <TabContent activeTab={activeTab}>
                   <TabPane tabId={1}>
-                    <EventFormStep1 />
+                    <EventFormStep1 onFormFieldChange={onFormFieldChange} />
                   </TabPane>
                   <TabPane tabId={2}>
-                    <EventFormStep2 />
+                    <EventFormStep2 onFormFieldChange={onFormFieldChange} />
                   </TabPane>
                   <TabPane tabId={3}>
-                    <EventFormStep3 />
+                    <EventFormStep3 onFormFieldChange={onFormFieldChange} />
                   </TabPane>
                   <TabPane tabId={4}>
-                    <EventFormStep4 />
+                    <EventFormStep4 onFormFieldChange={onFormFieldChange} />
                   </TabPane>
                 </TabContent>
               </div>

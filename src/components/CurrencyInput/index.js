@@ -4,14 +4,20 @@ import { Col, Label } from "reactstrap";
 import stringUtil from "utils/stringUtil";
 
 const CurrencyInput = ({
+  name,
   id = stringUtil.createRandom(),
   label,
   value,
   onChange,
   horizontal = false,
+  error,
 }) => {
-  const handleChange = () => {
-    if (onChange) onChange();
+  const handleChange = e => {
+    if (onChange)
+      onChange({
+        key: name,
+        value: e.floatValue,
+      });
   };
   if (horizontal) {
     return (
@@ -25,12 +31,17 @@ const CurrencyInput = ({
             displayType={"input"}
             thousandSeparator={"."}
             prefix={"Rp "}
-            onChange={() => handleChange()}
+            onValueChange={e => handleChange(e)}
             decimalSeparator={","}
             className="form-control"
             id={id}
           />
         </Col>
+        {error?.[name]?.map(message => (
+          <div className="invalid-feedback" key={message}>
+            {message}
+          </div>
+        ))}
       </div>
     );
   }
@@ -47,6 +58,11 @@ const CurrencyInput = ({
         className="form-control"
         id={id}
       />
+      {error?.[name]?.map(message => (
+        <div className="invalid-feedback" key={message}>
+          {message}
+        </div>
+      ))}
     </div>
   );
 };

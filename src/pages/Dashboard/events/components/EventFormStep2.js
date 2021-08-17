@@ -3,7 +3,12 @@ import React from "react";
 import { Col, Row } from "reactstrap";
 import { selectConstants } from "../../../../constants";
 
-export const EventFormStep2 = () => {
+export const EventFormStep2 = ({onFormFieldChange}) => {
+  const handleChange = ({key, value}) => {
+    console.log({key, value})
+    if (onFormFieldChange) onFormFieldChange(key, value);
+  };
+
   return (
     <>
       <Row>
@@ -31,6 +36,7 @@ export const EventFormStep2 = () => {
             label="Apakah Harga setiap kategori sama?"
             options={selectConstants.confirmation}
             inline
+            onChange={handleChange}
           />
         </Col>
       </Row>

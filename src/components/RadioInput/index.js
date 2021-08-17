@@ -12,26 +12,34 @@ const RadioInput = ({
   ],
   onChange = null,
   inline = false,
+  valueOnly = false,
+  error,
 }) => {
-  const handleChange = () => {
-    const newOptions = options;
-    if (onChange) onChange(newOptions);
+  const handleChange = (e, option) => {
+    if (onChange)
+      onChange({
+        key: name,
+        value: valueOnly ? option.id : option,
+      });
   };
 
   if (inline) {
     return (
       <div>
-        <Label>{label}</Label>
-
+        {label && <Label>{label}</Label>}
         <div>
           {options.map(option => {
             return (
-              <div className="form-check form-radio-primary" key={option.id} style={{display: "inline-block", marginRight: 10}}>
+              <div
+                className="form-check form-radio-primary"
+                key={option.id}
+                style={{ display: "inline-block", marginRight: 10 }}
+              >
                 <Input
                   type="radio"
                   className="form-check-Input"
                   id={option.id}
-                  onChange={e => handleChange(e)}
+                  onChange={e => handleChange(e, option)}
                   name={name}
                 />
                 <Label className="form-check-label" htmlFor={option.id}>
@@ -41,6 +49,11 @@ const RadioInput = ({
             );
           })}
         </div>
+        {error?.[name]?.map(message => (
+          <div className="invalid-feedback" key={message}>
+            {message}
+          </div>
+        ))}
       </div>
     );
   }
@@ -63,6 +76,11 @@ const RadioInput = ({
           </div>
         );
       })}
+      {error?.[name]?.map(message => (
+        <div className="invalid-feedback" key={message}>
+          {message}
+        </div>
+      ))}
     </div>
   );
 };

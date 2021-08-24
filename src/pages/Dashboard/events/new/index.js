@@ -16,17 +16,51 @@ const EventsNew = () => {
     city: "",
     locationType: "",
     description: "",
-    isFlatRegistrationFee: true,
-    teamCategories: [],
+    isFlatRegistrationFee: false,
     registrationFee: [],
+    teamCategories: [],
     eventCategories: [],
     target: "",
+    publishNow: true,
     publishDatetime: "",
   });
 
   const handleChange = (key, value) => {
-    const modifiedEventData = { ...eventData };
-    modifiedEventData[key] = value;
+    let modifiedEventData = { ...eventData };
+    if (key === "registrationFee" || key === "teamCategories") {
+      const registrationFees =
+        key === "registrationFee" ? value : eventData.registrationFee;
+      const categories =
+        key === "teamCategories" ? value : eventData.teamCategories;
+
+      const newRegistrationFee = registrationFees.map(item => {
+        const newItem = {
+          registrationType: item.registrationType || item.id,
+          id: item.id,
+          label: item.label,
+          price: item.price,
+        };
+        newItem.categoryPrice = categories.map(categoryItem => {
+          return {
+            id: categoryItem.id,
+            label: categoryItem.label,
+            teamCategory: categoryItem.id,
+            price: undefined,
+          };
+        });
+
+        return newItem;
+      });
+
+      modifiedEventData.teamCategories = categories;
+      modifiedEventData.registrationFee = newRegistrationFee;
+    } else {
+      modifiedEventData = _.set(
+        modifiedEventData,
+        key,
+        value
+      );
+    }
     setEventData(modifiedEventData);
   };
 
@@ -40,6 +74,7 @@ const EventsNew = () => {
           />
           <FormWizard
             onFormFieldChange={(key, value) => handleChange(key, value)}
+            formData={eventData}
           />
         </Container>
       </div>

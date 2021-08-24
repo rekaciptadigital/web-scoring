@@ -10,9 +10,8 @@ import React from "react";
 import { Col, Row } from "reactstrap";
 import { selectConstants } from "../../../../constants";
 
-export const EventFormStep1 = ({ onFormFieldChange }) => {
+export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
   const handleChange = ({ key, value }) => {
-    console.log({ key, value });
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
 
@@ -42,36 +41,68 @@ export const EventFormStep1 = ({ onFormFieldChange }) => {
       <Col lg={9}>
         <Row>
           <Col lg={12}>
-            <TextInput label="Nama Event" name="eventName" />
+            <TextInput
+              label="Nama Event"
+              name="eventName"
+              value={formData.eventName}
+              onChange={handleChange}
+            />
           </Col>
           <Col lg={6}>
             <DatetimeInput
               label="Buka Pendaftaran"
-              onChange={handleChange}
               name="registrationStartDatetime"
+              value={formData.registrationStartDatetime}
+              onChange={handleChange}
             />
           </Col>
           <Col lg={6}>
-            <DatetimeInput label="Tutup Pendaftaran" />
+            <DatetimeInput
+              label="Tutup Pendaftaran"
+              name="registrationEndDatetime"
+              value={formData.registrationEndDatetime}
+              onChange={handleChange}
+            />
           </Col>
           <Col lg={6}>
-            <DatetimeInput label="Mulai lomba" />
+            <DatetimeInput
+              label="Mulai lomba"
+              name="eventStartDatetime"
+              value={formData.eventStartDatetime}
+              onChange={handleChange}
+            />
           </Col>
           <Col lg={6}>
-            <DatetimeInput label="Selesai Lomba" />
+            <DatetimeInput
+              label="Selesai Lomba"
+              name="eventStartDatetime"
+              value={formData.eventEndDatetime}
+              onChange={handleChange}
+            />
           </Col>
           <Col lg={6}>
-            <TextInput label="Lokasi" />
+            <TextInput
+              label="Lokasi"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+            />
           </Col>
           <Col lg={6}>
-            <TextInput label="Kota" onChange={handleChange} />
+            <TextInput
+              label="Kota"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+            />
           </Col>
           <Col lg={12}>
             <RadioButtonInput
-              options={selectConstants.eventLocationType}
-              onChange={handleChange}
-              valueOnly
               name="locationType"
+              onChange={handleChange}
+              options={selectConstants.eventLocationType}
+              value={formData.locationType}
+              valueOnly
             />
           </Col>
           <Col lg={12}>
@@ -79,7 +110,7 @@ export const EventFormStep1 = ({ onFormFieldChange }) => {
               label="Deskripsi Tambahan"
               onChange={handleChange}
               name="description"
-              error={{description: ['invalid']}}
+              value={formData.description}
             />
           </Col>
         </Row>

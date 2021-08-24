@@ -1,9 +1,24 @@
 import { CheckboxInput } from "components";
-import React from "react";
+import _ from "lodash";
+import React, { useState } from "react";
 import { Modal } from "reactstrap";
 import { dummyConstants } from "../../../../constants";
 
-const ModalDistances = ({ isOpen, toggle }) => {
+const ModalDistances = ({ isOpen, toggle, name, onSaveChange }) => {
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  // eslint-disable-next-line no-unused-vars
+  const handleChange = ({ key, value }) => {
+    setSelectedItems(value);
+  };
+
+  const handleSave = () => {
+    if (onSaveChange) {
+      onSaveChange({ key: name, value: _.map(selectedItems, "label") });
+    }
+    toggle();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -28,7 +43,13 @@ const ModalDistances = ({ isOpen, toggle }) => {
         </button>
       </div>
       <div className="modal-body">
-        <CheckboxInput label="Jarak" options={dummyConstants.eventDistances} inline />
+        <CheckboxInput
+          label="Jarak"
+          options={dummyConstants.eventDistances}
+          inline
+          onChange={handleChange}
+          name={name}
+        />
       </div>
       <div className="modal-footer">
         <button
@@ -41,7 +62,13 @@ const ModalDistances = ({ isOpen, toggle }) => {
         >
           Close
         </button>
-        <button type="button" className="btn btn-primary ">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            handleSave();
+          }}
+        >
           Save changes
         </button>
       </div>

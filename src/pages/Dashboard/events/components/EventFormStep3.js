@@ -7,19 +7,31 @@ import ModalDistances from "./ModalDistances";
 import ModalTeamCategories from "./ModalTeamCategories";
 import styles from "./style";
 
-export const EventFormStep3 = ({ onFormFieldChange }) => {
+export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
   const [categories, setCategories] = useState([
     {
-      id: 1,
+      id: stringUtil.createRandom(),
       competitionCategories: [
         {
-          id: 1,
+          id: stringUtil.createRandom(),
         },
       ],
     },
   ]);
-  const [modal_standard, setmodal_standard] = useState(false);
-  const [modal_standard_v2, setmodal_standard_v2] = useState(false);
+  const [isOpenTeamCategoryModal, setIsOpenTeamCategoryModal] = useState(false);
+  const [isOpenDistanceModal, setIsOpenDistanceModal] = useState(false);
+
+  function toggleTeamCategoryModal() {
+    setIsOpenTeamCategoryModal(!isOpenTeamCategoryModal);
+  }
+
+  function toggleDistanceModal() {
+    setIsOpenDistanceModal(!isOpenDistanceModal);
+  }
+
+  const handleChange = ({ key, value }) => {
+    if (onFormFieldChange) onFormFieldChange(key, value);
+  };
 
   function handleAddRow() {
     const newCategory = {
@@ -30,124 +42,180 @@ export const EventFormStep3 = ({ onFormFieldChange }) => {
         },
       ],
     };
-    setCategories([...categories, newCategory]);
+    let categoryList = [...categories];
+    categoryList.push(newCategory);
+    setCategories(categoryList);
   }
 
   function handleRemoveRow(e, index) {
-    if (typeof index != "undefined") {
-      const newItems = categories.splice(index, 1);
+    if (index !== undefined && index !== null) {
+      const newItems = [...categories];
+      newItems.splice(index, 1);
       setCategories(newItems);
+
+      handleChange({
+        key: `eventCategories.${index}`,
+        value: undefined,
+      });
     }
   }
 
-  function tog_standard() {
-    setmodal_standard(!modal_standard);
-  }
-
-  function tog_standard_v2() {
-    setmodal_standard_v2(!modal_standard_v2);
-  }
-
-  function handleAddCompetitionCategory(id) {
+  function handleAddCompetitionCategory(categoryIndex) {
     const modifiedCategories = [...categories];
-    const categoryIndex = _.findIndex(categories, ["id", id]);
     modifiedCategories[categoryIndex].competitionCategories.push({
       id: stringUtil.createRandom(),
     });
     setCategories(modifiedCategories);
   }
-  //   function handleRemoveCompetitionCategory(id) {}
 
-  const handleChange = ({ key, value }) => {
-    console.log({ key, value });
-    if (onFormFieldChange) onFormFieldChange(key, value);
-  };
+  function handleRemoveCompetitionCategory(
+    categoryIndex,
+    competitionCategoryIndex
+  ) {
+    const modifiedCategories = [...categories];
+    modifiedCategories[categoryIndex].competitionCategories.splice(
+      competitionCategoryIndex,
+      1
+    );
+    setCategories(modifiedCategories);
+    handleChange({
+      key: `eventCategories.${categoryIndex}.competitionCategories.${competitionCategoryIndex}`,
+      value: undefined,
+    });
+  }
 
   return (
     <Row>
       <Col xs={12}>
-        {categories.map((item, idx) => (
-          <div style={styles.categoryBox} key={idx} id={"row" + idx}>
+        {categories.map((item, index) => (
+          <Row style={styles.categoryBox} key={index} id={"row" + index}>
             <Label>Kategori Kelas</Label>
             <div className="row">
               <Col lg={3}>
                 <SelectInput
-                  options={dummyConstants.eventAgeCategories}
+                  name={`eventCategories.${index}.ageCategories`}
                   onChange={handleChange}
-                  name={`eventCategories.${idx}.ageCategories`}
+                  options={dummyConstants.eventAgeCategories}
+                  value={formData.eventCategories[index]?.ageCategories}
                 />
               </Col>
               <Col lg={3}>
-                <DateInput name="maxDateOfBirth" onChange={handleChange} />
+                <DateInput
+                  name={`eventCategories.${index}.maxDateOfBirth`}
+                  onChange={handleChange}
+                  value={formData.eventCategories[index]?.maxDateOfBirth}
+                />
               </Col>
-              <Col lg={3}>
-                <SelectInput />
-              </Col>
+              {formData.eventCategories[index]?.teamCategories?.length > 0 && (
+                <Col lg={3}>
+                  <SelectInput
+                    name={`eventCategories.${index}.selectedTeamCategories`}
+                    onChange={handleChange}
+                    options={formData.eventCategories[index]?.teamCategories}
+                  />
+                </Col>
+              )}
               <Col lg={2}>
                 <div>
                   <Button
                     type="primary"
                     onClick={() => {
-                      tog_standard();
+                      toggleTeamCategoryModal();
                     }}
                     label="Tambah Info"
                     trailingIcon="plus"
                   />
                   <ModalTeamCategories
-                    isOpen={modal_standard}
+                    isOpen={isOpenTeamCategoryModal}
                     toggle={() => {
-                      tog_standard();
+                      toggleTeamCategoryModal();
                     }}
+                    options={formData.teamCategories || []}
+                    name={`eventCategories.${index}.teamCategories`}
+                    onSaveChange={handleChange}
                   />
                 </div>
               </Col>
-              <Col>
-                <button
-                  type="button"
-                  className="btn btn-danger "
-                  onClick={e => {
-                    handleRemoveRow(e, idx);
-                  }}
-                >
-                  <i className="bx bx-trash font-size-16 align-middle"></i>{" "}
-                </button>
-              </Col>
+              {index > 0 && (
+                <Col>
+                  <button
+                    type="button"
+                    className="btn btn-danger "
+                    onClick={e => {
+                      handleRemoveRow(e, index);
+                    }}
+                  >
+                    <i className="bx bx-trash font-size-16 align-middle"></i>{" "}
+                  </button>
+                </Col>
+              )}
             </div>
             <Label>Kategori Lomba</Label>
-            {item.competitionCategories.map(competitionCategory => {
-              return (
-                <Row key={competitionCategory.id}>
-                  <Col lg={3}>
-                    <SelectInput
-                      options={dummyConstants.eventCompetitionCategories}
-                    />
-                  </Col>
-                  <Col lg={4}>
-                    <TextInput
-                      accessoryRight={
-                        <Button icon="plus" onClick={() => tog_standard_v2()} />
-                      }
-                    />
-                    <ModalDistances
-                      isOpen={modal_standard_v2}
-                      toggle={() => {
-                        tog_standard_v2();
-                      }}
-                    />
-                  </Col>
-                  <Col lg={3}>
-                    <Button
-                      onClick={() => {
-                        handleAddCompetitionCategory(item.id);
-                      }}
-                      icon="copy"
-                    />{" "}
-                    <Button icon="trash" type="danger" />
-                  </Col>
-                </Row>
-              );
-            })}
-          </div>
+            {item.competitionCategories.map(
+              (competitionCategory, competitionCategoryIndex) => {
+                return (
+                  <Row key={competitionCategory.id}>
+                    <Col lg={3}>
+                      <SelectInput
+                        options={dummyConstants.eventCompetitionCategories}
+                        name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.name`}
+                        onChange={handleChange}
+                        value={
+                          formData.eventCategories?.[index]
+                            ?.competitionCategories?.[competitionCategoryIndex]
+                            ?.name
+                        }
+                      />
+                    </Col>
+                    <Col lg={4}>
+                      <TextInput
+                        readOnly
+                        accessoryRight={
+                          <Button
+                            icon="plus"
+                            onClick={() => toggleDistanceModal()}
+                          />
+                        }
+                        value={
+                          formData.eventCategories?.[index]
+                            ?.competitionCategories?.[competitionCategoryIndex]
+                            ?.distances || ""
+                        }
+                      />
+                      <ModalDistances
+                        isOpen={isOpenDistanceModal}
+                        name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.distances`}
+                        toggle={() => {
+                          toggleDistanceModal();
+                        }}
+                        onSaveChange={handleChange}
+                      />
+                    </Col>
+                    <Col lg={3}>
+                      <Button
+                        onClick={() => {
+                          handleAddCompetitionCategory(index);
+                        }}
+                        icon="copy"
+                      />{" "}
+                      {competitionCategoryIndex > 0 && (
+                        <Button
+                          onClick={() => {
+                            handleRemoveCompetitionCategory(
+                              index,
+                              competitionCategoryIndex
+                            );
+                          }}
+                          icon="trash"
+                          type="danger"
+                        />
+                      )}
+                    </Col>
+                  </Row>
+                );
+              }
+            )}
+          </Row>
         ))}
         <input
           data-repeater-create

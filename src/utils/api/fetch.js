@@ -1,6 +1,6 @@
 const API_URL = process.env.REACT_APP_API_URL
   ? process.env.REACT_APP_API_URL
-  : "https://api.my-archery.id"
+  : "https://api-staging.myarchery.id"
 
 export default function resource(endpoint, config) {
   return fetch(API_URL + endpoint, config)

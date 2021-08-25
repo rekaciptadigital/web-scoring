@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 //i18n
 import { withTranslation } from "react-i18next"
-import { Link } from "react-router-dom"
+// import { Link } from "react-router-dom"
 import {
   Dropdown,
   DropdownItem,
@@ -72,10 +72,10 @@ const ProfileMenu = props => {
             {props.t("Lock screen")}
           </DropdownItem>
           <div className="dropdown-divider" />
-          <Link to="/authentication/logout" className="dropdown-item">
+          <a href="/authentication/logout" className="dropdown-item">
             <i className="bx bx-power-off font-size-16 align-middle me-1 text-danger" />
             <span>{props.t("Logout")}</span>
-          </Link>
+          </a>
         </DropdownMenu>
       </Dropdown>
     </React.Fragment>

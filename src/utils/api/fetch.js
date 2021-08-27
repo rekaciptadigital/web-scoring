@@ -1,6 +1,6 @@
 const API_URL = process.env.REACT_APP_API_URL
   ? process.env.REACT_APP_API_URL
-  : "http://10.42.0.117/arcery/api/public"
+  : "https://api-staging.myarchery.id"
 
 export default function resource(endpoint, config) {
   return fetch(API_URL + endpoint, config)

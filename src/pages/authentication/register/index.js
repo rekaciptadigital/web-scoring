@@ -24,8 +24,12 @@ const Register = () => {
   let history = useHistory();
   
   const handleValidSubmit = async (event, values) => {
-    console.log(values)
-    const { data, errors, message, success } = await AuthenticationService.register(values)
+    const d = { ...values }
+    d.date_of_birth = "2012-06-24"
+    d.place_of_birth = "Padang"
+    d.phone_number = "082367998056"
+    console.log(d)
+    const { data, errors, message, success } = await AuthenticationService.register(d)
     if (success) {
       if (data) {
         dispatch(AuthenticationStore.register())

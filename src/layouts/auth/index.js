@@ -14,12 +14,6 @@ class NonAuthLayout extends Component {
     return string.charAt(1).toUpperCase() + string.slice(2)
   }
 
-  // componentDidMount() {
-  //   let currentage = this.capitalizeFirstLetter(this.props.location.pathname)
-
-  //   document.title =
-  //     currentage + " | Skote - React Admin & Dashboard Template"
-  // }
   render() {
     return <React.Fragment>{this.props.children}</React.Fragment>
   }

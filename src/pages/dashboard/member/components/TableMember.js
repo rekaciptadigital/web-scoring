@@ -10,19 +10,11 @@ import paginationFactory, {
 
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
+// Data for dummy
+import { dummyConstants } from '../../../../constants'
+
 //Import Breadcrumb
 import './sass/datatables.scss'
-
-// Table data
-const products = [
-  {"id": 1, "name": "Asep", "email": "asep@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "pria", "status": 1},
-  {"id": 2, "name": "Jamal", "email": "jamal@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 9, "gender": "pria", "status": 1},
-  {"id": 3, "name": "Taufik", "email": "taufik@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "pria", "status": 0},
-  {"id": 4, "name": "Arif", "email": "arif@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 9, "gender": "pria", "status": 1},
-  {"id": 5, "name": "Laisa", "email": "laisa@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "wanita", "status": 1},
-  {"id": 6, "name": "Wade Warren", "email": "wa-de@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 9, "gender": "pria", "status": 1},
-  {"id": 7, "name": "Udien", "email": "udien@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "pria", "status": 0},
-];
 
 class TableMember extends Component {
   constructor(props) {
@@ -30,7 +22,7 @@ class TableMember extends Component {
     this.state = {
       page: 1,
       sizePerPage: 10,
-      productData: products
+      productData: dummyConstants.members
     }
 
   }
@@ -83,7 +75,7 @@ class TableMember extends Component {
 
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: products.length, // replace later with size(customers),
+      totalSize: dummyConstants.members.length, // replace later with size(customers),
       custom: true,
     }
 

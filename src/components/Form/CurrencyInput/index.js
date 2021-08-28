@@ -26,9 +26,11 @@ const CurrencyInput = ({
   if (horizontal) {
     return (
       <div className="row">
-        <Label htmlFor="horizontal-Input" className="col-sm-6 col-form-label">
-          {label}
-        </Label>
+        {label && (
+          <Label htmlFor="horizontal-Input" className="col-sm-6 col-form-label">
+            {label}
+          </Label>
+        )}
         <Col sm={6}>
           <CurrencyFormat
             value={value}
@@ -54,13 +56,13 @@ const CurrencyInput = ({
 
   return (
     <div>
-      <Label>{label}</Label>
+      {label && <Label>{label}</Label>}
       <CurrencyFormat
         value={value}
         displayType={"input"}
         thousandSeparator={"."}
         prefix={"Rp "}
-        onChange={() => handleChange()}
+        onValueChange={e => handleChange(e)}
         decimalSeparator={","}
         className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
         id={id}

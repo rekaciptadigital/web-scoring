@@ -91,12 +91,12 @@ const ModalTeamCategories = ({
           <tbody>
             {teamCategories.map((category, categoryIndex) => {
               return (
-                <tr key={category.id}>
+                <tr key={`${name}${category.id}`}>
                   <td>
                     <Input
                       type="checkbox"
                       className="form-check-Input"
-                      id={category.id}
+                      id={`${name}${category.id}`}
                       onChange={e => handleCheck(e, categoryIndex, category)}
                       checked={category.checked}
                     />

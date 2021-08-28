@@ -1,8 +1,14 @@
-import { CheckboxInput, DatetimeInput, SwitchInput } from "components";
+import {
+  Accordion,
+  CheckboxInput,
+  DatetimeInput,
+  SwitchInput,
+} from "components";
 import React from "react";
 import ReactHtmlParser from "react-html-parser";
-import { Col, Row } from "reactstrap";
-import { selectConstants } from "../../../../constants";
+import { Col, Label, Row } from "reactstrap";
+import { selectConstants } from "constants/index";
+import styles from "../styles";
 
 export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
   const handleChange = ({ key, value }) => {
@@ -16,7 +22,11 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
             className="rounded"
             alt="Skote"
             width="100%"
-            src={formData.poster ? URL.createObjectURL(formData.poster) : "/images/no-image.jpeg"}
+            src={
+              formData.poster
+                ? URL.createObjectURL(formData.poster)
+                : "/images/no-image.jpeg"
+            }
           />
         </Col>
         <Col lg={8}>
@@ -47,6 +57,121 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
           </table>
         </Col>
       </Row>
+      <Accordion
+        separateItem
+        items={[
+          {
+            title: "Kategori yang dipertandingkan",
+            body: (
+              <Row>
+                <Col xs={12}>
+                  {formData.eventCategories
+                    .filter(Boolean)
+                    .map((item, index) => (
+                      <div key={index} id={"row" + index}>
+                        <Row style={styles.categoryBox}>
+                          <Col lg={3}>
+                            <Label>Kategori Kelas</Label>
+                            <br />
+                            {
+                              formData.eventCategories[index]?.ageCategories
+                                ?.label
+                            }
+                          </Col>
+                          <Col lg={4}>
+                            <Label>Batas Tanggal Lahir</Label>
+                            <br />
+                            {formData.eventCategories[index]?.maxDateOfBirth}
+                          </Col>
+                          <Col lg={6}>
+                            <Label>Info</Label>
+                            <table className="table">
+                              <thead>
+                                <tr>
+                                  <th>Kategori Regu</th>
+                                  <th>Kuota</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {item?.teamCategories?.map(
+                                  (teamCategory, teamCategoryIndex) => {
+                                    return (
+                                      <tr key={teamCategory.id}>
+                                        <td>
+                                          {
+                                            formData.eventCategories?.[index]
+                                              ?.teamCategories?.[
+                                              teamCategoryIndex
+                                            ]?.label
+                                          }
+                                        </td>
+                                        <td>
+                                          {
+                                            formData.eventCategories?.[index]
+                                              ?.teamCategories?.[
+                                              teamCategoryIndex
+                                            ]?.quota
+                                          }
+                                        </td>
+                                      </tr>
+                                    );
+                                  }
+                                )}
+                              </tbody>
+                            </table>
+                          </Col>
+                          <Col lg={6}>
+                            <Label>Kategori Lomba</Label>
+                            <table className="table">
+                              <thead>
+                                <tr>
+                                  <th>Kategori</th>
+                                  <th>Jarak</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {item?.competitionCategories
+                                  ?.filter(Boolean)
+                                  .map(
+                                    (
+                                      competitionCategory,
+                                      competitionCategoryIndex
+                                    ) => {
+                                      return (
+                                        <tr
+                                          key={`${competitionCategory.name?.id}-${competitionCategoryIndex}`}
+                                        >
+                                          <td>
+                                            {
+                                              formData.eventCategories?.[index]
+                                                ?.competitionCategories?.[
+                                                competitionCategoryIndex
+                                              ]?.name?.label
+                                            }
+                                          </td>
+                                          <td>
+                                            {formData.eventCategories?.[
+                                              index
+                                            ]?.competitionCategories?.[
+                                              competitionCategoryIndex
+                                            ]?.distances?.join("; ") || ""}
+                                          </td>
+                                        </tr>
+                                      );
+                                    }
+                                  )}
+                              </tbody>
+                            </table>
+                          </Col>
+                        </Row>
+                      </div>
+                    ))}
+                </Col>
+              </Row>
+            ),
+          },
+        ]}
+      />
       <Row>
         <Col lg={12}>
           <CheckboxInput

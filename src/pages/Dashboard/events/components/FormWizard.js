@@ -9,9 +9,9 @@ import {
   NavLink,
   Row,
   TabContent,
-  TabPane,
+  TabPane
 } from "reactstrap";
-import objectUtil from "utils/objectUtil";
+import { objectUtil } from "utils";
 import { EventFormStep1 } from "./EventFormStep1";
 import { EventFormStep2 } from "./EventFormStep2";
 import { EventFormStep3 } from "./EventFormStep3";
@@ -65,7 +65,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                         setactiveTab(3);
                       }}
                     >
-                      <span className="number">03</span> Set Kategori
+                      <span className="number">03</span> Rincian Tanggal
                     </NavLink>
                   </NavItem>
                   <NavItem className={classnames({ current: activeTab === 4 })}>

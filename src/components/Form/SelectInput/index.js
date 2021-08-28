@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Label } from "reactstrap";
-import Select from "react-select";
-import stringUtil from "utils/stringUtil";
 import _ from "lodash";
+import React, { useEffect, useState } from "react";
+import Select from "react-select";
+import { Label } from "reactstrap";
+import stringUtil from "utils/stringUtil";
 
 const SelectInput = ({
   name,
@@ -16,7 +16,9 @@ const SelectInput = ({
   readOnly,
 }) => {
   const [selectOptions, setSelectOptions] = useState([]);
-  const handleChange = e => {
+  const [selectValue, setSelectValue] = useState(null);
+
+  const handleChange = (e) => {
     if (onChange)
       onChange({
         key: name,
@@ -25,7 +27,7 @@ const SelectInput = ({
   };
 
   useEffect(() => {
-    const newSelectOptions = options.map(option => {
+    const newSelectOptions = options.map((option) => {
       return {
         id: option.value || option.id,
         value: option.value || option.id,
@@ -35,19 +37,31 @@ const SelectInput = ({
     setSelectOptions(newSelectOptions);
   }, []);
 
+  useEffect(() => {
+    if (value) {
+      setSelectValue({
+        id: value?.value || value?.id || value,
+        value: value?.value || value?.id || value,
+        label: value?.label || value,
+      });
+    } else {
+      setSelectValue(null)
+    }
+  }, [value]);
+
   return (
     <div>
       {label && <Label>{label}</Label>}
       <Select
         id={id}
-        value={value}
+        value={selectValue}
         onChange={handleChange}
         options={selectOptions}
         classNamePrefix="select2-selection"
         className={`${error?.[name] ? "is-invalid" : ""}`}
         isDisabled={disabled || readOnly}
       />
-      {_.get(error, name)?.map(message => (
+      {_.get(error, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

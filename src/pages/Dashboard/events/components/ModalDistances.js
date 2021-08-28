@@ -49,6 +49,7 @@ const ModalDistances = ({ isOpen, toggle, name, onSaveChange }) => {
           inline
           onChange={handleChange}
           name={name}
+          value={selectedItems}
         />
       </div>
       <div className="modal-footer">

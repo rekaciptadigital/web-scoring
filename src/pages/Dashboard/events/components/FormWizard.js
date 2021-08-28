@@ -9,19 +9,22 @@ import {
   NavLink,
   Row,
   TabContent,
-  TabPane,
+  TabPane
 } from "reactstrap";
+import { objectUtil } from "utils";
 import { EventFormStep1 } from "./EventFormStep1";
 import { EventFormStep2 } from "./EventFormStep2";
 import { EventFormStep3 } from "./EventFormStep3";
 import { EventFormStep4 } from "./EventFormStep4";
+import { EventFormStep5 } from "./EventFormStep5";
+import { EventFormStep6 } from "./EventFormStep6";
 
-const FormWizard = ({ onFormFieldChange }) => {
+const FormWizard = ({ onFormFieldChange, formData }) => {
   const [activeTab, setactiveTab] = useState(1);
 
   function toggleTab(tab) {
     if (activeTab !== tab) {
-      if (tab >= 1 && tab <= 4) {
+      if (tab >= 1 && tab <= 5) {
         setactiveTab(tab);
       }
     }
@@ -52,7 +55,7 @@ const FormWizard = ({ onFormFieldChange }) => {
                         setactiveTab(2);
                       }}
                     >
-                      <span className="number ms-2">02</span> Harga
+                      <span className="number">02</span> Harga
                     </NavLink>
                   </NavItem>
                   <NavItem className={classnames({ current: activeTab === 3 })}>
@@ -62,7 +65,7 @@ const FormWizard = ({ onFormFieldChange }) => {
                         setactiveTab(3);
                       }}
                     >
-                      <span className="number">03</span> Kategori
+                      <span className="number">03</span> Rincian Tanggal
                     </NavLink>
                   </NavItem>
                   <NavItem className={classnames({ current: activeTab === 4 })}>
@@ -72,7 +75,27 @@ const FormWizard = ({ onFormFieldChange }) => {
                         setactiveTab(4);
                       }}
                     >
-                      <span className="number">04</span> Publish
+                      <span className="number">04</span>Daftar Kategori
+                    </NavLink>
+                  </NavItem>
+                  <NavItem className={classnames({ current: activeTab === 5 })}>
+                    <NavLink
+                      className={classnames({ active: activeTab === 5 })}
+                      onClick={() => {
+                        setactiveTab(5);
+                      }}
+                    >
+                      <span className="number">05</span> Publikasi
+                    </NavLink>
+                  </NavItem>
+                  <NavItem className={classnames({ current: activeTab === 6 })}>
+                    <NavLink
+                      className={classnames({ active: activeTab === 6 })}
+                      onClick={() => {
+                        setactiveTab(6);
+                      }}
+                    >
+                      <span className="number">06</span> Selesai
                     </NavLink>
                   </NavItem>
                 </ul>
@@ -80,60 +103,83 @@ const FormWizard = ({ onFormFieldChange }) => {
               <div className="content clearfix mt-4">
                 <TabContent activeTab={activeTab}>
                   <TabPane tabId={1}>
-                    <EventFormStep1 onFormFieldChange={onFormFieldChange} />
+                    <EventFormStep1
+                      onFormFieldChange={onFormFieldChange}
+                      formData={formData}
+                    />
                   </TabPane>
                   <TabPane tabId={2}>
-                    <EventFormStep2 onFormFieldChange={onFormFieldChange} />
+                    <EventFormStep2
+                      onFormFieldChange={onFormFieldChange}
+                      formData={formData}
+                    />
                   </TabPane>
                   <TabPane tabId={3}>
-                    <EventFormStep3 onFormFieldChange={onFormFieldChange} />
+                    <EventFormStep3
+                      onFormFieldChange={onFormFieldChange}
+                      formData={formData}
+                    />
                   </TabPane>
                   <TabPane tabId={4}>
-                    <EventFormStep4 onFormFieldChange={onFormFieldChange} />
+                    <EventFormStep4
+                      onFormFieldChange={onFormFieldChange}
+                      formData={formData}
+                    />
+                  </TabPane>
+                  <TabPane tabId={5}>
+                    <EventFormStep5
+                      onFormFieldChange={onFormFieldChange}
+                      formData={formData}
+                    />
+                  </TabPane>
+                  <TabPane tabId={6}>
+                    <EventFormStep6 />
                   </TabPane>
                 </TabContent>
               </div>
-              <div className="actions clearfix">
-                <ul>
-                  <li
-                    className={
-                      activeTab === 1 ? "previous disabled" : "previous"
-                    }
-                  >
-                    <Link
-                      to="#"
-                      onClick={() => {
-                        toggleTab(activeTab - 1);
-                      }}
+              {activeTab < 6 && (
+                <div className="actions clearfix">
+                  <ul>
+                    <li
+                      className={
+                        activeTab === 1 ? "previous disabled" : "previous"
+                      }
                     >
-                      Previous
-                    </Link>
-                  </li>
-                  {activeTab === 4 ? (
-                    <li className="next">
                       <Link
                         to="#"
                         onClick={() => {
-                          toggleTab(activeTab + 1);
+                          toggleTab(activeTab - 1);
                         }}
                       >
-                        Publish
+                        Previous
                       </Link>
                     </li>
-                  ) : (
-                    <li className="next">
-                      <Link
-                        to="#"
-                        onClick={() => {
-                          toggleTab(activeTab + 1);
-                        }}
-                      >
-                        Next
-                      </Link>
-                    </li>
-                  )}
-                </ul>
-              </div>
+                    {activeTab === 5 ? (
+                      <li className="next">
+                        <Link
+                          to="#"
+                          onClick={() => {
+                            console.log(JSON.stringify(objectUtil.sanitize(formData)))
+                          }}
+                        >
+                          Publish
+                        </Link>
+                      </li>
+                    ) : (
+                      <li className="next">
+                        <Link
+                          to="#"
+                          onClick={() => {
+                            toggleTab(activeTab + 1);
+                          }}
+                        >
+                          Next
+                        </Link>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
           </CardBody>
         </Card>

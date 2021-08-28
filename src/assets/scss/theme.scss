@@ -390,9 +390,53 @@ div[class*=" col"] {
       left: 50%;
       transform: translate(-50%, -50%);
     }
+    &.is-invalid {
+      border: solid 1px $danger;
+    }
   }
+
 }
 
 .invalid-feedback {
   display: block;
+}
+
+.is-invalid {
+  .form-check-input[type="checkbox"] {
+    border-color: $danger;
+  }
+  .form-check-input[type="radio"] {
+    border-color: $danger;
+  }
+
+  ~ .input-group-append {
+    .input-group-text {
+      border-color: $danger;
+    }
+  }
+
+  .select2-selection__control {
+    border-color: $danger;
+  }
+
+  .rdw-editor-wrapper {
+    border: solid 1px $danger;
+  }
+}
+
+.dropzone.is-invalid {
+  border-color: $danger;
+}
+
+.radio-button-input {
+  .btn-group {
+    label {
+      margin-bottom: 0;
+    }
+
+    &.is-invalid {
+      border: solid 1px $danger;
+      border-radius: 0.25rem;
+    }
+  }
 }

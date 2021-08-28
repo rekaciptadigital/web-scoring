@@ -1,156 +1,167 @@
-import { Button, DateInput, SelectInput, TextInput } from "components";
-import React, { useState } from "react";
-import { Col, Label, Row } from "reactstrap";
-import stringUtil from "utils/stringUtil";
-import { dummyConstants } from "../../../../constants";
-import ModalDistances from "./ModalDistances";
-import ModalTeamCategories from "./ModalTeamCategories";
-import styles from "./style";
+import { Accordion, CheckboxInput, DatetimeInput, TextInput } from "components";
+import React from "react";
+import { Col, Row } from "reactstrap";
 
-export const EventFormStep3 = ({onFormFieldChange}) => {
-  const [categories, setCategories] = useState([
-    {
-      id: 1,
-      competitionCategories: [
-        {
-          id: 1,
-        },
-      ],
-    },
-  ]);
-  const [modal_standard, setmodal_standard] = useState(false);
-  const [modal_standard_v2, setmodal_standard_v2] = useState(false);
-
-  function handleAddRow() {
-    const newCategory = {
-      id: stringUtil.createRandom(),
-      competitionCategories: [
-        {
-          id: stringUtil.createRandom(),
-        },
-      ],
-    };
-    setCategories([...categories, newCategory]);
-  }
-
-  function handleRemoveRow(e, index) {
-    if (typeof index != "undefined") {
-      const newItems = categories.splice(index, 1);
-      setCategories(newItems);
-    }
-  }
-
-  function tog_standard() {
-    setmodal_standard(!modal_standard);
-  }
-
-  function tog_standard_v2() {
-    setmodal_standard_v2(!modal_standard_v2);
-  }
-
-  function handleAddCompetitionCategory(id) {
-    const modifiedCategories = [...categories];
-    const categoryIndex = _.findIndex(categories, ["id", id]);
-    modifiedCategories[categoryIndex].competitionCategories.push({
-      id: stringUtil.createRandom(),
-    });
-    setCategories(modifiedCategories);
-  }
-  //   function handleRemoveCompetitionCategory(id) {}
-
-  const handleChange = ({key, value}) => {
-    console.log({key, value})
+export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
+  const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
 
   return (
     <Row>
-      <Col xs={12}>
-        {categories.map((item, idx) => (
-          <div style={styles.categoryBox} key={idx} id={"row" + idx}>
-            <Label>Kategori Kelas</Label>
-            <div className="row">
-              <Col lg={3}>
-                <SelectInput options={dummyConstants.eventAgeCategories} onChange={handleChange} />
-              </Col>
-              <Col lg={3}>
-                <DateInput />
-              </Col>
-              <Col lg={3}>
-                <SelectInput />
-              </Col>
-              <Col lg={2}>
-                <div>
-                  <Button
-                    type="primary"
-                    onClick={() => {
-                      tog_standard();
-                    }}
-                    label="Tambah Info"
-                    trailingIcon="plus"
-                  />
-                  <ModalTeamCategories
-                    isOpen={modal_standard}
-                    toggle={() => {
-                      tog_standard();
-                    }}
-                  />
-                </div>
-              </Col>
-              <Col>
-                <button
-                  type="button"
-                  className="btn btn-danger "
-                  onClick={e => {
-                    handleRemoveRow(e, idx);
-                  }}
-                >
-                  <i className="bx bx-trash font-size-16 align-middle"></i>{" "}
-                </button>
-              </Col>
-            </div>
-            <Label>Kategori Lomba</Label>
-            {item.competitionCategories.map(competitionCategory => {
-              return (
-                <Row key={competitionCategory.id}>
-                  <Col lg={3}>
-                    <SelectInput
-                      options={dummyConstants.eventCompetitionCategories}
+      <Col lg={12}>
+        <Accordion
+          separateItem
+          items={[
+            {
+              title: "Rincian Pendaftaran dan Lomba",
+              alwaysOpen: true,
+              body: (
+                <Row>
+                  <Col lg={6}>
+                    <DatetimeInput
+                      label="Buka Pendaftaran"
+                      name="registrationStartDatetime"
+                      value={formData.registrationStartDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={6}>
+                    <DatetimeInput
+                      label="Tutup Pendaftaran"
+                      name="registrationEndDatetime"
+                      value={formData.registrationEndDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={6}>
+                    <DatetimeInput
+                      label="Mulai lomba"
+                      name="eventStartDatetime"
+                      value={formData.eventStartDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={6}>
+                    <DatetimeInput
+                      label="Selesai Lomba"
+                      name="eventStartDatetime"
+                      value={formData.eventEndDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                </Row>
+              ),
+            },
+            {
+              title: "Rincian Kualifikasi",
+              alwaysOpen: true,
+              hide: formData.eventType !== 'marathon',
+              body: (
+                <Row>
+                  <Col lg={4}>
+                    <DatetimeInput
+                      label="Buka Kualifikasi"
+                      name="quatificationStartDatetime"
+                      value={formData.quatificationStartDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={4}>
+                    <DatetimeInput
+                      label="Tutup Kualifikasi"
+                      name="quatificationEndDatetime"
+                      value={formData.quatificationEndDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={4}>
+                    <CheckboxInput
+                      name="qualificationFreeOnHoliday"
+                      value={formData.qualificationFreeOnHoliday}
+                      onChange={handleChange}
+                      options={[
+                        {
+                          id: 1,
+                          label: "Weekend dan Tanggal Merah Libur",
+                        },
+                      ]}
                     />
                   </Col>
                   <Col lg={4}>
                     <TextInput
-                      accessoryRight={
-                        <Button icon="plus" onClick={() => tog_standard_v2()} />
-                      }
-                    />
-                    <ModalDistances
-                      isOpen={modal_standard_v2}
-                      toggle={() => {
-                        tog_standard_v2();
-                      }}
+                      label="Sesi/Hari"
+                      name="quatificationSessionPerDay"
+                      value={formData.quatificationSessionPerDay}
+                      onChange={handleChange}
                     />
                   </Col>
-                  <Col lg={3}>
-                    <Button
-                      onClick={() => {
-                        handleAddCompetitionCategory(item.id);
-                      }}
-                      icon="copy"
-                    />{" "}
-                    <Button icon="trash" type="danger" />
+                  <Col lg={4}>
+                    <TextInput
+                      label="Kuota/Hari"
+                      name="quatificationQuotaPerDay"
+                      value={formData.quatificationQuotaPerDay}
+                      onChange={handleChange}
+                    />
                   </Col>
                 </Row>
-              );
-            })}
-          </div>
-        ))}
-        <input
-          data-repeater-create
-          type="button"
-          className="btn btn-success mt-3 mt-lg-0"
-          value="Add"
-          onClick={() => handleAddRow()}
+              ),
+            },
+            {
+              title: "Rincian Eliminasi",
+              alwaysOpen: true,
+              hide: formData.eventType !== 'marathon',
+              body: (
+                <Row>
+                  <Col lg={4}>
+                    <DatetimeInput
+                      label="Mulai Eliminasi"
+                      name="eliminationStartDatetime"
+                      value={formData.eliminationStartDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={4}>
+                    <DatetimeInput
+                      label="Selesai Eliminasi"
+                      name="eliminationEndDatetime"
+                      value={formData.eliminationEndDatetime}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={4}>
+                    <CheckboxInput
+                      name="eliminationFreeOnHoliday"
+                      value={formData.eliminationFreeOnHoliday}
+                      onChange={handleChange}
+                      options={[
+                        {
+                          id: 1,
+                          label: "Weekend dan Tanggal Merah Libur",
+                        },
+                      ]}
+                    />
+                  </Col>
+                  <Col lg={4}>
+                    <TextInput
+                      label="Sesi/Hari"
+                      name="eliminationSessionPerDay"
+                      value={formData.quatificationSessionPerDay}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={4}>
+                    <TextInput
+                      label="Kuota/Hari"
+                      name="eliminationQuotaPerDay"
+                      value={formData.quatificationQuotaPerDay}
+                      onChange={handleChange}
+                    />
+                  </Col>
+                </Row>
+              ),
+            },
+          ]}
         />
       </Col>
     </Row>

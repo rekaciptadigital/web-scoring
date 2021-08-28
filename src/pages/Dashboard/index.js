@@ -15,9 +15,9 @@ import {
   Table,
 } from "reactstrap";
 import { AuthenticationService } from "services";
-import modalimage2 from "../../assets/images/product/img-4.png";
-import modalimage1 from "../../assets/images/product/img-7.png";
-import Breadcrumbs from "../../components/Common/Breadcrumb";
+import modalimage2 from "assets/images/product/img-4.png";
+import modalimage1 from "assets/images/product/img-7.png";
+import Breadcrumbs from "components/Common/Breadcrumb";
 
 const Dashboard = () => {
   const [modal, setmodal] = useState(false);
@@ -45,7 +45,10 @@ const Dashboard = () => {
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-          <Breadcrumbs title="Dashboards" breadcrumbItems={[{title: "Dashboard"}]} />
+          <Breadcrumbs
+            title="Dashboards"
+            breadcrumbItems={[{ title: "Dashboard" }]}
+          />
 
           <Row>
             <Col xl="8">

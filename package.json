@@ -71,6 +71,7 @@
     "react-facebook-login": "^4.1.1",
     "react-flatpickr": "^3.10.6",
     "react-google-login": "^5.2.2",
+    "react-html-parser": "^2.0.2",
     "react-i18next": "^11.8.5",
     "react-image-lightbox": "^5.1.1",
     "react-input-mask": "^2.0.4",
@@ -110,38 +111,6 @@
     "format": "prettier --write \"**/*.{js,jsx,json,md,html,css,less,scss}\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "eslint:recommended",
-      "plugin:react/recommended"
-    ],
-    "parser": "babel-eslint",
-    "parserOptions": {
-      "ecmaVersion": 2020,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
-    "env": {
-      "browser": true,
-      "es6": true
-    },
-    "globals": {
-      "$": true
-    },
-    "settings": {
-      "react": {
-        "version": "^17.0.1"
-      }
-    },
-    "rules": {
-      "semi": [
-        "error",
-        "never"
-      ]
-    }
   },
   "browserslist": [
     ">0.2%",

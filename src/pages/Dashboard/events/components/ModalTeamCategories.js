@@ -1,9 +1,62 @@
-import { selectConstants } from "../../../../constants";
-import React from "react";
-import { Modal } from "reactstrap";
+import React, { useEffect, useState } from "react";
+import { Input, Modal } from "reactstrap";
 import { TextInput } from "components";
 
-const ModalTeamCategories = ({ isOpen, toggle }) => {
+const ModalTeamCategories = ({
+  isOpen,
+  toggle,
+  options,
+  onSaveChange,
+  name,
+}) => {
+  const [teamCategories, setTeamCategories] = useState([]);
+
+  useEffect(() => {
+    const newTeamCategories = options.map(option => {
+      const newOption = { ...option };
+      if (!newOption.checked) newOption.checked = false;
+      if (!newOption.quota) newOption.quota = "0";
+
+      return newOption;
+    });
+    setTeamCategories(newTeamCategories);
+  }, [options]);
+
+  const handleCheck = (e, index, category) => {
+    const checked = e.target.checked;
+    const newTeamCategories = [...teamCategories];
+    if (checked) {
+      const newCategory = category;
+      newCategory.checked = true;
+      if (!newCategory.quota) {
+        newCategory.quota = "0";
+      }
+      newTeamCategories[index] = newCategory;
+    } else {
+      const newCategory = category;
+      newCategory.checked = false;
+      newTeamCategories[index] = newCategory;
+    }
+    setTeamCategories(newTeamCategories);
+  };
+
+  const handleChange = (e, index, category) => {
+    const newTeamCategories = [...teamCategories];
+    const newCategory = category;
+    newCategory.checked = true;
+    newCategory.quota = e.value;
+    newTeamCategories[index] = newCategory;
+    setTeamCategories(newTeamCategories);
+  };
+
+  const handleSave = () => {
+    const selectedTeamCategories = _.filter(teamCategories, ['checked', true]);
+    if (onSaveChange) {
+      onSaveChange({ key: name, value: selectedTeamCategories });
+    }
+    toggle();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -31,16 +84,30 @@ const ModalTeamCategories = ({ isOpen, toggle }) => {
         <table className="table">
           <thead>
             <tr>
-              <th>Kategori Regu</th>
+              <th colSpan={2}>Kategori Regu</th>
               <th>Kuota</th>
             </tr>
           </thead>
           <tbody>
-            {selectConstants.teamCategories.map(category => {
+            {teamCategories.map((category, categoryIndex) => {
               return (
-                <tr key={category.id}>
+                <tr key={`${name}${category.id}`}>
+                  <td>
+                    <Input
+                      type="checkbox"
+                      className="form-check-Input"
+                      id={`${name}${category.id}`}
+                      onChange={e => handleCheck(e, categoryIndex, category)}
+                      checked={category.checked}
+                    />
+                  </td>
                   <td>{category.label}</td>
-                  <td><TextInput /></td>
+                  <td>
+                    <TextInput
+                      onChange={e => handleChange(e, categoryIndex, category)}
+                      value={category.quota || "0"}
+                    />
+                  </td>
                 </tr>
               );
             })}
@@ -58,7 +125,13 @@ const ModalTeamCategories = ({ isOpen, toggle }) => {
         >
           Close
         </button>
-        <button type="button" className="btn btn-primary ">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            handleSave();
+          }}
+        >
           Save changes
         </button>
       </div>

@@ -92,7 +92,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                     <TextInput
                       label="Sesi/Hari"
                       name="quatificationSessionPerDay"
-                      value={formData.quatificationSessionPerDay}
+                      value={formData.quatificationSessionPerDay || ""}
                       onChange={handleChange}
                     />
                   </Col>
@@ -100,7 +100,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                     <TextInput
                       label="Kuota/Hari"
                       name="quatificationQuotaPerDay"
-                      value={formData.quatificationQuotaPerDay}
+                      value={formData.quatificationQuotaPerDay || ""}
                       onChange={handleChange}
                     />
                   </Col>
@@ -146,7 +146,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                     <TextInput
                       label="Sesi/Hari"
                       name="eliminationSessionPerDay"
-                      value={formData.quatificationSessionPerDay}
+                      value={formData.eliminationSessionPerDay || ""}
                       onChange={handleChange}
                     />
                   </Col>
@@ -154,7 +154,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                     <TextInput
                       label="Kuota/Hari"
                       name="eliminationQuotaPerDay"
-                      value={formData.quatificationQuotaPerDay}
+                      value={formData.eliminationQuotaPerDay || ""}
                       onChange={handleChange}
                     />
                   </Col>

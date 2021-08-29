@@ -20,10 +20,10 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
           <CheckboxWithCurrencyInput
             inline
             label="Biaya Registrasi pertandingan yang tersedia"
-            name="registrationFee"
+            name="registrationFees"
             onChange={handleChange}
             options={selectConstants.eventAvailableRegistrationFee}
-            value={formData.registrationFee}
+            value={formData.registrationFees}
             textInputName="price"
           />
         </Col>
@@ -54,24 +54,20 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
       </Row>
       {!formData.isFlatRegistrationFee && (
         <Row>
-          {formData.registrationFee?.map((registrationFee, index) => (
+          {formData.registrationFees?.map((registrationFee, index) => (
             <Col lg={6} key={registrationFee.id}>
               <Row>
                 <h5>{registrationFee.label}</h5>
-                {registrationFee.categoryPrice?.map(
-                  (teamCategory, teamCategoryIndex) => (
-                    <Col lg={6} key={teamCategoryIndex}>
+                {registrationFee.categoryPrices?.map(
+                  (categoryPrice, categoryPriceIndex) => (
+                    <Col lg={6} key={categoryPriceIndex}>
                       <CurrencyInput
                         disabled={formData.isFlatRegistrationFee}
                         horizontal
-                        label={teamCategory.label}
-                        name={`registrationFee.${index}.categoryPrice.${teamCategoryIndex}.price`}
+                        label={categoryPrice.label}
+                        name={`registrationFees.${index}.categoryPrices.${categoryPriceIndex}.price`}
                         onChange={handleChange}
-                        value={
-                          formData.registrationFee?.[index]?.categoryPrice?.[
-                            teamCategoryIndex
-                          ]?.price
-                        }
+                        value={categoryPrice.price}
                       />
                     </Col>
                   )

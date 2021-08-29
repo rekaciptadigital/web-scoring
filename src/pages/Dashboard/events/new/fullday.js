@@ -19,7 +19,7 @@ const EventsNewFullday = () => {
     locationType: "",
     description: "",
     isFlatRegistrationFee: true,
-    registrationFee: [
+    registrationFees: [
       {
         id: "normal",
         label: "Normal",
@@ -37,27 +37,27 @@ const EventsNewFullday = () => {
         ],
       },
     ],
-    target: "",
+    targets: "",
     publishNow: true,
     publishDatetime: "",
   });
 
   const handleChange = (key, value) => {
     let modifiedEventData = { ...eventData };
-    if (key === "registrationFee" || key === "teamCategories") {
+    if (key === "registrationFees" || key === "teamCategories") {
       const registrationFees =
-        key === "registrationFee" ? value : eventData.registrationFee;
+        key === "registrationFees" ? value : eventData.registrationFees;
       const categories =
         key === "teamCategories" ? value : eventData.teamCategories;
 
-      const newRegistrationFee = registrationFees.map((item) => {
+      const newRegistrationFees = registrationFees.map((item) => {
         const newItem = {
           registrationType: item.registrationType || item.id,
           id: item.id,
           label: item.label,
           price: item.price,
         };
-        newItem.categoryPrice = categories.map((categoryItem) => {
+        newItem.categoryPrices = categories.map((categoryItem) => {
           return {
             id: categoryItem.id,
             label: categoryItem.label,
@@ -70,12 +70,11 @@ const EventsNewFullday = () => {
       });
 
       modifiedEventData.teamCategories = categories;
-      modifiedEventData.registrationFee = newRegistrationFee;
+      modifiedEventData.registrationFees = newRegistrationFees;
     } else {
       modifiedEventData = _.set(modifiedEventData, key, value);
     }
     setEventData(modifiedEventData);
-    console.log(modifiedEventData)
   };
 
   return (

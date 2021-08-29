@@ -1,6 +1,6 @@
+import { NumberInput } from "components";
 import React, { useEffect, useState } from "react";
 import { Input, Modal } from "reactstrap";
-import { TextInput } from "components";
 
 const ModalTeamCategories = ({
   isOpen,
@@ -12,10 +12,9 @@ const ModalTeamCategories = ({
   const [teamCategories, setTeamCategories] = useState([]);
 
   useEffect(() => {
-    const newTeamCategories = options.map(option => {
+    const newTeamCategories = options.map((option) => {
       const newOption = { ...option };
       if (!newOption.checked) newOption.checked = false;
-      if (!newOption.quota) newOption.quota = "0";
 
       return newOption;
     });
@@ -25,15 +24,11 @@ const ModalTeamCategories = ({
   const handleCheck = (e, index, category) => {
     const checked = e.target.checked;
     const newTeamCategories = [...teamCategories];
+    const newCategory = category;
     if (checked) {
-      const newCategory = category;
       newCategory.checked = true;
-      if (!newCategory.quota) {
-        newCategory.quota = "0";
-      }
       newTeamCategories[index] = newCategory;
     } else {
-      const newCategory = category;
       newCategory.checked = false;
       newTeamCategories[index] = newCategory;
     }
@@ -50,7 +45,7 @@ const ModalTeamCategories = ({
   };
 
   const handleSave = () => {
-    const selectedTeamCategories = _.filter(teamCategories, ['checked', true]);
+    const selectedTeamCategories = _.filter(teamCategories, ["checked", true]);
     if (onSaveChange) {
       onSaveChange({ key: name, value: selectedTeamCategories });
     }
@@ -97,15 +92,15 @@ const ModalTeamCategories = ({
                       type="checkbox"
                       className="form-check-Input"
                       id={`${name}${category.id}`}
-                      onChange={e => handleCheck(e, categoryIndex, category)}
+                      onChange={(e) => handleCheck(e, categoryIndex, category)}
                       checked={category.checked}
                     />
                   </td>
                   <td>{category.label}</td>
                   <td>
-                    <TextInput
-                      onChange={e => handleChange(e, categoryIndex, category)}
-                      value={category.quota || "0"}
+                    <NumberInput
+                      onChange={(e) => handleChange(e, categoryIndex, category)}
+                      value={category.quota || ""}
                     />
                   </td>
                 </tr>

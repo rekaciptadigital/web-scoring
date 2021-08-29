@@ -176,11 +176,11 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
         <Col lg={12}>
           <CheckboxInput
             label="Siapa yang bisa melihat event Anda?"
-            name="target"
+            name="targets"
             onChange={handleChange}
             options={selectConstants.eventAudiences}
             inline
-            value={formData.target}
+            value={formData.targets}
           />
         </Col>
         <Col lg={12}>

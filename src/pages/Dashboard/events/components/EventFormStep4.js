@@ -87,10 +87,10 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
               <div className="row">
                 <Col lg={4}>
                   <SelectInput
-                    name={`eventCategories.${index}.ageCategories`}
+                    name={`eventCategories.${index}.ageCategory`}
                     onChange={handleChange}
                     options={dummyConstants.eventAgeCategories}
-                    value={eventCategory.ageCategories}
+                    value={eventCategory.ageCategory}
                   />
                 </Col>
                 <Col lg={4}>
@@ -144,9 +144,9 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                       <Col lg={4}>
                         <SelectInput
                           options={dummyConstants.eventCompetitionCategories}
-                          name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.name`}
+                          name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
                           onChange={handleChange}
-                          value={competitionCategory.name}
+                          value={competitionCategory.competitionCategory}
                         />
                       </Col>
                       <Col lg={4}>

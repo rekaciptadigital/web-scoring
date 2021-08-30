@@ -20,7 +20,7 @@ function ListMember() {
                     <title>Dashboard | List - Member</title>
                 </MetaTags>
                 <Container fluid>
-                <Button color="primary">{'<-'}</Button>
+                <Button color="outline-dark">{'<-'}</Button>
                 <span style={{marginLeft: '0.5rem'}}>Kembali ke Dashboard</span>
                 <div className="mb-3 d-flex justify-content-around w-50 mt-md-0 mt-3 mx-auto">
                     <Link className="text-black-50">Edit Event</Link>
@@ -55,7 +55,7 @@ function ListMember() {
                             </Col>
                             <Col md={3} sm={12}>
                                 <div className="d-block d-md-flex mt-md-0 mt-3 justify-content-end">
-                                    <Button className="bg-white"><span className="text-black-50">Unduh Data</span></Button>
+                                    <Button color="outline-dark">Unduh Data</Button>
                                 </div>
                             </Col>
                         </Row>

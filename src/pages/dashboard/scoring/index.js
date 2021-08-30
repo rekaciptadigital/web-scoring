@@ -16,7 +16,7 @@ import { dummyConstants } from '../../../constants'
 
 function ListScoring() {
 
-    const [open] = useState(true)
+    const [open] = useState(false)
 
     return (
         <React.Fragment>
@@ -25,7 +25,7 @@ function ListScoring() {
                     <title>Dashboard | List - Scoring</title>
                 </MetaTags>
                 <Container fluid>
-                <Button color="primary">{'<-'}</Button>
+                <Button color="outline-dark">{'<-'}</Button>
                 <span style={{marginLeft: '0.5rem'}}>Kembali ke Dashboard</span>
                 <div className="mb-3 d-flex justify-content-around w-50 mt-md-0 mt-3 mx-auto">
                     <Link className="text-black-50">Edit Event</Link>
@@ -39,7 +39,9 @@ function ListScoring() {
                     <Card>
                         <CardBody className="d-flex justify-content-center" style={{height: '50vh', alignItems: 'center'}}>
                             <div style={{cursor: 'pointer'}}>
-                                <img src={setscore} />
+                                <Link to="/dashboard/scoring/new">
+                                    <img src={setscore} />
+                                </Link>
                             </div>
                         </CardBody>
                     </Card>
@@ -71,7 +73,9 @@ function ListScoring() {
                             </Col>
                             <Col md={3} sm={12}>
                                 <div className="d-block d-md-flex mt-md-0 mt-3 justify-content-end">
-                                    <Button className="bg-white"><span className="text-black-50">Tambah Scoring</span></Button>
+                                    <Link to="/dashboard/scoring/new">
+                                        <Button color="outline-dark">Tambah Scoring</Button>
+                                    </Link>
                                 </div>
                             </Col>
                         </Row>

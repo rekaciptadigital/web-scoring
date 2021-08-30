@@ -50,8 +50,8 @@ const ListEvent = () => {
               </Col>
               <Col md={6}>
                 <div className="float-end">
-                  <Button className="bg-white"><span style={{color: '#000'}}>List Event</span></Button>
-                  <Button className="mx-2 bg-white"><span style={{color: '#000'}}>Kalender</span></Button>
+                  <Button color="outline-dark">List Event</Button>
+                  <Button className="mx-2" color="outline-dark">Kalender</Button>
                   <Button color="primary">Tambah Event</Button>
                 </div>
               </Col>

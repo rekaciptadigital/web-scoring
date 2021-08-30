@@ -1,6 +1,11 @@
 // Dashboard
-import Dashboard from "pages/dashboard";
-import EventsNew from "pages/dashboard/events/new";
+import Dashboard from "../pages/dashboard"
+import ListEvent from "../pages/dashboard/events"
+import ListMember from "../pages/dashboard/member"
+import EventsNew from "../pages/dashboard/events/new"
+import ListCategory from "../pages/dashboard/category"
+import ListScoring from "../pages/dashboard/scoring"
+import ScoringNew from "pages/dashboard/scoring/new"
 import EventsNewFullday from "pages/dashboard/events/new/fullday";
 import EventsNewMarathon from "pages/dashboard/events/new/marathon";
 import React from "react";
@@ -8,7 +13,12 @@ import { Redirect } from "react-router-dom";
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
-
+  { path: "/dashboard/events", component: ListEvent},
+  { path: "/dashboard/member", component: ListMember},
+  { path: "/dashboard/category", component: ListCategory},
+  { path: "/dashboard/scoring", component: ListScoring},
+  { path: "/dashboard/scoring/new", component: ScoringNew},
+  
   // this route should be at the end of all other routes
   { path: "/", exact: true, component: () => <Redirect to="/dashboard" /> },
   { path: "/dashboard/events/new", component: EventsNew },

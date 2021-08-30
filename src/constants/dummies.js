@@ -97,9 +97,35 @@ const eventCategories = [
   },
 ];
 
+const members = [
+  {"id": 1, "name": "Asep", "email": "asep@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "pria", "status": 1},
+  {"id": 2, "name": "Jamal", "email": "jamal@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 9, "gender": "pria", "status": 1},
+  {"id": 3, "name": "Taufik", "email": "taufik@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "pria", "status": 0},
+  {"id": 4, "name": "Arif", "email": "arif@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 9, "gender": "pria", "status": 1},
+  {"id": 5, "name": "Laisa", "email": "laisa@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "wanita", "status": 1},
+  {"id": 6, "name": "Wade Warren", "email": "wa-de@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 9, "gender": "pria", "status": 1},
+  {"id": 7, "name": "Udien", "email": "udien@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "pria", "status": 0},
+];
+
+const category = [
+  {"id": 1, "class": "U-12", "death_bird": "12/09/2009", "arange": "50m", "kuota": "15/100", "registrasi": "Rp150.000", "status": 0},
+  {"id": 2, "class": "Umum", "death_bird": "-", "arange": "30m", "kuota": "10/100", "registrasi": "Rp150.000", "status": 0},
+  {"id": 3, "class": "U-12", "death_bird": "12/09/2009", "arange": "20m", "kuota": "70/75", "registrasi": "Rp150.000", "status": 1},
+]
+
+const scoring = [
+  {"id": 1, "class": "U-12", "arange": "50m", "session": 2, "rambahan": 5, "shoot": 6, "target_face": "122 cm"},
+  {"id": 2, "class": "Umum", "arange": "30m", "session": 2, "rambahan": 5, "shoot": 3, "target_face": "122 cm"},
+  {"id": 3, "class": "U-12", "arange": "20m", "session": 2, "rambahan": 5, "shoot": 6, "target_face": "122 cm"},
+]
+
+
 export default {
   eventAgeCategories,
   eventCompetitionCategories,
   eventDistances,
   eventCategories,
+  members,
+  category,
+  scoring
 };

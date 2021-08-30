@@ -15,16 +15,16 @@ const eventLocationType = [
 
 const eventAvailableRegistrationFee = [
   {
-    id: "early_bird",
-    label: "Early Bird",
-  },
-  {
     id: "normal",
     label: "Normal",
+    checked: true,
+    fixed: true,
   },
   {
-    id: "none",
-    label: "Tidak Ada",
+    id: "early_bird",
+    label: "Early Bird",
+    checked: false,
+    fixed: false,
   },
 ];
 
@@ -86,5 +86,5 @@ export default {
   teamCategories,
   confirmation,
   eventAudiences,
-  eventPublishTime
+  eventPublishTime,
 };

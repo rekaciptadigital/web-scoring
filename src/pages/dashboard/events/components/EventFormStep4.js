@@ -1,96 +1,241 @@
+import { Button, DateInput, SelectInput, TextInput } from "components";
+import { dummyConstants } from "constants/index";
 import React from "react";
 import { Col, Label, Row } from "reactstrap";
-import styles from "./style";
+import { stringUtil } from "utils";
+import styles from "../styles";
+import ModalDistances from "./ModalDistances";
+import ModalTeamCategories from "./ModalTeamCategories";
 
-export const EventFormStep4 = ({ formData }) => {
+export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
+  const handleChange = ({ key, value }) => {
+    if (onFormFieldChange) onFormFieldChange(key, value);
+  };
+
+  function handleAddRow() {
+    const newCategory = {
+      id: stringUtil.createRandom(),
+      competitionCategories: [
+        {
+          id: stringUtil.createRandom(),
+        },
+      ],
+    };
+    let categoryList = [...formData.eventCategories];
+    categoryList.push(newCategory);
+    handleChange({
+      key: "eventCategories",
+      value: categoryList,
+    });
+  }
+
+  function handleCopyRow(index) {
+    const newCategory = {...formData.eventCategories[index]};
+    let categoryList = [...formData.eventCategories];
+    categoryList.splice(index + 1, 0, newCategory);
+    handleChange({
+      key: "eventCategories",
+      value: categoryList,
+    });
+  }
+
+  function handleRemoveRow(e, index) {
+    if (index !== undefined && index !== null) {
+      const categoryList = [...formData.eventCategories];
+      categoryList.splice(index, 1);
+
+      handleChange({
+        key: "eventCategories",
+        value: categoryList,
+      });
+    }
+  }
+
+  function handleAddCompetitionCategory(categoryIndex) {
+    const categoryList = [...formData.eventCategories];
+    categoryList[categoryIndex].competitionCategories.push({
+      id: stringUtil.createRandom(),
+    });
+    handleChange({
+      key: "eventCategories",
+      value: categoryList,
+    });
+  }
+
+  function handleRemoveCompetitionCategory(
+    categoryIndex,
+    competitionCategoryIndex
+  ) {
+    const categoryList = [...formData.eventCategories];
+    categoryList[categoryIndex].competitionCategories.splice(
+      competitionCategoryIndex,
+      1
+    );
+    handleChange({
+      key: "eventCategories",
+      value: categoryList,
+    });
+  }
+
   return (
     <Row>
       <Col xs={12}>
-        {formData.eventCategories.filter(Boolean).map((item, index) => (
-          <div key={index} id={"row" + index}>
-            <Row style={styles.categoryBox}>
-              <Col lg={3}>
-                <Label>Kategori Kelas</Label>
-                <br />
-                {formData.eventCategories[index]?.ageCategories?.label}
-              </Col>
-              <Col lg={4}>
-                <Label>Batas Tanggal Lahir</Label>
-                <br />
-                {formData.eventCategories[index]?.maxDateOfBirth}
-              </Col>
-              <Col lg={6}>
-                <Label>Info</Label>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Kategori Regu</th>
-                      <th>Kuota</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {item?.teamCategories?.map(
-                      (teamCategory, teamCategoryIndex) => {
-                        return (
-                          <tr key={teamCategory.id}>
-                            <td>
-                              {
-                                formData.eventCategories?.[index]
-                                  ?.teamCategories?.[teamCategoryIndex]?.label
-                              }
-                            </td>
-                            <td>
-                              {
-                                formData.eventCategories?.[index]
-                                  ?.teamCategories?.[teamCategoryIndex]?.quota
-                              }
-                            </td>
-                          </tr>
-                        );
+        {formData.eventCategories.map((eventCategory, index) => (
+          <Row style={styles.categoryBox} key={index} id={"row" + index}>
+            <Col lg={10}>
+              <Label>Kategori Kelas</Label>
+              <div className="row">
+                <Col lg={4}>
+                  <SelectInput
+                    name={`eventCategories.${index}.ageCategory`}
+                    onChange={handleChange}
+                    options={dummyConstants.eventAgeCategories}
+                    value={eventCategory.ageCategory}
+                  />
+                </Col>
+                <Col lg={4}>
+                  <DateInput
+                    name={`eventCategories.${index}.maxDateOfBirth`}
+                    onChange={handleChange}
+                    value={eventCategory.maxDateOfBirth}
+                  />
+                </Col>
+                <Col lg={4}>
+                  <div>
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        handleChange({
+                          key: `eventCategories.${index}.isOpenTeamCategoryModal`,
+                          value: true,
+                        });
+                      }}
+                      label={
+                        formData.eventCategories[index]?.teamCategories
+                          ?.length > 0
+                          ? `${formData.eventCategories[index]?.teamCategories?.length} jenis regu`
+                          : "Tambah Info"
                       }
-                    )}
-                  </tbody>
-                </table>
-              </Col>
-              <Col lg={6}>
-                <Label>Kategori Lomba</Label>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Kategori</th>
-                      <th>Jarak</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {item?.competitionCategories
-                      ?.filter(Boolean)
-                      .map((competitionCategory, competitionCategoryIndex) => {
-                        return (
-                          <tr key={competitionCategory.name.id}>
-                            <td>
-                              {
-                                formData.eventCategories?.[index]
-                                  ?.competitionCategories?.[
-                                  competitionCategoryIndex
-                                ]?.name?.label
+                      trailingIcon={
+                        formData.eventCategories[index]?.teamCategories
+                          ?.length <= 0 && "plus"
+                      }
+                    />
+                    <ModalTeamCategories
+                      isOpen={eventCategory.isOpenTeamCategoryModal}
+                      toggle={() => {
+                        handleChange({
+                          key: `eventCategories.${index}.isOpenTeamCategoryModal`,
+                          value: false,
+                        });
+                      }}
+                      options={formData.teamCategories || []}
+                      name={`eventCategories.${index}.teamCategories`}
+                      onSaveChange={handleChange}
+                    />
+                  </div>
+                </Col>
+              </div>
+              <Label>Kategori Lomba</Label>
+              {eventCategory.competitionCategories.map(
+                (competitionCategory, competitionCategoryIndex) => {
+                  return (
+                    <Row key={competitionCategory.id}>
+                      <Col lg={4}>
+                        <SelectInput
+                          options={dummyConstants.eventCompetitionCategories}
+                          name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
+                          onChange={handleChange}
+                          value={competitionCategory.competitionCategory}
+                        />
+                      </Col>
+                      <Col lg={4}>
+                        <TextInput
+                          readOnly
+                          accessoryRight={
+                            <Button
+                              icon="plus"
+                              onClick={() =>
+                                handleChange({
+                                  key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenDistanceModal`,
+                                  value: true,
+                                })
                               }
-                            </td>
-                            <td>
-                              {formData.eventCategories?.[
-                                index
-                              ]?.competitionCategories?.[
+                            />
+                          }
+                          value={competitionCategory.distances || ""}
+                        />
+                        <ModalDistances
+                          isOpen={competitionCategory.isOpenDistanceModal}
+                          name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.distances`}
+                          toggle={() => {
+                            handleChange({
+                              key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenDistanceModal`,
+                              value: false,
+                            });
+                          }}
+                          onSaveChange={handleChange}
+                        />
+                      </Col>
+                      <Col lg={3}>
+                        <Button
+                          onClick={() => {
+                            handleAddCompetitionCategory(index);
+                          }}
+                          icon="copy"
+                        />{" "} 
+                        {eventCategory.competitionCategories.length > 1 && (
+                          <Button
+                            onClick={() => {
+                              handleRemoveCompetitionCategory(
+                                index,
                                 competitionCategoryIndex
-                              ]?.distances?.join("; ") || ""}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </Col>
-            </Row>
-          </div>
+                              );
+                            }}
+                            icon="trash"
+                            type="danger"
+                          />
+                        )}
+                      </Col>
+                    </Row>
+                  );
+                }
+              )}
+            </Col>
+            <Col>
+              <Label>Aksi</Label>
+              <div>
+                <button
+                  type="button"
+                  className="btn btn-primary "
+                  onClick={() => {
+                    handleCopyRow(index);
+                  }}
+                >
+                  <i className="bx bx-copy font-size-16 align-middle"></i>{" "}
+                </button>{" "}
+                {formData.eventCategories.length > 1 && (
+                  <button
+                    type="button"
+                    className="btn btn-danger "
+                    onClick={(e) => {
+                      handleRemoveRow(e, index);
+                    }}
+                  >
+                    <i className="bx bx-trash font-size-16 align-middle"></i>{" "}
+                  </button>
+                )}
+              </div>
+            </Col>
+          </Row>
         ))}
+        <input
+          data-repeater-create
+          type="button"
+          className="btn btn-success mt-3 mt-lg-0"
+          value="Add"
+          onClick={() => handleAddRow()}
+        />
       </Col>
     </Row>
   );

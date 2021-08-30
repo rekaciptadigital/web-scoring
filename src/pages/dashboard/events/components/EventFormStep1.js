@@ -1,5 +1,4 @@
 import {
-  DatetimeInput,
   FileUpload,
   ImageUpload,
   RadioButtonInput,
@@ -8,7 +7,7 @@ import {
 } from "components";
 import React from "react";
 import { Col, Row } from "reactstrap";
-import { selectConstants } from "../../../../constants";
+import { selectConstants } from "constants/index";
 
 export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
   const handleChange = ({ key, value }) => {
@@ -45,38 +44,6 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               label="Nama Event"
               name="eventName"
               value={formData.eventName}
-              onChange={handleChange}
-            />
-          </Col>
-          <Col lg={6}>
-            <DatetimeInput
-              label="Buka Pendaftaran"
-              name="registrationStartDatetime"
-              value={formData.registrationStartDatetime}
-              onChange={handleChange}
-            />
-          </Col>
-          <Col lg={6}>
-            <DatetimeInput
-              label="Tutup Pendaftaran"
-              name="registrationEndDatetime"
-              value={formData.registrationEndDatetime}
-              onChange={handleChange}
-            />
-          </Col>
-          <Col lg={6}>
-            <DatetimeInput
-              label="Mulai lomba"
-              name="eventStartDatetime"
-              value={formData.eventStartDatetime}
-              onChange={handleChange}
-            />
-          </Col>
-          <Col lg={6}>
-            <DatetimeInput
-              label="Selesai Lomba"
-              name="eventStartDatetime"
-              value={formData.eventEndDatetime}
               onChange={handleChange}
             />
           </Col>

@@ -52,7 +52,6 @@ const sanitize = object => {
       sanitize(v);
     }
     if (
-      (v && typeof v === "object" && !Object.keys(v).length) ||
       v === null ||
       v === undefined
     ) {

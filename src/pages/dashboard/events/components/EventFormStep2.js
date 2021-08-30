@@ -1,7 +1,12 @@
-import { CheckboxInput, CurrencyInput, SwitchInput } from "components";
+import {
+  CheckboxInput,
+  CheckboxWithCurrencyInput,
+  CurrencyInput,
+  SwitchInput,
+} from "components";
 import React from "react";
 import { Col, Row } from "reactstrap";
-import { selectConstants } from "../../../../constants";
+import { selectConstants } from "constants/index";
 
 export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
   const handleChange = ({ key, value }) => {
@@ -12,13 +17,14 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
     <>
       <Row>
         <Col lg={12}>
-          <CheckboxInput
+          <CheckboxWithCurrencyInput
             inline
             label="Biaya Registrasi pertandingan yang tersedia"
-            name="registrationFee"
+            name="registrationFees"
             onChange={handleChange}
             options={selectConstants.eventAvailableRegistrationFee}
-            value={formData.registrationFee}
+            value={formData.registrationFees}
+            textInputName="price"
           />
         </Col>
       </Row>
@@ -46,47 +52,31 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
           />
         </Col>
       </Row>
-      <Row>
-        {formData.registrationFee?.map((registrationFee, index) => (
-          <Col lg={3} key={registrationFee.id}>
-            <CurrencyInput
-              disabled={!formData.isFlatRegistrationFee}
-              horizontal
-              label={registrationFee.label}
-              name={`registrationFee.${index}.price`}
-              onChange={handleChange}
-              value={formData.registrationFee[index]?.price}
-            />
-          </Col>
-        ))}
-      </Row>
-      <Row>
-        {formData.registrationFee?.map((registrationFee, index) => (
-          <Col lg={6} key={registrationFee.id}>
-            <Row>
-              <h5>{registrationFee.label}</h5>
-              {registrationFee.categoryPrice?.map(
-                (teamCategory, teamCategoryIndex) => (
-                  <Col lg={6} key={teamCategoryIndex}>
-                    <CurrencyInput
-                      disabled={formData.isFlatRegistrationFee}
-                      horizontal
-                      label={teamCategory.label}
-                      name={`registrationFee.${index}.categoryPrice.${teamCategoryIndex}.price`}
-                      onChange={handleChange}
-                      value={
-                        formData.registrationFee?.[index]?.categoryPrice?.[
-                          teamCategoryIndex
-                        ]?.price
-                      }
-                    />
-                  </Col>
-                )
-              )}
-            </Row>
-          </Col>
-        ))}
-      </Row>
+      {!formData.isFlatRegistrationFee && (
+        <Row>
+          {formData.registrationFees?.map((registrationFee, index) => (
+            <Col lg={6} key={registrationFee.id}>
+              <Row>
+                <h5>{registrationFee.label}</h5>
+                {registrationFee.categoryPrices?.map(
+                  (categoryPrice, categoryPriceIndex) => (
+                    <Col lg={6} key={categoryPriceIndex}>
+                      <CurrencyInput
+                        disabled={formData.isFlatRegistrationFee}
+                        horizontal
+                        label={categoryPrice.label}
+                        name={`registrationFees.${index}.categoryPrices.${categoryPriceIndex}.price`}
+                        onChange={handleChange}
+                        value={categoryPrice.price}
+                      />
+                    </Col>
+                  )
+                )}
+              </Row>
+            </Col>
+          ))}
+        </Row>
+      )}
     </>
   );
 };

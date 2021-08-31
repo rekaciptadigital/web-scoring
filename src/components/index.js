@@ -14,6 +14,7 @@ export { default as SwitchInput } from './Form/SwitchInput';
 export { default as TextareaInput } from './Form/TextareaInput';
 export { default as TextEditor } from './Form/TextEditor';
 export { default as TextInput } from './Form/TextInput';
+export { default as TimeInput } from './Form/TimeInput';
 export { default as Accordion } from './UIElements/Accordion';
 export { default as Button } from './UIElements/Button';
 

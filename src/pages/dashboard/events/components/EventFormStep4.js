@@ -30,7 +30,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
   }
 
   function handleCopyRow(index) {
-    const newCategory = {...formData.eventCategories[index]};
+    const newCategory = { ...formData.eventCategories[index] };
     let categoryList = [...formData.eventCategories];
     categoryList.splice(index + 1, 0, newCategory);
     handleChange({
@@ -79,12 +79,12 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
 
   return (
     <Row>
-      <Col xs={12}>
+      <Col lg={12}>
         {formData.eventCategories.map((eventCategory, index) => (
-          <Row style={styles.categoryBox} key={index} id={"row" + index}>
-            <Col lg={10}>
+          <Row key={index} id={"row" + index}>
+            <Col lg={12} style={styles.categoryBox}>
               <Label>Kategori Kelas</Label>
-              <div className="row">
+              <Row>
                 <Col lg={4}>
                   <SelectInput
                     name={`eventCategories.${index}.ageCategory`}
@@ -100,132 +100,135 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                     value={eventCategory.maxDateOfBirth}
                   />
                 </Col>
-                <Col lg={4}>
-                  <div>
+                <Col>
+                  <Button
+                    onClick={() => {
+                      handleCopyRow(index);
+                    }}
+                    icon="copy"
+                    type="primary"
+                  />{" "}
+                  {formData.eventCategories.length > 1 && (
                     <Button
-                      type="primary"
-                      onClick={() => {
-                        handleChange({
-                          key: `eventCategories.${index}.isOpenTeamCategoryModal`,
-                          value: true,
-                        });
+                      onClick={(e) => {
+                        handleRemoveRow(e, index);
                       }}
-                      label={
-                        formData.eventCategories[index]?.teamCategories
-                          ?.length > 0
-                          ? `${formData.eventCategories[index]?.teamCategories?.length} jenis regu`
-                          : "Tambah Info"
-                      }
-                      trailingIcon={
-                        formData.eventCategories[index]?.teamCategories
-                          ?.length <= 0 && "plus"
-                      }
+                      icon="trash"
+                      type="danger"
                     />
-                    <ModalTeamCategories
-                      isOpen={eventCategory.isOpenTeamCategoryModal}
-                      toggle={() => {
-                        handleChange({
-                          key: `eventCategories.${index}.isOpenTeamCategoryModal`,
-                          value: false,
-                        });
-                      }}
-                      options={formData.teamCategories || []}
-                      name={`eventCategories.${index}.teamCategories`}
-                      onSaveChange={handleChange}
-                    />
-                  </div>
+                  )}
                 </Col>
-              </div>
+              </Row>
               <Label>Kategori Lomba</Label>
-              {eventCategory.competitionCategories.map(
-                (competitionCategory, competitionCategoryIndex) => {
-                  return (
-                    <Row key={competitionCategory.id}>
-                      <Col lg={4}>
-                        <SelectInput
-                          options={dummyConstants.eventCompetitionCategories}
-                          name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
-                          onChange={handleChange}
-                          value={competitionCategory.competitionCategory}
-                        />
-                      </Col>
-                      <Col lg={4}>
-                        <TextInput
-                          readOnly
-                          accessoryRight={
-                            <Button
-                              icon="plus"
-                              onClick={() =>
+              <Row style={{paddingLeft: 10, paddingRight: 10}}>
+                <Col style={{ border: "dashed 1px #dedede", padding: 10 }}>
+                  {eventCategory.competitionCategories.map(
+                    (competitionCategory, competitionCategoryIndex) => {
+                      return (
+                        <Row key={competitionCategory.id}>
+                          <Col lg={4}>
+                            <SelectInput
+                              options={
+                                dummyConstants.eventCompetitionCategories
+                              }
+                              name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
+                              onChange={handleChange}
+                              value={competitionCategory.competitionCategory}
+                            />
+                          </Col>
+                          <Col lg={4}>
+                            <TextInput
+                              readOnly
+                              accessoryRight={
+                                <Button
+                                  icon="plus"
+                                  onClick={() =>
+                                    handleChange({
+                                      key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenDistanceModal`,
+                                      value: true,
+                                    })
+                                  }
+                                />
+                              }
+                              value={competitionCategory.distances || ""}
+                            />
+                            <ModalDistances
+                              isOpen={competitionCategory.isOpenDistanceModal}
+                              name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.distances`}
+                              toggle={() => {
                                 handleChange({
                                   key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenDistanceModal`,
-                                  value: true,
-                                })
-                              }
+                                  value: false,
+                                });
+                              }}
+                              onSaveChange={handleChange}
                             />
-                          }
-                          value={competitionCategory.distances || ""}
-                        />
-                        <ModalDistances
-                          isOpen={competitionCategory.isOpenDistanceModal}
-                          name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.distances`}
-                          toggle={() => {
-                            handleChange({
-                              key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenDistanceModal`,
-                              value: false,
-                            });
-                          }}
-                          onSaveChange={handleChange}
-                        />
-                      </Col>
-                      <Col lg={3}>
-                        <Button
-                          onClick={() => {
-                            handleAddCompetitionCategory(index);
-                          }}
-                          icon="copy"
-                        />{" "} 
-                        {eventCategory.competitionCategories.length > 1 && (
-                          <Button
-                            onClick={() => {
-                              handleRemoveCompetitionCategory(
-                                index,
-                                competitionCategoryIndex
-                              );
-                            }}
-                            icon="trash"
-                            type="danger"
-                          />
-                        )}
-                      </Col>
-                    </Row>
-                  );
-                }
-              )}
-            </Col>
-            <Col>
-              <Label>Aksi</Label>
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-primary "
-                  onClick={() => {
-                    handleCopyRow(index);
-                  }}
-                >
-                  <i className="bx bx-copy font-size-16 align-middle"></i>{" "}
-                </button>{" "}
-                {formData.eventCategories.length > 1 && (
-                  <button
-                    type="button"
-                    className="btn btn-danger "
-                    onClick={(e) => {
-                      handleRemoveRow(e, index);
-                    }}
-                  >
-                    <i className="bx bx-trash font-size-16 align-middle"></i>{" "}
-                  </button>
-                )}
-              </div>
+                          </Col>
+                          <Col lg={4}>
+                            <div>
+                              <Button
+                                type="primary"
+                                onClick={() => {
+                                  handleChange({
+                                    key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenTeamCategoryModal`,
+                                    value: true,
+                                  });
+                                }}
+                                label={
+                                  competitionCategory.teamCategories?.length > 0
+                                    ? "Rincian Kuota"
+                                    : "Tambah Kuota"
+                                }
+                                trailingIcon={
+                                  competitionCategory.teamCategories?.length > 0
+                                    ? "pencil"
+                                    : "plus"
+                                }
+                                outline
+                              />
+                              <ModalTeamCategories
+                                isOpen={
+                                  competitionCategory.isOpenTeamCategoryModal
+                                }
+                                toggle={() => {
+                                  handleChange({
+                                    key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenTeamCategoryModal`,
+                                    value: false,
+                                  });
+                                }}
+                                options={formData.teamCategories || []}
+                                name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.teamCategories`}
+                                onSaveChange={handleChange}
+                              />{" "}
+                              <Button
+                                onClick={() => {
+                                  handleAddCompetitionCategory(index);
+                                }}
+                                icon="copy"
+                                outline
+                              />{" "}
+                              {eventCategory.competitionCategories.length >
+                                1 && (
+                                <Button
+                                  onClick={() => {
+                                    handleRemoveCompetitionCategory(
+                                      index,
+                                      competitionCategoryIndex
+                                    );
+                                  }}
+                                  icon="trash"
+                                  type="danger"
+                                  outline
+                                />
+                              )}
+                            </div>
+                          </Col>
+                        </Row>
+                      );
+                    }
+                  )}
+                </Col>
+              </Row>
             </Col>
           </Row>
         ))}

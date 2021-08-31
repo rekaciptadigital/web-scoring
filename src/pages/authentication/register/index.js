@@ -1,22 +1,44 @@
 // availity-reactstrap-validation
+import myachery from "assets/images/myachery/logo-myarchery.png"
+import React, { useEffect, useState } from "react"
+import google from "assets/images/myachery/Google.png"
+import facebook from "assets/images/myachery/Facebook.png"
+import ladBg from "assets/images/myachery/achery-lad.png"
 import { AvField, AvForm } from "availity-reactstrap-validation"
-import React, { useEffect } from "react"
 import MetaTags from "react-meta-tags"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, useHistory } from "react-router-dom"
-import { Alert, Card, CardBody, Col, Container, Row } from "reactstrap"
+import { useHistory, Link } from "react-router-dom"
+import { AuthenticationService } from "services"
+import { Col, Container, Row } from "reactstrap"
 import * as AuthenticationStore from "store/slice/authentication"
-import logoImg from "../../../assets/images/logo.svg"
+import toastr from "toastr"
+// import logoImg from "../../../assets/images/logo.svg"
 // import images
-import profileImg from "../../../assets/images/profile-img.png"
+// import profileImg from "../../../assets/images/profile-img.png"
 
-const Register = props => {
+const Register = () => {
+  const [registerErrors, setRegisterErrors] = useState()
+
   const dispatch = useDispatch()
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
   let history = useHistory();
   
-  const handleValidSubmit = () => {
-    dispatch(AuthenticationStore.register())
+  const handleValidSubmit = async (event, values) => {
+    const d = { ...values }
+    d.date_of_birth = "2012-06-24"
+    d.place_of_birth = "Padang"
+    d.phone_number = "082367998056"
+    console.log(d)
+    const { data, errors, message, success } = await AuthenticationService.register(d)
+    if (success) {
+      if (data) {
+        dispatch(AuthenticationStore.register())
+      }
+    } else {
+      console.log(errors)
+      setRegisterErrors(errors)
+      toastr.error(message)
+    }
   }
 
   useEffect(() => {
@@ -25,135 +47,116 @@ const Register = props => {
     }
   }, [isLoggedIn])
 
+  console.log(registerErrors)
+
   return (
     <React.Fragment>
       <MetaTags>
         <title>Register | MyArchery</title>
       </MetaTags>
-      <div className="home-btn d-none d-sm-block">
-        <Link to="/" className="text-dark">
-          <i className="fas fa-home h2" />
-        </Link>
-      </div>
-      <div className="account-pages my-5 pt-sm-5">
-        <Container>
-          <Row className="justify-content-center">
-            <Col md={8} lg={6} xl={5}>
-              <Card className="overflow-hidden">
-                <div className="bg-primary bg-soft">
-                  <Row>
-                    <Col className="col-7">
-                      <div className="text-primary p-4">
-                        <h5 className="text-primary">Free Register</h5>
-                        <p>Get your free MyArchery account now.</p>
-                      </div>
-                    </Col>
-                    <Col className="col-5 align-self-end">
-                      <img src={profileImg} alt="" className="img-fluid" />
-                    </Col>
-                  </Row>
+      <Container fluid>
+        <div>
+          <Row>
+            <Col md={5} sm={12} xs={12}>
+            <img src={ladBg} style={{height: '100vh', zIndex: "-1", position: 'absolute', left:'-1px', width: 'auto'}} />
+              <div>
+                <div style={{paddingTop: "20vh"}} className=" mx-auto">
+                  <img src={myachery} />
                 </div>
-                <CardBody className="pt-0">
-                  <div>
-                    <Link to="/">
-                      <div className="avatar-md profile-user-wid mb-4">
-                        <span className="avatar-title rounded-circle bg-light">
-                          <img
-                            src={logoImg}
-                            alt=""
-                            className="rounded-circle"
-                            height="34"
-                          />
-                        </span>
-                      </div>
+                <div style={{zIndex: '100'}}>
+                <p className="font-size-16 text-white">BUAT EVENT DI MANA SAJA KAPAN SAJA</p>
+                  <div className="w-75 mx-auto">
+                    <Link to="/authentication/login" className="text-decoration-none text-black-50">
+                      <span style={{marginRight: '36px'}} className="font-size-18 text-white">Masuk</span>
+                    </Link>
+                    <Link to="/authentication/register" className="text-decoration-none text-black-50 text-decoration-underline">
+                      <span className="font-size-18 text-white">Daftar</span>
                     </Link>
                   </div>
-                  <div className="p-2">
-                    <AvForm
-                      className="form-horizontal"
-                      onValidSubmit={(e, v) => {
-                        handleValidSubmit(e, v)
-                      }}
-                    >
-                      {props.user && props.user ? (
-                        <Alert color="success">
-                          Register User Successfully
-                        </Alert>
-                      ) : null}
-
-                      {props.registrationError && props.registrationError ? (
-                        <Alert color="danger">{props.registrationError}</Alert>
-                      ) : null}
-
-                      <div className="mb-3">
-                        <AvField
-                          id="email"
-                          name="email"
-                          label="Email"
-                          className="form-control"
-                          placeholder="Enter email"
-                          type="email"
-                          required
-                        />
-                      </div>
-
-                      <div className="mb-3">
-                        <AvField
-                          name="username"
-                          label="Username"
-                          type="text"
-                          required
-                          placeholder="Enter username"
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <AvField
-                          name="password"
-                          label="Password"
-                          type="password"
-                          required
-                          placeholder="Enter Password"
-                        />
-                      </div>
-
-                      <div className="mt-4">
-                        <button
-                          className="btn btn-primary btn-block "
-                          type="submit"
-                        >
-                          Register
-                        </button>
-                      </div>
-
-                      <div className="mt-4 text-center">
-                        <p className="mb-0">
-                          By registering you agree to the MyArchery{" "}
-                          <Link to="#" className="text-primary">
-                            Terms of Use
-                          </Link>
-                        </p>
-                      </div>
-                    </AvForm>
-                  </div>
-                </CardBody>
-              </Card>
-              <div className="mt-5 text-center">
-                <p>
-                  Already have an account ?{" "}
-                  <Link to="/authentication/login" className="font-weight-medium text-primary">
-                    {" "}
-                    Login
-                  </Link>{" "}
-                </p>
-                <p>
-                  © {new Date().getFullYear()} MyArchery. Crafted with{" "}
-                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
-                </p>
+                </div>
               </div>
             </Col>
+            <Col md={7} sm={12} xs={12}>
+            <div className="w-50 mx-auto" style={{paddingTop: "16vh"}}>
+              <div className="text-center">
+                <h2 className="font-size-20 text-danger">Daftar ke myarchery.id</h2>
+              </div>
+              <AvForm
+              className="form-horizontal"
+              onValidSubmit={(e, v) => {
+                handleValidSubmit(e, v)
+              }}
+              >
+                <div className="mb-2">
+                  <AvField
+                    name="email"
+                    label="Email"
+                    className="form-control"
+                    placeholder="Masukkan email/Nama EO Terdaftar"
+                    type="email"
+                    required
+                  />
+                </div>
+                <div className="mb-2">
+                  <AvField
+                    name="name"
+                    label="Nama EO"
+                    className="form-control"
+                    placeholder="Masukkan email/Nama EO Terdaftar"
+                    type="text"
+                    required
+                  />
+                </div>
+                <div className="mb-2">
+                        <AvField
+                          name="password"
+                          label="Kata Sandi"
+                          type="password"
+                          required
+                          placeholder="Masukkan kata sandi"
+                        />
+                      </div>
+                <div className="mb-2">
+                  <AvField
+                    name="password_confirmation"
+                    label="Konfirmasi Kata Sandi"
+                    type="password"
+                    required
+                    placeholder="Masukkan kata sandi"
+                  />
+                </div>
+
+                <div className="form-check">
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id="customControlInline"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="customControlInline"
+                        >
+                        I Agree to Terms of Service and Privacy Policy
+                        </label>
+                      </div>
+                      <div className="mt-3 d-grid">
+                        <button
+                          className="btn btn-primary btn-block"
+                          type="submit"
+                        >
+                          Daftar
+                        </button>
+                      </div>
+              </AvForm>
+                    <div className="d-flex justify-content-center pt-5">
+                      <img src={facebook} style={{cursor: 'pointer'}} />
+                      <img src={google} style={{cursor: 'pointer'}} />
+                    </div>
+                </div>
+            </Col>
           </Row>
-        </Container>
-      </div>
+        </div>
+      </Container>
     </React.Fragment>
   )
 }

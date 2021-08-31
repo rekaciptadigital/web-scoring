@@ -1,13 +1,18 @@
-import logo from "assets/images/logo.svg"
+// import logo from "assets/images/logo.svg"
 // import images
-import profile from "assets/images/profile-img.png"
+// import profile from "assets/images/profile-img.png"
 // availity-reactstrap-validation
 import { AvField, AvForm } from "availity-reactstrap-validation"
+import myachery from "assets/images/myachery/logo-myarchery.png"
+// import gmail from "assets/images/myachery/gmail.png"
+import google from "assets/images/myachery/Google.png"
+import facebook from "assets/images/myachery/Facebook.png"
+import ladBg from "assets/images/myachery/achery-lad.png"
 import React, { useEffect, useState } from "react"
 import MetaTags from "react-meta-tags"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, useHistory } from "react-router-dom"
-import { Card, CardBody, Col, Container, Row } from "reactstrap"
+import { useHistory, Link } from "react-router-dom"
+import { Col, Row, Container } from "reactstrap"
 import { AuthenticationService } from "services"
 //Import config
 import * as AuthenticationStore from "store/slice/authentication"
@@ -39,51 +44,41 @@ const Login = () => {
     }
   }, [isLoggedIn])
 
+  console.log(loginErrors)
+
   return (
     <React.Fragment>
       <MetaTags>
         <title>Login | MyArchery</title>
       </MetaTags>
-      <div className="home-btn d-none d-sm-block">
-        <Link to="/" className="text-dark">
-          <i className="fas fa-home h2" />
-        </Link>
-      </div>
-      <div className="account-pages my-5 pt-sm-5">
-        <Container>
-          <Row className="justify-content-center">
-            <Col md={8} lg={6} xl={5}>
-              <Card className="overflow-hidden">
-                <div className="bg-primary bg-soft">
-                  <Row>
-                    <Col xs={7}>
-                      <div className="text-primary p-4">
-                        <h5 className="text-primary">Welcome Back !</h5>
-                        <p>Sign in to continue to MyArchery.</p>
-                      </div>
-                    </Col>
-                    <Col className="col-5 align-self-end">
-                      <img src={profile} alt="" className="img-fluid" />
-                    </Col>
-                  </Row>
+      <Container fluid>
+        <div>
+          <Row>
+            <Col md={5} sm={12} xs={12}>
+              <img src={ladBg} style={{height: '100vh', zIndex: "-1", position: 'absolute', left:'-1px', width: 'auto'}} />
+              <div>
+                <div style={{paddingTop: "20vh"}} className=" mx-auto">
+                  <img src={myachery} />
                 </div>
-                <CardBody className="pt-0">
-                  <div>
-                    <Link to="/" className="auth-logo-light">
-                      <div className="avatar-md profile-user-wid mb-4">
-                        <span className="avatar-title rounded-circle bg-light">
-                          <img
-                            src={logo}
-                            alt=""
-                            className="rounded-circle"
-                            height="34"
-                          />
-                        </span>
-                      </div>
+                <div style={{zIndex: '100'}}>
+                  <p className="font-size-16 text-white">BUAT EVENT DI MANA SAJA KAPAN SAJA</p>
+                  <div className="w-75 mx-auto">
+                    <Link to="/authentication/login" className="text-decoration-none text-black-50 text-decoration-underline">
+                      <span style={{marginRight: '36px'}} className="font-size-18 text-white ">Masuk</span>
+                    </Link>
+                    <Link to="/authentication/register" className="text-decoration-none text-black-50">
+                      <span className="font-size-18 text-white">Daftar</span>
                     </Link>
                   </div>
-                  <div className="p-2">
-                    <AvForm
+                </div>
+              </div>
+            </Col>
+            <Col md={7} sm={12} xs={12}>
+            <div className="mx-auto w-50" style={{paddingTop: "25vh"}}>
+            <div className="text-center">
+              <h2 className="font-size-20 text-danger">Masuk ke myarchery.id</h2>
+            </div>
+            <AvForm
                       className="form-horizontal"
                       onValidSubmit={(e, v) => {
                         handleValidSubmit(e, v)
@@ -148,26 +143,15 @@ const Login = () => {
                         </Link>
                       </div>
                     </AvForm>
-                  </div>
-                </CardBody>
-              </Card>
-              <div className="mt-5 text-center">
-                <p>
-                  Don&#39;t have an account ?{" "}
-                  <Link to="register" className="fw-medium text-primary">
-                    {" "}
-                    Signup now{" "}
-                  </Link>{" "}
-                </p>
-                <p>
-                  © {new Date().getFullYear()} MyArchery. Crafted with{" "}
-                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
-                </p>
-              </div>
+                    <div className="d-flex justify-content-center pt-5">
+                      <img src={facebook} style={{cursor: 'pointer'}} />
+                      <img src={google} style={{cursor: 'pointer'}} />
+                    </div>
+                </div>
             </Col>
           </Row>
-        </Container>
-      </div>
+        </div>
+      </Container>
     </React.Fragment>
   )
 }

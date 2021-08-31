@@ -14,6 +14,7 @@ const SelectInput = ({
   error,
   disabled,
   readOnly,
+  placeholder,
 }) => {
   const [selectOptions, setSelectOptions] = useState([]);
   const [selectValue, setSelectValue] = useState(null);
@@ -60,6 +61,7 @@ const SelectInput = ({
         classNamePrefix="select2-selection"
         className={`${error?.[name] ? "is-invalid" : ""}`}
         isDisabled={disabled || readOnly}
+        placeholder={placeholder}
       />
       {_.get(error, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>

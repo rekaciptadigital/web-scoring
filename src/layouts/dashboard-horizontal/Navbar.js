@@ -7,6 +7,7 @@ import { Collapse } from "reactstrap";
 
 const Navbar = props => {
   const [app, setapp] = useState(false);
+  const [event, setEvent] = useState(false)
 
   useEffect(() => {
     var matchingMenuItem = null;
@@ -70,10 +71,24 @@ const Navbar = props => {
                   </Link>
                 </li>
                 <li className="nav-item dropdown">
-                  <Link className="nav-link" to="/dashboard/events/new">
+                  <Link to="/#"
+                        onClick={e => {
+                          e.preventDefault();
+                          setEvent(!event);
+                        }}
+                        className="nav-link dropdown-togglez arrow-none"
+                  >
                     <i className="bx bx-home-circle me-2"></i>
-                    {props.t("Event")}
+                    {props.t("Event")} <div className="arrow-down"></div>
                   </Link>
+                  <div className={classname("dropdown-menu", { show: event })}>
+                    <Link className="dropdown-item" to="/dashboard/events">
+                      {props.t("List")}
+                    </Link>
+                    <Link className="dropdown-item" to="/dashboard/events/new">
+                      {props.t("New")}
+                    </Link>
+                  </div>
                 </li>
                 <li className="nav-item dropdown">
                   <Link

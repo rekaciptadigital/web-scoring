@@ -3,7 +3,7 @@ const styles = {
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#dedede",
-    marginBottom: 10,
+    marginBottom: 30,
     padding: 10,
   },
 };

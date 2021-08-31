@@ -1,10 +1,82 @@
-import { Accordion, CheckboxInput, DatetimeInput, TextInput } from "components";
+import {
+  Accordion,
+  Button,
+  DateInput,
+  DatetimeInput,
+  NumberInput,
+  SelectInput,
+  SwitchInput,
+  TimeInput,
+} from "components";
 import React from "react";
 import { Col, Row } from "reactstrap";
 
 export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
+  };
+
+  const addSession = (dayIndex) => {
+    const qualificationDays = [...formData.qualificationDays];
+    qualificationDays[dayIndex].openDetails = true;
+    qualificationDays[dayIndex]?.details.push({
+      startTime: "",
+      endTime: "",
+      openEdit: true,
+      quota: 0,
+    });
+    handleChange({
+      key: "qualificationDays",
+      value: qualificationDays,
+    });
+  };
+
+  const expandSession = (dayIndex) => {
+    const qualificationDays = [...formData.qualificationDays];
+    qualificationDays[dayIndex].openDetails = qualificationDays[dayIndex]
+      .openDetails
+      ? false
+      : !qualificationDays[dayIndex].openDetails;
+    handleChange({
+      key: "qualificationDays",
+      value: qualificationDays,
+    });
+  };
+
+  const removeSessionItem = (dayIndex, detailIndex) => {
+    const qualificationDays = [...formData.qualificationDays];
+    qualificationDays[dayIndex].details.splice(detailIndex, 1);
+    handleChange({
+      key: "qualificationDays",
+      value: qualificationDays,
+    });
+  };
+
+  const saveSessionItem = (dayIndex, detailIndex) => {
+    const qualificationDays = [...formData.qualificationDays];
+    qualificationDays[dayIndex].details[detailIndex].openEdit = false;
+    handleChange({
+      key: "qualificationDays",
+      value: qualificationDays,
+    });
+  };
+
+  const editSessionItem = (dayIndex, detailIndex) => {
+    const qualificationDays = [...formData.qualificationDays];
+    qualificationDays[dayIndex].details[detailIndex].openEdit = true;
+    handleChange({
+      key: "qualificationDays",
+      value: qualificationDays,
+    });
+  };
+
+  const sumQuota = (items) => {
+    let totalQuota = 0;
+    items.map((item) => {
+      totalQuota += parseInt(item.quota || 0);
+    });
+
+    return totalQuota;
   };
 
   return (
@@ -56,107 +128,173 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
             {
               title: "Rincian Kualifikasi",
               alwaysOpen: true,
-              hide: formData.eventType !== 'marathon',
+              hide: formData.eventType !== "marathon",
               body: (
                 <Row>
-                  <Col lg={4}>
-                    <DatetimeInput
+                  <Col lg={3}>
+                    <DateInput
                       label="Buka Kualifikasi"
                       name="quatificationStartDatetime"
                       value={formData.quatificationStartDatetime}
                       onChange={handleChange}
                     />
                   </Col>
-                  <Col lg={4}>
-                    <DatetimeInput
+                  <Col lg={3}>
+                    <DateInput
                       label="Tutup Kualifikasi"
                       name="quatificationEndDatetime"
                       value={formData.quatificationEndDatetime}
                       onChange={handleChange}
                     />
                   </Col>
-                  <Col lg={4}>
-                    <CheckboxInput
-                      name="qualificationFreeOnHoliday"
-                      value={formData.qualificationFreeOnHoliday}
+                  <Col lg={3}>
+                    <SelectInput
+                      label="Sesi"
+                      name="sessionLength"
+                      value={formData.sessionLength}
+                      options={[{ id: "60", label: "Per 1 Jam" }]}
                       onChange={handleChange}
+                    />
+                  </Col>
+                  <Col lg={3}>
+                    <SwitchInput
+                      name="weekdaysOnly"
+                      value={formData.weekdaysOnly}
+                      onChange={handleChange}
+                      label="Weekday Only"
                       options={[
                         {
                           id: 1,
-                          label: "Weekend dan Tanggal Merah Libur",
+                          label: "Weekdays only",
                         },
                       ]}
                     />
                   </Col>
-                  <Col lg={4}>
-                    <TextInput
-                      label="Sesi/Hari"
-                      name="quatificationSessionPerDay"
-                      value={formData.quatificationSessionPerDay || ""}
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col lg={4}>
-                    <TextInput
-                      label="Kuota/Hari"
-                      name="quatificationQuotaPerDay"
-                      value={formData.quatificationQuotaPerDay || ""}
-                      onChange={handleChange}
-                    />
-                  </Col>
-                </Row>
-              ),
-            },
-            {
-              title: "Rincian Eliminasi",
-              alwaysOpen: true,
-              hide: formData.eventType !== 'marathon',
-              body: (
-                <Row>
-                  <Col lg={4}>
-                    <DatetimeInput
-                      label="Mulai Eliminasi"
-                      name="eliminationStartDatetime"
-                      value={formData.eliminationStartDatetime}
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col lg={4}>
-                    <DatetimeInput
-                      label="Selesai Eliminasi"
-                      name="eliminationEndDatetime"
-                      value={formData.eliminationEndDatetime}
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col lg={4}>
-                    <CheckboxInput
-                      name="eliminationFreeOnHoliday"
-                      value={formData.eliminationFreeOnHoliday}
-                      onChange={handleChange}
-                      options={[
-                        {
-                          id: 1,
-                          label: "Weekend dan Tanggal Merah Libur",
-                        },
-                      ]}
-                    />
-                  </Col>
-                  <Col lg={4}>
-                    <TextInput
-                      label="Sesi/Hari"
-                      name="eliminationSessionPerDay"
-                      value={formData.eliminationSessionPerDay || ""}
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col lg={4}>
-                    <TextInput
-                      label="Kuota/Hari"
-                      name="eliminationQuotaPerDay"
-                      value={formData.eliminationQuotaPerDay || ""}
-                      onChange={handleChange}
-                    />
+                  <Col lg={12}>
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Hari</th>
+                          <th>Sesi</th>
+                          <th style={{width: '1%', whiteSpace: 'nowrap'}}>Detail Sesi</th>
+                          <th>Kuota</th>
+                          <th>...</th>
+                        </tr>
+                      </thead>
+                      {formData.qualificationDays.map((day, dayIndex) => (
+                        <tbody key={day.id}>
+                          <tr>
+                            <td>{day.label}</td>
+                            <td>{day.details?.length} Sesi</td>
+                            <td>
+                              {day.details?.[0]?.startTime} -{" "}
+                              {day.details?.[0]?.endTime}
+                            </td>
+                            <td>{sumQuota(day.details)}</td>
+                            <td>
+                              <Button
+                                type="light"
+                                icon="plus-circle"
+                                outline
+                                size="sm"
+                                onClick={() => addSession(dayIndex)}
+                              />
+                              {" "}
+                              <Button
+                                type="light"
+                                icon={
+                                  day.openDetails
+                                    ? "chevron-up"
+                                    : "chevron-down"
+                                }
+                                outline
+                                size="sm"
+                                onClick={() => expandSession(dayIndex)}
+                              />
+                            </td>
+                          </tr>
+                          {day.openDetails &&
+                            day.details.map((detail, detailIndex) => (
+                              <tr
+                                key={detailIndex}
+                                style={{ background: "#F8F9FA" }}
+                              >
+                                <td></td>
+                                <td>Sesi {detailIndex + 1}</td>
+                                <td style={{width: '1%', whiteSpace: 'nowrap'}}>
+                                  {detail.openEdit ? (
+                                    <div style={{ display: "flex" }}>
+                                      <div style={{ width: 140 }}>
+                                        <TimeInput
+                                          name={`qualificationDays.${dayIndex}.details.${detailIndex}.startTime`}
+                                          value={detail.startTime}
+                                          onChange={handleChange}
+                                        />
+                                      </div>
+                                      <div> - </div>
+                                      <div style={{ width: 140 }}>
+                                        <TimeInput
+                                          name={`qualificationDays.${dayIndex}.details.${detailIndex}.endTime`}
+                                          value={detail.endTime}
+                                          onChange={handleChange}
+                                        />
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    `${detail.startTime} - ${detail.endTime}`
+                                  )}
+                                </td>
+                                <td style={{width: '1%'}}>
+                                  {detail.openEdit ? (
+                                    <div style={{ width: 100 }}>
+                                      <NumberInput
+                                        name={`qualificationDays.${dayIndex}.details.${detailIndex}.quota`}
+                                        value={detail.quota}
+                                        onChange={handleChange}
+                                      />
+                                    </div>
+                                  ) : (
+                                    detail.quota
+                                  )}
+                                </td>
+                                <td>
+                                  {detail.openEdit ? (
+                                    <Button
+                                      type="primary"
+                                      icon="check"
+                                      outline
+                                      size="sm"
+                                      onClick={() =>
+                                        saveSessionItem(dayIndex, detailIndex)
+                                      }
+                                    />
+                                  ) : (
+                                    <Button
+                                      type="warning"
+                                      icon="pencil"
+                                      outline
+                                      size="sm"
+                                      onClick={() =>
+                                        editSessionItem(dayIndex, detailIndex)
+                                      }
+                                    />
+                                  )}
+                                  {" "}
+                                  <Button
+                                    type="danger"
+                                    icon="trash"
+                                    outline
+                                    size="sm"
+                                    onClick={() =>
+                                      removeSessionItem(dayIndex, detailIndex)
+                                    }
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      ))}
+                    </table>
                   </Col>
                 </Row>
               ),

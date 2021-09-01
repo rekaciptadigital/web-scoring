@@ -117,7 +117,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                   <Col lg={6}>
                     <DatetimeInput
                       label="Selesai Lomba"
-                      name="eventStartDatetime"
+                      name="eventEndDatetime"
                       value={formData.eventEndDatetime}
                       onChange={handleChange}
                     />
@@ -152,24 +152,18 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       <Col lg={3}>
                         <SelectInput
                           label="Sesi"
-                          name="sessionLength"
-                          value={formData.sessionLength}
+                          name="qualificationSessionLength"
+                          value={formData.qualificationSessionLength}
                           options={[{ id: "60", label: "Per 1 Jam" }]}
                           onChange={handleChange}
                         />
                       </Col>
                       <Col lg={3}>
                         <SwitchInput
-                          name="weekdaysOnly"
-                          value={formData.weekdaysOnly}
+                          name="qualificationWeekdaysOnly"
+                          value={formData.qualificationWeekdaysOnly}
                           onChange={handleChange}
                           label="Weekday Only"
-                          options={[
-                            {
-                              id: 1,
-                              label: "Weekdays only",
-                            },
-                          ]}
                         />
                       </Col>
                       <Col lg={12}>

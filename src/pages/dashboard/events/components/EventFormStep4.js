@@ -1,8 +1,9 @@
 import { Button, DateInput, SelectInput, TextInput } from "components";
 import { dummyConstants } from "constants/index";
+import _ from "lodash";
 import React from "react";
 import { Col, Label, Row } from "reactstrap";
-import { stringUtil } from "utils";
+import { objectUtil, stringUtil } from "utils";
 import styles from "../styles";
 import ModalDistances from "./ModalDistances";
 import ModalTeamCategories from "./ModalTeamCategories";
@@ -30,7 +31,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
   }
 
   function handleCopyRow(index) {
-    const newCategory = { ...formData.eventCategories[index] };
+    const newCategory = objectUtil.copy(formData.eventCategories[index]);
     let categoryList = [...formData.eventCategories];
     categoryList.splice(index + 1, 0, newCategory);
     handleChange({
@@ -120,7 +121,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                 </Col>
               </Row>
               <Label>Kategori Lomba</Label>
-              <Row style={{paddingLeft: 10, paddingRight: 10}}>
+              <Row style={{ paddingLeft: 10, paddingRight: 10 }}>
                 <Col style={{ border: "dashed 1px #dedede", padding: 10 }}>
                   {eventCategory.competitionCategories.map(
                     (competitionCategory, competitionCategoryIndex) => {
@@ -150,7 +151,10 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                   }
                                 />
                               }
-                              value={competitionCategory.distances || ""}
+                              value={_.map(
+                                competitionCategory.distances || [],
+                                "label"
+                              )}
                             />
                             <ModalDistances
                               isOpen={competitionCategory.isOpenDistanceModal}

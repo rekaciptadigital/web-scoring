@@ -54,7 +54,8 @@ const CheckboxInput = ({
                   checked={
                     option.checked ||
                     value.includes(option.id) ||
-                    _.findIndex(value, ["id", option.id]) != -1
+                    _.findIndex(value, ["id", option.id]) != -1 ||
+                    value === true
                   }
                 />
                 <Label className="form-check-label" htmlFor={option.id}>

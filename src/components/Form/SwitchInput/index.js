@@ -47,7 +47,7 @@ const SwitchInput = ({
   label,
   onLabel,
   offLabel,
-  value,
+  value = false,
   onChange,
   error,
   onInfo,

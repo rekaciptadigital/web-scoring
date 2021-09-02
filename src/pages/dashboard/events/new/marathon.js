@@ -40,6 +40,15 @@ const EventsNewMarathon = () => {
     targets: "",
     publishNow: true,
     publishDatetime: "",
+    qualificationDays: [
+      { id: "monday", label: "Senin", details: [], weekday: true },
+      { id: "tuesday", label: "Selasa", details: [], weekday: true },
+      { id: "wednesday", label: "Rabu", details: [], weekday: true },
+      { id: "thursday", label: "Kamis", details: [], weekday: true },
+      { id: "friday", label: "Jumat", details: [], weekday: true },
+      { id: "saturday", label: "Sabtu", details: [], weekday: false },
+      { id: "sunday", label: "Minggu", details: [], weekday: false },
+    ],
   });
 
   const handleChange = (key, value) => {

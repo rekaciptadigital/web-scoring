@@ -1,15 +1,15 @@
 // Dashboard
-import Dashboard from "../pages/Dashboard"
-import ListEvent from "../pages/Dashboard/events"
-import ListMember from "../pages/Dashboard/member"
-import EventsNew from "../pages/Dashboard/events/new"
-import ListCategory from "../pages/Dashboard/category"
-import ListScoring from "../pages/Dashboard/scoring"
-import ScoringNew from "pages/Dashboard/scoring/new"
-import EventsNewFullday from "pages/Dashboard/events/new/fullday";
-import EventsNewMarathon from "pages/Dashboard/events/new/marathon";
-import React from "react";
-import { Redirect } from "react-router-dom";
+import EventsNewFullday from "pages/dashboard/events/new/fullday"
+import EventsNewMarathon from "pages/dashboard/events/new/marathon"
+import ScoringNew from "pages/dashboard/scoring/new"
+import React from "react"
+import { Redirect } from "react-router-dom"
+import Dashboard from "../pages/dashboard"
+import ListCategory from "../pages/dashboard/category"
+import ListEvent from "../pages/dashboard/events"
+import EventsNew from "../pages/dashboard/events/new"
+import ListMember from "../pages/dashboard/member"
+import ListScoring from "../pages/dashboard/scoring"
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },

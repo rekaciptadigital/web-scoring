@@ -1,9 +1,4 @@
 {
-  "rules": {
-    "no-undef": "off",
-    "react/prop-types": 0,
-    "react/display-name": 0
-  },
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended"
@@ -17,5 +12,22 @@
       "modules": true,
       "experimentalObjectRestSpread": true
     }
+  },
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "globals": {
+    "$": true
+  },
+  "settings": {
+    "react": {
+      "version": "^17.0.1"
+    }
+  },
+  "rules": {
+    "no-undef": "off",
+    "react/prop-types": 0,
+    "react/display-name": 0
   }
 }

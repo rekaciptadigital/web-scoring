@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
 import "./assets/scss/theme.scss";
-import { AuthLayout, DashboardHorizontalLayout } from "./layouts";
+import { AuthLayout, DashboardHorizontalLayout, DashboardEventUmum, LandingPageLayout } from "./layouts";
 import { AuthenticationMiddleware } from "./middlewares";
-import { authenticationRoutes, dashboardRoutes, workingRoutes } from "./routes";
+import { authenticationRoutes, dashboardRoutes, workingRoutes, eventRouters, landingpageRouters } from "./routes";
 
 const App = () => {
   return (
@@ -35,6 +35,26 @@ const App = () => {
             <AuthenticationMiddleware
               path={route.path}
               layout={AuthLayout}
+              component={route.component}
+              key={idx}
+              isAuthProtected={false}
+              exact
+            />
+          ))}
+          {eventRouters.map((route, idx) => (
+            <AuthenticationMiddleware
+              path={route.path}
+              layout={DashboardEventUmum}
+              component={route.component}
+              key={idx}
+              isAuthProtected={false}
+              exact
+            />
+          ))}
+           {landingpageRouters.map((route, idx) => (
+            <AuthenticationMiddleware
+              path={route.path}
+              layout={LandingPageLayout}
               component={route.component}
               key={idx}
               isAuthProtected={false}

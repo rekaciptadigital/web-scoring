@@ -32,11 +32,10 @@ class Layout extends Component {
     // Scrollto 0,0
     window.scrollTo(0, 0)
 
-    const title = this.props.location.pathname
-    let currentage = title.charAt(1).toUpperCase() + title.slice(2)
-
+    // const title = this.props.location.pathname
+    // let currentage = title.charAt(1).toUpperCase() + title.slice(2)
     document.title =
-      currentage + " | Skote - React Admin & Dashboard Template"
+      "Dashboard" + " | MyArchery"
   }
 
   /**
@@ -46,6 +45,7 @@ class Layout extends Component {
     this.setState({ isMenuOpened: !this.state.isMenuOpened })
   }
   render() {
+    console.log(this.props.children)
     return (
       <React.Fragment>
         <div id="preloader">

@@ -10,13 +10,13 @@ import { Container, Row, Col, CardBody, Card, Button } from "reactstrap"
 // import images
 import profileImg from "../../../assets/images/profile-img.png"
 import logoImg from "../../../assets/images/logo.svg"
-import avatar from "../../../assets/images/users/avatar-1.jpg"
+import avatar from "../../../assets/images/users/avatar-man.png"
 
 const LockScreen = () => {
   return (
     <React.Fragment>
       <MetaTags>
-        <title>Lock Screen | Skote - React Admin & Dashboard Template</title>
+        <title>Lock Screen | MyArchery</title>
       </MetaTags>
       <div className="home-btn d-none d-sm-block">
         <Link to="/" className="text-dark">
@@ -104,7 +104,7 @@ const LockScreen = () => {
                   </Link>{" "}
                 </p>
                 <p>
-                  © 2021 Skote. Crafted with{" "}
+                  © 2021 MyArchery. Crafted with{" "}
                   <i className="mdi mdi-heart text-danger" /> by Themesbrand
                   </p>
               </div>

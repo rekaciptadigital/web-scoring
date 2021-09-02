@@ -31,8 +31,28 @@ deploy_production:
   only:
     - master
 
+update_staging:
+  stage: update
+  script:
+    - echo "Updating develop"
+    - ssh -p22 root@$IP_HOST "GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git checkout develop && GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git fetch origin develop && GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git pull origin develop"
+    - echo "Code Updated"
+  only:
+    - develop
 
-# ####New Deployment######
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Cleaning Up Modules"
+    - ssh -p22 root@$IP_HOST "rm -rf /var/www/web-archery-stg/node_modules && rm  /var/www/web-archery-stg/package-lock.json"
+    - ssh -p22 root@$IP_HOST "sudo npm install --prefix /var/www/web-archery-stg && sudo npm run build --prefix /var/www/web-archery-stg"
+    - echo "Build Success, Apps running for Staging"
+  only:
+    - develop
+
+
+
+####New Deployment######
 # image: tetraweb/php
 
 # before_script:
@@ -57,4 +77,3 @@ deploy_production:
 #     - scp -P22 -r build/* root@IP_HOST:/opt/archery-web/_tmp
 #     - ssh -p22 root@IP_HOST "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
 #     - ssh -p22 root@IP_HOST "rm -rf /opt/archery-web/_old"
-

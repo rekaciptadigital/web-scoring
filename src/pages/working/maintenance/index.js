@@ -15,7 +15,7 @@ const Maintenance = () => {
     <React.Fragment>
       <section className="my-5 pt-sm-5">
         <MetaTags>
-          <title>Maintenance | Skote - React Admin & Dashboard Template</title>
+          <title>Maintenance | MyArchery</title>
         </MetaTags>
         <Container>
           <Row>

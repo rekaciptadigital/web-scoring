@@ -16,7 +16,7 @@ import { dummyConstants } from '../../../constants'
 
 function ListScoring() {
 
-    const [open] = useState(false)
+    const [open] = useState(true)
 
     return (
         <React.Fragment>
@@ -25,14 +25,16 @@ function ListScoring() {
                     <title>Dashboard | List - Scoring</title>
                 </MetaTags>
                 <Container fluid>
-                <Button color="outline-dark">{'<-'}</Button>
+                <Link to="/dashboard">
+                    <Button color="outline-dark">{'<-'}</Button>
+                </Link>
                 <span style={{marginLeft: '0.5rem'}}>Kembali ke Dashboard</span>
                 <div className="mb-3 d-flex justify-content-around w-50 mt-md-0 mt-3 mx-auto">
                     <Link className="text-black-50">Edit Event</Link>
                     <Link to='/dashboard/category' className="text-black-50">List Kategori</Link>
                     <Link to='/dashboard/member' className="text-black-50">List Peserta</Link>
                     <Link to='/dashboard/scoring'>Set Scoring</Link>
-                    <Link className="text-black-50">Hasil Scoring</Link>
+                    <Link to='/dashboard/result' className="text-black-50">Hasil Scoring</Link>
                 </div>
                 {  open ? (
                     <div className="mb-4">

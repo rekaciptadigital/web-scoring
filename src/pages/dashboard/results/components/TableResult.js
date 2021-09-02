@@ -7,6 +7,7 @@ import paginationFactory, {
   PaginationProvider, PaginationListStandalone,
   SizePerPageDropdownStandalone
 } from 'react-bootstrap-table2-paginator';
+import { Link } from 'react-router-dom'
 
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
@@ -15,15 +16,14 @@ import { dummyConstants } from '../../../../constants'
 
 //Import Breadcrumb
 import './sass/datatables.scss'
-// import '../../member/components/sass/datatables.scss'
 
-class TableCategory extends Component {
+class TableResult extends Component {
   constructor(props) {
     super(props)
     this.state = {
       page: 1,
       sizePerPage: 10,
-      productData: dummyConstants.category
+      productData: dummyConstants.result
     }
 
   }
@@ -35,31 +35,42 @@ class TableCategory extends Component {
       text: 'Id',
       sort: true,
     }, {
-      dataField: 'class',
-      text: 'Kelas',
+      dataField: 'name',
+      text: 'Name',
       sort: true
     }, {
-      dataField: 'death_bird',
-      text: 'Batas Lahir',
+      dataField: 'code',
+      text: 'Kode',
+      sort: true,
+    }, {
+      dataField: 'club',
+      text: 'Nama Klub',
       sort: true
     }, {
-      dataField: 'arange',
-      text: 'Jarak',
+      dataField: 'sum',
+      text: 'Sum',
       sort: true
     }, {
-      dataField: 'kuota',
-      text: 'Kuota Terisi',
+      dataField: 'total',
+      text: 'Total',
       sort: true
     }, {
-      dataField: 'registrasi',
-      text: 'Biaya Registrasi',
+      dataField: 'x',
+      text: 'X',
+      sort: true,
+    }, {
+      dataField: 'x_10',
+      text: 'X + 10',
+      sort: true,
     }, {
       dataField: 'status',
       text: 'Status',
-      formatter: (cell, row) => {
+      formatter: () => {
         return (
           <div>
-            <span className={`${row.status ? "bg-danger" : "bg-success"} text-white rounded-3 px-2`}>{row.status ? "Full Booked" : "On Sale"}</span>
+            <Link to="/dashboard/result/edit" className="text-black-50">
+              <i className="bx bx-edit-alt"></i>
+            </Link>
           </div>
         )
       }
@@ -73,7 +84,7 @@ class TableCategory extends Component {
 
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: dummyConstants.category.length, // replace later with size(customers),
+      totalSize: dummyConstants.result.length, // replace later with size(customers),
       custom: true,
     }
 
@@ -184,4 +195,4 @@ class TableCategory extends Component {
   }
 }
 
-export default TableCategory
+export default TableResult

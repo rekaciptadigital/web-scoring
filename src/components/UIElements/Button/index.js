@@ -8,6 +8,8 @@ const Button = ({
   iconType = "bx",
   trailingIcon,
   trailingIconType = "bx",
+  size = "normal",
+  outline = false,
 }) => {
   const handleClick = () => {
     if (onClick) onClick();
@@ -16,7 +18,7 @@ const Button = ({
   return (
     <button
       type="button"
-      className={`btn btn-${type}`}
+      className={`btn btn${outline ? "-outline-" : "-"}${type} btn-${size}`}
       onClick={() => {
         handleClick();
       }}

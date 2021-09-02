@@ -46,7 +46,6 @@ class Layout extends Component {
     this.setState({ isMenuOpened: !this.state.isMenuOpened })
   }
   render() {
-    console.log(this.props.children)
     return (
       <React.Fragment>
         <div id="preloader">

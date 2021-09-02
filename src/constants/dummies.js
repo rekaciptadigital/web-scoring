@@ -134,6 +134,14 @@ const editResult = [
   {"id": 6, "shoot": [0, 0, 0, 0, 0, 0], "sum": 5, "x": 6, "x_10": 5},
 ]
 
+const categoryArchery = [
+  {"id": 1, "arange": "50m", "category": "Traditional Bow", "type": "Individu", "quota": "20/75"},
+  {"id": 2, "arange": "50m", "type": "Mix Team; Female Team, Male Team", "category": "Individu", "quota": "20/100"},
+  {"id": 3, "arange": "20m", "category": "Barebow", "type": "Individu", "quota": "0/75"},
+  {"id": 4, "arange": "30m", "category": "Recurve", "type": "Mix Team; Female Team, Male Team", "quota": "20/100"},
+  
+]
+
 
 export default {
   eventAgeCategories,
@@ -145,4 +153,5 @@ export default {
   scoring,
   result,
   editResult,
+  categoryArchery
 };

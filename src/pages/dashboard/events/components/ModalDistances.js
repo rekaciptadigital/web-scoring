@@ -1,5 +1,4 @@
 import { CheckboxInput } from "components";
-import _ from "lodash";
 import React, { useState } from "react";
 import { Modal } from "reactstrap";
 import { dummyConstants } from "../../../../constants";
@@ -14,7 +13,7 @@ const ModalDistances = ({ isOpen, toggle, name, onSaveChange }) => {
 
   const handleSave = () => {
     if (onSaveChange) {
-      onSaveChange({ key: name, value: _.map(selectedItems, "label") });
+      onSaveChange({ key: name, value: selectedItems });
     }
     toggle();
   };

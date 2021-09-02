@@ -29,7 +29,7 @@ function isNumeric(str) {
 function isNumericOnly(object) {
   let numericOnly = true;
   const keys = Object.keys(object);
-  keys.map(key => {
+  keys.map((key) => {
     if (!isNumeric(key) && numericOnly) {
       numericOnly = false;
     }
@@ -40,21 +40,18 @@ function isNumericOnly(object) {
 
 function convertToArray(object) {
   const keys = Object.keys(object);
-  const newArray = keys.map(key => {
+  const newArray = keys.map((key) => {
     return object[key];
   });
   return newArray;
 }
 
-const sanitize = object => {
+const sanitize = (object) => {
   Object.entries(object).forEach(([k, v]) => {
     if (v && typeof v === "object") {
       sanitize(v);
     }
-    if (
-      v === null ||
-      v === undefined
-    ) {
+    if (v === null || v === undefined) {
       if (Array.isArray(object)) {
         object.splice(k, 1);
       } else {
@@ -65,7 +62,12 @@ const sanitize = object => {
   return object;
 };
 
+const copy = (object) => {
+  return JSON.parse(JSON.stringify(object));
+};
+
 export default {
   set,
   sanitize,
+  copy,
 };

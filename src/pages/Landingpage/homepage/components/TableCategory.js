@@ -4,7 +4,7 @@ import { Row, Col,  } from "reactstrap"
 // datatable related plugins
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory, {
-  PaginationProvider, PaginationListStandalone,
+  PaginationProvider,
  
 } from 'react-bootstrap-table2-paginator';
 
@@ -89,7 +89,7 @@ class TableCategory extends Component {
                       columns={columns}
                       data={this.state.productData}
                     >
-                      {({ paginationProps, paginationTableProps }) => (
+                      {({ paginationTableProps }) => (
                         <ToolkitProvider
                           keyField='id'
                           columns={columns}
@@ -98,19 +98,6 @@ class TableCategory extends Component {
                         >
                           {toolkitProps => (
                             <React.Fragment>
-
-                              <Row className="mb-2">
-                                <Col md="4">
-                                  <div className="search-box me-2 mb-2 d-inline-block">
-                                    <div className="position-relative">
-                                      {/* <SearchBar
-                                        {...toolkitProps.searchProps}
-                                      /> */}
-                                      {/* <i className="bx bx-search-alt search-icon" /> */}
-                                    </div>
-                                  </div>
-                                </Col>
-                              </Row>
 
                               <Row>
                                 <Col xl="12">
@@ -129,17 +116,6 @@ class TableCategory extends Component {
                                       {...paginationTableProps}
                                     />
 
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row className="align-items-md-center mt-30">
-                                <Col className="inner-custom-pagination d-flex">
-                                  
-                                  <div className="text-md-right ms-auto">
-                                    <PaginationListStandalone
-                                      {...paginationProps}
-                                    />
                                   </div>
                                 </Col>
                               </Row>

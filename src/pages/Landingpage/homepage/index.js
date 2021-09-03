@@ -15,6 +15,7 @@ import Countdown from "react-countdown"
 //Import Components
 import Header from "layouts/landingpage/Header"
 import CardContent from "./components/card-content";
+import Footer from "layouts/landingpage/Footer";
 
 
 const renderer = ({ days, hours, minutes, seconds, completed }) => {
@@ -131,8 +132,10 @@ const LandingPage = () => {
         </Container>
       </section>
 
+
       <CardContent/>
 
+      <Footer />
 
     </React.Fragment>
   )

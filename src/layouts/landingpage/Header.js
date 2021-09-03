@@ -14,6 +14,7 @@ import { Link } from "react-router-dom"
 
 //Import Images
 import logolight from "../../assets/images/myachery/logo-myarchery.png"
+import logoblack from "../../assets/images/myachery/myachery.png"
 
 const navItems = [
   { id: 1, idnm: "home", navheading: "Home" },
@@ -39,7 +40,7 @@ const Navbar_Page = props => {
           <NavbarBrand className="navbar-logo" href="/">
             {props.imglight !== true ? (
               <img
-                src={logolight}
+                src={logoblack}
                 alt=""
                 height="44"
                 width="80"

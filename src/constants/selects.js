@@ -80,6 +80,17 @@ const eventPublishTime = [
   },
 ];
 
+const fulldayAudience = [
+  {
+    id: "Individu",
+    label: "Individu"
+  },
+  {
+    id: "Tim",
+    label: "Tim"
+  },
+]
+
 export default {
   eventLocationType,
   eventAvailableRegistrationFee,
@@ -87,4 +98,5 @@ export default {
   confirmation,
   eventAudiences,
   eventPublishTime,
+  fulldayAudience,
 };

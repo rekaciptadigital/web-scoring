@@ -7,22 +7,20 @@ import {
   import React from "react";
   import { Col, Row, Label } from "reactstrap";
   import { selectConstants } from "constants/index";
-import { dummyConstants } from "constants/index";
-import CardTicket from "./cardTicket";
-  
+  import { dummyConstants } from "constants/index";
+
   export const FulldayFormStep1 = ({ onFormFieldChange, formData }) => {
     const handleChange = ({ key, value }) => {
       if (onFormFieldChange) onFormFieldChange(key, value);
     };
   
     return (
-      <Row>
         <Col lg={8}>
           <Row>
             <Col lg={12}>
                 <CheckboxInput
                     label="Daftar Sebagai?"
-                    name="teamCategories"
+                    name="fulldayAudience"
                     onChange={handleChange}
                     options={selectConstants.fulldayAudience}
                     inline
@@ -84,22 +82,9 @@ import CardTicket from "./cardTicket";
                     value={formData.competitionCategory}
                 />
               </Row>
-              <Col lg={4}>
-           
-            <TextInput
-                label="Nama Tim"
-                name="teamName"
-                value={formData.city}
-                onChange={handleChange}
-              />
-            </Col>
-           
           </Row>
         </Col>
-        <Col lg={4}>
-          <CardTicket/>
-        </Col>
-      </Row>
+      
     );
   };
   

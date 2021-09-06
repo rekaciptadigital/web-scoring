@@ -13,11 +13,17 @@ const LabelFooter = styled.label`
     padding-right: 5px;
 `;
 
+const FooterTag = styled.footer`
+  position: absolute;
+  background-color: #f2f2f5;
+  width: 100%;
+`;
+
 
 const Footer = () => {
   return (
     <React.Fragment>
-      <footer >
+      <FooterTag>
         <Container fluid={true}>
           <Row className="mt-4">
             <Col md={12}>
@@ -49,7 +55,7 @@ const Footer = () => {
                 </Col>
           </Row>
         </Container>
-      </footer>
+      </FooterTag>
     </React.Fragment>
   )
 }

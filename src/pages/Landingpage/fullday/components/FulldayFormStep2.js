@@ -1,6 +1,5 @@
   import React from "react";
   import { Col, Row } from "reactstrap";
-  import CardTicket from "./cardTicket";
   
   export const FulldayFormStep2 = ({  formData }) => {
     
@@ -11,43 +10,39 @@
             <table className="table">
               <tbody>
                 <tr>
-                  <td>Email</td>
+                  <td>Email :</td>
                   <td>
-                    {formData.eventStartDatetime} s/d {formData.eventEndDatetime}
+                    {formData.email}
                   </td>
                 </tr>
                 <tr>
-                  <td>No. Telp</td>
+                  <td>No. Telp :</td>
                   <td>
-                    {formData.registrationStartDatetime} s/d{" "}
-                    {formData.registrationEndDatetime}
+                    {formData.phone}
                   </td>
                 </tr>
                 <tr>
-                  <td>Nama Klub</td>
+                  <td>Nama Klub :</td>
                   <td>
-                    {formData.eventStartDatetime} s/d {formData.eventEndDatetime}
+                    {formData.clubName}
                   </td>
                 </tr>
                 <tr>
-                  <td>Nama Pemanah 1</td>
+                  <td>Tanggal Lahir :</td>
                   <td>
-                    {formData.eventStartDatetime} s/d {formData.eventEndDatetime}
+                    {formData.clubName}
                   </td>
                 </tr>
                 <tr>
-                  <td>Nama Pemanah 2</td>
+                  <td>Gender :</td>
                   <td>
-                    {formData.eventStartDatetime} s/d {formData.eventEndDatetime}
+                    {formData.clubName}
                   </td>
                 </tr>
               </tbody>
             </table>
           </Col>
-          <Col lg={4}>
-            <CardTicket/>
-          </Col>
-
+          
         </Row>
         
         

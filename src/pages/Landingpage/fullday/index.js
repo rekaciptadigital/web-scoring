@@ -3,7 +3,6 @@ import MetaTags from 'react-meta-tags';
 import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
 import FormFullday from "./components/FormFullday";
-import { stringUtil } from "utils";
 import { Container, Row } from "reactstrap";
 import styled from 'styled-components';
 
@@ -22,39 +21,13 @@ const RegisterFullday = () => {
 
     const [eventData, setEventData] = useState({
         eventType: "fullday",
-        poster: "",
-        handbook: "",
-        eventName: "",
-        registrationStartDatetime: "",
-        registrationEndDatetime: "",
-        eventStartDatetime: "",
-        eventEndDatetime: "",
-        location: "",
-        city: "",
-        locationType: "",
-        description: "",
-        isFlatRegistrationFee: true,
-        registrationFees: [
-          {
-            id: "normal",
-            label: "Normal",
-            checkedRequired: true,
-          },
-        ],
-        teamCategories: [],
-        eventCategories: [
-          {
-            id: stringUtil.createRandom(),
-            competitionCategories: [
-              {
-                id: stringUtil.createRandom(),
-              },
-            ],
-          },
-        ],
-        targets: "",
-        publishNow: true,
-        publishDatetime: "",
+        fulldayAudience: "",
+        email: "",
+        phone: "",
+        clubName: "",
+        teamName: "",
+        isUserSamePlayer: true,
+        category: "",
       });
     
 

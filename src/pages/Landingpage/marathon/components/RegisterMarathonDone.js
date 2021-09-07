@@ -32,7 +32,7 @@ const Content = styled.div`
 `;
 
 
-const RegisterDone = () => {
+const RegisterMarathonDone = () => {
     return (
         <React.Fragment>
             <MetaTags>
@@ -47,16 +47,19 @@ const RegisterDone = () => {
                         <H5>Transaksi Anda Berhasil! </H5>
                         <p>Bukti pembayaran akan dikirim ke email terdaftar:</p>
                         <span>nama@mail.com</span>
-                        
-                        <Col sm={12}>
-                        
-                        <Button
-                            href="/full-day"
-                            type="button"
-                            style={{backgroundColor: "#0D47A1",  marginTop:"20px"}}>
-                        Kembali ke Dashboard
-                        </Button>
-                                </Col>
+                        <p>Pilih tanggal kualifikasi?</p>
+                        <Col sm="12">
+                            <Button
+                                type="button"
+                                style={{backgroundColor: "#BF152C"}}>
+                            Lewati
+                            </Button>
+                            <Button
+                                type="button"
+                                style={{backgroundColor: "#0D47A1", marginLeft: "10px"}}>
+                            Selanjutnya
+                            </Button>
+                        </Col>
                     </Row>
                 </Content>
 
@@ -66,4 +69,4 @@ const RegisterDone = () => {
     )
 }
 
-export default RegisterDone
+export default RegisterMarathonDone

@@ -91,6 +91,17 @@ const fulldayAudience = [
   },
 ]
 
+const gender = [
+  {
+    id: "Male",
+    label: "Laki-laki"
+  },
+  {
+    id: "Female",
+    label: "Perempuan"
+  },
+]
+
 export default {
   eventLocationType,
   eventAvailableRegistrationFee,
@@ -99,4 +110,5 @@ export default {
   eventAudiences,
   eventPublishTime,
   fulldayAudience,
+  gender,
 };

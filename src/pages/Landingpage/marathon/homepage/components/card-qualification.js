@@ -1,8 +1,7 @@
-// import PropTypes from 'prop-types'
-import TableCategory from "pages/dashboard/category/components/TableCategory";
 import React from "react"
 import { Card, CardBody, Col, Media } from "reactstrap"
 import styled from "styled-components"
+import TableSchedule from "./TableQualificationSchedule";
 
 const Label = styled.label`
   font-size: 12px;
@@ -23,7 +22,7 @@ const CardQualification = () => {
                 <Media body>
                     <h5 className="mb-3">Jadwal Kualifikasi</h5>
                     <Label>Peserta dapat memilih maksimal 3 sesi</Label>
-                    <TableCategory />
+                    <TableSchedule />
                 </Media>
               </Media>
             </CardBody>

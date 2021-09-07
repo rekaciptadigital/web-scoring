@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import MetaTags from 'react-meta-tags';
 import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
-import FormFullday from "./components/FormFullday";
+import FormMarathon from "./components/FormMarathon";
 import { Container, Row } from "reactstrap";
 import styled from 'styled-components';
 
@@ -17,7 +17,7 @@ const H5 = styled.h5`
 `;
 
 
-const RegisterFullday = () => {
+const RegisterMarathon = () => {
 
     const [eventData, setEventData] = useState({
         eventType: "fullday",
@@ -72,7 +72,7 @@ const RegisterFullday = () => {
   return (
     <React.Fragment>
       <MetaTags>
-        <title>ICO Landing | Skote - React Admin & Dashboard Template</title>
+        <title>Marathon | MyAchery</title>
       </MetaTags>
       {/* import navbar */}
       <HeaderForm />
@@ -82,7 +82,7 @@ const RegisterFullday = () => {
         </Row>
  
         <Container fluid className="px-5 p-2">
-          <FormFullday
+          <FormMarathon
             onFormFieldChange={(key, value) => handleChange(key, value)}
             formData={eventData}
           />
@@ -94,4 +94,4 @@ const RegisterFullday = () => {
   )
 }
 
-export default RegisterFullday
+export default RegisterMarathon

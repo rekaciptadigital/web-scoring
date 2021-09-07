@@ -1,7 +1,7 @@
 // import PropTypes from 'prop-types'
 import React from "react"
 import { Card, CardBody, Col, Media, Row } from "reactstrap"
-import TableCategory from "./TableCategory"
+import TableCategory from "./TableCategoryMarathon"
 import styled from "styled-components"
 
 const Td = styled.td`

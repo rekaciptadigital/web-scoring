@@ -11,7 +11,7 @@ import paginationFactory, {
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
 // Data for dummy
-import { dummyConstants } from '../../../../constants'
+import { dummyConstants } from '../../../../../constants'
 
 //Import Breadcrumb
 import './sass/datatables.scss'

@@ -144,9 +144,8 @@ const FormMarathon = ({ onFormFieldChange, formData }) => {
                                   <Button
                                       type="button"
                                       style={{backgroundColor: "#0D47A1"}}
-                                      onClick={() => {
-                                        toggleTab(activeTab + 1);
-                                      }}>
+                                      href="/checkout-event"
+                                     >
                                     Selesai
                                   </Button>
                                   ) : (

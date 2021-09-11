@@ -11,7 +11,7 @@ import {
   TabContent,
   TabPane
 } from "reactstrap";
-import dummy from "../new/DummyEvent.json" //Coba mengunankan data json yang ada pada postman
+// import dummy from "../new/DummyEvent.json" //Coba mengunankan data json yang ada pada postman
 import { EventsService } from "../../../../services"
 // import { objectUtil } from "utils";
 import { EventFormStep1 } from "./EventFormStep1";
@@ -23,7 +23,7 @@ import { EventFormStep6 } from "./EventFormStep6";
 
 const FormWizard = ({ onFormFieldChange, formData }) => {
 
-  console.log(dummy)
+  // console.log(dummy)
   const [activeTab, setactiveTab] = useState(1);
 
   function toggleTab(tab) {
@@ -37,7 +37,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
   const handleValidSubmit = async (values) => {
     const d = { ...values }
     d.qualificationWeekdaysOnly = "1"
-    const { data, errors, message, success } = await EventsService.register(dummy)
+    const { data, errors, message, success } = await EventsService.register(d)
       if (success) {
         if (data) {
           console.log(data)

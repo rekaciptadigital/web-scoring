@@ -36,9 +36,11 @@ export default {
       });
     } else {
       for (var key in data) {
+        console.log(`Key: ${key} - Data: ${data[key]}`)
         formData.append(key, data[key]);
       }
     }
+    console.log(formData)
     let config = {
       method: "POST",
       headers: {

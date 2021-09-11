@@ -1,15 +1,15 @@
 // availity-reactstrap-validation
-import myachery from "assets/images/myachery/logo-myarchery.png"
+import myachery from "assets/images/myachery/logo 3.png"
 import React, { useEffect, useState } from "react"
 import google from "assets/images/myachery/Google.png"
 import facebook from "assets/images/myachery/Facebook.png"
-import ladBg from "assets/images/myachery/achery-lad.png"
+// import ladBg from "assets/images/myachery/achery-lad.png"
 import { AvField, AvForm } from "availity-reactstrap-validation"
 import MetaTags from "react-meta-tags"
 import { useDispatch, useSelector } from "react-redux"
 import { useHistory, Link } from "react-router-dom"
 import { AuthenticationService } from "services"
-import { Col, Container, Row } from "reactstrap"
+import { Col, Container, Row, Card, CardBody } from "reactstrap"
 import * as AuthenticationStore from "store/slice/authentication"
 import toastr from "toastr"
 // import logoImg from "../../../assets/images/logo.svg"
@@ -24,12 +24,7 @@ const Register = () => {
   let history = useHistory();
   
   const handleValidSubmit = async (event, values) => {
-    const d = { ...values }
-    d.date_of_birth = "2012-06-24"
-    d.place_of_birth = "Padang"
-    d.phone_number = "082367998056"
-    console.log(d)
-    const { data, errors, message, success } = await AuthenticationService.register(d)
+    const { data, errors, message, success } = await AuthenticationService.register(values)
     if (success) {
       if (data) {
         dispatch(AuthenticationStore.register())
@@ -52,36 +47,48 @@ const Register = () => {
   return (
     <React.Fragment>
       <MetaTags>
-        <title>Register | MyArchery</title>
+        <title>Login | MyArchery</title>
       </MetaTags>
-      <Container fluid>
-        <div>
-          <Row>
-            <Col md={5} sm={12} xs={12}>
-            <img src={ladBg} style={{height: '100vh', zIndex: "-1", position: 'absolute', left:'-1px', width: 'auto'}} />
-              <div>
-                <div style={{paddingTop: "20vh"}} className=" mx-auto">
-                  <img src={myachery} />
+      <div className="home-btn d-none d-sm-block">
+        <Link to="/" className="text-dark">
+          <i className="fas fa-home h2" />
+        </Link>
+      </div>
+      <div className="account-pages my-5 pt-sm-5">
+        <Container>
+          <Row className="justify-content-center">
+            <Col md={8} lg={6} xl={5}>
+              <Card className="overflow-hidden">
+                <div className="bg-primary">
+                  <Row>
+                    <Col xs={7}>
+                      <div className="text-light p-4">
+                        <h5 className="text-light">Daftar MyArchery.id</h5>
+                        <p>Get your free MyArchery.id <br />account now.</p>
+                      </div>
+                    </Col>
+                    {/* <Col className="col-5 align-self-end">
+                      <img src={profile} alt="" className="img-fluid" />
+                    </Col> */}
+                  </Row>
                 </div>
-                <div style={{zIndex: '100'}}>
-                <p className="font-size-16 text-white">BUAT EVENT DI MANA SAJA KAPAN SAJA</p>
-                  <div className="w-75 mx-auto">
-                    <Link to="/authentication/login" className="text-decoration-none text-black-50">
-                      <span style={{marginRight: '36px'}} className="font-size-18 text-white">Masuk</span>
-                    </Link>
-                    <Link to="/authentication/register" className="text-decoration-none text-black-50 text-decoration-underline">
-                      <span className="font-size-18 text-white">Daftar</span>
+                <CardBody className="pt-0">
+                  <div>
+                    <Link to="/" className="auth-logo-light">
+                      <div className="avatar-md profile-user-wid mb-4">
+                        <span className="avatar-title rounded-circle bg-light">
+                          <img
+                            src={myachery}
+                            alt=""
+                            className="rounded-circle"
+                            height="34"
+                          />
+                        </span>
+                      </div>
                     </Link>
                   </div>
-                </div>
-              </div>
-            </Col>
-            <Col md={7} sm={12} xs={12}>
-            <div className="w-50 mx-auto" style={{paddingTop: "16vh"}}>
-              <div className="text-center">
-                <h2 className="font-size-20 text-danger">Daftar ke myarchery.id</h2>
-              </div>
-              <AvForm
+                  <div className="p-2">
+                  <AvForm
               className="form-horizontal"
               onValidSubmit={(e, v) => {
                 handleValidSubmit(e, v)
@@ -125,38 +132,53 @@ const Register = () => {
                     placeholder="Masukkan kata sandi"
                   />
                 </div>
-
-                <div className="form-check">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          id="customControlInline"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="customControlInline"
-                        >
-                        I Agree to Terms of Service and Privacy Policy
-                        </label>
-                      </div>
-                      <div className="mt-3 d-grid">
+                <div className="mt-3 d-grid">
                         <button
                           className="btn btn-primary btn-block"
                           type="submit"
                         >
-                          Daftar
+                          Register
                         </button>
                       </div>
+
+                      <div className="text-center mt-4">
+                        <p className="font-size-14 color-black">Atau daftar dengan</p>
+                        <div>
+                          <img src={facebook} alt="" />
+                          <img src={google} alt="" />
+                        </div>
+                      </div>
+
+                      <div className="mt-4 text-center">
+                        <Link
+                          to="/authentication/forgot-password"
+                          className="text-muted"
+                        >
+                          <i className="mdi mdi-lock me-1" />
+                          Forgot your password?
+                        </Link>
+                      </div>
               </AvForm>
-                    <div className="d-flex justify-content-center pt-5">
-                      <img src={facebook} style={{cursor: 'pointer'}} />
-                      <img src={google} style={{cursor: 'pointer'}} />
-                    </div>
-                </div>
+                  </div>
+                </CardBody>
+              </Card>
+              <div className="mt-5 text-center">
+                <p>
+                  Already have an account ?{" "}
+                  <Link to="/authentication/login" className="fw-medium text-primary">
+                    {" "}
+                    Login{" "}
+                  </Link>{" "}
+                </p>
+                <p>
+                  © {new Date().getFullYear()} Skote. Crafted with{" "}
+                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
+                </p>
+              </div>
             </Col>
           </Row>
-        </div>
-      </Container>
+        </Container>
+      </div>
     </React.Fragment>
   )
 }

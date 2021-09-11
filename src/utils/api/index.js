@@ -21,6 +21,7 @@ export default {
 
   post(endpoint, data = null, qs = null) {
     const token = store.getState()?.authentication?.user?.accessToken;
+    console.log(token)
     let params = "";
     if (qs) {
       params = queryString.stringify(qs);
@@ -36,11 +37,9 @@ export default {
       });
     } else {
       for (var key in data) {
-        console.log(`Key: ${key} - Data: ${data[key]}`)
         formData.append(key, data[key]);
       }
     }
-    console.log(formData)
     let config = {
       method: "POST",
       headers: {

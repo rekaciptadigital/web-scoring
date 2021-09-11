@@ -48,7 +48,7 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
 }
 
 
-const LandingPage = () => {
+const MarathonLandingPage = () => {
   const [imglight, setimglight] = useState(true)
   const [navClass, setnavClass] = useState("")
 
@@ -141,4 +141,4 @@ const LandingPage = () => {
   )
 }
 
-export default LandingPage
+export default MarathonLandingPage

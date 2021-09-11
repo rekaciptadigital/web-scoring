@@ -11,18 +11,18 @@ import paginationFactory, {
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
 // Data for dummy
-import { dummyConstants } from '../../../../constants'
+import { dummyConstants } from '../../../../../constants'
 
 //Import Breadcrumb
 import './sass/datatables.scss'
 
-class TableCategory extends Component {
+class TableSchedule extends Component {
   constructor(props) {
     super(props)
     this.state = {
       page: 1,
       sizePerPage: 10,
-      productData: dummyConstants.categoryArchery
+      productData: dummyConstants.qualificationSchedule
     }
 
   }
@@ -34,18 +34,18 @@ class TableCategory extends Component {
       text: 'No.',
       sort: true,
     }, {
-      dataField: 'category',
-      text: 'Kategori',
+      dataField: 'date',
+      text: 'Tanggal',
       sort: true
     }, 
     {
-    dataField: 'arange',
-    text: 'Jarak',
+    dataField: 'session',
+    text: 'Sesi',
     sort: true
     }, 
     {
-    dataField: 'type',
-    text: 'Jenis',
+    dataField: 'time',
+    text: 'Waktu',
     sort: true
     }, 
     {
@@ -132,4 +132,4 @@ class TableCategory extends Component {
   }
 }
 
-export default TableCategory
+export default TableSchedule

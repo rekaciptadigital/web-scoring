@@ -139,7 +139,13 @@ const categoryArchery = [
   {"id": 2, "arange": "50m", "type": "Mix Team; Female Team, Male Team", "category": "Individu", "quota": "20/100"},
   {"id": 3, "arange": "20m", "category": "Barebow", "type": "Individu", "quota": "0/75"},
   {"id": 4, "arange": "30m", "category": "Recurve", "type": "Mix Team; Female Team, Male Team", "quota": "20/100"},
-  
+]
+
+const qualificationSchedule = [
+  {"id": 1, "date": "23 Agustus 2021", "session": "1", "time": "10.00-11.00", "quota": "20/75"},
+  {"id": 2, "date": "23 Agustus 2021", "session": "2", "time": "11.00-12.00", "quota": "20/75"},
+  {"id": 3, "date": "23 Agustus 2021", "session": "3", "time": "12.00-13.00", "quota": "0/75"},
+  {"id": 4, "date": "23 Agustus 2021", "session": "4", "time": "13.00-14.00", "quota": "20/100"},
 ]
 
 
@@ -153,5 +159,6 @@ export default {
   scoring,
   result,
   editResult,
-  categoryArchery
+  categoryArchery,
+  qualificationSchedule
 };

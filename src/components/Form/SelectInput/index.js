@@ -30,6 +30,7 @@ const SelectInput = ({
   useEffect(() => {
     const newSelectOptions = options.map((option) => {
       return {
+        ...option,
         id: option.value || option.id,
         value: option.value || option.id,
         label: option.label,
@@ -41,6 +42,7 @@ const SelectInput = ({
   useEffect(() => {
     if (value) {
       setSelectValue({
+        ...value,
         id: value?.value || value?.id || value,
         value: value?.value || value?.id || value,
         label: value?.label || value,

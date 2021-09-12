@@ -38,6 +38,18 @@ const RegisterFullday = () => {
               gender: ""
           }
         ],
+        categoryEvent: {
+          archeryEventId: "",
+          ageCategoryId: "",
+          ageCategoryLabel: "",
+          competitionCategoryId: "",
+          competitionCategoryLabel: "",
+          teamCategoryId: "",
+          teamCategoryLabel: "",
+          distanceId: "",
+          distanceLabel: "",
+          archeryEventCategoryLabel: ""
+        },
         eventCategories: [
           {
             id: stringUtil.createRandom(),

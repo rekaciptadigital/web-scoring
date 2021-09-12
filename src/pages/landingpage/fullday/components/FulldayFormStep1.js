@@ -115,7 +115,7 @@ import {
                   <DateInput
                       label="Tanggal Lahir"
                       name="dateBirth"
-                      value={formData.participantMembers.name}
+                      value={formData.participantMembers.birthdate}
                       onChange={handleChange}
                     />
                 </Col>

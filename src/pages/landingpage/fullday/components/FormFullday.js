@@ -19,7 +19,7 @@ import styled from "styled-components"
 import { OrderEventService } from "../../../../services";
 import {useHistory} from "react-router-dom";
 //tesing post data postman
-import dummy from "./DummyOrderEvent.json";
+// import dummy from "./DummyOrderEvent.json";
 
 const Label = styled.label`
   font-size: 12px;
@@ -50,7 +50,7 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
   const handleValidSubmit = async (values) => {
     const d = { ...values }
     d.qualificationWeekdaysOnly = "1"
-    const { data, errors, message, success } = await OrderEventService.register(dummy)
+    const { data, errors, message, success } = await OrderEventService.register(formData)
       if (success) {
         if (data) {
           console.log(data)

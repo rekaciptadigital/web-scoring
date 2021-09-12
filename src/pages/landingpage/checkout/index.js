@@ -23,7 +23,7 @@ const CheckoutEvent = () => {
     
     let scriptTag = document.createElement('script');
     scriptTag.src = midtransScriptUrl;
-    scriptTag.setAttribute('ab727dea-ba18-43be-812d-4f4a0810309b', myMidtransClientKey);
+    scriptTag.setAttribute("data-client-key", myMidtransClientKey);
     document.body.appendChild(scriptTag);
     return () => {
       document.body.removeChild(scriptTag);

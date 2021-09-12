@@ -35,56 +35,11 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
   }
 
   const handleValidSubmit = async (values) => {
-    const d = { ...values }
-    d.qualificationWeekdaysOnly = "1"
-    d.targets = [
-      {
-        "id": "public",
-        "label": "public"
-      }
-    ]
-    d.poster = null
-    d.registrationFees = [
-      {
-        "registrationType": "sdsds",
-        "id": "normal",
-        "label": "Normal",
-        "price": 10001,
-        "startDate": "2021-09-01",
-        "endDate": "2021-09-01",
-        "categoryPrices": [
-          {
-            "id": "individu",
-            "label": "Individu",
-            "teamCategory": "individu",
-            "price": 100
-          },
-          {
-            "id": "mix_team",
-            "label": "Mix Team",
-            "teamCategory": "mix_team",
-            "price": 100
-          },
-          {
-            "id": "male_team",
-            "label": "Male Team",
-            "teamCategory": "male_team",
-            "price": 100
-          },
-          {
-            "id": "female_team",
-            "label": "Female Team",
-            "teamCategory": "female_team",
-            "price": 100
-          }
-        ]
-      }
-    ]
-    const { data, errors, message, success } = await EventsService.register(d)
+    const { data, errors, message, success } = await EventsService.register(values)
       if (success) {
         if (data) {
           console.log(data)
-          toggleTab(activeTab + 1);
+          // toggleTab(activeTab + 1);
         }
     } else {
       console.log(errors)

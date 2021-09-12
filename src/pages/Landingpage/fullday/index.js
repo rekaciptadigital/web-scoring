@@ -5,6 +5,7 @@ import HeaderForm from "layouts/landingpage/HeaderForm";
 import FormFullday from "./components/FormFullday";
 import { Container, Row } from "reactstrap";
 import styled from 'styled-components';
+import { stringUtil } from "utils";
 
 const H5 = styled.h5`
     font-family: Poppins;
@@ -30,6 +31,16 @@ const RegisterFullday = () => {
         category: "",
         gender: "",
         dateBirth: "",
+        eventCategories: [
+          {
+            id: stringUtil.createRandom(),
+            competitionCategories: [
+              {
+                id: stringUtil.createRandom(),
+              },
+            ],
+          },
+        ],
       });
     
 

@@ -4,16 +4,44 @@ import {
     SelectInput,
     RadioButtonInput,
     DateInput,
+    Button
   } from "components";
   import React from "react";
-  import { Col, Row, Label } from "reactstrap";
+  import { Col, Row, Label, } from "reactstrap";
   import { selectConstants } from "constants/index";
   import { dummyConstants } from "constants/index";
+  import { stringUtil } from "utils";
 
   export const FulldayFormStep1 = ({ onFormFieldChange, formData }) => {
     const handleChange = ({ key, value }) => {
       if (onFormFieldChange) onFormFieldChange(key, value);
     };
+
+    function handleAddCompetitionCategory(categoryIndex) {
+      const categoryList = [...formData.eventCategories];
+      categoryList[categoryIndex].competitionCategories.push({
+        id: stringUtil.createRandom(),
+      });
+      handleChange({
+        key: "eventCategories",
+        value: categoryList,
+      });
+    }
+  
+    function handleRemoveCompetitionCategory(
+      categoryIndex,
+      competitionCategoryIndex
+    ) {
+      const categoryList = [...formData.eventCategories];
+      categoryList[categoryIndex].competitionCategories.splice(
+        competitionCategoryIndex,
+        1
+      );
+      handleChange({
+        key: "eventCategories",
+        value: categoryList,
+      });
+    }
   
     return (
         <Col lg={8}>
@@ -116,6 +144,58 @@ import {
                     value={formData.competitionCategory}
                 />
               </Row>
+
+
+              <Label className="mt-2">Nama Peserta (Tim)</Label>
+              
+              {formData.eventCategories.map((eventCategory, index) => (
+              <Row key={index} >
+                <Col style={{ border: "dashed 1px #dedede", padding: 10 }}>
+                  {eventCategory.competitionCategories.map(
+                    (competitionCategory, competitionCategoryIndex) => {
+                      return (
+                        <Row key={competitionCategory.id}>
+                          <Col lg={4}>
+                            
+                              <TextInput
+                                name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
+                                value={formData.city}
+                                onChange={handleChange}
+                              />
+                          </Col>
+                         
+                          <Col lg={4}>
+                            <div>
+                              <Button
+                                onClick={() => {
+                                  handleAddCompetitionCategory(index);
+                                }}
+                                icon="copy"
+                                outline
+                              />{" "}
+                              {eventCategory.competitionCategories.length >
+                                1 && (
+                                <Button
+                                  onClick={() => {
+                                    handleRemoveCompetitionCategory(
+                                      index,
+                                      competitionCategoryIndex
+                                    );
+                                  }}
+                                  icon="trash"
+                                  type="danger"
+                                  outline
+                                />
+                              )}
+                            </div>
+                          </Col>
+                        </Row>
+                      );
+                    }
+                 )}
+                </Col>
+              </Row>
+              ))};
           </Row>
         </Col>
       

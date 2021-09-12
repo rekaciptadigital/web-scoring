@@ -14,16 +14,15 @@ import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 import { dummyConstants } from '../../../../constants'
 
 //Import Breadcrumb
-import './sass/datatables.scss'
-// import '../../member/components/sass/datatables.scss'
+// import './sass/datatables.scss'
 
-class TableCategory extends Component {
+class TableEditResult extends Component {
   constructor(props) {
     super(props)
     this.state = {
       page: 1,
       sizePerPage: 10,
-      productData: dummyConstants.category
+      productData: dummyConstants.editResult
     }
 
   }
@@ -33,33 +32,38 @@ class TableCategory extends Component {
     const columns = [{
       dataField: 'id',
       text: 'Id',
-      sort: true,
     }, {
-      dataField: 'class',
-      text: 'Kelas',
-      sort: true
+      dataField: 'shoot',
+      text: 'Shoot',
+      formatter: (cell, row) => {
+          return (
+              <div>
+                  <div className="d-flex">
+                  {row.shoot.map(s => {
+                      return(<div className="rounded-3 px-2 py-1 mx-1" style={{
+                          background: `${s <= 0 ? 'yellow' : 'red'}`
+                      }} key={s}>{s <= 0 ? `X` : s}</div>)
+                        })}
+                </div>
+              </div>
+          )
+      }
     }, {
-      dataField: 'death_bird',
-      text: 'Batas Lahir',
-      sort: true
+      dataField: 'sum',
+      text: 'Sum',
     }, {
-      dataField: 'arange',
-      text: 'Jarak',
-      sort: true
+      dataField: 'x',
+      text: 'X',
     }, {
-      dataField: 'kuota',
-      text: 'Kuota Terisi',
-      sort: true
-    }, {
-      dataField: 'registrasi',
-      text: 'Biaya Registrasi',
+      dataField: 'x_10',
+      text: 'X + 10',
     }, {
       dataField: 'status',
       text: 'Status',
-      formatter: (cell, row) => {
+      formatter: () => {
         return (
           <div>
-            <span className={`${row.status ? "bg-danger" : "bg-success"} text-white rounded-3 px-2`}>{row.status ? "Full Booked" : "On Sale"}</span>
+            <i className="bx bx-edit-alt"></i>
           </div>
         )
       }
@@ -73,7 +77,7 @@ class TableCategory extends Component {
 
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: dummyConstants.category.length, // replace later with size(customers),
+      totalSize: dummyConstants.editResult.length, // replace later with size(customers),
       custom: true,
     }
 
@@ -88,9 +92,9 @@ class TableCategory extends Component {
 
   
     // Select All Button operation
-    const selectRow = {
-      mode: 'checkbox'
-    }
+    // const selectRow = {
+    //   mode: 'checkbox'
+    // }
 
     // const { SearchBar } = Search;
 
@@ -140,7 +144,7 @@ class TableCategory extends Component {
                                       bordered={false}
                                       striped={false}
                                       defaultSorted={defaultSorted}
-                                      selectRow={selectRow}
+                                    //   selectRow={selectRow}
                                       classes={
                                         "table align-middle table-nowrap"
                                       }
@@ -184,4 +188,4 @@ class TableCategory extends Component {
   }
 }
 
-export default TableCategory
+export default TableEditResult

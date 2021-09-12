@@ -18,7 +18,7 @@ const EventsNewFullday = () => {
     city: "",
     locationType: "",
     description: "",
-    isFlatRegistrationFee: true,
+    isFlatRegistrationFee: "0",
     registrationFees: [
       {
         id: "normal",

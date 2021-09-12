@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MetaTags from "react-meta-tags";
 import {
   Col,
@@ -13,9 +13,29 @@ import {
 //Import Breadcrumb
 // import Breadcrumbs from "../../components/Common/Breadcrumb";
 import CardEvent from "./components/CardEvent";
+import { EventsService } from "../../../services"
 
 const ListEvent = () => {
   const [isOpenDropDown, setIsOpenDropDown] = useState(false)
+  const [listEvent, setListEvent] = useState([])
+
+  const getEvent = async () => {
+    const {message, errors, data } = await EventsService.get()
+    if (data) {
+      setListEvent(data)
+      console.log(data)
+      console.log(message)
+    } else 
+    console.log(message)
+    console.log(errors)
+  }
+
+  useEffect(() => {
+    getEvent()
+  }, [])
+
+  console.log(listEvent)
+
 
   return (
     <React.Fragment>

@@ -41,6 +41,8 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
     }
   }
 
+  console.log(formData)
+
   return (
     <Row>
       <Col lg="12">
@@ -145,6 +147,7 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                                       type="button"
                                       style={{backgroundColor: "#0D47A1"}}
                                       onClick={() => {
+                                        console.log(formData)
                                         toggleTab(activeTab + 1);
                                       }}>
                                     Selesai
@@ -154,6 +157,7 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                                     type="button"
                                     style={{backgroundColor: "#0D47A1"}}
                                     onClick={() => {
+                                      console.log(formData)
                                       toggleTab(activeTab + 1);
                                     }}>
                                       Pilih Pembayaran

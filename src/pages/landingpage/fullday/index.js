@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import { stringUtil } from "utils";
 import { CategoryService } from "services";
 import {useParams} from "react-router-dom";
-import { useSelector } from "react-redux";
 
 
 const H5 = styled.h5`
@@ -23,7 +22,6 @@ const H5 = styled.h5`
 
 
 const RegisterFullday = () => {
-    let { isLoggedIn } = useSelector(getAuthenticationStore)
     const {slug} = useParams();
     const [eventData, setEventData] = useState({
         eventType: "fullday",
@@ -94,20 +92,15 @@ const RegisterFullday = () => {
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      console.log("belum login")
-    } else {
     const {data, errors, success, message} = CategoryService.get({slug});
     if (success) {
       if (data) {
-        console.log(data)
-        setState(data);
+        console.log(data, 'dad')
         }
       } else {
         console.log(errors)
         console.log(message)
       }
-    }
   });
 
   console.log(eventData)

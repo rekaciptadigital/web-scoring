@@ -15,7 +15,7 @@ const H5 = styled.h5`
 `;
 
 const CheckoutEvent = () => {
-  const [state, setState] = useState();
+  const [info, setInfo] = useState();
   const handleClick = () => {
     window.snap.pay("ab727dea-ba18-43be-812d-4f4a0810309b")
     return () => {
@@ -23,12 +23,13 @@ const CheckoutEvent = () => {
     };
   };
 
-  useEffect(() => {
-    const {data, errors, message, success} = OrderEventService.get();
+  useEffect(async() => {
+    const {data, errors, message, success} = await OrderEventService.get();
+    console.log(data, errors, message, success)
     if (success) {
       if (data) {
         console.log(data)
-        setState(data);
+        setInfo(data);
         }
       } else {
         console.log(errors)
@@ -36,7 +37,10 @@ const CheckoutEvent = () => {
       }
   }, []);
 
-  console.log(state, 'dada');
+  console.log(info, 'dada')
+
+
+
 
   return (
     <React.Fragment>
@@ -62,16 +66,16 @@ const CheckoutEvent = () => {
                   <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
-                      <h4>John Doe</h4>
+                      <h4>{info.participant.name}</h4>
                       <H5>Klub FAST</H5>
                     </div>
                     <div className="mx-5 text-muted">
                       <h4>No. Ponsel</h4>
-                      <H5>+62 81234 56789</H5>
+                      <H5>{info.participant.phoneNumber}</H5>
                     </div>
                     <div className="mx-5 text-muted">
                       <h4>Email</h4>
-                      <H5>nama@mail.com</H5>
+                      <H5>{info.participant.email}</H5>
                     </div>
                   </div>
                 </Media>
@@ -80,6 +84,7 @@ const CheckoutEvent = () => {
                   type="button"
                   size="sm"
                   style={{ backgroundColor: "#0D47A1" }}
+                  disabled
                 >
                   Setting
                 </Button>
@@ -104,16 +109,15 @@ const CheckoutEvent = () => {
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
                       <H5>ID ORDER</H5>
-                      <h4>#88 8888</h4>
-                      <H5>21 Agustus 2021</H5>
+                      <h4>{info.transactionInfo.orderId}</h4>
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Total</H5>
-                      <h4>Rp 100.000</h4>
+                      <h4>Rp {info.transactionInfo.total}</h4>
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Status Pembayaran</H5>
-                      <h4>Email</h4>
+                      <h4>{info.transactionInfo.status}</h4>
                     </div>
                   </div>
                   <hr />
@@ -132,7 +136,7 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Kategori</H5>
-                      <h4>Individu - Barebow Bow U12 - 50m</h4>
+                      <h4>{info.transactionInfo.orderId}</h4>
                     </div>
                   </div>
                   <hr />

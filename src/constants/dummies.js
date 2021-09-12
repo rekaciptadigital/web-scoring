@@ -101,6 +101,25 @@ const eventCategories = [
   },
 ];
 
+const eventCompetitionCategories = [
+  {
+    id: "Recurved",
+    label: "Recurved",
+  },
+  {
+    id: "Bound",
+    label: "Bound",
+  },
+  {
+    id: "Traditional",
+    label: "Traditional",
+  },
+  {
+    id: "Barebow",
+    label: "Barebow",
+  },
+];
+
 const members = [
   {"id": 1, "name": "Asep", "email": "asep@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 10, "gender": "pria", "status": 1},
   {"id": 2, "name": "Jamal", "email": "jamal@gmail.com", "telepon": "+62 812 3456 789", "club": "Klub Macan", "age": 9, "gender": "pria", "status": 1},
@@ -154,6 +173,7 @@ const qualificationSchedule = [
 
 
 export default {
+  eventCompetitionCategories,
   eventAgeCategories,
   competitionCategories,
   eventDistances,

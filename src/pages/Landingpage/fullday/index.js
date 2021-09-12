@@ -22,7 +22,7 @@ const RegisterFullday = () => {
 
     const [eventData, setEventData] = useState({
         eventType: "fullday",
-        fulldayAudience: "",
+        type: "",
         email: "",
         phone: "",
         clubName: "",
@@ -31,6 +31,13 @@ const RegisterFullday = () => {
         category: "",
         gender: "",
         dateBirth: "",
+        participantMembers: [
+          {
+              name: "",
+              birthdate: "",
+              gender: ""
+          }
+        ],
         eventCategories: [
           {
             id: stringUtil.createRandom(),
@@ -41,6 +48,7 @@ const RegisterFullday = () => {
             ],
           },
         ],
+        team_category_id: "individu",
       });
     
 

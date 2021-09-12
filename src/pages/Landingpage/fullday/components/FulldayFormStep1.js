@@ -49,17 +49,17 @@ import {
             <Col lg={12}>
                 <label>Daftar Sebagai?</label>
                 <RadioButtonInput
-                    name="fulldayAudience"
+                    name="type"
                     onChange={handleChange}
                     options={selectConstants.fulldayAudience}
-                    value={formData.fulldayAudience}
+                    value={formData.type}
                 />
             </Col>
             <Col lg={4}>
               <TextInput
                 label="Email"
                 name="email"
-                value={formData.location}
+                value={formData.email}
                 onChange={handleChange}
               />
             </Col>
@@ -67,7 +67,7 @@ import {
               <TextInput
                 label="No. Telepon"
                 name="phone"
-                value={formData.city}
+                value={formData.phone}
                 onChange={handleChange}
               />
             </Col>
@@ -75,7 +75,7 @@ import {
               <TextInput
                 label="Nama Klub (Opsional)"
                 name="clubName"
-                value={formData.city}
+                value={formData.clubName}
                 onChange={handleChange}
               />
             </Col>
@@ -91,7 +91,7 @@ import {
                 />
             </Col>
 
-             {formData.fulldayAudience.id === "Tim" ? (
+             {formData.type.id === "Tim" ? (
               <Col lg={4}>
                 <TextInput
                   label="Nama Tim"
@@ -106,7 +106,7 @@ import {
                   <TextInput
                     label="Nama Peserta"
                     name="teamName"
-                    value={formData.city}
+                    value={formData.participantMembers.name}
                     onChange={handleChange}
                     />
                 </Col>
@@ -115,7 +115,7 @@ import {
                   <DateInput
                       label="Tanggal Lahir"
                       name="dateBirth"
-                      value={formData.registrationStartDatetime}
+                      value={formData.participantMembers.name}
                       onChange={handleChange}
                     />
                 </Col>
@@ -126,7 +126,7 @@ import {
                       name="gender"
                       onChange={handleChange}
                       options={selectConstants.gender}
-                      value={formData.gender}
+                      value={formData.participantMembers.name}
                     />
                 </Col>
               </>
@@ -137,27 +137,26 @@ import {
               <Row >
                 <SelectInput
                     options={
-                    dummyConstants.eventCompetitionCategories
+                    dummyConstants.competitionCategories
                     }
                     name="category"
                     onChange={handleChange}
-                    value={formData.competitionCategory}
+                    value={formData.category}
                 />
               </Row>
 
 
-              <Label className="mt-2">Nama Peserta (Tim)</Label>
               
-              {formData.eventCategories.map((eventCategory, index) => (
-              <Row key={index} >
-                <Col style={{ border: "dashed 1px #dedede", padding: 10 }}>
+              {formData.type.id === "Tim" && formData.eventCategories.map((eventCategory, index) => (
+                <Row key={index} >
+                <Label className="mt-2">Nama Peserta (Tim)</Label>
+                <Col>
                   {eventCategory.competitionCategories.map(
                     (competitionCategory, competitionCategoryIndex) => {
                       return (
                         <Row key={competitionCategory.id}>
                           <Col lg={4}>
-                            
-                              <TextInput
+                            <TextInput
                                 name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
                                 value={formData.city}
                                 onChange={handleChange}
@@ -190,12 +189,12 @@ import {
                             </div>
                           </Col>
                         </Row>
-                      );
+                      )
                     }
                  )}
                 </Col>
               </Row>
-              ))};
+              ))}
           </Row>
         </Col>
       

@@ -36,7 +36,7 @@
                 <tr>
                   <td>Gender :</td>
                   <td>
-                    {formData.clubName}
+                    {formData.participantMembers.name}
                   </td>
                 </tr>
               </tbody>

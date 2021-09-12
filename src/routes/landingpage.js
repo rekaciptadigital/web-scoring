@@ -6,6 +6,7 @@ import RegisterMarathon from "pages/landingpage/marathon";
 import RegisterMarathonDone from "pages/landingpage/marathon/components/RegisterMarathonDone";
 import DashboardMarathon from "pages/landingpage/marathon/dashboard";
 import CheckoutEvent from "pages/landingpage/checkout";
+import DashboardOrderEvent from "pages/landingpage/dashboard";
 
 const landingpageRouters = [
     { path: "/full-day", component: LandingPage },
@@ -18,7 +19,7 @@ const landingpageRouters = [
     {path: "/marathon/dashboard", component:DashboardMarathon},
 
     {path: "/checkout-event", component:CheckoutEvent},
-    
+    {path: "/dashboard/event", component:DashboardOrderEvent},
 ]
 
 export default landingpageRouters

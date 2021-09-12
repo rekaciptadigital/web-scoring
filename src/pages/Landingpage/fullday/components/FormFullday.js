@@ -14,8 +14,12 @@ import {
 } from "reactstrap";
 import { FulldayFormStep1 } from "./FulldayFormStep1";
 import { FulldayFormStep2 } from "./FulldayFormStep2";
-import { FulldayFormStep3 } from "./FulldayFormStep3";
+// import { FulldayFormStep3 } from "./FulldayFormStep3";
 import styled from "styled-components"
+import { OrderEventService } from "../../../../services";
+import {useHistory} from "react-router-dom";
+//tesing post data postman
+import dummy from "./DummyOrderEvent.json";
 
 const Label = styled.label`
   font-size: 12px;
@@ -31,6 +35,9 @@ const Td = styled.td`
 
 
 const FormFullday = ({ onFormFieldChange, formData }) => {
+  console.log(dummy, 'drata');
+
+  const history = useHistory();
   const [activeTab, setactiveTab] = useState(1);
 
   function toggleTab(tab) {
@@ -38,6 +45,21 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
       if (tab >= 1 && tab <= 5) {
         setactiveTab(tab);
       }
+    }
+  }
+
+  const handleValidSubmit = async (values) => {
+    const d = { ...values }
+    d.qualificationWeekdaysOnly = "1"
+    const { data, errors, message, success } = await OrderEventService.register(dummy)
+      if (success) {
+        if (data) {
+          console.log(data)
+          history.push("/checkout-event");
+        }
+    } else {
+      console.log(errors)
+      console.log(message)
     }
   }
 
@@ -84,7 +106,7 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                       <span className="number">2.</span> Bayar
                     </NavLink>
                   </NavItem>
-                  <NavItem className={classnames({ current: activeTab === 3 })}>
+                  {/* <NavItem className={classnames({ current: activeTab === 3 })}>
                     <NavLink
                       className={classnames({ active: activeTab === 3 })}
                       onClick={() => {
@@ -93,7 +115,7 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                     >
                       <span className="number">3.</span> Selesai
                     </NavLink>
-                  </NavItem>
+                  </NavItem> */}
                  
                 </ul>
               </div>
@@ -113,12 +135,12 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                       formData={formData}
                       />
                   </TabPane>
-                  <TabPane tabId={3}>
+                  {/* <TabPane tabId={3}>
                     <FulldayFormStep3
                       onFormFieldChange={onFormFieldChange}
                       formData={formData}
                       />
-                  </TabPane>
+                  </TabPane> */}
                 </TabContent>
               </div>
               </Col>
@@ -130,13 +152,12 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                           <Media>
                               <Media body>
                                   <h5 className="mb-3">Tiket Lomba</h5>
-                                  <h5 className="mb-3">Order ID 12345</h5>
                                   <tr>
                                       <Td>
                                           <Label>Jenis Regu: </Label>
                                       </Td>
                                       <Td>
-                                          Tim
+                                          {formData.type.id}
                                       </Td>
                                   </tr>
                                   <tr>
@@ -144,22 +165,19 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                                           <Label>Kategori Lomba: </Label>
                                       </Td>
                                       <Td>
-                                          Traditional Bow - U16 - 50m
+                                          {formData.category.label}
                                       </Td>
                                   </tr>
-                                  <tr>
-                                      <Td>
-                                          <Label><b>Total: </b> </Label>
-                                      </Td>
-                                      <Td><b>Rp 100.000</b></Td>
-                                  </tr>
+                                 
 
                                   <div className="d-grid gap-2 mt-5">
-                                  {activeTab === 3 ? (
+                                  {activeTab === 2 ? (
                                   <Button
                                       type="button"
                                       style={{backgroundColor: "#0D47A1"}}
-                                      href="/checkout-event"
+                                      onClick={() => {
+                                        handleValidSubmit(formData)
+                                      }}
                                     >
                                     Selesai
                                   </Button>

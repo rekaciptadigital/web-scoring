@@ -21,7 +21,6 @@ export default {
 
   post(endpoint, data = null, qs = null) {
     const token = store.getState()?.authentication?.user?.accessToken;
-    console.log(token)
     let params = "";
     if (qs) {
       params = queryString.stringify(qs);

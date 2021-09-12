@@ -2,6 +2,36 @@ import queryString from "query-string";
 import fetch from "./fetch";
 import { store } from "../../store";
 
+const objectToFormData = function (obj, form, namespace) {
+  var fd = form || new FormData();
+  var formKey;
+
+  for (var property in obj) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (obj.hasOwnProperty(property)) {
+      if (namespace) {
+        formKey = namespace + "[" + property + "]";
+      } else {
+        formKey = property;
+      }
+
+      // if the property is an object, but not a File,
+      // use recursivity.
+      if (
+        typeof obj[property] === "object" &&
+        !(obj[property] instanceof File)
+      ) {
+        objectToFormData(obj[property], fd, property);
+      } else {
+        // if it's a string or a File object
+        fd.append(formKey, obj[property]);
+      }
+    }
+  }
+
+  return fd;
+};
+
 export default {
   get(endpoint, qs = null) {
     const token = store.getState()?.authentication?.user?.accessToken;
@@ -21,10 +51,9 @@ export default {
 
   post(endpoint, data = null, qs = null, requestWithJSON = false) {
     if (requestWithJSON) {
-      return this.postFormJSON(endpoint, data, qs)
+      return this.postFormJSON(endpoint, data, qs);
     }
-    return this.postFormData(endpoint, data, qs)
-    
+    return this.postFormData(endpoint, data, qs);
   },
 
   postFormData(endpoint, data = null, qs = null) {
@@ -34,19 +63,7 @@ export default {
       params = queryString.stringify(qs);
     }
 
-    var formData = new FormData();
-
-    if (Array.isArray(data) && data.length > 0) {
-      data.map(item => {
-        for (var key in item) {
-          formData.append(key, item[key]);
-        }
-      });
-    } else {
-      for (var key in data) {
-        formData.append(key, data[key]);
-      }
-    }
+    var formData = objectToFormData(data);
     let config = {
       method: "POST",
       headers: {
@@ -69,14 +86,13 @@ export default {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         "Accept-Language": localStorage.getItem("I18N_LANGUAGE") || "en",
       },
       body: JSON.stringify(data),
     };
     return fetch(`${endpoint}?${params}`, config);
   },
-
 
   put(endpoint, data = null, qs = null) {
     const token = store.getState()?.authentication?.user?.accessToken;
@@ -85,10 +101,7 @@ export default {
       params = queryString.stringify(qs);
     }
 
-    var formData = new FormData();
-    for (var key in data) {
-      formData.append(key, data[key]);
-    }
+    var formData = objectToFormData(data);
     let config = {
       method: "PUT",
       headers: {
@@ -107,10 +120,7 @@ export default {
       params = queryString.stringify(qs);
     }
 
-    var formData = new FormData();
-    for (var key in data) {
-      formData.append(key, data[key]);
-    }
+    var formData = objectToFormData(data);
     let config = {
       method: "DELETE",
       headers: {

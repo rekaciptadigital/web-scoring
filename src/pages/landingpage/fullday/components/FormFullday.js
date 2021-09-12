@@ -47,10 +47,10 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
     }
   }
 
-  const handleValidSubmit = async (values) => {
-    const d = { ...values }
-    d.qualificationWeekdaysOnly = "1"
-    const { data, errors, message, success } = await OrderEventService.register(formData)
+  const handleValidSubmit = async () => {
+    const localFormData = {...formData}
+    localFormData.type = formData.type?.id
+    const { data, errors, message, success } = await OrderEventService.register(localFormData)
       if (success) {
         if (data) {
           console.log(data)

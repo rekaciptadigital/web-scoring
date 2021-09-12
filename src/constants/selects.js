@@ -82,22 +82,22 @@ const eventPublishTime = [
 
 const fulldayAudience = [
   {
-    id: "Individu",
+    id: "individual",
     label: "Individu"
   },
   {
-    id: "Tim",
+    id: "team",
     label: "Tim"
   },
 ]
 
 const gender = [
   {
-    id: "Male",
+    id: "male",
     label: "Laki-laki"
   },
   {
-    id: "Female",
+    id: "female",
     label: "Perempuan"
   },
 ]

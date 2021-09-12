@@ -12,6 +12,8 @@ import {
   import { dummyConstants } from "constants/index";
   import { stringUtil } from "utils";
 
+
+
   export const FulldayFormStep1 = ({ onFormFieldChange, formData }) => {
     const handleChange = ({ key, value }) => {
       if (onFormFieldChange) onFormFieldChange(key, value);
@@ -139,9 +141,9 @@ import {
                     options={
                     dummyConstants.competitionCategories
                     }
-                    name="category"
+                    name="categoryEvent"
                     onChange={handleChange}
-                    value={formData.category}
+                    value={formData.categoryEvent}
                 />
               </Row>
 

@@ -10,7 +10,7 @@ import DashboardOrderEvent from "pages/landingpage/dashboard";
 
 const landingpageRouters = [
     { path: "/full-day", component: LandingPage },
-    { path: "/full-day/register", component: RegisterFullday},
+    { path: "/full-day/register/:slug", component: RegisterFullday},
     { path: "/full-day/register-done", component: RegisterDone},
 
     {path: "/marathon", component: MarathonLandingPage},

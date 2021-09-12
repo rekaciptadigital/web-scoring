@@ -19,7 +19,15 @@ export default {
     return fetch(`${endpoint}?${params}`, config);
   },
 
-  post(endpoint, data = null, qs = null) {
+  post(endpoint, data = null, qs = null, requestWithJSON = false) {
+    if (requestWithJSON) {
+      return this.postFormJSON(endpoint, data, qs)
+    }
+    return this.postFormData(endpoint, data, qs)
+    
+  },
+
+  postFormData(endpoint, data = null, qs = null) {
     const token = store.getState()?.authentication?.user?.accessToken;
     let params = "";
     if (qs) {
@@ -49,6 +57,26 @@ export default {
     };
     return fetch(`${endpoint}?${params}`, config);
   },
+
+  postFormJSON(endpoint, data = null, qs = null) {
+    const token = store.getState()?.authentication?.user?.accessToken;
+    let params = "";
+    if (qs) {
+      params = queryString.stringify(qs);
+    }
+
+    let config = {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        "Accept-Language": localStorage.getItem("I18N_LANGUAGE") || "en",
+      },
+      body: JSON.stringify(data),
+    };
+    return fetch(`${endpoint}?${params}`, config);
+  },
+
 
   put(endpoint, data = null, qs = null) {
     const token = store.getState()?.authentication?.user?.accessToken;

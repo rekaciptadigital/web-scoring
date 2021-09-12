@@ -35,7 +35,6 @@ const Td = styled.td`
 
 
 const FormFullday = ({ onFormFieldChange, formData }) => {
-  console.log(dummy, 'drata');
 
   const history = useHistory();
   const [activeTab, setactiveTab] = useState(1);
@@ -63,21 +62,7 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
     }
   }
 
-  // const handleClick = () => {
-  //   console.log('clik')
-  //   const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
-
-  //   const myMidtransClientKey = 'your-client-key-goes-here';
-    
-  //   let scriptTag = document.createElement('script');
-  //   scriptTag.src = midtransScriptUrl;
-  //   scriptTag.setAttribute('data-client-key', myMidtransClientKey);
-  //   document.body.appendChild(scriptTag);
-  //   return () => {
-  //     document.body.removeChild(scriptTag);
-  //   };
-  // };
-
+ 
   return (
     <Row>
       <Col lg="12">

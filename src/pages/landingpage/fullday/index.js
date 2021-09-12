@@ -5,6 +5,7 @@ import HeaderForm from "layouts/landingpage/HeaderForm";
 import FormFullday from "./components/FormFullday";
 import { Container, Row } from "reactstrap";
 import styled from 'styled-components';
+import { stringUtil } from "utils";
 
 const H5 = styled.h5`
     font-family: Poppins;
@@ -21,7 +22,7 @@ const RegisterFullday = () => {
 
     const [eventData, setEventData] = useState({
         eventType: "fullday",
-        fulldayAudience: "",
+        type: "",
         email: "",
         phone: "",
         clubName: "",
@@ -30,6 +31,24 @@ const RegisterFullday = () => {
         category: "",
         gender: "",
         dateBirth: "",
+        participantMembers: [
+          {
+              name: "",
+              birthdate: "",
+              gender: ""
+          }
+        ],
+        eventCategories: [
+          {
+            id: stringUtil.createRandom(),
+            competitionCategories: [
+              {
+                id: stringUtil.createRandom(),
+              },
+            ],
+          },
+        ],
+        team_category_id: "individu",
       });
     
 

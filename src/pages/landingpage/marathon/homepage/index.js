@@ -92,7 +92,7 @@ const MarathonLandingPage = () => {
                 </p>
 
                 <div className="button-items mt-4">
-                  <Link to="/full-day/register" className="btn btn-success me-1">
+                  <Link to="/marathon/register" className="btn btn-success me-1">
                     DAFTAR
                   </Link>
                 </div>

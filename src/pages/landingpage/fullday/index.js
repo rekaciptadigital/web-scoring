@@ -87,6 +87,7 @@ const RegisterFullday = () => {
     setEventData(modifiedEventData);
   };
 
+  console.log(eventData)
 
   return (
     <React.Fragment>

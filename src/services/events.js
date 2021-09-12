@@ -6,5 +6,8 @@ export default {
     },
     get(qs = null) {
         return API.get("/web/v1/archery/events", qs)
+    },
+    getEventBySlug(qs) {
+        return API.get("/web/v1/archery/event-by-slug", qs)
     }
 }

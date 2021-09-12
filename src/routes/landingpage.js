@@ -9,7 +9,7 @@ import CheckoutEvent from "pages/landingpage/checkout";
 import DashboardOrderEvent from "pages/landingpage/dashboard";
 
 const landingpageRouters = [
-    { path: "/full-day", component: LandingPage },
+    { path: "/:username/:slug", component: LandingPage },
     { path: "/full-day/register", component: RegisterFullday},
     { path: "/full-day/register-done", component: RegisterDone},
 

@@ -37,7 +37,13 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
   const handleValidSubmit = async (values) => {
     const d = { ...values }
     d.qualificationWeekdaysOnly = "1"
-    const { data, errors, message, success } = await EventsService.register(dummy)
+    d.targets = [
+      {
+        "id": "public",
+        "label": "public"
+      }
+    ]
+    const { data, errors, message, success } = await EventsService.register(d)
       if (success) {
         if (data) {
           console.log(data)

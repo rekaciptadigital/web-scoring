@@ -15,6 +15,22 @@ const H5 = styled.h5`
 
 const CheckoutEvent = () => {
 
+   const handleClick = () => {
+    console.log('clik')
+    const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+
+    const myMidtransClientKey = 'SB-Mid-client-y_BGhv-exWF6m27x';
+    
+    let scriptTag = document.createElement('script');
+    scriptTag.src = midtransScriptUrl;
+    scriptTag.setAttribute('ab727dea-ba18-43be-812d-4f4a0810309b', myMidtransClientKey);
+    document.body.appendChild(scriptTag);
+    return () => {
+      document.body.removeChild(scriptTag);
+    };
+  };
+
+
   return (
     <React.Fragment>
       <MetaTags>
@@ -97,17 +113,20 @@ const CheckoutEvent = () => {
                           <hr/>
                           <div className="d-flex">
                               <div className="mx-5 text-muted">
-                                  <H5>ID ORDER</H5>
-                                  <h4>#88 8888</h4>
-                                  <H5>21 Agustus 2021</H5>
+                                  <H5>Event</H5>
+                                  <h4>Jakarta Archery 2021</h4>
                               </div>
                               <div className="mx-5 text-muted">
-                                  <H5>Total</H5>
-                                  <h4>Rp 100.000</h4>
+                                  <H5>Lokasi</H5>
+                                  <h4>Gelora Bung Karno</h4>
                               </div>
                               <div className="mx-5 text-muted">
-                                  <H5>Status Pembayaran</H5>
-                                  <h4>Email</h4>
+                                  <H5>Peserta</H5>
+                                  <h4>Asep</h4>
+                              </div>
+                              <div className="mx-5 text-muted">
+                                  <H5>Kategori</H5>
+                                  <h4>Individu - Barebow Bow U12 - 50m</h4>
                               </div>
                           </div>
                           <hr/>
@@ -121,7 +140,9 @@ const CheckoutEvent = () => {
                                 href="/marathon/dashboard"
                                 type="button"
                                 size="sm"
-                                style={{backgroundColor: "#0D47A1",  }}>
+                                style={{backgroundColor: "#0D47A1",  }}
+                                disabled
+                                >
                                 Pilih Jadwal Kualifikasi
                               </Button>
                             </div>
@@ -132,6 +153,7 @@ const CheckoutEvent = () => {
                         <Button
                           type="button"
                           size="md"
+                          onClick={handleClick}
                           style={{backgroundColor: "#0D47A1",  }}>
                           LAKUKAN PEMBAYARAN
                         </Button>

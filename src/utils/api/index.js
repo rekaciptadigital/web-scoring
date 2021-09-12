@@ -74,7 +74,6 @@ export default {
     };
     return fetch(`${endpoint}?${params}`, config);
   },
-
   postFormJSON(endpoint, data = null, qs = null) {
     const token = store.getState()?.authentication?.user?.accessToken;
     let params = "";

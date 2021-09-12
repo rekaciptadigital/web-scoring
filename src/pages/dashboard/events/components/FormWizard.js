@@ -35,12 +35,11 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
   }
 
   const handleValidSubmit = async (values) => {
-    const d = { ...values }
-    d.qualificationWeekdaysOnly = "1"
-    const { data, errors, message, success } = await EventsService.register(dummy)
+    const { data, errors, message, success } = await EventsService.register(values)
       if (success) {
         if (data) {
           console.log(data)
+          // toggleTab(activeTab + 1);
         }
     } else {
       console.log(errors)

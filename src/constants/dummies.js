@@ -119,6 +119,21 @@ const scoring = [
   {"id": 3, "class": "U-12", "arange": "20m", "session": 2, "rambahan": 5, "shoot": 6, "target_face": "122 cm"},
 ]
 
+const result = [
+  {"id": 1, "name": "Asep", "code": "INDIV", "club": "INDIVIDU", "sum": 5, "total": 5, "x": 6, "x_10": "122cm"},
+  {"id": 2, "name": "Laisa", "code": "PERTAC", "club": "Pertamina", "sum": 5, "total": 5, "x": 3, "x_10": "122cm"},
+  {"id": 3, "name": "Jamal", "code": "FAST", "club": "Focus Archery", "sum": 5, "total": 5, "x": 6, "x_10": "122cm"},
+]
+
+const editResult = [
+  {"id": 1, "shoot": [0, 0, 0, 0, 0, 0], "sum": 5, "x": 6, "x_10": 5},
+  {"id": 2, "shoot": [8, 8, 0, 0, 0, 10], "sum": 5, "x": 3, "x_10": 5},
+  {"id": 3, "shoot": [0, 0, 0, 0, 0, 0], "sum": 5, "x": 6, "x_10": 5},
+  {"id": 4, "shoot": [0, 0, 0, 0, 0, 0], "sum": 5, "x": 6, "x_10": 5},
+  {"id": 5, "shoot": [0, 0, 0, 0, 0, 0], "sum": 5, "x": 6, "x_10": 5},
+  {"id": 6, "shoot": [0, 0, 0, 0, 0, 0], "sum": 5, "x": 6, "x_10": 5},
+]
+
 const categoryArchery = [
   {"id": 1, "arange": "50m", "category": "Traditional Bow", "type": "Individu", "quota": "20/75"},
   {"id": 2, "arange": "50m", "type": "Mix Team; Female Team, Male Team", "category": "Individu", "quota": "20/100"},
@@ -142,6 +157,8 @@ export default {
   members,
   category,
   scoring,
+  result,
+  editResult,
   categoryArchery,
   qualificationSchedule
 };

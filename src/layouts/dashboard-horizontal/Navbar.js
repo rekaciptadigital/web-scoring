@@ -67,8 +67,22 @@ const Navbar = props => {
                 <li className="nav-item dropdown">
                   <Link className="nav-link" to="/dashboard">
                     <i className="bx bx-home-circle me-2"></i>
-                    {props.t("Dashboard")}
+                    {props.t("Dashboard")} <div className="arrow-down"></div>
                   </Link>
+                  <div className={classname("dropdown-menu", { show: event })}>
+                    <Link className="dropdown-item" to="/dashboard/category">
+                      {props.t("Category")}
+                    </Link>
+                    <Link className="dropdown-item" to="/dashboard/member">
+                      {props.t("Member")}
+                    </Link>
+                    <Link className="dropdown-item" to="/dashboard/scoring">
+                      {props.t("Scoring")}
+                    </Link>
+                    <Link className="dropdown-item" to="/dashboard/result">
+                      {props.t("Result")}
+                    </Link>
+                  </div>
                 </li>
                 <li className="nav-item dropdown">
                   <Link to="/#"

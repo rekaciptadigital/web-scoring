@@ -18,7 +18,7 @@ const EventsNewMarathon = () => {
     city: "",
     locationType: "",
     description: "",
-    isFlatRegistrationFee: true,
+    isFlatRegistrationFee: "0",
     registrationFees: [
       {
         id: "normal",
@@ -85,7 +85,7 @@ const EventsNewMarathon = () => {
     }
     setEventData(modifiedEventData);
   };
-
+  
   return (
     <React.Fragment>
       <div className="page-content">

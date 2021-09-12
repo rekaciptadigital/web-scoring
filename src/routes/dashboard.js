@@ -10,6 +10,9 @@ import ListEvent from "../pages/dashboard/events"
 import EventsNew from "../pages/dashboard/events/new"
 import ListMember from "../pages/dashboard/member"
 import ListScoring from "../pages/dashboard/scoring"
+import ListResult from "pages/dashboard/results"
+import Bagan from "pages/dashboard/results/bagan"
+import EditResult from "pages/dashboard/results/edit"
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -18,6 +21,9 @@ const dashboardRoutes = [
   { path: "/dashboard/category", component: ListCategory},
   { path: "/dashboard/scoring", component: ListScoring},
   { path: "/dashboard/scoring/new", component: ScoringNew},
+  { path: "/dashboard/result", component: ListResult},
+  { path: "/dashboard/result/bagan", component: Bagan},
+  { path: "/dashboard/result/edit", component: EditResult},
   
   // this route should be at the end of all other routes
   { path: "/", exact: true, component: () => <Redirect to="/dashboard" /> },

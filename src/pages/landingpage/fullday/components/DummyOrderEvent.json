@@ -1,0 +1,27 @@
+{
+    "clubName": "nama club",
+    "email": "mail@mail.com",
+    "phoneNumber": "082234643",
+    "type": "team",
+    "categoryEvent": {
+        "archeryEventId": 74,
+        "ageCategoryId": "U-12",
+        "ageCategoryLabel": "U-12",
+        "competitionCategoryId": "Standard Bow",    
+        "competitionCategoryLabel": "Standard Bow",
+        "distanceId": "20",
+        "distanceLabel": "20m",
+        "teamCategoryId": "individu",
+        "teamCategoryLabel": "Individu",
+        "archeryEventCategoryLabel": "Standard Bow - U12 - 20m"
+    },
+    "eventId": 41,
+    "participantMembers": [
+        {
+            "name": "udin",
+            "birthdate": "1995-12-12",
+            "gender": "male"
+        }
+    ],
+    "teamName": "gogo"
+}

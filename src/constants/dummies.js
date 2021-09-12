@@ -13,22 +13,26 @@ const eventAgeCategories = [
   },
 ];
 
-const eventCompetitionCategories = [
+const competitionCategories = [
   {
-    id: "Recurved",
-    label: "Recurved",
+    id: "1",
+    ageCategoryId: "U-12",
+    ageCategoryLabel: "U-12",
+    competitionCategoryId: "Standard Bow",    
+    competitionCategoryLabel: "Standard Bow",
+    distanceId: "20",
+    distanceLabel: "20m",
+    label: "Standard Bow - U12 - 20m"
   },
   {
-    id: "Bound",
-    label: "Bound",
-  },
-  {
-    id: "Traditional",
-    label: "Traditional",
-  },
-  {
-    id: "Barebow",
-    label: "Barebow",
+    id: "2",
+    ageCategoryId: "U-12",
+    ageCategoryLabel: "U-12",
+    competitionCategoryId: "Barebow",
+    competitionCategoryLabel: "Barebow",
+    distanceId: "50",
+    distanceLabel: "50m",
+    label: "Barebow - U12 - 50m"
   },
 ];
 
@@ -151,7 +155,7 @@ const qualificationSchedule = [
 
 export default {
   eventAgeCategories,
-  eventCompetitionCategories,
+  competitionCategories,
   eventDistances,
   eventCategories,
   members,

@@ -49,14 +49,13 @@ const RegisterDone = () => {
                         <span>nama@mail.com</span>
                         
                         <Col sm={12}>
-                        
-                        <Button
-                            href="/full-day"
-                            type="button"
-                            style={{backgroundColor: "#0D47A1",  marginTop:"20px"}}>
-                        Kembali ke Dashboard
-                        </Button>
-                                </Col>
+                            <Button
+                                href="/full-day"
+                                type="button"
+                                style={{backgroundColor: "#0D47A1",  marginTop:"20px"}}>
+                            Kembali ke Dashboard
+                            </Button>
+                        </Col>
                     </Row>
                 </Content>
 

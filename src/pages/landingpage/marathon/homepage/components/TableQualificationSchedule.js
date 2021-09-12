@@ -24,9 +24,8 @@ class TableSchedule extends Component {
       sizePerPage: 10,
       productData: dummyConstants.qualificationSchedule
     }
-
   }
-
+  
   render() {
 
     const columns = [{

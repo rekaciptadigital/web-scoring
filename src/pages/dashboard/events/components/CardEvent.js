@@ -32,7 +32,7 @@ function CardEvent() {
                             <p className="text-muted fw-medium">
                                 Gelora Bung Karno
                             </p>
-                            <Button color="primary">Manage Event</Button>
+                            <Button disabled color="primary">Manage Event</Button>
                             </div>
                         </Col>
                     </Row>

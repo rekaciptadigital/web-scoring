@@ -1,5 +1,5 @@
 import {
-  FileUpload,
+  // FileUpload,
   ImageUpload,
   RadioButtonInput,
   TextEditor,
@@ -27,7 +27,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
             />
           </Col>
         </Row>
-        <Row>
+        {/* <Row>
           <Col lg={12}>
             <FileUpload
               label="Upload Handbook"
@@ -35,7 +35,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
             />
           </Col>
-        </Row>
+        </Row> */}
       </Col>
       <Col lg={9}>
         <Row>

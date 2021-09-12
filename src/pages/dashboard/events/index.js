@@ -50,6 +50,7 @@ const ListEvent = () => {
             <Row>
               <Col md={6}>
               <Dropdown
+                disabled
                 isOpen={isOpenDropDown}
                 toggle={() =>
                   setIsOpenDropDown(!isOpenDropDown)
@@ -70,9 +71,9 @@ const ListEvent = () => {
               </Col>
               <Col md={6}>
                 <div className="float-end">
-                  <Button color="outline-dark">List Event</Button>
-                  <Button className="mx-2" color="outline-dark">Kalender</Button>
-                  <Button color="primary">Tambah Event</Button>
+                  <Button disabled color="outline-dark">List Event</Button>
+                  <Button disabled className="mx-2" color="outline-dark">Kalender</Button>
+                  {/* <Button color="primary">Tambah Event</Button> */}
                 </div>
               </Col>
               </Row>

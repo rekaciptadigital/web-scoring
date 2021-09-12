@@ -49,6 +49,7 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
             options={selectConstants.confirmation}
             inline
             value={formData.isFlatRegistrationFee}
+            disabled
           />
         </Col>
       </Row>

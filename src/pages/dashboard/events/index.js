@@ -23,7 +23,6 @@ const ListEvent = () => {
     const {message, errors, data } = await EventsService.get()
     if (data) {
       setListEvent(data)
-      console.log(data)
       console.log(message)
     } else 
     console.log(message)
@@ -33,9 +32,6 @@ const ListEvent = () => {
   useEffect(() => {
     getEvent()
   }, [])
-
-  console.log(listEvent)
-
 
   return (
     <React.Fragment>
@@ -82,18 +78,15 @@ const ListEvent = () => {
           {/* / */}
 
           <Row>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
+            {listEvent.map((list) => {
+              return (
+                <>
+                <Col key={list.id} md={6}>
+                  <CardEvent dataEvent={list} />
+                </Col>
+                </>
+              )
+            })}
           </Row>
         </Container>
       </div>

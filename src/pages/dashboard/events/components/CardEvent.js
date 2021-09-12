@@ -9,7 +9,8 @@ import {
 
   import satuDashboard from '../../../../assets/images/myachery/dashboard-1.png'
 
-function CardEvent() {
+function CardEvent(props) {
+    console.log(props.dataEvent)
     return (
         <div>
             <Card className="mini-stats-wid">
@@ -25,12 +26,12 @@ function CardEvent() {
                         </Col>
                         <Col md={6} sm={12}>
                             <div>
-                            <h4>Jakarta Archery 2021</h4>
+                            <h4>{props.dataEvent.eventName}</h4>
                             <p className="text-muted fw-medium">
-                                13 Agustus - 16 Agustus 2021
+                                {props.dataEvent.registrationStartDatetime} - {props.dataEvent.registrationEndDatetime}
                             </p>
                             <p className="text-muted fw-medium">
-                                Gelora Bung Karno
+                                {props.dataEvent.location} - {props.dataEvent.locationType}
                             </p>
                             <Button disabled color="primary">Manage Event</Button>
                             </div>

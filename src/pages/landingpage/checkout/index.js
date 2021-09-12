@@ -15,16 +15,6 @@ const H5 = styled.h5`
 
 const CheckoutEvent = () => {
   const handleClick = () => {
-    console.log("clik");
-    const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
-
-    const myMidtransClientKey = "SB-Mid-client-y_BGhv-exWF6m27x";
-
-    let scriptTag = document.createElement("script");
-    scriptTag.src = midtransScriptUrl;
-    scriptTag.setAttribute("data-client-key", myMidtransClientKey);
-    document.body.appendChild(scriptTag);
-
     window.snap.pay("ab727dea-ba18-43be-812d-4f4a0810309b")
     return () => {
       document.body.removeChild(scriptTag);

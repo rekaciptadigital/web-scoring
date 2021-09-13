@@ -16,6 +16,7 @@ const H5 = styled.h5`
 
 const CheckoutEvent = () => {
   const [info, setInfo] = useState();
+
   const handleClick = () => {
     window.snap.pay("ab727dea-ba18-43be-812d-4f4a0810309b")
     return () => {
@@ -35,7 +36,7 @@ const CheckoutEvent = () => {
         console.log(errors)
         console.log(message)
       }
-  }, []);
+  }, [info]);
 
   console.log(info, 'dada')
 

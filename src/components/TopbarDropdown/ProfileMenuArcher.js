@@ -60,7 +60,7 @@ const ProfileMenuArcher = props => {
           </DropdownItem>
 
           <div className="dropdown-divider" />
-          <a href="/archer/login" className="dropdown-item">
+          <a href="/archer/logout" className="dropdown-item">
             <i className="bx bx-power-off font-size-16 align-middle me-1 text-danger" />
             <span>{props.t("Logout")}</span>
           </a>

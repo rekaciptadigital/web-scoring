@@ -11,7 +11,6 @@ import {
 //   import poster from '../../../../assets/images/myachery/logo-myarchery.png'
 
 function CardEvent(props) {
-    console.log(props.dataEvent)
     return (
         <div>
             <Card className="mini-stats-wid">

@@ -4,7 +4,7 @@ import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
 import { Container, Row, Col, Card, Media, CardBody, Button } from "reactstrap";
 import styled from 'styled-components';
-import Avatar from "../../../assets/images/users/avatar-man.png"
+// import Avatar from "../../../assets/images/users/avatar-man.png"
 import { OrderEventService } from "services";
 // import classnames from "classnames"
 // import CardActivity from "./CardActivity";
@@ -42,7 +42,7 @@ const DashboardOrderEvent = () => {
       <HeaderForm />
  
         <Container fluid className="px-5 p-2">
-            <Row>
+            {/* <Row>
               <Card>
                 <CardBody>
                     <Media>
@@ -82,7 +82,7 @@ const DashboardOrderEvent = () => {
                       </Media>
                   </CardBody>
               </Card>
-            </Row>
+            </Row> */}
 
             <Row>
                 {/* <Col sm={6}>

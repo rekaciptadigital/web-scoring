@@ -20,7 +20,8 @@ const CheckoutEvent = () => {
   const { id } = useParams();
 
   const handleClick = () => {
-    window.snap.pay("ab727dea-ba18-43be-812d-4f4a0810309b")
+    console.log(info.transactionInfo?.snapToken, 'klik')
+    window.snap.pay(`${info.transactionInfo?.snapToken}`)
     return () => {
       document.body.removeChild(scriptTag);
     };

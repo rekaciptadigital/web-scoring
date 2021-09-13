@@ -48,6 +48,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
 
   const handleValidSubmit = async () => {
     const localFormData = { ...formData };
+    localFormData.eventId = eventDetail.id;
     localFormData.type = formData.type?.id;
     const { data, errors, message, success } = await OrderEventService.register(
       localFormData

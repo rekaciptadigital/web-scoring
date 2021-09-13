@@ -1,7 +1,8 @@
   import React from "react";
   import { Col, Row } from "reactstrap";
   
-  export const FulldayFormStep2 = ({  formData }) => {
+  export const FulldayFormStep2 = ({ formData }) => {
+    console.log(formData)
     
     return (
       <>

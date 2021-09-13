@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import MetaTags from 'react-meta-tags';
 import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
@@ -6,6 +6,10 @@ import FormFullday from "./components/FormFullday";
 import { Container, Row } from "reactstrap";
 import styled from 'styled-components';
 import { stringUtil } from "utils";
+import { CategoryService } from "services";
+import {useParams} from "react-router-dom";
+import { useSelector } from "react-redux";
+
 
 const H5 = styled.h5`
     font-family: Poppins;
@@ -19,7 +23,8 @@ const H5 = styled.h5`
 
 
 const RegisterFullday = () => {
-
+    let { isLoggedIn } = useSelector(getAuthenticationStore)
+    const {slug} = useParams();
     const [eventData, setEventData] = useState({
         eventType: "fullday",
         type: "",
@@ -38,6 +43,7 @@ const RegisterFullday = () => {
               gender: ""
           }
         ],
+        categoryEvent: null,
         eventCategories: [
           {
             id: stringUtil.createRandom(),
@@ -86,6 +92,23 @@ const RegisterFullday = () => {
     }
     setEventData(modifiedEventData);
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log("belum login")
+    } else {
+    const {data, errors, success, message} = CategoryService.get({slug});
+    if (success) {
+      if (data) {
+        console.log(data)
+        setState(data);
+        }
+      } else {
+        console.log(errors)
+        console.log(message)
+      }
+    }
+  });
 
   console.log(eventData)
 

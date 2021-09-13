@@ -20,6 +20,8 @@ const competitionCategories = [
     ageCategoryLabel: "U-12",
     competitionCategoryId: "Standard Bow",    
     competitionCategoryLabel: "Standard Bow",
+    teamCategoryId: "team",
+    teamCategoryLabel: "team",
     distanceId: "20",
     distanceLabel: "20m",
     label: "Standard Bow - U12 - 20m"
@@ -30,6 +32,8 @@ const competitionCategories = [
     ageCategoryLabel: "U-12",
     competitionCategoryId: "Barebow",
     competitionCategoryLabel: "Barebow",
+    teamCategoryId: "team",
+    teamCategoryLabel: "team",
     distanceId: "50",
     distanceLabel: "50m",
     label: "Barebow - U12 - 50m"

@@ -1,5 +1,5 @@
 import {
-  FileUpload,
+  // FileUpload,
   ImageUpload,
   RadioButtonInput,
   TextEditor,
@@ -10,10 +10,50 @@ import { Col, Row } from "reactstrap";
 import { selectConstants } from "constants/index";
 
 export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
+  //   const [base64URL, setBase64URL] = useState("");
+  //   // const [imgTo64, setImgTo64] = useState("")
+  //   const [file, setFile] = useState(null)
+  
+  // const getBase64 = (file) => {
+  //   return new Promise((resolve) => {
+  //     let fileInfo
+  //     let baseURL = ""
+  //     let reader = new FileReader
+
+  //     reader.readAsDataURL(file)
+  //     reader.onload = () => {
+  //       baseURL = reader.result
+  //       resolve(baseURL)
+  //     }
+  //     console.log(fileInfo)
+  //   })
+  // }
+
+  // const handlerFileInputChange = (e) => {
+  //   let go = e.target.files[0]
+  //   console.log(e.target.files[0])
+  //   getBase64(e.target.files[0]).then((result) => {
+  //     go['base64'] = result
+  //     setFile(go)
+  //     setBase64URL(result)
+  //   }).catch((err) => {
+  //     console.log(err)
+  //   })
+  // }
+  
   const handleChange = ({ key, value }) => {
-    if (onFormFieldChange) onFormFieldChange(key, value);
+    if (onFormFieldChange){
+      // if (key === "poster"){
+        // onFormFieldChange(key, base64URL);
+      // }
+      onFormFieldChange(key, value);
+    } 
+      
   };
 
+  // console.log(base64URL)
+  // console.log(file)
+  console.log(formData.poster)
   return (
     <Row>
       <Col lg={3}>
@@ -24,10 +64,11 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="poster"
               onChange={handleChange}
               thumbnail
+              // base64={handlerFileInputChange}
             />
           </Col>
         </Row>
-        <Row>
+        {/* <Row>
           <Col lg={12}>
             <FileUpload
               label="Upload Handbook"
@@ -35,7 +76,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
             />
           </Col>
-        </Row>
+        </Row> */}
       </Col>
       <Col lg={9}>
         <Row>

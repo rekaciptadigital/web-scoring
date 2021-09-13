@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import MetaTags from "react-meta-tags";
 import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
 import { Container, Row, Card, Media, CardBody, Button } from "reactstrap";
 import styled from "styled-components";
 import Avatar from "../../../assets/images/users/avatar-man.png";
+import { OrderEventService } from "services";
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -14,22 +15,28 @@ const H5 = styled.h5`
 `;
 
 const CheckoutEvent = () => {
+  const [state, setState] = useState();
   const handleClick = () => {
-    console.log("clik");
-    const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
-
-    const myMidtransClientKey = "SB-Mid-client-y_BGhv-exWF6m27x";
-
-    let scriptTag = document.createElement("script");
-    scriptTag.src = midtransScriptUrl;
-    scriptTag.setAttribute("data-client-key", myMidtransClientKey);
-    document.body.appendChild(scriptTag);
-
     window.snap.pay("ab727dea-ba18-43be-812d-4f4a0810309b")
     return () => {
       document.body.removeChild(scriptTag);
     };
   };
+
+  useEffect(() => {
+    const {data, errors, message, success} = OrderEventService.get();
+    if (success) {
+      if (data) {
+        console.log(data)
+        setState(data);
+        }
+      } else {
+        console.log(errors)
+        console.log(message)
+      }
+  }, []);
+
+  console.log(state, 'dada');
 
   return (
     <React.Fragment>

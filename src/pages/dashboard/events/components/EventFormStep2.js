@@ -2,7 +2,7 @@ import {
   CheckboxInput,
   CheckboxWithCurrencyInput,
   CurrencyInput,
-  SwitchInput,
+  // SwitchInput,
 } from "components";
 import React from "react";
 import { Col, Row } from "reactstrap";
@@ -40,7 +40,7 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
           />
         </Col>
       </Row>
-      <Row>
+      {/* <Row>
         <Col lg={12}>
           <SwitchInput
             label="Apakah Harga setiap kategori sama?"
@@ -51,8 +51,8 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
             value={formData.isFlatRegistrationFee}
           />
         </Col>
-      </Row>
-      {!formData.isFlatRegistrationFee && (
+      </Row> */}
+      {/* {formData.isFlatRegistrationFee && ( */}
         <Row>
           {formData.registrationFees?.map((registrationFee, index) => (
             <Col lg={6} key={registrationFee.id}>
@@ -62,7 +62,7 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
                   (categoryPrice, categoryPriceIndex) => (
                     <Col lg={6} key={categoryPriceIndex}>
                       <CurrencyInput
-                        disabled={formData.isFlatRegistrationFee}
+                        // disabled={formData.isFlatRegistrationFee}
                         horizontal
                         label={categoryPrice.label}
                         name={`registrationFees.${index}.categoryPrices.${categoryPriceIndex}.price`}
@@ -76,7 +76,6 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
             </Col>
           ))}
         </Row>
-      )}
     </>
   );
 };

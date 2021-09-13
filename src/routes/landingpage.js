@@ -9,8 +9,13 @@ import CheckoutEvent from "../pages/landingpage/checkout";
 import DashboardOrderEvent from "../pages/landingpage/dashboard";
 
 const landingpageRouters = [
+<<<<<<< HEAD
     { path: "/full-day", component: LandingPage },
     { path: "/full-day/register/:slug", component: RegisterFullday},
+=======
+    { path: "/:username/:slug", component: LandingPage },
+    { path: "/full-day/register", component: RegisterFullday},
+>>>>>>> develop
     { path: "/full-day/register-done", component: RegisterDone},
 
     {path: "/marathon", component: MarathonLandingPage},

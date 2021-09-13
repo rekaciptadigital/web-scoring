@@ -11,7 +11,7 @@ import {
 //   import poster from '../../../../assets/images/myachery/logo-myarchery.png'
 
 function CardEvent(props) {
-    console.log(props.dataEvent.poster)
+    console.log(props.dataEvent)
     return (
         <div>
             <Card className="mini-stats-wid">
@@ -21,7 +21,7 @@ function CardEvent(props) {
                             <div>
                                 <span>
                                     {/* <i className="bx bx-home font-size-24"></i> */}
-                                    <img src={props.dataEvent.poster ? props.dataEvent.poster : satuDashboard} height="130" />
+                                    <img src={props.dataEvent.poster ? props.dataEvent.poster : satuDashboard} height="120" width="200" />
                                 </span>
                             </div>
                         </Col>
@@ -34,6 +34,9 @@ function CardEvent(props) {
                             <p className="text-muted fw-medium">
                                 {props.dataEvent.location} - {props.dataEvent.locationType}
                             </p>
+                            <div className="mb-2">
+                                <a target="_blank" rel="noreferrer" href={props.dataEvent.eventUrl}>Link Event</a>
+                            </div>
                             <Button disabled color="primary">Manage Event</Button>
                             </div>
                         </Col>

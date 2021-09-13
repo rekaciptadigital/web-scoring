@@ -7,12 +7,12 @@ import {
   CardImg,
   CardText,
   CardTitle,
-  Col,
+  // Col,
   Container,
-  Row,
+  // Row,
 } from "reactstrap";
 import eventFullday from "assets/images/events/fullday.jpg";
-import eventMarathon from "assets/images/events/marathon.jpg";
+// import eventMarathon from "assets/images/events/marathon.jpg";
 
 const EventsNew = () => {
   return (
@@ -24,8 +24,8 @@ const EventsNew = () => {
             breadcrumbItems={[{ title: "Dashboard" }, { title: "Events" }]}
           />
           <h2 style={{textAlign: 'center'}}>Pilih Jenis Event Anda</h2>
-          <Row>
-            <Col md={6} xl={{size: 3, offset: 3}}>
+          {/* <Row> */}
+            {/* <Col md={12} xl={{size: 3, offset: 3}}> */}
               <Card>
                 <CardBody>
                   <CardTitle className="mt-0">Event Full Day</CardTitle>
@@ -38,8 +38,8 @@ const EventsNew = () => {
                   </Link>
                 </CardBody>
               </Card>
-            </Col>
-            <Col md={6} xl={3}>
+            {/* </Col> */}
+            {/* <Col md={6} xl={3}>
               <Card>
                 <CardBody>
                   <CardTitle className="mt-0">Event Marathon</CardTitle>
@@ -59,8 +59,8 @@ const EventsNew = () => {
                   </Link>
                 </CardBody>
               </Card>
-            </Col>
-          </Row>
+            </Col> */}
+          {/* </Row> */}
         </Container>
       </div>
     </React.Fragment>

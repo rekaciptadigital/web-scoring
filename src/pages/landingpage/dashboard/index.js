@@ -73,6 +73,7 @@ const DashboardOrderEvent = () => {
                         </div>
                         </Media>
                           <Button
+                            disabled
                               href="/full-day"
                               type="button"
                               size="sm"

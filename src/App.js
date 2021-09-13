@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
 import "./assets/scss/theme.scss";
 import { AuthLayout, DashboardHorizontalLayout, DashboardEventUmum, LandingPageLayout, LayoutArcher } from "./layouts";
-import { AuthenticationMiddleware, AuthenticationArcherMiddleware } from "./middlewares";
+import { AuthenticationMiddleware } from "./middlewares";
 import { authenticationRoutes, dashboardRoutes, workingRoutes, eventRouters, landingpageRouters, archerRouters, routerDasboardArcher } from "./routes";
 
 const App = () => {
@@ -52,7 +52,7 @@ const App = () => {
             />
           ))}
            {landingpageRouters.map((route, idx) => (
-            <AuthenticationArcherMiddleware
+            <AuthenticationMiddleware
               path={route.path}
               layout={LandingPageLayout}
               component={route.component}

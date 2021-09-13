@@ -91,10 +91,12 @@ const RegisterFullday = () => {
   };
 
   useEffect(() => {
-    const {data, errors, success, message} = CategoryService.get({slug});
+    const slugData = {slug}
+    const {data, errors, success, message} = CategoryService.get(slugData);
+    console.log(data, errors, success, message)
     if (success) {
       if (data) {
-        console.log(data, 'dad')
+        console.log(data)
         }
       } else {
         console.log(errors)

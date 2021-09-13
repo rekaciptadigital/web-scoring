@@ -38,11 +38,6 @@ const CheckoutEvent = () => {
       }
   }, []);
 
-  console.log(info, 'dada')
-
-
-
-
   return (
     <React.Fragment>
       <MetaTags>

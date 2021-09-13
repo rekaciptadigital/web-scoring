@@ -92,24 +92,24 @@ const DashboardOrderEvent = () => {
                     <Card>
                         <CardBody>
                                 {event && event?.map((i) => (
-                                <Media className="mt-3" key={i.archeryEvent.id}>
-                                    <div>
-                                        <div className="d-flex">
-                                            <h3>{i.archeryEvent.eventName} </h3>
-                                            <p style={{color: "#74788D"}} className="mt-1 mx-3"><i>{i.transactionInfo.status}</i></p> 
+                                    <>
+                                    <Media className="mt-3 flex-row" key={i.archeryEvent.id}>
+                                        <div>
+                                            <div className="d-flex">
+                                                <h3>{i.archeryEvent.eventName} </h3>
+                                                <p style={{color: "#74788D"}} className="mt-1 mx-3"><i>{i.transactionInfo.status}</i></p> 
+                                            </div>
+                                            <H5>{i.archeryEvent.flatCategories[0].archeryEventCategoryLabel}</H5>
+                                            <H5>ID {i.transactionInfo.orderId}</H5>
                                         </div>
-                                        <H5>{i.archeryEvent.flatCategories[0].archeryEventCategoryLabel}</H5>
-                                        <H5>ID {i.transactionInfo.orderId}</H5>
-                                    </div>
-                                    <div className="align-items-end">
-                                        <Button
-                                            href="/checkout-event"
-                                            type="button"
-                                            style={{backgroundColor: "#0D47A1", float: "right" }}>
-                                            Detail
-                                        </Button>
-                                    </div>    
-                                </Media> 
+                                    </Media> 
+                                    <Button
+                                        href="/checkout-event"
+                                        type="button"
+                                        style={{backgroundColor: "#0D47A1",  }}>
+                                        Detail
+                                    </Button>
+                                </>
                                 ))}
 
 

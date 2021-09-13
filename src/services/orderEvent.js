@@ -6,5 +6,8 @@ export default {
     },
     get(qs = null) {
         return API.get("/web/v1/archery/event-order/1?id=5", qs)
+    },
+    getAll(qs = null) {
+        return API.get("/web/v1/archery/event-order", qs)
     }
 }

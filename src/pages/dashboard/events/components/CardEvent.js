@@ -10,7 +10,6 @@ import {
   import satuDashboard from '../../../../assets/images/myachery/dashboard-1.png'
 
 function CardEvent(props) {
-    console.log(props.dataEvent)
     return (
         <div>
             <Card className="mini-stats-wid">

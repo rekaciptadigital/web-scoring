@@ -4,10 +4,10 @@ import {
   Col,
   Container,
   Row,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
+  // Dropdown,
+  // DropdownToggle,
+  // DropdownMenu,
+  // DropdownItem,
   Button
 } from "reactstrap";
 //Import Breadcrumb
@@ -16,7 +16,7 @@ import CardEvent from "./components/CardEvent";
 import { EventsService } from "../../../services"
 
 const ListEvent = () => {
-  const [isOpenDropDown, setIsOpenDropDown] = useState(false)
+  // const [isOpenDropDown, setIsOpenDropDown] = useState(false)
   const [listEvent, setListEvent] = useState([])
 
   const getEvent = async () => {
@@ -45,7 +45,7 @@ const ListEvent = () => {
           <div className="mb-3">
             <Row>
               <Col md={6}>
-              <Dropdown
+              {/* <Dropdown
                 disabled
                 isOpen={isOpenDropDown}
                 toggle={() =>
@@ -63,7 +63,7 @@ const ListEvent = () => {
                   <DropdownItem>Another action</DropdownItem>
                   <DropdownItem>Something else here</DropdownItem>
                 </DropdownMenu>
-              </Dropdown>{" "}
+              </Dropdown>{" "} */}
               </Col>
               <Col md={6}>
                 <div className="float-end">

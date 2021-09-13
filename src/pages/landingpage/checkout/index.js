@@ -141,7 +141,7 @@ const CheckoutEvent = () => {
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
                       <H5>Tanggal Kualifikasi</H5>
-                      <h4>Unknown</h4>
+                      <h4>{info.archeryEvent?.eventStartDatetime}</h4>
                     </div>
                     <div className="mx-5 text-muted">
                       <Button

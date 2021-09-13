@@ -8,6 +8,6 @@ export default {
     return API.get("/app/v1/archery/event-order/"+qs.id, qs);
   },
   getAll(qs = null) {
-    return API.get("/web/v1/archery/event-order", qs);
+    return API.get("/app/v1/archery/event-order", qs);
   },
 };

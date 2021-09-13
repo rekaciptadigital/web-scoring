@@ -40,6 +40,49 @@ const DashboardOrderEvent = () => {
       </MetaTags>
       {/* import navbar */}
       <HeaderForm />
+ 
+        <Container fluid className="px-5 p-2">
+            <Row>
+              <Card>
+                <CardBody>
+                    <Media>
+                        <div className="ms-3">
+                        <img
+                            src={Avatar}
+                            alt=""
+                            className="avatar-md rounded-circle img-thumbnail"
+                        />
+                        </div>
+                        <Media body className="align-self-center">
+                        
+                        <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
+                        <div className="d-flex">
+                            <div className="mx-5 text-muted">
+                                <h4>John Doe</h4>
+                                <H5>Klub FAST</H5>
+                            </div>
+                            <div className="mx-5 text-muted">
+                                <h4>No. Ponsel</h4>
+                                <H5>+62 81234 56789</H5>
+                            </div>
+                            <div className="mx-5 text-muted">
+                                <h4>Email</h4>
+                                <H5>nama@mail.com</H5>
+                            </div>
+                        </div>
+                        </Media>
+                          <Button
+                            disabled
+                              href="/full-day"
+                              type="button"
+                              size="sm"
+                              style={{backgroundColor: "#0D47A1",  }}>
+                              Setting
+                          </Button>
+                      </Media>
+                  </CardBody>
+              </Card>
+            </Row>
 
             <Row>
                 {/* <Col sm={6}>
@@ -61,7 +104,7 @@ const DashboardOrderEvent = () => {
                                         </div>
                                     </Media> 
                                     <Button
-                                        href="/checkout-event"
+                                        href={`/checkout-event/${i.participant.id}`}
                                         type="button"
                                         style={{backgroundColor: "#0D47A1",  }}>
                                         Detail
@@ -108,67 +151,13 @@ const DashboardOrderEvent = () => {
                                     </NavLink>
                                 </NavItem>
                                 </ul> */}
-
-
-                           
-                            
+       
                         </CardBody>
                     </Card>
                 </Col>
                
             </Row>
 
-        <Row>
-          <Col sm={6}>
-            <CardActivity />
-          </Col>
-          <Col sm={6}>
-            <Card>
-              <CardBody>
-                <Media>
-                  <ul className="nav nav-tabs nav-tabs-custom">
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: activeTab === "1",
-                        })}
-                        onClick={() => {
-                          toggleTab("1");
-                        }}
-                      >
-                        Cek Event
-                      </NavLink>
-                    </NavItem>
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: activeTab === "2",
-                        })}
-                        onClick={() => {
-                          toggleTab("2");
-                        }}
-                      >
-                        On Going
-                      </NavLink>
-                    </NavItem>
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: activeTab === "3",
-                        })}
-                        onClick={() => {
-                          toggleTab("3");
-                        }}
-                      >
-                        Attended
-                      </NavLink>
-                    </NavItem>
-                  </ul>
-                </Media>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
       </Container>
 
       <Footer />

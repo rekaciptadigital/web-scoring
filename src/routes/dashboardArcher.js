@@ -19,7 +19,7 @@ const routerDasboardArcher = [
   { path: "/marathon/register-done", component: RegisterMarathonDone },
   { path: "/marathon/dashboard", component: DashboardMarathon },
 
-  { path: "/checkout-event", component: CheckoutEvent, exact: true },
+  { path: "/checkout-event/:id", component: CheckoutEvent, exact: true },
   { path: "/dashboard/event", component: DashboardOrderEvent, exact: true },
   { path: "/archer/logout", component: ArcherLogout },
 ];

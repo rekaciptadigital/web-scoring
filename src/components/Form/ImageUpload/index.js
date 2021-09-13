@@ -13,12 +13,12 @@ const ImageUpload = ({
   error,
   disabled,
   readOnly,
-  base64,
+  // base64,
 }) => {
   const [uploadedImage, setUploadedImage] = useState();
 
   const handleChange = e => {
-    base64(e)
+    // base64(e)
     setUploadedImage(URL.createObjectURL(e.target.files[0]));
     if (onChange)
       onChange({

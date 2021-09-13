@@ -9,12 +9,11 @@ import { OrderEventService } from "services";
 // import classnames from "classnames"
 // import CardActivity from "./CardActivity";
 
-
 const H5 = styled.h5`
-    font-size: 13px;
-    line-height: 19px;
-    color: #74788D;
-    font-weight: normal;
+  font-size: 13px;
+  line-height: 19px;
+  color: #74788d;
+  font-weight: normal;
 `;
 
 const DashboardOrderEvent = () => {
@@ -105,7 +104,7 @@ const DashboardOrderEvent = () => {
                                         </div>
                                     </Media> 
                                     <Button
-                                        href="/checkout-event"
+                                        href={`/checkout-event/${i.participant.id}`}
                                         type="button"
                                         style={{backgroundColor: "#0D47A1",  }}>
                                         Detail
@@ -152,23 +151,18 @@ const DashboardOrderEvent = () => {
                                     </NavLink>
                                 </NavItem>
                                 </ul> */}
-
-
-                           
-                            
+       
                         </CardBody>
                     </Card>
                 </Col>
                
             </Row>
 
-
-        </Container>
+      </Container>
 
       <Footer />
-
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default DashboardOrderEvent
+export default DashboardOrderEvent;

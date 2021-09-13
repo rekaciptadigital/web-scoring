@@ -6,6 +6,7 @@ import { Container, Row, Card, Media, CardBody, Button } from "reactstrap";
 import styled from "styled-components";
 import Avatar from "../../../assets/images/users/avatar-man.png";
 import { OrderEventService } from "services";
+import { useParams } from "react-router";
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -16,6 +17,7 @@ const H5 = styled.h5`
 
 const CheckoutEvent = () => {
   const [info, setInfo] = useState([]);
+  const { id } = useParams();
 
   const handleClick = () => {
     window.snap.pay("ab727dea-ba18-43be-812d-4f4a0810309b")
@@ -25,7 +27,7 @@ const CheckoutEvent = () => {
   };
 
   useEffect(async() => {
-    const {data, errors, message, success} = await OrderEventService.get();
+    const {data, errors, message, success} = await OrderEventService.get({id});
     console.log(data, errors, message, success)
     if (success) {
       if (data) {

@@ -26,7 +26,7 @@ const dashboardRoutes = [
   { path: "/dashboard/result/edit", component: EditResult},
   
   // this route should be at the end of all other routes
-  { path: "/", exact: true, component: () => <Redirect to="/dashboard" /> },
+  { path: "/", exact: true, component: () => <Redirect to="/dashboard/events" /> },
   { path: "/dashboard/events/new", component: EventsNew },
   { path: "/dashboard/events/new/fullday", component: EventsNewFullday },
   { path: "/dashboard/events/new/marathon", component: EventsNewMarathon },

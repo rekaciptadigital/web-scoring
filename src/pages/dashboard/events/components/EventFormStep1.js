@@ -51,8 +51,8 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
       
   };
 
-  console.log(base64URL)
-  console.log(file)
+  // console.log(base64URL)
+  // console.log(file)
   console.log(formData.poster)
   return (
     <Row>

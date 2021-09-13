@@ -37,7 +37,9 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
   }
 
   const handleValidSubmit = async (values) => {
-    const { data, errors, message, success } = await EventsService.register(values)
+    const d = { ...values }
+    d.handbook = null
+    const { data, errors, message, success } = await EventsService.register(d)
       if (success) {
         if (data) {
           history.push("/dashboard/events")

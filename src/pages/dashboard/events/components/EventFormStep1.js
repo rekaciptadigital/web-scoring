@@ -35,6 +35,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
     getBase64(e.target.files[0]).then((result) => {
       go['base64'] = result
       setFile(go)
+      console.log(file)
       setBase64URL(result)
     }).catch((err) => {
       console.log(err)
@@ -44,16 +45,16 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange){
       if (key === "poster"){
-        onFormFieldChange(key, base64URL);
+        onFormFieldChange(key, base64URL?.base64);
       }
       onFormFieldChange(key, value);
     } 
       
   };
 
-  console.log(base64URL)
-  console.log(file)
-  console.log(formData.poster)
+  // console.log(base64URL)
+  // console.log(file)
+  // console.log(formData.poster)
   return (
     <Row>
       <Col lg={3}>

@@ -9,8 +9,8 @@ import CheckoutEvent from "../pages/landingpage/checkout";
 import DashboardOrderEvent from "../pages/landingpage/dashboard";
 
 const landingpageRouters = [
-    { path: "/:username/:slug", component: LandingPage },
-    { path: "/full-day/register", component: RegisterFullday},
+    { path: "/event/:username/:slug", component: LandingPage, exact: true },
+    { path: "/full-day/register", component: RegisterFullday, exact: true},
     { path: "/full-day/register-done", component: RegisterDone},
 
     {path: "/marathon", component: MarathonLandingPage},
@@ -18,8 +18,8 @@ const landingpageRouters = [
     {path: "/marathon/register-done", component: RegisterMarathonDone},
     {path: "/marathon/dashboard", component:DashboardMarathon},
 
-    {path: "/checkout-event", component:CheckoutEvent},
-    {path: "/dashboard/event", component:DashboardOrderEvent},
+    {path: "/checkout-event", component:CheckoutEvent, exact: true},
+    {path: "/dashboard/event", component:DashboardOrderEvent, exact: true},
 ]
 
 export default landingpageRouters

@@ -10,7 +10,9 @@ const AuthenticationMiddleware = ({
   isAuthProtected,
   ...rest
 }) => {
-  const { isLoggedIn } = useSelector(getAuthenticationStore)
+  let { isLoggedIn } = useSelector(getAuthenticationStore)
+  // isLoggedIn = true;
+  // isAuthProtected = false
   
   return (
     <Route

@@ -352,3 +352,91 @@ span.flatpickr-weekday {
 .css-sourceMap-modules-importLoaders-1-localIdentName-ReactDrawer__overlay___2QFmC-sass {
   background: rgba(0, 0, 0, 0.15) !important;
 }
+
+div[class^="col"],
+div[class*=" col"] {
+  margin-bottom: 10px;
+}
+
+.date-input,
+.datetime-input {
+  .form-control:disabled,
+  .form-control[readonly] {
+    background-color: #fff;
+  }
+}
+
+.input-group .btn {
+  position: relative;
+  z-index: 0;
+}
+
+.input-file-thumbnail {
+  display: flex;
+  justify-content: center;
+  .label {
+    position: relative;
+    width: 100%;
+    background: rgb(229, 229, 229);
+    border-radius: 14px;
+    max-width: 200px;
+    max-height: 200px;
+    min-height: 200px;
+    overflow: hidden;
+    .icon {
+      font-size: 50px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    &.is-invalid {
+      border: solid 1px $danger;
+    }
+  }
+
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+.is-invalid {
+  .form-check-input[type="checkbox"] {
+    border-color: $danger;
+  }
+  .form-check-input[type="radio"] {
+    border-color: $danger;
+  }
+
+  ~ .input-group-append {
+    .input-group-text {
+      border-color: $danger;
+    }
+  }
+
+  .select2-selection__control {
+    border-color: $danger;
+  }
+
+  .rdw-editor-wrapper {
+    border: solid 1px $danger;
+  }
+}
+
+.dropzone.is-invalid {
+  border-color: $danger;
+}
+
+.radio-button-input {
+  .btn-group {
+    label {
+      margin-bottom: 0;
+    }
+
+    &.is-invalid {
+      border: solid 1px $danger;
+      border-radius: 0.25rem;
+    }
+  }
+}

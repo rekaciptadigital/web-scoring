@@ -1,22 +1,39 @@
 // availity-reactstrap-validation
+import myachery from "assets/images/myachery/logo 3.png"
+import React, { useEffect, useState } from "react"
+import google from "assets/images/myachery/Google.png"
+import facebook from "assets/images/myachery/Facebook.png"
+// import ladBg from "assets/images/myachery/achery-lad.png"
 import { AvField, AvForm } from "availity-reactstrap-validation"
-import React, { useEffect } from "react"
 import MetaTags from "react-meta-tags"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, useHistory } from "react-router-dom"
-import { Alert, Card, CardBody, Col, Container, Row } from "reactstrap"
+import { useHistory, Link } from "react-router-dom"
+import { AuthenticationService } from "services"
+import { Col, Container, Row, Card, CardBody } from "reactstrap"
 import * as AuthenticationStore from "store/slice/authentication"
-import logoImg from "../../../assets/images/logo.svg"
+import toastr from "toastr"
+// import logoImg from "../../../assets/images/logo.svg"
 // import images
-import profileImg from "../../../assets/images/profile-img.png"
+// import profileImg from "../../../assets/images/profile-img.png"
 
-const Register = props => {
+const Register = () => {
+  const [registerErrors, setRegisterErrors] = useState()
+
   const dispatch = useDispatch()
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
   let history = useHistory();
   
-  const handleValidSubmit = () => {
-    dispatch(AuthenticationStore.register())
+  const handleValidSubmit = async (event, values) => {
+    const { data, errors, message, success } = await AuthenticationService.register(values)
+    if (success) {
+      if (data) {
+        dispatch(AuthenticationStore.register())
+      }
+    } else {
+      console.log(errors)
+      setRegisterErrors(errors)
+      toastr.error(message)
+    }
   }
 
   useEffect(() => {
@@ -25,10 +42,12 @@ const Register = props => {
     }
   }, [isLoggedIn])
 
+  console.log(registerErrors)
+
   return (
     <React.Fragment>
       <MetaTags>
-        <title>Register | Skote - React Admin & Dashboard Template</title>
+        <title>Login | MyArchery</title>
       </MetaTags>
       <div className="home-btn d-none d-sm-block">
         <Link to="/" className="text-dark">
@@ -40,26 +59,26 @@ const Register = props => {
           <Row className="justify-content-center">
             <Col md={8} lg={6} xl={5}>
               <Card className="overflow-hidden">
-                <div className="bg-primary bg-soft">
+                <div className="bg-primary">
                   <Row>
-                    <Col className="col-7">
-                      <div className="text-primary p-4">
-                        <h5 className="text-primary">Free Register</h5>
-                        <p>Get your free Skote account now.</p>
+                    <Col xs={7}>
+                      <div className="text-light p-4">
+                        <h5 className="text-light">Daftar MyArchery.id</h5>
+                        <p>Get your free MyArchery.id <br />account now.</p>
                       </div>
                     </Col>
-                    <Col className="col-5 align-self-end">
-                      <img src={profileImg} alt="" className="img-fluid" />
-                    </Col>
+                    {/* <Col className="col-5 align-self-end">
+                      <img src={profile} alt="" className="img-fluid" />
+                    </Col> */}
                   </Row>
                 </div>
                 <CardBody className="pt-0">
                   <div>
-                    <Link to="/">
+                    <Link to="/" className="auth-logo-light">
                       <div className="avatar-md profile-user-wid mb-4">
                         <span className="avatar-title rounded-circle bg-light">
                           <img
-                            src={logoImg}
+                            src={myachery}
                             alt=""
                             className="rounded-circle"
                             height="34"
@@ -69,80 +88,86 @@ const Register = props => {
                     </Link>
                   </div>
                   <div className="p-2">
-                    <AvForm
-                      className="form-horizontal"
-                      onValidSubmit={(e, v) => {
-                        handleValidSubmit(e, v)
-                      }}
-                    >
-                      {props.user && props.user ? (
-                        <Alert color="success">
-                          Register User Successfully
-                        </Alert>
-                      ) : null}
-
-                      {props.registrationError && props.registrationError ? (
-                        <Alert color="danger">{props.registrationError}</Alert>
-                      ) : null}
-
-                      <div className="mb-3">
-                        <AvField
-                          id="email"
-                          name="email"
-                          label="Email"
-                          className="form-control"
-                          placeholder="Enter email"
-                          type="email"
-                          required
-                        />
-                      </div>
-
-                      <div className="mb-3">
-                        <AvField
-                          name="username"
-                          label="Username"
-                          type="text"
-                          required
-                          placeholder="Enter username"
-                        />
-                      </div>
-                      <div className="mb-3">
+                  <AvForm
+              className="form-horizontal"
+              onValidSubmit={(e, v) => {
+                handleValidSubmit(e, v)
+              }}
+              >
+                <div className="mb-2">
+                  <AvField
+                    name="email"
+                    label="Email"
+                    className="form-control"
+                    placeholder="Masukkan email/Nama EO Terdaftar"
+                    type="email"
+                    required
+                  />
+                </div>
+                <div className="mb-2">
+                  <AvField
+                    name="name"
+                    label="Nama EO"
+                    className="form-control"
+                    placeholder="Masukkan email/Nama EO Terdaftar"
+                    type="text"
+                    required
+                  />
+                </div>
+                <div className="mb-2">
                         <AvField
                           name="password"
-                          label="Password"
+                          label="Kata Sandi"
                           type="password"
                           required
-                          placeholder="Enter Password"
+                          placeholder="Masukkan kata sandi"
                         />
                       </div>
-
-                      <div className="mt-4">
+                <div className="mb-2">
+                  <AvField
+                    name="password_confirmation"
+                    label="Konfirmasi Kata Sandi"
+                    type="password"
+                    required
+                    placeholder="Masukkan kata sandi"
+                  />
+                </div>
+                <div className="mt-3 d-grid">
                         <button
-                          className="btn btn-primary btn-block "
+                          className="btn btn-primary btn-block"
                           type="submit"
                         >
                           Register
                         </button>
                       </div>
 
-                      <div className="mt-4 text-center">
-                        <p className="mb-0">
-                          By registering you agree to the Skote{" "}
-                          <Link to="#" className="text-primary">
-                            Terms of Use
-                          </Link>
-                        </p>
+                      <div className="text-center mt-4">
+                        <p className="font-size-14 color-black">Atau daftar dengan</p>
+                        <div>
+                          <img src={facebook} alt="" />
+                          <img src={google} alt="" />
+                        </div>
                       </div>
-                    </AvForm>
+
+                      <div className="mt-4 text-center">
+                        <Link
+                          to="/authentication/forgot-password"
+                          className="text-muted"
+                        >
+                          <i className="mdi mdi-lock me-1" />
+                          Forgot your password?
+                        </Link>
+                      </div>
+              </AvForm>
                   </div>
                 </CardBody>
               </Card>
               <div className="mt-5 text-center">
                 <p>
                   Already have an account ?{" "}
-                  <Link to="/authentication/login" className="font-weight-medium text-primary">
+                  <Link to="/authentication/login" className="fw-medium text-primary">
                     {" "}
-                    Login
+                    Login{" "}
                   </Link>{" "}
                 </p>
                 <p>

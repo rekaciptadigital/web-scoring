@@ -1,13 +1,18 @@
-import logo from "assets/images/logo.svg"
+// import logo from "assets/images/logo.svg"
 // import images
-import profile from "assets/images/profile-img.png"
+// import profile from "assets/images/profile-img.png"
 // availity-reactstrap-validation
 import { AvField, AvForm } from "availity-reactstrap-validation"
+import myachery from "assets/images/myachery/logo 3.png"
+// import gmail from "assets/images/myachery/gmail.png"
+import google from "assets/images/myachery/Google.png"
+import facebook from "assets/images/myachery/Facebook.png"
+// import ladBg from "assets/images/myachery/achery-lad.png"
 import React, { useEffect, useState } from "react"
 import MetaTags from "react-meta-tags"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, useHistory } from "react-router-dom"
-import { Card, CardBody, Col, Container, Row } from "reactstrap"
+import { useHistory, Link } from "react-router-dom"
+import { Col, Row, Container, Card, CardBody } from "reactstrap"
 import { AuthenticationService } from "services"
 //Import config
 import * as AuthenticationStore from "store/slice/authentication"
@@ -39,10 +44,12 @@ const Login = () => {
     }
   }, [isLoggedIn])
 
+  console.log(loginErrors)
+
   return (
     <React.Fragment>
       <MetaTags>
-        <title>Login | Skote - React Admin & Dashboard Template</title>
+        <title>Login | MyArchery</title>
       </MetaTags>
       <div className="home-btn d-none d-sm-block">
         <Link to="/" className="text-dark">
@@ -54,17 +61,17 @@ const Login = () => {
           <Row className="justify-content-center">
             <Col md={8} lg={6} xl={5}>
               <Card className="overflow-hidden">
-                <div className="bg-primary bg-soft">
+                <div className="bg-primary">
                   <Row>
                     <Col xs={7}>
-                      <div className="text-primary p-4">
-                        <h5 className="text-primary">Welcome Back !</h5>
-                        <p>Sign in to continue to Skote.</p>
+                      <div className="text-light p-4">
+                        <h5 className="text-light">Masuk MyArchery.id</h5>
+                        {/* <p>Sign in to continue MyArchery.</p> */}
                       </div>
                     </Col>
-                    <Col className="col-5 align-self-end">
+                    {/* <Col className="col-5 align-self-end">
                       <img src={profile} alt="" className="img-fluid" />
-                    </Col>
+                    </Col> */}
                   </Row>
                 </div>
                 <CardBody className="pt-0">
@@ -73,7 +80,7 @@ const Login = () => {
                       <div className="avatar-md profile-user-wid mb-4">
                         <span className="avatar-title rounded-circle bg-light">
                           <img
-                            src={logo}
+                            src={myachery}
                             alt=""
                             className="rounded-circle"
                             height="34"
@@ -134,8 +141,16 @@ const Login = () => {
                           className="btn btn-primary btn-block"
                           type="submit"
                         >
-                          Log In
+                          Masuk
                         </button>
+                      </div>
+
+                      <div className="text-center mt-4">
+                        <p className="font-size-14 color-black">Atau masuk dengan</p>
+                        <div>
+                          <img src={facebook} alt="" />
+                          <img src={google} alt="" />
+                        </div>
                       </div>
 
                       <div className="mt-4 text-center">
@@ -154,7 +169,7 @@ const Login = () => {
               <div className="mt-5 text-center">
                 <p>
                   Don&#39;t have an account ?{" "}
-                  <Link to="register" className="fw-medium text-primary">
+                  <Link to="/authentication/register" className="fw-medium text-primary">
                     {" "}
                     Signup now{" "}
                   </Link>{" "}
@@ -169,7 +184,7 @@ const Login = () => {
         </Container>
       </div>
     </React.Fragment>
-  )
+   )
 }
 
 export default Login

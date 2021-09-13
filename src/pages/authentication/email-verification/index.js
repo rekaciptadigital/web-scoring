@@ -13,7 +13,7 @@ const EmailVerification = () => {
       <div className="account-pages my-5 pt-sm-5">
         <MetaTags>
           <title>
-            Email Verification | Skote - React Admin & Dashboard Template
+            Email Verification | MyArchery
           </title>
         </MetaTags>
         <Container>
@@ -77,7 +77,7 @@ const EmailVerification = () => {
                   </a>{" "}
                 </p>
                 <p>
-                  © {new Date().getFullYear()} Skote. Crafted with{" "}
+                  © {new Date().getFullYear()} MyArchery. Crafted with{" "}
                   <i className="mdi mdi-heart text-danger"></i> by Themesbrand
                 </p>
               </div>

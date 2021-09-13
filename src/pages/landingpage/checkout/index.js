@@ -6,6 +6,7 @@ import { Container, Row, Card, Media, CardBody, Button } from "reactstrap";
 import styled from "styled-components";
 import Avatar from "../../../assets/images/users/avatar-man.png";
 import { OrderEventService } from "services";
+import { useParams } from "react-router";
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -15,17 +16,19 @@ const H5 = styled.h5`
 `;
 
 const CheckoutEvent = () => {
-  const [info, setInfo] = useState();
+  const [info, setInfo] = useState([]);
+  const { id } = useParams();
 
   const handleClick = () => {
-    window.snap.pay("ab727dea-ba18-43be-812d-4f4a0810309b")
+    console.log(info.transactionInfo?.snapToken, 'klik')
+    window.snap.pay(`${info.transactionInfo?.snapToken}`)
     return () => {
       document.body.removeChild(scriptTag);
     };
   };
 
   useEffect(async() => {
-    const {data, errors, message, success} = await OrderEventService.get();
+    const {data, errors, message, success} = await OrderEventService.get({id});
     console.log(data, errors, message, success)
     if (success) {
       if (data) {
@@ -36,12 +39,7 @@ const CheckoutEvent = () => {
         console.log(errors)
         console.log(message)
       }
-  }, [info]);
-
-  console.log(info, 'dada')
-
-
-
+  }, []);
 
   return (
     <React.Fragment>
@@ -67,16 +65,16 @@ const CheckoutEvent = () => {
                   <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
-                      <h4>{info.participant.name}</h4>
+                      <h4>{info.participant?.name}</h4>
                       <H5>Klub FAST</H5>
                     </div>
                     <div className="mx-5 text-muted">
                       <h4>No. Ponsel</h4>
-                      <H5>{info.participant.phoneNumber}</H5>
+                      <H5>{info.participant?.phoneNumber}</H5>
                     </div>
                     <div className="mx-5 text-muted">
                       <h4>Email</h4>
-                      <H5>{info.participant.email}</H5>
+                      <H5>{info.participant?.email}</H5>
                     </div>
                   </div>
                 </Media>
@@ -110,15 +108,15 @@ const CheckoutEvent = () => {
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
                       <H5>ID ORDER</H5>
-                      <h4>{info.transactionInfo.orderId}</h4>
+                      <h4>{info.transactionInfo?.orderId}</h4>
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Total</H5>
-                      <h4>Rp {info.transactionInfo.total}</h4>
+                      <h4>Rp {info.transactionInfo?.total}</h4>
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Status Pembayaran</H5>
-                      <h4>{info.transactionInfo.status}</h4>
+                      <h4>{info.transactionInfo?.status}</h4>
                     </div>
                   </div>
                   <hr />
@@ -137,14 +135,14 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Kategori</H5>
-                      <h4>{info.transactionInfo.orderId}</h4>
+                      <h4>{info.transactionInfo?.orderId}</h4>
                     </div>
                   </div>
                   <hr />
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
                       <H5>Tanggal Kualifikasi</H5>
-                      <h4>Unknown</h4>
+                      <h4>{info.archeryEvent?.eventStartDatetime}</h4>
                     </div>
                     <div className="mx-5 text-muted">
                       <Button

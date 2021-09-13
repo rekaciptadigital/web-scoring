@@ -10,14 +10,15 @@ import {
   Row,
   TabContent,
   TabPane,
-  Media, Button
+  Media,
+  Button,
 } from "reactstrap";
 import { FulldayFormStep1 } from "./FulldayFormStep1";
 import { FulldayFormStep2 } from "./FulldayFormStep2";
 // import { FulldayFormStep3 } from "./FulldayFormStep3";
-import styled from "styled-components"
+import styled from "styled-components";
 import { OrderEventService } from "../../../../services";
-import {useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 //tesing post data postman
 // import dummy from "./DummyOrderEvent.json";
 
@@ -33,9 +34,7 @@ const Td = styled.td`
   padding-top: 20px;
 `;
 
-
-const FormFullday = ({ onFormFieldChange, formData }) => {
-
+const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
   const history = useHistory();
   const [activeTab, setactiveTab] = useState(1);
 
@@ -48,21 +47,23 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
   }
 
   const handleValidSubmit = async () => {
-    const localFormData = {...formData}
-    localFormData.type = formData.type?.id
-    const { data, errors, message, success } = await OrderEventService.register(localFormData)
-      if (success) {
-        if (data) {
-          console.log(data)
-          history.push("/checkout-event");
-        }
+    const localFormData = { ...formData };
+    localFormData.eventId = eventDetail.id;
+    localFormData.type = formData.type?.id;
+    const { data, errors, message, success } = await OrderEventService.register(
+      localFormData
+    );
+    if (success) {
+      if (data) {
+        console.log(data);
+        history.push("/checkout-event");
+      }
     } else {
-      console.log(errors)
-      console.log(message)
+      console.log(errors);
+      console.log(message);
     }
-  }
+  };
 
- 
   return (
     <Row>
       <Col lg="12">
@@ -101,91 +102,86 @@ const FormFullday = ({ onFormFieldChange, formData }) => {
                       <span className="number">3.</span> Selesai
                     </NavLink>
                   </NavItem> */}
-                 
                 </ul>
               </div>
               <div className="d-flex">
-              <Col sm={8}>
-              <div className="content clearfix mt-4">
-                <TabContent activeTab={activeTab}>
-                  <TabPane tabId={1}>
-                    <FulldayFormStep1
-                      onFormFieldChange={onFormFieldChange}
-                      formData={formData}
-                      />
-                  </TabPane>
-                  <TabPane tabId={2}>
-                    <FulldayFormStep2
-                      onFormFieldChange={onFormFieldChange}
-                      formData={formData}
-                      />
-                  </TabPane>
-                  {/* <TabPane tabId={3}>
+                <Col sm={8}>
+                  <div className="content clearfix mt-4">
+                    <TabContent activeTab={activeTab}>
+                      <TabPane tabId={1}>
+                        <FulldayFormStep1
+                          onFormFieldChange={onFormFieldChange}
+                          formData={formData}
+                          eventDetail={eventDetail}
+                        />
+                      </TabPane>
+                      <TabPane tabId={2}>
+                        <FulldayFormStep2
+                          onFormFieldChange={onFormFieldChange}
+                          formData={formData}
+                        />
+                      </TabPane>
+                      {/* <TabPane tabId={3}>
                     <FulldayFormStep3
                       onFormFieldChange={onFormFieldChange}
                       formData={formData}
                       />
                   </TabPane> */}
-                </TabContent>
-              </div>
-              </Col>
-              <Col sm={4}>
-              {activeTab < 6 && (
-                <div className="actions clearfix mt-3">
-                    <Card style={{backgroundColor: "#FAFAFA"}}>
-                      <CardBody>
+                    </TabContent>
+                  </div>
+                </Col>
+                <Col sm={4}>
+                  {activeTab < 6 && (
+                    <div className="actions clearfix mt-3">
+                      <Card style={{ backgroundColor: "#FAFAFA" }}>
+                        <CardBody>
                           <Media>
-                              <Media body>
-                                  <h5 className="mb-3">Tiket Lomba</h5>
-                                  <tr>
-                                      <Td>
-                                          <Label>Jenis Regu: </Label>
-                                      </Td>
-                                      <Td>
-                                          {formData.type.id}
-                                      </Td>
-                                  </tr>
-                                  <tr>
-                                      <Td>
-                                          <Label>Kategori Lomba: </Label>
-                                      </Td>
-                                      <Td>
-                                          {formData.category.label}
-                                      </Td>
-                                  </tr>
-                                 
+                            <Media body>
+                              <h5 className="mb-3">Tiket Lomba</h5>
+                              <tr>
+                                <Td>
+                                  <Label>Jenis Regu: </Label>
+                                </Td>
+                                <Td>{formData.type.id}</Td>
+                              </tr>
+                              <tr>
+                                <Td>
+                                  <Label>Kategori Lomba: </Label>
+                                </Td>
+                                <Td>{formData.category.label}</Td>
+                              </tr>
 
-                                  <div className="d-grid gap-2 mt-5">
-                                  {activeTab === 2 ? (
+                              <div className="d-grid gap-2 mt-5">
+                                {activeTab === 2 ? (
                                   <Button
-                                      type="button"
-                                      style={{backgroundColor: "#0D47A1"}}
-                                      onClick={() => {
-                                        handleValidSubmit(formData)
-                                      }}
-                                    >
+                                    type="button"
+                                    style={{ backgroundColor: "#0D47A1" }}
+                                    onClick={() => {
+                                      handleValidSubmit(formData);
+                                    }}
+                                  >
                                     Selesai
                                   </Button>
-                                  ) : (
-                                    <Button
+                                ) : (
+                                  <Button
                                     type="button"
-                                    style={{backgroundColor: "#0D47A1"}}
+                                    style={{ backgroundColor: "#0D47A1" }}
                                     onClick={() => {
-                                      console.log(formData)
+                                      console.log(formData);
                                       toggleTab(activeTab + 1);
-                                    }}>
-                                      Pilih Pembayaran
-                                    </Button>
-                                  )}
-                                  </div>
-
-                              </Media>
+                                    }}
+                                  >
+                                    Pilih Pembayaran
+                                  </Button>
+                                )}
+                              </div>
+                            </Media>
                           </Media>
-                      </CardBody>
-                  </Card>
-                </div>
-              )}
-              </Col>
+                        </CardBody>
+                      </Card>
+                    </div>
+                  )}
+                </Col>
               </div>
             </div>
           </CardBody>

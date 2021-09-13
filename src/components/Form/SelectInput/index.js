@@ -37,7 +37,7 @@ const SelectInput = ({
       };
     });
     setSelectOptions(newSelectOptions);
-  }, []);
+  }, [options]);
 
   useEffect(() => {
     if (value) {

@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import { Route, Redirect } from "react-router-dom"
-import { getArcherStore } from "store/slice/archer"
+import { getAuthenticationStore } from "store/slice/authentication"
 import { useSelector } from "react-redux"
 
 const AuthenticationArcherMiddleware = ({
@@ -10,10 +10,10 @@ const AuthenticationArcherMiddleware = ({
   isAuthProtected,
   ...rest
 }) => {
-  let { isLoggedIn } = useSelector(getArcherStore)
+  let { isLoggedIn } = useSelector(getAuthenticationStore)
   // isLoggedIn = true;
   // isAuthProtected = false
-  
+  console.log(isLoggedIn)
   return (
     <Route
       {...rest}

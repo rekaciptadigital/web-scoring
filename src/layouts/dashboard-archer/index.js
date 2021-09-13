@@ -2,8 +2,8 @@ import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 
 // Other Layout related Component
-import Navbar from "./Navbar"
-import Header from "./Header"
+// import Navbar from "./Navbar"
+// import HeaderForm from "../landingpage/HeaderForm"
 import Footer from "./Footer"
 
 class LayoutArcher extends Component {
@@ -61,12 +61,7 @@ class LayoutArcher extends Component {
         </div>
 
         <div id="layout-wrapper">
-          <Header
-            theme={this.props.topbarTheme}
-            isMenuOpened={this.state.isMenuOpened}
-            openLeftMenuCallBack={this.openMenu}
-          />
-          <Navbar menuOpen={this.state.isMenuOpened} />
+          {/* <Navbar menuOpen={this.state.isMenuOpened} /> */}
           <div className="main-content">{this.props.children}</div>
           <Footer />
         </div>

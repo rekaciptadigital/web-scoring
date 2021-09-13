@@ -1,16 +1,16 @@
-import RegisterFullday from "pages/landingpage/fullday"
-import RegisterDone from "pages/landingpage/fullday/components/RegisterDone"
-import LandingPage from "pages/landingpage/homepage"
-import MarathonLandingPage from "pages/landingpage/marathon/homepage"
-import RegisterMarathon from "pages/landingpage/marathon";
-import RegisterMarathonDone from "pages/landingpage/marathon/components/RegisterMarathonDone";
-import DashboardMarathon from "pages/landingpage/marathon/dashboard";
-import CheckoutEvent from "pages/landingpage/checkout";
-import DashboardOrderEvent from "pages/landingpage/dashboard";
+import RegisterFullday from "../pages/landingpage/fullday"
+import RegisterDone from "../pages/landingpage/fullday/components/RegisterDone"
+import LandingPage from "../pages/landingpage/homepage"
+import MarathonLandingPage from "../pages/landingpage/marathon/homepage"
+import RegisterMarathon from "../pages/landingpage/marathon";
+import RegisterMarathonDone from "../pages/landingpage/marathon/components/RegisterMarathonDone";
+import DashboardMarathon from "../pages/landingpage/marathon/dashboard";
+import CheckoutEvent from "../pages/landingpage/checkout";
+import DashboardOrderEvent from "../pages/landingpage/dashboard";
 
 const landingpageRouters = [
-    { path: "/full-day", component: LandingPage },
-    { path: "/full-day/register/:slug", component: RegisterFullday},
+    { path: "/:username/:slug", component: LandingPage },
+    { path: "/full-day/register", component: RegisterFullday},
     { path: "/full-day/register-done", component: RegisterDone},
 
     {path: "/marathon", component: MarathonLandingPage},

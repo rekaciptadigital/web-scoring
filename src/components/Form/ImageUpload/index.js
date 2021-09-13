@@ -13,10 +13,12 @@ const ImageUpload = ({
   error,
   disabled,
   readOnly,
+  // base64,
 }) => {
   const [uploadedImage, setUploadedImage] = useState();
 
   const handleChange = e => {
+    // base64(e)
     setUploadedImage(URL.createObjectURL(e.target.files[0]));
     if (onChange)
       onChange({
@@ -24,6 +26,7 @@ const ImageUpload = ({
         value: multiple ? e.target.files : e.target.files[0],
       });
   };
+
   return (
     <div>
       {label && (

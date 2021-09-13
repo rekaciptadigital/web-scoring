@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import MetaTags from 'react-meta-tags';
+import React, { useEffect, useState } from "react";
+import MetaTags from "react-meta-tags";
 import {
   Container,
   Row,
@@ -7,21 +7,39 @@ import {
   Card,
   CardBody,
   CardHeader,
-} from "reactstrap"
-import { Link } from "react-router-dom"
+  Media,
+} from "reactstrap";
+import { Link } from "react-router-dom";
+import { useParams } from "react-router";
 
 //Import Countdown
-import Countdown from "react-countdown"
+import Countdown from "react-countdown";
 //Import Components
-import Header from "layouts/landingpage/Header"
-import CardContent from "./components/card-content";
+import Header from "layouts/landingpage/Header";
 import Footer from "layouts/landingpage/Footer";
+import { EventsService } from "services";
+import ToolkitProvider from "react-bootstrap-table2-toolkit";
+import BootstrapTable from "react-bootstrap-table-next";
+import paginationFactory, {
+  PaginationProvider,
+} from "react-bootstrap-table2-paginator";
+import styled from "styled-components";
 
+const Td = styled.td`
+  padding-top: 12px;
+`;
+const Label = styled.label`
+  font-size: 12px;
+  line-height: 15px;
+  color: #495057;
+  display: ruby;
+  font-weight: 400;
+`;
 
 const renderer = ({ days, hours, minutes, seconds, completed }) => {
   if (completed) {
     // Render a completed state
-    return <span>You are good to go!</span>
+    return <span>You are good to go!</span>;
   } else {
     // Render a countdown
     return (
@@ -43,52 +61,96 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
           <span>Seconds</span>
         </div>
       </>
-    )
+    );
   }
-}
-
+};
 
 const LandingPage = () => {
-  const [imglight, setimglight] = useState(true)
-  const [navClass, setnavClass] = useState("")
+  const { slug } = useParams();
+  const [imglight, setimglight] = useState(true);
+  const [navClass, setnavClass] = useState("");
+  const [event, setEvent] = useState({});
 
   // Use ComponentDidMount
   useEffect(() => {
-    window.addEventListener("scroll", scrollNavigation, true)
-  })
+    window.addEventListener("scroll", scrollNavigation, true);
+  });
 
   function scrollNavigation() {
-    var scrollup = document.documentElement.scrollTop
+    var scrollup = document.documentElement.scrollTop;
     if (scrollup > 80) {
-      setimglight(false)
-      setnavClass("nav-sticky")
+      setimglight(false);
+      setnavClass("nav-sticky");
     } else {
-      setimglight(true)
-      setnavClass("")
+      setimglight(true);
+      setnavClass("");
     }
   }
+
+  useEffect(async () => {
+    const { data, success } = await EventsService.getEventBySlug({ slug });
+    if (success) {
+      setEvent(data);
+    }
+  }, []);
+
+  const pageOptions = {
+    sizePerPage: 10,
+    totalSize: event.flatCategories?.length,
+    custom: true,
+  };
+
+  const columns = [
+    {
+      dataField: "ageCategoryLabel",
+      text: "Kategori Usia.",
+      sort: true,
+    },
+    {
+      dataField: "competitionCategoryLabel",
+      text: "Kategori Lomba",
+      sort: true,
+    },
+    {
+      dataField: "teamCategoryLabel",
+      text: "Jenis Regu",
+      sort: true,
+    },
+    {
+      dataField: "distanceLabel",
+      text: "Jarak",
+      sort: true,
+    },
+  ];
+
+  const defaultSorted = [
+    {
+      dataField: "ageCategoryId",
+      order: "asc",
+    },
+  ];
 
   return (
     <React.Fragment>
       <MetaTags>
-        <title>ICO Landing | Skote - React Admin & Dashboard Template</title>
+        <title>{event.eventName}</title>
       </MetaTags>
       {/* import navbar */}
       <Header navClass={navClass} imglight={imglight} />
 
       <section className="section hero-section bg-ico-hero" id="home">
-        <div className="bg-overlay"/>
+        <div className="bg-overlay" />
         <Container>
           <Row className="align-items-center">
             <Col lg="5">
               <div className="text-white-50">
                 <h1 className="text-white font-weight-semibold mb-3 hero-title">
-                  Jakarta Archery 2021
+                  {event.eventName}
                 </h1>
                 <p className="font-size-14">
-                Penyelenggara: Panahan Jakarta <br/>
-                13 Agustus - 16 Agustus 2021 <br/>
-                Gelora Bung karno
+                  Penyelenggara: {event.admin?.name} <br />
+                  {event.eventStartDatetime} - {event.eventEndDatetime} <br />
+                  {event.location}
                 </p>
 
                 <div className="button-items mt-4">
@@ -105,26 +167,18 @@ const LandingPage = () => {
                 </CardHeader>
                 <CardBody>
                   <div className="text-center">
-                     <div className="mt-4">
+                    <div className="mt-4">
                       <div className="counter-number ico-countdown">
                         <Countdown date="2021/12/31" renderer={renderer} />
                       </div>
                     </div>
                   </div>
 
-                    <div className="mt-5">
-                      <div className="clearfix mt-4">
-                        <h4 className="font-weight-semibold">Total Hadiah 50 JT</h4>
-                      </div>
-                      <div className="clearfix mt-1">
-                        <p className="font-size-14">
-                        Juara I: Medali + Piagam+ Tunai<br/>
-                        Juara II: Medali + Piagam+ Tunai<br/>
-                        Juara III: Medali + Piagam+ Tunai<br/>
-                        Doorprize
-                        </p>
-                      </div>
+                  <div className="mt-5">
+                    <div className="clearfix mt-4">
+                      <p className="font-size-14">{event.description}</p>
                     </div>
+                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -132,13 +186,145 @@ const LandingPage = () => {
         </Container>
       </section>
 
-
-      <CardContent/>
+      <section className="section bg-white p-0">
+        <Container>
+          <div className="currency-price">
+            <Row>
+              {/* reder card boxes */}
+              <Col md="5">
+                <Card>
+                  <CardBody>
+                    <Media>
+                      <Media body>
+                        <h5>Waktu dan Tempat</h5>
+                        <table>
+                          <tr>
+                            <Td>
+                              <Label className="text-muted text-Truncate mb-0 me-3">
+                                Pendaftaran Hingga
+                              </Label>
+                            </Td>
+                            <Td>
+                              <i className={"me-2 far fa-calendar"} />
+                            </Td>
+                            <Td>
+                              <p className="mb-0 font-weight-bold">
+                                {event.registrationEndDatetime}
+                              </p>
+                            </Td>
+                          </tr>
+                          <tr>
+                            <Td>
+                              <Label className="text-muted text-Truncate mb-0 me-3">
+                                Tanggal Lomba:
+                              </Label>
+                            </Td>
+                            <Td>
+                              <i className={"me-2 far fa-calendar"} />
+                            </Td>
+                            <Td>
+                              <p className="mb-0 font-weight-bold">
+                                {event.eventStartDatetime} -{" "}
+                                {event.eventEndDatetime}
+                              </p>
+                            </Td>
+                          </tr>
+                          <tr>
+                            <Td>
+                              <Label className="text-muted text-Truncate mb-0 me-3">
+                                Lokasi
+                              </Label>
+                            </Td>
+                            <Td>
+                              <i className={"me-2 fas fa-map-marker-alt"} />
+                            </Td>
+                            <Td>
+                              <p className="mb-0 font-weight-bold">
+                                {event.location}
+                              </p>
+                            </Td>
+                          </tr>
+                          <tr>
+                            <Td>
+                              <Label className="text-muted text-Truncate mb-0 me-3">
+                                No. Telpon
+                              </Label>
+                            </Td>
+                            <Td>
+                              <i className={"me-2 fas fa-phone-alt"} />
+                            </Td>
+                            <Td>
+                              <p className="mb-0 font-weight-bold">
+                                {event.admin?.phoneNumber || '-'}
+                              </p>
+                            </Td>
+                          </tr>
+                        </table>
+                      </Media>
+                    </Media>
+                  </CardBody>
+                </Card>
+              </Col>
+              <Col md="7">
+                <Card>
+                  <CardBody>
+                    <Media>
+                      <Media body>
+                        <h5 className="mb-3">Kategori Event</h5>
+                        <div className="col-11">
+                          <PaginationProvider
+                            pagination={paginationFactory(pageOptions)}
+                            keyField="id"
+                            columns={columns}
+                            data={event.flatCategories}
+                          >
+                            {({ paginationTableProps }) => (
+                              <ToolkitProvider
+                                keyField="id"
+                                columns={columns}
+                                data={event.flatCategories || []}
+                                search
+                              >
+                                {(toolkitProps) => (
+                                  <React.Fragment>
+                                    <Row>
+                                      <Col xl="12">
+                                        <div className="table-responsive">
+                                          <BootstrapTable
+                                            keyField={"id"}
+                                            responsive
+                                            bordered={false}
+                                            striped={false}
+                                            defaultSorted={defaultSorted}
+                                            classes={
+                                              "table align-middle table-nowrap"
+                                            }
+                                            headerWrapperClasses={"thead-light"}
+                                            {...toolkitProps.baseProps}
+                                            {...paginationTableProps}
+                                          />
+                                        </div>
+                                      </Col>
+                                    </Row>
+                                  </React.Fragment>
+                                )}
+                              </ToolkitProvider>
+                            )}
+                          </PaginationProvider>
+                        </div>
+                      </Media>
+                    </Media>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        </Container>
+      </section>
 
       <Footer />
-
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import {
   Card,
   CardBody,
@@ -26,6 +26,8 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
   console.log(dummy)
   const [activeTab, setactiveTab] = useState(1);
 
+  const history = useHistory();
+
   function toggleTab(tab) {
     if (activeTab !== tab) {
       if (tab >= 1 && tab <= 5) {
@@ -38,8 +40,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
     const { data, errors, message, success } = await EventsService.register(values)
       if (success) {
         if (data) {
-          console.log(data)
-          // toggleTab(activeTab + 1);
+          history.push("/dashboard/events")
         }
     } else {
       console.log(errors)

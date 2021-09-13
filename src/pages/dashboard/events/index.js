@@ -4,10 +4,10 @@ import {
   Col,
   Container,
   Row,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
+  // Dropdown,
+  // DropdownToggle,
+  // DropdownMenu,
+  // DropdownItem,
   Button
 } from "reactstrap";
 //Import Breadcrumb
@@ -16,14 +16,13 @@ import CardEvent from "./components/CardEvent";
 import { EventsService } from "../../../services"
 
 const ListEvent = () => {
-  const [isOpenDropDown, setIsOpenDropDown] = useState(false)
+  // const [isOpenDropDown, setIsOpenDropDown] = useState(false)
   const [listEvent, setListEvent] = useState([])
 
   const getEvent = async () => {
     const {message, errors, data } = await EventsService.get()
     if (data) {
       setListEvent(data)
-      console.log(data)
       console.log(message)
     } else 
     console.log(message)
@@ -33,9 +32,6 @@ const ListEvent = () => {
   useEffect(() => {
     getEvent()
   }, [])
-
-  console.log(listEvent)
-
 
   return (
     <React.Fragment>
@@ -49,7 +45,8 @@ const ListEvent = () => {
           <div className="mb-3">
             <Row>
               <Col md={6}>
-              <Dropdown
+              {/* <Dropdown
+                disabled
                 isOpen={isOpenDropDown}
                 toggle={() =>
                   setIsOpenDropDown(!isOpenDropDown)
@@ -66,13 +63,13 @@ const ListEvent = () => {
                   <DropdownItem>Another action</DropdownItem>
                   <DropdownItem>Something else here</DropdownItem>
                 </DropdownMenu>
-              </Dropdown>{" "}
+              </Dropdown>{" "} */}
               </Col>
               <Col md={6}>
                 <div className="float-end">
-                  <Button color="outline-dark">List Event</Button>
-                  <Button className="mx-2" color="outline-dark">Kalender</Button>
-                  <Button color="primary">Tambah Event</Button>
+                  <Button disabled color="outline-dark">List Event</Button>
+                  <Button disabled className="mx-2" color="outline-dark">Kalender</Button>
+                  {/* <Button color="primary">Tambah Event</Button> */}
                 </div>
               </Col>
               </Row>
@@ -81,18 +78,15 @@ const ListEvent = () => {
           {/* / */}
 
           <Row>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
-            <Col md={6}>
-              <CardEvent />
-            </Col>
+            {listEvent.map((list) => {
+              return (
+                <>
+                <Col key={list.id} md={6}>
+                  <CardEvent dataEvent={list} />
+                </Col>
+                </>
+              )
+            })}
           </Row>
         </Container>
       </div>

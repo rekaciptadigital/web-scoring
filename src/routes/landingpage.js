@@ -19,7 +19,7 @@ const landingpageRouters = [
     {path: "/marathon/dashboard", component:DashboardMarathon},
 
     {path: "/checkout-event", component:CheckoutEvent, exact: true},
-    {path: "/dashboard/event", component:DashboardOrderEvent, exact: true},
+    {path: "/dashboard/archer-event", component:DashboardOrderEvent, exact: true},
 ]
 
 export default landingpageRouters

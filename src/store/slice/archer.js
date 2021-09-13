@@ -1,11 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit"
 
+const initialState = {
+  isLoggedIn: false,
+  user: null,
+}
+
 export const archerSlice = createSlice({
   name: "archer",
-  initialState: {
-    isLoggedIn: false,
-    user: null,
-  },
+  initialState,
   reducers: {
     login: (state, action) => {
       state.isLoggedIn = true
@@ -21,7 +23,7 @@ export const archerSlice = createSlice({
   },
 })
 
-export const getArcherStore = state => state.archerSlice
+export const getArcherStore = state => state.archer
 
 // Action creators are generated for each case reducer function
 export const { login, logout, register } = archerSlice.actions

@@ -26,7 +26,7 @@ const LoginArcher = () => {
       await ArcherService.login(values)
     if (success) {
       if (data) {
-        history.push("/archer/dashboard")
+        history.push("/full-day")
       }
     } else {
       console.log(errors)

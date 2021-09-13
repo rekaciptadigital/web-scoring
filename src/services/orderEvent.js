@@ -5,6 +5,6 @@ export default {
         return API.post("/web/v1/archery/event-order", data, qs, true)
     },
     get(qs = null) {
-        return API.get("/web/v1/archery/event-order", qs)
+        return API.get("/web/v1/archery/event-order/1?id=5", qs)
     }
 }

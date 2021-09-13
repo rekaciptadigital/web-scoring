@@ -8,8 +8,10 @@ import {
   } from "reactstrap";
 
   import satuDashboard from '../../../../assets/images/myachery/dashboard-1.png'
+//   import poster from '../../../../assets/images/myachery/logo-myarchery.png'
 
 function CardEvent(props) {
+    console.log(props.dataEvent.poster)
     return (
         <div>
             <Card className="mini-stats-wid">
@@ -19,7 +21,7 @@ function CardEvent(props) {
                             <div>
                                 <span>
                                     {/* <i className="bx bx-home font-size-24"></i> */}
-                                    <img src={satuDashboard} />
+                                    <img src={props.dataEvent.poster ? props.dataEvent.poster : satuDashboard} height="130" />
                                 </span>
                             </div>
                         </Col>

@@ -11,7 +11,8 @@ import ladBg from "assets/images/myachery/achery-lad.png";
 import React, { useEffect, useState } from "react";
 import MetaTags from "react-meta-tags";
 // import { useDispatch, useSelector } from "react-redux"
-import { useHistory, Link } from "react-router-dom";
+  useLocation
+import { useHistory, Link, useLocation } from "react-router-dom";
 import { Col, Row, Container } from "reactstrap";
 import { ArcherService } from "services";
 //Import config
@@ -19,11 +20,12 @@ import toastr from "toastr";
 import * as AuthenticationStore from "store/slice/authentication"
 import { useDispatch, useSelector } from "react-redux";
 
-const LoginArcher = () => {
+const LoginArcher = (props) => {
   const dispatch = useDispatch()
   let history = useHistory()
   const [loginErrors, setLoginErrors] = useState();
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
+  let path = new URLSearchParams(useLocation().search).get("path");
 
   const handleValidSubmit = async (event, values) => {
     const { data, errors, message, success } = await ArcherService.login(
@@ -41,8 +43,13 @@ const LoginArcher = () => {
   };
 
   useEffect(() => {
+    path = props.location.state && props.location.state.from && props.location.state.from.pathname ? props.location.state.from.pathname : path;
     if (isLoggedIn) {
-      history.push("/archer/dashboard")
+      if (path == null) {
+        history.push("/archer/dashboard")        
+      }else{
+        history.push(path)
+      }
     }
   }, [isLoggedIn])
 
@@ -70,12 +77,9 @@ const LoginArcher = () => {
                   <img src={myachery} />
                 </div>
                 <div style={{ zIndex: "100" }}>
-                  <p className="font-size-16 text-white">
-                    BUAT EVENT DI MANA SAJA KAPAN SAJA
-                  </p>
                   <div className="w-75 mx-auto">
                     <Link
-                      to="/archer/login"
+                      to={path != null ? "/archer/login?path="+path :"/archer/login"}
                       className="text-decoration-none text-black-50 text-decoration-underline"
                     >
                       <span
@@ -86,7 +90,7 @@ const LoginArcher = () => {
                       </span>
                     </Link>
                     <Link
-                      to="/archer/register"
+                      to={path != null ? "/archer/register?path="+path :"/archer/register"}
                       className="text-decoration-none text-black-50"
                     >
                       <span className="font-size-18 text-white">Daftar</span>
@@ -156,7 +160,7 @@ const LoginArcher = () => {
 
                   <div className="mt-4 text-center">
                     <Link
-                      to="/authentication/forgot-password"
+                      to={"/authentication/forgot-password"}
                       className="text-muted"
                     >
                       <i className="mdi mdi-lock me-1" />

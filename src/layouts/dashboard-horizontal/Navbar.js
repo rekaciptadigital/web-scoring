@@ -6,7 +6,7 @@ import { Link, withRouter } from "react-router-dom";
 import { Collapse } from "reactstrap";
 
 const Navbar = props => {
-  const [app, setapp] = useState(false);
+  // const [app, setapp] = useState(false);
   const [event, setEvent] = useState(false)
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const Navbar = props => {
               id="topnav-menu-content"
             >
               <ul className="navbar-nav">
-                <li className="nav-item dropdown">
+                {/* <li className="nav-item dropdown">
                   <Link className="nav-link" to="/dashboard">
                     <i className="bx bx-home-circle me-2"></i>
                     {props.t("Dashboard")} <div className="arrow-down"></div>
@@ -83,7 +83,7 @@ const Navbar = props => {
                       {props.t("Result")}
                     </Link>
                   </div>
-                </li>
+                </li> */}
                 <li className="nav-item dropdown">
                   <Link to="/#"
                         onClick={e => {
@@ -104,7 +104,7 @@ const Navbar = props => {
                     </Link>
                   </div>
                 </li>
-                <li className="nav-item dropdown">
+                {/* <li className="nav-item dropdown">
                   <Link
                     to="/#"
                     onClick={e => {
@@ -121,7 +121,7 @@ const Navbar = props => {
                       {props.t("Calendar")}
                     </Link>
                   </div>
-                </li>
+                </li> */}
               </ul>
             </Collapse>
           </nav>

@@ -6,10 +6,10 @@ import logoDark from "../../assets/images/myachery/myachery.png";
 import logoLight from "../../assets/images/myachery/myachery.png";
 import logoLightSvg from "../../assets/images/myachery/myachery.png";
 import logo from "../../assets/images/myachery/myachery.png";
-import NotificationDropdown from "../../components//TopbarDropdown/NotificationDropdown";
+// import NotificationDropdown from "../../components//TopbarDropdown/NotificationDropdown";
 import ProfileMenu from "../../components//TopbarDropdown/ProfileMenu";
 // Import menuDropdown
-import LanguageDropdown from "../../components/TopbarDropdown/LanguageDropdown";
+// import LanguageDropdown from "../../components/TopbarDropdown/LanguageDropdown";
 
 const Header = props => {
   const [isSearch, setSearch] = useState(false);
@@ -101,10 +101,10 @@ const Header = props => {
               </div>
             </div>
 
-            <LanguageDropdown />
+            {/* <LanguageDropdown /> */}
 
-            <NotificationDropdown />
-sssss
+            {/* <NotificationDropdown /> */}
+
             <ProfileMenu />
           </div>
         </div>

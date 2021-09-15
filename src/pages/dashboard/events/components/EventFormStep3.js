@@ -136,16 +136,16 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       <Col lg={3}>
                         <DateInput
                           label="Buka Kualifikasi"
-                          name="quatificationStartDatetime"
-                          value={formData.quatificationStartDatetime}
+                          name="qualificationStartDatetime"
+                          value={formData.qualificationStartDatetime}
                           onChange={handleChange}
                         />
                       </Col>
                       <Col lg={3}>
                         <DateInput
                           label="Tutup Kualifikasi"
-                          name="quatificationEndDatetime"
-                          value={formData.quatificationEndDatetime}
+                          name="qualificationEndDatetime"
+                          value={formData.qualificationEndDatetime}
                           onChange={handleChange}
                         />
                       </Col>

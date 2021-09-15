@@ -28,8 +28,8 @@ const RegisterFullday = () => {
   const [eventData, setEventData] = useState({
     eventType: "fullday",
     type: "",
-    email: profile.email,
-    phone: profile.phoneNumber,
+    email: profile?.email,
+    phone: profile?.phoneNumber,
     clubName: "",
     teamName: "",
     isUserSamePlayer: true,
@@ -38,8 +38,8 @@ const RegisterFullday = () => {
     dateBirth: "",
     participantMembers: [
       {
-        name: profile.name,
-        birthdate: profile.dateOfBirth,
+        name: profile?.name,
+        birthdate: profile?.dateOfBirth,
         gender: "",
       },
     ],

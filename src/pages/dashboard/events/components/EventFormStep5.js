@@ -21,7 +21,7 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
   return (
     <>
     <div>
-      {errors ? null : (
+      {!errors ? null : (
         <Alert color="danger">Ada inputan yang belum diisi</Alert>
       )}
     </div>

@@ -102,7 +102,7 @@ const DashboardOrderEvent = () => {
                                     </div>
                                 : null}
                                 {event && event?.map((i) => (
-                                    <div style={{marginBottom:"20px;",borderRadius:"10px",border:"2px solid #0064ff"}} key={i.archeryEvent.id}>
+                                    <div style={{marginBottom:"20px",borderRadius:"10px",border:"2px solid #0064ff"}} key={i.archeryEvent.id}>
                                     <CardBody>
                                         <Row>
                                             <Col md={3} sm={12}>
@@ -123,12 +123,12 @@ const DashboardOrderEvent = () => {
                                                 <p className="text-muted fw-medium">
                                                    Order ID : {i.transactionInfo.orderId}
                                                 </p>
-                                                {i.transactionInfo.status == 1 ?
-                                                    <p style={{color: "green"}} className="fw-medium"><i>{i.transactionInfo.status}</i></p>                                                 
-                                                : i.transactionInfo.status == 4 ? 
-                                                    <p style={{color: "yellow"}} className="fw-medium"><i>{i.transactionInfo.status}</i></p> 
+                                                {i.transactionInfo.statusId == 1 ?
+                                                    <h5 style={{color: "green"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5>                                                 
+                                                : i.transactionInfo.statusId == 4 ? 
+                                                    <h5 style={{color: "yellow"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5> 
                                                 :
-                                                    <p style={{color: "red"}} className="fw-medium"><i>{i.transactionInfo.status}</i></p> 
+                                                    <h5 style={{color: "red"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5> 
                                                 }
                                                 <Button
                                                     href={`/checkout-event/${i.participant.id}`}

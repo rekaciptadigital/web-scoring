@@ -17,6 +17,7 @@ const RadioButtonInput = ({
   error,
   disabled,
   readOnly,
+  checked,
 }) => {
   const [checkedOption, setCheckedOption] = useState();
 
@@ -37,7 +38,7 @@ const RadioButtonInput = ({
         id={id}
         autoComplete="off"
         onChange={e => handleChange(e, { id, label })}
-        checked={id === checkedOption?.id}
+        checked={id === checkedOption?.id || checked}
         disabled={disabled}
         readOnly={readOnly}
       />

@@ -1,6 +1,6 @@
 import React, {useEffect} from "react"
 import PropTypes from "prop-types"
-import { Route, Redirect } from "react-router-dom"
+import { Route, Redirect, useLocation } from "react-router-dom"
 import { getAuthenticationStore } from "store/slice/authentication"
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux";
@@ -18,7 +18,8 @@ const AuthenticationArcherMiddleware = ({
   // isAuthProtected = false
   console.log("archer login",isLoggedIn)
   const dispatch = useDispatch()
-
+  const {pathname} = useLocation();
+  console.log("oath",pathname)
   useEffect(async() => {
     const {data, success} = await ArcherService.profile();
       if (success) {

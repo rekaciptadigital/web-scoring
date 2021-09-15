@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Card,
     CardBody,
@@ -10,7 +10,13 @@ import {
   import satuDashboard from '../../../../assets/images/myachery/dashboard-1.png'
 //   import poster from '../../../../assets/images/myachery/logo-myarchery.png'
 
+
 function CardEvent(props) {
+    const [check, setCheck] = useState(false)
+    const getCheckCopy = () => {
+        navigator.clipboard.writeText(props.dataEvent.eventUrl)
+        setCheck(true)
+    }
     return (
         <div>
             <Card className="mini-stats-wid">
@@ -34,9 +40,13 @@ function CardEvent(props) {
                                 {props.dataEvent.location} - {props.dataEvent.locationType}
                             </p>
                             <div className="mb-2">
-                                <a target="_blank" rel="noreferrer" href={props.dataEvent.eventUrl}>Link Event</a>
+                                <div className="d-flex">
+                                    <a style={{marginRight: '0.5rem'}} target="_blank" rel="noreferrer" href={props.dataEvent.eventUrl}>Link Event</a>
+                                    <a onClick={getCheckCopy}>Copy Link</a>
+                                    {!check ? null : (<i className="bx bx-check"></i>)}
+                                </div>
                             </div>
-                            <Button disabled color="primary">Manage Event</Button>
+                                <Button disabled color="primary">Manage Event</Button>
                             </div>
                         </Col>
                     </Row>

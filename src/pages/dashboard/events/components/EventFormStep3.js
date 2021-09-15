@@ -10,8 +10,11 @@ import {
 } from "components";
 import React from "react";
 import { Badge, Col, Row } from "reactstrap";
+import * as EventsStore from "store/slice/events"
+import { useSelector } from "react-redux"
 
 export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
+  const { errors } = useSelector(EventsStore.getEventsStore)  
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
@@ -96,6 +99,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="registrationStartDatetime"
                       value={formData.registrationStartDatetime}
                       onChange={handleChange}
+                      error={errors}
                     />
                   </Col>
                   <Col lg={6}>
@@ -104,6 +108,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="registrationEndDatetime"
                       value={formData.registrationEndDatetime}
                       onChange={handleChange}
+                      error={errors}
                     />
                   </Col>
                   <Col lg={6}>
@@ -112,6 +117,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="eventStartDatetime"
                       value={formData.eventStartDatetime}
                       onChange={handleChange}
+                      error={errors}
                     />
                   </Col>
                   <Col lg={6}>
@@ -120,6 +126,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="eventEndDatetime"
                       value={formData.eventEndDatetime}
                       onChange={handleChange}
+                      error={errors}
                     />
                   </Col>
                 </Row>
@@ -139,6 +146,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           name="quatificationStartDatetime"
                           value={formData.quatificationStartDatetime}
                           onChange={handleChange}
+                          error={errors}
                         />
                       </Col>
                       <Col lg={3}>
@@ -147,6 +155,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           name="quatificationEndDatetime"
                           value={formData.quatificationEndDatetime}
                           onChange={handleChange}
+                          error={errors}
                         />
                       </Col>
                       <Col lg={3}>
@@ -156,6 +165,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           value={formData.qualificationSessionLength}
                           options={[{ id: "60", label: "Per 1 Jam" }]}
                           onChange={handleChange}
+                          error={errors}
                         />
                       </Col>
                       <Col lg={3}>
@@ -164,6 +174,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           value={formData.qualificationWeekdaysOnly}
                           onChange={handleChange}
                           label="Weekday Only"
+                          error={errors}
                         />
                       </Col>
                       <Col lg={12}>
@@ -249,6 +260,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                               name={`qualificationDays.${dayIndex}.details.${detailIndex}.startTime`}
                                               value={detail.startTime}
                                               onChange={handleChange}
+                                              error={errors}
                                             />
                                           </div>
                                           <div
@@ -265,6 +277,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                               name={`qualificationDays.${dayIndex}.details.${detailIndex}.endTime`}
                                               value={detail.endTime}
                                               onChange={handleChange}
+                                              error={errors}
                                             />
                                           </div>
                                         </div>
@@ -279,6 +292,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                             name={`qualificationDays.${dayIndex}.details.${detailIndex}.quota`}
                                             value={detail.quota}
                                             onChange={handleChange}
+                                            error={errors}
                                           />
                                         </div>
                                       ) : (

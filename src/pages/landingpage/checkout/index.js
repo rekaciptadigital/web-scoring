@@ -31,6 +31,8 @@ const CheckoutEvent = () => {
     };
   };
 
+  console.log(profile)
+
   useEffect(async() => {
     const {data, errors, message, success} = await OrderEventService.get({id});
     console.log(data, errors, message, success)
@@ -69,17 +71,17 @@ const CheckoutEvent = () => {
                         
                         <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
                         <div className="d-flex">
-                            <div className="mx-5 text-muted">
-                                <h4>{profile.name}</h4>
+                        <div className="mx-5 text-muted">
+                                <h4>Admin</h4>
                                 {/* <H5>Klub FAST</H5> */}
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>No. Ponsel</h4>
-                                <H5>{profile.phoneNumber}</H5>
+                                <H5>081256897045</H5>
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>Email</h4>
-                                <H5>{profile.email}</H5>
+                                <H5>admin234@gmail.com</H5>
                             </div>
                         </div>
                         </Media>

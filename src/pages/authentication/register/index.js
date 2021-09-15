@@ -1,8 +1,8 @@
 // availity-reactstrap-validation
 import myachery from "assets/images/myachery/logo 3.png"
 import React, { useEffect, useState } from "react"
-import google from "assets/images/myachery/Google.png"
-import facebook from "assets/images/myachery/Facebook.png"
+// import google from "assets/images/myachery/Google.png"
+// import facebook from "assets/images/myachery/Facebook.png"
 // import ladBg from "assets/images/myachery/achery-lad.png"
 import { AvField, AvForm } from "availity-reactstrap-validation"
 import MetaTags from "react-meta-tags"
@@ -141,13 +141,13 @@ const Register = () => {
                         </button>
                       </div>
 
-                      <div className="text-center mt-4">
+                      {/* <div className="text-center mt-4">
                         <p className="font-size-14 color-black">Atau daftar dengan</p>
                         <div>
                           <img src={facebook} alt="" />
                           <img src={google} alt="" />
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="mt-4 text-center">
                         <Link
@@ -170,10 +170,10 @@ const Register = () => {
                     Login{" "}
                   </Link>{" "}
                 </p>
-                <p>
+                {/* <p>
                   © {new Date().getFullYear()} Skote. Crafted with{" "}
                   <i className="mdi mdi-heart text-danger" /> by Themesbrand
-                </p>
+                </p> */}
               </div>
             </Col>
           </Row>

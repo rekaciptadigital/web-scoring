@@ -11,7 +11,8 @@ import ladBg from "assets/images/myachery/achery-lad.png";
 import React, { useEffect, useState } from "react";
 import MetaTags from "react-meta-tags";
 // import { useDispatch, useSelector } from "react-redux"
-import { useHistory, Link } from "react-router-dom";
+  useLocation
+import { useHistory, Link, useLocation } from "react-router-dom";
 import { Col, Row, Container } from "reactstrap";
 import { ArcherService } from "services";
 //Import config
@@ -24,6 +25,7 @@ const LoginArcher = () => {
   let history = useHistory()
   const [loginErrors, setLoginErrors] = useState();
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
+  console.log("path", useLocation());
 
   const handleValidSubmit = async (event, values) => {
     const { data, errors, message, success } = await ArcherService.login(

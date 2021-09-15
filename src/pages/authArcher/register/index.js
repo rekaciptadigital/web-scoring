@@ -1,6 +1,6 @@
 // availity-reactstrap-validation
 import myachery from "assets/images/myachery/logo-myarchery.png"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import google from "assets/images/myachery/Google.png"
 import facebook from "assets/images/myachery/Facebook.png"
 import ladBg from "assets/images/myachery/achery-lad.png"
@@ -10,12 +10,16 @@ import { useHistory, Link } from "react-router-dom"
 import { ArcherService } from "services"
 import { Col, Container, Row } from "reactstrap"
 import toastr from "toastr"
+import { useDispatch, useSelector } from "react-redux";
+import * as AuthenticationStore from "store/slice/authentication"
 // import logoImg from "../../../assets/images/logo.svg"
 // import images
 // import profileImg from "../../../assets/images/profile-img.png"
 
 const RegisterArcher = () => {
+  const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
   const [registerErrors, setRegisterErrors] = useState()
+  const dispatch = useDispatch()
 
   let history = useHistory();
   
@@ -24,6 +28,7 @@ const RegisterArcher = () => {
     const { data, errors, message, success } = await ArcherService.register(values)
     if (success) {
       if (data) {
+        dispatch(AuthenticationStore.login(data))
         history.push("/archer/dashboard")
       }
     } else {
@@ -32,6 +37,12 @@ const RegisterArcher = () => {
       toastr.error(message)
     }
   }
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      history.push("/archer/dashboard")
+    }
+  }, [isLoggedIn])
 
   console.log(registerErrors)
 

@@ -23,13 +23,13 @@ const H5 = styled.h5`
 const RegisterFullday = () => {
   const { slug } = useParams();
   const [eventDetail, setEventDetail] = useState();
-  let { profile } = useSelector(getAuthenticationStore);
+  let { userProfile } = useSelector(getAuthenticationStore);
   
   const [eventData, setEventData] = useState({
     eventType: "fullday",
     type: "",
-    email: profile?.email,
-    phone: profile?.phoneNumber,
+    email: userProfile?.email,
+    phone: userProfile?.phoneNumber,
     clubName: "",
     teamName: "",
     isUserSamePlayer: true,
@@ -38,8 +38,8 @@ const RegisterFullday = () => {
     dateBirth: "",
     participantMembers: [
       {
-        name: profile?.name,
-        birthdate: profile?.dateOfBirth,
+        name: userProfile?.name,
+        birthdate: userProfile?.dateOfBirth,
         gender: "",
       },
     ],

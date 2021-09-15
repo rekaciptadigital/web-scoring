@@ -21,7 +21,7 @@ const H5 = styled.h5`
 const CheckoutEvent = () => {
   const [info, setInfo] = useState([]);
   const { id } = useParams();
-  let { profile } = useSelector(getAuthenticationStore);
+  let { userProfile } = useSelector(getAuthenticationStore);
 
   const handleClick = () => {
     console.log(info.transactionInfo?.snapToken, 'klik')
@@ -70,16 +70,16 @@ const CheckoutEvent = () => {
                         <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
                         <div className="d-flex">
                             <div className="mx-5 text-muted">
-                                <h4>{profile?.name}</h4>
+                                <h4>{userProfile?.name}</h4>
                                 {/* <H5>Klub FAST</H5> */}
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>No. Ponsel</h4>
-                                <H5>{profile?.phoneNumber}</H5>
+                                <H5>{userProfile?.phoneNumber}</H5>
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>Email</h4>
-                                <H5>{profile?.email}</H5>
+                                <H5>{userProfile?.email}</H5>
                             </div>
                         </div>
                         </Media>

@@ -7,8 +7,11 @@ import { objectUtil, stringUtil } from "utils";
 import styles from "../styles";
 import ModalDistances from "./ModalDistances";
 import ModalTeamCategories from "./ModalTeamCategories";
+// import * as EventsStore from "store/slice/events"
+// import { useSelector } from "react-redux"
 
 export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
+  // const { errors } = useSelector(EventsStore.getEventsStore)
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };

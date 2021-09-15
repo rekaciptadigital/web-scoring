@@ -9,13 +9,22 @@ import ReactHtmlParser from "react-html-parser";
 import { Col, Label, Row } from "reactstrap";
 import { selectConstants } from "constants/index";
 import styles from "../styles";
+import * as EventsStore from "store/slice/events"
+import { useSelector } from "react-redux"
+import { Alert } from "reactstrap"
 
 export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
+  const { errors } = useSelector(EventsStore.getEventsStore)  
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
   return (
     <>
+    <div>
+      {errors ? null : (
+        <Alert color="danger">Ada inputan yang belum diisi</Alert>
+      )}
+    </div>
       <Row>
         <Col lg={4}>
           <img

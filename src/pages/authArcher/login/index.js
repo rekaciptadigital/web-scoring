@@ -70,9 +70,6 @@ const LoginArcher = () => {
                   <img src={myachery} />
                 </div>
                 <div style={{ zIndex: "100" }}>
-                  <p className="font-size-16 text-white">
-                    BUAT EVENT DI MANA SAJA KAPAN SAJA
-                  </p>
                   <div className="w-75 mx-auto">
                     <Link
                       to="/archer/login"

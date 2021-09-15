@@ -9,7 +9,7 @@ import DashboardOrderEvent from "../pages/landingpage/dashboard";
 import ArcherLogout from "pages/authArcher/logout";
 
 const routerDasboardArcher = [
-  { path: "/fullday/register/:slug", component: RegisterFullday, exact: true },
+  { path: "/event/register/process/:slug", component: RegisterFullday, exact: true },
   { path: "/fullday/register-done", component: RegisterDone },
 
   { path: "/marathon", component: MarathonLandingPage },

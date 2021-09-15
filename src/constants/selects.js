@@ -85,10 +85,10 @@ const fulldayAudience = [
     id: "individual",
     label: "Individu"
   },
-  {
-    id: "team",
-    label: "Tim"
-  },
+  // {
+  //   id: "team",
+  //   label: "Tim"
+  // },
 ]
 
 const gender = [

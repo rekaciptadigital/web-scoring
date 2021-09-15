@@ -1,5 +1,5 @@
 import {
-  SwitchInput,
+  // SwitchInput,
   TextInput,
   SelectInput,
   RadioButtonInput,
@@ -12,8 +12,10 @@ import { selectConstants } from "constants/index";
 import { stringUtil } from "utils";
 
 export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) => {
+  
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
+    console.log("formData",key);
   };
 
   function handleAddCompetitionCategory(categoryIndex) {
@@ -51,10 +53,11 @@ export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) =
             name="type"
             onChange={handleChange}
             options={selectConstants.fulldayAudience}
+            checked={selectConstants.fulldayAudience[0].id === formData.type.id}
             value={formData.type}
           />
         </Col>
-        <Col lg={4}>
+        <Col lg={6}>
           <TextInput
             label="Email"
             name="email"
@@ -62,7 +65,7 @@ export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) =
             onChange={handleChange}
           />
         </Col>
-        <Col lg={4}>
+        <Col lg={6}>
           <TextInput
             label="No. Telepon"
             name="phone"
@@ -70,7 +73,7 @@ export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) =
             onChange={handleChange}
           />
         </Col>
-        <Col lg={4}>
+        <Col lg={6}>
           <TextInput
             label="Nama Klub (Opsional)"
             name="clubName"
@@ -79,7 +82,7 @@ export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) =
           />
         </Col>
 
-        <Col lg={12}>
+        {/* <Col lg={12}>
           <SwitchInput
             label="Nama peserta sama dengan pemilik akun "
             name="isUserSamePlayer"
@@ -88,7 +91,7 @@ export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) =
             inline
             value={formData.isFlatRegistrationFee}
           />
-        </Col>
+        </Col> */}
 
         {formData.type.id === "Tim" ? (
           <Col lg={4}>
@@ -101,31 +104,31 @@ export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) =
           </Col>
         ) : (
           <>
-            <Col lg={4}>
+            <Col lg={6}>
               <TextInput
                 label="Nama Peserta"
-                name="teamName"
-                value={formData.participantMembers.name}
+                name="participantMembers.0.name"
+                value={formData.participantMembers[0].name}
                 onChange={handleChange}
               />
             </Col>
 
-            <Col lg={4}>
+            <Col lg={6}>
               <DateInput
                 label="Tanggal Lahir"
-                name="dateBirth"
-                value={formData.participantMembers.birthdate}
+                name="participantMembers.0.birthdate"
+                value={formData.participantMembers[0].birthdate}
                 onChange={handleChange}
               />
             </Col>
 
-            <Col lg={4}>
+            <Col lg={6}>
               <label>Jenis Kelamin</label>
               <RadioButtonInput
-                name="gender"
+                name="participantMembers.0.gender"
                 onChange={handleChange}
                 options={selectConstants.gender}
-                value={formData.participantMembers.name}
+                value={formData.participantMembers[0].gender}
               />
             </Col>
           </>

@@ -48,6 +48,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
       if (success) {
         if (data) {
           history.push("/dashboard/events")
+          dispatch(EventsStore.errors(errors))
         }
     } else {
       dispatch(EventsStore.errors(errors))

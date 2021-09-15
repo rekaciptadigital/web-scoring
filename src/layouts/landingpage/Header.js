@@ -57,9 +57,9 @@ const Navbar_Page = props => {
 
           <Collapse id="topnav-menu-content" isOpen={isOpenMenu} navbar>
             <div className="ms-auto">
-              <Link to="/archer/login" className="btn btn-outline-light w-xs">
+              {/* <Link to="/archer/login" className="btn btn-outline-light w-xs">
                 Sign in
-              </Link>
+              </Link> */}
             </div>
           </Collapse>
         </Container>

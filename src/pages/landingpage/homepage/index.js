@@ -155,7 +155,7 @@ const LandingPage = () => {
 
                 <div className="button-items mt-4">
                   <Link to={`/event/register/process/${slug}`} className="btn btn-success me-1">
-                    DAFTAR
+                    DAFTAR EVENT
                   </Link>
                 </div>
               </div>

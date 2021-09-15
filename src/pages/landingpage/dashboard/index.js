@@ -22,6 +22,7 @@ const H5 = styled.h5`
 const DashboardOrderEvent = () => {
     const [event, setEvent] = useState([]);
     let { profile } = useSelector(getAuthenticationStore);
+    console.log("get profile",profile);
 
     // const [activeTab, setActiveTab] = useState("1")
     // const toggleTab = tab => {
@@ -31,7 +32,8 @@ const DashboardOrderEvent = () => {
     // }
 
     useEffect(async() => {
-        const {data, success} = await OrderEventService.getAll();
+    console.log("get profile2",profile);
+    const {data, success} = await OrderEventService.getAll();
         if (success) {
             setEvent(data);
         }

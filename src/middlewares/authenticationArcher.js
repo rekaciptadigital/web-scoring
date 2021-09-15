@@ -1,8 +1,11 @@
-import React from "react"
+import React, {useEffect} from "react"
 import PropTypes from "prop-types"
 import { Route, Redirect } from "react-router-dom"
 import { getAuthenticationStore } from "store/slice/authentication"
 import { useSelector } from "react-redux"
+import { useDispatch } from "react-redux";
+import * as AuthenticationStore from "store/slice/authentication"
+import { ArcherService } from "services";
 
 const AuthenticationArcherMiddleware = ({
   component: Component,
@@ -13,7 +16,16 @@ const AuthenticationArcherMiddleware = ({
   let { isLoggedIn } = useSelector(getAuthenticationStore)
   // isLoggedIn = true;
   // isAuthProtected = false
-  console.log(isLoggedIn)
+  console.log("archer login",isLoggedIn)
+  const dispatch = useDispatch()
+
+  useEffect(async() => {
+    const {data, success} = await ArcherService.profile();
+      if (success) {
+        console.log("set profile first",data);
+        dispatch(AuthenticationStore.profile(data))
+      }
+    },[])
   return (
     <Route
       {...rest}

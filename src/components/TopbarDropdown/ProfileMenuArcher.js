@@ -10,14 +10,22 @@ import {
 } from "reactstrap";
 // users
 import user1 from "../../assets/images/users/avatar-man.png";
-
+import { useDispatch } from "react-redux";
+import * as AuthenticationStore from "store/slice/authentication"
+import { ArcherService } from "services";
 const ProfileMenuArcher = props => {
   // Declare a new state variable, which we'll call "menu"
   const [menu, setMenu] = useState(false);
 
+  const dispatch = useDispatch()
   const [username, setusername] = useState("Admin");
 
   useEffect(() => {
+    const {data, success} = await ArcherService.profile();
+      if (success) {
+        setusername(data.name);
+        dispatch(AuthenticationStore.profile(data))
+      }
     if (localStorage.getItem("authUser")) {
       if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
         const obj = JSON.parse(localStorage.getItem("authUser"));

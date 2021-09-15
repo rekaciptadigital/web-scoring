@@ -116,12 +116,13 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Status Pembayaran</H5>
-                      {info.transactionInfo != undefined && info.transactionInfo.status == 1 ?
-                        <p style={{color: "green"}} className="fw-medium"><i>{info.transactionInfo.status}</i></p>                                                 
-                      : info.transactionInfo != undefined && info.transactionInfo.status == 4 ? 
-                        <p style={{color: "yellow"}} className="fw-medium"><i>{info.transactionInfo.status}</i></p> 
+
+                      {info.transactionInfo != undefined && info.transactionInfo.statusId == 1 ?
+                        <h4 style={{color: "green"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4>                                                 
+                      : info.transactionInfo != undefined && info.transactionInfo.statusId == 4 ? 
+                        <h4 style={{color: "yellow"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4> 
                       :
-                      <p style={{color: "red"}} className="fw-medium"><i>{info.transactionInfo ? info.transactionInfo.status : ""}</i></p> 
+                      <h4 style={{color: "red"}} className="fw-medium"><i>{info.transactionInfo ? info.transactionInfo.status : ""}</i></h4> 
                       }
                     </div>
                   </div>
@@ -155,11 +156,13 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <Button
-                        href="/marathon/dashboard"
+                        title="jadwal bisa dipilih pada hari ahad 19-09-2021"
+                        href=""
+                        // href="/marathon/dashboard"
                         type="button"
                         size="sm"
                         style={{ backgroundColor: "#0D47A1" }}
-                        disabled
+                        isReadonly
                       >
                         Pilih Jadwal Kualifikasi
                       </Button>

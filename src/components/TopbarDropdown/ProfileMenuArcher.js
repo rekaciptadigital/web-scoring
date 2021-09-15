@@ -10,14 +10,22 @@ import {
 } from "reactstrap";
 // users
 import user1 from "../../assets/images/users/avatar-man.png";
-
+import { useDispatch } from "react-redux";
+import * as AuthenticationStore from "store/slice/authentication"
+import { ArcherService } from "services";
 const ProfileMenuArcher = props => {
   // Declare a new state variable, which we'll call "menu"
   const [menu, setMenu] = useState(false);
 
+  const dispatch = useDispatch()
   const [username, setusername] = useState("Admin");
 
-  useEffect(() => {
+  useEffect(async() => {
+    const {data, success} = await ArcherService.profile();
+      if (success) {
+        setusername(data.name);
+        dispatch(AuthenticationStore.profile(data))
+      }
     if (localStorage.getItem("authUser")) {
       if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
         const obj = JSON.parse(localStorage.getItem("authUser"));
@@ -49,7 +57,7 @@ const ProfileMenuArcher = props => {
             src={user1}
             alt="Header Avatar"
           />
-          <span className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
+          <span style={{color:"white"}} className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
           <i className="mdi mdi-chevron-down d-none d-xl-inline-block" />
         </DropdownToggle>
         <DropdownMenu className="dropdown-menu-end">

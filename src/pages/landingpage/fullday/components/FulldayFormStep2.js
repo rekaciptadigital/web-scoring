@@ -2,7 +2,7 @@
   import { Col, Row } from "reactstrap";
   
   export const FulldayFormStep2 = ({ formData }) => {
-    console.log(formData)
+    console.log("formData",formData)
     
     return (
       <>
@@ -29,15 +29,21 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>Tanggal Lahir :</td>
+                  <td>Nama Peserta :</td>
                   <td>
-                    {formData.clubName}
+                    {formData.participantMembers[0] && formData.participantMembers[0].name ? formData.participantMembers[0].name : ""}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tanggal Lahir Peserta :</td>
+                  <td>
+                    {formData.participantMembers[0] && formData.participantMembers[0].birthdate? formData.participantMembers[0].birthdate : ""}
                   </td>
                 </tr>
                 <tr>
                   <td>Gender :</td>
                   <td>
-                    {formData.participantMembers.name}
+                    {formData.participantMembers[0] ? formData.participantMembers[0].gender && formData.participantMembers[0].gender.label : ""}
                   </td>
                 </tr>
               </tbody>

@@ -154,7 +154,7 @@ const LandingPage = () => {
                 </p>
 
                 <div className="button-items mt-4">
-                  <Link to={`/${event.eventType}/register/${slug}`} className="btn btn-success me-1">
+                  <Link to={`/event/register/process/${slug}`} className="btn btn-success me-1">
                     DAFTAR
                   </Link>
                 </div>
@@ -176,7 +176,7 @@ const LandingPage = () => {
 
                   <div className="mt-5">
                     <div className="clearfix mt-4">
-                      <p className="font-size-14">{event.description}</p>
+                      <div dangerouslySetInnerHTML={{__html: event.description}} />
                     </div>
                   </div>
                 </CardBody>

@@ -7,6 +7,9 @@ import styled from "styled-components";
 import Avatar from "../../../assets/images/users/avatar-man.png";
 import { OrderEventService } from "services";
 import { useParams } from "react-router";
+import logoLight from "../../../assets/images/myachery/myachery.png";
+import { useSelector } from "react-redux"
+import { getAuthenticationStore } from "store/slice/authentication"
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -18,6 +21,7 @@ const H5 = styled.h5`
 const CheckoutEvent = () => {
   const [info, setInfo] = useState([]);
   const { id } = useParams();
+  let { profile } = useSelector(getAuthenticationStore);
 
   const handleClick = () => {
     console.log(info.transactionInfo?.snapToken, 'klik')
@@ -50,61 +54,57 @@ const CheckoutEvent = () => {
       <HeaderForm />
 
       <Container fluid className="px-5 p-2">
-        <Row>
-          <Card>
-            <CardBody>
-              <Media>
-                <div className="ms-3">
-                  <img
-                    src={Avatar}
-                    alt=""
-                    className="avatar-md rounded-circle img-thumbnail"
-                  />
-                </div>
-                <Media body className="align-self-center">
-                  <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
-                  <div className="d-flex">
-                    <div className="mx-5 text-muted">
-                      <h4>{info.participant?.name}</h4>
-                      <H5>Klub FAST</H5>
-                    </div>
-                    <div className="mx-5 text-muted">
-                      <h4>No. Ponsel</h4>
-                      <H5>{info.participant?.phoneNumber}</H5>
-                    </div>
-                    <div className="mx-5 text-muted">
-                      <h4>Email</h4>
-                      <H5>{info.participant?.email}</H5>
-                    </div>
-                  </div>
-                </Media>
-                <Button
-                  href="/full-day"
-                  type="button"
-                  size="sm"
-                  style={{ backgroundColor: "#0D47A1" }}
-                  disabled
-                >
-                  Setting
-                </Button>
-              </Media>
-            </CardBody>
-          </Card>
-        </Row>
+      <Row>
+              <Card>
+                <CardBody>
+                    <Media>
+                        <div className="ms-3">
+                        <img
+                            src={Avatar}
+                            alt=""
+                            className="avatar-md rounded-circle img-thumbnail"
+                        />
+                        </div>
+                        <Media body className="align-self-center">
+                        
+                        <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
+                        <div className="d-flex">
+                            <div className="mx-5 text-muted">
+                                <h4>{profile.name}</h4>
+                                {/* <H5>Klub FAST</H5> */}
+                            </div>
+                            <div className="mx-5 text-muted">
+                                <h4>No. Ponsel</h4>
+                                <H5>{profile.phoneNumber}</H5>
+                            </div>
+                            <div className="mx-5 text-muted">
+                                <h4>Email</h4>
+                                <H5>{profile.email}</H5>
+                            </div>
+                        </div>
+                        </Media>
+                          <Button
+                            disabled
+                              href="/full-day"
+                              type="button"
+                              size="sm"
+                              style={{backgroundColor: "#0D47A1",  }}>
+                              Setting
+                          </Button>
+                      </Media>
+                  </CardBody>
+              </Card>
+            </Row>
 
         <Row>
           <Card>
             <CardBody>
               <Media>
                 <div className="ms-3">
-                  <img
-                    src={Avatar}
-                    alt=""
-                    className="avatar-md rounded-circle img-thumbnail"
-                  />
+                <img src={info.archeryEvent != undefined && info.archeryEvent.poster != null && info.archeryEvent.poster ? info.archeryEvent.poster : logoLight} height="130" />
                 </div>
                 <Media body className="align-self-center">
-                  <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
+                  <H5 className="mx-5">Detail Order</H5>
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
                       <H5>ID ORDER</H5>
@@ -116,41 +116,53 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Status Pembayaran</H5>
-                      <h4>{info.transactionInfo?.status}</h4>
+
+                      {info.transactionInfo != undefined && info.transactionInfo.statusId == 1 ?
+                        <h4 style={{color: "green"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4>                                                 
+                      : info.transactionInfo != undefined && info.transactionInfo.statusId == 4 ? 
+                        <h4 style={{color: "yellow"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4> 
+                      :
+                      <h4 style={{color: "red"}} className="fw-medium"><i>{info.transactionInfo ? info.transactionInfo.status : ""}</i></h4> 
+                      }
                     </div>
                   </div>
                   <hr />
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
                       <H5>Event</H5>
-                      <h4>Jakarta Archery 2021</h4>
+                      <h5>{info.archeryEvent?.eventName}</h5>
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Lokasi</H5>
-                      <h4>Gelora Bung Karno</h4>
+                      <h5>{info.archeryEvent?.location}</h5>
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Peserta</H5>
-                      <h4>Asep</h4>
+                        {info.participant && info.participant.members ? info.participant.members.map((i) => (
+                          <li key={i}>{i.name}</li>
+                        )):<></>
+                        }
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Kategori</H5>
-                      <h4>{info.transactionInfo?.orderId}</h4>
+                      <p>{info.transactionInfo?.orderId}</p>
                     </div>
                   </div>
                   <hr />
                   <div className="d-flex">
                     <div className="mx-5 text-muted">
                       <H5>Tanggal Kualifikasi</H5>
-                      <h4>{info.archeryEvent?.eventStartDatetime}</h4>
+                      <p>{info.archeryEvent?.eventStartDatetime}</p>
                     </div>
                     <div className="mx-5 text-muted">
                       <Button
-                        href="/marathon/dashboard"
+                        title="jadwal bisa dipilih pada hari ahad 19-09-2021"
+                        href=""
+                        // href="/marathon/dashboard"
                         type="button"
                         size="sm"
                         style={{ backgroundColor: "#0D47A1" }}
-                        disabled
+                        isReadonly
                       >
                         Pilih Jadwal Kualifikasi
                       </Button>

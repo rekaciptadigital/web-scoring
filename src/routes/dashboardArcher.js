@@ -8,7 +8,6 @@ import CheckoutEvent from "../pages/landingpage/checkout";
 import DashboardOrderEvent from "../pages/landingpage/dashboard";
 import ArcherLogout from "pages/authArcher/logout";
 
-console.log("start");
 const routerDasboardArcher = [
   { path: "/event/register/process/:slug", component: RegisterFullday, exact: true },
   { path: "/fullday/register-done", component: RegisterDone },

@@ -1,6 +1,5 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import MetaTags from "react-meta-tags";
-import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
 import { Container, Row, Card, Media, CardBody, Button } from "reactstrap";
 import styled from "styled-components";
@@ -8,8 +7,8 @@ import Avatar from "../../../assets/images/users/avatar-man.png";
 import { OrderEventService } from "services";
 import { useParams } from "react-router";
 import logoLight from "../../../assets/images/myachery/myachery.png";
-import { useSelector } from "react-redux"
-import { getAuthenticationStore } from "store/slice/authentication"
+import { useSelector } from "react-redux";
+import { getAuthenticationStore } from "store/slice/authentication";
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -24,25 +23,33 @@ const CheckoutEvent = () => {
   let { userProfile } = useSelector(getAuthenticationStore);
 
   const handleClick = () => {
-    console.log(info.transactionInfo?.snapToken, 'klik')
-    window.snap.pay(`${info.transactionInfo?.snapToken}`)
-    return () => {
-      document.body.removeChild(scriptTag);
-    };
+    window.snap.pay(`${info.transactionInfo?.snapToken}`, {
+      onSuccess: function () {
+        console.log("success");
+      },
+      onPending: function () {
+        console.log("pending");
+      },
+      onError: function () {
+        console.log("error");
+      },
+      onClose: function () {
+        console.log("customer closed the popup without finishing the payment");
+      },
+    });
   };
 
-  useEffect(async() => {
-    const {data, errors, message, success} = await OrderEventService.get({id});
-    console.log(data, errors, message, success)
+  useEffect(async () => {
+    const { data, errors, message, success } = await OrderEventService.get({
+      id,
+    });
     if (success) {
       if (data) {
-        console.log(data)
         setInfo(data);
-        }
-      } else {
-        console.log(errors)
-        console.log(message)
       }
+    } else {
+      console.error(message, errors);
+    }
   }, []);
 
   return (
@@ -54,54 +61,63 @@ const CheckoutEvent = () => {
       <HeaderForm />
 
       <Container fluid className="px-5 p-2">
-      <Row>
-              <Card>
-                <CardBody>
-                    <Media>
-                        <div className="ms-3">
-                        <img
-                            src={Avatar}
-                            alt=""
-                            className="avatar-md rounded-circle img-thumbnail"
-                        />
-                        </div>
-                        <Media body className="align-self-center">
-                        
-                        <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
-                        <div className="d-flex">
-                            <div className="mx-5 text-muted">
-                                <h4>{userProfile?.name}</h4>
-                                {/* <H5>Klub FAST</H5> */}
-                            </div>
-                            <div className="mx-5 text-muted">
-                                <h4>No. Ponsel</h4>
-                                <H5>{userProfile?.phoneNumber}</H5>
-                            </div>
-                            <div className="mx-5 text-muted">
-                                <h4>Email</h4>
-                                <H5>{userProfile?.email}</H5>
-                            </div>
-                        </div>
-                        </Media>
-                          <Button
-                            disabled
-                              href="/full-day"
-                              type="button"
-                              size="sm"
-                              style={{backgroundColor: "#0D47A1",  }}>
-                              Setting
-                          </Button>
-                      </Media>
-                  </CardBody>
-              </Card>
-            </Row>
+        <Row>
+          <Card>
+            <CardBody>
+              <Media>
+                <div className="ms-3">
+                  <img
+                    src={Avatar}
+                    alt=""
+                    className="avatar-md rounded-circle img-thumbnail"
+                  />
+                </div>
+                <Media body className="align-self-center">
+                  <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
+                  <div className="d-flex">
+                    <div className="mx-5 text-muted">
+                      <h4>{userProfile?.name}</h4>
+                      {/* <H5>Klub FAST</H5> */}
+                    </div>
+                    <div className="mx-5 text-muted">
+                      <h4>No. Ponsel</h4>
+                      <H5>{userProfile?.phoneNumber}</H5>
+                    </div>
+                    <div className="mx-5 text-muted">
+                      <h4>Email</h4>
+                      <H5>{userProfile?.email}</H5>
+                    </div>
+                  </div>
+                </Media>
+                <Button
+                  disabled
+                  href="/full-day"
+                  type="button"
+                  size="sm"
+                  style={{ backgroundColor: "#0D47A1" }}
+                >
+                  Setting
+                </Button>
+              </Media>
+            </CardBody>
+          </Card>
+        </Row>
 
         <Row>
           <Card>
             <CardBody>
               <Media>
                 <div className="ms-3">
-                <img src={info.archeryEvent != undefined && info.archeryEvent.poster != null && info.archeryEvent.poster ? info.archeryEvent.poster : logoLight} height="130" />
+                  <img
+                    src={
+                      info.archeryEvent != undefined &&
+                      info.archeryEvent.poster != null &&
+                      info.archeryEvent.poster
+                        ? info.archeryEvent.poster
+                        : logoLight
+                    }
+                    height="130"
+                  />
                 </div>
                 <Media body className="align-self-center">
                   <H5 className="mx-5">Detail Order</H5>
@@ -117,13 +133,25 @@ const CheckoutEvent = () => {
                     <div className="mx-5 text-muted">
                       <H5>Status Pembayaran</H5>
 
-                      {info.transactionInfo != undefined && info.transactionInfo.statusId == 1 ?
-                        <h4 style={{color: "green"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4>                                                 
-                      : info.transactionInfo != undefined && info.transactionInfo.statusId == 4 ? 
-                        <h4 style={{color: "yellow"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4> 
-                      :
-                      <h4 style={{color: "red"}} className="fw-medium"><i>{info.transactionInfo ? info.transactionInfo.status : ""}</i></h4> 
-                      }
+                      {info.transactionInfo != undefined &&
+                      info.transactionInfo.statusId == 1 ? (
+                        <h4 style={{ color: "green" }} className="fw-medium">
+                          <i>{info.transactionInfo.status}</i>
+                        </h4>
+                      ) : info.transactionInfo != undefined &&
+                        info.transactionInfo.statusId == 4 ? (
+                        <h4 style={{ color: "yellow" }} className="fw-medium">
+                          <i>{info.transactionInfo.status}</i>
+                        </h4>
+                      ) : (
+                        <h4 style={{ color: "red" }} className="fw-medium">
+                          <i>
+                            {info.transactionInfo
+                              ? info.transactionInfo.status
+                              : ""}
+                          </i>
+                        </h4>
+                      )}
                     </div>
                   </div>
                   <hr />
@@ -138,10 +166,13 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Peserta</H5>
-                        {info.participant && info.participant.members ? info.participant.members.map((i) => (
+                      {info.participant && info.participant.members ? (
+                        info.participant.members.map((i) => (
                           <li key={i}>{i.name}</li>
-                        )):<></>
-                        }
+                        ))
+                      ) : (
+                        <></>
+                      )}
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Kategori</H5>
@@ -184,8 +215,6 @@ const CheckoutEvent = () => {
           </Card>
         </Row>
       </Container>
-
-      <Footer />
     </React.Fragment>
   );
 };

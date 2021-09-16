@@ -20,8 +20,8 @@ import styled from "styled-components";
 import { OrderEventService } from "../../../../services";
 import { selectConstants } from "constants/index";
 import { useHistory } from "react-router-dom";
-//tesing post data postman
-// import dummy from "./DummyOrderEvent.json";
+//SweetAlert
+import SweetAlert from "react-bootstrap-sweetalert";
 
 const Label = styled.label`
   font-size: 12px;
@@ -37,10 +37,11 @@ const Td = styled.td`
 
 const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
   formData.type = selectConstants.fulldayAudience[0];
-  console.log("formData",formData);
   const history = useHistory();
   const [activeTab, setactiveTab] = useState(1);
-  const [err, seterr] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errors, setErrors] = useState(null);
+  const [confirm, setConfirm] = useState(false);
 
   function toggleTab(tab) {
     if (activeTab !== tab) {
@@ -51,28 +52,40 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
   }
 
   const handleValidSubmit = async () => {
-    seterr(false);
+    setErrors(null);
+    setIsError(false);
     const localFormData = { ...formData };
     localFormData.eventId = eventDetail ? eventDetail.id : 0;
     localFormData.type = formData.type?.id;
-    localFormData.participantMembers[0].gender = formData.participantMembers[0].gender?.id;
+    localFormData.participantMembers[0].gender =
+      formData.participantMembers[0].gender?.id;
     const { data, errors, message, success } = await OrderEventService.register(
       localFormData
     );
     if (success) {
       if (data) {
-        console.log(data);
-        history.push("/checkout-event/"+data.archeryEventParticipantId);
+        history.push("/checkout-event/" + data.archeryEventParticipantId);
       }
     } else {
-      seterr(true);
-      console.log(errors);
-      console.log(message);
+      setErrors(errors);
+      setIsError(true);
+      console.error(message, errors);
     }
   };
 
   return (
     <Row>
+      {isError ? (
+        <SweetAlert
+          title="Oops, data invalid"
+          warning
+          onConfirm={() => {
+            setIsError(false);
+          }}
+        >
+          Pastikan data terisi dengan benar dan lengkap
+        </SweetAlert>
+      ) : null}
       <Col lg="12">
         <Card>
           <CardBody>
@@ -120,6 +133,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                           onFormFieldChange={onFormFieldChange}
                           formData={formData}
                           eventDetail={eventDetail}
+                          errors={errors}
                         />
                       </TabPane>
                       <TabPane tabId={2}>
@@ -135,7 +149,6 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                       />
                   </TabPane> */}
                     </TabContent>
-                    {err ? <p style={{color:"red"}}>*pastikan data terisi dengan benar dan lengkap</p> : <></>}
                   </div>
                 </Col>
                 <Col sm={4}>
@@ -146,28 +159,43 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                           <Media>
                             <Media body>
                               <h5 className="mb-3">Tiket Lomba</h5>
-                              <tr>
-                                <Td>
-                                  <Label>Jenis Regu: </Label>
-                                </Td>
-                                <Td><strong>{formData.type.id}</strong></Td>
-                              </tr>
-                              <tr>
-                                <Td>
-                                  <Label>Kategori Lomba: </Label>
-                                </Td>
-                                <Td><strong>{formData.categoryEvent ? formData.categoryEvent.label : ""}</strong></Td>
-                              </tr>
+                              <table className="table">
+                                <tbody>
+                                  <tr>
+                                    <Td>
+                                      <Label>Jenis Regu: </Label>
+                                    </Td>
+                                    <Td>
+                                      <strong>{formData.type.id}</strong>
+                                    </Td>
+                                  </tr>
+                                  <tr>
+                                    <Td>
+                                      <Label>Kategori Lomba: </Label>
+                                    </Td>
+                                    <Td>
+                                      <strong>
+                                        {formData.categoryEvent
+                                          ? formData.categoryEvent.label
+                                          : ""}
+                                      </strong>
+                                    </Td>
+                                  </tr>
+                                </tbody>
+                              </table>
                               <br></br>
-                              <h4 style={{color:"green", textAlign:"center"}}>
-                                Rp {eventDetail && eventDetail.isFlatRegistrationFee ? eventDetail.price ? eventDetail.price : 0 : formData && formData.categoryEvent != null &&formData.categoryEvent.price?formData.categoryEvent.price:0}</h4>
+                              <h4
+                                style={{ color: "green", textAlign: "center" }}
+                              >
+                                Rp {formData?.categoryEvent?.price || 0}
+                              </h4>
                               <div className="d-grid gap-2 mt-5">
                                 {activeTab === 2 ? (
                                   <Button
                                     type="button"
                                     style={{ backgroundColor: "#0D47A1" }}
                                     onClick={() => {
-                                      handleValidSubmit(formData);
+                                      setConfirm(true);
                                     }}
                                   >
                                     Selesai
@@ -177,13 +205,28 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                                     type="button"
                                     style={{ backgroundColor: "#0D47A1" }}
                                     onClick={() => {
-                                      console.log(formData);
                                       toggleTab(activeTab + 1);
                                     }}
                                   >
                                     Pilih Pembayaran
                                   </Button>
                                 )}
+                                {confirm ? (
+                                  <SweetAlert
+                                    title="Apakah anda yakin?"
+                                    warning
+                                    showCancel
+                                    confirmButtonText="Ya"
+                                    cancelBtnText="Tidak"
+                                    confirmBtnBsStyle="success"
+                                    cancelBtnBsStyle="danger"
+                                    onConfirm={() => {
+                                      setConfirm(false);
+                                      handleValidSubmit(formData);
+                                    }}
+                                    onCancel={() => setConfirm(false)}
+                                  ></SweetAlert>
+                                ) : null}
                               </div>
                             </Media>
                           </Media>

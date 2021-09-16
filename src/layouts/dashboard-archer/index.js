@@ -62,7 +62,7 @@ class LayoutArcher extends Component {
 
         <div id="layout-wrapper">
           {/* <Navbar menuOpen={this.state.isMenuOpened} /> */}
-          <div className="main-content">{this.props.children}</div>
+          <div className="main-content" style={{minHeight: "calc(100vh - 60px)"}}>{this.props.children}</div>
           <Footer />
         </div>
       </React.Fragment>

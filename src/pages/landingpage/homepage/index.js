@@ -162,9 +162,8 @@ const LandingPage = () => {
                 </p>
 
                 <div className="button-items mt-4">
-                  <Link to={`/${event.eventType}/register/${slug}`} className="btn btn-success me-1">
-                  {/* <Link onClick={toggle} className="btn btn-success"> */}
-                    DAFTAR
+                  <Link to={`/event/register/process/${slug}`} className="btn btn-success me-1">
+                    DAFTAR EVENT
                   </Link>
                 </div>
                 <div>
@@ -191,14 +190,14 @@ const LandingPage = () => {
                   <div className="text-center">
                     <div className="mt-4">
                       <div className="counter-number ico-countdown">
-                        <Countdown date="2021/12/31" renderer={renderer} />
+                        <Countdown date={event.eventStartDatetime != undefined ? event.eventStartDatetime.replace(/-/g, "/") : "2021/12/12"} renderer={renderer} />
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-5">
                     <div className="clearfix mt-4">
-                      <p className="font-size-14">{event.description}</p>
+                      <div dangerouslySetInnerHTML={{__html: event.description}} />
                     </div>
                   </div>
                 </CardBody>

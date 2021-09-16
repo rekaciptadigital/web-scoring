@@ -1,21 +1,26 @@
 // availity-reactstrap-validation
 import myachery from "assets/images/myachery/logo-myarchery.png"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import google from "assets/images/myachery/Google.png"
 import facebook from "assets/images/myachery/Facebook.png"
 import ladBg from "assets/images/myachery/achery-lad.png"
 import { AvField, AvForm } from "availity-reactstrap-validation"
 import MetaTags from "react-meta-tags"
-import { useHistory, Link } from "react-router-dom"
+import { useHistory, Link, useLocation } from "react-router-dom"
 import { ArcherService } from "services"
 import { Col, Container, Row } from "reactstrap"
 import toastr from "toastr"
+import { useDispatch, useSelector } from "react-redux";
+import * as AuthenticationStore from "store/slice/authentication"
 // import logoImg from "../../../assets/images/logo.svg"
 // import images
 // import profileImg from "../../../assets/images/profile-img.png"
 
-const RegisterArcher = () => {
+const RegisterArcher = (props) => {
+  const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
   const [registerErrors, setRegisterErrors] = useState()
+  const dispatch = useDispatch()
+  let path = new URLSearchParams(useLocation().search).get("path");
 
   let history = useHistory();
   
@@ -24,7 +29,7 @@ const RegisterArcher = () => {
     const { data, errors, message, success } = await ArcherService.register(values)
     if (success) {
       if (data) {
-        history.push("/archer/dashboard")
+        dispatch(AuthenticationStore.login(data))
       }
     } else {
       console.log(errors)
@@ -32,6 +37,18 @@ const RegisterArcher = () => {
       toastr.error(message)
     }
   }
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      path = props.location.state && props.location.state.from && props.location.state.from.pathname ? props.location.state.from.pathname : path;
+
+      if (path == null) {
+        history.push("/archer/dashboard")        
+      }else{
+        history.push(path)
+      }
+    }
+  }, [isLoggedIn])
 
   console.log(registerErrors)
 
@@ -50,12 +67,11 @@ const RegisterArcher = () => {
                   <img src={myachery} />
                 </div>
                 <div style={{zIndex: '100'}}>
-                <p className="font-size-16 text-white">BUAT EVENT DI MANA SAJA KAPAN SAJA</p>
                   <div className="w-75 mx-auto">
-                    <Link to="/archer/login" className="text-decoration-none text-black-50">
+                    <Link to={path != null ? "/archer/login?path="+path :"/archer/login"} className="text-decoration-none text-black-50">
                       <span style={{marginRight: '36px'}} className="font-size-18 text-white">Masuk</span>
                     </Link>
-                    <Link to="/archer/register" className="text-decoration-none text-black-50 text-decoration-underline">
+                    <Link to={path != null ? "/archer/register?path="+path :"/archer/register"} className="text-decoration-none text-black-50 text-decoration-underline">
                       <span className="font-size-18 text-white">Daftar</span>
                     </Link>
                   </div>

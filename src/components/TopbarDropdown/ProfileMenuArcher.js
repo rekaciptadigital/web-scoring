@@ -20,10 +20,11 @@ const ProfileMenuArcher = props => {
   const dispatch = useDispatch()
   const [username, setusername] = useState("Admin");
 
-  useEffect(() => {
+  useEffect(async() => {
     const {data, success} = await ArcherService.profile();
       if (success) {
         setusername(data.name);
+        console.log("set profile",data);
         dispatch(AuthenticationStore.profile(data))
       }
     if (localStorage.getItem("authUser")) {
@@ -57,7 +58,7 @@ const ProfileMenuArcher = props => {
             src={user1}
             alt="Header Avatar"
           />
-          <span className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
+          <span style={{color:"white"}} className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
           <i className="mdi mdi-chevron-down d-none d-xl-inline-block" />
         </DropdownToggle>
         <DropdownMenu className="dropdown-menu-end">

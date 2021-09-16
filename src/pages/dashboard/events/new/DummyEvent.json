@@ -332,8 +332,8 @@
         "openDetails": true
       }
     ],
-    "quatificationStartDatetime": "2021-09-30 12:00:00",
-    "quatificationEndDatetime": "2021-09-30 12:00:00",
+    "qualificationStartDatetime": "2021-09-30 12:00:00",
+    "qualificationEndDatetime": "2021-09-30 12:00:00",
     "qualificationSessionLength": {
       "id": "60",
       "value": "60",

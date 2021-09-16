@@ -3,7 +3,7 @@ import React from "react";
 import { withTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import logolight from "../../assets/images/myachery/logo-myarchery.png"
-import ProfileMenu from "../../components//TopbarDropdown/ProfileMenu";
+import ProfileMenuArcher from "../../components//TopbarDropdown/ProfileMenuArcher";
 import styled from "styled-components";
 
 const Header = styled.header`
@@ -19,7 +19,7 @@ const HeaderForm = props => {
         <div className="navbar-header">
           <div className="d-flex">
             <div className="navbar-brand-box">
-              <Link to="/" className="logo logo-dark">
+              <Link to="/archer/dashboard" className="logo logo-dark">
                 <span className="logo-sm">
                   <img src={logolight} alt="" height="55" />
                 </span>
@@ -28,7 +28,7 @@ const HeaderForm = props => {
                 </span>
               </Link>
 
-              <Link to="/" className="logo logo-light">
+              <Link to="/archer/dashboard" className="logo logo-light">
                 <span className="logo-sm">
                   <img src={logolight} alt="" height="55" />
                 </span>
@@ -54,7 +54,7 @@ const HeaderForm = props => {
           </div>
 
           <div className="d-flex">
-          <ProfileMenu />
+          <ProfileMenuArcher />
           </div>
         </div>
       </Header>

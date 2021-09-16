@@ -21,7 +21,8 @@ const H5 = styled.h5`
 
 const DashboardOrderEvent = () => {
     const [event, setEvent] = useState([]);
-    let { profile } = useSelector(getAuthenticationStore);
+    let { userProfile } = useSelector(getAuthenticationStore);
+    console.log("get profile",userProfile);
 
     // const [activeTab, setActiveTab] = useState("1")
     // const toggleTab = tab => {
@@ -31,7 +32,8 @@ const DashboardOrderEvent = () => {
     // }
 
     useEffect(async() => {
-        const {data, success} = await OrderEventService.getAll();
+    console.log("get profile2",userProfile);
+    const {data, success} = await OrderEventService.getAll();
         if (success) {
             setEvent(data);
         }
@@ -64,16 +66,16 @@ const DashboardOrderEvent = () => {
                         <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
                         <div className="d-flex">
                             <div className="mx-5 text-muted">
-                                <h4>Admin</h4>
+                                <h4>{userProfile?.name}</h4>
                                 {/* <H5>Klub FAST</H5> */}
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>No. Ponsel</h4>
-                                <H5>081256897045</H5>
+                                <H5>{userProfile?.phoneNumber}</H5>
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>Email</h4>
-                                <H5>admin234@gmail.com</H5>
+                                <H5>{userProfile?.email}</H5>
                             </div>
                         </div>
                         </Media>
@@ -104,7 +106,7 @@ const DashboardOrderEvent = () => {
                                     </div>
                                 : null}
                                 {event && event?.map((i) => (
-                                    <div style={{marginBottom:"20px;",borderRadius:"10px",border:"2px solid #0064ff"}} key={i.archeryEvent.id}>
+                                    <div style={{marginBottom:"20px",borderRadius:"10px",border:"2px solid #0064ff"}} key={i.archeryEvent.id}>
                                     <CardBody>
                                         <Row>
                                             <Col md={3} sm={12}>
@@ -125,12 +127,12 @@ const DashboardOrderEvent = () => {
                                                 <p className="text-muted fw-medium">
                                                    Order ID : {i.transactionInfo.orderId}
                                                 </p>
-                                                {i.transactionInfo.status == 1 ?
-                                                    <p style={{color: "green"}} className="fw-medium"><i>{i.transactionInfo.status}</i></p>                                                 
-                                                : i.transactionInfo.status == 4 ? 
-                                                    <p style={{color: "yellow"}} className="fw-medium"><i>{i.transactionInfo.status}</i></p> 
+                                                {i.transactionInfo.statusId == 1 ?
+                                                    <h5 style={{color: "green"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5>                                                 
+                                                : i.transactionInfo.statusId == 4 ? 
+                                                    <h5 style={{color: "yellow"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5> 
                                                 :
-                                                    <p style={{color: "red"}} className="fw-medium"><i>{i.transactionInfo.status}</i></p> 
+                                                    <h5 style={{color: "red"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5> 
                                                 }
                                                 <Button
                                                     href={`/checkout-event/${i.participant.id}`}

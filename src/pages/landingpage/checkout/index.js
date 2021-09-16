@@ -21,7 +21,7 @@ const H5 = styled.h5`
 const CheckoutEvent = () => {
   const [info, setInfo] = useState([]);
   const { id } = useParams();
-  let { profile } = useSelector(getAuthenticationStore);
+  let { userProfile } = useSelector(getAuthenticationStore);
 
   const handleClick = () => {
     console.log(info.transactionInfo?.snapToken, 'klik')
@@ -71,17 +71,17 @@ const CheckoutEvent = () => {
                         
                         <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
                         <div className="d-flex">
-                        <div className="mx-5 text-muted">
-                                <h4>Admin</h4>
+                            <div className="mx-5 text-muted">
+                                <h4>{userProfile?.name}</h4>
                                 {/* <H5>Klub FAST</H5> */}
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>No. Ponsel</h4>
-                                <H5>081256897045</H5>
+                                <H5>{userProfile?.phoneNumber}</H5>
                             </div>
                             <div className="mx-5 text-muted">
                                 <h4>Email</h4>
-                                <H5>admin234@gmail.com</H5>
+                                <H5>{userProfile?.email}</H5>
                             </div>
                         </div>
                         </Media>
@@ -118,12 +118,13 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <H5>Status Pembayaran</H5>
-                      {info.transactionInfo != undefined && info.transactionInfo.status == 1 ?
-                        <p style={{color: "green"}} className="fw-medium"><i>{info.transactionInfo.status}</i></p>                                                 
-                      : info.transactionInfo != undefined && info.transactionInfo.status == 4 ? 
-                        <p style={{color: "yellow"}} className="fw-medium"><i>{info.transactionInfo.status}</i></p> 
+
+                      {info.transactionInfo != undefined && info.transactionInfo.statusId == 1 ?
+                        <h4 style={{color: "green"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4>                                                 
+                      : info.transactionInfo != undefined && info.transactionInfo.statusId == 4 ? 
+                        <h4 style={{color: "yellow"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4> 
                       :
-                      <p style={{color: "red"}} className="fw-medium"><i>{info.transactionInfo ? info.transactionInfo.status : ""}</i></p> 
+                      <h4 style={{color: "red"}} className="fw-medium"><i>{info.transactionInfo ? info.transactionInfo.status : ""}</i></h4> 
                       }
                     </div>
                   </div>
@@ -157,11 +158,13 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-5 text-muted">
                       <Button
-                        href="/marathon/dashboard"
+                        title="jadwal bisa dipilih pada hari ahad 19-09-2021"
+                        href=""
+                        // href="/marathon/dashboard"
                         type="button"
                         size="sm"
                         style={{ backgroundColor: "#0D47A1" }}
-                        disabled
+                        isReadonly
                       >
                         Pilih Jadwal Kualifikasi
                       </Button>

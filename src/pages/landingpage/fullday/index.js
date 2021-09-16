@@ -7,6 +7,8 @@ import styled from "styled-components";
 import { stringUtil } from "utils";
 import { CategoryService } from "services";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux"
+import { getAuthenticationStore } from "store/slice/authentication"
 
 const H5 = styled.h5`
   font-family: Poppins;
@@ -21,11 +23,13 @@ const H5 = styled.h5`
 const RegisterFullday = () => {
   const { slug } = useParams();
   const [eventDetail, setEventDetail] = useState();
+  let { userProfile } = useSelector(getAuthenticationStore);
+  
   const [eventData, setEventData] = useState({
     eventType: "fullday",
     type: "",
-    email: "",
-    phone: "",
+    email: userProfile?.email,
+    phone: userProfile?.phoneNumber,
     clubName: "",
     teamName: "",
     isUserSamePlayer: true,
@@ -34,8 +38,8 @@ const RegisterFullday = () => {
     dateBirth: "",
     participantMembers: [
       {
-        name: "",
-        birthdate: "",
+        name: userProfile?.name,
+        birthdate: userProfile?.dateOfBirth,
         gender: "",
       },
     ],
@@ -113,7 +117,7 @@ const RegisterFullday = () => {
       <HeaderForm />
 
       <Row className="mt-3">
-        <H5>Pendaftaran Jakarta Archery 2021</H5>
+        <H5>Pendaftaran {eventDetail && eventDetail.eventName != undefined ? eventDetail.eventName : ""}</H5>
       </Row>
 
       <Container fluid className="px-5 p-2">

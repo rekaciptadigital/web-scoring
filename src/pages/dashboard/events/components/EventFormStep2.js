@@ -7,8 +7,11 @@ import {
 import React from "react";
 import { Col, Row } from "reactstrap";
 import { selectConstants } from "constants/index";
+import * as EventsStore from "store/slice/events"
+import { useSelector } from "react-redux"
 
 export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
+  const { errors } = useSelector(EventsStore.getEventsStore)  
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
@@ -37,6 +40,7 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
             options={selectConstants.teamCategories}
             inline
             value={formData.teamCategories}
+            error={errors}
           />
         </Col>
       </Row>
@@ -68,6 +72,7 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
                         name={`registrationFees.${index}.categoryPrices.${categoryPriceIndex}.price`}
                         onChange={handleChange}
                         value={categoryPrice.price}
+                        error={errors}
                       />
                     </Col>
                   )

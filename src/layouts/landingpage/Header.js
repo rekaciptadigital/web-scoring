@@ -31,7 +31,7 @@ const Navbar_Page = props => {
               <img
                 src={logoblack}
                 alt=""
-                height="44"
+                height="auto"
                 width="80"
                 className="logo logo-dark"
               />
@@ -39,7 +39,7 @@ const Navbar_Page = props => {
               <img
                 src={logolight}
                 alt=""
-                height="44"
+                height="auto"
                 width="80"
                 className="logo logo-light"
               />

@@ -11,7 +11,7 @@ import {
   TabContent,
   TabPane
 } from "reactstrap";
-import dummy from "../new/DummyEvent.json" //Coba mengunankan data json yang ada pada postman
+// import dummy from "../new/DummyEvent.json" //Coba mengunankan data json yang ada pada postman
 import { EventsService } from "../../../../services"
 // import { objectUtil } from "utils";
 import { EventFormStep1 } from "./EventFormStep1";
@@ -21,12 +21,17 @@ import { EventFormStep4 } from "./EventFormStep4";
 import { EventFormStep5 } from "./EventFormStep5";
 import { EventFormStep6 } from "./EventFormStep6";
 
-const FormWizard = ({ onFormFieldChange, formData }) => {
+import { useDispatch } from "react-redux"
+import * as EventsStore from "store/slice/events"
 
-  console.log(dummy)
+const FormWizard = ({ onFormFieldChange, formData }) => {
   const [activeTab, setactiveTab] = useState(1);
 
+  const dispatch = useDispatch();
   const history = useHistory();
+
+  // const { errors } = useSelector(EventsStore.getEventsStore)
+  // console.log(errors)
 
   function toggleTab(tab) {
     if (activeTab !== tab) {
@@ -43,9 +48,10 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
       if (success) {
         if (data) {
           history.push("/dashboard/events")
+          dispatch(EventsStore.errors(errors))
         }
     } else {
-      console.log(errors)
+      dispatch(EventsStore.errors(errors))
       console.log(message)
     }
   }

@@ -5,8 +5,8 @@
 import { AvField, AvForm } from "availity-reactstrap-validation";
 import myachery from "assets/images/myachery/logo-myarchery.png";
 // import gmail from "assets/images/myachery/gmail.png"
-import google from "assets/images/myachery/Google.png";
-import facebook from "assets/images/myachery/Facebook.png";
+// import google from "assets/images/myachery/Google.png";
+// import facebook from "assets/images/myachery/Facebook.png";
 import ladBg from "assets/images/myachery/achery-lad.png";
 import React, { useEffect, useState } from "react";
 import MetaTags from "react-meta-tags";
@@ -56,7 +56,7 @@ const LoginArcher = (props) => {
         history.push(path)
       }
     }else{
-      if (pathFrom != null && path == null){
+      if (pathFrom != null && path == null && path != "/archer/logout"){
         history.push("/archer/login?path="+pathFrom)
       }
     }
@@ -85,7 +85,7 @@ const LoginArcher = (props) => {
                 <div style={{ paddingTop: "20vh" }} className=" mx-auto">
                   <img src={myachery} />
                 </div>
-                <div style={{ zIndex: "100" }}>
+                {/* <div style={{ zIndex: "100" }}>
                   <div className="w-75 mx-auto">
                     <Link
                       to={path != null ? "/archer/login?path="+path :"/archer/login"}
@@ -105,7 +105,7 @@ const LoginArcher = (props) => {
                       <span className="font-size-18 text-white">Daftar</span>
                     </Link>
                   </div>
-                </div>
+                </div> */}
               </div>
             </Col>
             <Col md={7} sm={12} xs={12}>
@@ -176,11 +176,24 @@ const LoginArcher = (props) => {
                       Forgot your password?
                     </Link>
                   </div>
+                  <div className="mt-5 text-center">
+                <p>
+                  Belum memiliki akun daftar ?{" "}
+                  <Link to="/archer/register" className="fw-medium text-primary">
+                    {" "}
+                    Disini{" "}
+                  </Link>{" "}
+                </p>
+                {/* <p>
+                  © {new Date().getFullYear()} Skote. Crafted with{" "}
+                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
+                </p> */}
+              </div>
                 </AvForm>
-                <div className="d-flex justify-content-center pt-5">
+                {/* <div className="d-flex justify-content-center pt-5">
                   <img src={facebook} style={{ cursor: "pointer" }} />
                   <img src={google} style={{ cursor: "pointer" }} />
-                </div>
+                </div> */}
               </div>
             </Col>
           </Row>

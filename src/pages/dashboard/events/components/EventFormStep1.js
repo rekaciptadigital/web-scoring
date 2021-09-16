@@ -8,12 +8,15 @@ import {
 import React, { useState } from "react";
 import { Col, Row } from "reactstrap";
 import { selectConstants } from "constants/index";
+import { useSelector } from "react-redux";
+import * as EventsStore from "store/slice/events"
 
 export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
-    const [base64URL, setBase64URL] = useState("");
-    // const [imgTo64, setImgTo64] = useState("")
-    const [file, setFile] = useState(null)
-  
+  const [base64URL, setBase64URL] = useState("");
+  // const [imgTo64, setImgTo64] = useState("")
+  const [file, setFile] = useState(null)
+  const { errors } = useSelector(EventsStore.getEventsStore)  
+    
   const getBase64 = (file) => {
     return new Promise((resolve) => {
       let fileInfo
@@ -66,6 +69,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
               thumbnail
               base64={handlerFileInputChange}
+              error={errors}
             />
           </Col>
         </Row>
@@ -87,6 +91,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="eventName"
               value={formData.eventName}
               onChange={handleChange}
+              error={errors}
             />
           </Col>
           <Col lg={6}>
@@ -95,6 +100,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="location"
               value={formData.location}
               onChange={handleChange}
+              error={errors}
             />
           </Col>
           <Col lg={6}>
@@ -103,6 +109,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="city"
               value={formData.city}
               onChange={handleChange}
+              error={errors}
             />
           </Col>
           <Col lg={12}>
@@ -112,6 +119,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               options={selectConstants.eventLocationType}
               value={formData.locationType}
               valueOnly
+              error={errors}
             />
           </Col>
           <Col lg={12}>
@@ -120,6 +128,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
               name="description"
               value={formData.description}
+              error={errors}
             />
           </Col>
         </Row>

@@ -56,7 +56,7 @@ const LoginArcher = (props) => {
         history.push(path)
       }
     }else{
-      if (pathFrom != null && path == null){
+      if (pathFrom != null && path == null && path != "/archer/logout"){
         history.push("/archer/login?path="+pathFrom)
       }
     }

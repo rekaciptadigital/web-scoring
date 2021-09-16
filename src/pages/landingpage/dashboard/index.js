@@ -39,8 +39,6 @@ const DashboardOrderEvent = () => {
         }
     }, []);
 
-    console.log(profile)
-
   return (
     <React.Fragment>
       <MetaTags>

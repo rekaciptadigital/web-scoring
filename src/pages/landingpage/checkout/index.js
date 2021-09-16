@@ -31,8 +31,6 @@ const CheckoutEvent = () => {
     };
   };
 
-  console.log(profile)
-
   useEffect(async() => {
     const {data, errors, message, success} = await OrderEventService.get({id});
     console.log(data, errors, message, success)

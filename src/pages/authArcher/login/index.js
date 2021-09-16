@@ -43,12 +43,21 @@ const LoginArcher = (props) => {
   };
 
   useEffect(() => {
-    path = props.location.state && props.location.state.from && props.location.state.from.pathname ? props.location.state.from.pathname : path;
+    let pathFrom = props.location.state && props.location.state.from && props.location.state.from.pathname ? props.location.state.from.pathname : null;
+  
     if (isLoggedIn) {
       if (path == null) {
-        history.push("/archer/dashboard")        
+        if (pathFrom != null){
+          history.push(pathFrom)        
+        }else{
+          history.push("/archer/dashboard")        
+        }
       }else{
         history.push(path)
+      }
+    }else{
+      if (pathFrom != null && path == null){
+        history.push("/archer/login?path="+pathFrom)
       }
     }
   }, [isLoggedIn])

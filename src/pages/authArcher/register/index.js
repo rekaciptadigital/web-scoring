@@ -16,11 +16,11 @@ import * as AuthenticationStore from "store/slice/authentication"
 // import images
 // import profileImg from "../../../assets/images/profile-img.png"
 
-const RegisterArcher = () => {
+const RegisterArcher = (props) => {
   const { isLoggedIn } = useSelector(AuthenticationStore.getAuthenticationStore)
   const [registerErrors, setRegisterErrors] = useState()
   const dispatch = useDispatch()
-  const path = new URLSearchParams(useLocation().search).get("path");
+  let path = new URLSearchParams(useLocation().search).get("path");
 
   let history = useHistory();
   
@@ -40,6 +40,8 @@ const RegisterArcher = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
+      path = props.location.state && props.location.state.from && props.location.state.from.pathname ? props.location.state.from.pathname : path;
+
       if (path == null) {
         history.push("/archer/dashboard")        
       }else{

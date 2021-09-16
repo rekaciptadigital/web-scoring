@@ -155,7 +155,7 @@ const LandingPage = () => {
 
                 <div className="button-items mt-4">
                   <Link to={`/event/register/process/${slug}`} className="btn btn-success me-1">
-                    DAFTAR
+                    DAFTAR EVENT
                   </Link>
                 </div>
               </div>
@@ -169,7 +169,7 @@ const LandingPage = () => {
                   <div className="text-center">
                     <div className="mt-4">
                       <div className="counter-number ico-countdown">
-                        <Countdown date="2021/12/31" renderer={renderer} />
+                        <Countdown date={event.eventStartDatetime != undefined ? event.eventStartDatetime.replace(/-/g, "/") : "2021/12/12"} renderer={renderer} />
                       </div>
                     </div>
                   </div>

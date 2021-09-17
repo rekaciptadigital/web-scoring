@@ -75,7 +75,7 @@ export const FulldayFormStep1 = ({ onFormFieldChange, formData, eventDetail }) =
         </Col>
         <Col lg={6}>
           <TextInput
-            label="Nama Klub (Opsional)"
+            label="Nama Klub"
             name="clubName"
             value={formData.clubName}
             onChange={handleChange}

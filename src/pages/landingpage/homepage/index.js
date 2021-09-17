@@ -138,6 +138,11 @@ const LandingPage = () => {
     },
   ];
 
+  let eventStartDate = new Date(event.eventStartDatetime)
+  let eventEndDate = new Date(event.eventEndDatetime)
+  // let regStartDate = new Date(event.registrationStartDatetime)
+  let regEndDate = new Date(event.registrationEndDatetime)
+
   return (
     <React.Fragment>
       <MetaTags>
@@ -157,7 +162,7 @@ const LandingPage = () => {
                 </h1>
                 <p className="font-size-14">
                   Penyelenggara: {event.admin?.name} <br />
-                  {event.eventStartDatetime} - {event.eventEndDatetime} <br />
+                  {eventStartDate.toDateString()} - {eventEndDate.toDateString()} <br />
                   {event.location}
                 </p>
 
@@ -230,7 +235,7 @@ const LandingPage = () => {
                             </Td>
                             <Td>
                               <p className="mb-0 font-weight-bold">
-                                {event.registrationEndDatetime}
+                                {regEndDate.toDateString()} - {regEndDate.toLocaleTimeString()}
                               </p>
                             </Td>
                           </tr>
@@ -245,8 +250,8 @@ const LandingPage = () => {
                             </Td>
                             <Td>
                               <p className="mb-0 font-weight-bold">
-                                {event.eventStartDatetime} -{" "}
-                                {event.eventEndDatetime}
+                                {eventStartDate.toDateString()}, {eventStartDate.getHours()+":"+eventStartDate.getMinutes()} WIB-{" "}
+                                {eventEndDate.toDateString()}, {eventEndDate.getHours()+":"+eventEndDate.getMinutes()} WIB
                               </p>
                             </Td>
                           </tr>

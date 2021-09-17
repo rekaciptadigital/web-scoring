@@ -17,6 +17,9 @@ function CardEvent(props) {
         navigator.clipboard.writeText(props.dataEvent.eventUrl)
         setCheck(true)
     }
+    let dStart = new Date(props.dataEvent.registrationStartDatetime)
+    let dEnd = new Date(props.dataEvent.registrationEndDatetime)
+    // console.log(d.toDateString())
     return (
         <div>
             <Card className="mini-stats-wid">
@@ -34,7 +37,7 @@ function CardEvent(props) {
                             <div>
                             <h4>{props.dataEvent.eventName}</h4>
                             <p className="text-muted fw-medium">
-                                {props.dataEvent.registrationStartDatetime} - {props.dataEvent.registrationEndDatetime}
+                                {dStart.toDateString()} - {dEnd.toDateString()}
                             </p>
                             <p className="text-muted fw-medium">
                                 {props.dataEvent.location} - {props.dataEvent.locationType}

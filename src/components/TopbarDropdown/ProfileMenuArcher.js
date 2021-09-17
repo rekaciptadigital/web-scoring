@@ -24,7 +24,6 @@ const ProfileMenuArcher = props => {
     const {data, success} = await ArcherService.profile();
       if (success) {
         setusername(data.name);
-        console.log("set profile",data);
         dispatch(AuthenticationStore.profile(data))
       }
     if (localStorage.getItem("authUser")) {

@@ -1,10 +1,10 @@
-import React, {useEffect} from "react"
-import PropTypes from "prop-types"
-import { Route, Redirect, useLocation } from "react-router-dom"
-import { getAuthenticationStore } from "store/slice/authentication"
-import { useSelector } from "react-redux"
+import React, { useEffect } from "react";
+import PropTypes from "prop-types";
+import { Route, Redirect } from "react-router-dom";
+import { getAuthenticationStore } from "store/slice/authentication";
+import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import * as AuthenticationStore from "store/slice/authentication"
+import * as AuthenticationStore from "store/slice/authentication";
 import { ArcherService } from "services";
 
 const AuthenticationArcherMiddleware = ({
@@ -13,24 +13,22 @@ const AuthenticationArcherMiddleware = ({
   isAuthProtected,
   ...rest
 }) => {
-  let { isLoggedIn } = useSelector(getAuthenticationStore)
+  let { isLoggedIn } = useSelector(getAuthenticationStore);
   // isLoggedIn = true;
   // isAuthProtected = false
-  console.log("archer login",isLoggedIn)
-  const dispatch = useDispatch()
-  const {pathname} = useLocation();
-  console.log("oath",pathname)
-  useEffect(async() => {
-    const {data, success} = await ArcherService.profile();
-      if (success) {
-        console.log("set profile first",data);
-        dispatch(AuthenticationStore.profile(data))
-      }
-    },[])
+
+  const dispatch = useDispatch();
+
+  useEffect(async () => {
+    const { data, success } = await ArcherService.profile();
+    if (success) {
+      dispatch(AuthenticationStore.profile(data));
+    }
+  }, []);
   return (
     <Route
       {...rest}
-      render={props => {
+      render={(props) => {
         if (isAuthProtected && !isLoggedIn) {
           return (
             <Redirect
@@ -39,24 +37,24 @@ const AuthenticationArcherMiddleware = ({
                 state: { from: props.location },
               }}
             />
-          )
+          );
         }
 
         return (
           <Layout>
             <Component {...props} />
           </Layout>
-        )
+        );
       }}
     />
-  )
-}
+  );
+};
 
 AuthenticationArcherMiddleware.propTypes = {
   isAuthProtected: PropTypes.bool,
   component: PropTypes.any,
   location: PropTypes.object,
   layout: PropTypes.any,
-}
+};
 
-export default AuthenticationArcherMiddleware
+export default AuthenticationArcherMiddleware;

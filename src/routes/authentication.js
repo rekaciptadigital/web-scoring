@@ -7,6 +7,8 @@ import Logout from "../pages/authentication/logout"
 import RecoverPassword from "../pages/authentication/recover-password"
 import Register from "../pages/authentication/register"
 import TwostepVerification from "../pages/authentication/two-step-verification"
+import React from "react"
+import { Redirect } from "react-router-dom"
 
 const authRoutes = [
   { path: "/authentication/logout", component: Logout },
@@ -18,6 +20,8 @@ const authRoutes = [
   { path: "/authentication/lock-screen", component: LockScreen },
   { path: "/authentication/two-step-verification", component: TwostepVerification },
   { path: "/authentication/confirm-mail", component: ConfirmMail },
+  { path: "/", exact: true, component: () => <Redirect to="/archer/dashboard" /> },
+
 ]
 
 export default authRoutes

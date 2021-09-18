@@ -14,7 +14,7 @@ import {
   // ModalHeader,
   // Button
 } from "reactstrap";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useParams } from "react-router";
 
 //Import Countdown
@@ -167,9 +167,9 @@ const LandingPage = () => {
                 </p>
 
                 <div className="button-items mt-4">
-                  <Link to={`/event/register/process/${slug}`} className="btn btn-success me-1">
+                  <a  target="_blank" rel="noreferrer" href={`/event/register/process/${slug}`} className="btn btn-success me-1">
                     DAFTAR EVENT
-                  </Link>
+                  </a>
                 </div>
                 <div>
               {/* <Button color="danger" onClick={toggle}>Modal</Button> */}
@@ -217,7 +217,7 @@ const LandingPage = () => {
           <div className="currency-price">
             <Row>
               {/* reder card boxes */}
-              <Col md="5">
+              <Col>
                 <Card>
                   <CardBody>
                     <Media>
@@ -291,13 +291,12 @@ const LandingPage = () => {
                   </CardBody>
                 </Card>
               </Col>
-              <Col md="7">
+              <Col>
                 <Card>
                   <CardBody>
-                    <Media>
-                      <Media body>
                         <h5 className="mb-3">Kategori Event</h5>
-                        <div className="col-11">
+                        <Row>
+                        <Col>
                           <PaginationProvider
                             pagination={paginationFactory(pageOptions)}
                             keyField="id"
@@ -313,8 +312,8 @@ const LandingPage = () => {
                               >
                                 {(toolkitProps) => (
                                   <React.Fragment>
-                                    <Row>
-                                      <Col xl="12">
+                                    {/* <Row> */}
+                                      {/* <Col xl="12"> */}
                                         <div className="table-responsive">
                                           <BootstrapTable
                                             keyField={"id"}
@@ -330,16 +329,15 @@ const LandingPage = () => {
                                             {...paginationTableProps}
                                           />
                                         </div>
-                                      </Col>
-                                    </Row>
+                                      {/* </Col> */}
+                                    {/* </Row> */}
                                   </React.Fragment>
                                 )}
                               </ToolkitProvider>
                             )}
                           </PaginationProvider>
-                        </div>
-                      </Media>
-                    </Media>
+                        </Col>
+                        </Row>
                   </CardBody>
                 </Card>
               </Col>

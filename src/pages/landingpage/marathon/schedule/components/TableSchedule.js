@@ -9,7 +9,6 @@ const TableSchedule = (props) => {
   const [payload, setPayload] = useState({});
 
   useEffect(async() => {
-    console.log("props",props.list)
   }, []);
 
 return (
@@ -19,6 +18,7 @@ return (
                     <CardActivity/>
                 </Col> */}
                 <Col sm={12}>
+                <p style={{color:"red"}}>{props.errorMessage}</p>
                     <Card style={{maxHeight:"500px",overflow:"auto"}}>
                         <CardBody>
                                 {props !=undefined && props.list? props.list.map((i) => (

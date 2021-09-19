@@ -28,6 +28,7 @@ const ScheduleMarathon = () => {
     const { member_id } = useParams();
     const [confirm, setConfirm] = useState(false);
     const [error, setError] = useState("");
+    const [errorSet, setErrorSet] = useState("");
 
     useEffect(() => {
         getSchedule()
@@ -44,16 +45,16 @@ const ScheduleMarathon = () => {
                 setParticipant(data.participant)
           }
         } else {
-            error
-            setError(message);
             console.error(message, errors);
         }
     } 
 
     const setSchedule = async (schedule) => {
-        const { success } = await ScheduleMemberService.set(schedule);
+        const { success, message } = await ScheduleMemberService.set(schedule);
         if (success) {
             getSchedule()
+        }else{
+            setErrorSet("*"+message);
         }
       };
     
@@ -64,7 +65,6 @@ const ScheduleMarathon = () => {
             getSchedule()
         }else{
             setError(message);
-            console.log("success",message)
         }
       };
   return (
@@ -85,7 +85,7 @@ const ScheduleMarathon = () => {
                                     <Label>Kualifikasi dapat dilakukan sesuai dengan jadwal yang ditentukan peserta, Anda dapat memilih maksimal 3 sesi pengambilan nilai kualifikasi.</Label>
                                 <div className="d-flex mt-3">
                                     <Col sm={8}>
-                                        <TableSchedule setSchedule={setSchedule} list={list} member_id={member_id} myschedule={mySchedule}/>
+                                        <TableSchedule errorMessage={errorSet} setSchedule={setSchedule} list={list} member_id={member_id} myschedule={mySchedule}/>
                                     </Col>
 
                                     <Col sm={4}>

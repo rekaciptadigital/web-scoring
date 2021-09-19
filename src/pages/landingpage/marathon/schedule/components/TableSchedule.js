@@ -6,6 +6,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 
 const TableSchedule = (props) => {
   const [confirm, setConfirm] = useState(false);
+  const [payload, setPayload] = useState({});
 
   useEffect(async() => {
     console.log("props",props.list)
@@ -49,7 +50,7 @@ return (
                                                         <div>
                                                         {confirm ? (
                                                                     <SweetAlert
-                                                                        title="Apakah anda yakin?"
+                                                                        title={"Apakah anda yakin ? "}
                                                                         warning
                                                                         showCancel
                                                                         confirmButtonText="Ya"
@@ -58,11 +59,7 @@ return (
                                                                         cancelBtnBsStyle="danger"
                                                                         onConfirm={() => {
                                                                         setConfirm(false);
-                                                                        props.setSchedule({
-                                                                          "participant_member_id":props?.member_id,
-                                                                          "session_id":s.id,
-                                                                          "date":i.date,
-                                                                        });
+                                                                        props.setSchedule(payload);
                                                                         }}
                                                                         onCancel={() => setConfirm(false)}
                                                                         ></SweetAlert>
@@ -71,7 +68,11 @@ return (
                                                               disabled={props.myschedule && props.myschedule.length >= 3 ? true:false}
                                                               className="btn-success btn btn-secondary"
                                                               type="button"
-                                                              onClick={() =>setConfirm(true)}
+                                                              onClick={() =>{setConfirm(true);setPayload({
+                                                                "participant_member_id":props?.member_id,
+                                                                "session_id":s.id,
+                                                                "date":i.date,
+                                                              })}}
                                                               >
                                                               Pilih
                                                           </Button>

@@ -24,6 +24,7 @@ const ScheduleMarathon = () => {
     const [list, setList] = useState([]);
     const [mySchedule, setMySchedule] = useState([]);
     const [participant, setParticipant] = useState({});
+    const [payload, setPayload] = useState({});
     const { member_id } = useParams();
     const [confirm, setConfirm] = useState(false);
 
@@ -119,9 +120,7 @@ const ScheduleMarathon = () => {
                                                                         cancelBtnBsStyle="danger"
                                                                         onConfirm={() => {
                                                                         setConfirm(false);
-                                                                        unsetSchedule({
-                                                                            "schedule_id": s.myScheduleId
-                                                                        });
+                                                                        unsetSchedule(payload);
                                                                         }}
                                                                         onCancel={() => setConfirm(false)}
                                                                         ></SweetAlert>
@@ -130,7 +129,9 @@ const ScheduleMarathon = () => {
                                                                         className="btn-danger btn btn-secondary"
                                                                         type="button"
                                                                         onClick={() => {
-                                                                            setConfirm(true);
+                                                                            setConfirm(true);setPayload({
+                                                                                "schedule_id": s.myScheduleId
+                                                                            })
                                                                           }}
                                                                         >
                                                                         batalkan

@@ -101,7 +101,7 @@ const ScheduleMarathon = () => {
                                                         </div>
 
                                                         <div>
-                                                          {!mySchedule? null : mySchedule.map((s,k) => (
+                                                          {mySchedule.length < 1 ? <div><br></br><p style={{textAlign:"center"}}>belum ada jadwal yang dipilih</p></div> : mySchedule.map((s,k) => (
                                                             <tr key={k}>
                                                                 <td>*</td>
                                                                 <td>

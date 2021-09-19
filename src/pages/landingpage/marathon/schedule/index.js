@@ -27,6 +27,7 @@ const ScheduleMarathon = () => {
     const [payload, setPayload] = useState({});
     const { member_id } = useParams();
     const [confirm, setConfirm] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         getSchedule()
@@ -43,7 +44,9 @@ const ScheduleMarathon = () => {
                 setParticipant(data.participant)
           }
         } else {
-          console.error(message, errors);
+            error
+            setError(message);
+            console.error(message, errors);
         }
     } 
 
@@ -55,9 +58,13 @@ const ScheduleMarathon = () => {
       };
     
     const unsetSchedule = async (schedule) => {
-        const { success } = await ScheduleMemberService.unset(schedule);
+        setError("");
+        const { message, success } = await ScheduleMemberService.unset(schedule);
         if (success) {
             getSchedule()
+        }else{
+            setError(message);
+            console.log("success",message)
         }
       };
   return (
@@ -139,6 +146,7 @@ const ScheduleMarathon = () => {
                                                                 </td>
                                                             </tr>
                                                           ))}
+                                                          <p style={{color:"red"}}>{error}</p>
                                                         </div>
                                                     </Media>
                                                 </Media>

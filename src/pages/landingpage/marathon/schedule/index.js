@@ -29,7 +29,7 @@ const ScheduleMarathon = () => {
 
     useEffect(() => {
         getSchedule()
-      }, [mySchedule]);
+      }, []);
     
     const getSchedule = async() =>{
         const { data, errors, message, success } = await ScheduleMemberService.get({

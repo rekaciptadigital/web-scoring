@@ -74,19 +74,18 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
   };
 
   return (
-    <Row>
+    <div>
       {isError ? (
         <SweetAlert
-          title="Oops, data invalid"
-          warning
-          onConfirm={() => {
-            setIsError(false);
+        title="Oops, data invalid"
+        warning
+        onConfirm={() => {
+          setIsError(false);
           }}
-        >
+          >
           Pastikan data terisi dengan benar dan lengkap
         </SweetAlert>
       ) : null}
-      <Col lg="12">
         <Card>
           <CardBody>
             <div className="wizard clearfix">
@@ -118,14 +117,15 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                       onClick={() => {
                         setactiveTab(3);
                       }}
-                    >
+                      >
                       <span className="number">3.</span> Selesai
                     </NavLink>
                   </NavItem> */}
                 </ul>
               </div>
               <div className="d-flex">
-                <Col sm={8}>
+                  <Row>
+                <Col sm={12} md={8}>
                   <div className="content clearfix mt-4">
                     <TabContent activeTab={activeTab}>
                       <TabPane tabId={1}>
@@ -151,9 +151,9 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                     </TabContent>
                   </div>
                 </Col>
-                <Col sm={4}>
+                <Col sm={12} md={4}>
                   {activeTab < 6 && (
-                    <div className="actions clearfix mt-3">
+                    <div className="mt-4">
                       <Card style={{ backgroundColor: "#FAFAFA" }}>
                         <CardBody>
                           <Media>
@@ -186,28 +186,28 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                               <br></br>
                               <h4
                                 style={{ color: "green", textAlign: "center" }}
-                              >
+                                >
                                 Rp {formData?.categoryEvent?.price || 0}
                               </h4>
                               <div className="d-grid gap-2 mt-5">
                                 {activeTab === 2 ? (
                                   <Button
-                                    type="button"
-                                    style={{ backgroundColor: "#0D47A1" }}
-                                    onClick={() => {
-                                      setConfirm(true);
-                                    }}
+                                  type="button"
+                                  style={{ backgroundColor: "#0D47A1" }}
+                                  onClick={() => {
+                                    setConfirm(true);
+                                  }}
                                   >
                                     Selesai
                                   </Button>
                                 ) : (
                                   <Button
-                                    type="button"
+                                  type="button"
                                     style={{ backgroundColor: "#0D47A1" }}
                                     onClick={() => {
                                       toggleTab(activeTab + 1);
                                     }}
-                                  >
+                                    >
                                     Pilih Pembayaran
                                   </Button>
                                 )}
@@ -225,7 +225,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                                       handleValidSubmit(formData);
                                     }}
                                     onCancel={() => setConfirm(false)}
-                                  ></SweetAlert>
+                                    ></SweetAlert>
                                 ) : null}
                               </div>
                             </Media>
@@ -235,12 +235,12 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                     </div>
                   )}
                 </Col>
+                  </Row>
               </div>
             </div>
           </CardBody>
         </Card>
-      </Col>
-    </Row>
+    </div>
   );
 };
 

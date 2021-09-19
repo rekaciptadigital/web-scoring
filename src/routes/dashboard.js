@@ -2,8 +2,6 @@
 import EventsNewFullday from "pages/dashboard/events/new/fullday"
 import EventsNewMarathon from "pages/dashboard/events/new/marathon"
 import ScoringNew from "pages/dashboard/scoring/new"
-import React from "react"
-import { Redirect } from "react-router-dom"
 import Dashboard from "../pages/dashboard"
 import ListCategory from "../pages/dashboard/category"
 import ListEvent from "../pages/dashboard/events"
@@ -26,7 +24,6 @@ const dashboardRoutes = [
   { path: "/dashboard/result/edit", component: EditResult},
   
   // this route should be at the end of all other routes
-  { path: "/", exact: true, component: () => <Redirect to="/dashboard/events" /> },
   { path: "/dashboard/events/new", component: EventsNew },
   { path: "/dashboard/events/new/fullday", component: EventsNewFullday },
   { path: "/dashboard/events/new/marathon", component: EventsNewMarathon },

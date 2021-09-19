@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react"
 import MetaTags from 'react-meta-tags';
 import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
-import { Container, Row, Col, Card, Media, CardBody, Button } from "reactstrap";
+import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import styled from 'styled-components';
 import Avatar from "../../../assets/images/users/avatar-man.png"
 import { OrderEventService } from "services";
@@ -48,35 +48,42 @@ const DashboardOrderEvent = () => {
       <HeaderForm />
  
         <Container fluid className="px-5 p-2">
-            <Row>
               <Card>
                 <CardBody>
-                    <Media>
-                        <div className="ms-3">
+            <Row>
+                <Col md={1}>
+                        <div>
                         <img
                             src={Avatar}
                             alt=""
                             className="avatar-md rounded-circle img-thumbnail"
-                        />
-                        </div>
-                        <Media body className="align-self-center">
-                        
-                        <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
-                        <div className="d-flex">
-                            <div className="mx-5 text-muted">
+                            style={{height: 'auto'}}
+                            />
+                    </div>
+                            </Col>
+                            <Col md={4}>
+                        <H5>Welcome to MyArchery.id dashboard</H5>
+                            <div className="text-muted">
                                 <h4>{userProfile?.name}</h4>
                                 {/* <H5>Klub FAST</H5> */}
                             </div>
-                            <div className="mx-5 text-muted">
+                            </Col>
+                <Col md={4}>
+                    <div>
+                        <div className="d-flex">
+                            <div className="text-muted" style={{marginRight: '1rem'}}>
                                 <h4>No. Ponsel</h4>
                                 <H5>{userProfile?.phoneNumber}</H5>
                             </div>
-                            <div className="mx-5 text-muted">
+                            <div className="text-muted">
                                 <h4>Email</h4>
                                 <H5>{userProfile?.email}</H5>
                             </div>
                         </div>
-                        </Media>
+                    </div>
+                </Col>
+                <Col md={3}>
+                    <div className='float-md-end'>
                           <Button
                             disabled
                               href="/full-day"
@@ -85,10 +92,11 @@ const DashboardOrderEvent = () => {
                               style={{backgroundColor: "#0D47A1",  }}>
                               Setting
                           </Button>
-                      </Media>
+                    </div>
+                </Col>
+            </Row>
                   </CardBody>
               </Card>
-            </Row>
 
             <Row>
                 {/* <Col sm={6}>
@@ -97,7 +105,7 @@ const DashboardOrderEvent = () => {
                 <Col sm={12}>
                     <Card>
                         <CardBody>
-                        <H5 className="mx-5">Your Event</H5>
+                        <H5 className="mx-5 text-center">Your Event</H5>
                                 {event.length < 1 ? 
                                     <div style={{paddingTop:"20px", verticalAlign: "middle", textAlign: "center"}}>
                                     <H5 className="mx-5">You haven&apos;t followed any events yet</H5>
@@ -108,10 +116,10 @@ const DashboardOrderEvent = () => {
                                     <CardBody>
                                         <Row>
                                             <Col md={3} sm={12}>
-                                                <div>
+                                                <div className="w-75 mx-auto">
                                                     <span>
                                                         {/* <i className="bx bx-home font-size-24"></i> */}
-                                                        <img src={i.archeryEvent.poster != null && i.archeryEvent.poster ? i.archeryEvent.poster : logoLight} height="130" />
+                                                        <img src={i.archeryEvent.poster != null && i.archeryEvent.poster ? i.archeryEvent.poster : logoLight} height="auto" width="150" />
                                                     </span>
                                                 </div>
                                             </Col>

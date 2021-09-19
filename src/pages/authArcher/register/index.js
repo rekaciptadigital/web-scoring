@@ -1,8 +1,8 @@
 // availity-reactstrap-validation
 import myachery from "assets/images/myachery/logo-myarchery.png"
 import React, { useState, useEffect } from "react"
-import google from "assets/images/myachery/Google.png"
-import facebook from "assets/images/myachery/Facebook.png"
+// import google from "assets/images/myachery/Google.png"
+// import facebook from "assets/images/myachery/Facebook.png"
 import ladBg from "assets/images/myachery/achery-lad.png"
 import { AvField, AvForm } from "availity-reactstrap-validation"
 import MetaTags from "react-meta-tags"
@@ -66,7 +66,7 @@ const RegisterArcher = (props) => {
                 <div style={{paddingTop: "20vh"}} className=" mx-auto">
                   <img src={myachery} />
                 </div>
-                <div style={{zIndex: '100'}}>
+                {/* <div style={{zIndex: '100'}}>
                   <div className="w-75 mx-auto">
                     <Link to={path != null ? "/archer/login?path="+path :"/archer/login"} className="text-decoration-none text-black-50">
                       <span style={{marginRight: '36px'}} className="font-size-18 text-white">Masuk</span>
@@ -75,7 +75,7 @@ const RegisterArcher = (props) => {
                       <span className="font-size-18 text-white">Daftar</span>
                     </Link>
                   </div>
-                </div>
+                </div> */}
               </div>
             </Col>
             <Col md={7} sm={12} xs={12}>
@@ -158,11 +158,24 @@ const RegisterArcher = (props) => {
                           Daftar
                         </button>
                       </div>
+                      <div className="mt-5 text-center">
+                <p>
+                  Sudah memiliki akun masuk ?{" "}
+                  <Link to="/archer/login" className="fw-medium text-primary">
+                    {" "}
+                    Disini{" "}
+                  </Link>{" "}
+                </p>
+                {/* <p>
+                  © {new Date().getFullYear()} Skote. Crafted with{" "}
+                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
+                </p> */}
+              </div>
               </AvForm>
-                    <div className="d-flex justify-content-center pt-5">
+                    {/* <div className="d-flex justify-content-center pt-5">
                       <img src={facebook} style={{cursor: 'pointer'}} />
                       <img src={google} style={{cursor: 'pointer'}} />
-                    </div>
+                    </div> */}
                 </div>
             </Col>
           </Row>

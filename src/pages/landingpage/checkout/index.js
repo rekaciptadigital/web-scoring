@@ -1,15 +1,14 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import MetaTags from "react-meta-tags";
-import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
-import { Container, Row, Card, Media, CardBody, Button } from "reactstrap";
+import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import styled from "styled-components";
 import Avatar from "../../../assets/images/users/avatar-man.png";
 import { OrderEventService } from "services";
 import { useParams } from "react-router";
 import logoLight from "../../../assets/images/myachery/myachery.png";
-import { useSelector } from "react-redux"
-import { getAuthenticationStore } from "store/slice/authentication"
+import { useSelector } from "react-redux";
+import { getAuthenticationStore } from "store/slice/authentication";
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -24,25 +23,33 @@ const CheckoutEvent = () => {
   let { userProfile } = useSelector(getAuthenticationStore);
 
   const handleClick = () => {
-    console.log(info.transactionInfo?.snapToken, 'klik')
-    window.snap.pay(`${info.transactionInfo?.snapToken}`)
-    return () => {
-      document.body.removeChild(scriptTag);
-    };
+    window.snap.pay(`${info.transactionInfo?.snapToken}`, {
+      onSuccess: function () {
+        console.log("success");
+      },
+      onPending: function () {
+        console.log("pending");
+      },
+      onError: function () {
+        console.log("error");
+      },
+      onClose: function () {
+        console.log("customer closed the popup without finishing the payment");
+      },
+    });
   };
 
-  useEffect(async() => {
-    const {data, errors, message, success} = await OrderEventService.get({id});
-    console.log(data, errors, message, success)
+  useEffect(async () => {
+    const { data, errors, message, success } = await OrderEventService.get({
+      id,
+    });
     if (success) {
       if (data) {
-        console.log(data)
         setInfo(data);
-        }
-      } else {
-        console.log(errors)
-        console.log(message)
       }
+    } else {
+      console.error(message, errors);
+    }
   }, []);
 
   return (
@@ -54,35 +61,42 @@ const CheckoutEvent = () => {
       <HeaderForm />
 
       <Container fluid className="px-5 p-2">
-      <Row>
-              <Card>
+      <Card>
                 <CardBody>
-                    <Media>
-                        <div className="ms-3">
+            <Row>
+                <Col md={1}>
+                        <div>
                         <img
                             src={Avatar}
                             alt=""
                             className="avatar-md rounded-circle img-thumbnail"
-                        />
-                        </div>
-                        <Media body className="align-self-center">
-                        
-                        <H5 className="mx-5">Welcome to MyArchery.id dashboard</H5>
-                        <div className="d-flex">
-                            <div className="mx-5 text-muted">
+                            style={{height: 'auto'}}
+                            />
+                    </div>
+                            </Col>
+                            <Col md={4}>
+                        <H5>Welcome to MyArchery.id dashboard</H5>
+                            <div className="text-muted">
                                 <h4>{userProfile?.name}</h4>
                                 {/* <H5>Klub FAST</H5> */}
                             </div>
-                            <div className="mx-5 text-muted">
+                            </Col>
+                <Col md={4}>
+                    <div>
+                        <div className="d-flex">
+                            <div className="text-muted" style={{marginRight: '1rem'}}>
                                 <h4>No. Ponsel</h4>
                                 <H5>{userProfile?.phoneNumber}</H5>
                             </div>
-                            <div className="mx-5 text-muted">
+                            <div className="text-muted">
                                 <h4>Email</h4>
                                 <H5>{userProfile?.email}</H5>
                             </div>
                         </div>
-                        </Media>
+                    </div>
+                </Col>
+                <Col md={3}>
+                    <div className='float-md-end'>
                           <Button
                             disabled
                               href="/full-day"
@@ -91,86 +105,119 @@ const CheckoutEvent = () => {
                               style={{backgroundColor: "#0D47A1",  }}>
                               Setting
                           </Button>
-                      </Media>
+                    </div>
+                </Col>
+            </Row>
                   </CardBody>
               </Card>
-            </Row>
 
-        <Row>
           <Card>
             <CardBody>
-              <Media>
-                <div className="ms-3">
-                <img src={info.archeryEvent != undefined && info.archeryEvent.poster != null && info.archeryEvent.poster ? info.archeryEvent.poster : logoLight} height="130" />
+              <Row>
+                <Col md={3} sm={12}>
+                <div className="mb-4">
+                  <img
+                    src={
+                      info.archeryEvent != undefined &&
+                      info.archeryEvent.poster != null &&
+                      info.archeryEvent.poster
+                        ? info.archeryEvent.poster
+                        : logoLight
+                    }
+                    height="130"
+                  />
                 </div>
-                <Media body className="align-self-center">
-                  <H5 className="mx-5">Detail Order</H5>
-                  <div className="d-flex">
-                    <div className="mx-5 text-muted">
+                </Col>
+                <Col md={9} sm={12}>
+                  <Row>
+                    <Col sm={12}>
+                  <H5 className="mx-md-5">Detail Order</H5>
+                  <div className="d-md-flex">
+                    <div className="mx-md-5 text-muted">
                       <H5>ID ORDER</H5>
                       <h4>{info.transactionInfo?.orderId}</h4>
                     </div>
-                    <div className="mx-5 text-muted">
+                    <div className="mx-md-5 text-muted">
                       <H5>Total</H5>
                       <h4>Rp {info.transactionInfo?.total}</h4>
                     </div>
-                    <div className="mx-5 text-muted">
+                    <div className="mx-md-5 text-muted">
                       <H5>Status Pembayaran</H5>
 
-                      {info.transactionInfo != undefined && info.transactionInfo.statusId == 1 ?
-                        <h4 style={{color: "green"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4>                                                 
-                      : info.transactionInfo != undefined && info.transactionInfo.statusId == 4 ? 
-                        <h4 style={{color: "yellow"}} className="fw-medium"><i>{info.transactionInfo.status}</i></h4> 
-                      :
-                      <h4 style={{color: "red"}} className="fw-medium"><i>{info.transactionInfo ? info.transactionInfo.status : ""}</i></h4> 
-                      }
+                      {info.transactionInfo != undefined &&
+                      info.transactionInfo.statusId == 1 ? (
+                        <h4 style={{ color: "green" }} className="fw-medium">
+                          <i>{info.transactionInfo.status}</i>
+                        </h4>
+                      ) : info.transactionInfo != undefined &&
+                        info.transactionInfo.statusId == 4 ? (
+                        <h4 style={{ color: "yellow" }} className="fw-medium">
+                          <i>{info.transactionInfo.status}</i>
+                        </h4>
+                      ) : (
+                        <h4 style={{ color: "red" }} className="fw-medium">
+                          <i>
+                            {info.transactionInfo
+                              ? info.transactionInfo.status
+                              : ""}
+                          </i>
+                        </h4>
+                      )}
                     </div>
                   </div>
                   <hr />
-                  <div className="d-flex">
-                    <div className="mx-5 text-muted">
-                      <H5>Event</H5>
+                  </Col>
+                  <Col sm={12}>
+                      <H5 className="mx-md-5">Event</H5>
+                  <div className="d-md-flex">
+                    <div className="mx-md-5 text-muted">
                       <h5>{info.archeryEvent?.eventName}</h5>
                     </div>
-                    <div className="mx-5 text-muted">
+                    <div className="mx-md-5 text-muted">
                       <H5>Lokasi</H5>
                       <h5>{info.archeryEvent?.location}</h5>
                     </div>
-                    <div className="mx-5 text-muted">
+                    <div className="mx-md-5 text-muted">
                       <H5>Peserta</H5>
-                        {info.participant && info.participant.members ? info.participant.members.map((i) => (
+                      {info.participant && info.participant.members ? (
+                        info.participant.members.map((i) => (
                           <li key={i}>{i.name}</li>
-                        )):<></>
-                        }
+                        ))
+                      ) : (
+                        <></>
+                      )}
                     </div>
-                    <div className="mx-5 text-muted">
+                    <div className="mx-md-5 text-muted">
                       <H5>Kategori</H5>
-                      <p>{info.transactionInfo?.orderId}</p>
+                      <h6>{info.participant?.categoryLabel}</h6>
                     </div>
                   </div>
                   <hr />
-                  <div className="d-flex">
-                    <div className="mx-5 text-muted">
+                  </Col>
+                  <Col sm={12}>
+                  <div className="d-flex justify-content-between">
+                    <div className="mx-md-5 text-muted">
                       <H5>Tanggal Kualifikasi</H5>
                       <p>{info.archeryEvent?.eventStartDatetime}</p>
                     </div>
-                    <div className="mx-5 text-muted">
+                    <div className="mx-md-5 text-muted">
+                    {info.transactionInfo != undefined &&
+                      info.transactionInfo.statusId == 1 ? 
                       <Button
-                        title="jadwal bisa dipilih pada hari ahad 19-09-2021"
-                        href=""
-                        // href="/marathon/dashboard"
+                        href={info.participant ?"/archer/event/marathon/qualification/schedule/"+info.participant.members[0].id : ""}
                         type="button"
                         size="sm"
                         style={{ backgroundColor: "#0D47A1" }}
-                        isReadonly
                       >
                         Pilih Jadwal Kualifikasi
                       </Button>
+                      :null}
                     </div>
                   </div>
                   <hr />
-                </Media>
-
+                  </Col>
+                  {info.transactionInfo != undefined &&
+                      info.transactionInfo.statusId == 4 ?
                 <Button
                   type="button"
                   size="md"
@@ -179,13 +226,13 @@ const CheckoutEvent = () => {
                 >
                   LAKUKAN PEMBAYARAN
                 </Button>
-              </Media>
+                : null}
+                </Row>
+                </Col>
+                </Row>
             </CardBody>
           </Card>
-        </Row>
       </Container>
-
-      <Footer />
     </React.Fragment>
   );
 };

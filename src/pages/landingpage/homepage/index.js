@@ -8,8 +8,13 @@ import {
   CardBody,
   CardHeader,
   Media,
+  // Modal,
+  // ModalBody,
+  // ModalFooter,
+  // ModalHeader,
+  // Button
 } from "reactstrap";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useParams } from "react-router";
 
 //Import Countdown
@@ -70,6 +75,9 @@ const LandingPage = () => {
   const [imglight, setimglight] = useState(true);
   const [navClass, setnavClass] = useState("");
   const [event, setEvent] = useState({});
+  // const [modal, setModal] = useState(false);
+
+  // const toggle = () => setModal(!modal);
 
   // Use ComponentDidMount
   useEffect(() => {
@@ -130,6 +138,11 @@ const LandingPage = () => {
     },
   ];
 
+  let eventStartDate = new Date(event.eventStartDatetime)
+  let eventEndDate = new Date(event.eventEndDatetime)
+  // let regStartDate = new Date(event.registrationStartDatetime)
+  let regEndDate = new Date(event.registrationEndDatetime)
+
   return (
     <React.Fragment>
       <MetaTags>
@@ -149,15 +162,28 @@ const LandingPage = () => {
                 </h1>
                 <p className="font-size-14">
                   Penyelenggara: {event.admin?.name} <br />
-                  {event.eventStartDatetime} - {event.eventEndDatetime} <br />
+                  {eventStartDate.toDateString()} - {eventEndDate.toDateString()} <br />
                   {event.location}
                 </p>
 
                 <div className="button-items mt-4">
-                  <Link to={`/event/register/process/${slug}`} className="btn btn-success me-1">
+                  <a  target="_blank" rel="noreferrer" href={`/event/register/process/${slug}`} className="btn btn-success me-1">
                     DAFTAR EVENT
-                  </Link>
+                  </a>
                 </div>
+                <div>
+              {/* <Button color="danger" onClick={toggle}>Modal</Button> */}
+              {/* <Modal isOpen={modal} toggle={toggle}>
+                <ModalHeader toggle={toggle}>Modal title</ModalHeader>
+                <ModalBody>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onClick={toggle}>Do Something</Button>{' '}
+                  <Button color="secondary" onClick={toggle}>Cancel</Button>
+                </ModalFooter>
+              </Modal> */}
+            </div>
               </div>
             </Col>
             <Col lg="5" md="8" sm="10" className="ms-lg-auto">
@@ -191,7 +217,7 @@ const LandingPage = () => {
           <div className="currency-price">
             <Row>
               {/* reder card boxes */}
-              <Col md="5">
+              <Col>
                 <Card>
                   <CardBody>
                     <Media>
@@ -209,7 +235,7 @@ const LandingPage = () => {
                             </Td>
                             <Td>
                               <p className="mb-0 font-weight-bold">
-                                {event.registrationEndDatetime}
+                                {regEndDate.toDateString()} - {regEndDate.toLocaleTimeString()}
                               </p>
                             </Td>
                           </tr>
@@ -224,8 +250,8 @@ const LandingPage = () => {
                             </Td>
                             <Td>
                               <p className="mb-0 font-weight-bold">
-                                {event.eventStartDatetime} -{" "}
-                                {event.eventEndDatetime}
+                                {eventStartDate.toDateString()}, {eventStartDate.getHours()+":"+eventStartDate.getMinutes()} WIB-{" "}
+                                {eventEndDate.toDateString()}, {eventEndDate.getHours()+":"+eventEndDate.getMinutes()} WIB
                               </p>
                             </Td>
                           </tr>
@@ -265,13 +291,12 @@ const LandingPage = () => {
                   </CardBody>
                 </Card>
               </Col>
-              <Col md="7">
+              <Col>
                 <Card>
                   <CardBody>
-                    <Media>
-                      <Media body>
                         <h5 className="mb-3">Kategori Event</h5>
-                        <div className="col-11">
+                        <Row>
+                        <Col>
                           <PaginationProvider
                             pagination={paginationFactory(pageOptions)}
                             keyField="id"
@@ -287,8 +312,8 @@ const LandingPage = () => {
                               >
                                 {(toolkitProps) => (
                                   <React.Fragment>
-                                    <Row>
-                                      <Col xl="12">
+                                    {/* <Row> */}
+                                      {/* <Col xl="12"> */}
                                         <div className="table-responsive">
                                           <BootstrapTable
                                             keyField={"id"}
@@ -304,16 +329,15 @@ const LandingPage = () => {
                                             {...paginationTableProps}
                                           />
                                         </div>
-                                      </Col>
-                                    </Row>
+                                      {/* </Col> */}
+                                    {/* </Row> */}
                                   </React.Fragment>
                                 )}
                               </ToolkitProvider>
                             )}
                           </PaginationProvider>
-                        </div>
-                      </Media>
-                    </Media>
+                        </Col>
+                        </Row>
                   </CardBody>
                 </Card>
               </Col>

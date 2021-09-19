@@ -47,8 +47,12 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
     const { data, errors, message, success } = await EventsService.register(d)
       if (success) {
         if (data) {
+<<<<<<< HEAD
+          history.push("/dashboard/eventsi")
+=======
           history.push("/dashboard/events")
           dispatch(EventsStore.errors(errors))
+>>>>>>> d8b705fcdabf7c57ef3871e32d8c926948ca6247
         }
     } else {
       dispatch(EventsStore.errors(errors))

@@ -189,7 +189,7 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-md-5 text-muted">
                       <H5>Kategori</H5>
-                      <p>{info.transactionInfo?.orderId}</p>
+                      <h6>{info.participant?.categoryLabel}</h6>
                     </div>
                   </div>
                   <hr />
@@ -201,22 +201,23 @@ const CheckoutEvent = () => {
                       <p>{info.archeryEvent?.eventStartDatetime}</p>
                     </div>
                     <div className="mx-md-5 text-muted">
+                    {info.transactionInfo != undefined &&
+                      info.transactionInfo.statusId == 1 ? 
                       <Button
-                        title="jadwal bisa dipilih pada hari ahad 19-09-2021"
-                        href=""
-                        // href="/marathon/dashboard"
+                        href={info.participant ?"/archer/event/marathon/qualification/schedule/"+info.participant.members[0].id : ""}
                         type="button"
                         size="sm"
                         style={{ backgroundColor: "#0D47A1" }}
-                        isReadonly
                       >
                         Pilih Jadwal Kualifikasi
                       </Button>
+                      :null}
                     </div>
                   </div>
                   <hr />
                   </Col>
-
+                  {info.transactionInfo != undefined &&
+                      info.transactionInfo.statusId == 4 ?
                 <Button
                   type="button"
                   size="md"
@@ -225,6 +226,7 @@ const CheckoutEvent = () => {
                 >
                   LAKUKAN PEMBAYARAN
                 </Button>
+                : null}
                 </Row>
                 </Col>
                 </Row>

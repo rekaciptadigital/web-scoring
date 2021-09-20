@@ -195,7 +195,7 @@ const LandingPage = () => {
                   <div className="text-center">
                     <div className="mt-4">
                       <div className="counter-number ico-countdown">
-                        <Countdown date={event.eventStartDatetime != undefined ? event.eventStartDatetime.replace(/-/g, "/") : "2021/12/12"} renderer={renderer} />
+                        <Countdown date={event.eventEndDatetime != undefined ? event.eventEndDatetime.replace(/-/g, "/") : "2021/12/12"} renderer={renderer} />
                       </div>
                     </div>
                   </div>

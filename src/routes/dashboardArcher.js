@@ -3,7 +3,7 @@ import RegisterDone from "../pages/landingpage/fullday/components/RegisterDone"
 import MarathonLandingPage from "../pages/landingpage/marathon/homepage"
 import RegisterMarathon from "../pages/landingpage/marathon";
 import RegisterMarathonDone from "../pages/landingpage/marathon/components/RegisterMarathonDone";
-import DashboardMarathon from "../pages/landingpage/marathon/dashboard";
+import ScheduleMarathon from "../pages/landingpage/marathon/schedule";
 import CheckoutEvent from "../pages/landingpage/checkout";
 import DashboardOrderEvent from "../pages/landingpage/dashboard";
 import ArcherLogout from "pages/authArcher/logout";
@@ -16,7 +16,7 @@ const routerDasboardArcher = [
   { path: "/marathon", component: MarathonLandingPage },
   { path: "/marathon/register", component: RegisterMarathon },
   { path: "/marathon/register-done", component: RegisterMarathonDone },
-  { path: "/marathon/dashboard", component: DashboardMarathon },
+  { path: "/archer/event/marathon/qualification/schedule/:member_id", component: ScheduleMarathon },
 
   { path: "/checkout-event/:id", component: CheckoutEvent, exact: true },
   { path: "/archer/dashboard", component: DashboardOrderEvent, exact: true },

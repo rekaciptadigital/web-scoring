@@ -20,7 +20,7 @@ const authRoutes = [
   { path: "/authentication/lock-screen", component: LockScreen },
   { path: "/authentication/two-step-verification", component: TwostepVerification },
   { path: "/authentication/confirm-mail", component: ConfirmMail },
-  { path: "/", exact: true, component: () => <Redirect to="/archer/dashboard" /> },
+  { path: "/", exact: true, component: () => <Redirect to="/dashboard/events" /> },
 
 ]
 

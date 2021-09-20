@@ -22,7 +22,7 @@ return (
                     <Card style={{maxHeight:"500px",overflow:"auto"}}>
                         <CardBody>
                                 {props !=undefined && props.list? props.list.map((i) => (
-                                    <div style={{marginBottom:"20px",borderRadius:"10px",border:"2px solid #0064ff"}} key={i.id}>
+                                    <div style={{marginBottom:"20px",borderRadius:"10px"}} key={i.id}>
                                     <CardBody>
                                         <Row>
                                             <Col md={3} sm={12}>

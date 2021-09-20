@@ -6,6 +6,7 @@ export { default as DateInput } from './Form/DateInput';
 export { default as DatetimeInput } from './Form/DatetimeInput';
 export { default as FileUpload } from './Form/FileUpload';
 export { default as ImageUpload } from './Form/ImageUpload';
+export { default as EmailInput } from './Form/EmailInput';
 export { default as NumberInput } from './Form/NumberInput';
 export { default as RadioButtonInput } from './Form/RadioButtonInput';
 export { default as RadioInput } from './Form/RadioInput';

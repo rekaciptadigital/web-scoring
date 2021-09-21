@@ -50,6 +50,7 @@ const ScheduleMarathon = () => {
     } 
 
     const setSchedule = async (schedule) => {
+        setErrorSet("");
         const { success, message } = await ScheduleMemberService.set(schedule);
         if (success) {
             getSchedule()

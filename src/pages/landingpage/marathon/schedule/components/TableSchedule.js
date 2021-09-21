@@ -1,6 +1,12 @@
 import React, {useState, useEffect} from "react"
 
-import { Row, Col, Card, CardBody, Table, Button } from "reactstrap";
+import { Row,
+  Col, 
+  Card, 
+  CardBody, 
+  Table, 
+  Button } from "reactstrap";
+import {DateInput} from "components";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 
@@ -18,6 +24,14 @@ return (
                     <CardActivity/>
                 </Col> */}
                 <Col sm={12}>
+                <Col md={4} sm={12}>
+                <DateInput
+                          label="Pilih Tanggal"
+                          name="qualificationStartDatetime"
+                          // value={}
+                          // onChange={}
+                        />
+                </Col>
                 <p style={{color:"red"}}>{props.errorMessage}</p>
                     <Card style={{maxHeight:"500px",overflow:"auto"}}>
                         <CardBody>
@@ -65,7 +79,7 @@ return (
                                                                         ></SweetAlert>
                                                                     ) : null}
                                                           <Button
-                                                              disabled={props.myschedule && props.myschedule.length >= 3 ? true:false}
+                                                              disabled={(props.myschedule && props.myschedule.length >= 3) || (s.mySession == 1) ? true:false}
                                                               className="btn-success btn btn-secondary"
                                                               type="button"
                                                               onClick={() =>{setConfirm(true);setPayload({

@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react"
 import MetaTags from 'react-meta-tags';
 import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
-import { Container, Row, Col,  Card, Media, CardBody, Button} from "reactstrap";
+import { Container, Row, Col,  Card, CardBody, Button} from "reactstrap";
 import styled from 'styled-components';
 import TableSchedule from "./components/TableSchedule";
 import CardInfo from "./components/CardInfo";
@@ -77,34 +77,28 @@ const ScheduleMarathon = () => {
       <HeaderForm />
  
         <Container fluid className="px-5 p-2">
-            <Row>
                 <CardInfo info={participant}/>
                 <Card>
                     <CardBody>
-                        <Media>
-                            <Media body>
-                                    <Label>Kualifikasi dapat dilakukan sesuai dengan jadwal yang ditentukan peserta, Anda dapat memilih maksimal 3 sesi pengambilan nilai kualifikasi.</Label>
-                                <div className="d-flex mt-3">
-                                    <Col sm={8}>
+                        <Label>Kualifikasi dapat dilakukan sesuai dengan jadwal yang ditentukan peserta, Anda dapat memilih maksimal 3 sesi pengambilan nilai kualifikasi.</Label>
+            <Row>
+                            <div className="d-md-flex mt-3">
+                                    <Col md={8} sm={12}>
                                         <TableSchedule errorMessage={errorSet} setSchedule={setSchedule} list={list} member_id={member_id} myschedule={mySchedule}/>
                                     </Col>
 
-                                    <Col sm={4}>
+                                    <Col md={4} sm={12}>
 
                                         <Card style={{backgroundColor: "#FAFAFA"}}>
                                             <CardBody>
-                                                <Media>
-                                                    <Media body>
+                                                
                                                         <label>Kategori Lomba terdaftar</label>
                                                         <p>{participant.categoryLabel}</p>
-                                                    </Media>
-                                                </Media>
+                                                    
                                             </CardBody>
                                         </Card>
                                         <Card style={{backgroundColor: "#FAFAFA"}}>
                                             <CardBody>
-                                                <Media>
-                                                    <Media body>
                                                         <div>
                                                             <label>Jadwal Anda</label>
                                                         </div>
@@ -149,17 +143,13 @@ const ScheduleMarathon = () => {
                                                           ))}
                                                           <p style={{color:"red"}}>{error}</p>
                                                         </div>
-                                                    </Media>
-                                                </Media>
                                             </CardBody>
                                         </Card>
                                     </Col>
                                 </div>
-                            </Media>
-                        </Media>
+            </Row>
                     </CardBody>
                 </Card>
-            </Row>
         </Container>
 
       <Footer />

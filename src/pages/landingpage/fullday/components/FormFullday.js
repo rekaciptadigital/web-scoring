@@ -86,6 +86,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
           Pastikan data terisi dengan benar dan lengkap
         </SweetAlert>
       ) : null}
+      <div className="overflow-auto">
         <Card>
           <CardBody>
             <div className="wizard clearfix">
@@ -240,6 +241,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
             </div>
           </CardBody>
         </Card>
+        </div>
     </div>
   );
 };

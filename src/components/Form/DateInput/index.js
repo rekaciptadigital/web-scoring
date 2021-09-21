@@ -15,12 +15,14 @@ const DateInput = ({
   error,
   disabled,
   readOnly,
+  options={},
 }) => {
   const handleChange = e => {
+    console.log("sss",e)
     if (onChange)
       onChange({
         key: name,
-        value: moment(new Date(e)).format("Y-MM-D"),
+        value: e.length > 0 ? moment(new Date(e)).format("Y-MM-D") : "",
       });
   };
 
@@ -33,11 +35,9 @@ const DateInput = ({
             _.get(error, name) ? "is-invalid" : ""
           }`}
           placeholder="Tanggal/Bulan/Tahun"
-          options={{
-            altInput: true,
+          options={{altInput: true,
             altFormat: "d/m/Y",
-            dateFormat: "Y-m-d",
-          }}
+            dateFormat: "Y-m-d",...options}}
           value={value}
           onChange={e => handleChange(e)}
           disabled={disabled}

@@ -24,11 +24,14 @@ const ScheduleMarathon = () => {
     const [list, setList] = useState([]);
     const [mySchedule, setMySchedule] = useState([]);
     const [participant, setParticipant] = useState({});
+    const [event, setEvent] = useState({});
     const [payload, setPayload] = useState({});
     const { member_id } = useParams();
     const [confirm, setConfirm] = useState(false);
     const [error, setError] = useState("");
     const [errorSet, setErrorSet] = useState("");
+    const [date, setDate] = useState("");
+    const [dateEnable, setDateEnable] = useState([]);
 
     useEffect(() => {
         getSchedule()
@@ -40,9 +43,17 @@ const ScheduleMarathon = () => {
         });
         if (success) {
           if (data) {
+                let de = [];
+                data.schedules.map((s)=>{
+                    de.push(s.date);
+                })
                 setList(data.schedules)
+                setDateEnable(de)
                 setMySchedule(data.mySchedule)
                 setParticipant(data.participant)
+                if(date == "")
+                    setDate(data.schedules[0].date)
+                setEvent(data.event)
           }
         } else {
             console.error(message, errors);
@@ -84,7 +95,7 @@ const ScheduleMarathon = () => {
             <Row>
                             <div className="d-md-flex mt-3">
                                     <Col md={8} sm={12}>
-                                        <TableSchedule errorMessage={errorSet} setSchedule={setSchedule} list={list} member_id={member_id} myschedule={mySchedule}/>
+                                        <TableSchedule dateEnable={dateEnable} setDate={setDate} date={date} eventDetail={event} errorMessage={errorSet} setSchedule={setSchedule} list={list} member_id={member_id} myschedule={mySchedule}/>
                                     </Col>
 
                                     <Col md={4} sm={12}>

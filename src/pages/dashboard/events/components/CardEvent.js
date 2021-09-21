@@ -14,11 +14,11 @@ import {
 function CardEvent(props) {
     const [check, setCheck] = useState(false)
     const getCheckCopy = () => {
-        navigator.clipboard.writeText(props.dataEvent.eventUrl)
+        navigator.clipboard.writeText(props.detail.event.eventUrl)
         setCheck(true)
     }
-    let dStart = new Date(props.dataEvent.registrationStartDatetime)
-    let dEnd = new Date(props.dataEvent.registrationEndDatetime)
+    let dStart = new Date(props.detail.event.registrationStartDatetime)
+    let dEnd = new Date(props.detail.event.registrationEndDatetime)
     // console.log(d.toDateString())
     return (
         <div>
@@ -29,25 +29,26 @@ function CardEvent(props) {
                             <div>
                                 <span>
                                     {/* <i className="bx bx-home font-size-24"></i> */}
-                                    <img src={props.dataEvent.poster ? props.dataEvent.poster : satuDashboard} height="120" width="200" />
+                                    <img src={props.detail.event.poster ? props.detail.event.poster : satuDashboard} height="120" width="200" />
                                 </span>
                             </div>
                         </Col>
                         <Col md={6} sm={12}>
                             <div>
-                            <h4>{props.dataEvent.eventName}</h4>
+                            <h4>{props.detail.event.eventName}</h4>
                             <p className="text-muted fw-medium">
                                 {dStart.toDateString()} - {dEnd.toDateString()}
                             </p>
                             <p className="text-muted fw-medium">
-                                {props.dataEvent.location} - {props.dataEvent.locationType}
+                                {props.detail.event.location} - {props.detail.event.locationType}
                             </p>
                             <div className="mb-2">
                                 <div className="d-flex">
-                                    <a style={{marginRight: '0.5rem'}} target="_blank" rel="noreferrer" href={props.dataEvent.eventUrl}>Link Event</a>
+                                    <a style={{marginRight: '0.5rem'}} target="_blank" rel="noreferrer" href={props.detail.event.eventUrl}>Link Event</a>
                                     <a onClick={getCheckCopy}>Copy Link</a>
                                     {!check ? null : (<i className="bx bx-check"></i>)}
                                 </div>
+                                <label style={{color:"green"}}>{props.detail.totalParticipant} peserta terdaftar</label>
                             </div>
                                 <Button disabled color="primary">Manage Event</Button>
                             </div>

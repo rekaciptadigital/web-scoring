@@ -7,6 +7,7 @@ import ScheduleMarathon from "../pages/landingpage/marathon/schedule";
 import CheckoutEvent from "../pages/landingpage/checkout";
 import DashboardOrderEvent from "../pages/landingpage/dashboard";
 import ArcherLogout from "pages/authArcher/logout";
+import ProfileArcher from "pages/landingpage/profile";
 
 const routerDasboardArcher = [
   { path: "/event/register/process/:slug", component: RegisterFullday, exact: true },
@@ -20,6 +21,8 @@ const routerDasboardArcher = [
   { path: "/checkout-event/:id", component: CheckoutEvent, exact: true },
   { path: "/archer/dashboard", component: DashboardOrderEvent, exact: true },
   { path: "/archer/logout", component: ArcherLogout },
+
+  { path: "/archer/dashboard/profile", component: ProfileArcher},
 ];
 
 export default routerDasboardArcher;

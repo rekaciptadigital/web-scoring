@@ -1,15 +1,20 @@
 import React, {useState, useEffect} from "react"
 
-import { Row, Col, Card, CardBody, Table, Button } from "reactstrap";
+import { Row,
+  Col, 
+  Card, 
+  CardBody, 
+  Table, 
+  Button } from "reactstrap";
+import {DateInput} from "components";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 
-const TableSchedule = (props) => {
+const TableSchedule = ({dateEnable, setDate, date, errorMessage,setSchedule,list,member_id,myschedule}) => {
   const [confirm, setConfirm] = useState(false);
   const [payload, setPayload] = useState({});
-
-  useEffect(async() => {
-    console.log("props",props.list)
+  
+  useEffect(() => {
   }, []);
 
 return (
@@ -19,10 +24,21 @@ return (
                     <CardActivity/>
                 </Col> */}
                 <Col sm={12}>
+                <Col md={4} sm={12}>
+                <DateInput
+                          label="Pilih Tanggal"
+                          name="qualificationStartDatetime"
+                          value={date}
+                          options={{enable:dateEnable,maxDate : dateEnable[dateEnable.length - 1], minDate: dateEnable[0]}}
+                          onChange={(e)=>{setDate(e.value)}}
+                        />
+                </Col>
+                <p style={{color:"red"}}>{errorMessage}</p>
                     <Card style={{maxHeight:"500px",overflow:"auto"}}>
                         <CardBody>
-                                {props !=undefined && props.list? props.list.map((i) => (
-                                    <div style={{marginBottom:"20px",borderRadius:"10px",border:"2px solid #0064ff"}} key={i.id}>
+                                {list.length > 0? list.map((i) => (
+                                    i.date == date ?
+                                    <div style={{marginBottom:"20px",borderRadius:"10px"}} key={i.id}>
                                     <CardBody>
                                         <Row>
                                             <Col md={3} sm={12}>
@@ -59,17 +75,17 @@ return (
                                                                         cancelBtnBsStyle="danger"
                                                                         onConfirm={() => {
                                                                         setConfirm(false);
-                                                                        props.setSchedule(payload);
+                                                                        setSchedule(payload);
                                                                         }}
                                                                         onCancel={() => setConfirm(false)}
                                                                         ></SweetAlert>
                                                                     ) : null}
                                                           <Button
-                                                              disabled={props.myschedule && props.myschedule.length >= 3 ? true:false}
+                                                              disabled={(myschedule && myschedule.length >= 3) || (s.mySession == 1) ? true:false}
                                                               className="btn-success btn btn-secondary"
                                                               type="button"
                                                               onClick={() =>{setConfirm(true);setPayload({
-                                                                "participant_member_id":props?.member_id,
+                                                                "participant_member_id":member_id,
                                                                 "session_id":s.id,
                                                                 "date":i.date,
                                                               })}}
@@ -85,7 +101,7 @@ return (
                                             </Col>
                                         </Row>
                                     </CardBody>
-                                    </div>
+                                    </div> : <></>
                                     )):null}
                         </CardBody>
                     </Card>

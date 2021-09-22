@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react"
 import MetaTags from 'react-meta-tags';
 import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
-import { Container, Row, Col,  Card, Media, CardBody, Button} from "reactstrap";
+import { Container, Row, Col,  Card, CardBody, Button} from "reactstrap";
 import styled from 'styled-components';
 import TableSchedule from "./components/TableSchedule";
 import CardInfo from "./components/CardInfo";
@@ -24,10 +24,14 @@ const ScheduleMarathon = () => {
     const [list, setList] = useState([]);
     const [mySchedule, setMySchedule] = useState([]);
     const [participant, setParticipant] = useState({});
+    const [event, setEvent] = useState({});
     const [payload, setPayload] = useState({});
     const { member_id } = useParams();
     const [confirm, setConfirm] = useState(false);
     const [error, setError] = useState("");
+    const [errorSet, setErrorSet] = useState("");
+    const [date, setDate] = useState("");
+    const [dateEnable, setDateEnable] = useState([]);
 
     useEffect(() => {
         getSchedule()
@@ -39,21 +43,30 @@ const ScheduleMarathon = () => {
         });
         if (success) {
           if (data) {
+                let de = [];
+                data.schedules.map((s)=>{
+                    de.push(s.date);
+                })
                 setList(data.schedules)
+                setDateEnable(de)
                 setMySchedule(data.mySchedule)
                 setParticipant(data.participant)
+                if(date == "")
+                    setDate(data.schedules[0].date)
+                setEvent(data.event)
           }
         } else {
-            error
-            setError(message);
             console.error(message, errors);
         }
     } 
 
     const setSchedule = async (schedule) => {
-        const { success } = await ScheduleMemberService.set(schedule);
+        setErrorSet("");
+        const { success, message } = await ScheduleMemberService.set(schedule);
         if (success) {
             getSchedule()
+        }else{
+            setErrorSet("*"+message);
         }
       };
     
@@ -64,7 +77,6 @@ const ScheduleMarathon = () => {
             getSchedule()
         }else{
             setError(message);
-            console.log("success",message)
         }
       };
   return (
@@ -76,34 +88,28 @@ const ScheduleMarathon = () => {
       <HeaderForm />
  
         <Container fluid className="px-5 p-2">
-            <Row>
                 <CardInfo info={participant}/>
                 <Card>
                     <CardBody>
-                        <Media>
-                            <Media body>
-                                    <Label>Kualifikasi dapat dilakukan sesuai dengan jadwal yang ditentukan peserta, Anda dapat memilih maksimal 3 sesi pengambilan nilai kualifikasi.</Label>
-                                <div className="d-flex mt-3">
-                                    <Col sm={8}>
-                                        <TableSchedule setSchedule={setSchedule} list={list} member_id={member_id} myschedule={mySchedule}/>
+                        <Label>Kualifikasi dapat dilakukan sesuai dengan jadwal yang ditentukan peserta, Anda dapat memilih maksimal 3 sesi pengambilan nilai kualifikasi.</Label>
+            <Row>
+                            <div className="d-md-flex mt-3">
+                                    <Col md={8} sm={12}>
+                                        <TableSchedule dateEnable={dateEnable} setDate={setDate} date={date} eventDetail={event} errorMessage={errorSet} setSchedule={setSchedule} list={list} member_id={member_id} myschedule={mySchedule}/>
                                     </Col>
 
-                                    <Col sm={4}>
+                                    <Col md={4} sm={12}>
 
                                         <Card style={{backgroundColor: "#FAFAFA"}}>
                                             <CardBody>
-                                                <Media>
-                                                    <Media body>
+                                                
                                                         <label>Kategori Lomba terdaftar</label>
                                                         <p>{participant.categoryLabel}</p>
-                                                    </Media>
-                                                </Media>
+                                                    
                                             </CardBody>
                                         </Card>
                                         <Card style={{backgroundColor: "#FAFAFA"}}>
                                             <CardBody>
-                                                <Media>
-                                                    <Media body>
                                                         <div>
                                                             <label>Jadwal Anda</label>
                                                         </div>
@@ -148,17 +154,13 @@ const ScheduleMarathon = () => {
                                                           ))}
                                                           <p style={{color:"red"}}>{error}</p>
                                                         </div>
-                                                    </Media>
-                                                </Media>
                                             </CardBody>
                                         </Card>
                                     </Col>
                                 </div>
-                            </Media>
-                        </Media>
+            </Row>
                     </CardBody>
                 </Card>
-            </Row>
         </Container>
 
       <Footer />

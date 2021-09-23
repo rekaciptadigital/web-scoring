@@ -32,6 +32,8 @@ const ListEvent = () => {
   useEffect(() => {
     getEvent()
   }, [])
+  
+  console.log(listEvent)
 
   return (
     <React.Fragment>
@@ -78,7 +80,7 @@ const ListEvent = () => {
           {/* / */}
 
           <Row>
-            {listEvent.map((list) => {
+            {/* {listEvent.map((list) => {
               return (
                 <>
                 <Col key={list.event.id} md={6}>
@@ -86,7 +88,10 @@ const ListEvent = () => {
                 </Col>
                 </>
               )
-            })}
+            })} */}
+            <Col md={6}>
+              <CardEvent />
+            </Col>
           </Row>
         </Container>
       </div>

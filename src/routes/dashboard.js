@@ -11,6 +11,7 @@ import ListScoring from "../pages/dashboard/scoring"
 import ListResult from "pages/dashboard/results"
 import Bagan from "pages/dashboard/results/bagan"
 import EditResult from "pages/dashboard/results/edit"
+import ListSchedule from "../pages/dashboard/schedule"
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -22,6 +23,7 @@ const dashboardRoutes = [
   { path: "/dashboard/result", component: ListResult},
   { path: "/dashboard/result/bagan", component: Bagan},
   { path: "/dashboard/result/edit", component: EditResult},
+  { path: "/dashboard/schedule", component: ListSchedule},
   
   // this route should be at the end of all other routes
   { path: "/dashboard/events/new", component: EventsNew },

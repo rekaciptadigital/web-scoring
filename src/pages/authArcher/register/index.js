@@ -60,7 +60,7 @@ const RegisterArcher = (props) => {
       <Container fluid>
         <div>
           <Row>
-            <Col md={5} sm={12} xs={12}>
+            <Col className="d-md-block d-none" md={5} sm={12} xs={12}>
             <img src={ladBg} style={{height: '100vh', zIndex: "-1", position: 'absolute', left:'-1px', width: 'auto'}} />
               <div>
                 <div style={{paddingTop: "20vh"}} className=" mx-auto">

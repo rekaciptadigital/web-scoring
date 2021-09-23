@@ -9,6 +9,8 @@ import { useParams } from "react-router";
 import logoLight from "../../../assets/images/myachery/myachery.png";
 import { useSelector } from "react-redux";
 import { getAuthenticationStore } from "store/slice/authentication";
+// import QRCode from "qrcode.react";
+import { QRCode } from 'react-qr-svg'
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -151,11 +153,14 @@ const CheckoutEvent = () => {
                         </h4>
                       ) : info.transactionInfo != undefined &&
                         info.transactionInfo.statusId == 4 ? (
-                        <h4 style={{ color: "yellow" }} className="fw-medium">
-                          <i>{info.transactionInfo.status}</i>
+                        <h4 style={{ color: "red" }} className="fw-medium">
+                          <i className="me-sm-2">{info.transactionInfo.status}</i>
+                          <span className="btn btn-primary mt-2" onClick={() => {
+                            window.location.reload();
+                          }}>Check status</span>
                         </h4>
                       ) : (
-                        <h4 style={{ color: "red" }} className="fw-medium">
+                        <h4 style={{ color: "gray" }} className="fw-medium">
                           <i>
                             {info.transactionInfo
                               ? info.transactionInfo.status
@@ -163,6 +168,16 @@ const CheckoutEvent = () => {
                           </i>
                         </h4>
                       )}
+                    </div>
+                    <div>
+                      {/* <QRCode value={info.transactionInfo?.orderId} /> */}
+                      <QRCode 
+                        bgColor="#FFFFFF"
+                        fgColor="#000000"
+                        level="Q"
+                        style={{ width: 100 }}
+                        value={`${info.transactionInfo?.orderId}`}
+                      />
                     </div>
                   </div>
                   <hr />

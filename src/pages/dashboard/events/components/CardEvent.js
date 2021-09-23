@@ -26,54 +26,54 @@ function CardEvent(props) {
     // let dEnd = new Date(props.detail.event.registrationEndDatetime)
     // console.log(d.toDateString())
 
-    if (!props.detail) {
-        return (
-            <dvi>
-                <Card className="mini-stats-wid">
-                <CardBody>
-                    <Row>
-                        <Col md={6} sm={12}>
-                            <div>
-                                <span>
-                                    {/* <i className="bx bx-home font-size-24"></i> */}
-                                    <img src={satuDashboard} />
-                                </span>
-                            </div>
-                        </Col>
-                        <Col md={6} sm={12}>
-                            <div>
-                            <div className="d-flex justify-content-between">
-                                <h4>Jakarta Archery 2021</h4>
-                                <Dropdown
-                                    isOpen={menu}
-                                    toggle={() => setMenu(!menu)}
-                                >
-                                    <DropdownToggle tag="span">
-                                    <h3 className="bx bx-dots-vertical" style={{cursor: 'pointer'}}></h3>
-                                    </DropdownToggle>
-                                    <DropdownMenu className="dropdown-menu-end">
-                                    <DropdownItem tag="a" href="/dashboard/schedule">
-                                        {" "}
-                                        <span>Lihat Jadwal dan Peserta</span>
-                                    </DropdownItem>
-                                    </DropdownMenu>
-                                </Dropdown>
-                            </div>
-                            <p className="text-muted fw-medium">
-                                13 Agustus - 16 Agustus 2021
-                            </p>
-                            <p className="text-muted fw-medium">
-                                Gelora Bung Karno
-                            </p>
-                            <Button color="primary">Manage Event</Button>
-                            </div>
-                        </Col>
-                    </Row>
-                </CardBody>
-            </Card>
-            </dvi>
-        )
-    }
+    // if (!props.detail) {
+    //     return (
+    //         <dvi>
+    //             <Card className="mini-stats-wid">
+    //             <CardBody>
+    //                 <Row>
+    //                     <Col md={6} sm={12}>
+    //                         <div>
+    //                             <span>
+    //                                 {/* <i className="bx bx-home font-size-24"></i> */}
+    //                                 <img src={satuDashboard} />
+    //                             </span>
+    //                         </div>
+    //                     </Col>
+    //                     <Col md={6} sm={12}>
+    //                         <div>
+    //                         <div className="d-flex justify-content-between">
+    //                             <h4>Jakarta Archery 2021</h4>
+    //                             <Dropdown
+    //                                 isOpen={menu}
+    //                                 toggle={() => setMenu(!menu)}
+    //                             >
+    //                                 <DropdownToggle tag="span">
+    //                                 <h3 className="bx bx-dots-vertical" style={{cursor: 'pointer'}}></h3>
+    //                                 </DropdownToggle>
+    //                                 <DropdownMenu className="dropdown-menu-end">
+    //                                 <DropdownItem tag="a" href="/dashboard/schedule">
+    //                                     {" "}
+    //                                     <span>Lihat Jadwal dan Peserta</span>
+    //                                 </DropdownItem>
+    //                                 </DropdownMenu>
+    //                             </Dropdown>
+    //                         </div>
+    //                         <p className="text-muted fw-medium">
+    //                             13 Agustus - 16 Agustus 2021
+    //                         </p>
+    //                         <p className="text-muted fw-medium">
+    //                             Gelora Bung Karno
+    //                         </p>
+    //                         <Button color="primary">Manage Event</Button>
+    //                         </div>
+    //                     </Col>
+    //                 </Row>
+    //             </CardBody>
+    //         </Card>
+    //         </dvi>
+    //     )
+    // }
 
     return (
         <div>

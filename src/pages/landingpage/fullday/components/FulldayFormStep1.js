@@ -14,8 +14,7 @@ import { stringUtil } from "utils";
 export const FulldayFormStep1 = ({
   onFormFieldChange,
   formData,
-  eventDetail,
-  errors,
+  eventDetail
 }) => {
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
@@ -59,6 +58,24 @@ export const FulldayFormStep1 = ({
           value={formData.type}
         />
       </Col>
+      <Label>Kategori Lomba</Label>
+      <Row>
+        <SelectInput
+        className="overflow-auto"
+          options={
+            eventDetail?.flatCategories?.map((option) => {
+              return {
+                ...option,
+                id: `${option.teamCategoryId}.${option.ageCategoryId}.${option.competitionCategoryId}.${option.distanceId}`,
+                label: option.archeryEventCategoryLabel,
+              };
+            }) || []
+          }
+          name="categoryEvent"
+          onChange={handleChange}
+          value={formData.categoryEvent}
+        />
+      </Row>
       <Col lg={6}>
         <TextInput
           label="Email"
@@ -73,7 +90,6 @@ export const FulldayFormStep1 = ({
           name="phone"
           value={formData.phone || ""}
           onChange={handleChange}
-          error={errors}
         />
       </Col>
       <Col lg={6}>
@@ -82,7 +98,6 @@ export const FulldayFormStep1 = ({
           name="clubName"
           value={formData.clubName || ""}
           onChange={handleChange}
-          error={errors}
         />
       </Col>
 
@@ -104,7 +119,6 @@ export const FulldayFormStep1 = ({
             name="teamName"
             value={formData.city || ""}
             onChange={handleChange}
-            error={errors}
           />
         </Col>
       ) : (
@@ -115,7 +129,6 @@ export const FulldayFormStep1 = ({
               name="participantMembers.0.name"
               value={formData.participantMembers[0].name || ""}
               onChange={handleChange}
-              error={errors}
             />
           </Col>
 
@@ -125,7 +138,6 @@ export const FulldayFormStep1 = ({
               name="participantMembers.0.birthdate"
               value={formData.participantMembers[0].birthdate}
               onChange={handleChange}
-              error={errors}
             />
           </Col>
 
@@ -136,30 +148,10 @@ export const FulldayFormStep1 = ({
               onChange={handleChange}
               options={selectConstants.gender}
               value={formData.participantMembers[0].gender}
-              error={errors}
             />
           </Col>
         </>
       )}
-
-      <Label>Kategori Lomba</Label>
-      <Row>
-        <SelectInput
-          options={
-            eventDetail?.flatCategories?.map((option) => {
-              return {
-                ...option,
-                id: `${option.teamCategoryId}.${option.ageCategoryId}.${option.competitionCategoryId}.${option.distanceId}`,
-                label: option.archeryEventCategoryLabel,
-              };
-            }) || []
-          }
-          name="categoryEvent"
-          onChange={handleChange}
-          value={formData.categoryEvent}
-          error={errors}
-        />
-      </Row>
 
       {formData.type.id === "Tim" &&
         formData.eventCategories.map((eventCategory, index) => (

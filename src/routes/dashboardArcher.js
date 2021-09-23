@@ -8,10 +8,13 @@ import CheckoutEvent from "../pages/landingpage/checkout";
 import DashboardOrderEvent from "../pages/landingpage/dashboard";
 import ArcherLogout from "pages/authArcher/logout";
 import ProfileArcher from "pages/landingpage/profile";
+import React from "react"
+import { Redirect } from "react-router-dom"
 
 const routerDasboardArcher = [
   { path: "/event/register/process/:slug", component: RegisterFullday, exact: true },
   { path: "/fullday/register-done", component: RegisterDone },
+  { path: "/", exact: true, component: () => <Redirect to="/archer/dashboard" /> },
 
   { path: "/marathon", component: MarathonLandingPage },
   { path: "/marathon/register", component: RegisterMarathon },

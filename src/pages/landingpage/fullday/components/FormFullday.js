@@ -39,8 +39,8 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
   formData.type = selectConstants.fulldayAudience[0];
   const history = useHistory();
   const [activeTab, setactiveTab] = useState(1);
-  const [isError, setIsError] = useState(false);
-  const [errors, setErrors] = useState(null);
+  const [isError, setIsError] = useState("");
+  const [error, setError] = useState(null);
   const [confirm, setConfirm] = useState(false);
 
   function toggleTab(tab) {
@@ -52,11 +52,12 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
   }
 
   const handleValidSubmit = async () => {
-    setErrors(null);
-    setIsError(false);
+    setError(false);
+    setIsError("");
     const localFormData = { ...formData };
     localFormData.eventId = eventDetail ? eventDetail.id : 0;
     localFormData.type = formData.type?.id;
+    let tmpGender = localFormData.participantMembers[0].gender;
     localFormData.participantMembers[0].gender =
       formData.participantMembers[0].gender?.id;
     const { data, errors, message, success } = await OrderEventService.register(
@@ -67,26 +68,36 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
         history.push("/checkout-event/" + data.archeryEventParticipantId);
       }
     } else {
-      setErrors(errors);
-      setIsError(true);
+      localFormData.participantMembers[0].gender = tmpGender
+      setError(true);
+      if (message) {
+        if (errors) {
+          setIsError("Pastikan semua data sudah terisi");        
+        }else{
+          setIsError(message);        
+        }
+      }else{
+        setIsError("Pastikan data terisi dengan benar dan lengkap");
+      }
       console.error(message, errors);
     }
   };
 
   return (
     <div>
-      {isError ? (
+      {error ? (
         <SweetAlert
         title="Oops, data invalid"
         warning
         onConfirm={() => {
-          setIsError(false);
+          setIsError("");
+          setError(false);
           }}
           >
-          Pastikan data terisi dengan benar dan lengkap
+          {isError}
         </SweetAlert>
       ) : null}
-      <div className="overflow-auto">
+      <div>
         <Card>
           <CardBody>
             <div className="wizard clearfix">
@@ -134,7 +145,6 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                           onFormFieldChange={onFormFieldChange}
                           formData={formData}
                           eventDetail={eventDetail}
-                          errors={errors}
                         />
                       </TabPane>
                       <TabPane tabId={2}>

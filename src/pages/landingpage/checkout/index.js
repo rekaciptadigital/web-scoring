@@ -117,7 +117,7 @@ const CheckoutEvent = () => {
             <CardBody>
               <Row>
                 <Col md={3} sm={12}>
-                <div className="mb-4">
+                <div style={{textAlign:"center"}} className="mb-4">
                   <img
                     src={
                       info.archeryEvent != undefined &&
@@ -171,13 +171,15 @@ const CheckoutEvent = () => {
                     </div>
                     <div>
                       {/* <QRCode value={info.transactionInfo?.orderId} /> */}
-                      <QRCode 
-                        bgColor="#FFFFFF"
-                        fgColor="#000000"
-                        level="Q"
-                        style={{ width: 100 }}
-                        value={`${info.transactionInfo?.orderId}`}
-                      />
+                      {info.transactionInfo != undefined &&
+                        info.transactionInfo.statusId == 0 ?
+                          <QRCode 
+                            bgColor="#FFFFFF"
+                            fgColor="#000000"
+                            level="Q"
+                            style={{ width: 100 }}
+                            value={`${info.transactionInfo?.orderId}`}
+                          /> : ""}
                     </div>
                   </div>
                   <hr />

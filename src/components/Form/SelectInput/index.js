@@ -56,6 +56,7 @@ const SelectInput = ({
     <div>
       {label && <Label>{label}</Label>}
       <Select
+        maxMenuHeight={220}
         id={id}
         value={selectValue}
         onChange={handleChange}

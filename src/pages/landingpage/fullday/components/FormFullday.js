@@ -209,7 +209,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                                       toggleTab(activeTab + 1);
                                     }}
                                     >
-                                    Pilih Pembayaran
+                                    Lanjutkan Pembayaran
                                   </Button>
                                 )}
                                 {confirm ? (

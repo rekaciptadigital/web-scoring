@@ -70,7 +70,7 @@ const LoginArcher = (props) => {
       <Container fluid>
         <div>
           <Row>
-            <Col md={5} sm={12} xs={12}>
+            <Col className="d-md-block d-none" md={5} sm={12} xs={12}>
               <img
                 src={ladBg}
                 style={{

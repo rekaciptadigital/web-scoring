@@ -11,7 +11,7 @@ import {
 import { useParams } from "react-router";
 import Footer from "layouts/landingpage/Footer";
 import { EventsService } from "services";
-import bgauth from "../../../assets/images/myachery/bg-landingpage.jpg"
+// import bgauth from "../../../assets/images/myachery/bg-landingpage.jpg"
 import logomyarchery from "../../../assets/images/myachery/myachery.png"
 import Countdown from "react-countdown";
 import "./components/sass/landingpage.scss"
@@ -81,7 +81,7 @@ const LandingPage = () => {
         </div>
         <Container>
             <div>
-                <img className="w-100 h-landing" src={bgauth} />
+                <img className="w-100 h-landing" src={event.poster} />
             </div>
             <div>
               <Row className="mt-4">

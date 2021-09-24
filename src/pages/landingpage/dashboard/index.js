@@ -136,9 +136,9 @@ const DashboardOrderEvent = () => {
                                                 {i.transactionInfo.statusId == 1 ?
                                                     <h5 style={{color: "green"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5>                                                 
                                                 : i.transactionInfo.statusId == 4 ? 
-                                                    <h5 style={{color: "yellow"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5> 
-                                                :
                                                     <h5 style={{color: "red"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5> 
+                                                :
+                                                    <h5 style={{color: "gray"}} className="fw-medium"><i>{i.transactionInfo.status}</i></h5> 
                                                 }
                                                 <Button
                                                     href={`/checkout-event/${i.participant.id}`}

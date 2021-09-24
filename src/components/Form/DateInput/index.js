@@ -18,11 +18,11 @@ const DateInput = ({
   options={},
 }) => {
   const handleChange = e => {
-    console.log("sss",e)
+    console.log("sss",options)
     if (onChange)
       onChange({
         key: name,
-        value: e.length > 0 ? moment(new Date(e)).format("Y-MM-D") : "",
+        value: e.length > 0 ? moment(new Date(e)).format("Y-MM-DD") : "",
       });
   };
 

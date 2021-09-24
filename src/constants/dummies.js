@@ -175,7 +175,6 @@ const qualificationSchedule = [
   {"id": 4, "date": "23 Agustus 2021", "session": "4", "time": "13.00-14.00", "quota": "20/100"},
 ]
 
-
 export default {
   eventCompetitionCategories,
   eventAgeCategories,

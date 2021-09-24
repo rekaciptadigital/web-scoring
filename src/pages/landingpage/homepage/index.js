@@ -15,7 +15,7 @@ import { EventsService } from "services";
 import logomyarchery from "../../../assets/images/myachery/myachery.png"
 import Countdown from "react-countdown";
 import "./components/sass/landingpage.scss"
-import { dummyHtml } from './components/htmldummy'
+// import { dummyHtml } from './components/htmldummy'
 
 
 const LandingPage = () => {
@@ -97,7 +97,7 @@ const LandingPage = () => {
                   </p>
                   <div>
                     <div className="clearfix mt-4">
-                      <div dangerouslySetInnerHTML={{__html: dummyHtml}} />
+                      <div dangerouslySetInnerHTML={{__html: event.description}} />
                     </div>
                   </div>
                   {/* Detail data hardcode */}

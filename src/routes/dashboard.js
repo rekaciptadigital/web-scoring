@@ -12,8 +12,6 @@ import ListResult from "pages/dashboard/results"
 import Bagan from "pages/dashboard/results/bagan"
 import EditResult from "pages/dashboard/results/edit"
 import ListSchedule from "../pages/dashboard/schedule"
-import React from "react"
-import { Redirect } from "react-router-dom"
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -28,7 +26,6 @@ const dashboardRoutes = [
   { path: "/dashboard/schedule", component: ListSchedule},
   
   // this route should be at the end of all other routes
-  { path: "/", exact: true, component: () => <Redirect to="/dashboard/events" /> },
   { path: "/dashboard/events/new", component: EventsNew },
   { path: "/dashboard/events/new/fullday", component: EventsNewFullday },
   { path: "/dashboard/events/new/marathon", component: EventsNewMarathon },

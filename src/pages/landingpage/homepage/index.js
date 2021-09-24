@@ -14,6 +14,8 @@ import { EventsService } from "services";
 // import bgauth from "../../../assets/images/myachery/bg-landingpage.jpg"
 import logomyarchery from "../../../assets/images/myachery/myachery.png"
 import Countdown from "react-countdown";
+import "./components/sass/landingpage.scss"
+// import { dummyHtml } from './components/htmldummy'
 
 
 const LandingPage = () => {
@@ -79,7 +81,7 @@ const LandingPage = () => {
         </div>
         <Container>
             <div>
-                <img width="100%" height="531.03" className="h-auto" src={event.poster} />
+                <img className="w-100 h-landing" src={event.poster} />
             </div>
             <div>
               <Row className="mt-4">
@@ -93,12 +95,18 @@ const LandingPage = () => {
                     {eventStartDate.toDateString()} - {eventEndDate.toDateString()} <br />
                     {event.location}
                   </p>
+                  <div>
+                    <div className="clearfix mt-4">
+                      <div dangerouslySetInnerHTML={{__html: event.description}} />
+                    </div>
+                  </div>
+                  {/* Detail data hardcode */}
                 </div>
                 </Col>
                 <Col md={4}>
                 <Card className="overflow-hidden mb-0 mt-5 mt-lg-0">
                 <CardHeader className="text-center">
-                  <h5 className="mb-0">Time Left</h5>
+                  <h5 className="mb-0">Waktu Acara</h5>
                 </CardHeader>
                 <CardBody>
                   <div className="text-center">
@@ -108,12 +116,6 @@ const LandingPage = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* <div className="mt-5">
-                    <div className="clearfix mt-4">
-                      <div dangerouslySetInnerHTML={{__html: event.description}} />
-                    </div>
-                  </div> */}
                 </CardBody>
               </Card>
               <div className="button-items mt-4">
@@ -121,36 +123,6 @@ const LandingPage = () => {
                     DAFTAR EVENT
                   </a>
                 </div>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={8}>
-                  {/* <div>
-                    <div className="mb-4">
-                      <h4>Deskripsi</h4>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                    <div className="mb-4">
-                      <h4>Benefit Peserta</h4>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                    <div className="mb-4">
-                      <h4>FAQ</h4>
-                      <ol>
-                        <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit,</li>
-                        <li>Ut enim ad minim veniam, quis nostrud exercitatio</li>
-                        <li>laboris nisi ut aliquip ex ea commodo consequa</li>
-                        <li>irure dolor in reprehenderit in voluptate velit es</li>
-                        <li>dolore eu fugiat nulla pariatur. </li>
-                      </ol>
-                    </div>
-                  </div> */}
-                   <div className="mt-5">
-                    <div className="clearfix mt-4">
-                      <div dangerouslySetInnerHTML={{__html: event.description}} />
-                    </div>
-                  </div>
-
                 </Col>
               </Row>
             </div>

@@ -93,38 +93,6 @@ const LandingPage = () => {
                     {eventStartDate.toDateString()} - {eventEndDate.toDateString()} <br />
                     {event.location}
                   </p>
-                </div>
-                </Col>
-                <Col md={4}>
-                <Card className="overflow-hidden mb-0 mt-5 mt-lg-0">
-                <CardHeader className="text-center">
-                  <h5 className="mb-0">Time Left</h5>
-                </CardHeader>
-                <CardBody>
-                  <div className="text-center">
-                    <div className="mt-4">
-                      <div className="counter-number ico-countdown">
-                        <Countdown date={event.eventEndDatetime != undefined ? event.eventEndDatetime.replace(/-/g, "/") : "2021/12/12"} renderer={renderer} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* <div className="mt-5">
-                    <div className="clearfix mt-4">
-                      <div dangerouslySetInnerHTML={{__html: event.description}} />
-                    </div>
-                  </div> */}
-                </CardBody>
-              </Card>
-              <div className="button-items mt-4">
-                  <a  target="_blank" rel="noreferrer" href={`/event/register/process/${slug}`} className="btn btn-success me-1 w-100">
-                    DAFTAR EVENT
-                  </a>
-                </div>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={8}>
                   {/* <div>
                     <div className="mb-4">
                       <h4>Deskripsi</h4>
@@ -145,12 +113,33 @@ const LandingPage = () => {
                       </ol>
                     </div>
                   </div> */}
-                   <div className="mt-5">
+                  <div>
                     <div className="clearfix mt-4">
                       <div dangerouslySetInnerHTML={{__html: event.description}} />
                     </div>
                   </div>
-
+                </div>
+                </Col>
+                <Col md={4}>
+                <Card className="overflow-hidden mb-0 mt-5 mt-lg-0">
+                <CardHeader className="text-center">
+                  <h5 className="mb-0">Time Left</h5>
+                </CardHeader>
+                <CardBody>
+                  <div className="text-center">
+                    <div className="mt-4">
+                      <div className="counter-number ico-countdown">
+                        <Countdown date={event.eventEndDatetime != undefined ? event.eventEndDatetime.replace(/-/g, "/") : "2021/12/12"} renderer={renderer} />
+                      </div>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+              <div className="button-items mt-4">
+                  <a  target="_blank" rel="noreferrer" href={`/event/register/process/${slug}`} className="btn btn-success me-1 w-100">
+                    DAFTAR EVENT
+                  </a>
+                </div>
                 </Col>
               </Row>
             </div>

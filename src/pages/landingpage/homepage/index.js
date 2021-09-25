@@ -161,7 +161,9 @@ const LandingPage = () => {
                   <div>
                     <div className="clearfix mt-4">
                       <div dangerouslySetInnerHTML={{__html: event.description}} />
+                      <a href="http://www.africau.edu/images/default/sample.pdf" download>
                       <Button color="success">Download Technical Handbook</Button>
+                      </a>
                     </div>
                   </div>
                   {/* Detail data hardcode */}

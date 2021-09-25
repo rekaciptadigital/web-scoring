@@ -161,7 +161,7 @@ const RegisterArcher = (props) => {
                       <div className="mt-5 text-center">
                 <p>
                   Sudah memiliki akun masuk ?{" "}
-                  <Link to="/archer/login" className="fw-medium text-primary">
+                  <Link to={path != null ? "/archer/login?path="+path :"/archer/login"} className="fw-medium text-primary">
                     {" "}
                     Disini{" "}
                   </Link>{" "}

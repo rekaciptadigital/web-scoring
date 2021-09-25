@@ -127,8 +127,10 @@ const DashboardOrderEvent = () => {
                                                 <div>
                                                 <h4>{i.archeryEvent.eventName}</h4>
                                                 <p className="text-muted fw-medium">
-                                                    {i.archeryEvent.eventType}
-                                                    {i.archeryEvent.flatCategories[0] ? i.archeryEvent.flatCategories[0].archeryEventCategoryLabel : null}
+                                                    {i.archeryEvent.eventType} 
+                                                    <br></br>
+                                                    <br></br>
+                                                    {i.participant ? i.participant.categoryLabel : null}
                                                 </p>
                                                 <p className="text-muted fw-medium">
                                                    Order ID : {i.transactionInfo.orderId}

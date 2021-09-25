@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { getAuthenticationStore } from "store/slice/authentication";
 // import QRCode from "qrcode.react";
 import { QRCode } from 'react-qr-svg'
+import { LoadingScreen } from "components"
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -20,6 +21,7 @@ const H5 = styled.h5`
 `;
 
 const CheckoutEvent = () => {
+  const [loading, setLoading] = useState(true)
   const [info, setInfo] = useState([]);
   const { id } = useParams();
   let { userProfile } = useSelector(getAuthenticationStore);
@@ -52,11 +54,17 @@ const CheckoutEvent = () => {
         }
       
         setInfo(data);
+        setLoading(false)
       }
     } else {
       console.error(message, errors);
     }
   }, []);
+
+  let formatter = new Intl.NumberFormat("id-ID", {
+    style: 'currency',
+    currency: 'IDR',
+  })
 
   return (
     <React.Fragment>
@@ -67,6 +75,7 @@ const CheckoutEvent = () => {
       <HeaderForm />
 
       <Container fluid className="px-5 p-2">
+        <LoadingScreen loading={loading} />
       <Card>
                 <CardBody>
             <Row>
@@ -145,7 +154,7 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-md-5 text-muted">
                       <H5>Total</H5>
-                      <h4>Rp {info.transactionInfo?.total}</h4>
+                      <h4>{formatter.format(info.transactionInfo?.total)}</h4>
                     </div>
                     <div className="mx-md-5 text-muted">
                       <H5>Status Pembayaran</H5>

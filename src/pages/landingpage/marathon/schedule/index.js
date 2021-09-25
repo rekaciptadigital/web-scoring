@@ -9,6 +9,7 @@ import CardInfo from "./components/CardInfo";
 import { ScheduleMemberService } from "services";
 import { useParams } from "react-router";
 import SweetAlert from "react-bootstrap-sweetalert";
+import { LoadingScreen } from "components"
 
 
 const Label = styled.label`
@@ -32,6 +33,7 @@ const ScheduleMarathon = () => {
     const [errorSet, setErrorSet] = useState("");
     const [date, setDate] = useState("");
     const [dateEnable, setDateEnable] = useState([]);
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         getSchedule()
@@ -54,6 +56,7 @@ const ScheduleMarathon = () => {
                 if(date == "")
                     setDate(data.schedules[0].date)
                 setEvent(data.event)
+                setLoading(false)
           }
         } else {
             console.error(message, errors);
@@ -88,6 +91,7 @@ const ScheduleMarathon = () => {
       <HeaderForm />
  
         <Container fluid className="px-5 p-2">
+            <LoadingScreen loading={loading} />
                 <CardInfo info={participant}/>
                 <Card>
                     <CardBody>

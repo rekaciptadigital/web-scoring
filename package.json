@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.4.1",
     "@fullcalendar/bootstrap": "^5.5.0",
     "@fullcalendar/core": "^5.5.0",
     "@fullcalendar/daygrid": "^5.5.0",
@@ -92,6 +93,7 @@
     "react-scripts": "4.0.1",
     "react-select": "^3.2.0",
     "react-sparklines": "^1.7.0",
+    "react-spinners": "^0.11.0",
     "react-star-ratings": "^2.3.0",
     "react-super-responsive-table": "^5.2.0",
     "react-switch": "^6.0.0",

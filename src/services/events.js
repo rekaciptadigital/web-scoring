@@ -9,5 +9,14 @@ export default {
     },
     getEventBySlug(qs) {
         return API.get("/web/v1/archery/event-by-slug", qs)
+    },
+    getEventById(qs) {
+        return API.get("/web/v1/archery/events/"+qs.id, qs)
+    },
+    getEventMember(qs) {
+        return API.get("/web/v1/archery/events/participant/members", qs)
+    },
+    getEventMemberProfile(qs) {
+        return API.get("/web/v1/archery/events/participant/member/profile", qs)
     }
 }

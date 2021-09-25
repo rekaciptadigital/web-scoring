@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { MetaTags } from 'react-meta-tags'
 import {
     Container,
@@ -6,72 +6,102 @@ import {
     Col,
     Row,
 } from 'reactstrap'
-import { SelectInput } from 'components'
 import { Link } from 'react-router-dom'
 import TableSchedule from './components/TableSchedule'
-import { dummyConstants } from '../../../constants'
 import { DateInput } from "components"
+import { ScheduleMemberService } from "services";
+import { useParams } from "react-router";
+import { LoadingScreen } from "components"
 
 function ListMember() {
 
+    const { event_id } = useParams();
+    const [date, setDate] = useState("");
+    const [loading, setLoading] = useState(false)
+    const [member, setMember] = useState([])
+    const [dateEnable, setDateEnable] = useState([]);
+    const [list, setList] = useState([]);
+    const [event, setEvent] = useState({});
+    
+    useEffect(() => {
+        getSchedule()
+      }, []);
+    
+    const getSchedule = async() =>{
+        setLoading(true)
+        const { data, errors, message, success } = await ScheduleMemberService.getEventSchedule({
+            "event_id":event_id,
+        });
+        if (success) {
+          if (data) {
+                let de = [];
+                data.schedules.map((s)=>{
+                    de.push(s.date);
+                })
+                setList(data.schedules)
+                setDateEnable(de)
+                if(date == "")
+                    setDate(data.schedules[0].date)
+                setEvent(data.event)
+          }
+        } else {
+            console.error(message, errors);
+        }
+        setLoading(false)
+    }
+    
+    const getMemberSchedule = async(date_schedule, session_id) =>{
+        setLoading(true)
+        const { data, errors, message, success } = await ScheduleMemberService.getEventMemberSchedule({
+            "date":date_schedule,
+            "session_id":session_id,
+            "event_id":event_id,
+        });
+        if (success) {
+          if (data) {
+                let m = member;
+                m[date_schedule+"-"+session_id] = data; 
+                setMember(m);
+          }
+        } else {
+            console.error(message, errors);
+        }
+        setLoading(false)
+    }
+
     return (
         <React.Fragment>
+            <LoadingScreen loading={loading} />
             <div className="page-content">
                 <MetaTags>
                     <title>Dashboard | List - Member</title>
                 </MetaTags>
                 <Container fluid>
-                <Link to="/dashboard">
+                <Link to="/dashboard/events">
                     <Button color="outline-dark">{'<-'}</Button>
                 </Link>
-                <span style={{marginLeft: '0.5rem'}}>Kembali ke Dashboard</span>
+                <span style={{marginLeft: '0.5rem'}}>Kembali ke List Event</span>
                 <div className="mb-3 d-flex justify-content-around w-50 mt-md-0 mt-3 mx-auto">
                     <h3 style={{letterSpacing: '2px'}}>Jadwal Kualifikasi</h3>
                 </div>
                 <div className="mb-4">
-                    <h6>Data Peserta</h6>
+                    <h6>Pilih Jadwal</h6>
                     <div>
                         <Row>
-                            <Col md={2} sm={12}>
-                                {/* <div className="d-block d-md-flex justify-content-between"> */}
-                                    <SelectInput
-                                        name='jenis'
-                                        onChange={(e) => console.log(e)}
-                                        options={dummyConstants.eventAgeCategories}
-                                        />
-                            </Col>
-                            <Col md={2}>
-                                    <SelectInput
-                                        name='jenis'
-                                        onChange={(e) => console.log(e)}
-                                        options={dummyConstants.eventAgeCategories}
-                                        />
-                                        </Col>
-                                    <Col md={2}>
-
-
-                                    <DateInput />
-                                {/* </div> */}
-                            </Col>
-                            <Col md={3}>
-                                    <Button color='primary mt-md-0 mt-3' style={{width: '86.28px'}}>Search</Button>
-                            </Col>
-                            <Col md={3} sm={12}>
-                                <div className="d-block d-md-flex mt-md-0 mt-3 justify-content-end">
-                                    <Button color="outline-dark">Unduh Data</Button>
-                                </div>
-                            </Col>
+                        <Col md={3} sm={12}>
+                            <DateInput
+                                onChange={(e)=>{setDate(e.value)}}
+                                value={date}
+                                options={{enable:dateEnable,maxDate : dateEnable[dateEnable.length - 1], minDate: dateEnable[0]}}
+                            />
+                        </Col>
                         </Row>
                     </div>
                 </div>
                 <div className="mb-4">
-                    <div className="d-flex justify-content-between" style={{width: '100px'}}>
-                        <Link>U-12</Link>
-                        <Link className="text-black-50">Umum</Link>
-                    </div>
                     <hr />
                 </div>
-                <TableSchedule />
+                <TableSchedule member={member} getMemberSchedule={getMemberSchedule} event={event} date={date} list={list} />
                 </Container>
             </div>
         </React.Fragment>

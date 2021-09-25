@@ -40,7 +40,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      history.push("/")
+      history.push("/dashboard")
     }
   }, [isLoggedIn])
 

@@ -25,11 +25,6 @@ const Dashboard = () => {
   const reports = [
     { title: "Orders", iconClass: "bx-copy-alt", description: "1,235" },
     { title: "Revenue", iconClass: "bx-archive-in", description: "$35, 723" },
-    {
-      title: "Average Price",
-      iconClass: "bx-purchase-tag-alt",
-      description: "$16.2",
-    },
   ];
   const email = [
     { title: "Week", linkto: "#", isActive: false },

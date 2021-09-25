@@ -9,6 +9,7 @@ import CardInfo from "./components/CardInfo";
 import { ScheduleMemberService } from "services";
 import { useParams } from "react-router";
 import SweetAlert from "react-bootstrap-sweetalert";
+import { LoadingScreen } from "components"
 
 
 const Label = styled.label`
@@ -32,12 +33,14 @@ const ScheduleMarathon = () => {
     const [errorSet, setErrorSet] = useState("");
     const [date, setDate] = useState("");
     const [dateEnable, setDateEnable] = useState([]);
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         getSchedule()
       }, []);
     
     const getSchedule = async() =>{
+        setLoading(true)
         const { data, errors, message, success } = await ScheduleMemberService.get({
             "participant_member_id":member_id,
         });
@@ -54,6 +57,7 @@ const ScheduleMarathon = () => {
                 if(date == "")
                     setDate(data.schedules[0].date)
                 setEvent(data.event)
+                setLoading(false)
           }
         } else {
             console.error(message, errors);
@@ -62,22 +66,27 @@ const ScheduleMarathon = () => {
 
     const setSchedule = async (schedule) => {
         setErrorSet("");
+        setLoading(true)
         const { success, message } = await ScheduleMemberService.set(schedule);
         if (success) {
             getSchedule()
         }else{
             setErrorSet("*"+message);
         }
+        setLoading(false)
+
       };
     
     const unsetSchedule = async (schedule) => {
         setError("");
+        setLoading(true)
         const { message, success } = await ScheduleMemberService.unset(schedule);
         if (success) {
             getSchedule()
         }else{
             setError(message);
         }
+        setLoading(false)
       };
   return (
     <React.Fragment>
@@ -88,6 +97,7 @@ const ScheduleMarathon = () => {
       <HeaderForm />
  
         <Container fluid className="px-5 p-2">
+            <LoadingScreen loading={loading} />
                 <CardInfo info={participant}/>
                 <Card>
                     <CardBody>

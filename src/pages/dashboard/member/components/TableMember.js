@@ -1,22 +1,18 @@
 import React, { Component } from "react"
-import { Row, Col, Card, CardBody, Modal, ModalBody, Button } from "reactstrap"
-
+import { Row, Col, Card, CardBody } from "reactstrap"
+import { EventsService } from "services";
+import ModalParticipantMemberProfile  from "../../../../components/Common/ModalParticipanMemberProfile";
 // datatable related plugins
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory, {
-  PaginationProvider, PaginationListStandalone,
-  SizePerPageDropdownStandalone
+  PaginationProvider
 } from 'react-bootstrap-table2-paginator';
 
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
-// Data for dummy
-import { dummyConstants } from '../../../../constants'
-
 //Import Breadcrumb
 import './sass/datatables.scss'
 
-import Avatar from "../../../../assets/images/users/avatar-man.png"
 
 class TableMember extends Component {
   constructor(props) {
@@ -24,14 +20,37 @@ class TableMember extends Component {
     this.state = {
       page: 1,
       sizePerPage: 10,
-      productData: dummyConstants.members,
+      productData: this.props.members,
       modal: false,
-      user: {},
+      member_id_for_pop_up: 0,
+      users: [],
+      user: [],
     }
 
   }
 
   render() {
+    const getMemberProfile = async(id) =>{
+      let u = [];
+      u = await this.state.users;
+      if(u[id]) {
+        this.setState({modal: true, user: this.state.users[id]});
+        return;
+      }
+
+      const { data, errors, success, message } = await EventsService.getEventMemberProfile(
+        {"member_id":id}
+      );
+    if (success) {
+        if (data) {
+          u[id] = data;
+          this.setState({modal: true, user: data, users:u})
+        }
+    } else {
+        console.log(message, errors);
+    }
+    }
+
     const toggle = () =>{
       this.setState({modal: !this.state.modal})
     } 
@@ -48,8 +67,9 @@ class TableMember extends Component {
         return(
           <>
             <span onClick={() => {
-              this.setState({modal: true, user: row})}
-            }>{row.name}</span>
+              getMemberProfile(row.id);
+            }
+            }><p style={{color:"blue"}}>{row.name}</p></span>
           </>
         )
       }
@@ -77,7 +97,7 @@ class TableMember extends Component {
       formatter: (cell, row) => {
         return (
           <div>
-            <span className={`${row.status ? "bg-success" : "bg-warning"} text-white rounded-3 px-2`}>{row.status ? "Completed" : "Pending"}</span>
+            <span className={`${row.status == 1 ? "bg-success" : row.status == 2 ? "bg-danger" : row.status == 4 ? "bg-info" : "bg-warning"} text-white rounded-3 px-2`}>{row.statusLabel ? row.statusLabel : "Pending"}</span>
           </div>
         )
       }
@@ -91,7 +111,7 @@ class TableMember extends Component {
 
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: dummyConstants.members.length, // replace later with size(customers),
+      totalSize: this.props.members.length, // replace later with size(customers),
       custom: true,
     }
 
@@ -115,49 +135,7 @@ class TableMember extends Component {
     return (
       <React.Fragment>
         <div>
-        <Modal isOpen={this.state.modal} fade={false} toggle={toggle}>
-        <ModalBody>
-          <Row>
-            <Col md={2}>
-              <img
-                  src={Avatar}
-                  alt=""
-                  className="avatar-md rounded-circle img-thumbnail"
-                  style={{height: 'auto'}}
-              />
-            </Col>
-            <Col md={4}>
-              <h4>
-                {this.state.user?.name}
-              </h4>
-              <span>{this.state.user?.club}</span>
-              <div>
-                <h3>No. Ponsel</h3>
-                <span>{this.state?.user?.telepon}</span>
-              </div>
-              <div>
-                <h3>Email</h3>
-                <span>{this.state?.user?.email}</span>
-              </div>
-            </Col>
-            <Col md={6}>
-            <div>
-                <h3>Usia</h3>
-                <span>{this.state.user?.age}</span>
-              </div>
-            <div>
-                <h3>Jadwal Kualifikasi:</h3>
-                <p>Sesi 1 - 12 September 2021</p>
-                <p>Sesi 2 - 13 September 2021</p>
-                <p>Sesi 3 - 1 September 2021</p>
-              </div>
-            </Col>
-          </Row>
-          <div className="float-end">
-            <Button color="secondary" onClick={toggle}>Ok</Button>
-          </div>
-        </ModalBody>
-      </Modal>
+          <ModalParticipantMemberProfile isOpen={this.state.modal} toggle={toggle} participant={this.state.user} />
           <div>
             <Row>
               <Col className="col-12">
@@ -167,13 +145,13 @@ class TableMember extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField='id'
                       columns={columns}
-                      data={this.state.productData}
+                      data={this.props.members}
                     >
-                      {({ paginationProps, paginationTableProps }) => (
+                      {({paginationTableProps }) => (
                         <ToolkitProvider
                           keyField='id'
                           columns={columns}
-                          data={this.state.productData}
+                          data={this.props.members}
                           search
                         >
                           {toolkitProps => (
@@ -210,21 +188,6 @@ class TableMember extends Component {
                                       {...paginationTableProps}
                                     />
 
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row className="align-items-md-center mt-30">
-                                <Col className="inner-custom-pagination d-flex">
-                                  <div className="d-inline">
-                                    <SizePerPageDropdownStandalone
-                                      {...paginationProps}
-                                    />
-                                  </div>
-                                  <div className="text-md-right ms-auto">
-                                    <PaginationListStandalone
-                                      {...paginationProps}
-                                    />
                                   </div>
                                 </Col>
                               </Row>

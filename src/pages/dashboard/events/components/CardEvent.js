@@ -22,8 +22,8 @@ function CardEvent(props) {
         navigator.clipboard.writeText(props.detail.event.eventUrl)
         setCheck(true)
     }
-    // let dStart = new Date(props.detail.event.registrationStartDatetime)
-    // let dEnd = new Date(props.detail.event.registrationEndDatetime)
+    let dStart = new Date(props.detail.event.registrationStartDatetime)
+    let dEnd = new Date(props.detail.event.registrationEndDatetime)
     // console.log(d.toDateString())
 
     // if (!props.detail) {
@@ -100,15 +100,19 @@ function CardEvent(props) {
                                         <h3 className="bx bx-dots-vertical" style={{cursor: 'pointer'}}></h3>
                                     </DropdownToggle>
                                     <DropdownMenu className="dropdown-menu-end">
-                                    <DropdownItem tag="a" href="/dashboard/schedule">
-                                        {" "}
-                                        <span>Lihat Jadwal dan Peserta</span>
-                                    </DropdownItem>
+                                        <DropdownItem tag="a" href={"/dashboard/schedule/"+props.detail.event.id}>
+                                            {" "}
+                                            <span>Lihat Jadwal</span>
+                                        </DropdownItem>
+                                        <DropdownItem tag="a" href={"/dashboard/member/"+props.detail.event.id}>
+                                            {" "}
+                                            <span>Lihat Peserta</span>
+                                        </DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>
                             </div>
                             <p className="text-muted fw-medium">
-                                {dStart.toDateString()} - {dEnd.toDateString()}
+                                {dStart != undefined ? dStart.toDateString() : ""} - {dEnd != undefined? dEnd.toDateString():""}
                             </p>
                             <p className="text-muted fw-medium">
                                 {props.detail.event.location} - {props.detail.event.locationType}

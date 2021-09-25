@@ -53,6 +53,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
 
   const handleValidSubmit = async () => {
     setError(false);
+    // TODO set load true
     setIsError("");
     const localFormData = { ...formData };
     localFormData.eventId = eventDetail ? eventDetail.id : 0;
@@ -81,7 +82,13 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
       }
       console.error(message, errors);
     }
+    // TODO set load false
   };
+
+  let formatter = new Intl.NumberFormat("id-ID", {
+    style: 'currency',
+    currency: 'IDR',
+  })
 
   return (
     <div>
@@ -198,7 +205,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                               <h4
                                 style={{ color: "green", textAlign: "center" }}
                                 >
-                                Rp {formData?.categoryEvent?.price || 0}
+                                {formData?.categoryEvent?.price ? formatter.format(formData?.categoryEvent?.price) : formatter.format(0)}
                               </h4>
                               <div className="d-grid gap-2 mt-5">
                                 {activeTab === 2 ? (

@@ -24,8 +24,8 @@ const CheckoutEvent = () => {
   const { id } = useParams();
   let { userProfile } = useSelector(getAuthenticationStore);
 
-  const handleClick = () => {
-    window.snap.pay(`${info.transactionInfo?.snapToken}`, {
+  const handleClickPayment = (snapToken = "") => {
+    window.snap.pay(`${info.transactionInfo ? info.transactionInfo.snapToken : snapToken}`, {
       onSuccess: function () {
         console.log("success");
       },
@@ -47,6 +47,10 @@ const CheckoutEvent = () => {
     });
     if (success) {
       if (data) {
+        if(data.transactionInfo.statusId == 4){
+          handleClickPayment(data.transactionInfo.snapToken)
+        }
+      
         setInfo(data);
       }
     } else {
@@ -243,7 +247,7 @@ const CheckoutEvent = () => {
                 <Button
                   type="button"
                   size="md"
-                  onClick={handleClick}
+                  onClick={handleClickPayment}
                   style={{ backgroundColor: "#0D47A1" }}
                 >
                   LAKUKAN PEMBAYARAN

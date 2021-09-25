@@ -29,7 +29,7 @@ const ModalParticipantMemberProfile = props => {
                 </div>
                 <div>
                   <h6>Email</h6>
-                  <span>{participant?.user?.email}</span>
+                  <span>{participant?.email}</span>
                 </div>
               </Col>
               <Col md={6}>

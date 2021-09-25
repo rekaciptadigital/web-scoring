@@ -33,13 +33,14 @@ const ScheduleMarathon = () => {
     const [errorSet, setErrorSet] = useState("");
     const [date, setDate] = useState("");
     const [dateEnable, setDateEnable] = useState([]);
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         getSchedule()
       }, []);
     
     const getSchedule = async() =>{
+        setLoading(true)
         const { data, errors, message, success } = await ScheduleMemberService.get({
             "participant_member_id":member_id,
         });
@@ -65,22 +66,27 @@ const ScheduleMarathon = () => {
 
     const setSchedule = async (schedule) => {
         setErrorSet("");
+        setLoading(true)
         const { success, message } = await ScheduleMemberService.set(schedule);
         if (success) {
             getSchedule()
         }else{
             setErrorSet("*"+message);
         }
+        setLoading(false)
+
       };
     
     const unsetSchedule = async (schedule) => {
         setError("");
+        setLoading(true)
         const { message, success } = await ScheduleMemberService.unset(schedule);
         if (success) {
             getSchedule()
         }else{
             setError(message);
         }
+        setLoading(false)
       };
   return (
     <React.Fragment>

@@ -26,7 +26,8 @@ import "./components/sass/landingpage.scss"
 const LandingPage = () => {
   const { slug } = useParams();
   const [event, setEvent] = useState({})
-
+  const path = window.location.pathname;
+  
   useEffect(async () => {
     const { data, success } = await EventsService.getEventBySlug({ slug });
     if (success) {
@@ -113,7 +114,7 @@ const LandingPage = () => {
                   <ProfileMenuArcher color="black" />
                 </div>
               ) : (
-                <Link to="/archer/dashboard">
+                <Link style={{padding:"20px"}} to={"/archer/login?path="+path}>
                 <Button className="float-end" color="outline-dark">Masuk</Button>
               </Link>
                 )
@@ -150,21 +151,13 @@ const LandingPage = () => {
                 </Col>
                 <Col md={8} sm={12}>
                 <div>
-                  {/* <h1 className="hero-title">
-                    {event.eventName}
-                  </h1>
-                  <p className="font-size-14">
-                    Penyelenggara: {event.admin?.name} <br />
-                    {eventStartDate.toDateString()} - {eventEndDate.toDateString()} <br />
-                    {event.location}
-                  </p> */}
                   <div>
-                    <div className="clearfix mt-4">
+                    {/* <div className="clearfix mt-4">
                       <div dangerouslySetInnerHTML={{__html: event.description}} />
-                      <a href={event?.handbook} download>
+                      <a target="_blank" rel="noreferrer" href={event?.handbook} download>
                       <Button color="success">Download Technical Handbook</Button>
                       </a>
-                    </div>
+                    </div> */}
                   </div>
                   {/* Detail data hardcode */}
                 </div>

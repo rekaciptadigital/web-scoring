@@ -53,6 +53,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
 
   const handleValidSubmit = async () => {
     setError(false);
+    // TODO set load true
     setIsError("");
     const localFormData = { ...formData };
     localFormData.eventId = eventDetail ? eventDetail.id : 0;
@@ -81,6 +82,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
       }
       console.error(message, errors);
     }
+    // TODO set load false
   };
 
   let formatter = new Intl.NumberFormat("id-ID", {

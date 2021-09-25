@@ -105,7 +105,7 @@ const Header = props => {
 
             <NotificationDropdown />
 
-            <ProfileMenuArcher />
+            <ProfileMenuArcher color="#fff" />
           </div>
         </div>
       </header>

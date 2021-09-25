@@ -83,6 +83,11 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
     }
   };
 
+  let formatter = new Intl.NumberFormat("id-ID", {
+    style: 'currency',
+    currency: 'IDR',
+  })
+
   return (
     <div>
       {error ? (
@@ -198,7 +203,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
                               <h4
                                 style={{ color: "green", textAlign: "center" }}
                                 >
-                                Rp {formData?.categoryEvent?.price || 0}
+                                {formData?.categoryEvent?.price ? formatter.format(formData?.categoryEvent?.price) : formatter.format(0)}
                               </h4>
                               <div className="d-grid gap-2 mt-5">
                                 {activeTab === 2 ? (

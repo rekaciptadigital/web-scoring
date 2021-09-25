@@ -57,8 +57,8 @@ const ProfileMenuArcher = props => {
             src={user1}
             alt="Header Avatar"
           />
-          <span style={{color:"white"}} className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
-          <i className="mdi mdi-chevron-down d-none d-xl-inline-block" />
+          <span style={{color: `${props.color ? props.color : "#ffffff"}`}} className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
+          <i className="mdi mdi-chevron-down d-none d-xl-inline-block" style={{color: `${props.color ? props.color : "#ffffff"}`}} />
         </DropdownToggle>
         <DropdownMenu className="dropdown-menu-end">
           <DropdownItem tag="a" href="/archer/dashboard/profile">

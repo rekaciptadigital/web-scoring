@@ -6,11 +6,16 @@ import {
   Col,
   Card,
   CardBody,
-  CardHeader
+  CardHeader,
+  Button
 } from "reactstrap";
 import { useParams } from "react-router";
 import Footer from "layouts/landingpage/Footer";
 import { EventsService } from "services";
+import { Link } from "react-router-dom";
+import { getAuthenticationStore } from "store/slice/authentication";
+import { useSelector } from "react-redux";
+import ProfileMenuArcher from "components/TopbarDropdown/ProfileMenuArcher";
 // import bgauth from "../../../assets/images/myachery/bg-landingpage.jpg"
 import logomyarchery from "../../../assets/images/myachery/myachery.png"
 import Countdown from "react-countdown";
@@ -29,8 +34,8 @@ const LandingPage = () => {
     }
   }, []);
 
-  let eventStartDate = new Date(event.eventStartDatetime)
-  let eventEndDate = new Date(event.eventEndDatetime)
+  // let eventStartDate = new Date(event.eventStartDatetime)
+  // let eventEndDate = new Date(event.eventEndDatetime)
   // let regStartDate = new Date(event.registrationStartDatetime)
   // let regEndDate = new Date(event.registrationEndDatetime)
 
@@ -63,21 +68,58 @@ const LandingPage = () => {
     }
   };
 
+  const getWindowDimensions = () => {
+    const { innerWidth: width, innerHeight: height } = window;
+    return {
+      width,
+      height
+    };
+  }
+
+  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // console.log(windowDimensions)
+  let { isLoggedIn } = useSelector(getAuthenticationStore);
+  console.log(isLoggedIn)
+
+
   return (
     <React.Fragment>
       <MetaTags>
         <title>{event.eventName}</title>
       </MetaTags>
       {/* import navbar */}
-        <div className="px-4 py-1 sticky-top bg-light">
-          <Row>
-            <Col md={6}>
+        <div className="px-4 py-1 sticky-top bg-light d-flex justify-content-between">
+          {/* <Row>
+            <Col md={6}> */}
+              <Link to="/archer/dashboard">
               <div>
                 <img src={logomyarchery} width="91" />
               </div>
-            </Col>
-            <Col md={6}></Col>
-          </Row>
+              </Link>
+            {/* </Col>
+            <Col md={6}> */}
+              { isLoggedIn ? (
+                <div>
+                  <ProfileMenuArcher color="black" />
+                </div>
+              ) : (
+                <Link to="/archer/dashboard">
+                <Button className="float-end" color="outline-dark">Masuk</Button>
+              </Link>
+                )
+              }
+            {/* </Col>
+          </Row> */}
         </div>
         <Container>
             <div>
@@ -85,25 +127,47 @@ const LandingPage = () => {
             </div>
             <div>
               <Row className="mt-4">
-                <Col md={8}>
+              <Col md={4} sm={12} className={windowDimensions.width <= 767 ? "d-block" : "d-none"}>
+                <Card className="overflow-hidden mb-0 mt-5 mt-lg-0">
+                <CardHeader className="text-center">
+                  <h5 className="mb-0">Waktu Acara</h5>
+                </CardHeader>
+                <CardBody>
+                  <div className="text-center">
+                    <div className="mt-4">
+                      <div className="counter-number ico-countdown">
+                        <Countdown date={event.eventEndDatetime != undefined ? event.eventEndDatetime.replace(/-/g, "/") : "2021/12/12"} renderer={renderer} />
+                      </div>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+              <div className="button-items mt-4">
+                  <a  target="_blank" rel="noreferrer" href={`/event/register/process/${slug}`} className="btn btn-success me-1 w-100">
+                    DAFTAR EVENT
+                  </a>
+                </div>
+                </Col>
+                <Col md={8} sm={12}>
                 <div>
-                  <h1 className="hero-title">
+                  {/* <h1 className="hero-title">
                     {event.eventName}
                   </h1>
                   <p className="font-size-14">
                     Penyelenggara: {event.admin?.name} <br />
                     {eventStartDate.toDateString()} - {eventEndDate.toDateString()} <br />
                     {event.location}
-                  </p>
+                  </p> */}
                   <div>
                     <div className="clearfix mt-4">
                       <div dangerouslySetInnerHTML={{__html: event.description}} />
+                      <Button color="success">Download Technical Handbook</Button>
                     </div>
                   </div>
                   {/* Detail data hardcode */}
                 </div>
                 </Col>
-                <Col md={4}>
+                <Col md={4} sm={12} className={windowDimensions.width > 752 ? "d-block" : "d-none"}>
                 <Card className="overflow-hidden mb-0 mt-5 mt-lg-0">
                 <CardHeader className="text-center">
                   <h5 className="mb-0">Waktu Acara</h5>

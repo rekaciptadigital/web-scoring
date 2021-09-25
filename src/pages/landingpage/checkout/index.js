@@ -54,6 +54,11 @@ const CheckoutEvent = () => {
     }
   }, []);
 
+  let formatter = new Intl.NumberFormat("id-ID", {
+    style: 'currency',
+    currency: 'IDR',
+  })
+
   return (
     <React.Fragment>
       <MetaTags>
@@ -141,7 +146,7 @@ const CheckoutEvent = () => {
                     </div>
                     <div className="mx-md-5 text-muted">
                       <H5>Total</H5>
-                      <h4>Rp {info.transactionInfo?.total}</h4>
+                      <h4>{formatter.format(info.transactionInfo?.total)}</h4>
                     </div>
                     <div className="mx-md-5 text-muted">
                       <H5>Status Pembayaran</H5>

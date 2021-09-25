@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { getAuthenticationStore } from "store/slice/authentication";
 // import QRCode from "qrcode.react";
 import { QRCode } from 'react-qr-svg'
+import { LoadingScreen } from "components"
 
 const H5 = styled.h5`
   font-size: 13px;
@@ -20,6 +21,7 @@ const H5 = styled.h5`
 `;
 
 const CheckoutEvent = () => {
+  const [loading, setLoading] = useState(true)
   const [info, setInfo] = useState([]);
   const { id } = useParams();
   let { userProfile } = useSelector(getAuthenticationStore);
@@ -52,6 +54,7 @@ const CheckoutEvent = () => {
         }
       
         setInfo(data);
+        setLoading(false)
       }
     } else {
       console.error(message, errors);
@@ -72,6 +75,7 @@ const CheckoutEvent = () => {
       <HeaderForm />
 
       <Container fluid className="px-5 p-2">
+        <LoadingScreen loading={loading} />
       <Card>
                 <CardBody>
             <Row>

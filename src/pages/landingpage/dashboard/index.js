@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react"
 import MetaTags from 'react-meta-tags';
-import Footer from "layouts/landingpage/Footer";
+// import Footer from "layouts/landingpage/Footer";
 import HeaderForm from "layouts/landingpage/HeaderForm";
 import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
 import styled from 'styled-components';
@@ -9,6 +9,7 @@ import { OrderEventService } from "services";
 import { getAuthenticationStore } from "store/slice/authentication"
 import logoLight from "../../../assets/images/myachery/myachery.png";
 import { useSelector } from "react-redux"
+import { LoadingScreen } from "components"
 // import classnames from "classnames"
 // import CardActivity from "./CardActivity";
 
@@ -21,6 +22,7 @@ const H5 = styled.h5`
 
 const DashboardOrderEvent = () => {
     const [event, setEvent] = useState([]);
+    const [loading, setLoading] = useState(true)
     let { userProfile } = useSelector(getAuthenticationStore);
     console.log("get profile",userProfile);
 
@@ -35,6 +37,7 @@ const DashboardOrderEvent = () => {
     console.log("get profile2",userProfile);
     const {data, success} = await OrderEventService.getAll();
         if (success) {
+            setLoading(false)
             setEvent(data);
         }
     }, []);
@@ -48,6 +51,7 @@ const DashboardOrderEvent = () => {
       <HeaderForm />
  
         <Container fluid className="px-5 p-2">
+            <LoadingScreen loading={loading} />
               <Card>
                 <CardBody>
             <Row>
@@ -222,8 +226,8 @@ const DashboardOrderEvent = () => {
             </Row>
 
       </Container>
+      {/* <Footer /> */}
 
-      <Footer />
     </React.Fragment>
   );
 };

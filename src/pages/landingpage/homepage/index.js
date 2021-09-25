@@ -152,12 +152,12 @@ const LandingPage = () => {
                 <Col md={8} sm={12}>
                 <div>
                   <div>
-                    {/* <div className="clearfix mt-4">
+                    <div className="clearfix mt-4">
                       <div dangerouslySetInnerHTML={{__html: event.description}} />
-                      <a target="_blank" rel="noreferrer" href={event?.handbook} download>
+                      {/* <a target="_blank" rel="noreferrer" href={event?.handbook} download>
                       <Button color="success">Download Technical Handbook</Button>
-                      </a>
-                    </div> */}
+                      </a> */}
+                    </div>
                   </div>
                   {/* Detail data hardcode */}
                 </div>

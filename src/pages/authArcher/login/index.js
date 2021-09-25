@@ -168,18 +168,18 @@ const LoginArcher = (props) => {
                   </div>
 
                   <div className="mt-4 text-center">
-                    <Link
+                    {/* <Link
                       to={"/authentication/forgot-password"}
                       className="text-muted"
                     >
                       <i className="mdi mdi-lock me-1" />
                       Forgot your password?
-                    </Link>
+                    </Link> */}
                   </div>
                   <div className="mt-5 text-center">
                 <p>
                   Belum memiliki akun daftar ?{" "}
-                  <Link to="/archer/register" className="fw-medium text-primary">
+                  <Link to={path != null ? "/archer/register?path="+path :"/archer/register"} className="fw-medium text-primary">
                     {" "}
                     Disini{" "}
                   </Link>{" "}

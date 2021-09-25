@@ -1,184 +1,80 @@
-import React, { Component } from "react"
-import { Row, Col, Card, CardBody, Button } from "reactstrap"
+import React, {useEffect} from "react"
 
-// datatable related plugins
-import BootstrapTable from 'react-bootstrap-table-next';
-import paginationFactory, {
-  PaginationProvider, PaginationListStandalone,
-  SizePerPageDropdownStandalone
-} from 'react-bootstrap-table2-paginator';
+import { Row,
+  Col, 
+  Card, 
+  CardBody, 
+  Table} from "reactstrap";
 
-import ToolkitProvider from 'react-bootstrap-table2-toolkit';
+const TableSchedule = ({event,date, errorMessage,list, member, getMemberSchedule}) => {
+  useEffect(() => {
+    console.log("event",event);
+    console.log("list",list);
+    console.log("date",date);
+  }, []);
 
-// Data for dummy
-import { dummyConstants } from '../../../../constants'
-
-//Import Breadcrumb
-import './sass/datatables.scss'
-import { Link } from "react-router-dom";
-
-class TableSchedule extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      page: 1,
-      sizePerPage: 10,
-      productData: dummyConstants.qualificationSchedule
-    }
-
-  }
-
-  render() {
-
-    const columns = [{
-      dataField: 'id',
-      text: 'Id',
-      sort: true,
-    }, {
-      dataField: 'date',
-      text: 'Tanggal',
-      sort: true
-    }, {
-      dataField: 'session',
-      text: 'Sesi',
-      sort: true
-    }, {
-      dataField: 'time',
-      text: 'Jam',
-      sort: true
-    }, {
-      dataField: 'quota',
-      text: 'Kuota Terisi',
-      sort: true
-    }, {
-      formatter: () => {
-        return (
-          <div>
-            <Link to={`/dashboard/member`}>
-              <Button color="success" >List Peserta</Button>
-            </Link>
-          </div>
-        )
-      }
-    }
-];
-
-    const defaultSorted = [{
-      dataField: 'id',
-      order: 'asc'
-    }];
-
-    const pageOptions = {
-      sizePerPage: 10,
-      totalSize: dummyConstants.qualificationSchedule.length, // replace later with size(customers),
-      custom: true,
-    }
-
-    // Custom Pagination Toggle
-    // const sizePerPageList = [
-    //   { text: '5', value: 5 },
-    //   { text: '10', value: 10 },
-    //   { text: '15', value: 15 },
-    //   { text: '20', value: 20 },
-    //   { text: '25', value: 25 },
-    //   { text: 'All', value: (this.state.productData).length }];
-
-  
-    // Select All Button operation
-    const selectRow = {
-      mode: 'checkbox'
-    }
-
-    // const { SearchBar } = Search;
-
-    return (
+return (
       <React.Fragment>
-        <div>
-          <div>
-            <Row>
-              <Col className="col-12">
-                <Card>
-                  <CardBody>
-                    <PaginationProvider
-                      pagination={paginationFactory(pageOptions)}
-                      keyField='id'
-                      columns={columns}
-                      data={this.state.productData}
-                    >
-                      {({ paginationProps, paginationTableProps }) => (
-                        <ToolkitProvider
-                          keyField='id'
-                          columns={columns}
-                          data={this.state.productData}
-                          search
-                        >
-                          {toolkitProps => (
-                            <React.Fragment>
-
-                              <Row className="mb-2">
-                                <Col md="4">
-                                  <div className="search-box me-2 mb-2 d-inline-block">
-                                    <div className="position-relative">
-                                      {/* <SearchBar
-                                        {...toolkitProps.searchProps}
-                                      /> */}
-                                      {/* <i className="bx bx-search-alt search-icon" /> */}
-                                    </div>
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row>
-                                <Col xl="12">
-                                  <div className="table-responsive">
-                                    <BootstrapTable
-                                      keyField={"id"}
-                                      responsive
-                                      bordered={false}
-                                      striped={false}
-                                      defaultSorted={defaultSorted}
-                                      selectRow={selectRow}
-                                      classes={
-                                        "table align-middle table-nowrap"
-                                      }
-                                      headerWrapperClasses={"thead-light"}
-                                      {...toolkitProps.baseProps}
-                                      {...paginationTableProps}
-                                    />
-
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row className="align-items-md-center mt-30">
-                                <Col className="inner-custom-pagination d-flex">
-                                  <div className="d-inline">
-                                    <SizePerPageDropdownStandalone
-                                      {...paginationProps}
-                                    />
-                                  </div>
-                                  <div className="text-md-right ms-auto">
-                                    <PaginationListStandalone
-                                      {...paginationProps}
-                                    />
-                                  </div>
-                                </Col>
-                              </Row>
-                            </React.Fragment>
-                          )
-                          }
-                        </ToolkitProvider>
-                      )
-                      }</PaginationProvider>
-                  </CardBody>
-                </Card>
-              </Col>
+        <Row>
+                <Col sm={12}>
+                <p style={{color:"red"}}>{errorMessage}</p>
+                    <Card style={{maxHeight:"500px",overflow:"auto"}}>
+                        <CardBody>
+                                {list.length > 0 ? list.map((i) => (
+                                    i.date == date ?
+                                    <div style={{marginBottom:"20px",borderRadius:"10px"}} key={i.id}>
+                                    <CardBody>
+                                        <Row>
+                                            <Col md={3} sm={12}>
+                                                <div className="w-75 mx-auto">
+                                                    <span>
+                                                        <h5>{i.dayLabel}<br></br>{i.dateLabel}</h5>
+                                                    </span>
+                                                </div>
+                                            </Col>
+                                            <Col md={9} sm={12}>
+                                                <div>
+                                                <Table borderless={true} style={{borderCollapse: "collapse"}} responsive="true">
+                                                  <tr>
+                                                    <td align="center" style={{paddingRight:"10px",paddingLeft:"10px"}}><h6>sesi</h6></td>
+                                                    <td align="center" style={{paddingRight:"10px",paddingLeft:"10px"}}><h6>waktu</h6></td>
+                                                    <td align="center" style={{paddingRight:"10px",paddingLeft:"10px"}}><h6>quota</h6></td>
+                                                    <td align="center" style={{paddingRight:"10px",paddingLeft:"10px"}}><h6>peserta</h6></td>
+                                                  </tr>
+                                                  {i.session.map((s,k) => (
+                                                    <tr style={{borderBottom: "1px solid black"}} key={s.id}>
+                                                      <td align="center">{k+1}</td>
+                                                      <td align="center">{s.startTime+" - "+s.endTime}</td>
+                                                      <td align="center">{s.totalBooking+"/"+s.quota}</td>
+                                                      <td>
+                                                        {s.totalBooking > 0 ?
+                                                          member[i.date+"-"+s.id] ?
+                                                          member[i.date+"-"+s.id].map((m)=>(
+                                                            <div key={i.date+"-"+s.id}>
+                                                                <p>{m.member.name} ({m.categoryLabel})</p>
+                                                            </div>
+                                                          )) : 
+                                                          <p style={{textAlign:"center"}}>
+                                                            <button onClick={()=>{getMemberSchedule(i.date, s.id)}}>lihat list</button>
+                                                          </p>
+                                                          :null}
+                                                      </td>
+                                                    </tr>
+                                                  ))}
+                                                </Table>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </CardBody>
+                                    </div> : <></>
+                                    )):null}
+                        </CardBody>
+                    </Card>
+                </Col>
+               
             </Row>
-          </div>
-        </div>
       </React.Fragment>
-    )
-  }
-}
-
-export default TableSchedule
+     );
+    };
+    
+    export default TableSchedule;

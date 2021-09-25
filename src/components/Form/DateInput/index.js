@@ -18,7 +18,6 @@ const DateInput = ({
   options={},
 }) => {
   const handleChange = e => {
-    console.log("sss",options)
     if (onChange)
       onChange({
         key: name,

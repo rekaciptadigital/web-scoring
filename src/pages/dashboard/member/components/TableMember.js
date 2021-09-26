@@ -110,7 +110,7 @@ class TableMember extends Component {
     }];
 
     const pageOptions = {
-      sizePerPage: 10,
+      sizePerPage: 500,
       totalSize: this.props.members.length, // replace later with size(customers),
       custom: true,
     }

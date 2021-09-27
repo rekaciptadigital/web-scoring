@@ -103,7 +103,7 @@ class TableScoring extends Component {
         <div>
           <div>
             <Row>
-              <Col className="col-12">
+              <Col>
                 <Card>
                   <CardBody>
                     <PaginationProvider
@@ -123,7 +123,7 @@ class TableScoring extends Component {
                             <React.Fragment>
 
                               <Row className="mb-2">
-                                <Col md="4">
+                                <Col>
                                   <div className="search-box me-2 mb-2 d-inline-block">
                                     <div className="position-relative">
                                       {/* <SearchBar
@@ -136,7 +136,7 @@ class TableScoring extends Component {
                               </Row>
 
                               <Row>
-                                <Col xl="12">
+                                <Col>
                                   <div className="table-responsive">
                                     <BootstrapTable
                                       keyField={"id"}

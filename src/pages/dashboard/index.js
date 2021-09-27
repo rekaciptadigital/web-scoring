@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import {
   Button,
   Card,
-  CardBody,
+  // CardBody,
   Col,
   Container,
-  Media,
+  // Media,
   Modal,
   ModalBody,
   ModalFooter,
@@ -14,7 +14,7 @@ import {
   Row,
   Table,
 } from "reactstrap";
-import { AuthenticationService } from "services";
+// import { AuthenticationService } from "services";
 import modalimage2 from "assets/images/product/img-4.png";
 import modalimage1 from "assets/images/product/img-7.png";
 import Breadcrumbs from "components/Common/Breadcrumb";
@@ -26,15 +26,15 @@ const Dashboard = () => {
     { title: "Orders", iconClass: "bx-copy-alt", description: "1,235" },
     { title: "Revenue", iconClass: "bx-archive-in", description: "$35, 723" },
   ];
-  const email = [
-    { title: "Week", linkto: "#", isActive: false },
-    { title: "Month", linkto: "#", isActive: false },
-    { title: "Year", linkto: "#", isActive: true },
-  ];
+  // const email = [
+  //   { title: "Week", linkto: "#", isActive: false },
+  //   { title: "Month", linkto: "#", isActive: false },
+  //   { title: "Year", linkto: "#", isActive: true },
+  // ];
 
-  const test = async () => {
-    await AuthenticationService.login({});
-  };
+  // const test = async () => {
+  //   await AuthenticationService.login({});
+  // };
 
   return (
     <React.Fragment>
@@ -49,38 +49,39 @@ const Dashboard = () => {
             <Col xl="8">
               <Row>
                 {/* Reports Render */}
-                {reports.map((report, key) => (
-                  <Col md="4" key={"_col_" + key}>
-                    <Card className="mini-stats-wid">
-                      <CardBody>
-                        <Media>
-                          <Media body>
-                            <p className="text-muted fw-medium">
-                              {report.title}
-                            </p>
-                            <h4 className="mb-0">{report.description}</h4>
-                          </Media>
-                          <div
-                            className="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon"
-                            onClick={() => test()}
-                          >
-                            <span className="avatar-title rounded-circle bg-primary">
-                              <i
-                                className={
-                                  "bx " + report.iconClass + " font-size-24"
-                                }
-                              ></i>
-                            </span>
-                          </div>
-                        </Media>
-                      </CardBody>
-                    </Card>
-                  </Col>
+                {reports.map((report) => (
+                  <div key={report.label}>{console.log(report)}</div>
+                  // <Col md="4" key={"_col_" + key}>
+                  //   <Card className="mini-stats-wid">
+                  //     <CardBody>
+                  //       <Media>
+                  //         <Media body>
+                  //           <p className="text-muted fw-medium">
+                  //             {report.title}
+                  //           </p>
+                  //           <h4 className="mb-0">{report.description}</h4>
+                  //         </Media>
+                  //         <div
+                  //           className="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon"
+                  //           onClick={() => test()}
+                  //         >
+                  //           <span className="avatar-title rounded-circle bg-primary">
+                  //             <i
+                  //               className={
+                  //                 "bx " + report.iconClass + " font-size-24"
+                  //               }
+                  //             ></i>
+                  //           </span>
+                  //         </div>
+                  //       </Media>
+                  //     </CardBody>
+                  //   </Card>
+                  // </Col>
                 ))}
               </Row>
 
               <Card>
-                <CardBody>
+                {/* <CardBody>
                   <div className="d-sm-flex flex-wrap">
                     <h4 className="card-title mb-4">Email Sent</h4>
                     <div className="ms-auto">
@@ -100,7 +101,7 @@ const Dashboard = () => {
                       </ul>
                     </div>
                   </div>
-                </CardBody>
+                </CardBody> */}
               </Card>
             </Col>
           </Row>

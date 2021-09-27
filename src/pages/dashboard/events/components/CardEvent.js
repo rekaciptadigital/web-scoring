@@ -100,11 +100,11 @@ function CardEvent(props) {
                                         <h3 className="bx bx-dots-vertical" style={{cursor: 'pointer'}}></h3>
                                     </DropdownToggle>
                                     <DropdownMenu className="dropdown-menu-end">
-                                        <DropdownItem tag="a" href="/dashboard/schedule">
+                                        <DropdownItem tag="a" href={"/dashboard/schedule/"+props.detail.event.id}>
                                             {" "}
                                             <span>Lihat Jadwal</span>
                                         </DropdownItem>
-                                        <DropdownItem tag="a" href="/dashboard/schedule">
+                                        <DropdownItem tag="a" href={"/dashboard/member/"+props.detail.event.id}>
                                             {" "}
                                             <span>Lihat Peserta</span>
                                         </DropdownItem>

@@ -16,14 +16,14 @@ import ListSchedule from "../pages/dashboard/schedule"
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
   { path: "/dashboard/events", component: ListEvent},
-  { path: "/dashboard/member", component: ListMember},
+  { path: "/dashboard/member/:event_id", component: ListMember},
   { path: "/dashboard/category", component: ListCategory},
   { path: "/dashboard/scoring", component: ListScoring},
   { path: "/dashboard/scoring/new", component: ScoringNew},
   { path: "/dashboard/result", component: ListResult},
   { path: "/dashboard/result/bagan", component: Bagan},
   { path: "/dashboard/result/edit", component: EditResult},
-  { path: "/dashboard/schedule", component: ListSchedule},
+  { path: "/dashboard/schedule/:event_id", component: ListSchedule},
   
   // this route should be at the end of all other routes
   { path: "/dashboard/events/new", component: EventsNew },

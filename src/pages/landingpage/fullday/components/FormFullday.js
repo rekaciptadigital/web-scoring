@@ -22,6 +22,7 @@ import { selectConstants } from "constants/index";
 import { useHistory } from "react-router-dom";
 //SweetAlert
 import SweetAlert from "react-bootstrap-sweetalert";
+import { LoadingScreen } from "components"
 
 const Label = styled.label`
   font-size: 12px;
@@ -42,6 +43,8 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
   const [isError, setIsError] = useState("");
   const [error, setError] = useState(null);
   const [confirm, setConfirm] = useState(false);
+  const [loading, setLoading] = useState(false)
+
 
   function toggleTab(tab) {
     if (activeTab !== tab) {
@@ -53,7 +56,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
 
   const handleValidSubmit = async () => {
     setError(false);
-    // TODO set load true
+    setLoading(true)
     setIsError("");
     const localFormData = { ...formData };
     localFormData.eventId = eventDetail ? eventDetail.id : 0;
@@ -82,7 +85,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
       }
       console.error(message, errors);
     }
-    // TODO set load false
+    setLoading(false)
   };
 
   let formatter = new Intl.NumberFormat("id-ID", {
@@ -259,6 +262,7 @@ const FormFullday = ({ onFormFieldChange, formData, eventDetail }) => {
           </CardBody>
         </Card>
         </div>
+        <LoadingScreen loading={loading} />
     </div>
   );
 };

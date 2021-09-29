@@ -175,6 +175,21 @@ const qualificationSchedule = [
   {"id": 4, "date": "23 Agustus 2021", "session": "4", "time": "13.00-14.00", "quota": "20/100"},
 ]
 
+const displayScore = [
+  {"id": 1, "pos": 1, "athlete": "Kholidin", "country-code": "FAST", "state-code": "Focus Archery Sport Team", "50m-1": "320 1", "50m-2":"327 1",
+"total": 647, "10+x": 30, "x":11},
+  {"id": 2, "pos": 2, "athlete": "Hari Fitriyanto", "country-code": "NFBSLP1", "state-code": "Nfbs Lembang Pro 1", "50m-1": "309 3", "50m-2":"314 2",
+"total": 623, "10+x": 13, "x":4},
+  {"id": 3, "pos": 3, "athlete": "Shindu Purwanto", "country-code": "NFBSLP2", "state-code": "Nfbs Lembang Pro 2", "50m-1": "304 5", "50m-2":"309 3",
+"total": 613, "10+x": 14, "x":5},
+  {"id": 4, "pos": 4, "athlete": "Edi Purwanto", "country-code": "NFBSLP1", "state-code": "Nfbs Lembang Pro 1", "50m-1": "310 2", "50m-2":"303 6",
+"total": 613, "10+x": 13, "x":5},
+  {"id": 5, "pos": 5, "athlete": "Aditya Priyantoro", "country-code": "FOCUS", "state-code": "Focus Archery Club", "50m-1": "301 7", "50m-2":"307 5",
+"total": 608, "10+x": 16, "x":4},
+  {"id": 6, "pos": 6, "athlete": "Upuwansyah Herman", "country-code": "NFBSLP2", "state-code": "Nfbs Lembang Pro 2", "50m-1": "301 8", "50m-2":"307 5",
+"total": 608, "10+x": 10, "x":6},
+]
+
 export default {
   eventCompetitionCategories,
   eventAgeCategories,
@@ -187,5 +202,6 @@ export default {
   result,
   editResult,
   categoryArchery,
-  qualificationSchedule
+  qualificationSchedule,
+  displayScore,
 };

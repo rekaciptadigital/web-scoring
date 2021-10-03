@@ -93,6 +93,7 @@ class TableScore extends Component {
     return (
       <React.Fragment>
         <div className="col-12">
+          <h5 style={this.props.title.style}>{this.props.title.label}</h5>
           <PaginationProvider
             pagination={paginationFactory(pageOptions)}
             keyField="id"

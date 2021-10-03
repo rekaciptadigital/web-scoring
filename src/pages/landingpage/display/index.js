@@ -24,9 +24,11 @@ import { useParams } from "react-router-dom";
 function DisplayScore() {
     const path = window.location.pathname;
     const { slug } = useParams();
-    const [memberScoring, setMemberScoring] = useState([]);
+    const [memberScoringMale, setMemberScoringMale] = useState([]);
+    const [memberScoringFemale, setMemberScoringFemale] = useState([]);
     const [eventDetail, setEventDetail] = useState({});
     const [category, setCategory] = useState({});
+    const [gender, setGender] = useState(null);
 
     useEffect(async () => {
       try {
@@ -49,13 +51,13 @@ function DisplayScore() {
           }
       }, []);
 
-      const getScoring = async (event_id,category) => {
+      const getScoring = async (event_id,category,gender = null) => {
         setCategory(category);
-
         const { data, errors, success, message } = await EventsService.getEventMemberScoring(
           {
             "event_id":event_id,
             "type":1,
+            "gender":gender,
             ...category
           }
         );
@@ -66,7 +68,7 @@ function DisplayScore() {
                 m.push({"id": d.member.id,
                   "pos": i+1,
                   "athlete": d.member.name,
-                  "club": "FAST",
+                  "club": d.member.club,
                   "session_one": d.sessions[1].total,
                   "session_two": d.sessions[2].total,
                   "total": d.total,
@@ -74,11 +76,25 @@ function DisplayScore() {
                   "x":d.totalX
                 })}
               )
-              
-                setMemberScoring(m);
+                if (gender == "male") {
+                  setMemberScoringMale(m);                  
+                }
+                if (gender == "female") {
+                  setMemberScoringFemale(m);                  
+                }
               }
         } else {
             console.log(message, errors);
+        }
+      }
+
+      const filterScoringGender = async (event_id,category,gender = null) => {
+        setGender(gender);
+        if (gender == null) {
+          getScoring(event_id,category,"male")        
+          getScoring(event_id,category,"female")        
+        }else{
+          getScoring(event_id,category,gender)
         }
       }
     let { isLoggedIn } = useSelector(getAuthenticationStore);
@@ -145,7 +161,7 @@ function DisplayScore() {
                                 {/* <div className="d-block d-md-flex justify-content-between"> */}
                                     <SelectInput
                                         name='jenis'
-                                        onChange={(v) => {getScoring(eventDetail.id,v.value)}}
+                                        onChange={(v) => {filterScoringGender(eventDetail.id,v.value)}}
                                         options={
                                             eventDetail?.flatCategories?.map((option) => {
                                               return {
@@ -158,10 +174,22 @@ function DisplayScore() {
                                           value={category.label != undefined ? category:null}
                                         />
                   </Col>
+                  <Col md={4} sm={12}>
+                      <div className="d-block d-md-flex mt-md-0 mt-3">
+                        <Button onClick={()=>filterScoringGender(eventDetail.id,category,null)} color={gender == null ? "dark" : "outline-dark"}>Semua</Button>
+                        <Button onClick={()=>filterScoringGender(eventDetail.id,category,"male")} color={gender == "male" ? "dark" : "outline-dark"}>Laki Laki</Button>
+                        <Button onClick={()=>filterScoringGender(eventDetail.id,category,"female")} color={gender == "female" ? "dark" : "outline-dark"}>Perempuan</Button>
+                      </div>
+                  </Col>
                 </Row>
                 <hr />
                 </div>
-                <TableScore member={memberScoring} />
+                {gender == "male" || gender == null ? 
+                  <TableScore title={{style:{color:"blue"},label:"Laki-laki"}} member={memberScoringMale} />
+                :null}
+                {gender == "female" || gender == null ? 
+                  <TableScore title={{style:{color:"#e12c4b"},label:"Perempuan"}} member={memberScoringFemale} />
+                :null}
         </Container>
         <Footer />
         </React.Fragment>

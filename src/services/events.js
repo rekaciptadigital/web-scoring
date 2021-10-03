@@ -18,5 +18,8 @@ export default {
     },
     getEventMemberProfile(qs) {
         return API.get("/web/v1/archery/events/participant/member/profile", qs)
+    },
+    getEventMemberScoring(qs) {
+        return API.get("/api/v1/archery/scorer/participant", qs)
     }
 }

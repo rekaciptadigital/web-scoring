@@ -143,9 +143,14 @@ const LandingPage = () => {
                   </div>
                 </CardBody>
               </Card>
-              <div className="button-items mt-4">
+                <div className="button-items mt-4">
                   <a  target="_blank" rel="noreferrer" href={`/event/register/process/${slug}`} className="btn btn-success me-1 w-100">
                     DAFTAR EVENT
+                  </a>
+                </div>
+                <div className="button-items mt-4">
+                  <a  target="_blank" rel="noreferrer" href={`/display/score/${slug}`} className="btn btn-warning me-1 w-100">
+                    LIVE SCORING
                   </a>
                 </div>
                 </Col>
@@ -177,9 +182,14 @@ const LandingPage = () => {
                   </div>
                 </CardBody>
               </Card>
-              <div className="button-items mt-4">
+                <div className="button-items mt-4">
                   <a  target="_blank" rel="noreferrer" href={`/event/register/process/${slug}`} className="btn btn-success me-1 w-100">
                     DAFTAR EVENT
+                  </a>
+                </div>
+                <div className="button-items mt-4">
+                  <a  target="_blank" rel="noreferrer" href={`/display/score/${slug}`} className="btn btn-warning me-1 w-100">
+                    LIVE SCORING
                   </a>
                 </div>
                 </Col>

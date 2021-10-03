@@ -41,7 +41,7 @@ function DisplayScore() {
                   let cat = {...data.flatCategories[0],
                     id: `${data.flatCategories[0].teamCategoryId}.${data.flatCategories[0].ageCategoryId}.${data.flatCategories[0].competitionCategoryId}.${data.flatCategories[0].distanceId}`,
                     "label":data.flatCategories[0].archeryEventCategoryLabel}
-                  await getScoring(data.id,cat)
+                  await filterScoringGender(data.id,cat)
                 }
           } else {
               console.log(message, errors);

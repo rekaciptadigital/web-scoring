@@ -117,14 +117,14 @@ class TableScore extends Component {
                             responsive
                             bordered={false}
                             rowStyle={(row, rowIndex) => {
-                              if(rowIndex == 1)
-                                return {background:"#aaa707 none repeat scroll 0% 0%", color:"white"};
                               if(rowIndex == 0)
-                                return {background:"#07aa2f none repeat scroll 0% 0%",color:"white"};
+                                return {background:"rgb(217, 156, 14) none repeat scroll 0% 0%", color:"white"};
+                              if(rowIndex == 1)
+                                return {background:"rgb(198, 213, 207) none repeat scroll 0% 0%",color:"black"};
                               if(rowIndex == 2)
-                                return {background:"#0711aa none repeat scroll 0% 0%",color:"white"};
+                                return {background:"rgb(142, 102, 72) none repeat scroll 0% 0%",color:"white"};
                               if(rowIndex > 2 && rowIndex <= 10)
-                                return {background:"rgba(209, 207, 213, 0.68) none repeat scroll 0% 0%",color:"black"};
+                                return {background:"rgba(238, 236, 242, 0.44) none repeat scroll 0% 0%",color:"black"};
                             }}
                             striped={false}
                             defaultSorted={defaultSorted}

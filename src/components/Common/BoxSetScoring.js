@@ -10,6 +10,7 @@ import { Row,
 
 const BoxSetScoring = props => {
   const [error, setError] = useState([]);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
   }, []);
@@ -70,7 +71,6 @@ return (
                                           <td>No Target</td>
                                           <td> : </td>
                                           <td><input onChange={(e)=>{
-                                            console.log("e.value",e.target.value);
                                                   props.setMemberScore({...props.memberScore,no_target:e.target.value});
                                                 }} value={props.memberScore?.no_target}/>  </td>
                                         </tr>
@@ -85,6 +85,7 @@ return (
                                       <tr>
                                         <td>seri</td>
                                         <td align="center" colSpan={6}>score</td>
+                                        <td>total</td>
                                       </tr>
                                       <tr>
                                         <td></td>
@@ -104,12 +105,41 @@ return (
                                                   let ms = props.memberScore.scors;
                                                   ms[i][x] = e
                                                   props.setMemberScore({...props.memberScore,scors:ms});
+                                                  let tps = props.totalPerSeri;
+                                                  let total = 0;
+                                                  ms[i].map((s) => {
+                                                    let ns = s.value; 
+                                                    if(s.value == "x")
+                                                      ns = 10;
+                                                    if(s.value == "m")
+                                                      ns = 0;
+                                                    total = total+parseInt(ns)
+                                                  })
+                                                  tps[i] = total;
+                                                  
+                                                  let totalAll = 0;
+                                                  tps.map((t)=>{
+                                                    totalAll = totalAll + t;
+                                                  })
+                                                  setTotal(totalAll);
+                                                  props.setTotalPerSeri(tps);
                                                 }}
                                                 classNamePrefix="select2-selection"
                                               /></td>
                                               })}
+                                              <td style={{color:props.scoreSeries[i-1].color}} >{props.totalPerSeri[i]}</td>
                                             </tr>
                                       }) : null}
+                                      <tr style={{background:"black",color:"white"}}>
+                                        <td align="center">total</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="center">{total}</td>
+                                      </tr>
                                     </table>
                                     <p style={{color:"red"}}>{error}</p>
                                   </span>

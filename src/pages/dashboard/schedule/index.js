@@ -44,6 +44,7 @@ function ListMember() {
     const [member, setMember] = useState([])
     const [dateEnable, setDateEnable] = useState([]);
     const [list, setList] = useState([]);
+    const [totalPerSeri, setTotalPerSeri] = useState({});
     const [event, setEvent] = useState({});
     const [memberScore, setMemberScore] = useState({});
     
@@ -53,13 +54,16 @@ function ListMember() {
     
     const showScorebox = (memberDetail)=>{
         let ms = [];
+        let ts = [];
         scoreSeries.map((ss)=>{
             let scorePerSesi = [];
             shot_per_seri.map((sps)=>{
                 scorePerSesi[sps] = score[0]
             })
+            ts[ss.seri] = 0;
             ms[ss.seri] = scorePerSesi;
         })
+        setTotalPerSeri(ts);
         setMemberScore({no_target:"",participant:memberDetail,scors:ms});
     }
 
@@ -140,7 +144,7 @@ function ListMember() {
                 {Object.keys(memberScore).length == 0 ?
                     <TableSchedule member={member} getMemberSchedule={getMemberSchedule} showScorebox={showScorebox} event={event} date={date} list={list} />
                     :
-                    <BoxSetScoring memberScore={memberScore} shot_per_seri={shot_per_seri} score={score} setMemberScore={setMemberScore} scoreSeries={scoreSeries}/>
+                    <BoxSetScoring setTotalPerSeri={setTotalPerSeri} totalPerSeri={totalPerSeri} memberScore={memberScore} shot_per_seri={shot_per_seri} score={score} setMemberScore={setMemberScore} scoreSeries={scoreSeries}/>
                 }
                 </Container>
             </div>

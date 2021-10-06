@@ -11,6 +11,13 @@ const App = () => {
     <React.Fragment>
       <Router>
         <Switch>
+          <AuthenticationMiddleware
+            path="/"
+            layout={React.Fragment}
+            component={() => <Redirect to="/authentication/login" />}
+            isAuthProtected={false}
+            exact
+          />
           {authenticationRoutes.map((route, idx) => (
             <AuthenticationMiddleware
               path={route.path}

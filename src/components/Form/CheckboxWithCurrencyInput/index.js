@@ -99,6 +99,9 @@ const CheckboxWithCurrencyInput = ({
                 <CurrencyInput
                   name={textInputName}
                   onChange={(e) => handleTextInputChange(e, index, option)}
+                  validation={
+                    option.id === "normal" ? { required: "Harga normalnya harus diisi" } : undefined
+                  }
                 />
               )}
             </div>

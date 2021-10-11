@@ -66,15 +66,9 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
     });
   }
 
-  function handleRemoveCompetitionCategory(
-    categoryIndex,
-    competitionCategoryIndex
-  ) {
+  function handleRemoveCompetitionCategory(categoryIndex, competitionCategoryIndex) {
     const categoryList = [...formData.eventCategories];
-    categoryList[categoryIndex].competitionCategories.splice(
-      competitionCategoryIndex,
-      1
-    );
+    categoryList[categoryIndex].competitionCategories.splice(competitionCategoryIndex, 1);
     handleChange({
       key: "eventCategories",
       value: categoryList,
@@ -95,6 +89,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                     onChange={handleChange}
                     options={dummyConstants.eventAgeCategories}
                     value={eventCategory.ageCategory}
+                    validation={{ required: "Kategori kelas wajib diisi" }}
                   />
                 </Col>
                 <Col lg={4}>
@@ -102,16 +97,11 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                     name={`eventCategories.${index}.maxDateOfBirth`}
                     onChange={handleChange}
                     value={eventCategory.maxDateOfBirth}
+                    validation={{ required: "Tanggal kelas wajib diisi" }}
                   />
                 </Col>
                 <Col>
-                  <Button
-                    onClick={() => {
-                      handleCopyRow(index);
-                    }}
-                    icon="copy"
-                    type="primary"
-                  />{" "}
+                  <Button onClick={() => handleCopyRow(index)} icon="copy" type="primary" />{" "}
                   {formData.eventCategories.length > 1 && (
                     <Button
                       onClick={(e) => {
@@ -132,12 +122,11 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                         <Row key={competitionCategory.id}>
                           <Col lg={4}>
                             <SelectInput
-                              options={
-                                dummyConstants.eventCompetitionCategories
-                              }
+                              options={dummyConstants.eventCompetitionCategories}
                               name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
                               onChange={handleChange}
                               value={competitionCategory.competitionCategory}
+                              validation={{ required: "Kategori lomba wajib diisi" }}
                             />
                           </Col>
                           <Col lg={4}>
@@ -154,10 +143,8 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                   }
                                 />
                               }
-                              value={_.map(
-                                competitionCategory.distances || [],
-                                "label"
-                              )}
+                              value={_.map(competitionCategory.distances || [], "label")}
+                              validation={{ required: "Jarak yang dilombakan wajib diisi" }}
                             />
                             <ModalDistances
                               isOpen={competitionCategory.isOpenDistanceModal}
@@ -187,16 +174,12 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                     : "Tambah Kuota"
                                 }
                                 trailingIcon={
-                                  competitionCategory.teamCategories?.length > 0
-                                    ? "pencil"
-                                    : "plus"
+                                  competitionCategory.teamCategories?.length > 0 ? "pencil" : "plus"
                                 }
                                 outline
                               />
                               <ModalTeamCategories
-                                isOpen={
-                                  competitionCategory.isOpenTeamCategoryModal
-                                }
+                                isOpen={competitionCategory.isOpenTeamCategoryModal}
                                 toggle={() => {
                                   handleChange({
                                     key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenTeamCategoryModal`,
@@ -214,8 +197,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                 icon="copy"
                                 outline
                               />{" "}
-                              {eventCategory.competitionCategories.length >
-                                1 && (
+                              {eventCategory.competitionCategories.length > 1 && (
                                 <Button
                                   onClick={() => {
                                     handleRemoveCompetitionCategory(
@@ -243,7 +225,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
           data-repeater-create
           type="button"
           className="btn btn-success mt-3 mt-lg-0"
-          value="Add"
+          value="Tambah Kelas"
           onClick={() => handleAddRow()}
         />
       </Col>

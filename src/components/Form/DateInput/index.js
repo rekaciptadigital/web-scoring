@@ -1,10 +1,12 @@
-import React from "react";
-import { InputGroup, Label } from "reactstrap";
-import "flatpickr/dist/themes/material_blue.css";
-import Flatpickr from "react-flatpickr";
+import * as React from "react";
 import stringUtil from "utils/stringUtil";
 import moment from "moment";
 import _ from "lodash";
+
+import { InputGroup, Label } from "reactstrap";
+import Flatpickr from "react-flatpickr";
+
+import "flatpickr/dist/themes/material_blue.css";
 
 const DateInput = ({
   name,
@@ -12,12 +14,14 @@ const DateInput = ({
   label,
   value,
   onChange = null,
-  error,
   disabled,
   readOnly,
-  options={},
+  options = {},
+  validation,
 }) => {
-  const handleChange = e => {
+  const [error, setError] = React.useState(null);
+
+  const handleChange = (e) => {
     if (onChange)
       onChange({
         key: name,
@@ -25,20 +29,36 @@ const DateInput = ({
       });
   };
 
+  const handleClose = (ev) => {
+    if (validation?.required) {
+      if (!ev.length) {
+        setError((errors) => {
+          return {
+            ...errors,
+            [name]: [validation.required],
+          };
+        });
+      } else {
+        setError((errors) => {
+          const updatedErrors = { ...errors };
+          delete updatedErrors[name];
+          return updatedErrors;
+        });
+      }
+    }
+  };
+
   return (
     <div className="date-input">
       {label && <Label htmlFor={id}>{label}</Label>}
       <InputGroup>
         <Flatpickr
-          className={`form-control d-block ${
-            _.get(error, name) ? "is-invalid" : ""
-          }`}
+          className={`form-control d-block ${_.get(error, name) ? "is-invalid" : ""}`}
           placeholder="Tanggal/Bulan/Tahun"
-          options={{altInput: true,
-            altFormat: "d/m/Y",
-            dateFormat: "Y-m-d",...options}}
+          options={{ altInput: true, altFormat: "d/m/Y", dateFormat: "Y-m-d", ...options }}
           value={value}
-          onChange={e => handleChange(e)}
+          onChange={(e) => handleChange(e)}
+          onClose={handleClose}
           disabled={disabled}
           readOnly={readOnly}
         />
@@ -48,7 +68,7 @@ const DateInput = ({
           </span>
         </div>
       </InputGroup>
-      {_.get(error, name)?.map(message => (
+      {_.get(error, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

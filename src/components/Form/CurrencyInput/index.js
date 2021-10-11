@@ -1,8 +1,9 @@
-import _ from "lodash";
-import React from "react";
+import * as React from "react";
 import CurrencyFormat from "react-currency-format";
-import { Col, Label } from "reactstrap";
+import _ from "lodash";
 import stringUtil from "utils/stringUtil";
+
+import { Col, Label } from "reactstrap";
 
 const CurrencyInput = ({
   name,
@@ -11,16 +12,37 @@ const CurrencyInput = ({
   value,
   onChange,
   horizontal = false,
-  error,
   disabled = false,
   readOnly,
+  validation,
 }) => {
-  const handleChange = e => {
+  const [error, setError] = React.useState(null);
+
+  const handleChange = (e) => {
     if (onChange)
       onChange({
         key: name,
         value: e.floatValue,
       });
+  };
+
+  const handleBlur = (ev) => {
+    if (validation?.required) {
+      if (!ev.target.value) {
+        setError((errors) => {
+          return {
+            ...errors,
+            [name]: [validation.required],
+          };
+        });
+      } else {
+        setError((errors) => {
+          const updatedErrors = { ...errors };
+          delete updatedErrors[name];
+          return updatedErrors;
+        });
+      }
+    }
   };
 
   if (horizontal) {
@@ -37,14 +59,15 @@ const CurrencyInput = ({
             displayType={"input"}
             thousandSeparator={"."}
             prefix={"Rp "}
-            onValueChange={e => handleChange(e)}
+            onValueChange={(e) => handleChange(e)}
+            onBlur={handleBlur}
             decimalSeparator={","}
             className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
             id={id}
             disabled={disabled}
             readOnly={readOnly}
           />
-          {_.get(error, name)?.map(message => (
+          {_.get(error, name)?.map((message) => (
             <div className="invalid-feedback" key={message}>
               {message}
             </div>
@@ -62,13 +85,14 @@ const CurrencyInput = ({
         displayType={"input"}
         thousandSeparator={"."}
         prefix={"Rp "}
-        onValueChange={e => handleChange(e)}
+        onValueChange={(e) => handleChange(e)}
+        onBlur={handleBlur}
         decimalSeparator={","}
         className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
         id={id}
         disabled={disabled}
       />
-      {_.get(error, name)?.map(message => (
+      {_.get(error, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

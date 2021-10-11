@@ -1,3 +1,6 @@
+import React from "react";
+
+import { Badge, Col, Row } from "reactstrap";
 import {
   Accordion,
   Button,
@@ -8,13 +11,8 @@ import {
   SwitchInput,
   TimeInput,
 } from "components";
-import React from "react";
-import { Badge, Col, Row } from "reactstrap";
-import * as EventsStore from "store/slice/events"
-import { useSelector } from "react-redux"
 
 export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
-  const { errors } = useSelector(EventsStore.getEventsStore)  
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
@@ -36,8 +34,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
 
   const expandSession = (dayIndex) => {
     const qualificationDays = [...formData.qualificationDays];
-    qualificationDays[dayIndex].openDetails = qualificationDays[dayIndex]
-      .openDetails
+    qualificationDays[dayIndex].openDetails = qualificationDays[dayIndex].openDetails
       ? false
       : !qualificationDays[dayIndex].openDetails;
     handleChange({
@@ -99,7 +96,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="registrationStartDatetime"
                       value={formData.registrationStartDatetime}
                       onChange={handleChange}
-                      error={errors}
+                      validation={{ required: "Tanggal dan jam buka pendaftaran harus diisi" }}
                     />
                   </Col>
                   <Col lg={6}>
@@ -108,7 +105,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="registrationEndDatetime"
                       value={formData.registrationEndDatetime}
                       onChange={handleChange}
-                      error={errors}
+                      validation={{ required: "Tanggal dan jam tutup pendaftaran harus diisi" }}
                     />
                   </Col>
                   <Col lg={6}>
@@ -117,7 +114,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="eventStartDatetime"
                       value={formData.eventStartDatetime}
                       onChange={handleChange}
-                      error={errors}
+                      validation={{ required: "Tanggal dan jam mulai lomba harus diisi" }}
                     />
                   </Col>
                   <Col lg={6}>
@@ -126,7 +123,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="eventEndDatetime"
                       value={formData.eventEndDatetime}
                       onChange={handleChange}
-                      error={errors}
+                      validation={{ required: "Tanggal dan jam mulai lomba harus diisi" }}
                     />
                   </Col>
                 </Row>
@@ -146,7 +143,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           name="qualificationStartDatetime"
                           value={formData.qualificationStartDatetime}
                           onChange={handleChange}
-                          error={errors}
+                          validation={{ required: "Tanggal pembukaan kualifikasi harus diisi" }}
                         />
                       </Col>
                       <Col lg={3}>
@@ -155,7 +152,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           name="qualificationEndDatetime"
                           value={formData.qualificationEndDatetime}
                           onChange={handleChange}
-                          error={errors}
+                          validation={{ required: "Tanggal penutupan kualifikasi harus diisi" }}
                         />
                       </Col>
                       <Col lg={3}>
@@ -165,7 +162,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           value={formData.qualificationSessionLength}
                           options={[{ id: "60", label: "Per 1 Jam" }]}
                           onChange={handleChange}
-                          error={errors}
+                          validation={{ required: "Sesi harus diisi" }}
                         />
                       </Col>
                       <Col lg={3}>
@@ -174,7 +171,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           value={formData.qualificationWeekdaysOnly}
                           onChange={handleChange}
                           label="Weekday Only"
-                          error={errors}
                         />
                       </Col>
                       <Col lg={12}>
@@ -183,13 +179,9 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                             <tr>
                               <th>Hari</th>
                               <th>Sesi</th>
-                              <th style={{ width: "1%", whiteSpace: "nowrap" }}>
-                                Detail Sesi
-                              </th>
+                              <th style={{ width: "1%", whiteSpace: "nowrap" }}>Detail Sesi</th>
                               <th>Kuota</th>
-                              <th style={{ width: "1%", whiteSpace: "nowrap" }}>
-                                ...
-                              </th>
+                              <th style={{ width: "1%", whiteSpace: "nowrap" }}>...</th>
                             </tr>
                           </thead>
                           {formData.qualificationDays.map((day, dayIndex) => (
@@ -197,28 +189,19 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                               <tr>
                                 <td>{day.label}</td>
                                 <td>
-                                  <Badge
-                                    className="bg-info"
-                                    style={{ fontSize: "1em" }}
-                                  >
+                                  <Badge className="bg-info" style={{ fontSize: "1em" }}>
                                     {day.details?.length} Sesi
                                   </Badge>
                                 </td>
                                 <td>
-                                  {day.details?.[0]?.startTime} -{" "}
-                                  {day.details?.[0]?.endTime}
+                                  {day.details?.[0]?.startTime} - {day.details?.[0]?.endTime}
                                 </td>
                                 <td>
-                                  <Badge
-                                    className="bg-info"
-                                    style={{ fontSize: "1em" }}
-                                  >
+                                  <Badge className="bg-info" style={{ fontSize: "1em" }}>
                                     {sumQuota(day.details)}
                                   </Badge>
                                 </td>
-                                <td
-                                  style={{ width: "1%", whiteSpace: "nowrap" }}
-                                >
+                                <td style={{ width: "1%", whiteSpace: "nowrap" }}>
                                   <Button
                                     type="light"
                                     icon="plus-circle"
@@ -228,11 +211,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                   />{" "}
                                   <Button
                                     type="light"
-                                    icon={
-                                      day.openDetails
-                                        ? "chevron-up"
-                                        : "chevron-down"
-                                    }
+                                    icon={day.openDetails ? "chevron-up" : "chevron-down"}
                                     outline
                                     size="sm"
                                     onClick={() => expandSession(dayIndex)}
@@ -241,10 +220,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                               </tr>
                               {day.openDetails &&
                                 day.details.map((detail, detailIndex) => (
-                                  <tr
-                                    key={detailIndex}
-                                    style={{ background: "#F8F9FA" }}
-                                  >
+                                  <tr key={detailIndex} style={{ background: "#F8F9FA" }}>
                                     <td></td>
                                     <td>Sesi {detailIndex + 1}</td>
                                     <td
@@ -260,7 +236,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                               name={`qualificationDays.${dayIndex}.details.${detailIndex}.startTime`}
                                               value={detail.startTime}
                                               onChange={handleChange}
-                                              error={errors}
                                             />
                                           </div>
                                           <div
@@ -277,7 +252,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                               name={`qualificationDays.${dayIndex}.details.${detailIndex}.endTime`}
                                               value={detail.endTime}
                                               onChange={handleChange}
-                                              error={errors}
                                             />
                                           </div>
                                         </div>
@@ -292,7 +266,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                             name={`qualificationDays.${dayIndex}.details.${detailIndex}.quota`}
                                             value={detail.quota}
                                             onChange={handleChange}
-                                            error={errors}
                                           />
                                         </div>
                                       ) : (
@@ -311,12 +284,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                           icon="check"
                                           outline
                                           size="sm"
-                                          onClick={() =>
-                                            saveSessionItem(
-                                              dayIndex,
-                                              detailIndex
-                                            )
-                                          }
+                                          onClick={() => saveSessionItem(dayIndex, detailIndex)}
                                         />
                                       ) : (
                                         <Button
@@ -324,12 +292,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                           icon="pencil"
                                           outline
                                           size="sm"
-                                          onClick={() =>
-                                            editSessionItem(
-                                              dayIndex,
-                                              detailIndex
-                                            )
-                                          }
+                                          onClick={() => editSessionItem(dayIndex, detailIndex)}
                                         />
                                       )}{" "}
                                       <Button
@@ -337,12 +300,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                                         icon="trash"
                                         outline
                                         size="sm"
-                                        onClick={() =>
-                                          removeSessionItem(
-                                            dayIndex,
-                                            detailIndex
-                                          )
-                                        }
+                                        onClick={() => removeSessionItem(dayIndex, detailIndex)}
                                       />
                                     </td>
                                   </tr>

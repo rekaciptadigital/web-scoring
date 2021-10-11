@@ -1,17 +1,15 @@
+import React from "react";
+import { selectConstants } from "constants/index";
+
+import { Col, Row } from "reactstrap";
 import {
   CheckboxInput,
   CheckboxWithCurrencyInput,
   CurrencyInput,
   // SwitchInput,
 } from "components";
-import React from "react";
-import { Col, Row } from "reactstrap";
-import { selectConstants } from "constants/index";
-import * as EventsStore from "store/slice/events"
-import { useSelector } from "react-redux"
 
 export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
-  const { errors } = useSelector(EventsStore.getEventsStore)  
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
@@ -40,7 +38,6 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
             options={selectConstants.teamCategories}
             inline
             value={formData.teamCategories}
-            error={errors}
           />
         </Col>
       </Row>
@@ -57,30 +54,27 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
         </Col>
       </Row> */}
       {/* {formData.isFlatRegistrationFee && ( */}
-        <Row>
-          {formData.registrationFees?.map((registrationFee, index) => (
-            <Col lg={6} key={registrationFee.id}>
-              <Row>
-                <h5>{registrationFee.label}</h5>
-                {registrationFee.categoryPrices?.map(
-                  (categoryPrice, categoryPriceIndex) => (
-                    <Col lg={6} key={categoryPriceIndex}>
-                      <CurrencyInput
-                        // disabled={formData.isFlatRegistrationFee}
-                        horizontal
-                        label={categoryPrice.label}
-                        name={`registrationFees.${index}.categoryPrices.${categoryPriceIndex}.price`}
-                        onChange={handleChange}
-                        value={categoryPrice.price}
-                        error={errors}
-                      />
-                    </Col>
-                  )
-                )}
-              </Row>
-            </Col>
-          ))}
-        </Row>
+      <Row>
+        {formData.registrationFees?.map((registrationFee, index) => (
+          <Col lg={6} key={registrationFee.id}>
+            <Row>
+              <h5>{registrationFee.label}</h5>
+              {registrationFee.categoryPrices?.map((categoryPrice, categoryPriceIndex) => (
+                <Col lg={6} key={categoryPriceIndex}>
+                  <CurrencyInput
+                    // disabled={formData.isFlatRegistrationFee}
+                    horizontal
+                    label={categoryPrice.label}
+                    name={`registrationFees.${index}.categoryPrices.${categoryPriceIndex}.price`}
+                    onChange={handleChange}
+                    value={categoryPrice.price}
+                  />
+                </Col>
+              ))}
+            </Row>
+          </Col>
+        ))}
+      </Row>
     </>
   );
 };

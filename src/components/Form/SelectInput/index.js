@@ -1,8 +1,9 @@
-import _ from "lodash";
 import React, { useEffect, useState } from "react";
-import Select from "react-select";
-import { Label } from "reactstrap";
+import _ from "lodash";
 import stringUtil from "utils/stringUtil";
+
+import { Label } from "reactstrap";
+import Select from "react-select";
 
 const SelectInput = ({
   name,
@@ -11,13 +12,14 @@ const SelectInput = ({
   value,
   onChange,
   options = [],
-  error,
   disabled,
   readOnly,
   placeholder,
+  validation,
 }) => {
   const [selectOptions, setSelectOptions] = useState([]);
   const [selectValue, setSelectValue] = useState(null);
+  const [error, setError] = React.useState(null);
 
   const handleChange = (e) => {
     if (onChange)
@@ -48,9 +50,28 @@ const SelectInput = ({
         label: value?.label || value,
       });
     } else {
-      setSelectValue(null)
+      setSelectValue(null);
     }
   }, [value]);
+
+  const handleBlur = () => {
+    if (validation?.required) {
+      if (!selectValue) {
+        setError((errors) => {
+          return {
+            ...errors,
+            [name]: [validation.required],
+          };
+        });
+      } else {
+        setError((errors) => {
+          const updatedErrors = { ...errors };
+          delete updatedErrors[name];
+          return updatedErrors;
+        });
+      }
+    }
+  };
 
   return (
     <div>
@@ -60,6 +81,7 @@ const SelectInput = ({
         id={id}
         value={selectValue}
         onChange={handleChange}
+        onBlur={handleBlur}
         options={selectOptions}
         classNamePrefix="select2-selection"
         className={`${error?.[name] ? "is-invalid" : ""}`}

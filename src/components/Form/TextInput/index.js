@@ -1,7 +1,8 @@
+import * as React from "react";
 import _ from "lodash";
-import React from "react";
-import { Input, InputGroup, Label } from "reactstrap";
 import stringUtil from "utils/stringUtil";
+
+import { Input, InputGroup, Label } from "reactstrap";
 
 const TextInput = ({
   name,
@@ -10,16 +11,37 @@ const TextInput = ({
   value,
   onChange,
   accessoryRight,
-  error,
   readOnly,
   disabled,
+  validation,
 }) => {
-  const handleChange = e => {
+  const [error, setError] = React.useState(null);
+
+  const handleChange = (e) => {
     if (onChange)
       onChange({
         key: name,
         value: e.target.value,
       });
+  };
+
+  const handleBlur = (ev) => {
+    if (validation?.required) {
+      if (!ev.target.value) {
+        setError((errors) => {
+          return {
+            ...errors,
+            [name]: [validation.required],
+          };
+        });
+      } else {
+        setError((errors) => {
+          const updatedErrors = { ...errors };
+          delete updatedErrors[name];
+          return updatedErrors;
+        });
+      }
+    }
   };
 
   return (
@@ -31,6 +53,7 @@ const TextInput = ({
           className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
           id={id}
           onChange={handleChange}
+          onBlur={handleBlur}
           value={value}
           placeholder={label}
           readOnly={readOnly}
@@ -38,7 +61,7 @@ const TextInput = ({
         />
         {accessoryRight}
       </InputGroup>
-      {_.get(error, name)?.map(message => (
+      {_.get(error, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

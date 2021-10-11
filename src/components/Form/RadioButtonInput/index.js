@@ -12,14 +12,15 @@ const RadioButtonInput = ({
     },
   ],
   onChange,
+  validation,
   value,
   valueOnly = false,
-  error,
   disabled,
   readOnly,
   checked,
 }) => {
   const [checkedOption, setCheckedOption] = useState();
+  const [error, setError] = React.useState(null);
 
   const handleChange = (e, option) => {
     setCheckedOption(option);
@@ -29,6 +30,26 @@ const RadioButtonInput = ({
         value: valueOnly ? option.id : option,
       });
   };
+
+  const handleBlur = (ev) => {
+    if (validation?.required) {
+      if (!ev.target.checked) {
+        setError((errors) => {
+          return {
+            ...errors,
+            [name]: [validation.required],
+          };
+        });
+      } else {
+        setError((errors) => {
+          const updatedErrors = { ...errors };
+          delete updatedErrors[name];
+          return updatedErrors;
+        });
+      }
+    }
+  };
+
   const Button = ({ id, label }) => (
     <>
       <input
@@ -37,15 +58,14 @@ const RadioButtonInput = ({
         name={name}
         id={id}
         autoComplete="off"
-        onChange={e => handleChange(e, { id, label })}
+        onChange={(e) => handleChange(e, { id, label })}
+        onBlur={handleBlur}
         checked={id === checkedOption?.id || checked}
         disabled={disabled}
         readOnly={readOnly}
       />
       <label
-        className={`btn ${
-          _.get(error, name) ? "btn-outline-danger" : "btn-outline-primary"
-        }`}
+        className={`btn ${_.get(error, name) ? "btn-outline-danger" : "btn-outline-primary"}`}
         htmlFor={id}
       >
         {label}
@@ -61,16 +81,12 @@ const RadioButtonInput = ({
   return (
     <div className="radio-button-input">
       {label && <Label className="form-label">{label}</Label>}
-      <div
-        className="btn-group"
-        role="group"
-        aria-label="Basic radio toggle button group"
-      >
-        {options.map(option => (
+      <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+        {options.map((option) => (
           <Button id={option.id} key={option.id} label={option.label} />
         ))}
       </div>
-      {_.get(error, name)?.map(message => (
+      {_.get(error, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

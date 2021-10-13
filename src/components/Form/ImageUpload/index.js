@@ -1,7 +1,9 @@
-import _ from "lodash";
 import React, { useState } from "react";
-import { Input, Label } from "reactstrap";
+import _ from "lodash";
 import stringUtil from "utils/stringUtil";
+import { useFieldValidation } from "../_utils/hooks/field-validation";
+
+import { Input, Label } from "reactstrap";
 
 const ImageUpload = ({
   id = stringUtil.createRandom(),
@@ -10,21 +12,23 @@ const ImageUpload = ({
   onChange,
   multiple = false,
   thumbnail = false,
-  error,
   disabled,
   readOnly,
   base64,
 }) => {
   const [uploadedImage, setUploadedImage] = useState();
+  const { errors, runFieldValidation } = useFieldValidation(name);
 
-  const handleChange = e => {
-    base64(e)
-    setUploadedImage(URL.createObjectURL(e.target.files[0]));
-    if (onChange)
+  const handleChange = (ev) => {
+    base64(ev);
+    setUploadedImage(URL.createObjectURL(ev.target.files[0]));
+    if (onChange) {
       onChange({
         key: name,
-        value: multiple ? e.target.files : e.target.files[0],
+        value: multiple ? ev.target.files : ev.target.files[0],
       });
+    }
+    runFieldValidation(multiple ? ev.target.files : ev.target.files[0]);
   };
 
   return (
@@ -36,10 +40,7 @@ const ImageUpload = ({
       )}
       {thumbnail && (
         <div className="input-file-thumbnail">
-          <label
-            className={`label ${_.get(error, name) ? "is-invalid" : ""}`}
-            htmlFor={id}
-          >
+          <label className={`label ${_.get(errors, name) ? "is-invalid" : ""}`} htmlFor={id}>
             {uploadedImage ? (
               <img src={uploadedImage} width="100%" className="icon" />
             ) : (
@@ -51,15 +52,14 @@ const ImageUpload = ({
         </div>
       )}
       <Input
-        className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
+        className={`d-none form-control ${_.get(errors, name) ? "is-invalid" : ""}`}
         id={id}
         type="file"
         onChange={handleChange}
-        style={{ display: thumbnail ? "none" : "block" }}
         disabled={disabled}
         readOnly={readOnly}
       />
-      {_.get(error, name)?.map(message => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

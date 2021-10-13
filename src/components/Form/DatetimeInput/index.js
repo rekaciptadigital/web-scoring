@@ -2,6 +2,7 @@ import * as React from "react";
 import _ from "lodash";
 import moment from "moment";
 import stringUtil from "utils/stringUtil";
+import { useFieldValidation } from "../_utils/hooks/field-validation";
 
 import { InputGroup, Label } from "reactstrap";
 import Flatpickr from "react-flatpickr";
@@ -16,9 +17,8 @@ const DatetimeInput = ({
   onChange = null,
   disabled,
   readOnly,
-  validation,
 }) => {
-  const [error, setError] = React.useState(null);
+  const { errors, runFieldValidation } = useFieldValidation(name);
 
   const handleChange = (e) => {
     const datetime = moment(new Date(e)).format("YYYY-MM-DD H:mm:ss");
@@ -29,31 +29,17 @@ const DatetimeInput = ({
       });
   };
 
-  const handleClose = (ev) => {
-    if (validation?.required) {
-      if (!ev.length) {
-        setError((errors) => {
-          return {
-            ...errors,
-            [name]: [validation.required],
-          };
-        });
-      } else {
-        setError((errors) => {
-          const updatedErrors = { ...errors };
-          delete updatedErrors[name];
-          return updatedErrors;
-        });
-      }
-    }
+  const handleClose = (value) => {
+    runFieldValidation(value);
   };
 
   return (
     <div className="datetime-input">
       {label && <Label htmlFor={id}>{label}</Label>}
+
       <InputGroup>
         <Flatpickr
-          className={`form-control d-block ${_.get(error, name) ? "is-invalid" : ""}`}
+          className={`form-control d-block ${_.get(errors, name) ? "is-invalid" : ""}`}
           placeholder="Pilih Tanggal & Jam"
           options={{
             enableTime: true,
@@ -73,7 +59,8 @@ const DatetimeInput = ({
           </span>
         </div>
       </InputGroup>
-      {_.get(error, name)?.map((message) => (
+
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

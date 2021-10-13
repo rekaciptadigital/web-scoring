@@ -96,7 +96,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="registrationStartDatetime"
                       value={formData.registrationStartDatetime}
                       onChange={handleChange}
-                      validation={{ required: "Tanggal dan jam buka pendaftaran harus diisi" }}
                     />
                   </Col>
                   <Col lg={6}>
@@ -105,7 +104,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="registrationEndDatetime"
                       value={formData.registrationEndDatetime}
                       onChange={handleChange}
-                      validation={{ required: "Tanggal dan jam tutup pendaftaran harus diisi" }}
                     />
                   </Col>
                   <Col lg={6}>
@@ -114,7 +112,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="eventStartDatetime"
                       value={formData.eventStartDatetime}
                       onChange={handleChange}
-                      validation={{ required: "Tanggal dan jam mulai lomba harus diisi" }}
                     />
                   </Col>
                   <Col lg={6}>
@@ -123,7 +120,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                       name="eventEndDatetime"
                       value={formData.eventEndDatetime}
                       onChange={handleChange}
-                      validation={{ required: "Tanggal dan jam mulai lomba harus diisi" }}
                     />
                   </Col>
                 </Row>

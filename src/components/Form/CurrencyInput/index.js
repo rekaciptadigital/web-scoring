@@ -1,9 +1,10 @@
 import * as React from "react";
-import CurrencyFormat from "react-currency-format";
 import _ from "lodash";
 import stringUtil from "utils/stringUtil";
+import { useFieldValidation } from "../_utils/hooks/field-validation";
 
 import { Col, Label } from "reactstrap";
+import CurrencyFormat from "react-currency-format";
 
 const CurrencyInput = ({
   name,
@@ -14,35 +15,20 @@ const CurrencyInput = ({
   horizontal = false,
   disabled = false,
   readOnly,
-  validation,
 }) => {
-  const [error, setError] = React.useState(null);
+  const { errors, runFieldValidation } = useFieldValidation(name);
 
-  const handleChange = (e) => {
-    if (onChange)
+  const handleChange = (ev) => {
+    if (onChange) {
       onChange({
         key: name,
-        value: e.floatValue,
+        value: !isNaN(ev.floatValue) ? ev.floatValue : undefined,
       });
+    }
   };
 
-  const handleBlur = (ev) => {
-    if (validation?.required) {
-      if (!ev.target.value) {
-        setError((errors) => {
-          return {
-            ...errors,
-            [name]: [validation.required],
-          };
-        });
-      } else {
-        setError((errors) => {
-          const updatedErrors = { ...errors };
-          delete updatedErrors[name];
-          return updatedErrors;
-        });
-      }
-    }
+  const handleBlur = () => {
+    runFieldValidation(value);
   };
 
   if (horizontal) {
@@ -55,19 +41,19 @@ const CurrencyInput = ({
         )}
         <Col sm={6}>
           <CurrencyFormat
-            value={value}
+            id={id}
             displayType={"input"}
-            thousandSeparator={"."}
             prefix={"Rp "}
+            thousandSeparator={"."}
+            decimalSeparator={","}
+            value={value}
             onValueChange={(e) => handleChange(e)}
             onBlur={handleBlur}
-            decimalSeparator={","}
-            className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
-            id={id}
+            className={`form-control ${_.get(errors, name) ? "is-invalid" : ""}`}
             disabled={disabled}
             readOnly={readOnly}
           />
-          {_.get(error, name)?.map((message) => (
+          {_.get(errors, name)?.map((message) => (
             <div className="invalid-feedback" key={message}>
               {message}
             </div>
@@ -81,18 +67,18 @@ const CurrencyInput = ({
     <div>
       {label && <Label>{label}</Label>}
       <CurrencyFormat
-        value={value}
+        id={id}
         displayType={"input"}
-        thousandSeparator={"."}
         prefix={"Rp "}
+        thousandSeparator={"."}
+        decimalSeparator={","}
+        value={value}
         onValueChange={(e) => handleChange(e)}
         onBlur={handleBlur}
-        decimalSeparator={","}
-        className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
-        id={id}
+        className={`form-control ${_.get(errors, name) ? "is-invalid" : ""}`}
         disabled={disabled}
       />
-      {_.get(error, name)?.map((message) => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

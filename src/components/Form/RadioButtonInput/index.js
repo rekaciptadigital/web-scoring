@@ -1,18 +1,14 @@
-import _ from "lodash";
 import React, { useEffect, useState } from "react";
+import _ from "lodash";
+import { useFieldValidation } from "../_utils/hooks/field-validation";
+
 import { Label } from "reactstrap";
 
 const RadioButtonInput = ({
   name,
   label,
-  options = [
-    {
-      id: 1,
-      label: "Default",
-    },
-  ],
+  options = [{ id: 1, label: "Default" }],
   onChange,
-  validation,
   value,
   valueOnly = false,
   disabled,
@@ -20,34 +16,26 @@ const RadioButtonInput = ({
   checked,
 }) => {
   const [checkedOption, setCheckedOption] = useState();
-  const [error, setError] = React.useState(null);
+  const { errors, runFieldValidation } = useFieldValidation(name);
 
-  const handleChange = (e, option) => {
+  useEffect(() => {
+    const option = _.find(options, ["id", value]);
     setCheckedOption(option);
-    if (onChange)
+  }, []);
+
+  const handleChange = (ev, option) => {
+    setCheckedOption(option);
+    if (onChange) {
       onChange({
         key: name,
         value: valueOnly ? option.id : option,
       });
+    }
+    runFieldValidation(valueOnly ? option.id : option);
   };
 
-  const handleBlur = (ev) => {
-    if (validation?.required) {
-      if (!ev.target.checked) {
-        setError((errors) => {
-          return {
-            ...errors,
-            [name]: [validation.required],
-          };
-        });
-      } else {
-        setError((errors) => {
-          const updatedErrors = { ...errors };
-          delete updatedErrors[name];
-          return updatedErrors;
-        });
-      }
-    }
+  const handleBlur = () => {
+    runFieldValidation(value);
   };
 
   const Button = ({ id, label }) => (
@@ -65,18 +53,13 @@ const RadioButtonInput = ({
         readOnly={readOnly}
       />
       <label
-        className={`btn ${_.get(error, name) ? "btn-outline-danger" : "btn-outline-primary"}`}
+        className={`btn ${_.get(errors, name) ? "btn-outline-danger" : "btn-outline-primary"}`}
         htmlFor={id}
       >
         {label}
       </label>
     </>
   );
-
-  useEffect(() => {
-    const option = _.find(options, ["id", value]);
-    setCheckedOption(option);
-  }, []);
 
   return (
     <div className="radio-button-input">
@@ -86,7 +69,7 @@ const RadioButtonInput = ({
           <Button id={option.id} key={option.id} label={option.label} />
         ))}
       </div>
-      {_.get(error, name)?.map((message) => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

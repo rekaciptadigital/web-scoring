@@ -1,6 +1,7 @@
 import * as React from "react";
 import _ from "lodash";
 import stringUtil from "utils/stringUtil";
+import { useFieldValidation } from "../_utils/hooks/field-validation";
 
 import { Input, InputGroup, Label } from "reactstrap";
 
@@ -13,9 +14,8 @@ const TextInput = ({
   accessoryRight,
   readOnly,
   disabled,
-  validation,
 }) => {
-  const [error, setError] = React.useState(null);
+  const { errors, runFieldValidation } = useFieldValidation(name);
 
   const handleChange = (e) => {
     if (onChange)
@@ -26,22 +26,7 @@ const TextInput = ({
   };
 
   const handleBlur = (ev) => {
-    if (validation?.required) {
-      if (!ev.target.value) {
-        setError((errors) => {
-          return {
-            ...errors,
-            [name]: [validation.required],
-          };
-        });
-      } else {
-        setError((errors) => {
-          const updatedErrors = { ...errors };
-          delete updatedErrors[name];
-          return updatedErrors;
-        });
-      }
-    }
+    runFieldValidation(ev.target.value);
   };
 
   return (
@@ -50,7 +35,7 @@ const TextInput = ({
       <InputGroup>
         <Input
           type="text"
-          className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
+          className={`form-control ${_.get(errors, name) ? "is-invalid" : ""}`}
           id={id}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -61,7 +46,7 @@ const TextInput = ({
         />
         {accessoryRight}
       </InputGroup>
-      {_.get(error, name)?.map((message) => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

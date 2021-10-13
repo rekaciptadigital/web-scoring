@@ -86,7 +86,6 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="eventName"
               value={formData.eventName}
               onChange={handleChange}
-              validation={{ required: "Nama event harus diisi" }}
             />
           </Col>
           <Col lg={6}>
@@ -95,7 +94,6 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="location"
               value={formData.location}
               onChange={handleChange}
-              validation={{ required: "Lokasi event harus diisi" }}
             />
           </Col>
           <Col lg={6}>
@@ -107,7 +105,6 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
               options={selectConstants.eventLocationType}
               value={formData.locationType}
-              validation={{ required: "Tipe lokasinya harus dipilih salah satu" }}
               valueOnly
             />
           </Col>

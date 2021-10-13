@@ -1,5 +1,7 @@
+import * as React from "react";
 import _ from "lodash";
-import React from "react";
+import { useFieldValidation } from "../_utils/hooks/field-validation";
+
 import { Input, Label } from "reactstrap";
 
 const CheckboxInput = ({
@@ -8,13 +10,23 @@ const CheckboxInput = ({
   options = [],
   onChange,
   inline = false,
-  error,
   disabled,
   readOnly,
   value = [],
 }) => {
-  const handleChange = (e, option) => {
-    const checked = e.target.checked;
+  const [isFieldDirty, setsFieldDirty] = React.useState(false);
+  const { errors, runFieldValidation } = useFieldValidation(name);
+
+  React.useEffect(() => {
+    if (isFieldDirty) {
+      runFieldValidation(value);
+    }
+  }, [isFieldDirty, value]);
+
+  const handleChange = (ev, option) => {
+    if (!isFieldDirty) setsFieldDirty(true);
+
+    const checked = ev.target.checked;
     const modifiedOptions = [...value];
     if (checked) {
       modifiedOptions.push(option);
@@ -22,11 +34,12 @@ const CheckboxInput = ({
       const index = _.findIndex(modifiedOptions, ["id", option.id]);
       modifiedOptions.splice(index, 1);
     }
-    if (onChange)
+    if (onChange) {
       onChange({
         key: name,
         value: modifiedOptions,
       });
+    }
   };
 
   if (inline) {
@@ -37,9 +50,7 @@ const CheckboxInput = ({
           {options.map((option) => {
             return (
               <div
-                className={`form-check ${
-                  _.get(error, name) ? "is-invalid" : ""
-                }`}
+                className={`form-check ${_.get(errors, name) ? "is-invalid" : ""}`}
                 key={option.id}
                 style={{ display: "inline-block", marginRight: 10 }}
               >
@@ -65,7 +76,7 @@ const CheckboxInput = ({
             );
           })}
         </div>
-        {_.get(error, name)?.map((message) => (
+        {_.get(errors, name)?.map((message) => (
           <div className="invalid-feedback" key={message}>
             {message}
           </div>
@@ -78,10 +89,7 @@ const CheckboxInput = ({
       <Label>{label}</Label>
       {options.map((option) => {
         return (
-          <div
-            className={`form-check ${error?.[name] ? "is-invalid" : ""}`}
-            key={option.id}
-          >
+          <div className={`form-check ${errors?.[name] ? "is-invalid" : ""}`} key={option.id}>
             <Input
               type="checkbox"
               className="form-check-Input"

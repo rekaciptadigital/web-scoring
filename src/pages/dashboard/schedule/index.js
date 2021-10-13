@@ -55,155 +55,6 @@ function ListMember() {
     useEffect(() => {
         getSchedule()
       }, []);
-
-      const generatePDF = () => {
-          let dd = {
-              pageOrientation: 'landscape',
-              content: [
-                  {text: "The Hub Scoring 2021", alignment: 'center', bold: true, fontSize: 24, margin: [0, 0, 0, 16]},
-                  
-                  {
-                      columns: [
-                          {text: "Order ID:\t11111\nName:\t\tPutra\nJarak:\t\t50m\nDevisi:\t\tBarebow\nNo Target:\t2\t(A)\t(B)\nTanggal:\t28/8", bold: true, margin: [0, 0, 0, 16]},
-                          {text: "Order ID:\t11111\nName:\t\tPutra\nJarak:\t\t50m\nDevisi:\t\tBarebow\nNo Target:\t2\t(A)\t(B)\nTanggal:\t28/8", bold: true, margin: [0, 0, 0, 16]},
-
-                      ]
-                  },
-                  {
-                    columns: [
-                        {
-                            
-                            alignment: 'center',
-                            table: {
-                                heights: [20, 20, 20, 20, 20, 20, 20, 20],
-                                widths: [50, 0, 30, 30, 30, 30, 30, 30],
-                                body: 
-                                [
-                                    ['Seri', '', '', 'SCORE', '','','T2S',''],
-                                    ['1', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['2', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['3', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['4', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['5', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['6', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    [{text: "", colSpan: 5}, {}, {}, {}, {}, '', '', '    '],
-                                ]
-                            }
-                        },
-                        {
-                            alignment: 'center',
-                            table: {
-                                heights: [20, 20, 20, 20, 20, 20, 20, 20],
-                                widths: [50, 0, 30, 30, 30, 30, 30, 30],
-                                body: 
-                                [
-                                    ['Seri', '', '', 'SCORE', '','','T2S',''],
-                                    ['1', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['2', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['3', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['4', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['5', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    ['6', '', '', '', '', '', '', '    '],
-                                    ['', '', '', '', '', '', '', '    '],
-                                    [{text: "", colSpan: 5}, {}, {}, {}, {}, '', '', '    '],
-                                ]
-                            }
-                            
-                        },
-
-                    ]
-                },
-                {
-                    columns: [
-                        {qr: 'text in qr', fit: 50, margin: [0, 4, 0, 0]},
-                        {qr: 'text in qr', fit: 50, margin: [0, 4, 0, 0]},
-                    ]
-                },
-
-                {
-                    columns: [
-                        {text: "Order ID:\t11111\nName:\t\tPutra\nJarak:\t\t50m\nDevisi:\t\tBarebow\nNo Target:\t2\t(A)\t(B)\nTanggal:\t28/8", bold: true, margin: [0, 0, 0, 16]},
-                        {text: "Order ID:\t11111\nName:\t\tPutra\nJarak:\t\t50m\nDevisi:\t\tBarebow\nNo Target:\t2\t(A)\t(B)\nTanggal:\t28/8", bold: true, margin: [0, 0, 0, 16]},
-
-                    ]
-                },
-                {
-                  columns: [
-                      {
-                          
-                          alignment: 'center',
-                          table: {
-                              heights: [20, 20, 20, 20, 20, 20, 20, 20],
-                              widths: [50, 0, 30, 30, 30, 30, 30, 30],
-                              body: 
-                              [
-                                  ['Seri', '', '', 'SCORE', '','','T2S',''],
-                                  ['1', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['2', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['3', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['4', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['5', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['6', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  [{text: "", colSpan: 5}, {}, {}, {}, {}, '', '', '    '],
-                              ]
-                          }
-                      },
-                      {
-                          alignment: 'center',
-                          table: {
-                              heights: [20, 20, 20, 20, 20, 20, 20, 20],
-                              widths: [50, 0, 30, 30, 30, 30, 30, 30],
-                              body: 
-                              [
-                                  ['Seri', '', '', 'SCORE', '','','T2S',''],
-                                  ['1', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['2', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['3', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['4', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['5', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  ['6', '', '', '', '', '', '', '    '],
-                                  ['', '', '', '', '', '', '', '    '],
-                                  [{text: "", colSpan: 5}, {}, {}, {}, {}, '', '', '    '],
-                              ]
-                          }
-                          
-                      },
-
-                  ]
-              },
-              {
-                  columns: [
-                      {qr: 'text in qr', fit: 50, margin: [0, 4, 0, 0]},
-                      {qr: 'text in qr', fit: 50, margin: [0, 4, 0, 0]},
-                  ]
-              },
-                  
-              ]
-          }
-          pdfMake.createPdf(dd).download();
-        }
     
     const showScorebox = (memberDetail)=>{
         let ms = [];
@@ -262,12 +113,6 @@ function ListMember() {
         setLoading(false)
     }
 
-    const pdfExportComponent = useRef(null);
-
-    const handleExportWithComponent = event => {
-        pdfExportComponent.current.save();
-      };
-
 
     return (
         <React.Fragment>
@@ -305,9 +150,6 @@ function ListMember() {
                 </div>
                 <div>
                     <Row>
-                        <Col md={2}>
-                        <Button color="primary" onClick={generatePDF}>EXPORT PDF</Button>
-                        </Col>
                         <Col md={10}>
                             {Object.keys(memberScore).length == 0 ?
                                 <TableSchedule member={member} getMemberSchedule={getMemberSchedule} showScorebox={showScorebox} event={event} date={date} list={list} />

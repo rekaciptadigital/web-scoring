@@ -27,8 +27,15 @@ const validators = {
   registrationFees: {
     price: (value) => {
       if (!value) {
-        return "Harga normalnya wajib diisi";
+        return "Harganya wajib diisi";
       }
+    },
+    categoryPrices: {
+      price: (value, global) => {
+        if (global?.teamCategories.length && !value) {
+          return "Jangan lupa isi harganya";
+        }
+      },
     },
   },
   teamCategories: (value) => {
@@ -112,16 +119,13 @@ const validators = {
 function getValidatorByField(fieldName) {
   const fieldKeys = fieldName.split(".");
   const isNumber = (value) => !isNaN(value);
+
   let validatorFound = validators;
   for (let key of fieldKeys) {
-    if (isNumber(key)) {
-      continue;
-    }
-    validatorFound = validatorFound[key];
+    if (isNumber(key)) continue;
+    validatorFound = validatorFound?.[key];
   }
-  if (validatorFound) {
-    return validatorFound;
-  }
+  return validatorFound;
 }
 
 export { validators, getValidatorByField };

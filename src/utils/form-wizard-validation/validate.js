@@ -8,8 +8,24 @@ const validateFieldsByStep = (config) => {
     const fieldsList = ["poster", "eventName", "location", "locationType", "city"];
     validationErrors = validateInBulk(formData, fieldsList);
   } else if (activeTab === 2) {
-    const fieldsList = ["registrationFees.0.price", "teamCategories"];
+    const fieldsList = ["teamCategories"];
     validationErrors = validateInBulk(formData, fieldsList);
+
+    for (let i = 0; i < formData.registrationFees.length; i++) {
+      const fieldsList = [`registrationFees.${i}.price`];
+      validationErrors = {
+        ...validationErrors,
+        ...validateInBulk(formData, fieldsList),
+      };
+
+      for (let j = 0; j < formData.registrationFees[i].categoryPrices.length; j++) {
+        const fieldsList = [`registrationFees.${i}.categoryPrices.${j}.price`];
+        validationErrors = {
+          ...validationErrors,
+          ...validateInBulk(formData, fieldsList),
+        };
+      }
+    }
   } else if (activeTab === 3) {
     const fieldsList = [
       "registrationStartDatetime",
@@ -71,7 +87,7 @@ const validateInBulk = (data, fieldsList) => {
     if (!validate) continue;
 
     const value = getValueByFieldName(data, field);
-    const error = validate(value);
+    const error = validate(value, data);
     if (error) {
       validationErrors[field] = [error];
     }

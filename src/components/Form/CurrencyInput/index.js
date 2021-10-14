@@ -46,7 +46,7 @@ const CurrencyInput = ({
             prefix={"Rp "}
             thousandSeparator={"."}
             decimalSeparator={","}
-            value={value}
+            value={value || ""} // fallback string kosongan kalau value === undefined
             onValueChange={(e) => handleChange(e)}
             onBlur={handleBlur}
             className={`form-control ${_.get(errors, name) ? "is-invalid" : ""}`}
@@ -72,7 +72,7 @@ const CurrencyInput = ({
         prefix={"Rp "}
         thousandSeparator={"."}
         decimalSeparator={","}
-        value={value}
+        value={value || ""} // fallback string kosongan kalau value === undefined
         onValueChange={(e) => handleChange(e)}
         onBlur={handleBlur}
         className={`form-control ${_.get(errors, name) ? "is-invalid" : ""}`}

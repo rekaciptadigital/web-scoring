@@ -18,7 +18,7 @@ const DatetimeInput = ({
   disabled,
   readOnly,
 }) => {
-  const { errors, runFieldValidation } = useFieldValidation(name);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   const handleChange = (e) => {
     const datetime = moment(new Date(e)).format("YYYY-MM-DD H:mm:ss");
@@ -30,7 +30,7 @@ const DatetimeInput = ({
   };
 
   const handleClose = (value) => {
-    runFieldValidation(value);
+    handleFieldValidation(value);
   };
 
   return (

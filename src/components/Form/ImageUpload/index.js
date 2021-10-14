@@ -17,7 +17,7 @@ const ImageUpload = ({
   base64,
 }) => {
   const [uploadedImage, setUploadedImage] = useState();
-  const { errors, runFieldValidation } = useFieldValidation(name);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   const handleChange = (ev) => {
     base64(ev);
@@ -28,7 +28,7 @@ const ImageUpload = ({
         value: multiple ? ev.target.files : ev.target.files[0],
       });
     }
-    runFieldValidation(multiple ? ev.target.files : ev.target.files[0]);
+    handleFieldValidation(multiple ? ev.target.files : ev.target.files[0]);
   };
 
   return (

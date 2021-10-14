@@ -15,11 +15,11 @@ const CheckboxInput = ({
   value = [],
 }) => {
   const [isFieldDirty, setsFieldDirty] = React.useState(false);
-  const { errors, runFieldValidation } = useFieldValidation(name);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   React.useEffect(() => {
     if (isFieldDirty) {
-      runFieldValidation(value);
+      handleFieldValidation(value);
     }
   }, [isFieldDirty, value]);
 

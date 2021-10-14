@@ -9,24 +9,26 @@ const TextInput = ({
   name,
   id = stringUtil.createRandom(),
   label,
+  placeholder,
   value,
   onChange,
   accessoryRight,
   readOnly,
   disabled,
 }) => {
-  const { errors, runFieldValidation } = useFieldValidation(name);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   const handleChange = (e) => {
-    if (onChange)
+    if (onChange) {
       onChange({
         key: name,
         value: e.target.value,
       });
+    }
   };
 
-  const handleBlur = (ev) => {
-    runFieldValidation(ev.target.value);
+  const handleBlur = () => {
+    handleFieldValidation(value);
   };
 
   return (
@@ -40,7 +42,7 @@ const TextInput = ({
           onChange={handleChange}
           onBlur={handleBlur}
           value={value}
-          placeholder={label}
+          placeholder={label || placeholder}
           readOnly={readOnly}
           disabled={disabled}
         />

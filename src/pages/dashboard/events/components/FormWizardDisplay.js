@@ -1,8 +1,5 @@
-import { useFormWizardContext } from "../../../../components/Form/_utils/context/wizard";
-
-function FormWizardDisplay({ children, tabId }) {
-  const { currentStep } = useFormWizardContext();
-  if (tabId === currentStep) {
+function FormWizardDisplay({ children, tabId, activeTab }) {
+  if (tabId === activeTab) {
     return children;
   }
   return null;

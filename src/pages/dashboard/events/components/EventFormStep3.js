@@ -139,7 +139,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           name="qualificationStartDatetime"
                           value={formData.qualificationStartDatetime}
                           onChange={handleChange}
-                          validation={{ required: "Tanggal pembukaan kualifikasi harus diisi" }}
                         />
                       </Col>
                       <Col lg={3}>
@@ -148,7 +147,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           name="qualificationEndDatetime"
                           value={formData.qualificationEndDatetime}
                           onChange={handleChange}
-                          validation={{ required: "Tanggal penutupan kualifikasi harus diisi" }}
                         />
                       </Col>
                       <Col lg={3}>
@@ -158,7 +156,6 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
                           value={formData.qualificationSessionLength}
                           options={[{ id: "60", label: "Per 1 Jam" }]}
                           onChange={handleChange}
-                          validation={{ required: "Sesi harus diisi" }}
                         />
                       </Col>
                       <Col lg={3}>

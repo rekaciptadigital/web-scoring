@@ -89,7 +89,6 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                     onChange={handleChange}
                     options={dummyConstants.eventAgeCategories}
                     value={eventCategory.ageCategory}
-                    validation={{ required: "Kategori kelas wajib diisi" }}
                   />
                 </Col>
                 <Col lg={4}>
@@ -97,7 +96,6 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                     name={`eventCategories.${index}.maxDateOfBirth`}
                     onChange={handleChange}
                     value={eventCategory.maxDateOfBirth}
-                    validation={{ required: "Tanggal kelas wajib diisi" }}
                   />
                 </Col>
                 <Col>
@@ -126,12 +124,13 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                               name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
                               onChange={handleChange}
                               value={competitionCategory.competitionCategory}
-                              validation={{ required: "Kategori lomba wajib diisi" }}
                             />
                           </Col>
                           <Col lg={4}>
                             <TextInput
                               readOnly
+                              placeholder="Jarak yang dilombakan"
+                              name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.distancesDisplay`}
                               accessoryRight={
                                 <Button
                                   icon="plus"
@@ -144,7 +143,6 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                 />
                               }
                               value={_.map(competitionCategory.distances || [], "label")}
-                              validation={{ required: "Jarak yang dilombakan wajib diisi" }}
                             />
                             <ModalDistances
                               isOpen={competitionCategory.isOpenDistanceModal}

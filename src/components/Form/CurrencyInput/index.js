@@ -16,7 +16,7 @@ const CurrencyInput = ({
   disabled = false,
   readOnly,
 }) => {
-  const { errors, runFieldValidation } = useFieldValidation(name);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   const handleChange = (ev) => {
     if (onChange) {
@@ -28,7 +28,7 @@ const CurrencyInput = ({
   };
 
   const handleBlur = () => {
-    runFieldValidation(value);
+    handleFieldValidation(value);
   };
 
   if (horizontal) {

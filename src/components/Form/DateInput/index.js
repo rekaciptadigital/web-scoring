@@ -2,6 +2,7 @@ import * as React from "react";
 import stringUtil from "utils/stringUtil";
 import moment from "moment";
 import _ from "lodash";
+import { useFieldValidation } from "../_utils/hooks/field-validation";
 
 import { InputGroup, Label } from "reactstrap";
 import Flatpickr from "react-flatpickr";
@@ -17,9 +18,8 @@ const DateInput = ({
   disabled,
   readOnly,
   options = {},
-  validation,
 }) => {
-  const [error, setError] = React.useState(null);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   const handleChange = (e) => {
     if (onChange)
@@ -29,23 +29,8 @@ const DateInput = ({
       });
   };
 
-  const handleClose = (ev) => {
-    if (validation?.required) {
-      if (!ev.length) {
-        setError((errors) => {
-          return {
-            ...errors,
-            [name]: [validation.required],
-          };
-        });
-      } else {
-        setError((errors) => {
-          const updatedErrors = { ...errors };
-          delete updatedErrors[name];
-          return updatedErrors;
-        });
-      }
-    }
+  const handleClose = () => {
+    handleFieldValidation(value);
   };
 
   return (
@@ -53,7 +38,7 @@ const DateInput = ({
       {label && <Label htmlFor={id}>{label}</Label>}
       <InputGroup>
         <Flatpickr
-          className={`form-control d-block ${_.get(error, name) ? "is-invalid" : ""}`}
+          className={`form-control d-block ${_.get(errors, name) ? "is-invalid" : ""}`}
           placeholder="Tanggal/Bulan/Tahun"
           options={{ altInput: true, altFormat: "d/m/Y", dateFormat: "Y-m-d", ...options }}
           value={value}
@@ -68,7 +53,7 @@ const DateInput = ({
           </span>
         </div>
       </InputGroup>
-      {_.get(error, name)?.map((message) => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

@@ -16,7 +16,7 @@ const RadioButtonInput = ({
   checked,
 }) => {
   const [checkedOption, setCheckedOption] = useState();
-  const { errors, runFieldValidation } = useFieldValidation(name);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   useEffect(() => {
     const option = _.find(options, ["id", value]);
@@ -31,11 +31,11 @@ const RadioButtonInput = ({
         value: valueOnly ? option.id : option,
       });
     }
-    runFieldValidation(valueOnly ? option.id : option);
+    handleFieldValidation(valueOnly ? option.id : option);
   };
 
   const handleBlur = () => {
-    runFieldValidation(value);
+    handleFieldValidation(value);
   };
 
   const Button = ({ id, label }) => (

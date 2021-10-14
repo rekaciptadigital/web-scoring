@@ -1,37 +1,31 @@
-import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import * as EventsStore from "store/slice/events";
-import { useFormWizardContext } from "../context/wizard";
+import {
+  validators,
+  getValidatorByField,
+} from "../../../../pages/dashboard/events/components/_helpers/form-wizard-validation";
 
 function useFieldValidation(fieldName) {
-  const { validate, registerField } = useFormWizardContext();
   const { errors } = useSelector(EventsStore.getEventsStore);
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    if (!fieldName) {
-      return;
-    }
-    // register field ke list fields menurut nomor step di form wizard
-    registerField(fieldName);
-  }, [fieldName, registerField]);
+  const handleFieldValidation = (value) => {
+    if (!fieldName) return;
 
-  return {
-    errors,
-    runFieldValidation: (value) => {
-      if (!validate[fieldName]) {
-        return;
-      }
-      const error = validate[fieldName](value);
-      const updatedErrors = { ...errors };
-      if (error) {
-        updatedErrors[fieldName] = [error];
-      } else {
-        delete updatedErrors[fieldName];
-      }
-      dispatch(EventsStore.errors(updatedErrors));
-    },
+    const validate = validators[fieldName] || getValidatorByField(fieldName);
+    if (!validate) return;
+
+    const error = validate(value);
+    const updatedErrors = { ...errors };
+    if (error) {
+      updatedErrors[fieldName] = [error];
+    } else {
+      delete updatedErrors[fieldName];
+    }
+    dispatch(EventsStore.errors(updatedErrors));
   };
+
+  return { errors, handleFieldValidation };
 }
 
 export { useFieldValidation };

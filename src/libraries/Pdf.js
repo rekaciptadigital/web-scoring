@@ -9,17 +9,17 @@ const download = (title,tgl,members) => {
                             body: [
                                 ['Name', ":", m.member.name.substr(0,33)],
                                 ['Club', ":", m.club.substr(0,33)],
-                                ['Kategori', ":", m.categoryLabel.substr(0,33)],
+                                ['Category', ":", m.categoryLabel.substr(0,33)],
                                 ['No Target', ":", ''],
                                 ['Code', ":", code],
-                                ['Tanggal', ":", tgl],
+                                ['Date', ":", tgl],
                             ]
                         },
                         layout: 'noBorders'
                       },
                       {alignment: 'center',
                       table: {
-                          heights: [20, 20, 20, 20, 20, 20, 20, 20],
+                          heights: [10, 10, 10, 10, 10, 10, 10, 10],
                           widths: [30, 0, "*", "*", "*", "*", "*", "*"],
                           body: 
                           [
@@ -45,7 +45,17 @@ const download = (title,tgl,members) => {
                         }
                       }
                     },
-                    {qr: code, fit: 55, margin: [0, 4, 0, 0]},
+                    {  
+                      alignment: 'center', 
+                      margin: [0, 4, 0, 0],
+                      table: {
+                              widths: [60,"*", 50, "*"],
+                              body: [
+                                  [{text: code, style: 'tableHeader'},{style: 'tableHeader', text: "archer's signature"}, {style: 'tableHeader',text: 'Total Score'},{style: 'tableHeader',text: "referee's signature"} ],
+                                  [{qr: code, fit: 55, margin: [0, 4, 0, 4]},"", "", ""],
+                              ]
+                          },
+                        },
                     ]
     memberInPage.push(content);
     if(memberInPage.length == 2 || members[i+1] == undefined){
@@ -70,7 +80,7 @@ const download = (title,tgl,members) => {
                 pageOrientation: 'landscape',
                 content: content
               }
-  pdfMake.createPdf(dd).download();
+  pdfMake.createPdf(dd).download("score_sheet_"+tgl);
   }
 
 

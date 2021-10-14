@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import _ from "lodash";
-import { useFieldValidation } from "../_utils/hooks/field-validation";
+import { useFieldValidation } from "utils/hooks/field-validation";
 
 import { Label } from "reactstrap";
 

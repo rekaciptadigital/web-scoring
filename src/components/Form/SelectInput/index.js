@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import _ from "lodash";
 import stringUtil from "utils/stringUtil";
-import { useFieldValidation } from "../_utils/hooks/field-validation";
+import { useFieldValidation } from "utils/hooks/field-validation";
 
 import { Label } from "reactstrap";
 import Select from "react-select";

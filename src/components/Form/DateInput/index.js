@@ -2,7 +2,7 @@ import * as React from "react";
 import stringUtil from "utils/stringUtil";
 import moment from "moment";
 import _ from "lodash";
-import { useFieldValidation } from "../_utils/hooks/field-validation";
+import { useFieldValidation } from "utils/hooks/field-validation";
 
 import { InputGroup, Label } from "reactstrap";
 import Flatpickr from "react-flatpickr";
@@ -21,12 +21,15 @@ const DateInput = ({
 }) => {
   const { errors, handleFieldValidation } = useFieldValidation(name);
 
-  const handleChange = (e) => {
-    if (onChange)
+  const handleChange = (ev) => {
+    if (onChange) {
+      const updatedValue = ev.length > 0 ? moment(new Date(ev)).format("Y-MM-DD") : "";
       onChange({
         key: name,
-        value: e.length > 0 ? moment(new Date(e)).format("Y-MM-DD") : "",
+        value: updatedValue,
       });
+      handleFieldValidation(updatedValue);
+    }
   };
 
   const handleClose = () => {

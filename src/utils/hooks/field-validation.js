@@ -1,9 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import * as EventsStore from "store/slice/events";
-import {
-  validators,
-  getValidatorByField,
-} from "../../../../pages/dashboard/events/components/_helpers/form-wizard-validation";
+import { validators, getValidatorByField } from "utils/form-wizard-validation";
 
 function useFieldValidation(fieldName) {
   const { errors } = useSelector(EventsStore.getEventsStore);

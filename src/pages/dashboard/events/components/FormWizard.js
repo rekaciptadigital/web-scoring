@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import * as EventsStore from "store/slice/events";
 import { EventsService } from "../../../../services";
 import classnames from "classnames";
-import { validateFieldsByStep } from "./_helpers/form-wizard-validation";
+import { validateFieldsByStep } from "utils/form-wizard-validation";
 // import dummy from "../new/DummyEvent.json" //Coba mengunankan data json yang ada pada postman
 // import { objectUtil } from "utils";
 
@@ -19,7 +19,6 @@ import { EventFormStep6 } from "./EventFormStep6";
 
 const FormWizard = ({ onFormFieldChange, formData }) => {
   const history = useHistory();
-  const { errors } = useSelector(EventsStore.getEventsStore);
   const dispatch = useDispatch();
   const [activeTab, setactiveTab] = React.useState(1);
 

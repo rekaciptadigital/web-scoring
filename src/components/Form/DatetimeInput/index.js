@@ -2,7 +2,7 @@ import * as React from "react";
 import _ from "lodash";
 import moment from "moment";
 import stringUtil from "utils/stringUtil";
-import { useFieldValidation } from "../_utils/hooks/field-validation";
+import { useFieldValidation } from "utils/hooks/field-validation";
 
 import { InputGroup, Label } from "reactstrap";
 import Flatpickr from "react-flatpickr";

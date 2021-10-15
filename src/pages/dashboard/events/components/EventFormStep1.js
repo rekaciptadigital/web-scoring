@@ -94,18 +94,30 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="location"
               value={formData.location}
               onChange={handleChange}
+              placeholder="Nama GOR/Lapangan"
             />
           </Col>
           <Col lg={6}>
             <TextInput label="Kota" name="city" value={formData.city} onChange={handleChange} />
           </Col>
-          <Col lg={12}>
-            <RadioButtonInput
-              name="locationType"
+          <Col lg={6}>
+            <div className="d-flex h-100 align-items-center">
+              <RadioButtonInput
+                name="locationType"
+                onChange={handleChange}
+                options={selectConstants.eventLocationType}
+                value={formData.locationType}
+                valueOnly
+              />
+            </div>
+          </Col>
+          <Col lg={6}>
+            <TextInput
+              label="PIC/Call Center"
+              name="picCallCenter"
+              value={formData.picCallCenter}
               onChange={handleChange}
-              options={selectConstants.eventLocationType}
-              value={formData.locationType}
-              valueOnly
+              placeholder="Contoh: Brady Ellison (085xxxxxxxxx)"
             />
           </Col>
           <Col lg={12}>
@@ -114,6 +126,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
               name="description"
               value={formData.description}
+              placeholder="Hadiah kompetisi, Flow lomba, peraturan, informasi tambahan mengenai lomba..."
             />
           </Col>
         </Row>

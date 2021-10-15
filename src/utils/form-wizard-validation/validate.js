@@ -5,7 +5,15 @@ const validateFieldsByStep = (config) => {
   let validationErrors = {};
 
   if (activeTab === 1) {
-    const fieldsList = ["poster", "eventName", "location", "locationType", "city"];
+    const fieldsList = [
+      "poster",
+      "eventName",
+      "location",
+      "locationType",
+      "city",
+      "picCallCenter",
+      "description",
+    ];
     validationErrors = validateInBulk(formData, fieldsList);
   } else if (activeTab === 2) {
     const fieldsList = ["teamCategories"];

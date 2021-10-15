@@ -10,6 +10,7 @@ const EventsNewMarathon = () => {
     poster: "",
     handbook: "",
     eventName: "",
+    picCallCenter: "",
     registrationStartDatetime: "",
     registrationEndDatetime: "",
     eventStartDatetime: "",

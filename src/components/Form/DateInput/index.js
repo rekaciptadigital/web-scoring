@@ -11,6 +11,7 @@ import "flatpickr/dist/themes/material_blue.css";
 
 const DateInput = ({
   name,
+  placeholder,
   id = stringUtil.createRandom(),
   label,
   value,
@@ -42,7 +43,7 @@ const DateInput = ({
       <InputGroup>
         <Flatpickr
           className={`form-control d-block ${_.get(errors, name) ? "is-invalid" : ""}`}
-          placeholder="Tanggal/Bulan/Tahun"
+          placeholder={placeholder ? `${placeholder} (TT/BB/TTTT)` : "Tanggal/Bulan/Tahun"}
           options={{ altInput: true, altFormat: "d/m/Y", dateFormat: "Y-m-d", ...options }}
           value={value}
           onChange={(e) => handleChange(e)}

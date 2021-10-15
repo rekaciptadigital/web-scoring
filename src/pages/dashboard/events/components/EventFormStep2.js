@@ -20,7 +20,7 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
         <Col lg={12}>
           <CheckboxWithCurrencyInput
             inline
-            label="Biaya Registrasi pertandingan yang tersedia"
+            label="Biaya Registrasi Pertandingan yang Tersedia"
             name="registrationFees"
             onChange={handleChange}
             options={selectConstants.eventAvailableRegistrationFee}
@@ -32,7 +32,7 @@ export const EventFormStep2 = ({ onFormFieldChange, formData }) => {
       <Row>
         <Col lg={12}>
           <CheckboxInput
-            label="Kategori regu yang dipertandingkan"
+            label="Kategori Regu yang Dipertandingkan"
             name="teamCategories"
             onChange={handleChange}
             options={selectConstants.teamCategories}

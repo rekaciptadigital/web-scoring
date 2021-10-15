@@ -19,9 +19,19 @@ const validators = {
       return "Lokasi event wajib diisi";
     }
   },
+  picCallCenter: (value) => {
+    if (!value) {
+      return "PIC/Call Center event wajib diisi";
+    }
+  },
   poster: (value) => {
     if (!value) {
       return "Poster event wajib diupload";
+    }
+  },
+  description: (value) => {
+    if (!value) {
+      return "Deskripsi mengenai pertandingan wajib diisi";
     }
   },
   registrationFees: {

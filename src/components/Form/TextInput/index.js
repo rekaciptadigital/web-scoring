@@ -42,7 +42,7 @@ const TextInput = ({
           onChange={handleChange}
           onBlur={handleBlur}
           value={value}
-          placeholder={label || placeholder}
+          placeholder={placeholder || label}
           readOnly={readOnly}
           disabled={disabled}
         />

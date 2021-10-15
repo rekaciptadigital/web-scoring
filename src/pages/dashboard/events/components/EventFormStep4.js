@@ -1,17 +1,16 @@
-import { Button, DateInput, SelectInput, TextInput } from "components";
-import { dummyConstants } from "constants/index";
+import * as React from "react";
 import _ from "lodash";
-import React from "react";
-import { Col, Label, Row } from "reactstrap";
+import { dummyConstants } from "constants/index";
 import { objectUtil, stringUtil } from "utils";
-import styles from "../styles";
+
+import { Col, Label, Row, ButtonGroup } from "reactstrap";
+import { Button, DateInput, SelectInput, TextInput } from "components";
 import ModalDistances from "./ModalDistances";
 import ModalTeamCategories from "./ModalTeamCategories";
-// import * as EventsStore from "store/slice/events"
-// import { useSelector } from "react-redux"
+
+import styles from "../styles";
 
 export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
-  // const { errors } = useSelector(EventsStore.getEventsStore)
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
@@ -82,6 +81,20 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
           <Row key={index} id={"row" + index}>
             <Col lg={12} style={styles.categoryBox}>
               <Label>Kategori Kelas</Label>
+
+              <ButtonGroup className="float-end mt-2">
+                <Button onClick={() => handleCopyRow(index)} icon="copy" type="primary" />{" "}
+                {formData.eventCategories.length > 1 && (
+                  <Button
+                    onClick={(e) => {
+                      handleRemoveRow(e, index);
+                    }}
+                    icon="trash"
+                    type="danger"
+                  />
+                )}
+              </ButtonGroup>
+
               <Row>
                 <Col lg={4}>
                   <SelectInput
@@ -91,26 +104,17 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                     value={eventCategory.ageCategory}
                   />
                 </Col>
+
                 <Col lg={4}>
                   <DateInput
                     name={`eventCategories.${index}.maxDateOfBirth`}
+                    placeholder="Batas lahir peserta kategori"
                     onChange={handleChange}
                     value={eventCategory.maxDateOfBirth}
                   />
                 </Col>
-                <Col>
-                  <Button onClick={() => handleCopyRow(index)} icon="copy" type="primary" />{" "}
-                  {formData.eventCategories.length > 1 && (
-                    <Button
-                      onClick={(e) => {
-                        handleRemoveRow(e, index);
-                      }}
-                      icon="trash"
-                      type="danger"
-                    />
-                  )}
-                </Col>
               </Row>
+
               <Label>Kategori Lomba</Label>
               <Row style={{ paddingLeft: 10, paddingRight: 10 }}>
                 <Col style={{ border: "dashed 1px #dedede", padding: 10 }}>
@@ -159,6 +163,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                           <Col lg={4}>
                             <div>
                               <Button
+                                outline
                                 type="primary"
                                 onClick={() => {
                                   handleChange({
@@ -174,7 +179,6 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                 trailingIcon={
                                   competitionCategory.teamCategories?.length > 0 ? "pencil" : "plus"
                                 }
-                                outline
                               />
                               <ModalTeamCategories
                                 isOpen={competitionCategory.isOpenTeamCategoryModal}
@@ -187,27 +191,30 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                 options={formData.teamCategories || []}
                                 name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.teamCategories`}
                                 onSaveChange={handleChange}
-                              />{" "}
-                              <Button
-                                onClick={() => {
-                                  handleAddCompetitionCategory(index);
-                                }}
-                                icon="copy"
-                                outline
-                              />{" "}
-                              {eventCategory.competitionCategories.length > 1 && (
+                              />
+
+                              <ButtonGroup className="ms-3">
                                 <Button
-                                  onClick={() => {
-                                    handleRemoveCompetitionCategory(
-                                      index,
-                                      competitionCategoryIndex
-                                    );
-                                  }}
-                                  icon="trash"
-                                  type="danger"
+                                  icon="copy"
                                   outline
+                                  onClick={() => {
+                                    handleAddCompetitionCategory(index);
+                                  }}
                                 />
-                              )}
+                                {eventCategory.competitionCategories.length > 1 && (
+                                  <Button
+                                    icon="trash"
+                                    type="danger"
+                                    outline
+                                    onClick={() => {
+                                      handleRemoveCompetitionCategory(
+                                        index,
+                                        competitionCategoryIndex
+                                      );
+                                    }}
+                                  />
+                                )}
+                              </ButtonGroup>
                             </div>
                           </Col>
                         </Row>

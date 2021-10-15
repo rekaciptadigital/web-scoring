@@ -1,43 +1,39 @@
-import {
-  Accordion,
-  CheckboxInput,
-  DatetimeInput,
-  SwitchInput,
-} from "components";
-import React from "react";
+import * as React from "react";
+import { useSelector } from "react-redux";
+import * as EventsStore from "store/slice/events";
 import ReactHtmlParser from "react-html-parser";
-import { Col, Label, Row } from "reactstrap";
 import { selectConstants } from "constants/index";
+
+import { Col, Label, Row, Alert } from "reactstrap";
+import { Accordion, CheckboxInput, DatetimeInput, SwitchInput } from "components";
+
 import styles from "../styles";
-import * as EventsStore from "store/slice/events"
-import { useSelector } from "react-redux"
-import { Alert } from "reactstrap"
 
 export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
-  const { errors } = useSelector(EventsStore.getEventsStore)  
+  const { errors } = useSelector(EventsStore.getEventsStore);
+
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
+
   return (
     <>
-    <div>
-      {!Object.keys(errors).length ? null : (
-        <Alert color="danger">Ada inputan yang belum diisi</Alert>
-      )}
-    </div>
+      <div>
+        {!Object.keys(errors).length ? null : (
+          <Alert color="danger">Ada inputan yang belum diisi</Alert>
+        )}
+      </div>
+
       <Row>
         <Col lg={4}>
           <img
             className="rounded"
             alt="Skote"
             width="100%"
-            src={
-              formData.poster
-                ? URL.createObjectURL(formData.poster)
-                : "/images/no-image.jpeg"
-            }
+            src={formData.poster ? URL.createObjectURL(formData.poster) : "/images/no-image.jpeg"}
           />
         </Col>
+
         <Col lg={8}>
           <table className="table">
             <tbody>
@@ -50,8 +46,7 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
               <tr>
                 <td>Tanggal Pendaftaran</td>
                 <td>
-                  {formData.registrationStartDatetime} s/d{" "}
-                  {formData.registrationEndDatetime}
+                  {formData.registrationStartDatetime} s/d {formData.registrationEndDatetime}
                 </td>
               </tr>
               <tr>
@@ -66,6 +61,7 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
           </table>
         </Col>
       </Row>
+
       <Accordion
         separateItem
         items={[
@@ -74,114 +70,98 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
             body: (
               <Row>
                 <Col xs={12}>
-                  {formData.eventCategories
-                    .filter(Boolean)
-                    .map((item, index) => (
-                      <div key={index} id={"row" + index}>
-                        <Row style={styles.categoryBox}>
-                          <Col lg={3}>
-                            <Label>Kategori Kelas</Label>
-                            <br />
-                            {
-                              formData.eventCategories[index]?.ageCategories
-                                ?.label
-                            }
-                          </Col>
-                          <Col lg={4}>
-                            <Label>Batas Tanggal Lahir</Label>
-                            <br />
-                            {formData.eventCategories[index]?.maxDateOfBirth}
-                          </Col>
-                          <Col lg={6}>
-                            <Label>Info</Label>
-                            <table className="table">
-                              <thead>
-                                <tr>
-                                  <th>Kategori Regu</th>
-                                  <th>Kuota</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {item?.teamCategories?.map(
-                                  (teamCategory, teamCategoryIndex) => {
-                                    return (
-                                      <tr key={teamCategory.id}>
-                                        <td>
-                                          {
-                                            formData.eventCategories?.[index]
-                                              ?.teamCategories?.[
-                                              teamCategoryIndex
-                                            ]?.label
-                                          }
-                                        </td>
-                                        <td>
-                                          {
-                                            formData.eventCategories?.[index]
-                                              ?.teamCategories?.[
-                                              teamCategoryIndex
-                                            ]?.quota
-                                          }
-                                        </td>
-                                      </tr>
-                                    );
-                                  }
-                                )}
-                              </tbody>
-                            </table>
-                          </Col>
-                          <Col lg={6}>
-                            <Label>Kategori Lomba</Label>
-                            <table className="table">
-                              <thead>
-                                <tr>
-                                  <th>Kategori</th>
-                                  <th>Jarak</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {item?.competitionCategories
-                                  ?.filter(Boolean)
-                                  .map(
-                                    (
-                                      competitionCategory,
-                                      competitionCategoryIndex
-                                    ) => {
-                                      return (
-                                        <tr
-                                          key={`${competitionCategory.name?.id}-${competitionCategoryIndex}`}
-                                        >
-                                          <td>
-                                            {
-                                              formData.eventCategories?.[index]
-                                                ?.competitionCategories?.[
-                                                competitionCategoryIndex
-                                              ]?.name?.label
-                                            }
-                                          </td>
-                                          <td>
-                                            {formData.eventCategories?.[
-                                              index
-                                            ]?.competitionCategories?.[
-                                              competitionCategoryIndex
-                                            ]?.distances?.join("; ") || ""}
-                                          </td>
-                                        </tr>
-                                      );
-                                    }
-                                  )}
-                              </tbody>
-                            </table>
-                          </Col>
-                        </Row>
-                      </div>
-                    ))}
+                  {formData.eventCategories.filter(Boolean).map((item, index) => (
+                    <div key={index} id={"row" + index}>
+                      <Row style={styles.categoryBox}>
+                        <Col lg={3}>
+                          <Label>Kategori Kelas</Label>
+                          <br />
+                          {formData.eventCategories[index]?.ageCategories?.label}
+                        </Col>
+                        <Col lg={4}>
+                          <Label>Batas Tanggal Lahir</Label>
+                          <br />
+                          {formData.eventCategories[index]?.maxDateOfBirth}
+                        </Col>
+                        <Col lg={6}>
+                          <Label>Info</Label>
+                          <table className="table">
+                            <thead>
+                              <tr>
+                                <th>Kategori Regu</th>
+                                <th>Kuota</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {item?.teamCategories?.map((teamCategory, teamCategoryIndex) => {
+                                return (
+                                  <tr key={teamCategory.id}>
+                                    <td>
+                                      {
+                                        formData.eventCategories?.[index]?.teamCategories?.[
+                                          teamCategoryIndex
+                                        ]?.label
+                                      }
+                                    </td>
+                                    <td>
+                                      {
+                                        formData.eventCategories?.[index]?.teamCategories?.[
+                                          teamCategoryIndex
+                                        ]?.quota
+                                      }
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </Col>
+                        <Col lg={6}>
+                          <Label>Kategori Lomba</Label>
+                          <table className="table">
+                            <thead>
+                              <tr>
+                                <th>Kategori</th>
+                                <th>Jarak</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {item?.competitionCategories
+                                ?.filter(Boolean)
+                                .map((competitionCategory, competitionCategoryIndex) => {
+                                  return (
+                                    <tr
+                                      key={`${competitionCategory.name?.id}-${competitionCategoryIndex}`}
+                                    >
+                                      <td>
+                                        {
+                                          formData.eventCategories?.[index]
+                                            ?.competitionCategories?.[competitionCategoryIndex]
+                                            ?.name?.label
+                                        }
+                                      </td>
+                                      <td>
+                                        {formData.eventCategories?.[index]?.competitionCategories?.[
+                                          competitionCategoryIndex
+                                        ]?.distances?.join("; ") || ""}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                            </tbody>
+                          </table>
+                        </Col>
+                      </Row>
+                    </div>
+                  ))}
                 </Col>
               </Row>
             ),
           },
         ]}
       />
-      <Row>
+
+      <Row className="mb-4">
         <Col lg={12}>
           <CheckboxInput
             label="Siapa yang bisa melihat event Anda?"
@@ -192,6 +172,9 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
             value={formData.targets}
           />
         </Col>
+      </Row>
+
+      <Row className="mb-4">
         <Col lg={12}>
           <SwitchInput
             label="Kapan waktu publikasi event Anda?"

@@ -1,12 +1,15 @@
-import { ContentState, convertToRaw, EditorState } from "draft-js";
+import * as React from "react";
+import _ from "lodash";
+import stringUtil from "utils/stringUtil";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
-import _ from "lodash";
-import React, { useState } from "react";
-import { Editor } from "react-draft-wysiwyg";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { ContentState, convertToRaw, EditorState } from "draft-js";
+import { useFieldValidation } from "utils/hooks/field-validation";
+
 import { Label } from "reactstrap";
-import stringUtil from "utils/stringUtil";
+import { Editor } from "react-draft-wysiwyg";
+
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 const TextEditor = ({
   name,
@@ -14,44 +17,54 @@ const TextEditor = ({
   label,
   value,
   onChange,
-  error,
   readOnly,
+  placeholder,
 }) => {
-  const [editorState, setEditorState] = useState();
-  const handleChange = e => {
-    setEditorState(e);
-    if (onChange)
+  const [editorStateLocal, setEditorStateLocal] = React.useState();
+  const { errors, handleFieldValidation } = useFieldValidation(name);
+
+  const handleChange = (editorState) => {
+    setEditorStateLocal(editorState);
+    if (onChange) {
       onChange({
         key: name,
-        value: draftToHtml(convertToRaw(e.getCurrentContent())),
+        value: editorState.getCurrentContent().hasText()
+          ? draftToHtml(convertToRaw(editorState.getCurrentContent()))
+          : "",
       });
+    }
   };
 
-  useState(() => {
+  const handleBlur = () => {
+    handleFieldValidation(value);
+  };
+
+  React.useEffect(() => {
     const contentBlock = htmlToDraft(value || "");
     if (contentBlock) {
-      const contentState = ContentState.createFromBlockArray(
-        contentBlock.contentBlocks
-      );
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
       const editorState = EditorState.createWithContent(contentState);
-      setEditorState(editorState);
+      setEditorStateLocal(editorState);
     }
   }, []);
 
   return (
-    <div className={`${_.get(error, name) ? "is-invalid" : ""}`}>
+    <div className={`${_.get(errors, name) ? "is-invalid" : ""}`}>
       {label && <Label htmlFor={id}>{label}</Label>}
       <Editor
         name={name}
         id={id}
-        editorState={editorState}
+        editorState={editorStateLocal}
         toolbarClassName="toolbarClassName"
         wrapperClassName="wrapperClassName"
         editorClassName="editorClassName"
         onEditorStateChange={handleChange}
         readOnly={readOnly}
+        placeholder={placeholder}
+        onBlur={handleBlur}
       />
-      {_.get(error, name)?.map(message => (
+
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

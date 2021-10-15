@@ -90,6 +90,12 @@ const validators = {
       return "Durasi sesi kualifikasi wajib dipilih salah satu";
     }
   },
+  qualificationDaysDetails: (value, global) => {
+    for (let day of global.qualificationDays) {
+      if (day.details.length) return;
+    }
+    return "Jadwal sesi belum diisi...";
+  },
   eventCategories: {
     ageCategory: (value) => {
       if (!value) {

@@ -53,11 +53,15 @@ const EventsNewMarathon = () => {
 
   const handleChange = (key, value) => {
     let modifiedEventData = { ...eventData };
+
+    if (key === "qualificationWeekdaysOnly" && value) {
+      modifiedEventData.qualificationDays[5].details = []; // sabtu
+      modifiedEventData.qualificationDays[6].details = []; // minggu
+    }
+
     if (key === "registrationFees" || key === "teamCategories") {
-      const registrationFees =
-        key === "registrationFees" ? value : eventData.registrationFees;
-      const categories =
-        key === "teamCategories" ? value : eventData.teamCategories;
+      const registrationFees = key === "registrationFees" ? value : eventData.registrationFees;
+      const categories = key === "teamCategories" ? value : eventData.teamCategories;
 
       const newRegistrationFees = registrationFees.map((item) => {
         const newItem = {
@@ -85,7 +89,7 @@ const EventsNewMarathon = () => {
     }
     setEventData(modifiedEventData);
   };
-  
+
   return (
     <React.Fragment>
       <div className="page-content">

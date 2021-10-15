@@ -35,6 +35,7 @@ const validateFieldsByStep = (config) => {
       "qualificationStartDatetime",
       "qualificationEndDatetime",
       "qualificationSessionLength",
+      "qualificationDaysDetails",
     ];
     validationErrors = validateInBulk(formData, fieldsList);
   } else if (activeTab === 4) {

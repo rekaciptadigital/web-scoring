@@ -4,7 +4,7 @@ import * as EventsStore from "store/slice/events";
 import ReactHtmlParser from "react-html-parser";
 import { selectConstants } from "constants/index";
 
-import { Col, Label, Row, Alert } from "reactstrap";
+import { Col, Label, Row, Alert, Collapse } from "reactstrap";
 import { Accordion, CheckboxInput, DatetimeInput, SwitchInput } from "components";
 
 import styles from "../styles";
@@ -17,12 +17,11 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
   };
 
   return (
-    <>
-      <div>
-        {!Object.keys(errors).length ? null : (
-          <Alert color="danger">Ada inputan yang belum diisi</Alert>
-        )}
-      </div>
+    <React.Fragment>
+      {!Object.keys(errors).length || errors.code ? null : (
+        <Alert color="warning">Silakan lengkapi data yang perlu diisi</Alert>
+      )}
+      {!Object.keys(errors).length || errors.code !== 500 ? null : <Alert500 errors={errors} />}
 
       <Row>
         <Col lg={4}>
@@ -192,6 +191,26 @@ export const EventFormStep5 = ({ onFormFieldChange, formData }) => {
           </Col>
         )}
       </Row>
-    </>
+    </React.Fragment>
   );
 };
+
+function Alert500({ errors }) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  return (
+    <Alert color="danger">
+      <div className="mt-2">
+        <p>500 Internal Server Error</p>
+        <p>
+          <a onClick={() => setIsOpen((state) => !state)}>
+            <u>Pesan selengkapnya</u>
+          </a>
+        </p>
+      </div>
+
+      <Collapse isOpen={isOpen}>
+        <pre>{errors.message}</pre>
+      </Collapse>
+    </Alert>
+  );
+}

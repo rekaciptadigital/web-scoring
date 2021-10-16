@@ -26,6 +26,10 @@ const validateFieldsByStep = (config) => {
         ...validateInBulk(formData, fieldsList),
       };
 
+      if (!formData.registrationFees[i].categoryPrices) {
+        continue;
+      }
+
       for (let j = 0; j < formData.registrationFees[i].categoryPrices.length; j++) {
         const fieldsList = [`registrationFees.${i}.categoryPrices.${j}.price`];
         validationErrors = {
@@ -35,19 +39,25 @@ const validateFieldsByStep = (config) => {
       }
     }
   } else if (activeTab === 3) {
-    const fieldsList = [
+    let fieldsList = [
       "registrationStartDatetime",
       "registrationEndDatetime",
       "eventStartDatetime",
       "eventEndDatetime",
-      "qualificationStartDatetime",
-      "qualificationEndDatetime",
-      "qualificationSessionLength",
-      "qualificationDaysDetails",
     ];
+    // Field-field berikut cuma dicek di event marathon, di full-day skip
+    if (formData.eventType === "marathon") {
+      fieldsList = [
+        ...fieldsList,
+        "qualificationStartDatetime",
+        "qualificationEndDatetime",
+        "qualificationSessionLength",
+        "qualificationDaysDetails",
+      ];
+    }
     validationErrors = validateInBulk(formData, fieldsList);
   } else if (activeTab === 4) {
-    // Nested, array dynamic fields wkwk
+    // Nested, dynamic array fields wkwk
     for (let i = 0; i < formData.eventCategories.length; i++) {
       const fieldsList = [
         `eventCategories.${i}.ageCategory`,
@@ -69,9 +79,16 @@ const validateFieldsByStep = (config) => {
         };
       }
     }
+  } else if (activeTab === 5) {
+    const fieldsList = ["targets", "publishDatetime"];
+    validationErrors = validateInBulk(formData, fieldsList);
   }
+
+  // Status "valid" diwakili dengan data Objek kosongan...
+  // `undefined` juga valid, tapi harus diubah dulu jadi -> `{}`
+  validationErrors = validationErrors ? validationErrors : {};
   dispatchErrors(validationErrors);
-  if (!Object.keys(validationErrors).length) {
+  if (!validationErrors || !Object.keys(validationErrors).length) {
     onValid();
   }
 };

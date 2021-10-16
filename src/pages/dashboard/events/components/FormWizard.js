@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import * as EventsStore from "store/slice/events";
 import { EventsService } from "../../../../services";
@@ -18,7 +18,6 @@ import { EventFormStep5 } from "./EventFormStep5";
 import { EventFormStep6 } from "./EventFormStep6";
 
 const FormWizard = ({ onFormFieldChange, formData }) => {
-  const history = useHistory();
   const dispatch = useDispatch();
   const [activeTab, setactiveTab] = React.useState(1);
 
@@ -30,32 +29,43 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
     }
   }
 
+  const validationConfigCommon = {
+    formData,
+    activeTab,
+    dispatchErrors: (errors) => dispatch(EventsStore.errors(errors)),
+  };
+
   const handleClickNext = () => {
     validateFieldsByStep({
-      formData,
-      activeTab,
-      dispatchErrors: (errors) => {
-        dispatch(EventsStore.errors(errors));
-      },
+      ...validationConfigCommon,
       onValid: () => {
         toggleTab(activeTab + 1);
       },
     });
   };
 
-  const handleValidSubmit = async (values) => {
-    const d = { ...values };
-    d.handbook = null;
-    const { data, errors, message, success } = await EventsService.register(d);
-    if (success) {
-      if (data) {
-        history.push("/dashboard/events");
-        dispatch(EventsStore.errors(errors));
-      }
-    } else {
-      dispatch(EventsStore.errors(errors));
-      console.log(message);
-    }
+  const handleSubmitPublish = () => {
+    validateFieldsByStep({
+      ...validationConfigCommon,
+      onValid: async () => {
+        const d = { ...formData };
+        d.handbook = null;
+
+        const { data, errors, success, code, message } = await EventsService.register(d);
+        if (success) {
+          if (data) {
+            dispatch(EventsStore.errors(errors));
+            toggleTab(activeTab + 1);
+          }
+        } else {
+          if (code === 500) {
+            dispatch(EventsStore.errors({ ...errors, code: 500, message }));
+          } else if (code === 422) {
+            dispatch(EventsStore.errors(errors));
+          }
+        }
+      },
+    });
   };
 
   return (
@@ -177,12 +187,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                     </li>
                     {activeTab === 5 ? (
                       <li className="next">
-                        <Link
-                          to="#"
-                          onClick={() => {
-                            handleValidSubmit(formData);
-                          }}
-                        >
+                        <Link to="#" onClick={handleSubmitPublish}>
                           Publish
                         </Link>
                       </li>

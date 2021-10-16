@@ -130,6 +130,18 @@ const validators = {
       },
     },
   },
+  targets: (value) => {
+    if (!value || !value.length) {
+      return "Target audience wajib diisi";
+    }
+  },
+  publishDatetime: (value, global) => {
+    if (!global) return;
+
+    if (!global.publishNow && (!value || value.toLowerCase() === "invalid date")) {
+      return "Jangan lupa isi tanggal publish bila memilih dijadwalkan";
+    }
+  },
 };
 
 function getValidatorByField(fieldName) {

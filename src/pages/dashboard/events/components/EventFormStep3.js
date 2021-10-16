@@ -72,6 +72,7 @@ export const EventFormStep3 = ({ onFormFieldChange, formData }) => {
     });
 
     // Invalidate pesan error ketika sudah ada item sesi yang disimpan
+    // TODO: refaktor pakai hook `useFieldValidation`?
     if (errors.qualificationDaysDetails) {
       const errorsUpdated = { ...errors };
       delete errorsUpdated.qualificationDaysDetails;

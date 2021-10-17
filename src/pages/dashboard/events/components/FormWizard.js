@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import * as EventsStore from "store/slice/events";
 import { EventsService } from "../../../../services";
 import classnames from "classnames";
@@ -18,13 +18,15 @@ import { EventFormStep5 } from "./EventFormStep5";
 import { EventFormStep6 } from "./EventFormStep6";
 
 const FormWizard = ({ onFormFieldChange, formData }) => {
-  const dispatch = useDispatch();
   const [activeTab, setactiveTab] = React.useState(1);
+  const { errors } = useSelector(EventsStore.getEventsStore);
+  const dispatch = useDispatch();
 
   function toggleTab(tab) {
     if (activeTab !== tab) {
       if (tab >= 1 && tab <= 5) {
         setactiveTab(tab);
+        Object.keys(errors).length && dispatch(EventsStore.errors({}));
       }
     }
   }
@@ -33,6 +35,25 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
     formData,
     activeTab,
     dispatchErrors: (errors) => dispatch(EventsStore.errors(errors)),
+  };
+
+  const handleClickTab = (tab) => {
+    if (tab > activeTab) {
+      for (let count = 1; count <= activeTab; count++) {
+        validateFieldsByStep({
+          ...validationConfigCommon,
+          onValid: () => {
+            if (count === activeTab) {
+              toggleTab(tab);
+            }
+          },
+        });
+      }
+    } else if (tab < activeTab) {
+      toggleTab(tab);
+    } else {
+      Object.keys(errors).length && dispatch(EventsStore.errors({}));
+    }
   };
 
   const handleClickNext = () => {
@@ -80,7 +101,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                     <NavLink
                       className={classnames({ current: activeTab === 1 })}
                       onClick={() => {
-                        setactiveTab(1);
+                        handleClickTab(1);
                       }}
                     >
                       <span className="number">01</span> Info Umum
@@ -90,7 +111,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                     <NavLink
                       className={classnames({ active: activeTab === 2 })}
                       onClick={() => {
-                        setactiveTab(2);
+                        handleClickTab(2);
                       }}
                     >
                       <span className="number">02</span> Harga
@@ -100,7 +121,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                     <NavLink
                       className={classnames({ active: activeTab === 3 })}
                       onClick={() => {
-                        setactiveTab(3);
+                        handleClickTab(3);
                       }}
                     >
                       <span className="number">03</span> Rincian Tanggal
@@ -110,7 +131,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                     <NavLink
                       className={classnames({ active: activeTab === 4 })}
                       onClick={() => {
-                        setactiveTab(4);
+                        handleClickTab(4);
                       }}
                     >
                       <span className="number">04</span>Daftar Kategori
@@ -120,7 +141,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                     <NavLink
                       className={classnames({ active: activeTab === 5 })}
                       onClick={() => {
-                        setactiveTab(5);
+                        handleClickTab(5);
                       }}
                     >
                       <span className="number">05</span> Publikasi
@@ -130,7 +151,7 @@ const FormWizard = ({ onFormFieldChange, formData }) => {
                     <NavLink
                       className={classnames({ active: activeTab === 6 })}
                       onClick={() => {
-                        setactiveTab(6);
+                        handleClickTab(6);
                       }}
                     >
                       <span className="number">06</span> Selesai

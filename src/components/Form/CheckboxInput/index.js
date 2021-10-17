@@ -26,19 +26,16 @@ const CheckboxInput = ({
   const handleChange = (ev, option) => {
     if (!isFieldDirty) setsFieldDirty(true);
 
-    const checked = ev.target.checked;
     const modifiedOptions = [...value];
-    if (checked) {
+    if (ev.target.checked) {
       modifiedOptions.push(option);
     } else {
       const index = _.findIndex(modifiedOptions, ["id", option.id]);
       modifiedOptions.splice(index, 1);
     }
+
     if (onChange) {
-      onChange({
-        key: name,
-        value: modifiedOptions,
-      });
+      onChange({ key: name, value: modifiedOptions });
     }
   };
 

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { stringUtil } from "utils";
+import { computeEventData } from "./utils/event-data";
+
 import { Container } from "reactstrap";
 import { Breadcrumbs } from "components";
 import FormWizard from "../components/FormWizard";
-import { stringUtil } from "utils";
 
 const EventsNewMarathon = () => {
   const [eventData, setEventData] = useState({
@@ -53,42 +55,7 @@ const EventsNewMarathon = () => {
   });
 
   const handleChange = (key, value) => {
-    let modifiedEventData = { ...eventData };
-
-    if (key === "qualificationWeekdaysOnly" && value) {
-      modifiedEventData.qualificationDays[5].details = []; // sabtu
-      modifiedEventData.qualificationDays[6].details = []; // minggu
-    }
-
-    if (key === "registrationFees" || key === "teamCategories") {
-      const registrationFees = key === "registrationFees" ? value : eventData.registrationFees;
-      const categories = key === "teamCategories" ? value : eventData.teamCategories;
-
-      const newRegistrationFees = registrationFees.map((item) => {
-        const newItem = {
-          registrationType: item.registrationType || item.id,
-          id: item.id,
-          label: item.label,
-          price: item.price,
-        };
-        newItem.categoryPrices = categories.map((categoryItem) => {
-          return {
-            id: categoryItem.id,
-            label: categoryItem.label,
-            teamCategory: categoryItem.id,
-            price: undefined,
-          };
-        });
-
-        return newItem;
-      });
-
-      modifiedEventData.teamCategories = categories;
-      modifiedEventData.registrationFees = newRegistrationFees;
-    } else {
-      modifiedEventData = _.set(modifiedEventData, key, value);
-    }
-    setEventData(modifiedEventData);
+    setEventData(computeEventData(key, value));
   };
 
   return (

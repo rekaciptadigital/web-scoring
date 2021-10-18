@@ -12,43 +12,43 @@ stages:
   - update
   - deploy
 
-update_production:
-  stage: update
-  script:
-    - echo "Updating develop"
-    - ssh -p22 root@$IP_HOST "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master"
-    - echo "Code Updated"
-  only:
-    - master
+# update_production:
+#   stage: update
+#   script:
+#     - echo "Updating develop"
+#     - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master"
+#     - echo "Code Updated"
+#   only:
+#     - master
 
-deploy_production:
-  stage: deploy
-  script:
-    - echo "Cleaning Up Modules"
-    - ssh -p22 root@$IP_HOST "rm -rf /var/www/web-archery/node_modules && rm  /var/www/web-archery/package-lock.json"
-    - ssh -p22 root@$IP_HOST "sudo npm install --prefix /var/www/web-archery && sudo npm run build --prefix /var/www/web-archery"
-    - echo "Build Success, Apps running for Production"
-  only:
-    - master
+# deploy_production:
+#   stage: deploy
+#   script:
+#     - echo "Cleaning Up Modules"
+#     - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-admin-archery/node_modules && rm  /var/www/web-admin-archery/package-lock.json"
+#     - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery && sudo npm run build --prefix /var/www/web-admin-archery"
+#     - echo "Build Success, Apps running for Production"
+#   only:
+#     - master
 
-update_staging:
-  stage: update
-  script:
-    - echo "Updating develop"
-    - ssh -p22 root@$IP_HOST "GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git checkout develop && GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git fetch origin develop && GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery-stg/.git GIT_WORK_TREE=/var/www/web-archery-stg git pull origin develop"
-    - echo "Code Updated"
-  only:
-    - develop
+# update_staging:
+#   stage: update
+#   script:
+#     - echo "Updating develop"
+#     - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git checkout develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git fetch origin develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git pull origin develop"
+#     - echo "Code Updated"
+#   only:
+#     - develop
 
-deploy_staging:
-  stage: deploy
-  script:
-    # - echo "Cleaning Up Modules"
-    # - ssh -p22 root@$IP_HOST "rm -rf /var/www/web-archery-stg/node_modules && rm  /var/www/web-archery-stg/package-lock.json"
-    - ssh -p22 root@$IP_HOST "sudo npm install --prefix /var/www/web-archery-stg && sudo npm run build --prefix /var/www/web-archery-stg"
-    - echo "Build Success, Apps running for Staging"
-  only:
-    - develop
+# deploy_staging:
+#   stage: deploy
+#   script:
+#     # - echo "Cleaning Up Modules"
+#     # - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-archery-stg/node_modules && rm  /var/www/web-archery-stg/package-lock.json"
+#     - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery-stg && sudo npm run build --prefix /var/www/web-admin-archery-stg"
+#     - echo "Build Success, Apps running for Staging"
+#   only:
+#     - develop
 
 
 
@@ -65,15 +65,15 @@ deploy_staging:
 #   - eval $(ssh-agent -s)
 #   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
-# stage_deploy:
-#   artifacts:
-#     paths:
-#       - build/
-#   # only:
-#   #   - dev
-#   script:
-#     - ssh-add <(echo "$PRIVATEKEY_ARCHERY")
-#     - ssh -p22 root@IP_HOST "mkdir /opt/archery-web/_tmp"
-#     - scp -P22 -r build/* root@IP_HOST:/opt/archery-web/_tmp
-#     - ssh -p22 root@IP_HOST "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
-#     - ssh -p22 root@IP_HOST "rm -rf /opt/archery-web/_old"
+stage_deploy:
+  stage: deploy
+  artifacts:
+    paths:
+      - build/
+  only:
+    - develop
+  script:
+    - ssh -p22 root@HOST_IP "mkdir /opt/archery-web/_tmp"
+    - scp -P22 -r build/* root@HOST_IP:/opt/archery-web/_tmp
+    - ssh -p22 root@HOST_IP "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
+    - ssh -p22 root@HOST_IP "rm -rf /opt/archery-web/_old"

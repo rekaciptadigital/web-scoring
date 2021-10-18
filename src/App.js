@@ -14,7 +14,7 @@ const App = () => {
           <AuthenticationMiddleware
             path="/"
             layout={React.Fragment}
-            component={() => <Redirect to="/authentication/login" />}
+            component={() => <Redirect to="/login" />}
             isAuthProtected={false}
             exact
           />

@@ -14,7 +14,7 @@ const Logout = () => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      history.push("/authentication/login")
+      history.push("/login")
     }
   }, [isLoggedIn])
 

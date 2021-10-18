@@ -10,9 +10,7 @@ const AuthenticationMiddleware = ({
   isAuthProtected,
   ...rest
 }) => {
-  let { isLoggedIn } = useSelector(getAuthenticationStore);
-  isLoggedIn = true;
-  isAuthProtected = false
+  const { isLoggedIn } = useSelector(getAuthenticationStore);
 
   return (
     <Route
@@ -22,13 +20,12 @@ const AuthenticationMiddleware = ({
           return (
             <Redirect
               to={{
-                pathname: "/authentication/login",
+                pathname: "/login",
                 state: { from: props.location },
               }}
             />
           );
         }
-
         return (
           <Layout>
             <Component {...props} />

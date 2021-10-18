@@ -72,7 +72,11 @@ stage_deploy:
   only:
     - develop
   script:
-    - ssh -p22 root@103.31.38.37 "mkdir /opt/archery-web/_tmp"
-    - scp -P22 -r build/* root@103.31.38.37:/opt/archery-web/_tmp
-    - ssh -p22 root@103.31.38.37 "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
-    - ssh -p22 root@103.31.38.37 "rm -rf /opt/archery-web/_old"
+    # - ssh -p22 root@103.31.38.37 "mkdir /opt/archery-web/_tmp"
+    # - scp -P22 -r build/* root@103.31.38.37:/opt/archery-web/_tmp
+    # - ssh -p22 root@103.31.38.37 "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
+    # - ssh -p22 root@103.31.38.37 "rm -rf /opt/archery-web/_old"
+    - ssh -p22 root@103.31.38.37 "mkdir /var/www/web-admin-archery-stg/_temp"
+    - scp -P22 -r build/* root@103.31.38.37:/var/www/web-admin-archery-stg/_temp
+    - ssh -p22 root@103.31.38.37 "mv /var/www/web-admin-archery-stg/build /var/www/web-admin-archery-stg/build_old && mv /var/www/web-admin-archery-stg/_temp //var/www/web-admin-archery-stg/build"
+    - ssh -p22 root@103.31.38.37 "rm -rf /var/www/web-admin-archery-stg/build_old"

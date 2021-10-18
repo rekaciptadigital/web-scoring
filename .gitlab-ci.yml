@@ -57,7 +57,7 @@ stages:
 # image: tetraweb/php
 
 stage_build:
-  stage: build
+  stage: update
   only: 
     - develop
   script:

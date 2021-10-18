@@ -1,3 +1,4 @@
+image: node:14
 before_script: 
   - apt-get update -qq
   - apt-get install -qq git
@@ -55,25 +56,22 @@ stages:
 ####New Deployment######
 # image: tetraweb/php
 
-# before_script:
-#   - apt-get update
-#   - apt-get install zip unzip
-#   - npm install
-#   - npm run build
-#   - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-#   - mkdir -p ~/.ssh
-#   - eval $(ssh-agent -s)
-#   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-
-stage_deploy:
-  stage: deploy
+stage_build:
+  stage: build
+  only: develop
+  script:
+    - npm install
+    - npm run build
   artifacts:
     paths:
       - build/
+
+stage_deploy:
+  stage: deploy
   only:
     - develop
   script:
-    - ssh -p22 root@HOST_IP "mkdir /opt/archery-web/_tmp"
-    - scp -P22 -r build/* root@HOST_IP:/opt/archery-web/_tmp
-    - ssh -p22 root@HOST_IP "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
-    - ssh -p22 root@HOST_IP "rm -rf /opt/archery-web/_old"
+    - ssh -p22 root@103.31.38.37 "mkdir /opt/archery-web/_tmp"
+    - scp -P22 -r build/* root@103.31.38.37:/opt/archery-web/_tmp
+    - ssh -p22 root@103.31.38.37 "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
+    - ssh -p22 root@103.31.38.37 "rm -rf /opt/archery-web/_old"

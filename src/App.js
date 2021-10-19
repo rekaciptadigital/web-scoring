@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
 import { AuthLayout, DashboardHorizontalLayout } from "./layouts";
 import { AuthenticationMiddleware } from "./middlewares";
-import { authenticationRoutes, dashboardRoutes, workingRoutes } from "./routes";
+import { authenticationRoutes, dashboardRoutes, certificateRoutes, workingRoutes } from "./routes";
 
 import "./assets/scss/theme.scss";
 
@@ -29,6 +29,16 @@ const App = () => {
             />
           ))}
           {dashboardRoutes.map((route, idx) => (
+            <AuthenticationMiddleware
+              path={route.path}
+              layout={DashboardHorizontalLayout}
+              component={route.component}
+              key={idx}
+              isAuthProtected={true}
+              exact
+            />
+          ))}
+          {certificateRoutes.map((route, idx) => (
             <AuthenticationMiddleware
               path={route.path}
               layout={DashboardHorizontalLayout}

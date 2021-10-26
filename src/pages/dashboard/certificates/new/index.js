@@ -1,26 +1,74 @@
 import * as React from "react";
+// TODO: untuk generate string HTML dari editor
+// import ReactDOMServer from "react-dom/server";
 
 import { Container, Col, Row, Card, CardBody, Button, Modal, ModalBody } from "reactstrap";
+import Select from "react-select";
 import { Breadcrumbs } from "components";
+import BgImageUploader from "../components/BgImageUploader";
+import EditorCanvas from "../components/EditorCanvas";
+import optionsFontSize from "../utils/font-size-list";
 
-// TODO: Hapus ganti dengan length dari list image yang user sudah pernah upload
-const count = 0;
+// TODO: generate string HTML
+// console.log(ReactDOMServer.renderToString(<EditorPreviewArea />));
+
+const initialEditorData = {
+  paperSize: "A4", // || [1280, 908] || letter
+  fields: {
+    member_name: {
+      x: 640,
+      y: 280,
+      fontFamily: "Popins",
+      fontSize: 60,
+    },
+    peringkat_name: {
+      x: 640,
+      y: 370,
+      fontFamily: "Popins",
+      fontSize: 36,
+    },
+    kategori_name: {
+      x: 640,
+      y: 430,
+      fontFamily: "Popins",
+      fontSize: 36,
+    },
+  },
+};
 
 export default function CertificateNew() {
-  const [isModePilihBg, setModePilihBg] = React.useState(false);
   const [image, setImage] = React.useState(null);
   const [isModePreview, setModePreview] = React.useState(false);
 
-  const handleOpenPilihBg = () => setModePilihBg(true);
-  const handleClosePilihBg = () => setModePilihBg(false);
-  const handleTogglePilihBg = () => setModePilihBg((isPilihBg) => !isPilihBg);
-  const handleSelectPilihBg = () => {
-    // logic pilih bg
-    // ...
-    // mock
-    setImage("image");
-    handleClosePilihBg();
+  const [editorData, setEditorData] = React.useState(null);
+  const [currentObject, setCurrentObject] = React.useState({ name: undefined });
+
+  React.useEffect(() => {
+    setEditorData(initialEditorData);
+  }, []);
+
+  const handleEditorChange = (data) => {
+    setEditorData((editorData) => {
+      const editorDataUpdated = { ...editorData };
+      const fieldData = editorDataUpdated.fields[currentObject.name];
+      editorDataUpdated.fields[currentObject.name] = {
+        ...fieldData,
+        ...data,
+      };
+      return editorDataUpdated;
+    });
   };
+
+  const handleFontSizeChange = (ev) => {
+    const { value } = ev;
+    setEditorData((data) => {
+      const dataUpdated = { ...data };
+      dataUpdated.fields[currentObject.name].fontSize = value;
+      return dataUpdated;
+    });
+  };
+
+  const handleSelectBg = () => setImage("image nih");
   const handleHapusBg = () => setImage(null);
 
   const handleOpenPreview = () => setModePreview(true);
@@ -59,7 +107,7 @@ export default function CertificateNew() {
 
                   <Modal
                     isOpen={isModePreview}
-                    size="xl"
+                    size="lg"
                     autoFocus={true}
                     centered={true}
                     className="modalPreview"
@@ -90,20 +138,16 @@ export default function CertificateNew() {
               <Col lg="8">
                 <Card>
                   <CardBody>
-                    <div className="ratio ratio-16x9">
-                      <div className="d-flex justify-content-center align-items-center">
-                        <div className="text-center">
-                          <h1 className="text-uppercase">NAMA PESERTA</h1>
-
-                          <hr />
-
-                          <p className="mb-0">Peringkat/Posisi Kepesertaan</p>
-                          <p>
-                            <strong>Kategori</strong>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    {editorData ? (
+                      <EditorCanvas
+                        data={editorData}
+                        onChange={(data) => handleEditorChange(data)}
+                        currentObject={currentObject}
+                        onSelect={(target) => setCurrentObject(target)}
+                      />
+                    ) : (
+                      <div>Loading data...</div>
+                    )}
                   </CardBody>
                 </Card>
               </Col>
@@ -111,131 +155,27 @@ export default function CertificateNew() {
               <Col lg="4">
                 <div className="ratio ratio-16x9">
                   <div className="d-flex justify-content-center align-items-center bg-secondary bg-opacity-10">
-                    {image ? (
-                      <div className="text-center">
-                        <Button color="primary" onClick={() => handleOpenPilihBg()}>
-                          Ganti Background
-                        </Button>
-                        <Button
-                          color="link"
-                          className="link-danger ms-2"
-                          onClick={() => handleHapusBg()}
-                        >
-                          <i className="bx bx-trash font-size-18 align-middle" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        <Button color="primary" onClick={() => handleOpenPilihBg()}>
-                          <i className="bx bx-image-add font-size-18 align-middle" /> Pilih
-                          Background
-                        </Button>
-                        <p className="mt-3 mb-0">PNG/JPEG, Ukuran 1280 x 908 pixel</p>
-                      </div>
-                    )}
+                    <BgImageUploader
+                      image={image}
+                      onSelectImage={() => handleSelectBg()}
+                      onRemoveImage={() => handleHapusBg()}
+                    />
                   </div>
                 </div>
 
-                <Modal
-                  isOpen={isModePilihBg}
-                  size="xl"
-                  autoFocus={true}
-                  centered={true}
-                  className="modalPilihBg"
-                  tabIndex="-1"
-                  toggle={() => handleTogglePilihBg()}
-                >
-                  <ModalBody>
-                    <div
-                      style={{
-                        position: "relative",
-                        overflowX: count > 4 ? "scroll" : "hidden",
-                        display: "grid",
-                        gridTemplateColumns: "repeat(5, minmax(200px,300px))",
-                        gap: 40,
+                {currentObject?.name && (
+                  <div className="mt-5">
+                    <Select
+                      options={optionsFontSize}
+                      placeholder="font size"
+                      value={{
+                        value: editorData.fields[currentObject.name].fontSize,
+                        label: editorData.fields[currentObject.name].fontSize,
                       }}
-                    >
-                      <div
-                        style={{
-                          marginBottom: 10,
-                          height: 200,
-                          width: 200,
-                          borderRadius: 10,
-                          backgroundColor: "silver",
-                          opacity: 0.4,
-                          cursor: "pointer",
-                        }}
-                        className="d-flex justify-content-center align-items-center"
-                      >
-                        <i className="bx bx-image-add fs-1 align-middle" />
-                      </div>
-                      <div
-                        style={{
-                          marginBottom: 10,
-                          height: 200,
-                          width: 200,
-                          borderRadius: 10,
-                          backgroundColor: "silver",
-                          opacity: 0.2,
-                        }}
-                      ></div>
-                      <div
-                        style={{
-                          marginBottom: 10,
-                          height: 200,
-                          width: 200,
-                          borderRadius: 10,
-                          backgroundColor: "silver",
-                          opacity: 0.2,
-                        }}
-                      ></div>
-                      <div
-                        style={{
-                          marginBottom: 10,
-                          height: 200,
-                          width: 200,
-                          borderRadius: 10,
-                          backgroundColor: "silver",
-                          opacity: 0.2,
-                        }}
-                      ></div>
-                      <div
-                        style={{
-                          marginBottom: 10,
-                          height: 200,
-                          width: 200,
-                          borderRadius: 10,
-                          backgroundColor: "silver",
-                          opacity: 0.2,
-                        }}
-                      ></div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          width: 150,
-                          height: "100%",
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          background: "linear-gradient(to right, rgba(255,255,255,0), #ffffff)",
-                        }}
-                      ></div>
-                    </div>
-
-                    <div className="float-end mt-3">
-                      <Button color="primary" onClick={() => handleSelectPilihBg()}>
-                        Pilih
-                      </Button>
-                      <Button
-                        color="secondary"
-                        className="ms-2"
-                        onClick={() => handleClosePilihBg()}
-                      >
-                        Batal
-                      </Button>
-                    </div>
-                  </ModalBody>
-                </Modal>
+                      onChange={(ev) => handleFontSizeChange(ev)}
+                    />
+                  </div>
+                )}
               </Col>
             </Row>
           </Col>

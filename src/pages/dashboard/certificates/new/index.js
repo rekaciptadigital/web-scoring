@@ -1,13 +1,13 @@
 import * as React from "react";
 // TODO: untuk generate string HTML dari editor
 // import ReactDOMServer from "react-dom/server";
+import { optionsFontSize, optionsFontFamily, getSelectedFontFamily } from "../utils";
 
 import { Container, Col, Row, Card, CardBody, Button, Modal, ModalBody } from "reactstrap";
 import Select from "react-select";
 import { Breadcrumbs } from "components";
 import BgImageUploader from "../components/BgImageUploader";
 import EditorCanvas from "../components/EditorCanvas";
-import optionsFontSize from "../utils/font-size-list";
 
 // TODO: generate string HTML
 // console.log(ReactDOMServer.renderToString(<EditorPreviewArea />));
@@ -18,19 +18,19 @@ const initialEditorData = {
     member_name: {
       x: 640,
       y: 280,
-      fontFamily: "Popins",
+      fontFamily: "'Poppins', sans-serif",
       fontSize: 60,
     },
     peringkat_name: {
       x: 640,
       y: 370,
-      fontFamily: "Popins",
+      fontFamily: "'Poppins', sans-serif",
       fontSize: 36,
     },
     kategori_name: {
       x: 640,
       y: 430,
-      fontFamily: "Popins",
+      fontFamily: "'Poppins', sans-serif",
       fontSize: 36,
     },
   },
@@ -44,6 +44,7 @@ export default function CertificateNew() {
   const [currentObject, setCurrentObject] = React.useState({ name: undefined });
 
   React.useEffect(() => {
+    // Mock untuk data awal dari server
     setEditorData(initialEditorData);
   }, []);
 
@@ -64,6 +65,15 @@ export default function CertificateNew() {
     setEditorData((data) => {
       const dataUpdated = { ...data };
       dataUpdated.fields[currentObject.name].fontSize = value;
+      return dataUpdated;
+    });
+  };
+
+  const handleFontFamilyChange = (ev) => {
+    const { value } = ev;
+    setEditorData((data) => {
+      const dataUpdated = { ...data };
+      dataUpdated.fields[currentObject.name].fontFamily = value;
       return dataUpdated;
     });
   };
@@ -165,15 +175,31 @@ export default function CertificateNew() {
 
                 {currentObject?.name && (
                   <div className="mt-5">
-                    <Select
-                      options={optionsFontSize}
-                      placeholder="font size"
-                      value={{
-                        value: editorData.fields[currentObject.name].fontSize,
-                        label: editorData.fields[currentObject.name].fontSize,
-                      }}
-                      onChange={(ev) => handleFontSizeChange(ev)}
-                    />
+                    <div>
+                      <label>Font family:</label>
+                      <Select
+                        options={optionsFontFamily}
+                        placeholder="Font Family"
+                        value={getSelectedFontFamily(
+                          optionsFontFamily,
+                          editorData.fields[currentObject?.name]
+                        )}
+                        onChange={(ev) => handleFontFamilyChange(ev)}
+                      />
+                    </div>
+
+                    <div className="mt-2">
+                      <label>Font size:</label>
+                      <Select
+                        options={optionsFontSize}
+                        placeholder="font size"
+                        value={{
+                          value: editorData.fields[currentObject?.name]?.fontSize,
+                          label: editorData.fields[currentObject?.name]?.fontSize,
+                        }}
+                        onChange={(ev) => handleFontSizeChange(ev)}
+                      />
+                    </div>
                   </div>
                 )}
               </Col>

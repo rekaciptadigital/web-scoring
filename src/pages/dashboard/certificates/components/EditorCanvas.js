@@ -1,5 +1,5 @@
 import * as React from "react";
-import ObjectText from "./TextPlaceholder";
+import EditorObjectText from "./EditorObjectText";
 
 import mockSertifBg from "../../../../assets/images/mock-sertif.png";
 
@@ -36,21 +36,21 @@ export default function EditorCanvas({ data, onChange, currentObject, onSelect }
           viewBox="0 0 1280 908"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <ObjectText
+          <EditorObjectText
             name="member_name"
             data={fields?.["member_name"]}
             selected={currentObject?.name === "member_name"}
             onSelected={() => handleSelect("member_name")}
             onChange={(data) => onChange(data)}
           />
-          <ObjectText
+          <EditorObjectText
             name="peringkat_name"
             data={fields?.["peringkat_name"]}
             selected={currentObject?.name === "peringkat_name"}
             onSelected={() => handleSelect("peringkat_name")}
             onChange={(data) => onChange(data)}
           />
-          <ObjectText
+          <EditorObjectText
             name="kategori_name"
             data={fields?.["kategori_name"]}
             selected={currentObject?.name === "kategori_name"}

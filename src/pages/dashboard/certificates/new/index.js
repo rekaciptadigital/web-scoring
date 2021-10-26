@@ -1,4 +1,5 @@
 import * as React from "react";
+import { CompactPicker } from "react-color";
 // TODO: untuk generate string HTML dari editor
 // import ReactDOMServer from "react-dom/server";
 import { optionsFontSize, optionsFontFamily, getSelectedFontFamily } from "../utils";
@@ -74,6 +75,23 @@ export default function CertificateNew() {
     setEditorData((data) => {
       const dataUpdated = { ...data };
       dataUpdated.fields[currentObject.name].fontFamily = value;
+      return dataUpdated;
+    });
+  };
+
+  const handleFontColorChange = (color) => {
+    setEditorData((data) => {
+      const dataUpdated = { ...data };
+      dataUpdated.fields[currentObject.name].color = color.hex;
+      return dataUpdated;
+    });
+  };
+
+  const handleFontBoldChange = () => {
+    setEditorData((data) => {
+      const dataUpdated = { ...data };
+      const currentWeight = dataUpdated.fields[currentObject.name].fontWeight;
+      dataUpdated.fields[currentObject.name].fontWeight = currentWeight ? undefined : "bold";
       return dataUpdated;
     });
   };
@@ -200,6 +218,28 @@ export default function CertificateNew() {
                         onChange={(ev) => handleFontSizeChange(ev)}
                       />
                     </div>
+
+                    <div className="mt-2">
+                      <label>Font color:</label>
+                      <div>
+                        <ColorPickerContainer color={editorData.fields[currentObject?.name]?.color}>
+                          <CompactPicker
+                            color={editorData.fields[currentObject?.name]?.color}
+                            onChange={(color) => handleFontColorChange(color)}
+                          />
+                        </ColorPickerContainer>
+                      </div>
+                    </div>
+
+                    <div className="mt-2">
+                      <label>Bold?</label>
+                      <div>
+                        <FontBoldToggle
+                          bold={editorData.fields[currentObject?.name]?.fontWeight}
+                          onChange={() => handleFontBoldChange()}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
               </Col>
@@ -207,6 +247,82 @@ export default function CertificateNew() {
           </Col>
         </Row>
       </Container>
+    </div>
+  );
+}
+
+function ColorPickerContainer({ children, color = "#495057" }) {
+  const [isShowPicker, setShowPicker] = React.useState(false);
+  return (
+    <React.Fragment>
+      <div
+        style={{
+          padding: 5,
+          width: 42,
+          background: "#fff",
+          borderRadius: 4,
+          boxShadow: "0 0 0 1px rgb(204, 204, 204)",
+          display: "inline-block",
+          cursor: "pointer",
+          textAlign: "center",
+        }}
+        onClick={() => setShowPicker((show) => !show)}
+      >
+        <h5
+          style={{
+            margin: 0,
+            fontWeight: 700,
+            color: color,
+          }}
+        >
+          A
+        </h5>
+        <div />
+      </div>
+
+      {isShowPicker && (
+        <div style={{ position: "absolute" }}>
+          <div
+            style={{
+              position: "fixed",
+              top: "0px",
+              right: "0px",
+              bottom: "0px",
+              left: "0px",
+            }}
+            onClick={() => setShowPicker(false)}
+          />
+          {children}
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
+function FontBoldToggle({ onChange, bold = false }) {
+  return (
+    <div
+      style={{
+        padding: 5,
+        width: 42,
+        background: "#fff",
+        borderRadius: 4,
+        boxShadow: "0 0 0 1px rgb(204, 204, 204)",
+        display: "inline-block",
+        cursor: "pointer",
+        textAlign: "center",
+      }}
+      onClick={() => onChange?.()}
+    >
+      <h5
+        style={{
+          margin: 0,
+          fontWeight: bold ? "700" : undefined,
+        }}
+      >
+        B
+      </h5>
+      <div />
     </div>
   );
 }

@@ -22,7 +22,7 @@ const boundingStroke = {
 };
 
 export default function EditorObjectText({ name, data = {}, onSelected, onChange, selected }) {
-  const { x, y, width, height, fontSize, fontFamily, color } = data;
+  const { x, y, width, height, fontSize, fontFamily, color, fontWeight } = data;
 
   const selectorRef = React.useRef(null);
   const textRef = React.useRef(undefined);
@@ -41,7 +41,7 @@ export default function EditorObjectText({ name, data = {}, onSelected, onChange
     // diupdate di sini, agar objek yang bergantung pada nilai state Rect
     // dirender ulang dengan nilai benar
     setCurrentTextRect(textRef.current?.getBBox());
-  }, [x, y, width, height, fontSize, fontFamily]);
+  }, [x, y, width, height, fontSize, fontFamily, fontWeight]);
 
   const highlightOnMouseOver = () => {
     setActiveStrokeColor(boundingStroke.highlighted.color);
@@ -87,6 +87,7 @@ export default function EditorObjectText({ name, data = {}, onSelected, onChange
         y={y}
         fontSize={fontSize}
         fontFamily={fontFamily}
+        fontWeight={fontWeight}
         fill={color}
         cursor="default"
         onMouseDown={(ev) => onSelected?.({ rect: currentTextRect, event: ev })}

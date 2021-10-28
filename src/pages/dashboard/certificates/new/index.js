@@ -7,7 +7,7 @@ import { optionsFontSize, optionsFontFamily, getSelectedFontFamily } from "../ut
 import { Container, Col, Row, Card, CardBody, Button, Modal, ModalBody } from "reactstrap";
 import Select from "react-select";
 import { Breadcrumbs } from "components";
-import BgImageUploader from "../components/BgImageUploader";
+import EditorBgImagePicker from "../components/EditorBgImagePicker";
 import EditorCanvas from "../components/EditorCanvas";
 
 // TODO: generate string HTML
@@ -15,6 +15,10 @@ import EditorCanvas from "../components/EditorCanvas";
 
 const initialEditorData = {
   paperSize: "A4", // || [1280, 908] || letter
+  backgroundUrl: undefined,
+  backgroundPreviewUrl: undefined,
+  backgroundFileRaw: null,
+  backgroundImage: null, // base64, yang nanti diupload
   fields: {
     member_name: {
       x: 640,
@@ -38,13 +42,18 @@ const initialEditorData = {
 };
 
 export default function CertificateNew() {
-  const [image, setImage] = React.useState(null);
-  const [isModePreview, setModePreview] = React.useState(false);
-
   const [editorData, setEditorData] = React.useState(null);
   const [currentObject, setCurrentObject] = React.useState({ name: undefined });
 
+  const [isModePreview, setModePreview] = React.useState(false);
+
+  const image = {
+    preview: editorData?.backgroundUrl || editorData?.backgroundPreviewUrl || null,
+    raw: editorData?.backgroundFileRaw || null,
+  };
+
   React.useEffect(() => {
+    // TODO: pakai data yang di-fetch dari backend
     // Mock untuk data awal dari server
     setEditorData(initialEditorData);
   }, []);
@@ -96,8 +105,27 @@ export default function CertificateNew() {
     });
   };
 
-  const handleSelectBg = () => setImage("image nih");
-  const handleHapusBg = () => setImage(null);
+  const handleSelectBg = (imageData) => {
+    if (!imageData) {
+      return;
+    }
+    const imagePreviewUrl = URL.createObjectURL(imageData);
+    setEditorData((data) => {
+      return {
+        ...data,
+        backgroundPreviewUrl: imagePreviewUrl,
+      };
+    });
+  };
+
+  const handleHapusBg = () => {
+    setEditorData((data) => {
+      return {
+        ...data,
+        backgroundPreviewUrl: undefined,
+      };
+    });
+  };
 
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
@@ -182,13 +210,11 @@ export default function CertificateNew() {
 
               <Col lg="4">
                 <div className="ratio ratio-16x9">
-                  <div className="d-flex justify-content-center align-items-center bg-secondary bg-opacity-10">
-                    <BgImageUploader
-                      image={image}
-                      onSelectImage={() => handleSelectBg()}
-                      onRemoveImage={() => handleHapusBg()}
-                    />
-                  </div>
+                  <EditorBgImagePicker
+                    image={image}
+                    onSelectImage={(imageData) => handleSelectBg(imageData)}
+                    onRemoveImage={() => handleHapusBg()}
+                  />
                 </div>
 
                 {currentObject?.name && (

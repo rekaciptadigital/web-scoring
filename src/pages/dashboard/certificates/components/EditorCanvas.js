@@ -1,10 +1,14 @@
 import * as React from "react";
 import EditorObjectText from "./EditorObjectText";
 
-import mockSertifBg from "../../../../assets/images/mock-sertif.png";
-
 export default function EditorCanvas({ data, onChange, currentObject, onSelect }) {
-  const { fields } = data;
+  const { backgroundUrl, backgroundPreviewUrl, fields } = data;
+
+  const getBackgroundImage = () => backgroundUrl || backgroundPreviewUrl;
+
+  const isSelected = (name) => {
+    return currentObject?.name === name;
+  };
 
   const handleSelect = (name) => {
     onSelect({ name });
@@ -26,8 +30,20 @@ export default function EditorCanvas({ data, onChange, currentObject, onSelect }
           xmlns="http://www.w3.org/2000/svg"
           onClick={() => handleDeselect()}
         >
-          <image href={mockSertifBg} x="0" y="0" height="100%" width="100%" />
+          {getBackgroundImage() ? (
+            <image
+              href={getBackgroundImage()}
+              x="0"
+              y="0"
+              height="100%"
+              width="100%"
+              preserveAspectRatio="xMidYMid slice"
+            />
+          ) : (
+            <rect x="0" y="0" height="100%" width="100%" />
+          )}
         </svg>
+
         {/* "Layer" teks */}
         <svg
           id="certificateTextLayer"
@@ -39,21 +55,21 @@ export default function EditorCanvas({ data, onChange, currentObject, onSelect }
           <EditorObjectText
             name="member_name"
             data={fields?.["member_name"]}
-            selected={currentObject?.name === "member_name"}
+            selected={isSelected("member_name")}
             onSelected={() => handleSelect("member_name")}
             onChange={(data) => onChange(data)}
           />
           <EditorObjectText
             name="peringkat_name"
             data={fields?.["peringkat_name"]}
-            selected={currentObject?.name === "peringkat_name"}
+            selected={isSelected("peringkat_name")}
             onSelected={() => handleSelect("peringkat_name")}
             onChange={(data) => onChange(data)}
           />
           <EditorObjectText
             name="kategori_name"
             data={fields?.["kategori_name"]}
-            selected={currentObject?.name === "kategori_name"}
+            selected={isSelected("kategori_name")}
             onSelected={() => handleSelect("kategori_name")}
             onChange={(data) => onChange(data)}
           />

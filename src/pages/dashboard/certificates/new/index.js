@@ -1,17 +1,19 @@
 import * as React from "react";
-import { CompactPicker } from "react-color";
-// TODO: untuk generate string HTML dari editor
-// import ReactDOMServer from "react-dom/server";
-import { optionsFontSize, optionsFontFamily, getSelectedFontFamily } from "../utils";
+import {
+  optionsFontSize,
+  optionsFontFamily,
+  getSelectedFontFamily,
+  renderTemplateString,
+  convertBase64,
+} from "../utils";
 
-import { Container, Col, Row, Card, CardBody, Button, Modal, ModalBody } from "reactstrap";
+import { Container, Col, Row, Card, Button, Modal, ModalBody } from "reactstrap";
+import { CompactPicker } from "react-color";
 import Select from "react-select";
+
 import { Breadcrumbs } from "components";
 import EditorBgImagePicker from "../components/EditorBgImagePicker";
-import EditorCanvas from "../components/EditorCanvas";
-
-// TODO: generate string HTML
-// console.log(ReactDOMServer.renderToString(<EditorPreviewArea />));
+import EditorCanvasHTML from "../components/EditorCanvasHTML";
 
 const initialEditorData = {
   paperSize: "A4", // || [1280, 908] || letter
@@ -114,6 +116,7 @@ export default function CertificateNew() {
       return {
         ...data,
         backgroundPreviewUrl: imagePreviewUrl,
+        backgroundFileRaw: imageData,
       };
     });
   };
@@ -123,8 +126,15 @@ export default function CertificateNew() {
       return {
         ...data,
         backgroundPreviewUrl: undefined,
+        backgroundFileRaw: undefined,
+        backgroundUrl: undefined,
       };
     });
+  };
+
+  const handleClickSave = async () => {
+    const data = await prepareSaveData(editorData);
+    console.log(data);
   };
 
   const handleOpenPreview = () => setModePreview(true);
@@ -150,7 +160,7 @@ export default function CertificateNew() {
 
               <Col lg="4">
                 <div className="float-end">
-                  <Button color="primary" className="ms-2 mw-50">
+                  <Button color="primary" className="ms-2 mw-50" onClick={() => handleClickSave()}>
                     Save
                   </Button>
                   <Button
@@ -193,18 +203,16 @@ export default function CertificateNew() {
             <Row>
               <Col lg="8">
                 <Card>
-                  <CardBody>
-                    {editorData ? (
-                      <EditorCanvas
-                        data={editorData}
-                        onChange={(data) => handleEditorChange(data)}
-                        currentObject={currentObject}
-                        onSelect={(target) => setCurrentObject(target)}
-                      />
-                    ) : (
-                      <div>Loading data...</div>
-                    )}
-                  </CardBody>
+                  {editorData ? (
+                    <EditorCanvasHTML
+                      data={editorData}
+                      onChange={(data) => handleEditorChange(data)}
+                      currentObject={currentObject}
+                      onSelect={(target) => setCurrentObject(target)}
+                    />
+                  ) : (
+                    <div>Loading data...</div>
+                  )}
                 </Card>
               </Col>
 
@@ -351,4 +359,25 @@ function FontBoldToggle({ onChange, bold = false }) {
       <div />
     </div>
   );
+}
+
+// TODO: refaktor jadi service
+async function prepareSaveData(editorData) {
+  const dataCopy = { ...editorData };
+  dataCopy.backgroundImage = await convertBase64(dataCopy.backgroundFileRaw);
+  const certificateHtmlTemplate = renderTemplateString(dataCopy);
+
+  const savedEditorData = {
+    paperSize: dataCopy.paperSize,
+    fields: dataCopy.fields,
+  };
+
+  const payload = {
+    htmlTemplate: certificateHtmlTemplate,
+    backgroundImage: dataCopy.backgroundImage || dataCopy.backgroundFileRaw || undefined,
+    backgroundUrl: dataCopy.backgroundUrl || undefined,
+    editorData: savedEditorData,
+  };
+
+  return payload;
 }

@@ -52,6 +52,7 @@ export default function EditorBgImagePicker({
           </Button>
           <input
             type="file"
+            accept="image/jpg,image/jpeg,image/png"
             id="button-upload-bg-image"
             onChange={(ev) => handleClickUpload(ev)}
             style={{ display: "none" }}

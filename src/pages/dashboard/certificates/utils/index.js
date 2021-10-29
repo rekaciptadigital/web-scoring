@@ -1,5 +1,6 @@
 import optionsFontSize from "./font-size-list";
 import optionsFontFamily from "./font-family-list";
+import { renderTemplateString } from "./render-template-string";
 
 const getSelectedFontFamily = (optionsFontFamily, fieldData) => {
   return {
@@ -10,4 +11,21 @@ const getSelectedFontFamily = (optionsFontFamily, fieldData) => {
   };
 };
 
-export { getSelectedFontFamily, optionsFontSize, optionsFontFamily };
+async function convertBase64(imageFileRaw) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(imageFileRaw);
+    reader.onload = () => {
+      const baseURL = reader.result;
+      resolve(baseURL);
+    };
+  });
+}
+
+export {
+  getSelectedFontFamily,
+  optionsFontSize,
+  optionsFontFamily,
+  renderTemplateString,
+  convertBase64,
+};

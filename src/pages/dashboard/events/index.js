@@ -80,7 +80,7 @@ const ListEvent = () => {
           {/* / */}
 
           <Row>
-            {listEvent.map((list) => {
+            {/* {listEvent.map((list) => {
               return (
                 <>
                 <Col key={list.event.id} md={6}>
@@ -88,10 +88,10 @@ const ListEvent = () => {
                 </Col>
                 </>
               )
-            })}
-            {/* <Col md={6}>
-              <CardEvent />
-            </Col> */}
+            })} */}
+            <Col md={6}>
+              <CardEvent detail={false} />
+            </Col>
           </Row>
         </Container>
       </div>

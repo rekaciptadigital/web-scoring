@@ -17,13 +17,13 @@ import {
 
 function CardEvent(props) {
     const [menu, setMenu] = useState(false);
-    // const [check, setCheck] = useState(false)
-    // const getCheckCopy = () => {
-    //     navigator.clipboard.writeText(props.detail.event.eventUrl)
-    //     setCheck(true)
-    // }
-    // let dStart = new Date(props.detail.event.registrationStartDatetime)
-    // let dEnd = new Date(props.detail.event.registrationEndDatetime)
+    const [check, setCheck] = useState(false)
+    const getCheckCopy = () => {
+        navigator.clipboard.writeText(props.detail.event.eventUrl)
+        setCheck(true)
+    }
+    let dStart = new Date(props.detail.event.registrationStartDatetime)
+    let dEnd = new Date(props.detail.event.registrationEndDatetime)
     // console.log(d.toDateString())
 
     // if (!props.detail) {

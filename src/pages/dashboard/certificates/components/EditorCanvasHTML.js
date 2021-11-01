@@ -2,21 +2,22 @@ import * as React from "react";
 import EditorFieldText from "./EditorFieldText";
 
 export default function EditorCanvasHTML({ data, currentObject, onChange, onSelect }) {
-  const { backgroundUrl, backgroundPreviewUrl, fields } = data;
+  const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
 
-  const getBackgroundImage = () => backgroundUrl || backgroundPreviewUrl;
+  const getBackgroundImage = () => backgroundUrl || backgroundPreviewUrl || backgroundImage;
 
   const isSelected = (name) => {
     return currentObject?.name === name;
   };
 
-  const handleSelect = (name) => {
-    onSelect({ name });
+  const handleSelectField = (name) => {
+    const fieldData = data.fields.find((field) => field.name === name);
+    onSelect({ ...fieldData });
   };
 
-  const handleDeselect = () => {
-    onSelect({ name: undefined });
+  const handleDeselectField = () => {
+    onSelect(null);
   };
 
   return (
@@ -51,31 +52,23 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
             right: 0,
             bottom: 0,
           }}
-          onClick={() => handleDeselect()}
+          onClick={() => handleDeselectField()}
         />
 
-        <EditorFieldText
-          name="member_name"
-          data={fields?.["member_name"]}
-          selected={isSelected("member_name")}
-          onChange={(data) => onChange(data)}
-          onSelected={() => handleSelect("member_name")}
-        />
-        <EditorFieldText
-          name="peringkat_name"
-          data={fields?.["peringkat_name"]}
-          selected={isSelected("peringkat_name")}
-          onChange={(data) => onChange(data)}
-          onSelected={() => handleSelect("peringkat_name")}
-        />
-
-        <EditorFieldText
-          name="kategori_name"
-          data={fields?.["kategori_name"]}
-          selected={isSelected("kategori_name")}
-          onChange={(data) => onChange(data)}
-          onSelected={() => handleSelect("kategori_name")}
-        />
+        {fields?.length ? (
+          fields.map((field) => (
+            <EditorFieldText
+              key={field.name}
+              name={field.name}
+              data={field}
+              selected={isSelected(field.name)}
+              onChange={(data) => onChange(data)}
+              onSelected={() => handleSelectField(field.name)}
+            />
+          ))
+        ) : (
+          <div>Ada error pada data editor</div>
+        )}
       </div>
     </div>
   );

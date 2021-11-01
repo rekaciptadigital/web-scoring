@@ -1,15 +1,7 @@
 import optionsFontSize from "./font-size-list";
-import optionsFontFamily from "./font-family-list";
+import { optionsFontFamily, getSelectedFontFamily } from "./font-family-list";
+import { optionsTypeCertificate, getCurrentTypeCertificate } from "./type-certificate-list";
 import { renderTemplateString } from "./render-template-string";
-
-const getSelectedFontFamily = (optionsFontFamily, fieldData) => {
-  return {
-    value: fieldData?.fontFamily,
-    label: optionsFontFamily.find((font) => {
-      return font.value === fieldData?.fontFamily;
-    })?.label,
-  };
-};
 
 async function convertBase64(imageFileRaw) {
   return new Promise((resolve) => {
@@ -26,6 +18,8 @@ export {
   getSelectedFontFamily,
   optionsFontSize,
   optionsFontFamily,
+  optionsTypeCertificate,
+  getCurrentTypeCertificate,
   renderTemplateString,
   convertBase64,
 };

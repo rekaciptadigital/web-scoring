@@ -1,6 +1,18 @@
-const optionsFontFamily = [
-  { value: "'Poppins', sans-serif", label: "Poppins" },
-  { value: "Arial, sans-serif", label: "Arial" },
+export const ARIAL = "Arial, sans-serif";
+export const DEJAVU_SANS = "'DejaVu Sans', sans-serif";
+export const POPPINS = "'Poppins', sans-serif";
+
+export const optionsFontFamily = [
+  { value: ARIAL, label: "Arial" },
+  { value: DEJAVU_SANS, label: "DejaVu Sans" },
+  { value: POPPINS, label: "Poppins" },
 ];
 
-export default optionsFontFamily;
+export const getSelectedFontFamily = (optionsFontFamily, fieldData) => {
+  return {
+    value: fieldData?.fontFamily,
+    label: optionsFontFamily.find((font) => {
+      return font.value === fieldData?.fontFamily;
+    })?.label,
+  };
+};

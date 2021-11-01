@@ -23,6 +23,7 @@ export default function EditorFieldText({ name, data = {}, onSelected, onChange,
   );
 
   const placeholderString = `{%${name}%}`;
+  const translatePosition = { x: 0, y };
 
   React.useEffect(() => {
     // Perubahan data yang memengaruhi width DOM perlu diupdate di sini,
@@ -41,18 +42,18 @@ export default function EditorFieldText({ name, data = {}, onSelected, onChange,
   };
 
   const handleDrag = () => {
-    onSelected?.();
+    onSelected?.(name);
   };
 
-  const handleDragStop = (position) => {
-    onChange?.({ y: position.y });
+  const handleDragStop = (translation) => {
+    onChange?.({ y: translation.y });
   };
 
   return (
     <Draggable
       axis="y"
       scale={0.5}
-      defaultPosition={{ x: 0, y }}
+      position={translatePosition}
       onStart={() => handleDrag()}
       onStop={(ev, position) => handleDragStop(position)}
     >

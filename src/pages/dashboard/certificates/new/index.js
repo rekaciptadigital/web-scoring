@@ -1,11 +1,17 @@
 import * as React from "react";
+import { useLocation } from "react-router-dom";
+import styled from "styled-components";
+import { CertificateService } from "services";
 import {
   optionsFontSize,
   optionsFontFamily,
+  optionsTypeCertificate,
+  getCurrentTypeCertificate,
   getSelectedFontFamily,
   renderTemplateString,
   convertBase64,
 } from "../utils";
+import { DEJAVU_SANS } from "../utils/font-family-list";
 
 import { Container, Col, Row, Card, Button, Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
@@ -14,97 +20,185 @@ import Select from "react-select";
 import { Breadcrumbs } from "components";
 import EditorBgImagePicker from "../components/EditorBgImagePicker";
 import EditorCanvasHTML from "../components/EditorCanvasHTML";
+import FontBoldToggle from "../components/FontBoldToggle";
+import ColorPickerContainer from "../components/ColorPickerContainer";
 
-const initialEditorData = {
+const defaultEditorData = {
   paperSize: "A4", // || [1280, 908] || letter
   backgroundUrl: undefined,
   backgroundPreviewUrl: undefined,
-  backgroundFileRaw: null,
-  backgroundImage: null, // base64, yang nanti diupload
-  fields: {
-    member_name: {
+  backgroundFileRaw: undefined,
+  backgroundImage: undefined, // base64, yang nanti diupload
+  fields: [
+    {
+      name: "member_name",
       x: 640,
       y: 280,
-      fontFamily: "'Poppins', sans-serif",
+      fontFamily: DEJAVU_SANS,
       fontSize: 60,
     },
-    peringkat_name: {
+    {
+      name: "peringkat_name",
       x: 640,
       y: 370,
-      fontFamily: "'Poppins', sans-serif",
+      fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
-    kategori_name: {
+    {
+      name: "kategori_name",
       x: 640,
       y: 430,
-      fontFamily: "'Poppins', sans-serif",
+      fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
-  },
+  ],
 };
 
 export default function CertificateNew() {
+  const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
+  const [status, setStatus] = React.useState("idle");
   const [editorData, setEditorData] = React.useState(null);
-  const [currentObject, setCurrentObject] = React.useState({ name: undefined });
+  const [currentObject, setCurrentObject] = React.useState(null);
 
   const [isModePreview, setModePreview] = React.useState(false);
 
+  const isSaving = status === "saving";
+  const isLoading = status === "loading";
+
   const image = {
-    preview: editorData?.backgroundUrl || editorData?.backgroundPreviewUrl || null,
+    preview:
+      editorData?.backgroundUrl ||
+      editorData?.backgroundPreviewUrl ||
+      editorData?.backgroundImage ||
+      null,
     raw: editorData?.backgroundFileRaw || null,
   };
 
+  const event_id = new URLSearchParams(useLocation().search).get("event_id");
+
   React.useEffect(() => {
-    // TODO: pakai data yang di-fetch dari backend
-    // Mock untuk data awal dari server
-    setEditorData(initialEditorData);
-  }, []);
+    setStatus("loading");
+
+    const getCertificateData = async () => {
+      const queryString = { event_id, type_certificate: currentCertificateType };
+      const { data } = await CertificateService.getForEditor(queryString);
+
+      if (data?.length) {
+        // Data editor dari data sertifikat yang sudah ada di server
+        const certificate = data[0];
+        setEditorData({
+          ...defaultEditorData,
+          typeCertificate: currentCertificateType,
+          certificateId: certificate.id,
+          backgroundUrl: certificate.backgroundUrl,
+          backgroundImage: certificate.editorData.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
+          fields: certificate.editorData.fields,
+        });
+      } else {
+        // Dari yang belum ada, dikenali dari gak ada `certificateId`-nya
+        setEditorData({
+          ...defaultEditorData,
+          typeCertificate: currentCertificateType,
+        });
+      }
+      setStatus("done");
+    };
+
+    getCertificateData();
+  }, [currentCertificateType]);
+
+  React.useEffect(() => {
+    if (!currentObject) {
+      return;
+    }
+    setEditorData((editorData) => {
+      const fieldsUpdated = editorData.fields.map((field) => {
+        if (field.name === currentObject.name) {
+          return currentObject;
+        }
+        return field;
+      });
+
+      return {
+        ...editorData,
+        fields: fieldsUpdated,
+      };
+    });
+  }, [currentObject]);
+
+  /**
+   * 1. Simpan data editor untuk sertifikat yang sedang aktif
+   * 2. Ganti ke current certificate
+   */
+  const handleTipeSertifikatChange = async (ev) => {
+    if (parseInt(ev.value) === parseInt(editorData.typeCertificate)) {
+      return;
+    }
+    setStatus("saving");
+    const queryString = { event_id, type_certificate: currentCertificateType };
+    const data = await prepareSaveData(editorData, queryString);
+
+    setEditorData((editorData) => ({
+      ...editorData,
+      backgroundImage: data.editor_data.backgroundImage,
+    }));
+
+    if (!editorData.certificateId) {
+      const result = await CertificateService.create(data);
+      if (result.success) {
+        setCurrentCertificateType(ev.value);
+      }
+      setCurrentCertificateType(ev.value);
+    } else {
+      const dataAsQueryString = {
+        ...data,
+        editor_data: JSON.stringify(data.editor_data),
+      };
+      const result = await CertificateService.saveUpdate(dataAsQueryString);
+      if (result.success) {
+        setCurrentCertificateType(ev.value);
+      }
+      setCurrentCertificateType(ev.value);
+    }
+    setStatus("done");
+    setCurrentObject(null);
+  };
 
   const handleEditorChange = (data) => {
-    setEditorData((editorData) => {
-      const editorDataUpdated = { ...editorData };
-      const fieldData = editorDataUpdated.fields[currentObject.name];
-      editorDataUpdated.fields[currentObject.name] = {
-        ...fieldData,
-        ...data,
-      };
-      return editorDataUpdated;
-    });
+    setCurrentObject((currentData) => ({
+      ...currentData,
+      ...data,
+    }));
   };
 
   const handleFontSizeChange = (ev) => {
     const { value } = ev;
-    setEditorData((data) => {
-      const dataUpdated = { ...data };
-      dataUpdated.fields[currentObject.name].fontSize = value;
-      return dataUpdated;
-    });
+    setCurrentObject((currentData) => ({
+      ...currentData,
+      fontSize: value,
+    }));
   };
 
   const handleFontFamilyChange = (ev) => {
     const { value } = ev;
-    setEditorData((data) => {
-      const dataUpdated = { ...data };
-      dataUpdated.fields[currentObject.name].fontFamily = value;
-      return dataUpdated;
-    });
+    setCurrentObject((currentData) => ({
+      ...currentData,
+      fontFamily: value,
+    }));
   };
 
   const handleFontColorChange = (color) => {
-    setEditorData((data) => {
-      const dataUpdated = { ...data };
-      dataUpdated.fields[currentObject.name].color = color.hex;
-      return dataUpdated;
-    });
+    setCurrentObject((currentData) => ({
+      ...currentData,
+      color: color.hex,
+    }));
   };
 
   const handleFontBoldChange = () => {
-    setEditorData((data) => {
-      const dataUpdated = { ...data };
-      const currentWeight = dataUpdated.fields[currentObject.name].fontWeight;
-      dataUpdated.fields[currentObject.name].fontWeight = currentWeight ? undefined : "bold";
-      return dataUpdated;
-    });
+    setCurrentObject((currentData) => ({
+      ...currentData,
+      fontWeight: currentData.fontWeight ? undefined : "bold",
+    }));
   };
 
   const handleSelectBg = (imageData) => {
@@ -127,14 +221,33 @@ export default function CertificateNew() {
         ...data,
         backgroundPreviewUrl: undefined,
         backgroundFileRaw: undefined,
-        backgroundUrl: undefined,
+        backgroundUrl: null,
+        backgroundImage: null,
       };
     });
   };
 
   const handleClickSave = async () => {
-    const data = await prepareSaveData(editorData);
-    console.log(data);
+    setStatus("saving");
+    const queryString = { event_id, type_certificate: currentCertificateType };
+    const data = await prepareSaveData(editorData, queryString);
+
+    setEditorData((editorData) => ({
+      ...editorData,
+      backgroundImage: data.editor_data.backgroundImage,
+    }));
+
+    if (!editorData.certificateId) {
+      const result = await CertificateService.create(data);
+      console.log(result);
+    } else {
+      const result = await CertificateService.saveUpdate({
+        ...data,
+        editor_data: JSON.stringify(data.editor_data),
+      });
+      console.log(result);
+    }
+    setStatus("done");
   };
 
   const handleOpenPreview = () => setModePreview(true);
@@ -151,7 +264,7 @@ export default function CertificateNew() {
           <Col lg="12">
             <Row>
               <Col lg="8">
-                <h1>Sertifikat Peserta </h1>
+                <h1>Sertifikat Event</h1>
                 <p>
                   Klik untuk mengubah jenis dan ukuran teks. Geser untuk mengatur komposisi
                   sertifikat.
@@ -159,44 +272,57 @@ export default function CertificateNew() {
               </Col>
 
               <Col lg="4">
-                <div className="float-end">
-                  <Button color="primary" className="ms-2 mw-50" onClick={() => handleClickSave()}>
-                    Save
-                  </Button>
-                  <Button
-                    color="secondary"
-                    className="ms-2 mw-50"
-                    onClick={() => handleOpenPreview()}
-                  >
-                    Preview
-                  </Button>
+                <EditorActionButtons>
+                  <div>
+                    <Select
+                      options={optionsTypeCertificate}
+                      placeholder="Tipe Sertifikat"
+                      value={getCurrentTypeCertificate(currentCertificateType)}
+                      onChange={(ev) => handleTipeSertifikatChange(ev)}
+                    />
+                  </div>
 
-                  <Modal
-                    isOpen={isModePreview}
-                    size="lg"
-                    autoFocus={true}
-                    centered={true}
-                    className="modalPreview"
-                    tabIndex="-1"
-                    toggle={() => handleTogglePreview()}
-                  >
-                    <ModalBody>
-                      <div className="ratio ratio-16x9">
-                        <div
-                          className="d-flex justify-content-center align-items-center "
-                          style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
-                        >
-                          Preview
+                  <div>
+                    <Button tag="a" color="primary" onClick={() => handleClickSave()}>
+                      Save
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button tag="a" color="secondary" outline onClick={() => handleOpenPreview()}>
+                      Preview
+                    </Button>
+
+                    <Modal
+                      isOpen={isModePreview}
+                      size="lg"
+                      autoFocus={true}
+                      centered={true}
+                      className="modalPreview"
+                      tabIndex="-1"
+                      toggle={() => handleTogglePreview()}
+                    >
+                      <ModalBody>
+                        <div className="ratio ratio-16x9">
+                          <div
+                            className="d-flex justify-content-center align-items-center "
+                            style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
+                          >
+                            Preview
+                          </div>
                         </div>
-                      </div>
-                      <div className="mt-4 mb-2 text-center">
-                        <Button color="primary" onClick={() => handleClosePreview()}>
-                          Tutup
-                        </Button>
-                      </div>
-                    </ModalBody>
-                  </Modal>
-                </div>
+                        <div className="mt-4 mb-2 text-center">
+                          <Button color="primary" onClick={() => handleClosePreview()}>
+                            Tutup
+                          </Button>
+                        </div>
+                      </ModalBody>
+                    </Modal>
+                  </div>
+
+                  {isSaving && <div className="indicator-message">Saving certificate...</div>}
+                  {isLoading && <div className="indicator-message">Loading certificate...</div>}
+                </EditorActionButtons>
               </Col>
             </Row>
 
@@ -211,7 +337,12 @@ export default function CertificateNew() {
                       onSelect={(target) => setCurrentObject(target)}
                     />
                   ) : (
-                    <div>Loading data...</div>
+                    <div
+                      className="d-flex align-items-center justify-content-center"
+                      style={{ height: 160 }}
+                    >
+                      Preparing editor...
+                    </div>
                   )}
                 </Card>
               </Col>
@@ -232,10 +363,7 @@ export default function CertificateNew() {
                       <Select
                         options={optionsFontFamily}
                         placeholder="Font Family"
-                        value={getSelectedFontFamily(
-                          optionsFontFamily,
-                          editorData.fields[currentObject?.name]
-                        )}
+                        value={getSelectedFontFamily(optionsFontFamily, currentObject)}
                         onChange={(ev) => handleFontFamilyChange(ev)}
                       />
                     </div>
@@ -246,8 +374,8 @@ export default function CertificateNew() {
                         options={optionsFontSize}
                         placeholder="font size"
                         value={{
-                          value: editorData.fields[currentObject?.name]?.fontSize,
-                          label: editorData.fields[currentObject?.name]?.fontSize,
+                          value: currentObject?.fontSize,
+                          label: currentObject?.fontSize,
                         }}
                         onChange={(ev) => handleFontSizeChange(ev)}
                       />
@@ -256,9 +384,9 @@ export default function CertificateNew() {
                     <div className="mt-2">
                       <label>Font color:</label>
                       <div>
-                        <ColorPickerContainer color={editorData.fields[currentObject?.name]?.color}>
+                        <ColorPickerContainer color={currentObject?.color}>
                           <CompactPicker
-                            color={editorData.fields[currentObject?.name]?.color}
+                            color={currentObject?.color}
                             onChange={(color) => handleFontColorChange(color)}
                           />
                         </ColorPickerContainer>
@@ -269,7 +397,7 @@ export default function CertificateNew() {
                       <label>Bold?</label>
                       <div>
                         <FontBoldToggle
-                          bold={editorData.fields[currentObject?.name]?.fontWeight}
+                          bold={currentObject?.fontWeight}
                           onChange={() => handleFontBoldChange()}
                         />
                       </div>
@@ -285,98 +413,54 @@ export default function CertificateNew() {
   );
 }
 
-function ColorPickerContainer({ children, color = "#495057" }) {
-  const [isShowPicker, setShowPicker] = React.useState(false);
-  return (
-    <React.Fragment>
-      <div
-        style={{
-          padding: 5,
-          width: 42,
-          background: "#fff",
-          borderRadius: 4,
-          boxShadow: "0 0 0 1px rgb(204, 204, 204)",
-          display: "inline-block",
-          cursor: "pointer",
-          textAlign: "center",
-        }}
-        onClick={() => setShowPicker((show) => !show)}
-      >
-        <h5
-          style={{
-            margin: 0,
-            fontWeight: 700,
-            color: color,
-          }}
-        >
-          A
-        </h5>
-        <div />
-      </div>
+const EditorActionButtons = styled.div`
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 10px;
 
-      {isShowPicker && (
-        <div style={{ position: "absolute" }}>
-          <div
-            style={{
-              position: "fixed",
-              top: "0px",
-              right: "0px",
-              bottom: "0px",
-              left: "0px",
-            }}
-            onClick={() => setShowPicker(false)}
-          />
-          {children}
-        </div>
-      )}
-    </React.Fragment>
-  );
-}
+  & > * {
+    flex: 1 1 30%;
 
-function FontBoldToggle({ onChange, bold = false }) {
-  return (
-    <div
-      style={{
-        padding: 5,
-        width: 42,
-        background: "#fff",
-        borderRadius: 4,
-        boxShadow: "0 0 0 1px rgb(204, 204, 204)",
-        display: "inline-block",
-        cursor: "pointer",
-        textAlign: "center",
-      }}
-      onClick={() => onChange?.()}
-    >
-      <h5
-        style={{
-          margin: 0,
-          fontWeight: bold ? "700" : undefined,
-        }}
-      >
-        B
-      </h5>
-      <div />
-    </div>
-  );
-}
+    :first-child {
+      flex: 1 0 40%;
+    }
+  }
 
-// TODO: refaktor jadi service
-async function prepareSaveData(editorData) {
+  & > * > a {
+    display: block;
+  }
+
+  .indicator-message {
+    position: absolute;
+    bottom: -1.8em;
+  }
+`;
+
+async function prepareSaveData(editorData, qs) {
   const dataCopy = { ...editorData };
-  dataCopy.backgroundImage = await convertBase64(dataCopy.backgroundFileRaw);
-  const certificateHtmlTemplate = renderTemplateString(dataCopy);
 
-  const savedEditorData = {
-    paperSize: dataCopy.paperSize,
-    fields: dataCopy.fields,
-  };
+  if (dataCopy.backgroundFileRaw) {
+    dataCopy.backgroundImage = await convertBase64(dataCopy.backgroundFileRaw);
+  } else {
+    dataCopy.backgroundImage = dataCopy.backgroundImage || null;
+  }
+
+  const certificateHtmlTemplate = renderTemplateString(dataCopy);
+  const templateInBase64 = btoa(certificateHtmlTemplate);
 
   const payload = {
-    htmlTemplate: certificateHtmlTemplate,
-    backgroundImage: dataCopy.backgroundImage || dataCopy.backgroundFileRaw || undefined,
-    backgroundUrl: dataCopy.backgroundUrl || undefined,
-    editorData: savedEditorData,
+    event_id: parseInt(qs.event_id),
+    type_certificate: dataCopy.typeCertificate,
+    html_template: templateInBase64,
+    background_url: dataCopy.backgroundUrl || null,
+    editor_data: {
+      ...dataCopy,
+      backgroundFileRaw: undefined,
+      backgroundPreviewUrl: undefined,
+    },
   };
 
   return payload;

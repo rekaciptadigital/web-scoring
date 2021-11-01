@@ -1,8 +1,5 @@
-import bg from "./mock-image-base64";
-
 function renderTemplateString(editorData) {
   const documentTitle = editorData.title || "My Archery Certificate";
-  const width = 1280;
 
   return `<!DOCTYPE html>
 <html>
@@ -19,18 +16,24 @@ function renderTemplateString(editorData) {
       body {
         margin: 0px;
         padding: 0px;
-        background-color: azure;
+        background-color: greenyellow; /* buat debugging */
+        font-family: DejaVu Sans, sans-serif; /* pre-installed DomPDF, untuk fallback */
       }
 
       .paper {
         position: relative;
-        overflow: hidden;
-        max-width: ${width}px;
-        margin: 0px auto;
+        width: 100%;
       }
 
-      .design {
-        max-width: ${width || 0}px;
+      .bg-design {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
       }
 
       .field-text {
@@ -38,24 +41,26 @@ function renderTemplateString(editorData) {
         left: 0;
         right: 0;
         text-align: center;
+        line-height: none; /* hack supaya box gak kepanjangan & sesuai koordinatnya */
       }
     </style>
   </head>
 
   <body>
     <div class="paper">
-      <img class="design" src="${editorData.backgroundImage || bg}" />
+      <div class="bg-design" style="background-image: url(${editorData.backgroundImage});"></div>
+      
       ${renderFieldText({
         name: "member_name",
-        data: editorData.fields["member_name"],
+        data: editorData.fields[0],
       })}
       ${renderFieldText({
         name: "peringkat_name",
-        data: editorData.fields["peringkat_name"],
+        data: editorData.fields[1],
       })}
       ${renderFieldText({
         name: "kategori_name",
-        data: editorData.fields["kategori_name"],
+        data: editorData.fields[2],
       })}
     </div>
   </body>
@@ -67,11 +72,9 @@ function renderFieldText({ name, data = {} }) {
   const { y, fontFamily, fontSize, color } = data;
   const placeholderString = `{%${name}%}`;
 
-  return `<div class="field-text" id="field-${name}"
-  style="font-size: ${fontSize}px;${
+  return `<div class="field-text" id="field-${name}" style="font-size: ${fontSize}px;${
     color ? ` color: ${color};` : ""
-  } font-family: ${fontFamily}; top: ${y}px;"
->
+  } font-family: ${fontFamily}; top: ${y}px;">
   ${placeholderString}
 </div>`;
 }

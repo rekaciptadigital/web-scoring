@@ -49,13 +49,21 @@ function CardEvent(props) {
     //                                 toggle={() => setMenu(!menu)}
     //                             >
     //                                 <DropdownToggle tag="span">
-    //                                 <h3 className="bx bx-dots-vertical" style={{cursor: 'pointer'}}></h3>
+    //                                     <h3 className="bx bx-dots-vertical" style={{cursor: 'pointer'}}></h3>
     //                                 </DropdownToggle>
     //                                 <DropdownMenu className="dropdown-menu-end">
-    //                                 <DropdownItem tag="a" href="/dashboard/schedule">
-    //                                     {" "}
-    //                                     <span>Lihat Jadwal dan Peserta</span>
-    //                                 </DropdownItem>
+    //                                     <DropdownItem tag="a" href={"/dashboard/schedule"}>
+    //                                         {" "}
+    //                                         <span>Lihat Jadwal</span>
+    //                                     </DropdownItem>
+    //                                     <DropdownItem tag="a" href={"/dashboard/member"}>
+    //                                         {" "}
+    //                                         <span>Lihat Peserta</span>
+    //                                     </DropdownItem>
+    //                                     <DropdownItem tag="a" href={"/dashboard/eliminasi"}>
+    //                                         {" "}
+    //                                         <span>Setting Eliminasi</span>
+    //                                     </DropdownItem>
     //                                 </DropdownMenu>
     //                             </Dropdown>
     //                         </div>
@@ -107,6 +115,10 @@ function CardEvent(props) {
                                         <DropdownItem tag="a" href={"/dashboard/member/"+props.detail.event.id}>
                                             {" "}
                                             <span>Lihat Peserta</span>
+                                        </DropdownItem>
+                                        <DropdownItem tag="a" href={"/dashboard/eliminasi/"+props.detail.event.id}>
+                                            {" "}
+                                            <span>Setting Eliminasi</span>
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>

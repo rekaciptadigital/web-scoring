@@ -15,6 +15,7 @@ import { useParams } from "react-router";
 import { LoadingScreen } from "components"
 import pdfMake from "pdfmake/build/pdfmake"
 import pdfFont from "pdfmake/build/vfs_fonts"
+import {Pdf} from "../../../libraries"
 function ListMember() {
     const scoreSeries = [
         {"color":"white","background":"#8c8cbb none repeat scroll 0% 0%","seri":1},

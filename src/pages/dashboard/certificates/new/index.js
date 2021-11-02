@@ -22,6 +22,7 @@ import EditorBgImagePicker from "../components/EditorBgImagePicker";
 import EditorCanvasHTML from "../components/EditorCanvasHTML";
 import FontBoldToggle from "../components/FontBoldToggle";
 import ColorPickerContainer from "../components/ColorPickerContainer";
+import PreviewCanvas from "../components/preview/PreviewCanvas";
 
 const defaultEditorData = {
   paperSize: "A4", // || [1280, 908] || letter
@@ -303,14 +304,7 @@ export default function CertificateNew() {
                       toggle={() => handleTogglePreview()}
                     >
                       <ModalBody>
-                        <div className="ratio ratio-16x9">
-                          <div
-                            className="d-flex justify-content-center align-items-center "
-                            style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
-                          >
-                            Preview
-                          </div>
-                        </div>
+                        <PreviewCanvas data={editorData} />
                         <div className="mt-4 mb-2 text-center">
                           <Button color="primary" onClick={() => handleClosePreview()}>
                             Tutup

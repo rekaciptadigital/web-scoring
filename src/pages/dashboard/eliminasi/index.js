@@ -1,16 +1,17 @@
 import React, {useState, useEffect} from 'react'
 import MetaTags from "react-meta-tags";
-import {Container, Card, CardBody, Row, Col, Button, Input} from "reactstrap"
+import {Container, Card, CardBody, Row, Col, Button} from "reactstrap"
 import { DateInput, TimeInput, SelectInput } from "components"
 import { Bracket, Seed, SeedItem, SeedTeam, SeedTime } from 'react-brackets'
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { EventsService, EliminationService } from "../../../services"
 
-  const CustomSeed = ({seed, breakpoint}) => {
+  const CustomSeed = (e,setScoring,updated) => {
+    const {seed, breakpoint} = e;
     // breakpoint passed to Bracket component
     // to check if mobile view is triggered or not
-  
+    let isScoring = true;
     // mobileBreakpoint is required to be passed down to a seed
     return (
       <Seed mobileBreakpoint={breakpoint} style={{ fontSize: 12 }}>
@@ -20,15 +21,30 @@ import { EventsService, EliminationService } from "../../../services"
                   seed.teams.map((team) => {
                     return(
                         team.win != undefined ? 
-                        team.win == 1 ? 
+                        team.win == 1 ?
+                        <div>
+                        {isScoring = false} 
                         <SeedTeam style={{ borderBottom: "2px solid black", color: "white", background: "#BC8B2C" }}>{team?.name || "<not have participant>"}</SeedTeam> 
+                        </div>
                         :
                         <SeedTeam style={{ borderBottom: "2px solid black", color: "#757575", background: "#E2E2E2"}}>{team?.name || "<not have participant>"}</SeedTeam>
                         :   
+                        <div>
+                        {isScoring = false} 
                         <SeedTeam style={{ borderBottom: "2px solid white"}}>{team?.name || '<not have participant>'}</SeedTeam>
+                        </div>
                     )
                   })
               }
+                <div>
+                {
+                    !updated && isScoring?                     
+                    <SeedItem style={{ borderBottom: "2px solid black", color: "black", background: "#fffdfd" }}>
+                        <button style={{color:"white",background:"red",width:"100%"}} key={breakpoint} onClick={setScoring()}>scoring</button>    
+                    </SeedItem> 
+                    :null
+                }
+                </div>
           </div>
         </SeedItem>
         <SeedTime>{seed.date}</SeedTime>
@@ -44,8 +60,6 @@ function Eliminasi() {
     const [start, setStart] = useState("")
     const [end, setEnd] = useState("")
     const [category, setCategory] = useState(0)
-    const [updated, setUpdated] = useState(true)
-    const [countEliminationMember, setCountEliminationMember] = useState(16)
     const { event_id } = useParams();
     const eliminationType = [
         { id: "1", label: "A vs Z" }, 
@@ -56,6 +70,19 @@ function Eliminasi() {
         { id: "male", label: "Laki-laki" }, 
         { id: "female", label: "Perempuan" }, 
     ]
+
+    const scoringTypeOptions = [
+        { id: "1", label: "Sistem Point" }, 
+        { id: "2", label: "Sistem Akumulasi Score" }, 
+    ]
+    const [scoringType, setScoringType] = useState(scoringTypeOptions[0])
+
+    const countEliminationMemberOptions = [
+        { id: "16", label: "16" }, 
+        { id: "8", label: "8" }, 
+    ]
+    const [countEliminationMember, setCountEliminationMember] = useState(countEliminationMemberOptions[0])
+
     const [type, setType] = useState(eliminationType[0])
     const [gender, setGender] = useState(genderOptions[0])
 
@@ -63,10 +90,8 @@ function Eliminasi() {
     useEffect(() => {
         if(eventDetail.id == undefined)
             getEventDetail()
-
-        setUpdated(true)
         getEventEliminationTemplate()
-    }, [category, countEliminationMember, type, gender]);
+    }, [category, countEliminationMember, type, gender, countEliminationMember]);
 
     const getEventDetail = async () => {
         const {message, errors, data } = await EventsService.getEventById({
@@ -89,7 +114,7 @@ function Eliminasi() {
             "match_type" : type.id,
             "gender" : gender.id,
             "event_category_id" : category.id,
-            "elimination_member_count" : countEliminationMember
+            "elimination_member_count" : countEliminationMember.id
         })
         if (data) {
             setMatches(data);
@@ -120,13 +145,18 @@ function Eliminasi() {
             "match_type" : type.id,
             "gender" : gender.id,
             "event_category_id" : category.id,
-            "elimination_member_count" : countEliminationMember
+            "scoring_type" : scoringType.id,
+            "elimination_member_count" : countEliminationMember.id
         })
         if (data) {
             getEventEliminationTemplate();
         } else 
         console.log(message)
         console.log(errors)
+    }
+
+    const setScoring = async() => {
+        console.log("masuk");
     }
 
     const getEliminasiSchedule = async() => {
@@ -170,9 +200,10 @@ function Eliminasi() {
                                             <SelectInput label ={"kategori"} options={eventDetail.categories} value={category} placeholder="select" onChange={(e)=>{setCategory(e.value)}} />
                                         </div>
                                         <div>
-                                            <label>jumlah peserta eliminasi</label>
-                                            <br></br>
-                                            <Input readOnly={updated == true ? true : true} style={{width:"70px"}} type="number" value={countEliminationMember} onChange={(e)=>{setCountEliminationMember(e.target.value)}} />
+                                            <SelectInput style={{width:"200px"}} label ={"scoring type"} options={scoringTypeOptions} value={scoringType} placeholder="select type" onChange={(e)=>{setScoringType(e.value)}} />
+                                        </div>
+                                        <div>
+                                            <SelectInput style={{width:"200px"}} label ={"jumlah peserta eliminasi"} options={countEliminationMemberOptions} value={countEliminationMember} placeholder="select type" onChange={(e)=>{setCountEliminationMember(e.value)}} />
                                         </div>
                                         <div>
                                             <SelectInput readOnly={true} style={{width:"100px"}} label ={"type"} options={eliminationType} value={type} placeholder="select type" onChange={(e)=>{setType(e.value)}} />
@@ -188,7 +219,7 @@ function Eliminasi() {
                                 <Card>
                                     <CardBody style={{overflow: "auto"}}>
                                         <div>
-                                            <Bracket rounds={matches.rounds != undefined ? matches.rounds : []} renderSeedComponent={CustomSeed} />
+                                            <Bracket rounds={matches.rounds != undefined ? matches.rounds : []} renderSeedComponent={(e) =>{return CustomSeed(e,setScoring,matches.updated)}} />
                                         </div>
                                     </CardBody>
                                 </Card>

@@ -8,6 +8,7 @@ const SelectInput = ({
   name,
   id = stringUtil.createRandom(),
   label,
+  style,
   value,
   onChange,
   options = [],
@@ -53,7 +54,7 @@ const SelectInput = ({
   }, [value]);
 
   return (
-    <div>
+    <div style={style}>
       {label && <Label>{label}</Label>}
       <Select
         maxMenuHeight={220}

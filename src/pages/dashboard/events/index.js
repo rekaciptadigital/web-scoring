@@ -90,7 +90,7 @@ const ListEvent = () => {
               )
             })}
             {/* <Col md={6}>
-              <CardEvent />
+              <CardEvent detail={false} />
             </Col> */}
           </Row>
         </Container>

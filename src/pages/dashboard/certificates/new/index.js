@@ -450,11 +450,11 @@ async function prepareSaveData(editorData, qs) {
     type_certificate: dataCopy.typeCertificate,
     html_template: templateInBase64,
     background_url: dataCopy.backgroundUrl || null,
-    editor_data: {
+    editor_data: JSON.stringify({
       ...dataCopy,
       backgroundFileRaw: undefined,
       backgroundPreviewUrl: undefined,
-    },
+    }),
   };
 
   return payload;

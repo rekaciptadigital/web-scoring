@@ -42,9 +42,12 @@ export default function PreviewCanvas({ data }) {
         />
 
         {fields?.length ? (
-          fields.map((field) => (
-            <PreviewFieldText key={field.name} name={field.name} data={field} />
-          ))
+          fields.map((field) => {
+            if (field.name === "peringkat_name" && data.typeCertificate !== 2) {
+              return;
+            }
+            return <PreviewFieldText key={field.name} name={field.name} data={field} />;
+          })
         ) : (
           <div>Ada error pada data editor</div>
         )}

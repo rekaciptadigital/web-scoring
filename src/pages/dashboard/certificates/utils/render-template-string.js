@@ -34,7 +34,7 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText("member_name")}
-    ${renderFieldText("peringkat_name")}
+    ${editorData.typeCertificate === 2 ? renderFieldText("peringkat_name") : ""}
     ${renderFieldText("kategori_name")}
   </body>
 </html>`;
@@ -57,10 +57,10 @@ function renderCssField(name, data = {}) {
 
   return `
       #field-${name} {
-        top: ${y}pt;
+        top: ${y}px;
         ${computeColor()}
         font-family: ${fontFamily};
-        font-size: ${fontSize}pt;  /* untuk media print satuan dijadikan pt */
+        font-size: ${fontSize}px;
         font-weight: ${computeFontWeight()};
       }`;
 }

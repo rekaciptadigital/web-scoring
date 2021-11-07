@@ -1,5 +1,6 @@
 import * as React from "react";
 import PreviewFieldText from "./PreviewFieldText";
+import QrCodeField from "../QrCodeField";
 
 export default function PreviewCanvas({ data }) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
@@ -51,6 +52,8 @@ export default function PreviewCanvas({ data }) {
         ) : (
           <div>Ada error pada data editor</div>
         )}
+
+        <QrCodeField preview />
       </div>
     </div>
   );

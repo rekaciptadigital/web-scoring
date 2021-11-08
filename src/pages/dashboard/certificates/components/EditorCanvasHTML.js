@@ -1,5 +1,6 @@
 import * as React from "react";
 import EditorFieldText from "./EditorFieldText";
+import QrCodeField from "./QrCodeField";
 
 export default function EditorCanvasHTML({ data, currentObject, onChange, onSelect }) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
@@ -56,19 +57,26 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
         />
 
         {fields?.length ? (
-          fields.map((field) => (
-            <EditorFieldText
-              key={field.name}
-              name={field.name}
-              data={field}
-              selected={isSelected(field.name)}
-              onChange={(data) => onChange(data)}
-              onSelected={() => handleSelectField(field.name)}
-            />
-          ))
+          fields.map((field) => {
+            if (field.name === "peringkat_name" && data.typeCertificate !== 2) {
+              return;
+            }
+            return (
+              <EditorFieldText
+                key={field.name}
+                name={field.name}
+                data={field}
+                selected={isSelected(field.name)}
+                onChange={(data) => onChange(data)}
+                onSelected={() => handleSelectField(field.name)}
+              />
+            );
+          })
         ) : (
           <div>Ada error pada data editor</div>
         )}
+
+        <QrCodeField />
       </div>
     </div>
   );

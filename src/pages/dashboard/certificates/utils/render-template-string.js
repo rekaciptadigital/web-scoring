@@ -26,6 +26,15 @@ function renderTemplateString(editorData) {
         text-align: center;
       }
 
+      .qr-code-container {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        width: 30mm;
+        height: 30mm;
+        background-color: white;
+      }
+
       ${renderCssField("member_name", editorData.fields[0])}
       ${renderCssField("peringkat_name", editorData.fields[1])}
       ${renderCssField("kategori_name", editorData.fields[2])}
@@ -34,8 +43,9 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText("member_name")}
-    ${renderFieldText("peringkat_name")}
+    ${editorData.typeCertificate === 2 ? renderFieldText("peringkat_name") : ""}
     ${renderFieldText("kategori_name")}
+    ${renderQrCode()}
   </body>
 </html>`;
 }
@@ -57,10 +67,10 @@ function renderCssField(name, data = {}) {
 
   return `
       #field-${name} {
-        top: ${y}pt;
+        top: ${y}px;
         ${computeColor()}
         font-family: ${fontFamily};
-        font-size: ${fontSize}pt;  /* untuk media print satuan dijadikan pt */
+        font-size: ${fontSize}px;
         font-weight: ${computeFontWeight()};
       }`;
 }
@@ -68,6 +78,19 @@ function renderCssField(name, data = {}) {
 function renderFieldText(name) {
   const placeholderString = `{%${name}%}`;
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
+}
+
+function renderQrCode() {
+  return `
+    <div class="qr-code-container">
+      <barcode
+        code="{%sertif_verif_url%}"
+        type="QR"
+        error="M"
+        class="barcode"
+        size="0.8"
+        disableborder="1" />
+    </div>`;
 }
 
 export { renderTemplateString };

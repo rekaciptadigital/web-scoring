@@ -118,12 +118,12 @@ function CardEvent(props) {
                                         </DropdownItem>
                                         <DropdownItem tag="a" href={"/dashboard/eliminasi/"+props.detail.event.id}>
                                             {" "}
-                                            <span>Setting Eliminasi</span>
+                                            <span>Konfigurasi Eliminasi</span>
                                         </DropdownItem>
 
                                         <DropdownItem tag="a" href={`/dashboard/certificate/new?event_id=${props.detail.event.id}`}>
                                             {" "}
-                                            <span>Edit Sertifikat</span>
+                                            <span>Ubah Sertifikat</span>
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>

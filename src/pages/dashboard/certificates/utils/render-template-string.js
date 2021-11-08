@@ -81,10 +81,11 @@ function renderFieldText(name) {
 }
 
 function renderQrCode() {
+  const urlPlaceholder = "https://myarchery.id" || "{%sertif_verif_url%}";
   return `
     <div class="qr-code-container">
       <barcode
-        code="{%sertif_verif_url%}"
+        code="${urlPlaceholder}"
         type="QR"
         error="M"
         class="barcode"

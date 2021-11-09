@@ -1,6 +1,7 @@
 import * as React from "react";
 import EditorFieldText from "./EditorFieldText";
-import QrCodeField from "./QrCodeField";
+// TODO: pakai nanti ketika QR ready
+// import QrCodeField from "./QrCodeField";
 
 export default function EditorCanvasHTML({ data, currentObject, onChange, onSelect }) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
@@ -76,7 +77,7 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
           <div>Ada error pada data editor</div>
         )}
 
-        <QrCodeField />
+        {/* <QrCodeField /> */}
       </div>
     </div>
   );

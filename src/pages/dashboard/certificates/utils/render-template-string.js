@@ -45,7 +45,6 @@ function renderTemplateString(editorData) {
     ${renderFieldText("member_name")}
     ${editorData.typeCertificate === 2 ? renderFieldText("peringkat_name") : ""}
     ${renderFieldText("kategori_name")}
-    ${renderQrCode()}
   </body>
 </html>`;
 }
@@ -78,20 +77,6 @@ function renderCssField(name, data = {}) {
 function renderFieldText(name) {
   const placeholderString = `{%${name}%}`;
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
-}
-
-function renderQrCode() {
-  const urlPlaceholder = "https://myarchery.id" || "{%sertif_verif_url%}";
-  return `
-    <div class="qr-code-container">
-      <barcode
-        code="${urlPlaceholder}"
-        type="QR"
-        error="M"
-        class="barcode"
-        size="0.8"
-        disableborder="1" />
-    </div>`;
 }
 
 export { renderTemplateString };

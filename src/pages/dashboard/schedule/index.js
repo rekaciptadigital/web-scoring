@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react'
+/* eslint-disable no-unused-vars */
+import React, {useState, useEffect, useRef} from 'react'
 import { MetaTags } from 'react-meta-tags'
 import {
     Container,
@@ -12,7 +13,9 @@ import { DateInput, BoxSetScoring } from "components"
 import { ScheduleMemberService } from "services";
 import { useParams } from "react-router";
 import { LoadingScreen } from "components"
-
+import pdfMake from "pdfmake/build/pdfmake"
+import pdfFont from "pdfmake/build/vfs_fonts"
+import {Pdf} from "../../../libraries"
 function ListMember() {
     const scoreSeries = [
         {"color":"white","background":"#8c8cbb none repeat scroll 0% 0%","seri":1},
@@ -46,6 +49,8 @@ function ListMember() {
     const [list, setList] = useState([]);
     const [totalPerSeri, setTotalPerSeri] = useState({});
     const [event, setEvent] = useState({});
+
+    pdfMake.vfs = pdfFont.pdfMake.vfs
     const [memberScore, setMemberScore] = useState({});
     
     useEffect(() => {
@@ -109,6 +114,7 @@ function ListMember() {
         setLoading(false)
     }
 
+
     return (
         <React.Fragment>
             <LoadingScreen loading={loading} />
@@ -125,7 +131,9 @@ function ListMember() {
                     <h3 style={{letterSpacing: '2px'}}>Jadwal Kualifikasi</h3>
                 </div>
                 <div className="mb-4">
+                    <div className="d-flex justify-content-between">
                     <h6>Pilih Jadwal</h6>
+                    </div>
                     <div>
                         <Row>
                         <Col md={3} sm={12}>
@@ -141,11 +149,17 @@ function ListMember() {
                 <div className="mb-4">
                     <hr />
                 </div>
-                {Object.keys(memberScore).length == 0 ?
-                    <TableSchedule member={member} getMemberSchedule={getMemberSchedule} showScorebox={showScorebox} event={event} date={date} list={list} />
-                    :
-                    <BoxSetScoring setTotalPerSeri={setTotalPerSeri} totalPerSeri={totalPerSeri} memberScore={memberScore} shot_per_seri={shot_per_seri} score={score} setMemberScore={setMemberScore} scoreSeries={scoreSeries}/>
-                }
+                <div>
+                    <Row>
+                        <Col md={10}>
+                            {Object.keys(memberScore).length == 0 ?
+                                <TableSchedule member={member} getMemberSchedule={getMemberSchedule} showScorebox={showScorebox} event={event} date={date} list={list} />
+                                :
+                                <BoxSetScoring setTotalPerSeri={setTotalPerSeri} totalPerSeri={totalPerSeri} memberScore={memberScore} shot_per_seri={shot_per_seri} score={score} setMemberScore={setMemberScore} scoreSeries={scoreSeries}/>
+                            }
+                        </Col>
+                    </Row>
+                </div>
                 </Container>
             </div>
         </React.Fragment>

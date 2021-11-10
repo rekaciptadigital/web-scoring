@@ -151,7 +151,7 @@ const Register = () => {
 
                       <div className="mt-4 text-center">
                         <Link
-                          to="/authentication/forgot-password"
+                          to="/forgot-password"
                           className="text-muted"
                         >
                           <i className="mdi mdi-lock me-1" />
@@ -165,7 +165,7 @@ const Register = () => {
               <div className="mt-5 text-center">
                 <p>
                   Already have an account ?{" "}
-                  <Link to="/authentication/login" className="fw-medium text-primary">
+                  <Link to="/login" className="fw-medium text-primary">
                     {" "}
                     Login{" "}
                   </Link>{" "}

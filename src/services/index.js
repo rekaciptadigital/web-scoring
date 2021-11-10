@@ -5,3 +5,5 @@ export { default as ScheduleMemberService } from "./scheduleMember";
 export { default as AdminService } from "./admin";
 export { default as ArcherService } from "./archer";
 export { default as CategoryService } from "./category";
+export { default as EliminationService } from "./elimination";
+export { default as CertificateService } from "./certificate";

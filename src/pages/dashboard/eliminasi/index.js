@@ -9,10 +9,17 @@ import { EventsService, EliminationService } from "../../../services";
 import ModalScoring from "./components/ModalScoring";
 
 const CustomSeed = (e, setScoring, updated) => {
-  const { seed, breakpoint } = e;
+  const { /* roundIndex, seedIndex, */ seed, breakpoint } = e;
+
+  const shouldRenderScoring = () => {
+    // hanya perlu render tombol scoring ketika masing-masing `team.win === 0`
+    // const teamWinnings = seed.teams.map((team) => team.win);
+    const isScoring = seed.teams.every((team) => team.win === 0);
+    return !updated && isScoring;
+  };
+
   // breakpoint passed to Bracket component
   // to check if mobile view is triggered or not
-  let isScoring = true;
   // mobileBreakpoint is required to be passed down to a seed
   return (
     <Seed mobileBreakpoint={breakpoint} style={{ fontSize: 12 }}>
@@ -22,10 +29,9 @@ const CustomSeed = (e, setScoring, updated) => {
             return team.win != undefined ? (
               team.win == 1 ? (
                 <div>
-                  {(isScoring = false)}
                   <SeedTeam
                     style={{
-                      borderBottom: "2px solid black",
+                      borderBottom: "2px solid black", // kotak emas, teks putih, yang udah menang
                       color: "white",
                       background: "#BC8B2C",
                     }}
@@ -37,7 +43,7 @@ const CustomSeed = (e, setScoring, updated) => {
                 <SeedTeam
                   style={{
                     borderBottom: "2px solid black",
-                    color: "#757575",
+                    color: "#757575", // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
                     background: "#E2E2E2",
                   }}
                 >
@@ -46,15 +52,19 @@ const CustomSeed = (e, setScoring, updated) => {
               )
             ) : (
               <div>
-                {(isScoring = false)}
-                <SeedTeam style={{ borderBottom: "2px solid white" }}>
+                <SeedTeam
+                  style={{
+                    borderBottom: "2px solid white", // kotak hitam, teks putih, kalah/di-bypass ("bye")
+                  }}
+                >
                   {team?.name || "<not have participant>"}
                 </SeedTeam>
               </div>
             );
           })}
-          <div>
-            {!updated && isScoring ? (
+
+          {shouldRenderScoring() && (
+            <div>
               <SeedItem
                 style={{ borderBottom: "2px solid black", color: "black", background: "#fffdfd" }}
               >
@@ -66,8 +76,8 @@ const CustomSeed = (e, setScoring, updated) => {
                   scoring
                 </button>
               </SeedItem>
-            ) : null}
-          </div>
+            </div>
+          )}
         </div>
       </SeedItem>
       <SeedTime>{seed.date}</SeedTime>
@@ -112,7 +122,9 @@ function Eliminasi() {
   const [gender, setGender] = useState(genderOptions[0]);
 
   useEffect(() => {
-    if (eventDetail.id == undefined) getEventDetail();
+    if (eventDetail.id == undefined) {
+      getEventDetail();
+    }
     getEventEliminationTemplate();
   }, [category, countEliminationMember, type, gender, countEliminationMember]);
 

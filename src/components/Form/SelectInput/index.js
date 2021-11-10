@@ -1,8 +1,10 @@
-import _ from "lodash";
 import React, { useEffect, useState } from "react";
-import Select from "react-select";
-import { Label } from "reactstrap";
+import _ from "lodash";
 import stringUtil from "utils/stringUtil";
+import { useFieldValidation } from "utils/hooks/field-validation";
+
+import { Label } from "reactstrap";
+import Select from "react-select";
 
 const SelectInput = ({
   name,
@@ -12,13 +14,13 @@ const SelectInput = ({
   value,
   onChange,
   options = [],
-  error,
   disabled,
   readOnly,
   placeholder,
 }) => {
   const [selectOptions, setSelectOptions] = useState([]);
   const [selectValue, setSelectValue] = useState(null);
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
   const handleChange = (e) => {
     if (onChange)
@@ -26,6 +28,10 @@ const SelectInput = ({
         key: name,
         value: e,
       });
+  };
+
+  const handleBlur = () => {
+    handleFieldValidation(value?.value);
   };
 
   useEffect(() => {
@@ -49,7 +55,7 @@ const SelectInput = ({
         label: value?.label || value,
       });
     } else {
-      setSelectValue(null)
+      setSelectValue(null);
     }
   }, [value]);
 
@@ -61,13 +67,14 @@ const SelectInput = ({
         id={id}
         value={selectValue}
         onChange={handleChange}
+        onBlur={handleBlur}
         options={selectOptions}
         classNamePrefix="select2-selection"
-        className={`${error?.[name] ? "is-invalid" : ""}`}
+        className={`${errors?.[name] ? "is-invalid" : ""}`}
         isDisabled={disabled || readOnly}
         placeholder={placeholder}
       />
-      {_.get(error, name)?.map((message) => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

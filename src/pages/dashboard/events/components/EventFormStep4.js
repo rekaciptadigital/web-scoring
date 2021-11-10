@@ -1,17 +1,16 @@
-import { Button, DateInput, SelectInput, TextInput } from "components";
-import { dummyConstants } from "constants/index";
+import * as React from "react";
 import _ from "lodash";
-import React from "react";
-import { Col, Label, Row } from "reactstrap";
+import { dummyConstants } from "constants/index";
 import { objectUtil, stringUtil } from "utils";
-import styles from "../styles";
+
+import { Col, Label, Row, ButtonGroup } from "reactstrap";
+import { Button, DateInput, SelectInput, TextInput } from "components";
 import ModalDistances from "./ModalDistances";
 import ModalTeamCategories from "./ModalTeamCategories";
-// import * as EventsStore from "store/slice/events"
-// import { useSelector } from "react-redux"
+
+import styles from "../styles";
 
 export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
-  // const { errors } = useSelector(EventsStore.getEventsStore)
   const handleChange = ({ key, value }) => {
     if (onFormFieldChange) onFormFieldChange(key, value);
   };
@@ -66,15 +65,9 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
     });
   }
 
-  function handleRemoveCompetitionCategory(
-    categoryIndex,
-    competitionCategoryIndex
-  ) {
+  function handleRemoveCompetitionCategory(categoryIndex, competitionCategoryIndex) {
     const categoryList = [...formData.eventCategories];
-    categoryList[categoryIndex].competitionCategories.splice(
-      competitionCategoryIndex,
-      1
-    );
+    categoryList[categoryIndex].competitionCategories.splice(competitionCategoryIndex, 1);
     handleChange({
       key: "eventCategories",
       value: categoryList,
@@ -88,6 +81,20 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
           <Row key={index} id={"row" + index}>
             <Col lg={12} style={styles.categoryBox}>
               <Label>Kategori Kelas</Label>
+
+              <ButtonGroup className="float-end mt-2">
+                <Button onClick={() => handleCopyRow(index)} icon="copy" type="primary" />{" "}
+                {formData.eventCategories.length > 1 && (
+                  <Button
+                    onClick={(e) => {
+                      handleRemoveRow(e, index);
+                    }}
+                    icon="trash"
+                    type="danger"
+                  />
+                )}
+              </ButtonGroup>
+
               <Row>
                 <Col lg={4}>
                   <SelectInput
@@ -97,32 +104,17 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                     value={eventCategory.ageCategory}
                   />
                 </Col>
+
                 <Col lg={4}>
                   <DateInput
                     name={`eventCategories.${index}.maxDateOfBirth`}
+                    placeholder="Batas lahir peserta kategori"
                     onChange={handleChange}
                     value={eventCategory.maxDateOfBirth}
                   />
                 </Col>
-                <Col>
-                  <Button
-                    onClick={() => {
-                      handleCopyRow(index);
-                    }}
-                    icon="copy"
-                    type="primary"
-                  />{" "}
-                  {formData.eventCategories.length > 1 && (
-                    <Button
-                      onClick={(e) => {
-                        handleRemoveRow(e, index);
-                      }}
-                      icon="trash"
-                      type="danger"
-                    />
-                  )}
-                </Col>
               </Row>
+
               <Label>Kategori Lomba</Label>
               <Row style={{ paddingLeft: 10, paddingRight: 10 }}>
                 <Col style={{ border: "dashed 1px #dedede", padding: 10 }}>
@@ -132,9 +124,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                         <Row key={competitionCategory.id}>
                           <Col lg={4}>
                             <SelectInput
-                              options={
-                                dummyConstants.eventCompetitionCategories
-                              }
+                              options={dummyConstants.eventCompetitionCategories}
                               name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
                               onChange={handleChange}
                               value={competitionCategory.competitionCategory}
@@ -143,6 +133,8 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                           <Col lg={4}>
                             <TextInput
                               readOnly
+                              placeholder="Jarak yang dilombakan"
+                              name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.distancesDisplay`}
                               accessoryRight={
                                 <Button
                                   icon="plus"
@@ -154,10 +146,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                   }
                                 />
                               }
-                              value={_.map(
-                                competitionCategory.distances || [],
-                                "label"
-                              )}
+                              value={_.map(competitionCategory.distances || [], "label")}
                             />
                             <ModalDistances
                               isOpen={competitionCategory.isOpenDistanceModal}
@@ -174,6 +163,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                           <Col lg={4}>
                             <div>
                               <Button
+                                outline
                                 type="primary"
                                 onClick={() => {
                                   handleChange({
@@ -187,16 +177,11 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                     : "Tambah Kuota"
                                 }
                                 trailingIcon={
-                                  competitionCategory.teamCategories?.length > 0
-                                    ? "pencil"
-                                    : "plus"
+                                  competitionCategory.teamCategories?.length > 0 ? "pencil" : "plus"
                                 }
-                                outline
                               />
                               <ModalTeamCategories
-                                isOpen={
-                                  competitionCategory.isOpenTeamCategoryModal
-                                }
+                                isOpen={competitionCategory.isOpenTeamCategoryModal}
                                 toggle={() => {
                                   handleChange({
                                     key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenTeamCategoryModal`,
@@ -206,28 +191,30 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                 options={formData.teamCategories || []}
                                 name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.teamCategories`}
                                 onSaveChange={handleChange}
-                              />{" "}
-                              <Button
-                                onClick={() => {
-                                  handleAddCompetitionCategory(index);
-                                }}
-                                icon="copy"
-                                outline
-                              />{" "}
-                              {eventCategory.competitionCategories.length >
-                                1 && (
+                              />
+
+                              <ButtonGroup className="ms-3">
                                 <Button
-                                  onClick={() => {
-                                    handleRemoveCompetitionCategory(
-                                      index,
-                                      competitionCategoryIndex
-                                    );
-                                  }}
-                                  icon="trash"
-                                  type="danger"
+                                  icon="copy"
                                   outline
+                                  onClick={() => {
+                                    handleAddCompetitionCategory(index);
+                                  }}
                                 />
-                              )}
+                                {eventCategory.competitionCategories.length > 1 && (
+                                  <Button
+                                    icon="trash"
+                                    type="danger"
+                                    outline
+                                    onClick={() => {
+                                      handleRemoveCompetitionCategory(
+                                        index,
+                                        competitionCategoryIndex
+                                      );
+                                    }}
+                                  />
+                                )}
+                              </ButtonGroup>
                             </div>
                           </Col>
                         </Row>
@@ -243,7 +230,7 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
           data-repeater-create
           type="button"
           className="btn btn-success mt-3 mt-lg-0"
-          value="Add"
+          value="Tambah Kelas"
           onClick={() => handleAddRow()}
         />
       </Col>

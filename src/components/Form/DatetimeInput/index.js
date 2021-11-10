@@ -1,10 +1,13 @@
-import "flatpickr/dist/themes/material_blue.css";
+import * as React from "react";
 import _ from "lodash";
 import moment from "moment";
-import React from "react";
-import Flatpickr from "react-flatpickr";
-import { InputGroup, Label } from "reactstrap";
 import stringUtil from "utils/stringUtil";
+import { useFieldValidation } from "utils/hooks/field-validation";
+
+import { InputGroup, Label } from "reactstrap";
+import Flatpickr from "react-flatpickr";
+
+import "flatpickr/dist/themes/material_blue.css";
 
 const DatetimeInput = ({
   name,
@@ -12,11 +15,12 @@ const DatetimeInput = ({
   label,
   value,
   onChange = null,
-  error,
   disabled,
   readOnly,
 }) => {
-  const handleChange = e => {
+  const { errors, handleFieldValidation } = useFieldValidation(name);
+
+  const handleChange = (e) => {
     const datetime = moment(new Date(e)).format("YYYY-MM-DD H:mm:ss");
     if (onChange)
       onChange({
@@ -25,14 +29,17 @@ const DatetimeInput = ({
       });
   };
 
+  const handleClose = (value) => {
+    handleFieldValidation(value);
+  };
+
   return (
     <div className="datetime-input">
       {label && <Label htmlFor={id}>{label}</Label>}
+
       <InputGroup>
         <Flatpickr
-          className={`form-control d-block ${
-            _.get(error, name) ? "is-invalid" : ""
-          }`}
+          className={`form-control d-block ${_.get(errors, name) ? "is-invalid" : ""}`}
           placeholder="Pilih Tanggal & Jam"
           options={{
             enableTime: true,
@@ -41,7 +48,8 @@ const DatetimeInput = ({
             dateFormat: "Y-m-d H:i:ss",
           }}
           value={value}
-          onChange={e => handleChange(e)}
+          onChange={(e) => handleChange(e)}
+          onClose={handleClose}
           disabled={disabled}
           readOnly={readOnly}
         />
@@ -51,7 +59,8 @@ const DatetimeInput = ({
           </span>
         </div>
       </InputGroup>
-      {_.get(error, name)?.map(message => (
+
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

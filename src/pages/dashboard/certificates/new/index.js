@@ -82,18 +82,18 @@ export default function CertificateNew() {
 
     const getCertificateData = async () => {
       const queryString = { event_id, type_certificate: currentCertificateType };
-      const { data } = await CertificateService.getForEditor(queryString);
+      const { data: certificate } = await CertificateService.getForEditor(queryString);
 
-      if (data?.length) {
+      if (certificate) {
         // Data editor dari data sertifikat yang sudah ada di server
-        const certificate = data[0];
+        const editorDataGet = JSON.parse(certificate.editorData);
         setEditorData({
           ...defaultEditorData,
           typeCertificate: currentCertificateType,
           certificateId: certificate.id,
           backgroundUrl: certificate.backgroundUrl,
-          backgroundImage: certificate.editorData.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
-          fields: certificate.editorData.fields,
+          backgroundImage: editorDataGet.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
+          fields: editorDataGet.fields,
         });
       } else {
         // Dari yang belum ada, dikenali dari gak ada `certificateId`-nya
@@ -135,29 +135,30 @@ export default function CertificateNew() {
     if (parseInt(ev.value) === parseInt(editorData.typeCertificate)) {
       return;
     }
+
     setStatus("saving");
     const queryString = { event_id, type_certificate: currentCertificateType };
     const data = await prepareSaveData(editorData, queryString);
 
-    setEditorData((editorData) => ({
-      ...editorData,
-      backgroundImage: data.editor_data.backgroundImage,
-    }));
-
     if (!editorData.certificateId) {
       const result = await CertificateService.create(data);
-      if (result.success) {
-        setCurrentCertificateType(ev.value);
+      if (result.success || result.data) {
+        const editorDataCreated = JSON.parse(result.data.editorData);
+        setEditorData((editorData) => ({
+          ...editorData,
+          ...editorDataCreated,
+          certificateId: result.data.id,
+        }));
       }
       setCurrentCertificateType(ev.value);
     } else {
-      const dataAsQueryString = {
-        ...data,
-        editor_data: JSON.stringify(data.editor_data),
-      };
-      const result = await CertificateService.saveUpdate(dataAsQueryString);
+      const result = await CertificateService.saveUpdate(data, queryString);
       if (result.success) {
-        setCurrentCertificateType(ev.value);
+        const editorDataSaved = result?.data ? JSON.parse(result.data.editorData) : {};
+        setEditorData((editorData) => ({
+          ...editorData,
+          ...editorDataSaved,
+        }));
       }
       setCurrentCertificateType(ev.value);
     }
@@ -233,20 +234,25 @@ export default function CertificateNew() {
     const queryString = { event_id, type_certificate: currentCertificateType };
     const data = await prepareSaveData(editorData, queryString);
 
-    setEditorData((editorData) => ({
-      ...editorData,
-      backgroundImage: data.editor_data.backgroundImage,
-    }));
-
     if (!editorData.certificateId) {
       const result = await CertificateService.create(data);
-      console.log(result);
+      if (result.success || result.data) {
+        const editorDataSaved = JSON.parse(result.data.editorData);
+        setEditorData((editorData) => ({
+          ...editorData,
+          ...editorDataSaved,
+          certificateId: result.data.id,
+        }));
+      }
     } else {
-      const result = await CertificateService.saveUpdate({
-        ...data,
-        editor_data: JSON.stringify(data.editor_data),
-      });
-      console.log(result);
+      const result = await CertificateService.saveUpdate(data, queryString);
+      if (result.success) {
+        const editorDataSaved = result?.data ? JSON.parse(result.data.editorData) : {};
+        setEditorData((editorData) => ({
+          ...editorData,
+          ...editorDataSaved,
+        }));
+      }
     }
     setStatus("done");
   };
@@ -280,17 +286,29 @@ export default function CertificateNew() {
                       placeholder="Tipe Sertifikat"
                       value={getCurrentTypeCertificate(currentCertificateType)}
                       onChange={(ev) => handleTipeSertifikatChange(ev)}
+                      isDisabled={isSaving || isLoading}
                     />
                   </div>
 
                   <div>
-                    <Button tag="a" color="primary" onClick={() => handleClickSave()}>
+                    <Button
+                      tag="a"
+                      color="primary"
+                      onClick={() => handleClickSave()}
+                      disabled={isSaving || isLoading}
+                    >
                       Save
                     </Button>
                   </div>
 
                   <div>
-                    <Button tag="a" color="secondary" outline onClick={() => handleOpenPreview()}>
+                    <Button
+                      tag="a"
+                      color="secondary"
+                      outline
+                      onClick={() => handleOpenPreview()}
+                      disabled={isSaving || isLoading}
+                    >
                       Preview
                     </Button>
 
@@ -324,12 +342,15 @@ export default function CertificateNew() {
               <Col lg="8">
                 <Card>
                   {editorData ? (
-                    <EditorCanvasHTML
-                      data={editorData}
-                      onChange={(data) => handleEditorChange(data)}
-                      currentObject={currentObject}
-                      onSelect={(target) => setCurrentObject(target)}
-                    />
+                    <React.Fragment>
+                      <EditorCanvasHTML
+                        data={editorData}
+                        onChange={(data) => handleEditorChange(data)}
+                        currentObject={currentObject}
+                        onSelect={(target) => setCurrentObject(target)}
+                      />
+                      {(isSaving || isLoading) && <ProcessingBlocker />}
+                    </React.Fragment>
                   ) : (
                     <div
                       className="d-flex align-items-center justify-content-center"
@@ -348,6 +369,7 @@ export default function CertificateNew() {
                     onSelectImage={(imageData) => handleSelectBg(imageData)}
                     onRemoveImage={() => handleHapusBg()}
                   />
+                  {(isSaving || isLoading) && <ProcessingBlocker />}
                 </div>
 
                 {currentObject?.name && (
@@ -450,12 +472,28 @@ async function prepareSaveData(editorData, qs) {
     type_certificate: dataCopy.typeCertificate,
     html_template: templateInBase64,
     background_url: dataCopy.backgroundUrl || null,
-    editor_data: {
+    editor_data: JSON.stringify({
       ...dataCopy,
       backgroundFileRaw: undefined,
       backgroundPreviewUrl: undefined,
-    },
+    }),
   };
 
   return payload;
+}
+
+function ProcessingBlocker() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: "#ffffff",
+        opacity: 0.5,
+      }}
+    />
+  );
 }

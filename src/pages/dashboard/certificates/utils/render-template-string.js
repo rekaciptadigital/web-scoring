@@ -7,76 +7,76 @@ function renderTemplateString(editorData) {
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>${documentTitle}</title>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
       @page {
         margin: 0px;
+        ${renderCssBackgroundImage(editorData.backgroundImage)}
       }
-  
+
       body {
+        position: relative;
         margin: 0px;
         padding: 0px;
-        background-color: greenyellow; /* buat debugging */
-        font-family: DejaVu Sans, sans-serif; /* pre-installed DomPDF, untuk fallback */
-      }
-
-      .paper {
-        position: relative;
-        width: 100%;
-      }
-
-      .bg-design {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: cover;
+        font-family: "DejaVu Sans", sans-serif;
       }
 
       .field-text {
         position: absolute;
-        left: 0;
-        right: 0;
+        left: 0px;
+        right: 0px;
         text-align: center;
-        line-height: none; /* hack supaya box gak kepanjangan & sesuai koordinatnya */
       }
+
+      .qr-code-container {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        width: 30mm;
+        height: 30mm;
+        background-color: white;
+      }
+
+      ${renderCssField("member_name", editorData.fields[0])}
+      ${renderCssField("peringkat_name", editorData.fields[1])}
+      ${renderCssField("kategori_name", editorData.fields[2])}
     </style>
   </head>
 
   <body>
-    <div class="paper">
-      <div class="bg-design" style="background-image: url(${editorData.backgroundImage});"></div>
-      
-      ${renderFieldText({
-        name: "member_name",
-        data: editorData.fields[0],
-      })}
-      ${renderFieldText({
-        name: "peringkat_name",
-        data: editorData.fields[1],
-      })}
-      ${renderFieldText({
-        name: "kategori_name",
-        data: editorData.fields[2],
-      })}
-    </div>
+    ${renderFieldText("member_name")}
+    ${editorData.typeCertificate === 2 ? renderFieldText("peringkat_name") : ""}
+    ${renderFieldText("kategori_name")}
   </body>
-</html>
-`;
+</html>`;
 }
 
-function renderFieldText({ name, data = {} }) {
-  const { y, fontFamily, fontSize, color } = data;
-  const placeholderString = `{%${name}%}`;
+const renderCssBackgroundImage = (backgroundImage) => {
+  if (backgroundImage) {
+    return `
+        background-image: url(${backgroundImage});
+        background-image-resize: 6; /* properti custom mpdf, mirip background-size: cover */`;
+  }
+  return "";
+};
 
-  return `<div class="field-text" id="field-${name}" style="font-size: ${fontSize}px;${
-    color ? ` color: ${color};` : ""
-  } font-family: ${fontFamily}; top: ${y}px;">
-  ${placeholderString}
-</div>`;
+function renderCssField(name, data = {}) {
+  const { y, fontFamily, fontWeight, fontSize, color } = data;
+
+  const computeColor = () => (color ? `color: ${color};` : "");
+  const computeFontWeight = () => fontWeight || "normal";
+
+  return `
+      #field-${name} {
+        top: ${y}px;
+        ${computeColor()}
+        font-family: ${fontFamily};
+        font-size: ${fontSize}px;
+        font-weight: ${computeFontWeight()};
+      }`;
+}
+
+function renderFieldText(name) {
+  const placeholderString = `{%${name}%}`;
+  return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 
 export { renderTemplateString };

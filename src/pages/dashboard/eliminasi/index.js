@@ -353,7 +353,9 @@ function Eliminasi() {
                         }}
                       />
                     </div>
-                    <ModalScoring data={currentScoringDetail} modalControl={modalControl} />
+                    {currentScoringDetail.scoringData?.length && (
+                      <ModalScoring data={currentScoringDetail} modalControl={modalControl} />
+                    )}
                   </CardBody>
                 </Card>
               </Col>

@@ -6,20 +6,22 @@ import { Modal, ModalBody, ModalHeader, ModalFooter, Row, Col, Button } from "re
 import SweetAlert from "react-bootstrap-sweetalert";
 import ScoringGrid from "./ScoringGrid";
 
+const computeMemberId = (data) => data?.participant.member.id;
 const computeMemberName = (data) => data?.participant.member.name;
 const computeCategoryLabel = (data) => {
   return data?.[0]?.participant.categoryLabel || data?.[1]?.participant.categoryLabel;
 };
 
 export default function ModalScoring({ data: { scoringData, ...contextDetails }, modalControl }) {
-  scoringData = scoringData ?? [];
   const { isModalScoringOpen, toggleModalScoring, closeModalScoring } = modalControl;
 
   // cuman yang bagian `scores`-nya di payload
-  const [membersScoringData, setMembersScoringData] = React.useState([]);
+  const [membersScoringData, setMembersScoringData] = React.useState(() =>
+    scoringData.map((data) => data.scores)
+  );
   const [isLoading, setIsLoading] = React.useState(false);
   const [savingStatus, setSavingStatus] = React.useState("idle");
-  const [confirmSavePermanent, setConfirmSavePermanent] = React.useState(false);
+  const [alertSavePermanent, setAlertSavePermanent] = React.useState(false);
 
   const handleGridChange = (index, ev) => {
     setMembersScoringData((value) => {
@@ -32,17 +34,18 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
   const computeDataToSave = () => {
     const { type, round, match, elimination_id } = contextDetails;
     return {
+      save_permanent: 0,
       elimination_id: elimination_id,
       round: round,
       match: match,
       type: type,
       members: [
         {
-          memberId: scoringData[0].participant.member.id,
+          memberId: computeMemberId(scoringData[0]),
           scores: membersScoringData[0],
         },
         {
-          memberId: scoringData[1].participant.member.id,
+          memberId: computeMemberId(scoringData[1]),
           scores: membersScoringData[1],
         },
       ],
@@ -51,27 +54,28 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
 
   const handleClickSave = async () => {
     setIsLoading(true);
-
-    const { success } = await ScoringService.saveParticipantScore({
-      ...computeDataToSave(),
-      save_permanent: 0,
-    });
+    const { success } = await ScoringService.saveParticipantScore({ ...computeDataToSave() });
 
     if (success) {
-      setSavingStatus("success");
+      const refetch = await ScoringService.findParticipantScoreDetail(contextDetails);
+      if (refetch.success) {
+        setMembersScoringData(refetch.data.map((data) => data.scores));
+        setSavingStatus("success");
+      } else {
+        setSavingStatus("error");
+      }
     } else {
       setSavingStatus("error");
     }
+    setIsLoading(false);
 
     setTimeout(() => {
       setSavingStatus("idle");
     }, 3000);
-
-    setIsLoading(false);
   };
 
   const handleConfirmSavePermanent = () => {
-    setConfirmSavePermanent(true);
+    setAlertSavePermanent(true);
   };
 
   const executeSavePermanent = async () => {
@@ -125,7 +129,7 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
               <Col className="border-end border-2 px-4">
                 <h5 className="text-center mb-3">{computeMemberName(scoringData[0])}</h5>
                 <ScoringGrid
-                  data={scoringData[0].scores}
+                  data={membersScoringData[0]}
                   onChange={(ev) => handleGridChange(0, ev)}
                 />
               </Col>
@@ -133,14 +137,14 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
               <Col className="px-4">
                 <h5 className="text-center mb-3">{computeMemberName(scoringData[1])}</h5>
                 <ScoringGrid
-                  data={scoringData[1].scores}
+                  data={membersScoringData[1]}
                   onChange={(ev) => handleGridChange(1, ev)}
                 />
               </Col>
             </Row>
 
             <SweetAlert
-              show={confirmSavePermanent}
+              show={alertSavePermanent}
               custom
               btnSize="md"
               reverseButtons={true}
@@ -150,10 +154,10 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
               confirmBtnBsStyle="outline-primary"
               cancelBtnBsStyle="primary"
               onConfirm={() => {
-                setConfirmSavePermanent(false);
+                setAlertSavePermanent(false);
                 executeSavePermanent();
               }}
-              onCancel={() => setConfirmSavePermanent(false)}
+              onCancel={() => setAlertSavePermanent(false)}
               style={{ padding: "30px 40px" }}
             >
               <p className="text-muted">

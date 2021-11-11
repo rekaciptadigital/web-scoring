@@ -84,31 +84,33 @@ function SetScoreExtra({ nomor, defaultData, onChange: notifyValueToParent }) {
     return (
       <React.Fragment>
         <DropdownOverlay onClick={() => closeSelect()} />
-        <Select
-          options={scoreOptions}
-          autoFocus
-          value={getOptionFromValue(currentValue.score)}
-          onChange={handleSelectScoreChange}
-        />
-        <Input
-          innerRef={refDistanceInput}
-          type="text"
-          name="distanceFromX"
-          placeholder="Jarak dari X"
-          className="mt-2"
-          style={{ position: "relative" }}
-          defaultValue={currentValue.distanceFromX}
-          onChange={handleInputDistanceChange}
-        />
-        <Button
-          color="success"
-          size="sm"
-          className="mt-2"
-          style={{ position: "relative" }}
-          onClick={() => closeSelect()}
-        >
-          Simpan
-        </Button>
+        <ExtraShotFieldGroup>
+          <Select
+            options={scoreOptions}
+            autoFocus
+            value={getOptionFromValue(currentValue.score)}
+            onChange={handleSelectScoreChange}
+          />
+          <Input
+            innerRef={refDistanceInput}
+            type="text"
+            name="distanceFromX"
+            placeholder="Jarak dari X"
+            className="mt-2"
+            style={{ position: "relative" }}
+            defaultValue={currentValue.distanceFromX}
+            onChange={handleInputDistanceChange}
+          />
+          <Button
+            color="success"
+            size="sm"
+            className="mt-2"
+            style={{ position: "relative" }}
+            onClick={() => closeSelect()}
+          >
+            Simpan
+          </Button>
+        </ExtraShotFieldGroup>
       </React.Fragment>
     );
   }
@@ -131,6 +133,11 @@ const DropdownOverlay = styled.div`
   left: 0;
   background-color: #ffffff;
   opacity: 0.8;
+`;
+
+const ExtraShotFieldGroup = styled.div`
+  width: 100%;
+  max-width: 100px;
 `;
 
 const getOptionFromValue = (value) => {

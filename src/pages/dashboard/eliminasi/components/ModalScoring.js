@@ -1,6 +1,9 @@
 import * as React from "react";
+import styled from "styled-components";
 import { ScoringService } from "services";
+
 import { Modal, ModalBody, ModalHeader, ModalFooter, Row, Col, Button } from "reactstrap";
+import SweetAlert from "react-bootstrap-sweetalert";
 import ScoringGrid from "./ScoringGrid";
 
 const computeMemberName = (data) => data?.participant.member.name;
@@ -11,9 +14,12 @@ const computeCategoryLabel = (data) => {
 export default function ModalScoring({ data: { scoringData, ...contextDetails }, modalControl }) {
   scoringData = scoringData ?? [];
   const { isModalScoringOpen, toggleModalScoring, closeModalScoring } = modalControl;
-  const [, setIsLoading] = React.useState(false);
+
   // cuman yang bagian `scores`-nya di payload
   const [membersScoringData, setMembersScoringData] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [savingStatus, setSavingStatus] = React.useState("idle");
+  const [confirmSavePermanent, setConfirmSavePermanent] = React.useState(false);
 
   const handleGridChange = (index, ev) => {
     setMembersScoringData((value) => {
@@ -23,16 +29,13 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
     });
   };
 
-  const handleClickSimpan = async () => {
-    setIsLoading(true);
-
+  const computeDataToSave = () => {
     const { type, round, match, elimination_id } = contextDetails;
-    const data = {
+    return {
       elimination_id: elimination_id,
       round: round,
       match: match,
       type: type,
-      save_permanent: 0,
       members: [
         {
           memberId: scoringData[0].participant.member.id,
@@ -44,12 +47,56 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
         },
       ],
     };
-    const result = await ScoringService.saveParticipantScore(data);
+  };
+
+  const handleClickSave = async () => {
+    setIsLoading(true);
+
+    const { success } = await ScoringService.saveParticipantScore({
+      ...computeDataToSave(),
+      save_permanent: 0,
+    });
+
+    if (success) {
+      setSavingStatus("success");
+    } else {
+      setSavingStatus("error");
+    }
+
+    setTimeout(() => {
+      setSavingStatus("idle");
+    }, 3000);
 
     setIsLoading(false);
   };
 
-  const handleClickTentukan = () => alert("Tentukan!");
+  const handleConfirmSavePermanent = () => {
+    setConfirmSavePermanent(true);
+  };
+
+  const executeSavePermanent = async () => {
+    setIsLoading(true);
+    // TODO: uncomment ketika udah selesai testing-testing lainnya
+    // const { success } = await ScoringService.saveParticipantScore({
+    //   ...computeDataToSave(),
+    //   save_permanent: 1,
+    // });
+
+    // setIsLoading(false);
+    // if (success) {
+    //   closeModalScoring();
+    // } else {
+    //   setSavingStatus("error");
+    //   setTimeout(() => {
+    //     setSavingStatus("idle");
+    //   }, 3000);
+    // }
+
+    setTimeout(() => {
+      setIsLoading(false);
+      closeModalScoring();
+    }, 1500);
+  };
 
   return (
     <Modal
@@ -62,7 +109,10 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
       onClosed={() => closeModalScoring()}
     >
       <ModalHeader toggle={() => toggleModalScoring()}>Set Scoring</ModalHeader>
+
       <ModalBody>
+        <SavingOverlay loading={isLoading} />
+
         {scoringData?.length ? (
           <React.Fragment>
             <Row className="mt-4 mb-4">
@@ -88,6 +138,28 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
                 />
               </Col>
             </Row>
+
+            <SweetAlert
+              show={confirmSavePermanent}
+              custom
+              btnSize="md"
+              reverseButtons={true}
+              showCancel
+              cancelBtnText="Batal"
+              confirmBtnText="OK"
+              confirmBtnBsStyle="outline-primary"
+              cancelBtnBsStyle="primary"
+              onConfirm={() => {
+                setConfirmSavePermanent(false);
+                executeSavePermanent();
+              }}
+              onCancel={() => setConfirmSavePermanent(false)}
+              style={{ padding: "30px 40px" }}
+            >
+              <p className="text-muted">
+                Skor tidak akan dapat diubah lagi. Pastikan semua skor telah diisi dengan benar.
+              </p>
+            </SweetAlert>
           </React.Fragment>
         ) : (
           <div>Preparing...</div>
@@ -96,17 +168,76 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
 
       {scoringData?.length && (
         <ModalFooter>
-          <React.Fragment>
-            <Button color="primary" onClick={handleClickSimpan}>
+          <div style={{ position: "relative" }}>
+            <Button color="primary" onClick={handleClickSave}>
               Simpan
             </Button>
 
-            <Button color="success" onClick={handleClickTentukan}>
+            <Button
+              color="success"
+              outline
+              className="ms-2"
+              onClick={handleConfirmSavePermanent}
+              disabled={false}
+            >
               Tentukan
             </Button>
-          </React.Fragment>
+
+            <FeedBackSavingStatus status={savingStatus} />
+          </div>
         </ModalFooter>
       )}
     </Modal>
   );
 }
+
+function SavingOverlay({ loading }) {
+  if (loading) {
+    return (
+      <SavingOverlayContainer>
+        <h5 className="text-muted">Menyimpan...</h5>
+      </SavingOverlayContainer>
+    );
+  }
+  return null;
+}
+
+const SavingOverlayContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #ffffff;
+  opacity: 0.8;
+  z-index: 10;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+function FeedBackSavingStatus({ status }) {
+  if (status === "success") {
+    return (
+      <FeedbackMessageSaving className="text-success">
+        Skor berhasil disimpan!
+      </FeedbackMessageSaving>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <FeedbackMessageSaving className="text-danger">Gagal menyimpan skor!</FeedbackMessageSaving>
+    );
+  }
+
+  return null;
+}
+
+const FeedbackMessageSaving = styled.div`
+  position: absolute;
+  top: 0.8em;
+  left: -100%;
+  opacity: 0.5;
+`;

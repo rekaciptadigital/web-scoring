@@ -93,6 +93,8 @@ const CustomSeed = (e, setScoring, updated) => {
   );
 };
 
+const initialScoringDetail = { scoringData: null };
+
 function Eliminasi() {
   const [loading, setLoading] = React.useState(false);
 
@@ -105,7 +107,9 @@ function Eliminasi() {
   const [category, setCategory] = useState(0);
   const { event_id } = useParams();
 
-  const [currentScoringDetail, setCurrentScoringDetail] = React.useState(null);
+  const [currentScoringDetail, setCurrentScoringDetail] = React.useState(
+    () => initialScoringDetail
+  );
 
   const eliminationType = [
     { id: "1", label: "A vs Z" },
@@ -201,18 +205,20 @@ function Eliminasi() {
 
   const setScoring = async (ev) => {
     setLoading(true);
-    const result = await ScoringService.findParticipantScoreDetail({
+
+    const contextDetails = {
       type: 2, // TODO: hardcoded sementara
       round: ev.round,
       match: ev.match,
       elimination_id: 2, // TODO: hardcoded sementara
-    });
+    };
+    const result = await ScoringService.findParticipantScoreDetail(contextDetails);
 
     if (result.success && result.data?.length) {
-      setCurrentScoringDetail(result.data);
+      setCurrentScoringDetail({ ...contextDetails, scoringData: result.data });
       openModalScoring();
     } else {
-      setCurrentScoringDetail(null);
+      setCurrentScoringDetail({ ...initialScoringDetail });
     }
 
     setLoading(false);
@@ -240,7 +246,7 @@ function Eliminasi() {
   const openModalScoring = () => setModalScoringOpen(true);
   const closeModalScoring = () => {
     setModalScoringOpen(false);
-    setCurrentScoringDetail(null); // reset data current detail kalau modal gak aktif
+    setCurrentScoringDetail({ ...initialScoringDetail }); // reset data current detail kalau modal gak aktif
   };
   const toggleModalScoring = () => setModalScoringOpen((isOpen) => !isOpen);
 

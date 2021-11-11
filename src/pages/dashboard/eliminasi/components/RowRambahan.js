@@ -4,14 +4,32 @@ import SelectScore from "./SelectScore";
 const createInitialScoresList = (initialScoresList) => {
   const scoresList = initialScoresList.map((score) => {
     const transformedValue = Number(score);
-    return isNaN(transformedValue) ? score : transformedValue;
+    const interpretedValue = isNaN(transformedValue) ? score : transformedValue;
+    return interpretedValue || "m";
   });
   return () => scoresList;
 };
 
-export default function RowRambahan({ nomor, rambahan: rambahanData }) {
+export default function RowRambahan({
+  nomor,
+  rambahan: rambahanData,
+  onChange: notifyChangeToParent,
+}) {
   const [scoreData, setScoreData] = React.useState(createInitialScoresList(rambahanData.score));
   const isDirty = React.useRef(false);
+
+  React.useEffect(() => {
+    const rambahanObject = {
+      nomor: nomor,
+      value: {
+        score: scoreData,
+        total: 0, // bagian ini mungkin bisa diabaikan dulu tapi pasang aja in case perlu nanti
+        status: "empty", // ...idem...
+        point: 0, // ...idem...
+      },
+    };
+    notifyChangeToParent?.(rambahanObject);
+  }, [scoreData]);
 
   const updateScoreData = (ev) => {
     isDirty.current = isDirty.current || true;

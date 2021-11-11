@@ -4,8 +4,32 @@ import styled from "styled-components";
 import { Button, Input } from "reactstrap";
 import Select from "react-select";
 
-export default function RowExtraShot({ data: extraShotData }) {
-  const handleSetScoreChange = () => {};
+const createInitialShotsList = (initialShotsList) => {
+  const scoresList = initialShotsList.map((shot) => {
+    const transformedValue = Number(shot.score);
+    const interpretedValue = isNaN(transformedValue) ? shot.score : transformedValue;
+    return {
+      score: interpretedValue || "m",
+      distanceFromX: shot.distanceFromX || 0,
+    };
+  });
+  return () => scoresList;
+};
+
+export default function RowExtraShot({ data: extraShotData, onChange: notifyChangeToParent }) {
+  const [shotsData, setShotsData] = React.useState(createInitialShotsList(extraShotData));
+
+  React.useEffect(() => {
+    notifyChangeToParent?.(shotsData);
+  }, [shotsData]);
+
+  const handleSetScoreChange = (ev) => {
+    setShotsData((shotsData) => {
+      const shotsDataUpdated = [...shotsData];
+      shotsDataUpdated[ev.nomor - 1] = { ...ev.value };
+      return shotsDataUpdated;
+    });
+  };
 
   return (
     <tr>
@@ -22,40 +46,37 @@ export default function RowExtraShot({ data: extraShotData }) {
   );
 }
 
-const createInitialValueData = (nomor, defaultData) => {
+const createInitialValueData = (defaultData) => {
   const transformedScoreValue = Number(defaultData.score);
   const interpretedScoreValue = isNaN(transformedScoreValue)
     ? defaultData.score
     : transformedScoreValue;
   return () => ({
-    nomor: nomor,
     score: interpretedScoreValue || "m",
-    distanceFromX: defaultData.distanceFromX || null,
+    distanceFromX: defaultData.distanceFromX || 0,
   });
 };
 
 function SetScoreExtra({ nomor, defaultData, onChange: notifyValueToParent }) {
   const [editMode, setEditMode] = React.useState(false);
-  const [currentValue, setCurrentValue] = React.useState(
-    createInitialValueData(nomor, defaultData)
-  );
+  const [currentValue, setCurrentValue] = React.useState(createInitialValueData(defaultData));
   const refDistanceInput = React.useRef(null);
 
   const openSelect = () => setEditMode(true);
   const closeSelect = () => {
     setEditMode(false);
-    notifyValueToParent?.(currentValue);
+    notifyValueToParent?.({ nomor: nomor, value: currentValue });
   };
 
   const handleSelectScoreChange = (ev) => {
-    setCurrentValue((value) => ({ ...value, score: Number(ev.value) }));
+    setCurrentValue((value) => ({ ...value, score: Number(ev.value) || ev.value }));
     refDistanceInput.current?.focus();
   };
 
   const handleInputDistanceChange = (ev) => {
     setCurrentValue((value) => ({
       ...value,
-      distanceFromX: Number(ev.target.value) || null,
+      distanceFromX: Number(ev.target.value) || 0,
     }));
   };
 
@@ -97,7 +118,7 @@ function SetScoreExtra({ nomor, defaultData, onChange: notifyValueToParent }) {
       <div className="border-bottom border-primary">
         {getOptionFromValue(currentValue?.score)?.label || "M"}
       </div>
-      <div>{currentValue?.distanceFromX || <span>&mdash;</span>}</div>
+      <div>{currentValue?.distanceFromX}</div>
     </Button>
   );
 }

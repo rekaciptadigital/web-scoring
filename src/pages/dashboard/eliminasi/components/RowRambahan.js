@@ -1,19 +1,34 @@
 import * as React from "react";
 import SelectScore from "./SelectScore";
 
-export default function RowRambahan({ nomor }) {
-  const [scoreData, setScoreData] = React.useState([]);
+const createInitialScoresList = (initialScoresList) => {
+  const scoresList = initialScoresList.map((score) => {
+    const transformedValue = Number(score);
+    return isNaN(transformedValue) ? score : transformedValue;
+  });
+  return () => scoresList;
+};
+
+export default function RowRambahan({ nomor, rambahan: rambahanData }) {
+  const [scoreData, setScoreData] = React.useState(createInitialScoresList(rambahanData.score));
+  const isDirty = React.useRef(false);
 
   const updateScoreData = (ev) => {
+    isDirty.current = isDirty.current || true;
     setScoreData((currentData) => {
       const dataUpdated = [...currentData];
-      dataUpdated[ev.nomor - 1] = ev.value.value;
+      dataUpdated[ev.nomor - 1] = ev.value;
       return dataUpdated;
     });
   };
 
   const computeTotal = () => {
-    return scoreData?.length ? scoreData.reduce(summingReducer, 0) : 0;
+    // Defaultnya tampilkan data total dari respon BE,
+    // tapi timpa dengan nilai dari select ketika ada inputan baru
+    if (isDirty.current) {
+      return scoreData?.reduce(summingReducer, 0);
+    }
+    return rambahanData.total;
   };
 
   return (
@@ -21,24 +36,17 @@ export default function RowRambahan({ nomor }) {
       <td className="text-center" style={{ color: "var(--bs-gray-400)" }}>
         #{nomor}
       </td>
-      <td>
-        <SelectScore nomor={1} onChange={(ev) => updateScoreData(ev)} />
-      </td>
-      <td>
-        <SelectScore nomor={2} onChange={(ev) => updateScoreData(ev)} />
-      </td>
-      <td>
-        <SelectScore nomor={3} onChange={(ev) => updateScoreData(ev)} />
-      </td>
-      <td>
-        <SelectScore nomor={4} onChange={(ev) => updateScoreData(ev)} />
-      </td>
-      <td>
-        <SelectScore nomor={5} onChange={(ev) => updateScoreData(ev)} />
-      </td>
-      <td>
-        <SelectScore nomor={6} onChange={(ev) => updateScoreData(ev)} />
-      </td>
+
+      {rambahanData.score.map((scoreValue, index) => (
+        <td key={index}>
+          <SelectScore
+            nomor={index + 1}
+            defaultValue={scoreValue}
+            onChange={(ev) => updateScoreData(ev)}
+          />
+        </td>
+      ))}
+
       <td className="text-end fw-bold">{computeTotal()}</td>
     </tr>
   );

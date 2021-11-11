@@ -4,35 +4,24 @@ import { Table } from "reactstrap";
 import RowRambahan from "./RowRambahan";
 import RowExtraShot from "./RowExtraShot";
 
-const listRambahan = [{ no: 1 }, { no: 2 }, { no: 3 }, { no: 4 }, { no: 5 }];
-
-export default function ScoringGrid() {
+export default function ScoringGrid({ data: scoresData }) {
   return (
     <div>
       <Table borderless className="text-muted text-center">
         <thead>
           <tr>
             <td className="text-center">Seri</td>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
+            {scoresData.shot[0].score.map((col, index) => (
+              <td key={index}>{index + 1}</td>
+            ))}
             <td className="text-end">Total</td>
           </tr>
         </thead>
 
         <tbody>
-          {listRambahan.map((row) => (
-            <RowRambahan key={row.no} nomor={row.no} />
+          {scoresData.shot.map((rambahan, index) => (
+            <RowRambahan key={index} nomor={index + 1} rambahan={rambahan} />
           ))}
-
-          <tr>
-            <td colSpan="8" className="text-end">
-              Total: <span className="ms-1 fw-bold">123</span>
-            </td>
-          </tr>
         </tbody>
       </Table>
 
@@ -45,7 +34,7 @@ export default function ScoringGrid() {
           </tr>
         </thead>
         <tbody>
-          <RowExtraShot />
+          <RowExtraShot data={scoresData.extraShot} />
         </tbody>
       </Table>
     </div>

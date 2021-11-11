@@ -4,44 +4,59 @@ import styled from "styled-components";
 import { Button, Input } from "reactstrap";
 import Select from "react-select";
 
-export default function RowExtraShot() {
+export default function RowExtraShot({ data: extraShotData }) {
+  const handleSetScoreChange = () => {};
+
   return (
     <tr>
       <td className="text-center" style={{ color: "var(--bs-gray-400)" }}>
         #
       </td>
-      <td>
-        <SetScoreExtra nomor={1} />
-      </td>
-      <td>
-        <SetScoreExtra nomor={2} />
-      </td>
-      <td>
-        <SetScoreExtra nomor={3} />
-      </td>
-      <td>
-        <SetScoreExtra nomor={4} />
-      </td>
-      <td>
-        <SetScoreExtra nomor={5} />
-      </td>
+
+      {extraShotData.map((shot, index) => (
+        <td key={index}>
+          <SetScoreExtra nomor={index + 1} defaultData={shot} onChange={handleSetScoreChange} />
+        </td>
+      ))}
     </tr>
   );
 }
 
-function SetScoreExtra({ nomor, onChange: notifyValueToParent }) {
-  const [editMode, setEditMode] = React.useState(false);
-  const [currentValue, setCurrentValue] = React.useState(() => ({
+const createInitialValueData = (nomor, defaultData) => {
+  const transformedScoreValue = Number(defaultData.score);
+  const interpretedScoreValue = isNaN(transformedScoreValue)
+    ? defaultData.score
+    : transformedScoreValue;
+  return () => ({
     nomor: nomor,
-    score: { value: "m", label: "M" },
-    distance: null,
-  }));
+    score: interpretedScoreValue || "m",
+    distanceFromX: defaultData.distanceFromX || null,
+  });
+};
+
+function SetScoreExtra({ nomor, defaultData, onChange: notifyValueToParent }) {
+  const [editMode, setEditMode] = React.useState(false);
+  const [currentValue, setCurrentValue] = React.useState(
+    createInitialValueData(nomor, defaultData)
+  );
   const refDistanceInput = React.useRef(null);
 
   const openSelect = () => setEditMode(true);
   const closeSelect = () => {
     setEditMode(false);
     notifyValueToParent?.(currentValue);
+  };
+
+  const handleSelectScoreChange = (ev) => {
+    setCurrentValue((value) => ({ ...value, score: Number(ev.value) }));
+    refDistanceInput.current?.focus();
+  };
+
+  const handleInputDistanceChange = (ev) => {
+    setCurrentValue((value) => ({
+      ...value,
+      distanceFromX: Number(ev.target.value) || null,
+    }));
   };
 
   if (editMode) {
@@ -51,23 +66,18 @@ function SetScoreExtra({ nomor, onChange: notifyValueToParent }) {
         <Select
           options={scoreOptions}
           autoFocus
-          value={currentValue.score}
-          onChange={(ev) => {
-            setCurrentValue((value) => ({ ...value, score: ev }));
-            refDistanceInput.current?.focus();
-          }}
+          value={getOptionFromValue(currentValue.score)}
+          onChange={handleSelectScoreChange}
         />
         <Input
           innerRef={refDistanceInput}
           type="text"
-          name="distance"
+          name="distanceFromX"
           placeholder="Jarak dari X"
           className="mt-2"
           style={{ position: "relative" }}
-          defaultValue={currentValue.distance}
-          onChange={(ev) => {
-            setCurrentValue((value) => ({ ...value, distance: ev.target.value || null }));
-          }}
+          defaultValue={currentValue.distanceFromX}
+          onChange={handleInputDistanceChange}
         />
         <Button
           color="success"
@@ -83,16 +93,11 @@ function SetScoreExtra({ nomor, onChange: notifyValueToParent }) {
   }
 
   return (
-    <Button
-      outline
-      color="primary"
-      type="button"
-      tag="div"
-      onClick={() => openSelect(true)}
-      style={{ minWidth: "2em" }}
-    >
-      <div className="border-bottom border-primary">{currentValue?.score?.label || "M"}</div>
-      <div>{currentValue?.distance || <span>&mdash;</span>}</div>
+    <Button outline color="primary" type="button" tag="div" onClick={() => openSelect(true)}>
+      <div className="border-bottom border-primary">
+        {getOptionFromValue(currentValue?.score)?.label || "M"}
+      </div>
+      <div>{currentValue?.distanceFromX || <span>&mdash;</span>}</div>
     </Button>
   );
 }
@@ -106,6 +111,10 @@ const DropdownOverlay = styled.div`
   background-color: #ffffff;
   opacity: 0.8;
 `;
+
+const getOptionFromValue = (value) => {
+  return scoreOptions.find((option) => option.value === value);
+};
 
 const scoreOptions = [
   { value: "m", label: "M" },

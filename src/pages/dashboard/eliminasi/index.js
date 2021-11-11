@@ -5,17 +5,25 @@ import { DateInput, TimeInput, SelectInput } from "components";
 import { Bracket, Seed, SeedItem, SeedTeam, SeedTime } from "react-brackets";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { EventsService, EliminationService } from "../../../services";
+import { EventsService, EliminationService, ScoringService } from "../../../services";
+
+import { LoadingScreen } from "components";
 import ModalScoring from "./components/ModalScoring";
 
 const CustomSeed = (e, setScoring, updated) => {
-  const { /* roundIndex, seedIndex, */ seed, breakpoint } = e;
+  const { roundIndex, seedIndex, seed, breakpoint } = e;
 
   const shouldRenderScoring = () => {
     // hanya perlu render tombol scoring ketika masing-masing `team.win === 0`
-    // const teamWinnings = seed.teams.map((team) => team.win);
     const isScoring = seed.teams.every((team) => team.win === 0);
     return !updated && isScoring;
+  };
+
+  const handleOnClickSetScoring = () => {
+    setScoring({
+      round: roundIndex + 1,
+      match: seedIndex + 1,
+    });
   };
 
   // breakpoint passed to Bracket component
@@ -71,7 +79,7 @@ const CustomSeed = (e, setScoring, updated) => {
                 <button
                   style={{ color: "white", background: "red", width: "100%" }}
                   key={breakpoint}
-                  onClick={() => setScoring()}
+                  onClick={handleOnClickSetScoring}
                 >
                   scoring
                 </button>
@@ -86,6 +94,8 @@ const CustomSeed = (e, setScoring, updated) => {
 };
 
 function Eliminasi() {
+  const [loading, setLoading] = React.useState(false);
+
   const [eliminasiSchedule, setEliminasiSchedule] = useState([]);
   const [matches, setMatches] = useState([]);
   const [eventDetail, setEventDetail] = useState({});
@@ -94,6 +104,9 @@ function Eliminasi() {
   const [end, setEnd] = useState("");
   const [category, setCategory] = useState(0);
   const { event_id } = useParams();
+
+  const [currentScoringDetail, setCurrentScoringDetail] = React.useState(null);
+
   const eliminationType = [
     { id: "1", label: "A vs Z" },
     { id: "2", label: "A vs B" },
@@ -186,8 +199,23 @@ function Eliminasi() {
     console.log(errors);
   };
 
-  const setScoring = async () => {
-    openModalScoring();
+  const setScoring = async (ev) => {
+    setLoading(true);
+    const result = await ScoringService.findParticipantScoreDetail({
+      type: 2, // TODO: hardcoded sementara
+      round: ev.round,
+      match: ev.match,
+      elimination_id: 2, // TODO: hardcoded sementara
+    });
+
+    if (result.success && result.data?.length) {
+      setCurrentScoringDetail(result.data);
+      openModalScoring();
+    } else {
+      setCurrentScoringDetail(null);
+    }
+
+    setLoading(false);
   };
 
   const getEliminasiSchedule = async () => {
@@ -210,8 +238,12 @@ function Eliminasi() {
   const [isModalScoringOpen, setModalScoringOpen] = React.useState(false);
 
   const openModalScoring = () => setModalScoringOpen(true);
-  const closeModalScoring = () => setModalScoringOpen(false);
+  const closeModalScoring = () => {
+    setModalScoringOpen(false);
+    setCurrentScoringDetail(null); // reset data current detail kalau modal gak aktif
+  };
   const toggleModalScoring = () => setModalScoringOpen((isOpen) => !isOpen);
+
   const modalControl = {
     isModalScoringOpen,
     toggleModalScoring,
@@ -315,7 +347,7 @@ function Eliminasi() {
                         }}
                       />
                     </div>
-                    <ModalScoring modalControl={modalControl} />
+                    <ModalScoring data={currentScoringDetail} modalControl={modalControl} />
                   </CardBody>
                 </Card>
               </Col>
@@ -399,6 +431,8 @@ function Eliminasi() {
           </div>
         </Container>
       </div>
+
+      <LoadingScreen loading={loading} />
     </React.Fragment>
   );
 }

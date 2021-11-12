@@ -1,34 +1,18 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { Button, Input } from "reactstrap";
+import { Button, Input, InputGroup, InputGroupText } from "reactstrap";
 import Select from "react-select";
 
-const createInitialShotsList = (initialShotsList) => {
-  const scoresList = initialShotsList.map((shot) => {
-    const transformedValue = Number(shot.score);
-    const interpretedValue = isNaN(transformedValue) ? shot.score : transformedValue;
-    return {
-      score: interpretedValue || "m",
-      distanceFromX: shot.distanceFromX || 0,
-    };
-  });
-  return () => scoresList;
-};
-
-export default function RowExtraShot({ data: extraShotData, onChange: notifyChangeToParent }) {
-  const [shotsData, setShotsData] = React.useState(createInitialShotsList(extraShotData));
-
-  React.useEffect(() => {
-    notifyChangeToParent?.(shotsData);
-  }, [shotsData]);
-
+export default function RowExtraShot({ extraShot, onChange: notifyChangeToParent }) {
   const handleSetScoreChange = (ev) => {
-    setShotsData((shotsData) => {
-      const shotsDataUpdated = [...shotsData];
-      shotsDataUpdated[ev.nomor - 1] = { ...ev.value };
-      return shotsDataUpdated;
-    });
+    if (!notifyChangeToParent) {
+      return;
+    }
+
+    const shotsDataUpdated = [...extraShot];
+    shotsDataUpdated[ev.nomor - 1] = { ...ev.value };
+    notifyChangeToParent(shotsDataUpdated);
   };
 
   return (
@@ -37,7 +21,7 @@ export default function RowExtraShot({ data: extraShotData, onChange: notifyChan
         #
       </td>
 
-      {extraShotData.map((shot, index) => (
+      {extraShot.map((shot, index) => (
         <td key={index}>
           <SetScoreExtra nomor={index + 1} defaultData={shot} onChange={handleSetScoreChange} />
         </td>
@@ -91,16 +75,20 @@ function SetScoreExtra({ nomor, defaultData, onChange: notifyValueToParent }) {
             value={getOptionFromValue(currentValue.score)}
             onChange={handleSelectScoreChange}
           />
-          <Input
-            innerRef={refDistanceInput}
-            type="text"
-            name="distanceFromX"
-            placeholder="Jarak dari X"
-            className="mt-2"
-            style={{ position: "relative" }}
-            defaultValue={currentValue.distanceFromX}
-            onChange={handleInputDistanceChange}
-          />
+          <InputGroup className="mt-2">
+            <Input
+              innerRef={refDistanceInput}
+              type="text"
+              name="distanceFromX"
+              placeholder="Jarak dari X"
+              style={{ position: "relative" }}
+              defaultValue={currentValue.distanceFromX}
+              onChange={handleInputDistanceChange}
+            />
+            <InputGroupText className="text-muted" style={{ fontSize: "0.8em" }}>
+              mm
+            </InputGroupText>
+          </InputGroup>
           <Button
             color="success"
             size="sm"

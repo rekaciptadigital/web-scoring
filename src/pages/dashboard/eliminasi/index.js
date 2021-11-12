@@ -10,6 +10,11 @@ import { EventsService, EliminationService, ScoringService } from "../../../serv
 import { LoadingScreen } from "components";
 import ModalScoring from "./components/ModalScoring";
 
+// TODO: pindah somewhere proper
+const APP_ARCHER_URL = process.env.REACT_APP_ARCHER_URL
+  ? process.env.REACT_APP_ARCHER_URL
+  : "https://staging.myarchery.id";
+
 const CustomSeed = (e, setScoring, updated) => {
   const { roundIndex, seedIndex, seed, breakpoint } = e;
 
@@ -349,7 +354,20 @@ function Eliminasi() {
                 </Card>
                 <Card>
                   <CardBody style={{ overflow: "auto" }}>
-                    <div>
+                    <div className="mb-4 float-end">
+                      <Button
+                        tag="a"
+                        size="sm"
+                        color="primary"
+                        target="_blank"
+                        href={`${APP_ARCHER_URL}/display/stages/${eventDetail.eventSlug}`}
+                        rel="noopener noreferrer"
+                      >
+                        Lihat di web
+                      </Button>
+                    </div>
+
+                    <div className="mt-5">
                       <Bracket
                         rounds={matches.rounds != undefined ? matches.rounds : []}
                         renderSeedComponent={(e) => {

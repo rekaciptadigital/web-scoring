@@ -78,7 +78,13 @@ export default function ModalScoring({
     const { success } = await ScoringService.saveParticipantScore({ ...computeDataToSave() });
 
     if (success) {
-      const refetch = await ScoringService.findParticipantScoreDetail(contextDetails);
+      const queryString = {
+        type: contextDetails.type,
+        round: contextDetails.round,
+        match: contextDetails.match,
+        elimination_id: contextDetails.elimination_id,
+      };
+      const refetch = await ScoringService.findParticipantScoreDetail(queryString);
       if (refetch.success) {
         setMembersScoringData(refetch.data.map((data) => data.scores));
         setSavingStatus("success");

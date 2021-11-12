@@ -1,46 +1,22 @@
 import * as React from "react";
 import SelectScore from "./SelectScore";
 
-const createInitialScoresList = (initialScoresList) => {
-  const scoresList = initialScoresList.map((score) => {
-    const transformedValue = Number(score);
-    const interpretedValue = isNaN(transformedValue) ? score : transformedValue;
-    return interpretedValue || "m";
-  });
-  return () => scoresList;
-};
+export default function RowRambahan({ nomor, shot, scoringType, onChange: notifyChangeToParent }) {
+  const { score, point } = shot;
 
-export default function RowRambahan({
-  nomor,
-  rambahan: rambahanData,
-  scoringType,
-  onChange: notifyChangeToParent,
-}) {
-  const [scoreData, setScoreData] = React.useState(createInitialScoresList(rambahanData.score));
+  const handleSelectScoreChange = (ev) => {
+    if (!notifyChangeToParent) {
+      return;
+    }
 
-  React.useEffect(() => {
-    const rambahanObject = {
+    const scoreUpdated = [...score];
+    scoreUpdated[ev.nomor - 1] = ev.value;
+
+    const shotUpdated = {
       nomor: nomor,
-      value: {
-        score: scoreData,
-        // total: 0, // bagian ini mungkin bisa diabaikan dulu tapi pasang aja in case perlu nanti
-        // status: "empty", // ...idem...
-        // point: 0, // ...idem...
-      },
+      value: { ...shot, score: scoreUpdated },
     };
-    notifyChangeToParent?.(rambahanObject);
-  }, [scoreData]);
-
-  const updateScoreData = (ev) => {
-    setScoreData((currentData) => {
-      const dataUpdated = [...currentData];
-      dataUpdated[ev.nomor - 1] = ev.value;
-      return dataUpdated;
-    });
-  };
-
-  const computeTotal = () => {
-    return scoreData?.reduce(summingReducer, 0);
+    notifyChangeToParent(shotUpdated);
   };
 
   return (
@@ -49,21 +25,25 @@ export default function RowRambahan({
         #{nomor}
       </td>
 
-      {rambahanData.score.map((scoreValue, index) => (
+      {score.map((scoreValue, index) => (
         <td key={index}>
           <SelectScore
             nomor={index + 1}
-            defaultValue={scoreValue}
-            onChange={(ev) => updateScoreData(ev)}
+            value={scoreValue}
+            onChange={(ev) => handleSelectScoreChange(ev)}
           />
         </td>
       ))}
 
-      <td className="text-end fw-bold">{computeTotal()}</td>
-      {scoringType === 1 && <td className="text-end fw-bold">{rambahanData.point}</td>}
+      <td className="text-end fw-bold">{computeTotal(score)}</td>
+      {scoringType === 1 && <td className="text-end fw-bold">{point}</td>}
     </tr>
   );
 }
+
+const computeTotal = (score) => {
+  return score?.reduce(summingReducer, 0);
+};
 
 const summingReducer = (prev, value) => {
   let interpretedValue;

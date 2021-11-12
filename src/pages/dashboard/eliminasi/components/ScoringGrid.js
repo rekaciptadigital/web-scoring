@@ -4,37 +4,28 @@ import { Table } from "reactstrap";
 import RowRambahan from "./RowRambahan";
 import RowExtraShot from "./RowExtraShot";
 
-export default function ScoringGrid({
-  scoringType,
-  data: scoresData,
-  onChange: notifyChangeToParent,
-}) {
-  // `scoreGridData` cuma simpan data list score, lainnya (`point`, dll) masih dari prop `scoresData`
-  const [scoreGridData, setScoreGridData] = React.useState(() => scoresData);
-  const firstMount = React.useRef(true);
-
-  React.useEffect(() => {
-    if (firstMount.current) {
-      firstMount.current = false;
-      return;
-    }
-    notifyChangeToParent?.(scoreGridData);
-  }, [scoreGridData]);
+export default function ScoringGrid({ scoringType, scores, onChange: notifyChangeToParent }) {
+  const { shot, extraShot } = scores;
 
   const handleRowRambahanChange = (ev) => {
-    setScoreGridData((gridData) => {
-      const shotsDataUpdated = [...gridData.shot]; // supaya gak mutasi array aslinya
-      const memberIndex = ev.nomor - 1;
-      shotsDataUpdated[memberIndex] = {
-        ...shotsDataUpdated[memberIndex],
-        ...ev.value,
-      }; // supaya gak mutasi objek aslinya
-      return { ...gridData, shot: shotsDataUpdated };
-    });
+    if (!notifyChangeToParent) {
+      return;
+    }
+    const { nomor, value } = ev;
+
+    const shotsDataUpdated = [...shot];
+    shotsDataUpdated[nomor - 1] = {
+      ...shotsDataUpdated[nomor - 1],
+      ...value,
+    };
+    notifyChangeToParent({ ...scores, shot: shotsDataUpdated });
   };
 
   const handleRowExtrashotChange = (ev) => {
-    setScoreGridData((gridData) => ({ ...gridData, extraShot: [...ev] }));
+    if (!notifyChangeToParent) {
+      return;
+    }
+    notifyChangeToParent({ ...scores, extraShot: [...ev] });
   };
 
   return (
@@ -43,7 +34,7 @@ export default function ScoringGrid({
         <thead>
           <tr>
             <td className="text-center">Seri</td>
-            {scoresData.shot[0].score.map((col, index) => (
+            {shot[0].score.map((col, index) => (
               <td key={index}>{index + 1}</td>
             ))}
             <td className="text-end">Total</td>
@@ -52,12 +43,12 @@ export default function ScoringGrid({
         </thead>
 
         <tbody>
-          {scoresData.shot.map((rambahan, index) => (
+          {shot.map((rambahan, index) => (
             <RowRambahan
               key={index}
               nomor={index + 1}
               scoringType={scoringType}
-              rambahan={rambahan}
+              shot={rambahan}
               onChange={handleRowRambahanChange}
             />
           ))}
@@ -73,7 +64,7 @@ export default function ScoringGrid({
           </tr>
         </thead>
         <tbody>
-          <RowExtraShot data={scoresData.extraShot} onChange={handleRowExtrashotChange} />
+          <RowExtraShot extraShot={extraShot} onChange={handleRowExtrashotChange} />
         </tbody>
       </Table>
     </div>

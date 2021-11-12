@@ -23,30 +23,14 @@ const getOptionFromValue = (value) => {
   return scoreOptions.find((option) => option.value === value);
 };
 
-const createInitialScore = (defaultValue) => {
-  const transformedValue = Number(defaultValue);
-  const interpretedValue = isNaN(transformedValue) ? defaultValue : transformedValue;
-  return () => interpretedValue || "m"; // default ke "m" kalau gak ada defaultValue-nya
-};
-
-export default function SelectScore({ nomor, defaultValue, onChange: notifyValueToParent }) {
+export default function SelectScore({ nomor, value, onChange: notifyValueToParent }) {
   const [editMode, setEditMode] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState(createInitialScore(defaultValue));
-  const firstMount = React.useRef(true);
 
   const openSelect = () => setEditMode(true);
   const closeSelect = () => setEditMode(false);
 
-  React.useEffect(() => {
-    if (firstMount.current) {
-      firstMount.current = false;
-      return;
-    }
-    notifyValueToParent?.({ nomor, value: selectedValue });
-  }, [selectedValue]);
-
   const handleSelectChange = (ev) => {
-    setSelectedValue(ev.value);
+    notifyValueToParent?.({ nomor, value: ev.value });
     closeSelect();
   };
 
@@ -55,9 +39,10 @@ export default function SelectScore({ nomor, defaultValue, onChange: notifyValue
       <React.Fragment>
         <DropdownOverlay onClick={() => closeSelect()} />
         <Select
+          autoFocus
           defaultMenuIsOpen
           options={scoreOptions}
-          value={getOptionFromValue(selectedValue)}
+          value={getOptionFromValue(value)}
           onChange={(ev) => handleSelectChange(ev)}
           onMenuClose={() => closeSelect()}
         />
@@ -67,7 +52,7 @@ export default function SelectScore({ nomor, defaultValue, onChange: notifyValue
 
   return (
     <Button outline color="primary" type="button" onClick={() => openSelect()}>
-      {getOptionFromValue(selectedValue)?.label || "M"}
+      {getOptionFromValue(value)?.label || "M"}
     </Button>
   );
 }

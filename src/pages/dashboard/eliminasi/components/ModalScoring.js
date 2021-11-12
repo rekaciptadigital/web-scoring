@@ -30,15 +30,16 @@ const computeTotalPoints = (data) => {
 };
 
 export default function ModalScoring({
-  data: { scoringData, ...contextDetails },
+  data: { scoringData: initialScoringData, ...contextDetails },
   modalControl,
   onSavePermanent,
 }) {
   const { isModalScoringOpen, toggleModalScoring, closeModalScoring } = modalControl;
 
   // cuman yang bagian `scores`-nya di payload
-  const [membersScoringData, setMembersScoringData] = React.useState(() =>
-    scoringData.map((data) => data.scores)
+  // supaya bisa dipakai untuk refetch setelah save
+  const [modalScoringData, setMembersScoringData] = React.useState(() =>
+    initialScoringData.map((data) => data.scores)
   );
   const [isLoading, setIsLoading] = React.useState(false);
   const [savingStatus, setSavingStatus] = React.useState("idle");
@@ -62,12 +63,12 @@ export default function ModalScoring({
       type: type,
       members: [
         {
-          memberId: computeMemberId(scoringData[0]),
-          scores: membersScoringData[0],
+          memberId: computeMemberId(initialScoringData[0]),
+          scores: modalScoringData[0],
         },
         {
-          memberId: computeMemberId(scoringData[1]),
-          scores: membersScoringData[1],
+          memberId: computeMemberId(initialScoringData[1]),
+          scores: modalScoringData[1],
         },
       ],
     };
@@ -141,47 +142,47 @@ export default function ModalScoring({
     >
       <ModalHeader toggle={() => toggleModalScoring()}>
         Set Scoring &mdash;{" "}
-        {computeScoringTypeLabel(scoringData, contextDetails.scoringTypeOptions)}
+        {computeScoringTypeLabel(initialScoringData, contextDetails.scoringTypeOptions)}
       </ModalHeader>
 
       <ModalBody>
         <SavingOverlay loading={isLoading} />
 
-        {scoringData?.length ? (
+        {initialScoringData?.length ? (
           <React.Fragment>
             <Row className="mt-4 mb-4">
               <Col>
-                <h4 className="text-center">{computeCategoryLabel(scoringData)}</h4>
+                <h4 className="text-center">{computeCategoryLabel(initialScoringData)}</h4>
               </Col>
             </Row>
 
             <Row>
               <Col className="border-end border-2 px-4">
-                <h5 className="text-center">{computeMemberName(scoringData[0])}</h5>
-                <h6 className="text-center mb-3">{computeClubName(scoringData[0])}</h6>
+                <h5 className="text-center">{computeMemberName(initialScoringData[0])}</h5>
+                <h6 className="text-center mb-3">{computeClubName(initialScoringData[0])}</h6>
 
-                {computeScoringTypeId(scoringData) === 1 && (
-                  <PointsDisplay point={computeTotalPoints(membersScoringData[0])} />
+                {computeScoringTypeId(initialScoringData) === 1 && (
+                  <PointsDisplay point={computeTotalPoints(modalScoringData[0])} />
                 )}
 
                 <ScoringGrid
-                  scoringType={computeScoringTypeId(scoringData)}
-                  data={membersScoringData[0]}
+                  scoringType={computeScoringTypeId(initialScoringData)}
+                  scores={modalScoringData[0]}
                   onChange={(ev) => handleGridChange(0, ev)}
                 />
               </Col>
 
               <Col className="px-4">
-                <h5 className="text-center">{computeMemberName(scoringData[1])}</h5>
-                <h6 className="text-center mb-3">{computeClubName(scoringData[1])}</h6>
+                <h5 className="text-center">{computeMemberName(initialScoringData[1])}</h5>
+                <h6 className="text-center mb-3">{computeClubName(initialScoringData[1])}</h6>
 
-                {computeScoringTypeId(scoringData) === 1 && (
-                  <PointsDisplay point={computeTotalPoints(membersScoringData[1])} />
+                {computeScoringTypeId(initialScoringData) === 1 && (
+                  <PointsDisplay point={computeTotalPoints(modalScoringData[1])} />
                 )}
 
                 <ScoringGrid
-                  scoringType={computeScoringTypeId(scoringData)}
-                  data={membersScoringData[1]}
+                  scoringType={computeScoringTypeId(initialScoringData)}
+                  scores={modalScoringData[1]}
                   onChange={(ev) => handleGridChange(1, ev)}
                 />
               </Col>
@@ -214,7 +215,7 @@ export default function ModalScoring({
         )}
       </ModalBody>
 
-      {scoringData?.length && (
+      {initialScoringData?.length && (
         <ModalFooter>
           <div style={{ position: "relative" }}>
             <Button color="primary" onClick={handleClickSave}>

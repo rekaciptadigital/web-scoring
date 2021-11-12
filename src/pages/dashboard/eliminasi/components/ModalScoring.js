@@ -6,11 +6,27 @@ import { Modal, ModalBody, ModalHeader, ModalFooter, Row, Col, Button } from "re
 import SweetAlert from "react-bootstrap-sweetalert";
 import ScoringGrid from "./ScoringGrid";
 
+const computeScoringTypeId = (data) => {
+  return data[0].scores.eliminationtScoreType || data[1].scores.eliminationtScoreType;
+};
+const computeScoringTypeLabel = (data, options) => {
+  const typeId = computeScoringTypeId(data);
+  const typeObj = options.find((type) => parseInt(type.id) === parseInt(typeId));
+  return typeObj.label;
+};
 const computeMemberId = (data) => data?.participant.member.id;
 const computeMemberName = (data) => data?.participant.member.name;
-const computeClubName = (data) => `(${data?.participant.club})`;
+const computeClubName = (data) => {
+  if (data?.participant.club) {
+    return `(${data?.participant.club})`;
+  }
+  return <span style={{ color: "var(--bs-gray-400)" }}>&mdash;</span>;
+};
 const computeCategoryLabel = (data) => {
   return data?.[0]?.participant.categoryLabel || data?.[1]?.participant.categoryLabel;
+};
+const computeTotalPoints = (data) => {
+  return data?.shot.reduce((prev, rambahan) => prev + rambahan.point, 0);
 };
 
 export default function ModalScoring({
@@ -118,7 +134,8 @@ export default function ModalScoring({
       onClosed={() => closeModalScoring()}
     >
       <ModalHeader toggle={() => toggleModalScoring()}>
-        Set Scoring &mdash; {contextDetails.scoringType.label}
+        Set Scoring &mdash;{" "}
+        {computeScoringTypeLabel(scoringData, contextDetails.scoringTypeOptions)}
       </ModalHeader>
 
       <ModalBody>
@@ -136,8 +153,13 @@ export default function ModalScoring({
               <Col className="border-end border-2 px-4">
                 <h5 className="text-center">{computeMemberName(scoringData[0])}</h5>
                 <h6 className="text-center mb-3">{computeClubName(scoringData[0])}</h6>
+
+                {computeScoringTypeId(scoringData) === 1 && (
+                  <PointsDisplay point={computeTotalPoints(membersScoringData[0])} />
+                )}
+
                 <ScoringGrid
-                  scoringType={parseInt(contextDetails.scoringType.id)}
+                  scoringType={computeScoringTypeId(scoringData)}
                   data={membersScoringData[0]}
                   onChange={(ev) => handleGridChange(0, ev)}
                 />
@@ -146,8 +168,13 @@ export default function ModalScoring({
               <Col className="px-4">
                 <h5 className="text-center">{computeMemberName(scoringData[1])}</h5>
                 <h6 className="text-center mb-3">{computeClubName(scoringData[1])}</h6>
+
+                {computeScoringTypeId(scoringData) === 1 && (
+                  <PointsDisplay point={computeTotalPoints(membersScoringData[1])} />
+                )}
+
                 <ScoringGrid
-                  scoringType={parseInt(contextDetails.scoringType.id)}
+                  scoringType={computeScoringTypeId(scoringData)}
                   data={membersScoringData[1]}
                   onChange={(ev) => handleGridChange(1, ev)}
                 />
@@ -205,6 +232,37 @@ export default function ModalScoring({
     </Modal>
   );
 }
+
+function PointsDisplay({ point = 0 }) {
+  return (
+    <StyledPointsDisplay className="mt-4 mb-4">
+      <span className="label-point">point</span>
+      <span>{point}</span>
+    </StyledPointsDisplay>
+  );
+}
+
+const StyledPointsDisplay = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 6px 20px;
+  max-width: 60px;
+  border-radius: 4px;
+  border: solid 1px var(--bs-primary);
+
+  color: var(--bs-primary);
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+
+  .label-point {
+    font-size: 0.35em;
+    font-weight: normal;
+  }
+`;
 
 function SavingOverlay({ loading }) {
   if (loading) {

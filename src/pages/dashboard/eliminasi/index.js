@@ -207,17 +207,17 @@ function Eliminasi() {
     setLoading(true);
 
     const contextDetails = {
-      type: parseInt(scoringType.id), // 1 || 2
+      type: 2, // id untuk eliminasi
       round: ev.round,
       match: ev.match,
-      elimination_id: 2, // TODO: hardcoded sementara: match (elimination: AZ, AB, random) type?
+      elimination_id: matches.eliminationId,
     };
     const result = await ScoringService.findParticipantScoreDetail(contextDetails);
 
     if (result.success && result.data?.length) {
       setCurrentScoringDetail({
         ...contextDetails,
-        scoringType: scoringType,
+        scoringTypeOptions: scoringTypeOptions,
         scoringData: result.data,
       });
       openModalScoring();

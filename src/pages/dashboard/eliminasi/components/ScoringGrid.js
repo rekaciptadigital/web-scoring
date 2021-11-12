@@ -9,6 +9,7 @@ export default function ScoringGrid({
   data: scoresData,
   onChange: notifyChangeToParent,
 }) {
+  // `scoreGridData` cuma simpan data list score, lainnya (`point`, dll) masih dari prop `scoresData`
   const [scoreGridData, setScoreGridData] = React.useState(() => scoresData);
   const firstMount = React.useRef(true);
 
@@ -23,7 +24,11 @@ export default function ScoringGrid({
   const handleRowRambahanChange = (ev) => {
     setScoreGridData((gridData) => {
       const shotsDataUpdated = [...gridData.shot]; // supaya gak mutasi array aslinya
-      shotsDataUpdated[ev.nomor - 1] = { ...ev.value }; // supaya gak mutasi objek aslinya
+      const memberIndex = ev.nomor - 1;
+      shotsDataUpdated[memberIndex] = {
+        ...shotsDataUpdated[memberIndex],
+        ...ev.value,
+      }; // supaya gak mutasi objek aslinya
       return { ...gridData, shot: shotsDataUpdated };
     });
   };

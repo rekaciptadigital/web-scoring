@@ -13,18 +13,18 @@ const createInitialScoresList = (initialScoresList) => {
 export default function RowRambahan({
   nomor,
   rambahan: rambahanData,
+  scoringType,
   onChange: notifyChangeToParent,
 }) {
   const [scoreData, setScoreData] = React.useState(createInitialScoresList(rambahanData.score));
-  const isDirty = React.useRef(false);
 
   React.useEffect(() => {
     const rambahanObject = {
       nomor: nomor,
       value: {
         score: scoreData,
-        total: 0, // bagian ini mungkin bisa diabaikan dulu tapi pasang aja in case perlu nanti
-        status: "empty", // ...idem...
+        // total: 0, // bagian ini mungkin bisa diabaikan dulu tapi pasang aja in case perlu nanti
+        // status: "empty", // ...idem...
         point: 0, // ...idem...
       },
     };
@@ -32,7 +32,6 @@ export default function RowRambahan({
   }, [scoreData]);
 
   const updateScoreData = (ev) => {
-    isDirty.current = isDirty.current || true;
     setScoreData((currentData) => {
       const dataUpdated = [...currentData];
       dataUpdated[ev.nomor - 1] = ev.value;
@@ -41,12 +40,7 @@ export default function RowRambahan({
   };
 
   const computeTotal = () => {
-    // Defaultnya tampilkan data total dari respon BE,
-    // tapi timpa dengan nilai dari select ketika ada inputan baru
-    if (isDirty.current) {
-      return scoreData?.reduce(summingReducer, 0);
-    }
-    return rambahanData.total;
+    return scoreData?.reduce(summingReducer, 0);
   };
 
   return (
@@ -66,6 +60,7 @@ export default function RowRambahan({
       ))}
 
       <td className="text-end fw-bold">{computeTotal()}</td>
+      {scoringType === 1 && <td className="text-end fw-bold">{rambahanData.point}</td>}
     </tr>
   );
 }

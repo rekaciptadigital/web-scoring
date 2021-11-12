@@ -4,73 +4,12 @@ import { Table } from "reactstrap";
 import RowRambahan from "./RowRambahan";
 import RowExtraShot from "./RowExtraShot";
 
-const initialScoreGridData = {
-  shot: [
-    {
-      score: ["", "", "", "", "", ""],
-      total: 0,
-      status: "empty",
-      point: 0,
-    },
-    {
-      score: ["", "", "", "", "", ""],
-      total: 0,
-      status: "empty",
-      point: 0,
-    },
-    {
-      score: ["", "", "", "", "", ""],
-      total: 0,
-      status: "empty",
-      point: 0,
-    },
-    {
-      score: ["", "", "", "", "", ""],
-      total: 0,
-      status: "empty",
-      point: 0,
-    },
-    {
-      score: ["", "", "", "", "", ""],
-      total: 0,
-      status: "empty",
-      point: 0,
-    },
-  ],
-  extraShot: [
-    {
-      distanceFromX: 0,
-      score: "",
-      status: "empty",
-    },
-    {
-      distanceFromX: 0,
-      score: "",
-      status: "empty",
-    },
-    {
-      distanceFromX: 0,
-      score: "",
-      status: "empty",
-    },
-    {
-      distanceFromX: 0,
-      score: "",
-      status: "empty",
-    },
-    {
-      distanceFromX: 0,
-      score: "",
-      status: "empty",
-    },
-  ],
-  win: 0,
-  total: 0,
-  eliminationtScoreType: 2, // tipe 2 akumulasi dulu
-};
-
-export default function ScoringGrid({ data: scoresData, onChange: notifyChangeToParent }) {
-  const [scoreGridData, setScoreGridData] = React.useState(() => initialScoreGridData);
+export default function ScoringGrid({
+  scoringType,
+  data: scoresData,
+  onChange: notifyChangeToParent,
+}) {
+  const [scoreGridData, setScoreGridData] = React.useState(() => scoresData);
   const firstMount = React.useRef(true);
 
   React.useEffect(() => {
@@ -82,9 +21,11 @@ export default function ScoringGrid({ data: scoresData, onChange: notifyChangeTo
   }, [scoreGridData]);
 
   const handleRowRambahanChange = (ev) => {
-    const shotsDataUpdated = [...scoreGridData.shot]; // supaya gak mutasi array aslinya
-    shotsDataUpdated[ev.nomor - 1] = { ...ev.value }; // supaya gak mutasi objek aslinya
-    setScoreGridData((gridData) => ({ ...gridData, shot: shotsDataUpdated }));
+    setScoreGridData((gridData) => {
+      const shotsDataUpdated = [...gridData.shot]; // supaya gak mutasi array aslinya
+      shotsDataUpdated[ev.nomor - 1] = { ...ev.value }; // supaya gak mutasi objek aslinya
+      return { ...gridData, shot: shotsDataUpdated };
+    });
   };
 
   const handleRowExtrashotChange = (ev) => {
@@ -101,6 +42,7 @@ export default function ScoringGrid({ data: scoresData, onChange: notifyChangeTo
               <td key={index}>{index + 1}</td>
             ))}
             <td className="text-end">Total</td>
+            {scoringType === 1 && <td className="text-end">Point</td>}
           </tr>
         </thead>
 
@@ -109,6 +51,7 @@ export default function ScoringGrid({ data: scoresData, onChange: notifyChangeTo
             <RowRambahan
               key={index}
               nomor={index + 1}
+              scoringType={scoringType}
               rambahan={rambahan}
               onChange={handleRowRambahanChange}
             />

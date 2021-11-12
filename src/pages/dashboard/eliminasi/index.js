@@ -207,7 +207,7 @@ function Eliminasi() {
     setLoading(true);
 
     const contextDetails = {
-      type: 2, // TODO: hardcoded sementara
+      type: scoringType.id, // 1 || 2
       round: ev.round,
       match: ev.match,
       elimination_id: 2, // TODO: hardcoded sementara

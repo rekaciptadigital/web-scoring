@@ -8,6 +8,7 @@ import ScoringGrid from "./ScoringGrid";
 
 const computeMemberId = (data) => data?.participant.member.id;
 const computeMemberName = (data) => data?.participant.member.name;
+const computeClubName = (data) => `(${data?.participant.club})`;
 const computeCategoryLabel = (data) => {
   return data?.[0]?.participant.categoryLabel || data?.[1]?.participant.categoryLabel;
 };
@@ -127,16 +128,20 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
 
             <Row>
               <Col className="border-end border-2 px-4">
-                <h5 className="text-center mb-3">{computeMemberName(scoringData[0])}</h5>
+                <h5 className="text-center">{computeMemberName(scoringData[0])}</h5>
+                <h6 className="text-center mb-3">{computeClubName(scoringData[0])}</h6>
                 <ScoringGrid
+                  scoringType={contextDetails.scoringType}
                   data={membersScoringData[0]}
                   onChange={(ev) => handleGridChange(0, ev)}
                 />
               </Col>
 
               <Col className="px-4">
-                <h5 className="text-center mb-3">{computeMemberName(scoringData[1])}</h5>
+                <h5 className="text-center">{computeMemberName(scoringData[1])}</h5>
+                <h6 className="text-center mb-3">{computeClubName(scoringData[1])}</h6>
                 <ScoringGrid
+                  scoringType={contextDetails.scoringType}
                   data={membersScoringData[1]}
                   onChange={(ev) => handleGridChange(1, ev)}
                 />

@@ -63,7 +63,7 @@ export default function ScoringGrid({
         <thead>
           <tr>
             <td colSpan="6" className="text-start">
-              <h6 className="mb-0">Extra Shot</h6>
+              <h6 className="mb-0">Shot Off</h6>
             </td>
           </tr>
         </thead>

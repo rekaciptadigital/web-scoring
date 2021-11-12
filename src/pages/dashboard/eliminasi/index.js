@@ -207,15 +207,19 @@ function Eliminasi() {
     setLoading(true);
 
     const contextDetails = {
-      type: scoringType.id, // 1 || 2
+      type: parseInt(scoringType.id), // 1 || 2
       round: ev.round,
       match: ev.match,
-      elimination_id: 2, // TODO: hardcoded sementara
+      elimination_id: 2, // TODO: hardcoded sementara: match (elimination: AZ, AB, random) type?
     };
     const result = await ScoringService.findParticipantScoreDetail(contextDetails);
 
     if (result.success && result.data?.length) {
-      setCurrentScoringDetail({ ...contextDetails, scoringData: result.data });
+      setCurrentScoringDetail({
+        ...contextDetails,
+        scoringType: scoringType,
+        scoringData: result.data,
+      });
       openModalScoring();
     } else {
       setCurrentScoringDetail({ ...initialScoringDetail });
@@ -354,7 +358,11 @@ function Eliminasi() {
                       />
                     </div>
                     {currentScoringDetail.scoringData?.length && (
-                      <ModalScoring data={currentScoringDetail} modalControl={modalControl} />
+                      <ModalScoring
+                        data={currentScoringDetail}
+                        modalControl={modalControl}
+                        onSavePermanent={() => getEventEliminationTemplate()}
+                      />
                     )}
                   </CardBody>
                 </Card>

@@ -13,7 +13,11 @@ const computeCategoryLabel = (data) => {
   return data?.[0]?.participant.categoryLabel || data?.[1]?.participant.categoryLabel;
 };
 
-export default function ModalScoring({ data: { scoringData, ...contextDetails }, modalControl }) {
+export default function ModalScoring({
+  data: { scoringData, ...contextDetails },
+  modalControl,
+  onSavePermanent,
+}) {
   const { isModalScoringOpen, toggleModalScoring, closeModalScoring } = modalControl;
 
   // cuman yang bagian `scores`-nya di payload
@@ -81,21 +85,21 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
 
   const executeSavePermanent = async () => {
     setIsLoading(true);
-    // TODO: uncomment ketika udah selesai testing-testing lainnya
-    // const { success } = await ScoringService.saveParticipantScore({
-    //   ...computeDataToSave(),
-    //   save_permanent: 1,
-    // });
+    const { success } = await ScoringService.saveParticipantScore({
+      ...computeDataToSave(),
+      save_permanent: 1,
+    });
 
-    // setIsLoading(false);
-    // if (success) {
-    //   closeModalScoring();
-    // } else {
-    //   setSavingStatus("error");
-    //   setTimeout(() => {
-    //     setSavingStatus("idle");
-    //   }, 3000);
-    // }
+    setIsLoading(false);
+    if (success) {
+      closeModalScoring();
+      onSavePermanent();
+    } else {
+      setSavingStatus("error");
+      setTimeout(() => {
+        setSavingStatus("idle");
+      }, 3000);
+    }
 
     setTimeout(() => {
       setIsLoading(false);
@@ -113,7 +117,9 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
       toggle={() => toggleModalScoring()}
       onClosed={() => closeModalScoring()}
     >
-      <ModalHeader toggle={() => toggleModalScoring()}>Set Scoring</ModalHeader>
+      <ModalHeader toggle={() => toggleModalScoring()}>
+        Set Scoring &mdash; {contextDetails.scoringType.label}
+      </ModalHeader>
 
       <ModalBody>
         <SavingOverlay loading={isLoading} />
@@ -131,7 +137,7 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
                 <h5 className="text-center">{computeMemberName(scoringData[0])}</h5>
                 <h6 className="text-center mb-3">{computeClubName(scoringData[0])}</h6>
                 <ScoringGrid
-                  scoringType={contextDetails.scoringType}
+                  scoringType={parseInt(contextDetails.scoringType.id)}
                   data={membersScoringData[0]}
                   onChange={(ev) => handleGridChange(0, ev)}
                 />
@@ -141,7 +147,7 @@ export default function ModalScoring({ data: { scoringData, ...contextDetails },
                 <h5 className="text-center">{computeMemberName(scoringData[1])}</h5>
                 <h6 className="text-center mb-3">{computeClubName(scoringData[1])}</h6>
                 <ScoringGrid
-                  scoringType={contextDetails.scoringType}
+                  scoringType={parseInt(contextDetails.scoringType.id)}
                   data={membersScoringData[1]}
                   onChange={(ev) => handleGridChange(1, ev)}
                 />

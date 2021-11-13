@@ -121,10 +121,10 @@ function CardEvent(props) {
                                             <span>Konfigurasi Eliminasi</span>
                                         </DropdownItem>
 
-                                        <DropdownItem tag="a" href={`/dashboard/certificate/new?event_id=${props.detail.event.id}`}>
+                                        {/* <DropdownItem tag="a" href={`/dashboard/certificate/new?event_id=${props.detail.event.id}`}>
                                             {" "}
                                             <span>Ubah Sertifikat</span>
-                                        </DropdownItem>
+                                        </DropdownItem> */}
                                     </DropdownMenu>
                                 </Dropdown>
                             </div>

@@ -1,5 +1,7 @@
 import * as React from "react";
 import PreviewFieldText from "./PreviewFieldText";
+// TODO: pakai nanti ketika QR ready
+// import QrCodeField from "../QrCodeField";
 
 export default function PreviewCanvas({ data }) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
@@ -42,12 +44,17 @@ export default function PreviewCanvas({ data }) {
         />
 
         {fields?.length ? (
-          fields.map((field) => (
-            <PreviewFieldText key={field.name} name={field.name} data={field} />
-          ))
+          fields.map((field) => {
+            if (field.name === "peringkat_name" && data.typeCertificate !== 2) {
+              return;
+            }
+            return <PreviewFieldText key={field.name} name={field.name} data={field} />;
+          })
         ) : (
           <div>Ada error pada data editor</div>
         )}
+
+        {/* <QrCodeField preview /> */}
       </div>
     </div>
   );

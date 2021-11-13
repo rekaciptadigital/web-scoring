@@ -1,7 +1,8 @@
-import CurrencyInput from "../CurrencyInput";
+import * as React from "react";
 import _ from "lodash";
-import React, { useEffect, useState } from "react";
+
 import { Input, Label } from "reactstrap";
+import CurrencyInput from "../CurrencyInput";
 
 const CheckboxWithCurrencyInput = ({
   name,
@@ -14,22 +15,25 @@ const CheckboxWithCurrencyInput = ({
   value = [],
   textInputName,
 }) => {
-  const [newOptions, setNewOptions] = useState([]);
-
-  useEffect(() => {
-    const newOptions = options.map((option) => {
-      const newOption = { ...option };
-      if (!newOption.checked)
-        newOption.checked =
-          option.checked ||
-          value.includes(option.id) ||
-          _.findIndex(value, ["id", option.id]) != -1;
-      if (!newOption[textInputName]) newOption[textInputName] = "";
-
-      return newOption;
+  const [newOptions, setNewOptions] = React.useState(() => {
+    return options.map((input) => {
+      const relatedValue = value.find((one) => one.id === input.id);
+      return {
+        ...input,
+        checked: Boolean(relatedValue),
+        price: relatedValue?.price,
+      };
     });
-    setNewOptions(newOptions);
-  }, [options]);
+  });
+
+  const handleChange = (newOptions) => {
+    if (onChange) {
+      onChange({
+        key: name,
+        value: _.filter(newOptions, ["checked", true]),
+      });
+    }
+  };
 
   const handleCheck = (e, index, option) => {
     const checked = e.target.checked;
@@ -60,23 +64,17 @@ const CheckboxWithCurrencyInput = ({
     handleChange(newOptionValues);
   };
 
-  const handleChange = (newOptions) => {
-    if (onChange) {
-      onChange({
-        key: name,
-        value: _.filter(newOptions, ["checked", true]),
-      });
-    }
-  };
-
   return (
     <div>
       {label && <Label>{label}</Label>}
       <div>
         {newOptions.map((option, index) => {
+          // Supaya atribut `name` gak rancu waktu ngeset pesan error ke DOM
+          const inputFieldName = `${name}.${index}.${textInputName}`;
+
           return (
             <div
-              className={`form-check ${_.get(error, name) ? "is-invalid" : ""}`}
+              className={`form-check ${_.get(error, inputFieldName) ? "is-invalid" : ""}`}
               key={option.id}
               style={{ display: "inline-block", marginRight: 10 }}
             >
@@ -86,7 +84,7 @@ const CheckboxWithCurrencyInput = ({
                   className="form-check-Input"
                   id={option.id}
                   onChange={(e) => handleCheck(e, index, option)}
-                  name={name}
+                  name={option.id}
                   disabled={disabled}
                   readOnly={readOnly || option.fixed}
                   checked={option.checked}
@@ -95,16 +93,20 @@ const CheckboxWithCurrencyInput = ({
               <Label className="form-check-label" htmlFor={option.id}>
                 {option.label}
               </Label>
+
               {option.checked && (
                 <CurrencyInput
-                  name={textInputName}
-                  onChange={(e) => handleTextInputChange(e, index, option)}
+                  id={inputFieldName}
+                  name={inputFieldName}
+                  value={option.price}
+                  onChange={(ev) => handleTextInputChange(ev, index, option)}
                 />
               )}
             </div>
           );
         })}
       </div>
+
       {_.get(error, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}

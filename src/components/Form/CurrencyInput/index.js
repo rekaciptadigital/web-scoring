@@ -1,8 +1,10 @@
+import * as React from "react";
 import _ from "lodash";
-import React from "react";
-import CurrencyFormat from "react-currency-format";
-import { Col, Label } from "reactstrap";
 import stringUtil from "utils/stringUtil";
+import { useFieldValidation } from "utils/hooks/field-validation";
+
+import { Col, Label } from "reactstrap";
+import CurrencyFormat from "react-currency-format";
 
 const CurrencyInput = ({
   name,
@@ -11,16 +13,22 @@ const CurrencyInput = ({
   value,
   onChange,
   horizontal = false,
-  error,
   disabled = false,
   readOnly,
 }) => {
-  const handleChange = e => {
-    if (onChange)
+  const { errors, handleFieldValidation } = useFieldValidation(name);
+
+  const handleChange = (ev) => {
+    if (onChange) {
       onChange({
         key: name,
-        value: e.floatValue,
+        value: !isNaN(ev.floatValue) ? ev.floatValue : undefined,
       });
+    }
+  };
+
+  const handleBlur = () => {
+    handleFieldValidation(value);
   };
 
   if (horizontal) {
@@ -33,18 +41,19 @@ const CurrencyInput = ({
         )}
         <Col sm={6}>
           <CurrencyFormat
-            value={value}
-            displayType={"input"}
-            thousandSeparator={"."}
-            prefix={"Rp "}
-            onValueChange={e => handleChange(e)}
-            decimalSeparator={","}
-            className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
             id={id}
+            displayType={"input"}
+            prefix={"Rp "}
+            thousandSeparator={"."}
+            decimalSeparator={","}
+            value={value || ""} // fallback string kosongan kalau value === undefined
+            onValueChange={(e) => handleChange(e)}
+            onBlur={handleBlur}
+            className={`form-control ${_.get(errors, name) ? "is-invalid" : ""}`}
             disabled={disabled}
             readOnly={readOnly}
           />
-          {_.get(error, name)?.map(message => (
+          {_.get(errors, name)?.map((message) => (
             <div className="invalid-feedback" key={message}>
               {message}
             </div>
@@ -58,17 +67,18 @@ const CurrencyInput = ({
     <div>
       {label && <Label>{label}</Label>}
       <CurrencyFormat
-        value={value}
-        displayType={"input"}
-        thousandSeparator={"."}
-        prefix={"Rp "}
-        onValueChange={e => handleChange(e)}
-        decimalSeparator={","}
-        className={`form-control ${_.get(error, name) ? "is-invalid" : ""}`}
         id={id}
+        displayType={"input"}
+        prefix={"Rp "}
+        thousandSeparator={"."}
+        decimalSeparator={","}
+        value={value || ""} // fallback string kosongan kalau value === undefined
+        onValueChange={(e) => handleChange(e)}
+        onBlur={handleBlur}
+        className={`form-control ${_.get(errors, name) ? "is-invalid" : ""}`}
         disabled={disabled}
       />
-      {_.get(error, name)?.map(message => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

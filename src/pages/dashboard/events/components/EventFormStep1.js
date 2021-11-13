@@ -1,3 +1,7 @@
+import React, { useState } from "react";
+import { selectConstants } from "constants/index";
+
+import { Col, Row } from "reactstrap";
 import {
   // FileUpload,
   ImageUpload,
@@ -5,59 +9,51 @@ import {
   TextEditor,
   TextInput,
 } from "components";
-import React, { useState } from "react";
-import { Col, Row } from "reactstrap";
-import { selectConstants } from "constants/index";
-import { useSelector } from "react-redux";
-import * as EventsStore from "store/slice/events"
 
 export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
   const [base64URL, setBase64URL] = useState("");
   // const [imgTo64, setImgTo64] = useState("")
-  const [file, setFile] = useState(null)
-  const { errors } = useSelector(EventsStore.getEventsStore)  
-    
+  const [file, setFile] = useState(null);
+
   const getBase64 = (file) => {
     return new Promise((resolve) => {
-      let fileInfo
-      let baseURL = ""
-      let reader = new FileReader
+      let fileInfo;
+      let baseURL = "";
+      let reader = new FileReader();
 
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(file);
       reader.onload = () => {
-        baseURL = reader.result
-        resolve(baseURL)
-      }
-      console.log(fileInfo)
-    })
-  }
+        baseURL = reader.result;
+        resolve(baseURL);
+      };
+      console.log(fileInfo);
+    });
+  };
 
   const handlerFileInputChange = (e) => {
-    let go = e.target.files[0]
-    console.log(e.target.files[0])
-    getBase64(e.target.files[0]).then((result) => {
-      go['base64'] = result
-      setFile(go)
-      console.log(file)
-      setBase64URL(result)
-    }).catch((err) => {
-      console.log(err)
-    })
-  }
-  
+    let go = e.target.files[0];
+    console.log(e.target.files[0]);
+    getBase64(e.target.files[0])
+      .then((result) => {
+        go["base64"] = result;
+        setFile(go);
+        console.log(file);
+        setBase64URL(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const handleChange = ({ key, value }) => {
-    if (onFormFieldChange){
-      if (key === "poster"){
+    if (onFormFieldChange) {
+      if (key === "poster") {
         onFormFieldChange(key, base64URL?.base64);
       }
       onFormFieldChange(key, value);
-    } 
-      
+    }
   };
 
-  // console.log(base64URL)
-  // console.log(file)
-  // console.log(formData.poster)
   return (
     <Row>
       <Col lg={3}>
@@ -69,7 +65,6 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
               thumbnail
               base64={handlerFileInputChange}
-              error={errors}
             />
           </Col>
         </Row>
@@ -91,7 +86,6 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="eventName"
               value={formData.eventName}
               onChange={handleChange}
-              error={errors}
             />
           </Col>
           <Col lg={6}>
@@ -100,26 +94,30 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               name="location"
               value={formData.location}
               onChange={handleChange}
-              error={errors}
+              placeholder="Nama GOR/Lapangan"
             />
           </Col>
           <Col lg={6}>
-            <TextInput
-              label="Kota"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              error={errors}
-            />
+            <TextInput label="Kota" name="city" value={formData.city} onChange={handleChange} />
           </Col>
-          <Col lg={12}>
-            <RadioButtonInput
-              name="locationType"
+          <Col lg={6}>
+            <div className="d-flex h-100 align-items-center">
+              <RadioButtonInput
+                name="locationType"
+                onChange={handleChange}
+                options={selectConstants.eventLocationType}
+                value={formData.locationType}
+                valueOnly
+              />
+            </div>
+          </Col>
+          <Col lg={6}>
+            <TextInput
+              label="PIC/Call Center"
+              name="picCallCenter"
+              value={formData.picCallCenter}
               onChange={handleChange}
-              options={selectConstants.eventLocationType}
-              value={formData.locationType}
-              valueOnly
-              error={errors}
+              placeholder="Contoh: Brady Ellison (085xxxxxxxxx)"
             />
           </Col>
           <Col lg={12}>
@@ -128,7 +126,7 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
               onChange={handleChange}
               name="description"
               value={formData.description}
-              error={errors}
+              placeholder="Hadiah kompetisi, Flow lomba, peraturan, informasi tambahan mengenai lomba..."
             />
           </Col>
         </Row>

@@ -1,34 +1,43 @@
-import _ from "lodash";
 import React, { useEffect, useState } from "react";
+import _ from "lodash";
+import { useFieldValidation } from "utils/hooks/field-validation";
+
 import { Label } from "reactstrap";
 
 const RadioButtonInput = ({
   name,
   label,
-  options = [
-    {
-      id: 1,
-      label: "Default",
-    },
-  ],
+  options = [{ id: 1, label: "Default" }],
   onChange,
   value,
   valueOnly = false,
-  error,
   disabled,
   readOnly,
   checked,
 }) => {
   const [checkedOption, setCheckedOption] = useState();
+  const { errors, handleFieldValidation } = useFieldValidation(name);
 
-  const handleChange = (e, option) => {
+  useEffect(() => {
+    const option = _.find(options, ["id", value]);
     setCheckedOption(option);
-    if (onChange)
+  }, []);
+
+  const handleChange = (ev, option) => {
+    setCheckedOption(option);
+    if (onChange) {
       onChange({
         key: name,
         value: valueOnly ? option.id : option,
       });
+    }
+    handleFieldValidation(valueOnly ? option.id : option);
   };
+
+  const handleBlur = () => {
+    handleFieldValidation(value);
+  };
+
   const Button = ({ id, label }) => (
     <>
       <input
@@ -37,15 +46,14 @@ const RadioButtonInput = ({
         name={name}
         id={id}
         autoComplete="off"
-        onChange={e => handleChange(e, { id, label })}
+        onChange={(e) => handleChange(e, { id, label })}
+        onBlur={handleBlur}
         checked={id === checkedOption?.id || checked}
         disabled={disabled}
         readOnly={readOnly}
       />
       <label
-        className={`btn ${
-          _.get(error, name) ? "btn-outline-danger" : "btn-outline-primary"
-        }`}
+        className={`btn ${_.get(errors, name) ? "btn-outline-danger" : "btn-outline-primary"}`}
         htmlFor={id}
       >
         {label}
@@ -53,24 +61,15 @@ const RadioButtonInput = ({
     </>
   );
 
-  useEffect(() => {
-    const option = _.find(options, ["id", value]);
-    setCheckedOption(option);
-  }, []);
-
   return (
     <div className="radio-button-input">
       {label && <Label className="form-label">{label}</Label>}
-      <div
-        className="btn-group"
-        role="group"
-        aria-label="Basic radio toggle button group"
-      >
-        {options.map(option => (
+      <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+        {options.map((option) => (
           <Button id={option.id} key={option.id} label={option.label} />
         ))}
       </div>
-      {_.get(error, name)?.map(message => (
+      {_.get(errors, name)?.map((message) => (
         <div className="invalid-feedback" key={message}>
           {message}
         </div>

@@ -7,7 +7,7 @@ export default {
   create(data = null, qs = null) {
     return API.post("/web/v1/event-certificate-templates", data, qs, true);
   },
-  saveUpdate(qs = null) {
-    return API.put("/web/v1/event-certificate-templates/", null, qs);
+  saveUpdate(data = null, qs = null) {
+    return API.put("/web/v1/event-certificate-templates/", data, qs, true);
   },
 };

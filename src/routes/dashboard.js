@@ -3,6 +3,7 @@ import EventsNewFullday from "pages/dashboard/events/new/fullday";
 import EventsNewMarathon from "pages/dashboard/events/new/marathon";
 import ScoringNew from "pages/dashboard/scoring/new";
 import Dashboard from "../pages/dashboard";
+import EventDetailHome from "../pages/dashboard/events/home";
 import ListCategory from "../pages/dashboard/category";
 import ListEvent from "../pages/dashboard/events";
 import EventsNew from "../pages/dashboard/events/new";
@@ -17,6 +18,7 @@ import Eliminasi from "../pages/dashboard/eliminasi";
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
   { path: "/dashboard/events", component: ListEvent },
+  { path: "/dashboard/event/:event_id/home", component: EventDetailHome },
   { path: "/dashboard/member/:event_id", component: ListMember },
   { path: "/dashboard/category", component: ListCategory },
   { path: "/dashboard/scoring", component: ListScoring },
@@ -25,7 +27,7 @@ const dashboardRoutes = [
   { path: "/dashboard/result/bagan", component: Bagan },
   { path: "/dashboard/result/edit", component: EditResult },
   { path: "/dashboard/schedule/:event_id", component: ListSchedule },
-  { path: "/dashboard/eliminasi/:event_id", component: Eliminasi},
+  { path: "/dashboard/eliminasi/:event_id", component: Eliminasi },
 
   // this route should be at the end of all other routes
   { path: "/dashboard/events/new", component: EventsNew },

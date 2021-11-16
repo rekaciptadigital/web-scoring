@@ -74,6 +74,7 @@ const ProfileMenu = (props) => {
       </Dropdown>
 
       <SweetAlert
+        title=""
         show={confirmLogout}
         custom
         btnSize="md"

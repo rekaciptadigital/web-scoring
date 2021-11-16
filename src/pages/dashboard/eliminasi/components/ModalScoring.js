@@ -189,6 +189,7 @@ export default function ModalScoring({
             </Row>
 
             <SweetAlert
+              title=""
               show={alertSavePermanent}
               custom
               btnSize="md"

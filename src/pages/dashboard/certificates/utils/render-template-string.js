@@ -50,7 +50,7 @@ function renderTemplateString(editorData) {
     ${renderFieldText("member_name")}
     ${editorData.typeCertificate === 2 ? renderFieldText("peringkat_name") : ""}
     ${renderFieldText("kategori_name")}
-    ${renderQrCode()}
+    ${/* TODO: renderQrCode() */ ""}
   </body>
 </html>`;
 }
@@ -85,6 +85,8 @@ function renderFieldText(name) {
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 
+// TODO: tampilkan (panggil) lagi kalau udah bisa QR
+// eslint-disable-next-line no-unused-vars
 function renderQrCode() {
   const urlPlaceholder = "{%sertif_verif_url%}";
   return `

@@ -11,13 +11,18 @@ import { EventsService, EliminationService, ScoringService } from "../../../serv
 import { LoadingScreen } from "components";
 import ModalScoring from "./components/ModalScoring";
 
+import medalGoldPng from "assets/icons/medal-gold.png";
+import medalSilverPng from "assets/icons/medal-silver.png";
+import medalBronzePng from "assets/icons/medal-bronze.png";
+
 // TODO: pindah somewhere proper
 const APP_ARCHER_URL = process.env.REACT_APP_ARCHER_URL
   ? process.env.REACT_APP_ARCHER_URL
   : "https://staging.myarchery.id";
 
-const CustomSeed = (e, setScoring, updated) => {
+const CustomSeed = (e, setScoring, updated, maxRounds) => {
   const { roundIndex, seedIndex, seed, breakpoint } = e;
+  console.log("ini e:", e);
 
   const shouldRenderScoring = () => {
     // hanya perlu render tombol scoring ketika masing-masing `team.win === 0`
@@ -32,6 +37,14 @@ const CustomSeed = (e, setScoring, updated) => {
     });
   };
 
+  const computeMedalStyle = (index) => {
+    const style = { position: "absolute", right: -15 };
+    if (index > 0) {
+      return { ...style, bottom: -8 };
+    }
+    return { ...style, top: -8 };
+  };
+
   // breakpoint passed to Bracket component
   // to check if mobile view is triggered or not
   // mobileBreakpoint is required to be passed down to a seed
@@ -39,10 +52,10 @@ const CustomSeed = (e, setScoring, updated) => {
     <Seed mobileBreakpoint={breakpoint} style={{ fontSize: 12 }}>
       <SeedItem>
         <div>
-          {seed.teams.map((team) => {
+          {seed.teams.map((team, index) => {
             return team.win != undefined ? (
               team.win == 1 ? (
-                <div>
+                <div style={{ position: "relative" }}>
                   <SeedTeam
                     style={{
                       borderBottom: "2px solid black", // kotak emas, teks putih, yang udah menang
@@ -52,19 +65,51 @@ const CustomSeed = (e, setScoring, updated) => {
                   >
                     {team?.name || "<not have participant>"}
                     <span>{team?.score || 0}</span>
+                    {roundIndex === maxRounds - 2 &&
+                      (team?.win ? (
+                        <span style={computeMedalStyle(index)}>
+                          <IconMedalGold />
+                        </span>
+                      ) : (
+                        <span style={computeMedalStyle(index)}>
+                          <IconMedalSilver />
+                        </span>
+                      ))}
+                    {roundIndex === maxRounds - 1 && team?.win && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalBronze />
+                      </span>
+                    )}
                   </SeedTeam>
                 </div>
               ) : (
-                <SeedTeam
-                  style={{
-                    borderBottom: "2px solid black",
-                    color: "#757575", // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
-                    background: "#E2E2E2",
-                  }}
-                >
-                  {team?.name || "<not have participant>"}
-                  <span>{team?.score || 0}</span>
-                </SeedTeam>
+                <div style={{ position: "relative" }}>
+                  <SeedTeam
+                    style={{
+                      borderBottom: "2px solid black",
+                      color: "#757575", // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
+                      background: "#E2E2E2",
+                    }}
+                  >
+                    {team?.name || "<not have participant>"}
+                    <span>{team?.score || 0}</span>
+                    {roundIndex === maxRounds - 2 &&
+                      (team?.win ? (
+                        <span style={computeMedalStyle(index)}>
+                          <IconMedalGold />
+                        </span>
+                      ) : (
+                        <span style={computeMedalStyle(index)}>
+                          <IconMedalSilver />
+                        </span>
+                      ))}
+                    {roundIndex === maxRounds - 1 && team?.win ? (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalBronze />
+                      </span>
+                    ) : null}
+                  </SeedTeam>
+                </div>
               )
             ) : (
               <div>
@@ -377,7 +422,7 @@ function Eliminasi() {
                       <Bracket
                         rounds={matches.rounds != undefined ? matches.rounds : []}
                         renderSeedComponent={(e) => {
-                          return CustomSeed(e, setScoring, matches.updated);
+                          return CustomSeed(e, setScoring, matches.updated, matches.rounds.length);
                         }}
                       />
 
@@ -486,5 +531,9 @@ const BaganView = styled.div`
   margin-left: -20px;
   padding: 10px;
 `;
+
+const IconMedalGold = () => <img src={medalGoldPng} />;
+const IconMedalSilver = () => <img src={medalSilverPng} />;
+const IconMedalBronze = () => <img src={medalBronzePng} />;
 
 export default Eliminasi;

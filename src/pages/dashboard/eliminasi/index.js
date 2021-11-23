@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import MetaTags from "react-meta-tags";
 import { Container, Card, CardBody, Row, Col, Button } from "reactstrap";
 import { DateInput, TimeInput, SelectInput } from "components";
@@ -352,39 +353,44 @@ function Eliminasi() {
                     </div>
                   </CardBody>
                 </Card>
+
                 <Card>
-                  <CardBody style={{ overflow: "auto" }}>
-                    <div className="mb-4 float-end">
-                      <Button
-                        tag="a"
-                        size="sm"
-                        color="primary"
-                        target="_blank"
-                        href={`${APP_ARCHER_URL}/display/stages/${eventDetail.eventSlug}`}
-                        rel="noopener noreferrer"
-                      >
-                        Lihat di web
-                      </Button>
+                  <CardBody>
+                    <div className="clearfix">
+                      <div className="mb-4 float-end">
+                        <Button
+                          tag="a"
+                          size="sm"
+                          color="primary"
+                          target="_blank"
+                          href={`${APP_ARCHER_URL}/display/stages/${eventDetail.eventSlug}`}
+                          rel="noopener noreferrer"
+                        >
+                          Lihat di web
+                        </Button>
+                      </div>
                     </div>
 
-                    <div className="mt-5">
+                    <BaganView>
                       <Bracket
                         rounds={matches.rounds != undefined ? matches.rounds : []}
                         renderSeedComponent={(e) => {
                           return CustomSeed(e, setScoring, matches.updated);
                         }}
                       />
-                    </div>
-                    {currentScoringDetail.scoringData?.length && (
-                      <ModalScoring
-                        data={currentScoringDetail}
-                        modalControl={modalControl}
-                        onSavePermanent={() => getEventEliminationTemplate()}
-                      />
-                    )}
+
+                      {currentScoringDetail.scoringData?.length && (
+                        <ModalScoring
+                          data={currentScoringDetail}
+                          modalControl={modalControl}
+                          onSavePermanent={() => getEventEliminationTemplate()}
+                        />
+                      )}
+                    </BaganView>
                   </CardBody>
                 </Card>
               </Col>
+
               <Col md={5}>
                 <Card>
                   <CardBody>
@@ -470,5 +476,13 @@ function Eliminasi() {
     </React.Fragment>
   );
 }
+
+const BaganView = styled.div`
+  overflow: auto;
+  margin-right: -20px;
+  margin-bottom: -20px;
+  margin-left: -20px;
+  padding: 10px;
+`;
 
 export default Eliminasi;

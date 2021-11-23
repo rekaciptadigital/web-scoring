@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import MetaTags from "react-meta-tags";
 import { Container, Card, CardBody, Row, Col, Button } from "reactstrap";
 import { DateInput, TimeInput, SelectInput } from "components";
@@ -10,13 +11,20 @@ import { EventsService, EliminationService, ScoringService } from "../../../serv
 import { LoadingScreen } from "components";
 import ModalScoring from "./components/ModalScoring";
 
+import medalGoldPng from "assets/icons/medal-gold.png";
+import medalSilverPng from "assets/icons/medal-silver.png";
+import medalBronzePng from "assets/icons/medal-bronze.png";
+
 // TODO: pindah somewhere proper
 const APP_ARCHER_URL = process.env.REACT_APP_ARCHER_URL
   ? process.env.REACT_APP_ARCHER_URL
   : "https://staging.myarchery.id";
 
-const CustomSeed = (e, setScoring, updated) => {
+const CustomSeed = (e, setScoring, updated, maxRounds) => {
   const { roundIndex, seedIndex, seed, breakpoint } = e;
+
+  const isFinalRound = roundIndex === maxRounds - 2;
+  const isThirdPlaceRound = roundIndex === maxRounds - 1;
 
   const shouldRenderScoring = () => {
     // hanya perlu render tombol scoring ketika masing-masing `team.win === 0`
@@ -31,6 +39,14 @@ const CustomSeed = (e, setScoring, updated) => {
     });
   };
 
+  const computeMedalStyle = (index) => {
+    const style = { position: "absolute", right: -15 };
+    if (index > 0) {
+      return { ...style, bottom: -8 };
+    }
+    return { ...style, top: -8 };
+  };
+
   // breakpoint passed to Bracket component
   // to check if mobile view is triggered or not
   // mobileBreakpoint is required to be passed down to a seed
@@ -38,10 +54,10 @@ const CustomSeed = (e, setScoring, updated) => {
     <Seed mobileBreakpoint={breakpoint} style={{ fontSize: 12 }}>
       <SeedItem>
         <div>
-          {seed.teams.map((team) => {
+          {seed.teams.map((team, index) => {
             return team.win != undefined ? (
               team.win == 1 ? (
-                <div>
+                <div style={{ position: "relative" }}>
                   <SeedTeam
                     style={{
                       borderBottom: "2px solid black", // kotak emas, teks putih, yang udah menang
@@ -50,18 +66,37 @@ const CustomSeed = (e, setScoring, updated) => {
                     }}
                   >
                     {team?.name || "<not have participant>"}
+                    <span>{team?.score || 0}</span>
+                    {isFinalRound && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalGold />
+                      </span>
+                    )}
+                    {isThirdPlaceRound && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalBronze />
+                      </span>
+                    )}
                   </SeedTeam>
                 </div>
               ) : (
-                <SeedTeam
-                  style={{
-                    borderBottom: "2px solid black",
-                    color: "#757575", // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
-                    background: "#E2E2E2",
-                  }}
-                >
-                  {team?.name || "<not have participant>"}
-                </SeedTeam>
+                <div style={{ position: "relative" }}>
+                  <SeedTeam
+                    style={{
+                      borderBottom: "2px solid black",
+                      color: "#757575", // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
+                      background: "#E2E2E2",
+                    }}
+                  >
+                    {team?.name || "<not have participant>"}
+                    <span>{team?.score || 0}</span>
+                    {isFinalRound && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalSilver />
+                      </span>
+                    )}
+                  </SeedTeam>
+                </div>
               )
             ) : (
               <div>
@@ -352,39 +387,44 @@ function Eliminasi() {
                     </div>
                   </CardBody>
                 </Card>
+
                 <Card>
-                  <CardBody style={{ overflow: "auto" }}>
-                    <div className="mb-4 float-end">
-                      <Button
-                        tag="a"
-                        size="sm"
-                        color="primary"
-                        target="_blank"
-                        href={`${APP_ARCHER_URL}/display/stages/${eventDetail.eventSlug}`}
-                        rel="noopener noreferrer"
-                      >
-                        Lihat di web
-                      </Button>
+                  <CardBody>
+                    <div className="clearfix">
+                      <div className="mb-4 float-end">
+                        <Button
+                          tag="a"
+                          size="sm"
+                          color="primary"
+                          target="_blank"
+                          href={`${APP_ARCHER_URL}/display/stages/${eventDetail.eventSlug}`}
+                          rel="noopener noreferrer"
+                        >
+                          Lihat di web
+                        </Button>
+                      </div>
                     </div>
 
-                    <div className="mt-5">
+                    <BaganView>
                       <Bracket
                         rounds={matches.rounds != undefined ? matches.rounds : []}
                         renderSeedComponent={(e) => {
-                          return CustomSeed(e, setScoring, matches.updated);
+                          return CustomSeed(e, setScoring, matches.updated, matches.rounds.length);
                         }}
                       />
-                    </div>
-                    {currentScoringDetail.scoringData?.length && (
-                      <ModalScoring
-                        data={currentScoringDetail}
-                        modalControl={modalControl}
-                        onSavePermanent={() => getEventEliminationTemplate()}
-                      />
-                    )}
+
+                      {currentScoringDetail.scoringData?.length && (
+                        <ModalScoring
+                          data={currentScoringDetail}
+                          modalControl={modalControl}
+                          onSavePermanent={() => getEventEliminationTemplate()}
+                        />
+                      )}
+                    </BaganView>
                   </CardBody>
                 </Card>
               </Col>
+
               <Col md={5}>
                 <Card>
                   <CardBody>
@@ -470,5 +510,17 @@ function Eliminasi() {
     </React.Fragment>
   );
 }
+
+const BaganView = styled.div`
+  overflow: auto;
+  margin-right: -20px;
+  margin-bottom: -20px;
+  margin-left: -20px;
+  padding: 10px;
+`;
+
+const IconMedalGold = () => <img src={medalGoldPng} />;
+const IconMedalSilver = () => <img src={medalSilverPng} />;
+const IconMedalBronze = () => <img src={medalBronzePng} />;
 
 export default Eliminasi;

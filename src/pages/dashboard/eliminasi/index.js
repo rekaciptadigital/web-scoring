@@ -51,6 +51,7 @@ const CustomSeed = (e, setScoring, updated) => {
                     }}
                   >
                     {team?.name || "<not have participant>"}
+                    <span>{team?.score || 0}</span>
                   </SeedTeam>
                 </div>
               ) : (
@@ -62,6 +63,7 @@ const CustomSeed = (e, setScoring, updated) => {
                   }}
                 >
                   {team?.name || "<not have participant>"}
+                  <span>{team?.score || 0}</span>
                 </SeedTeam>
               )
             ) : (

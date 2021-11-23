@@ -22,7 +22,9 @@ const APP_ARCHER_URL = process.env.REACT_APP_ARCHER_URL
 
 const CustomSeed = (e, setScoring, updated, maxRounds) => {
   const { roundIndex, seedIndex, seed, breakpoint } = e;
-  console.log("ini e:", e);
+
+  const isFinalRound = roundIndex === maxRounds - 2;
+  const isThirdPlaceRound = roundIndex === maxRounds - 1;
 
   const shouldRenderScoring = () => {
     // hanya perlu render tombol scoring ketika masing-masing `team.win === 0`
@@ -65,17 +67,12 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                   >
                     {team?.name || "<not have participant>"}
                     <span>{team?.score || 0}</span>
-                    {roundIndex === maxRounds - 2 &&
-                      (team?.win ? (
-                        <span style={computeMedalStyle(index)}>
-                          <IconMedalGold />
-                        </span>
-                      ) : (
-                        <span style={computeMedalStyle(index)}>
-                          <IconMedalSilver />
-                        </span>
-                      ))}
-                    {roundIndex === maxRounds - 1 && team?.win && (
+                    {isFinalRound && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalGold />
+                      </span>
+                    )}
+                    {isThirdPlaceRound && (
                       <span style={computeMedalStyle(index)}>
                         <IconMedalBronze />
                       </span>
@@ -93,21 +90,11 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                   >
                     {team?.name || "<not have participant>"}
                     <span>{team?.score || 0}</span>
-                    {roundIndex === maxRounds - 2 &&
-                      (team?.win ? (
-                        <span style={computeMedalStyle(index)}>
-                          <IconMedalGold />
-                        </span>
-                      ) : (
-                        <span style={computeMedalStyle(index)}>
-                          <IconMedalSilver />
-                        </span>
-                      ))}
-                    {roundIndex === maxRounds - 1 && team?.win ? (
+                    {isFinalRound && (
                       <span style={computeMedalStyle(index)}>
-                        <IconMedalBronze />
+                        <IconMedalSilver />
                       </span>
-                    ) : null}
+                    )}
                   </SeedTeam>
                 </div>
               )

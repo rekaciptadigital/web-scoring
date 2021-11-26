@@ -52,21 +52,26 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
   // mobileBreakpoint is required to be passed down to a seed
   return (
     <Seed mobileBreakpoint={breakpoint} style={{ fontSize: 12 }}>
-      <SeedItem>
+      <SeedItem style={{ padding: 2, backgroundColor: "var(--bs-gray-800)" }}>
         <div>
           {seed.teams.map((team, index) => {
             return team.win != undefined ? (
               team.win == 1 ? (
-                <div style={{ position: "relative" }}>
-                  <SeedTeam
-                    style={{
-                      borderBottom: "2px solid black", // kotak emas, teks putih, yang udah menang
-                      color: "white",
-                      background: "#BC8B2C",
-                    }}
+                <div key={index} style={{ position: "relative" }}>
+                  <SeedTeamStyled
+                    index={index}
+                    color="white"
+                    bgColor="#BC8B2C"
+                    // kotak emas, teks putih, yang udah menang
                   >
-                    {team?.name || "<not have participant>"}
-                    <span>{team?.score || 0}</span>
+                    <SeedNameLabel>
+                      {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                    </SeedNameLabel>
+
+                    <SeedScoreLabel bgColor="white" color="black">
+                      {team?.score || 0}
+                    </SeedScoreLabel>
+
                     {isFinalRound && (
                       <span style={computeMedalStyle(index)}>
                         <IconMedalGold />
@@ -77,54 +82,54 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                         <IconMedalBronze />
                       </span>
                     )}
-                  </SeedTeam>
+                  </SeedTeamStyled>
                 </div>
               ) : (
-                <div style={{ position: "relative" }}>
-                  <SeedTeam
-                    style={{
-                      borderBottom: "2px solid black",
-                      color: "#757575", // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
-                      background: "#E2E2E2",
-                    }}
+                <div key={index} style={{ position: "relative" }}>
+                  <SeedTeamStyled
+                    index={index}
+                    color="#757575"
+                    bgColor="#E2E2E2"
+                    // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
                   >
-                    {team?.name || "<not have participant>"}
-                    <span>{team?.score || 0}</span>
+                    <SeedNameLabel>
+                      {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                    </SeedNameLabel>
+
+                    <SeedScoreLabel bgColor="white" color="black">
+                      {team?.score || 0}
+                    </SeedScoreLabel>
+
                     {isFinalRound && (
                       <span style={computeMedalStyle(index)}>
                         <IconMedalSilver />
                       </span>
                     )}
-                  </SeedTeam>
+                  </SeedTeamStyled>
                 </div>
               )
             ) : (
-              <div>
-                <SeedTeam
-                  style={{
-                    borderBottom: "2px solid white", // kotak hitam, teks putih, kalah/di-bypass ("bye")
-                  }}
+              <div key={index}>
+                <SeedTeamStyled
+                  index={index}
+                  color="var(--bs-gray-600)"
+                  // kotak hitam, teks putih, di-bypass ("bye")
                 >
-                  {team?.name || "<not have participant>"}
-                </SeedTeam>
+                  <SeedNameLabel style={{ width: "100%", textAlign: "center" }}>
+                    {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                  </SeedNameLabel>
+                </SeedTeamStyled>
               </div>
             );
           })}
 
           {shouldRenderScoring() && (
-            <div>
-              <SeedItem
-                style={{ borderBottom: "2px solid black", color: "black", background: "#fffdfd" }}
-              >
-                <button
-                  style={{ color: "white", background: "red", width: "100%" }}
-                  key={breakpoint}
-                  onClick={handleOnClickSetScoring}
-                >
-                  scoring
-                </button>
-              </SeedItem>
-            </div>
+            <SeedItem style={{ marginTop: 2, backgroundColor: "var(--bs-gray-800)" }}>
+              <ButtonScoring key={breakpoint} onClick={handleOnClickSetScoring}>
+                <i className="bx bx-edit me-2" />
+                Scoring
+              </ButtonScoring>
+            </SeedItem>
           )}
         </div>
       </SeedItem>
@@ -183,7 +188,7 @@ function Eliminasi() {
       getEventDetail();
     }
     getEventEliminationTemplate();
-  }, [category, countEliminationMember, type, gender, countEliminationMember]);
+  }, [category, countEliminationMember, type, gender]);
 
   const getEventDetail = async () => {
     const { message, errors, data } = await EventsService.getEventById({
@@ -522,5 +527,43 @@ const BaganView = styled.div`
 const IconMedalGold = () => <img src={medalGoldPng} />;
 const IconMedalSilver = () => <img src={medalSilverPng} />;
 const IconMedalBronze = () => <img src={medalBronzePng} />;
+
+const SeedTeamStyled = styled(SeedTeam)`
+  overflow: hidden;
+  align-items: stretch;
+  padding: 0;
+  ${({ index }) => (index === 0 ? "margin-bottom: 2px;" : "")}
+  color: ${({ color }) => (color ? color : "inherit")};
+  background-color: ${({ bgColor }) => (bgColor ? bgColor : "none")};
+`;
+
+const SeedNameLabel = styled.div`
+  overflow: hidden;
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+`;
+
+const SeedScoreLabel = styled.div`
+  min-width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  background-color: white;
+  color: var(--bs-gray);
+  font-weight: bold;
+`;
+
+const ButtonScoring = styled.button`
+  color: white;
+  background-color: var(--bs-primary);
+  width: 100%;
+  border: none;
+  border-radius: 0.2rem;
+
+  &:hover {
+    background-color: #485ec4;
+  }
+`;
 
 export default Eliminasi;

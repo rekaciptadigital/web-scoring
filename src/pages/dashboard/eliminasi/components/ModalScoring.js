@@ -49,6 +49,8 @@ export default function ModalScoring({
   const [savingStatus, setSavingStatus] = React.useState("idle");
   const [alertSavePermanent, setAlertSavePermanent] = React.useState(false);
 
+  const hasWinner = modalScoringData.some((score) => score.win === 1);
+
   const handleGridChange = (index, ev) => {
     setMembersScoringData((value) => {
       const membersScoringUpdated = [...value];
@@ -106,8 +108,11 @@ export default function ModalScoring({
     }, 3000);
   };
 
+  const handleClickTentukan = () => setAlertSavePermanent(true);
+
   const handleConfirmSavePermanent = () => {
-    setAlertSavePermanent(true);
+    setAlertSavePermanent(false);
+    executeSavePermanent();
   };
 
   const executeSavePermanent = async () => {
@@ -117,21 +122,31 @@ export default function ModalScoring({
       save_permanent: 1,
     });
 
-    setIsLoading(false);
     if (success) {
-      closeModalScoring();
-      onSavePermanent();
+      onSavePermanent?.();
+
+      const queryString = {
+        type: contextDetails.type,
+        round: contextDetails.round,
+        match: contextDetails.match,
+        elimination_id: contextDetails.elimination_id,
+      };
+      const refetch = await ScoringService.findParticipantScoreDetail(queryString);
+      if (refetch.success) {
+        setMembersScoringData(refetch.data.map((data) => data.scores));
+        setSavingStatus("success");
+      } else {
+        setSavingStatus("error");
+      }
     } else {
       setSavingStatus("error");
-      setTimeout(() => {
-        setSavingStatus("idle");
-      }, 3000);
     }
 
+    setIsLoading(false);
+
     setTimeout(() => {
-      setIsLoading(false);
-      closeModalScoring();
-    }, 1500);
+      setSavingStatus("idle");
+    }, 3000);
   };
 
   return (
@@ -166,17 +181,29 @@ export default function ModalScoring({
                 <h6 className="text-center mb-3">{computeClubName(initialScoringData[0])}</h6>
 
                 {computeScoringTypeId(initialScoringData) === 1 && (
-                  <PointsDisplay scoringType={1} point={computeTotalPoints(modalScoringData[0])} />
+                  <PointsDisplay
+                    scoringType={1}
+                    point={computeTotalPoints(modalScoringData[0])}
+                    hasWinner={hasWinner}
+                    winningStatus={modalScoringData[0].win}
+                  />
                 )}
                 {computeScoringTypeId(initialScoringData) === 2 && (
-                  <PointsDisplay scoringType={2} point={computeTotalScores(modalScoringData[0])} />
+                  <PointsDisplay
+                    scoringType={2}
+                    point={computeTotalScores(modalScoringData[0])}
+                    hasWinner={hasWinner}
+                    winningStatus={modalScoringData[0].win}
+                  />
                 )}
 
-                <ScoringGrid
-                  scoringType={computeScoringTypeId(initialScoringData)}
-                  scores={modalScoringData[0]}
-                  onChange={(ev) => handleGridChange(0, ev)}
-                />
+                {!hasWinner && (
+                  <ScoringGrid
+                    scoringType={computeScoringTypeId(initialScoringData)}
+                    scores={modalScoringData[0]}
+                    onChange={(ev) => handleGridChange(0, ev)}
+                  />
+                )}
               </Col>
 
               <Col className="px-4">
@@ -184,17 +211,29 @@ export default function ModalScoring({
                 <h6 className="text-center mb-3">{computeClubName(initialScoringData[1])}</h6>
 
                 {computeScoringTypeId(initialScoringData) === 1 && (
-                  <PointsDisplay scoringType={1} point={computeTotalPoints(modalScoringData[1])} />
+                  <PointsDisplay
+                    scoringType={1}
+                    point={computeTotalPoints(modalScoringData[1])}
+                    hasWinner={hasWinner}
+                    winningStatus={modalScoringData[1].win}
+                  />
                 )}
                 {computeScoringTypeId(initialScoringData) === 2 && (
-                  <PointsDisplay scoringType={2} point={computeTotalScores(modalScoringData[1])} />
+                  <PointsDisplay
+                    scoringType={2}
+                    point={computeTotalScores(modalScoringData[1])}
+                    hasWinner={hasWinner}
+                    winningStatus={modalScoringData[1].win}
+                  />
                 )}
 
-                <ScoringGrid
-                  scoringType={computeScoringTypeId(initialScoringData)}
-                  scores={modalScoringData[1]}
-                  onChange={(ev) => handleGridChange(1, ev)}
-                />
+                {!hasWinner && (
+                  <ScoringGrid
+                    scoringType={computeScoringTypeId(initialScoringData)}
+                    scores={modalScoringData[1]}
+                    onChange={(ev) => handleGridChange(1, ev)}
+                  />
+                )}
               </Col>
             </Row>
 
@@ -209,10 +248,7 @@ export default function ModalScoring({
               confirmBtnText="OK"
               confirmBtnBsStyle="outline-primary"
               cancelBtnBsStyle="primary"
-              onConfirm={() => {
-                setAlertSavePermanent(false);
-                executeSavePermanent();
-              }}
+              onConfirm={handleConfirmSavePermanent}
               onCancel={() => setAlertSavePermanent(false)}
               style={{ padding: "30px 40px" }}
             >
@@ -228,32 +264,38 @@ export default function ModalScoring({
 
       {initialScoringData?.length && (
         <ModalFooter>
-          <div style={{ position: "relative" }}>
-            <Button color="primary" onClick={handleClickSave}>
-              Simpan
+          {hasWinner ? (
+            <Button color="primary" onClick={() => closeModalScoring()}>
+              Selesai
             </Button>
+          ) : (
+            <div style={{ position: "relative" }}>
+              <Button color="primary" onClick={handleClickSave}>
+                Simpan
+              </Button>
 
-            <Button
-              color="success"
-              outline
-              className="ms-2"
-              onClick={handleConfirmSavePermanent}
-              disabled={false}
-            >
-              Tentukan
-            </Button>
+              <Button
+                color="success"
+                outline
+                className="ms-2"
+                onClick={handleClickTentukan}
+                disabled={false}
+              >
+                Tentukan
+              </Button>
 
-            <FeedBackSavingStatus status={savingStatus} />
-          </div>
+              <FeedBackSavingStatus status={savingStatus} />
+            </div>
+          )}
         </ModalFooter>
       )}
     </Modal>
   );
 }
 
-function PointsDisplay({ scoringType, point = 0 }) {
+function PointsDisplay({ scoringType, point = 0, winningStatus, hasWinner }) {
   return (
-    <StyledPointsDisplay className="mt-4 mb-4">
+    <StyledPointsDisplay className="mt-4 mb-4" hasWinner={hasWinner} winningStatus={winningStatus}>
       <span className="label-point">
         {scoringType === 1 && "point"}
         {scoringType === 2 && "skor"}
@@ -262,6 +304,13 @@ function PointsDisplay({ scoringType, point = 0 }) {
     </StyledPointsDisplay>
   );
 }
+
+const colorByWinning = ({ hasWinner, winningStatus }) => {
+  if (hasWinner) {
+    return winningStatus ? "var(--bs-success)" : "var(--bs-gray)";
+  }
+  return "var(--bs-primary)";
+};
 
 const StyledPointsDisplay = styled.div`
   display: flex;
@@ -272,9 +321,9 @@ const StyledPointsDisplay = styled.div`
   padding: 6px 20px;
   max-width: 60px;
   border-radius: 4px;
-  border: solid 1px var(--bs-primary);
+  border: solid 1px ${(props) => colorByWinning(props)};
 
-  color: var(--bs-primary);
+  color: ${(props) => colorByWinning(props)};
   text-align: center;
   font-size: 1.6rem;
   font-weight: bold;

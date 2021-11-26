@@ -57,7 +57,7 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
           {seed.teams.map((team, index) => {
             return team.win != undefined ? (
               team.win == 1 ? (
-                <div style={{ position: "relative" }}>
+                <div key={index} style={{ position: "relative" }}>
                   <SeedTeamStyled
                     index={index}
                     color="white"
@@ -85,7 +85,7 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                   </SeedTeamStyled>
                 </div>
               ) : (
-                <div style={{ position: "relative" }}>
+                <div key={index} style={{ position: "relative" }}>
                   <SeedTeamStyled
                     index={index}
                     color="#757575"
@@ -109,11 +109,11 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                 </div>
               )
             ) : (
-              <div>
+              <div key={index}>
                 <SeedTeamStyled
                   index={index}
                   color="var(--bs-gray-600)"
-                  // kotak hitam, teks putih, kalah/di-bypass ("bye")
+                  // kotak hitam, teks putih, di-bypass ("bye")
                 >
                   <SeedNameLabel style={{ width: "100%", textAlign: "center" }}>
                     {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
@@ -125,10 +125,10 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
 
           {shouldRenderScoring() && (
             <SeedItem style={{ marginTop: 2, backgroundColor: "var(--bs-gray-800)" }}>
-              <ButtonSetScoring key={breakpoint} onClick={handleOnClickSetScoring}>
+              <ButtonScoring key={breakpoint} onClick={handleOnClickSetScoring}>
                 <i className="bx bx-edit me-2" />
-                Set Scoring
-              </ButtonSetScoring>
+                Scoring
+              </ButtonScoring>
             </SeedItem>
           )}
         </div>
@@ -188,7 +188,7 @@ function Eliminasi() {
       getEventDetail();
     }
     getEventEliminationTemplate();
-  }, [category, countEliminationMember, type, gender, countEliminationMember]);
+  }, [category, countEliminationMember, type, gender]);
 
   const getEventDetail = async () => {
     const { message, errors, data } = await EventsService.getEventById({
@@ -554,7 +554,7 @@ const SeedScoreLabel = styled.div`
   font-weight: bold;
 `;
 
-const ButtonSetScoring = styled.button`
+const ButtonScoring = styled.button`
   color: white;
   background-color: var(--bs-primary);
   width: 100%;

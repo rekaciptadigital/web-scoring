@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import MetaTags from "react-meta-tags";
 import { Container, Card, CardBody, Row, Col, Button } from "reactstrap";
 import { DateInput, TimeInput, SelectInput } from "components";
@@ -10,25 +11,42 @@ import { EventsService, EliminationService, ScoringService } from "../../../serv
 import { LoadingScreen } from "components";
 import ModalScoring from "./components/ModalScoring";
 
+import medalGoldPng from "assets/icons/medal-gold.png";
+import medalSilverPng from "assets/icons/medal-silver.png";
+import medalBronzePng from "assets/icons/medal-bronze.png";
+
 // TODO: pindah somewhere proper
 const APP_ARCHER_URL = process.env.REACT_APP_ARCHER_URL
   ? process.env.REACT_APP_ARCHER_URL
   : "https://staging.myarchery.id";
 
-const CustomSeed = (e, setScoring, updated) => {
-  const { roundIndex, seedIndex, seed, breakpoint } = e;
+const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
+  const { roundIndex, seed, breakpoint } = seedData;
 
-  const shouldRenderScoring = () => {
+  const isFinalRound = roundIndex === maxRounds - 2;
+  const isThirdPlaceRound = roundIndex === maxRounds - 1;
+
+  const shouldScoringEnabled = () => {
     // hanya perlu render tombol scoring ketika masing-masing `team.win === 0`
     const isScoring = seed.teams.every((team) => team.win === 0);
     return !updated && isScoring;
   };
 
+  const shouldRenderMedalIcon = () => {
+    const isPaired = seed.teams.every((team) => team.id);
+    return isPaired && !shouldScoringEnabled();
+  };
+
   const handleOnClickSetScoring = () => {
-    setScoring({
-      round: roundIndex + 1,
-      match: seedIndex + 1,
-    });
+    setScoring(seedData);
+  };
+
+  const computeMedalStyle = (index) => {
+    const style = { position: "absolute", right: -15 };
+    if (index > 0) {
+      return { ...style, bottom: -8 };
+    }
+    return { ...style, top: -8 };
   };
 
   // breakpoint passed to Bracket component
@@ -36,60 +54,84 @@ const CustomSeed = (e, setScoring, updated) => {
   // mobileBreakpoint is required to be passed down to a seed
   return (
     <Seed mobileBreakpoint={breakpoint} style={{ fontSize: 12 }}>
-      <SeedItem>
+      <SeedItem style={{ padding: 2, backgroundColor: "var(--bs-gray-800)" }}>
         <div>
-          {seed.teams.map((team) => {
+          {seed.teams.map((team, index) => {
             return team.win != undefined ? (
               team.win == 1 ? (
-                <div>
-                  <SeedTeam
-                    style={{
-                      borderBottom: "2px solid black", // kotak emas, teks putih, yang udah menang
-                      color: "white",
-                      background: "#BC8B2C",
-                    }}
+                <div key={index} style={{ position: "relative" }}>
+                  <SeedTeamStyled
+                    index={index}
+                    color="white"
+                    bgColor="#BC8B2C"
+                    // kotak emas, teks putih, yang udah menang
                   >
-                    {team?.name || "<not have participant>"}
-                  </SeedTeam>
+                    <SeedNameLabel>
+                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
+                    </SeedNameLabel>
+
+                    <SeedScoreLabel bgColor="white" color="black">
+                      {team?.result || 0}
+                    </SeedScoreLabel>
+
+                    {isFinalRound && shouldRenderMedalIcon() && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalGold />
+                      </span>
+                    )}
+                    {isThirdPlaceRound && shouldRenderMedalIcon() && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalBronze />
+                      </span>
+                    )}
+                  </SeedTeamStyled>
                 </div>
               ) : (
-                <SeedTeam
-                  style={{
-                    borderBottom: "2px solid black",
-                    color: "#757575", // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
-                    background: "#E2E2E2",
-                  }}
-                >
-                  {team?.name || "<not have participant>"}
-                </SeedTeam>
+                <div key={index} style={{ position: "relative" }}>
+                  <SeedTeamStyled
+                    index={index}
+                    color="#757575"
+                    bgColor="#E2E2E2"
+                    // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
+                  >
+                    <SeedNameLabel>
+                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
+                    </SeedNameLabel>
+
+                    <SeedScoreLabel bgColor="white" color="black">
+                      {team?.result || 0}
+                    </SeedScoreLabel>
+
+                    {isFinalRound && shouldRenderMedalIcon() && (
+                      <span style={computeMedalStyle(index)}>
+                        <IconMedalSilver />
+                      </span>
+                    )}
+                  </SeedTeamStyled>
+                </div>
               )
             ) : (
-              <div>
-                <SeedTeam
-                  style={{
-                    borderBottom: "2px solid white", // kotak hitam, teks putih, kalah/di-bypass ("bye")
-                  }}
+              <div key={index}>
+                <SeedTeamStyled
+                  index={index}
+                  color="var(--bs-gray-600)"
+                  // kotak hitam, teks putih, di-bypass ("bye")
                 >
-                  {team?.name || "<not have participant>"}
-                </SeedTeam>
+                  <SeedNameLabel style={{ width: "100%", textAlign: "center" }}>
+                    {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
+                  </SeedNameLabel>
+                </SeedTeamStyled>
               </div>
             );
           })}
 
-          {shouldRenderScoring() && (
-            <div>
-              <SeedItem
-                style={{ borderBottom: "2px solid black", color: "black", background: "#fffdfd" }}
-              >
-                <button
-                  style={{ color: "white", background: "red", width: "100%" }}
-                  key={breakpoint}
-                  onClick={handleOnClickSetScoring}
-                >
-                  scoring
-                </button>
-              </SeedItem>
-            </div>
+          {shouldScoringEnabled() && (
+            <SeedItem style={{ marginTop: 2, backgroundColor: "var(--bs-gray-800)" }}>
+              <ButtonScoring key={breakpoint} onClick={handleOnClickSetScoring}>
+                <i className="bx bx-edit me-2" />
+                Scoring
+              </ButtonScoring>
+            </SeedItem>
           )}
         </div>
       </SeedItem>
@@ -97,8 +139,6 @@ const CustomSeed = (e, setScoring, updated) => {
     </Seed>
   );
 };
-
-const initialScoringDetail = { scoringData: null };
 
 function Eliminasi() {
   const [loading, setLoading] = React.useState(false);
@@ -111,10 +151,6 @@ function Eliminasi() {
   const [end, setEnd] = useState("");
   const [category, setCategory] = useState(0);
   const { event_id } = useParams();
-
-  const [currentScoringDetail, setCurrentScoringDetail] = React.useState(
-    () => initialScoringDetail
-  );
 
   const eliminationType = [
     { id: "1", label: "A vs Z" },
@@ -148,7 +184,7 @@ function Eliminasi() {
       getEventDetail();
     }
     getEventEliminationTemplate();
-  }, [category, countEliminationMember, type, gender, countEliminationMember]);
+  }, [category, countEliminationMember, type, gender]);
 
   const getEventDetail = async () => {
     const { message, errors, data } = await EventsService.getEventById({
@@ -208,26 +244,28 @@ function Eliminasi() {
     console.log(errors);
   };
 
-  const setScoring = async (ev) => {
+  const setScoring = async (seedData) => {
     setLoading(true);
 
-    const contextDetails = {
+    const queryString = {
       type: 2, // id untuk eliminasi
-      round: ev.round,
-      match: ev.match,
+      round: seedData.roundIndex + 1,
+      match: seedData.seedIndex + 1,
       elimination_id: matches.eliminationId,
     };
-    const result = await ScoringService.findParticipantScoreDetail(contextDetails);
+    const result = await ScoringService.findParticipantScoreDetail(queryString);
 
-    if (result.success && result.data?.length) {
-      setCurrentScoringDetail({
-        ...contextDetails,
-        scoringTypeOptions: scoringTypeOptions,
-        scoringData: result.data,
+    if (result.success && result.data) {
+      setCurrentScoringDetail(result.data);
+      setCurrentMatchData({
+        roundIndex: seedData.roundIndex,
+        seedIndex: seedData.seedIndex,
+        queryStringRefetch: queryString,
       });
       openModalScoring();
     } else {
-      setCurrentScoringDetail({ ...initialScoringDetail });
+      setCurrentScoringDetail(null);
+      console.error("Error mengambil data detail scoring match ini:", result.error);
     }
 
     setLoading(false);
@@ -250,20 +288,28 @@ function Eliminasi() {
     { id: "1", label: "Babak 4" },
   ];
 
+  const [currentScoringDetail, setCurrentScoringDetail] = React.useState(null);
+  const [currentMatchData, setCurrentMatchData] = React.useState(null);
   const [isModalScoringOpen, setModalScoringOpen] = React.useState(false);
 
   const openModalScoring = () => setModalScoringOpen(true);
+
   const closeModalScoring = () => {
     setModalScoringOpen(false);
-    setCurrentScoringDetail({ ...initialScoringDetail }); // reset data current detail kalau modal gak aktif
+    setCurrentScoringDetail(null);
+    setCurrentMatchData(null);
+    getEventEliminationTemplate();
   };
-  const toggleModalScoring = () => setModalScoringOpen((isOpen) => !isOpen);
 
-  const modalControl = {
-    isModalScoringOpen,
-    toggleModalScoring,
-    closeModalScoring,
-    openModalScoring,
+  const toggleModalScoring = () => {
+    setModalScoringOpen((isOpen) => !isOpen);
+    if (isModalScoringOpen) {
+      closeModalScoring();
+    }
+  };
+
+  const handleSavePermanent = () => {
+    getEventEliminationTemplate();
   };
 
   return (
@@ -352,39 +398,70 @@ function Eliminasi() {
                     </div>
                   </CardBody>
                 </Card>
+
                 <Card>
-                  <CardBody style={{ overflow: "auto" }}>
-                    <div className="mb-4 float-end">
-                      <Button
-                        tag="a"
-                        size="sm"
-                        color="primary"
-                        target="_blank"
-                        href={`${APP_ARCHER_URL}/display/stages/${eventDetail.eventSlug}`}
-                        rel="noopener noreferrer"
-                      >
-                        Lihat di web
-                      </Button>
+                  <CardBody>
+                    <div className="clearfix">
+                      <div className="mb-4 float-end">
+                        <Button
+                          tag="a"
+                          size="sm"
+                          color="primary"
+                          target="_blank"
+                          href={`${APP_ARCHER_URL}/display/stages/${eventDetail.eventSlug}`}
+                          rel="noopener noreferrer"
+                        >
+                          Lihat di web
+                        </Button>
+                      </div>
                     </div>
 
-                    <div className="mt-5">
+                    <BaganView>
                       <Bracket
                         rounds={matches.rounds != undefined ? matches.rounds : []}
                         renderSeedComponent={(e) => {
-                          return CustomSeed(e, setScoring, matches.updated);
+                          return CustomSeed(e, setScoring, matches.updated, matches.rounds.length);
                         }}
                       />
-                    </div>
-                    {currentScoringDetail.scoringData?.length && (
-                      <ModalScoring
-                        data={currentScoringDetail}
-                        modalControl={modalControl}
-                        onSavePermanent={() => getEventEliminationTemplate()}
-                      />
-                    )}
+
+                      {isModalScoringOpen && currentScoringDetail?.length && currentMatchData && (
+                        <ModalScoring
+                          matchData={{
+                            ...currentMatchData,
+                            ...matches.rounds[currentMatchData.roundIndex].seeds[
+                              currentMatchData.seedIndex
+                            ],
+                            updated: matches.updated,
+                          }}
+                          scoringDetail={currentScoringDetail}
+                          onChangeScoringDetail={(index, ev) => {
+                            setCurrentScoringDetail((currentDetail) => {
+                              const scoringDetailUpdated = [...currentDetail];
+                              scoringDetailUpdated[index].scores = { ...ev };
+                              return scoringDetailUpdated;
+                            });
+                          }}
+                          refetchScoreDetail={async () => {
+                            const result = await ScoringService.findParticipantScoreDetail(
+                              currentMatchData.queryStringRefetch
+                            );
+                            if (result.success && result.data) {
+                              setCurrentScoringDetail(result.data);
+                            }
+                            return result;
+                          }}
+                          isOpen={isModalScoringOpen}
+                          onToggle={toggleModalScoring}
+                          onClosed={closeModalScoring}
+                          onSavePermanent={handleSavePermanent}
+                          scoringTypeOptions={scoringTypeOptions}
+                        />
+                      )}
+                    </BaganView>
                   </CardBody>
                 </Card>
               </Col>
+
               <Col md={5}>
                 <Card>
                   <CardBody>
@@ -470,5 +547,55 @@ function Eliminasi() {
     </React.Fragment>
   );
 }
+
+const BaganView = styled.div`
+  overflow: auto;
+  margin-right: -20px;
+  margin-bottom: -20px;
+  margin-left: -20px;
+  padding: 10px;
+`;
+
+const IconMedalGold = () => <img src={medalGoldPng} />;
+const IconMedalSilver = () => <img src={medalSilverPng} />;
+const IconMedalBronze = () => <img src={medalBronzePng} />;
+
+const SeedTeamStyled = styled(SeedTeam)`
+  overflow: hidden;
+  align-items: stretch;
+  padding: 0;
+  ${({ index }) => (index === 0 ? "margin-bottom: 2px;" : "")}
+  color: ${({ color }) => (color ? color : "inherit")};
+  background-color: ${({ bgColor }) => (bgColor ? bgColor : "none")};
+`;
+
+const SeedNameLabel = styled.div`
+  overflow: hidden;
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+`;
+
+const SeedScoreLabel = styled.div`
+  min-width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  background-color: white;
+  color: var(--bs-gray);
+  font-weight: bold;
+`;
+
+const ButtonScoring = styled.button`
+  color: white;
+  background-color: var(--bs-primary);
+  width: 100%;
+  border: none;
+  border-radius: 0.2rem;
+
+  &:hover {
+    background-color: #485ec4;
+  }
+`;
 
 export default Eliminasi;

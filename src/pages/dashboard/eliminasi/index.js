@@ -32,6 +32,11 @@ const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
     return !updated && isScoring;
   };
 
+  const shouldRenderMedalIcon = () => {
+    const isPaired = seed.teams.every((team) => team.id);
+    return isPaired && !shouldScoringEnabled();
+  };
+
   const handleOnClickSetScoring = () => {
     setScoring(seedData);
   };
@@ -69,12 +74,12 @@ const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
                       {team?.result || 0}
                     </SeedScoreLabel>
 
-                    {isFinalRound && (
+                    {isFinalRound && shouldRenderMedalIcon() && (
                       <span style={computeMedalStyle(index)}>
                         <IconMedalGold />
                       </span>
                     )}
-                    {isThirdPlaceRound && (
+                    {isThirdPlaceRound && shouldRenderMedalIcon() && (
                       <span style={computeMedalStyle(index)}>
                         <IconMedalBronze />
                       </span>
@@ -97,7 +102,7 @@ const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
                       {team?.result || 0}
                     </SeedScoreLabel>
 
-                    {isFinalRound && (
+                    {isFinalRound && shouldRenderMedalIcon() && (
                       <span style={computeMedalStyle(index)}>
                         <IconMedalSilver />
                       </span>

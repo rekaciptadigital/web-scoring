@@ -65,7 +65,7 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                     // kotak emas, teks putih, yang udah menang
                   >
                     <SeedNameLabel>
-                      {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
@@ -93,7 +93,7 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                     // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
                   >
                     <SeedNameLabel>
-                      {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
@@ -116,7 +116,7 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                   // kotak hitam, teks putih, di-bypass ("bye")
                 >
                   <SeedNameLabel style={{ width: "100%", textAlign: "center" }}>
-                    {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                    {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
                   </SeedNameLabel>
                 </SeedTeamStyled>
               </div>

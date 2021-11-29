@@ -69,7 +69,7 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
-                      {team?.score || 0}
+                      {team?.result || 0}
                     </SeedScoreLabel>
 
                     {isFinalRound && (
@@ -97,7 +97,7 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
-                      {team?.score || 0}
+                      {team?.result || 0}
                     </SeedScoreLabel>
 
                     {isFinalRound && (

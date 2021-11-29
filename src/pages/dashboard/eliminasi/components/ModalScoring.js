@@ -26,41 +26,48 @@ const computeCategoryLabel = (data) => {
   return data?.[0]?.participant.categoryLabel || data?.[1]?.participant.categoryLabel;
 };
 const computeTotalPoints = (data) => {
-  return data?.shot.reduce((prev, rambahan) => prev + rambahan.point, 0);
+  return data?.shot.reduce((prev, rambahan) => prev + Number(rambahan.point), 0);
 };
 
 const computeTotalScores = (data) => {
-  return data?.shot.reduce((prev, rambahan) => prev + rambahan.total, 0);
+  return data?.shot.reduce((prev, rambahan) => prev + Number(rambahan.total), 0);
 };
 
 export default function ModalScoring({
-  data: { scoringData: initialScoringData, ...contextDetails },
-  modalControl,
+  matchData,
+  scoringDetail,
+  onChangeScoringDetail,
+  isOpen,
+  onToggle,
+  onClosed,
   onSavePermanent,
+  scoringTypeOptions,
+  refetchScoreDetail,
 }) {
-  const { isModalScoringOpen, toggleModalScoring, closeModalScoring } = modalControl;
+  const { queryStringRefetch, updated, teams } = matchData;
 
-  // cuman yang bagian `scores`-nya di payload
-  // supaya bisa dipakai untuk refetch setelah save
-  const [modalScoringData, setMembersScoringData] = React.useState(() =>
-    initialScoringData.map((data) => data.scores)
-  );
   const [isLoading, setIsLoading] = React.useState(false);
   const [savingStatus, setSavingStatus] = React.useState("idle");
   const [alertSavePermanent, setAlertSavePermanent] = React.useState(false);
 
-  const hasWinner = modalScoringData.some((score) => score.win === 1);
+  const handleToggle = () => onToggle();
+
+  // cuman yang bagian `scores`-nya di payload
+  // supaya bisa dipakai untuk refetch setelah save
+  const modalScoringData = scoringDetail.map((data) => data.scores);
+
+  const isScoringEnabled = () => {
+    return !updated && teams.every((team) => team.win === 0);
+  };
+
+  const hasWinner = !isScoringEnabled();
 
   const handleGridChange = (index, ev) => {
-    setMembersScoringData((value) => {
-      const membersScoringUpdated = [...value];
-      membersScoringUpdated[index] = { ...ev };
-      return membersScoringUpdated;
-    });
+    onChangeScoringDetail(index, ev);
   };
 
   const computeDataToSave = () => {
-    const { type, round, match, elimination_id } = contextDetails;
+    const { type, round, match, elimination_id } = queryStringRefetch;
     return {
       save_permanent: 0,
       elimination_id: elimination_id,
@@ -69,11 +76,11 @@ export default function ModalScoring({
       type: type,
       members: [
         {
-          memberId: computeMemberId(initialScoringData[0]),
+          memberId: computeMemberId(scoringDetail[0]),
           scores: modalScoringData[0],
         },
         {
-          memberId: computeMemberId(initialScoringData[1]),
+          memberId: computeMemberId(scoringDetail[1]),
           scores: modalScoringData[1],
         },
       ],
@@ -85,15 +92,8 @@ export default function ModalScoring({
     const { success } = await ScoringService.saveParticipantScore({ ...computeDataToSave() });
 
     if (success) {
-      const queryString = {
-        type: contextDetails.type,
-        round: contextDetails.round,
-        match: contextDetails.match,
-        elimination_id: contextDetails.elimination_id,
-      };
-      const refetch = await ScoringService.findParticipantScoreDetail(queryString);
+      const refetch = await refetchScoreDetail();
       if (refetch.success) {
-        setMembersScoringData(refetch.data.map((data) => data.scores));
         setSavingStatus("success");
       } else {
         setSavingStatus("error");
@@ -125,15 +125,8 @@ export default function ModalScoring({
     if (success) {
       onSavePermanent?.();
 
-      const queryString = {
-        type: contextDetails.type,
-        round: contextDetails.round,
-        match: contextDetails.match,
-        elimination_id: contextDetails.elimination_id,
-      };
-      const refetch = await ScoringService.findParticipantScoreDetail(queryString);
+      const refetch = await refetchScoreDetail();
       if (refetch.success) {
-        setMembersScoringData(refetch.data.map((data) => data.scores));
         setSavingStatus("success");
       } else {
         setSavingStatus("error");
@@ -155,32 +148,31 @@ export default function ModalScoring({
       backdrop="static"
       autoFocus={true}
       centered={true}
-      isOpen={isModalScoringOpen}
-      toggle={() => toggleModalScoring()}
-      onClosed={() => closeModalScoring()}
+      isOpen={isOpen}
+      toggle={handleToggle}
+      onClosed={() => onClosed()}
     >
-      <ModalHeader toggle={() => toggleModalScoring()}>
-        Set Scoring &mdash;{" "}
-        {computeScoringTypeLabel(initialScoringData, contextDetails.scoringTypeOptions)}
+      <ModalHeader toggle={handleToggle}>
+        Set Scoring &mdash; {computeScoringTypeLabel(scoringDetail, scoringTypeOptions)}
       </ModalHeader>
 
       <ModalBody>
         <SavingOverlay loading={isLoading} />
 
-        {initialScoringData?.length ? (
+        {scoringDetail?.length ? (
           <React.Fragment>
             <Row className="mt-4 mb-4">
               <Col>
-                <h4 className="text-center">{computeCategoryLabel(initialScoringData)}</h4>
+                <h4 className="text-center">{computeCategoryLabel(scoringDetail)}</h4>
               </Col>
             </Row>
 
             <Row>
               <Col className="border-end border-2 px-4">
-                <h5 className="text-center">{computeMemberName(initialScoringData[0])}</h5>
-                <h6 className="text-center mb-3">{computeClubName(initialScoringData[0])}</h6>
+                <h5 className="text-center">{computeMemberName(scoringDetail[0])}</h5>
+                <h6 className="text-center mb-3">{computeClubName(scoringDetail[0])}</h6>
 
-                {computeScoringTypeId(initialScoringData) === 1 && (
+                {computeScoringTypeId(scoringDetail) === 1 && (
                   <PointsDisplay
                     scoringType={1}
                     point={computeTotalPoints(modalScoringData[0])}
@@ -188,7 +180,7 @@ export default function ModalScoring({
                     winningStatus={modalScoringData[0].win}
                   />
                 )}
-                {computeScoringTypeId(initialScoringData) === 2 && (
+                {computeScoringTypeId(scoringDetail) === 2 && (
                   <PointsDisplay
                     scoringType={2}
                     point={computeTotalScores(modalScoringData[0])}
@@ -199,7 +191,7 @@ export default function ModalScoring({
 
                 {!hasWinner && (
                   <ScoringGrid
-                    scoringType={computeScoringTypeId(initialScoringData)}
+                    scoringType={computeScoringTypeId(scoringDetail)}
                     scores={modalScoringData[0]}
                     onChange={(ev) => handleGridChange(0, ev)}
                   />
@@ -207,10 +199,10 @@ export default function ModalScoring({
               </Col>
 
               <Col className="px-4">
-                <h5 className="text-center">{computeMemberName(initialScoringData[1])}</h5>
-                <h6 className="text-center mb-3">{computeClubName(initialScoringData[1])}</h6>
+                <h5 className="text-center">{computeMemberName(scoringDetail[1])}</h5>
+                <h6 className="text-center mb-3">{computeClubName(scoringDetail[1])}</h6>
 
-                {computeScoringTypeId(initialScoringData) === 1 && (
+                {computeScoringTypeId(scoringDetail) === 1 && (
                   <PointsDisplay
                     scoringType={1}
                     point={computeTotalPoints(modalScoringData[1])}
@@ -218,7 +210,7 @@ export default function ModalScoring({
                     winningStatus={modalScoringData[1].win}
                   />
                 )}
-                {computeScoringTypeId(initialScoringData) === 2 && (
+                {computeScoringTypeId(scoringDetail) === 2 && (
                   <PointsDisplay
                     scoringType={2}
                     point={computeTotalScores(modalScoringData[1])}
@@ -229,7 +221,7 @@ export default function ModalScoring({
 
                 {!hasWinner && (
                   <ScoringGrid
-                    scoringType={computeScoringTypeId(initialScoringData)}
+                    scoringType={computeScoringTypeId(scoringDetail)}
                     scores={modalScoringData[1]}
                     onChange={(ev) => handleGridChange(1, ev)}
                   />
@@ -262,10 +254,10 @@ export default function ModalScoring({
         )}
       </ModalBody>
 
-      {initialScoringData?.length && (
+      {scoringDetail?.length && (
         <ModalFooter>
           {hasWinner ? (
-            <Button color="primary" onClick={() => closeModalScoring()}>
+            <Button color="primary" onClick={() => onClosed()}>
               Selesai
             </Button>
           ) : (

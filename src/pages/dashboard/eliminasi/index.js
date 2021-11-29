@@ -20,23 +20,20 @@ const APP_ARCHER_URL = process.env.REACT_APP_ARCHER_URL
   ? process.env.REACT_APP_ARCHER_URL
   : "https://staging.myarchery.id";
 
-const CustomSeed = (e, setScoring, updated, maxRounds) => {
-  const { roundIndex, seedIndex, seed, breakpoint } = e;
+const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
+  const { roundIndex, seed, breakpoint } = seedData;
 
   const isFinalRound = roundIndex === maxRounds - 2;
   const isThirdPlaceRound = roundIndex === maxRounds - 1;
 
-  const shouldRenderScoring = () => {
+  const shouldScoringEnabled = () => {
     // hanya perlu render tombol scoring ketika masing-masing `team.win === 0`
     const isScoring = seed.teams.every((team) => team.win === 0);
     return !updated && isScoring;
   };
 
   const handleOnClickSetScoring = () => {
-    setScoring({
-      round: roundIndex + 1,
-      match: seedIndex + 1,
-    });
+    setScoring(seedData);
   };
 
   const computeMedalStyle = (index) => {
@@ -65,11 +62,11 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                     // kotak emas, teks putih, yang udah menang
                   >
                     <SeedNameLabel>
-                      {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
-                      {team?.score || 0}
+                      {team?.result || 0}
                     </SeedScoreLabel>
 
                     {isFinalRound && (
@@ -93,11 +90,11 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                     // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
                   >
                     <SeedNameLabel>
-                      {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
-                      {team?.score || 0}
+                      {team?.result || 0}
                     </SeedScoreLabel>
 
                     {isFinalRound && (
@@ -116,14 +113,14 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
                   // kotak hitam, teks putih, di-bypass ("bye")
                 >
                   <SeedNameLabel style={{ width: "100%", textAlign: "center" }}>
-                    {team?.name || <React.Fragment>&lt;not have participant&gt;</React.Fragment>}
+                    {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
                   </SeedNameLabel>
                 </SeedTeamStyled>
               </div>
             );
           })}
 
-          {shouldRenderScoring() && (
+          {shouldScoringEnabled() && (
             <SeedItem style={{ marginTop: 2, backgroundColor: "var(--bs-gray-800)" }}>
               <ButtonScoring key={breakpoint} onClick={handleOnClickSetScoring}>
                 <i className="bx bx-edit me-2" />
@@ -138,8 +135,6 @@ const CustomSeed = (e, setScoring, updated, maxRounds) => {
   );
 };
 
-const initialScoringDetail = { scoringData: null };
-
 function Eliminasi() {
   const [loading, setLoading] = React.useState(false);
 
@@ -151,10 +146,6 @@ function Eliminasi() {
   const [end, setEnd] = useState("");
   const [category, setCategory] = useState(0);
   const { event_id } = useParams();
-
-  const [currentScoringDetail, setCurrentScoringDetail] = React.useState(
-    () => initialScoringDetail
-  );
 
   const eliminationType = [
     { id: "1", label: "A vs Z" },
@@ -248,26 +239,28 @@ function Eliminasi() {
     console.log(errors);
   };
 
-  const setScoring = async (ev) => {
+  const setScoring = async (seedData) => {
     setLoading(true);
 
-    const contextDetails = {
+    const queryString = {
       type: 2, // id untuk eliminasi
-      round: ev.round,
-      match: ev.match,
+      round: seedData.roundIndex + 1,
+      match: seedData.seedIndex + 1,
       elimination_id: matches.eliminationId,
     };
-    const result = await ScoringService.findParticipantScoreDetail(contextDetails);
+    const result = await ScoringService.findParticipantScoreDetail(queryString);
 
-    if (result.success && result.data?.length) {
-      setCurrentScoringDetail({
-        ...contextDetails,
-        scoringTypeOptions: scoringTypeOptions,
-        scoringData: result.data,
+    if (result.success && result.data) {
+      setCurrentScoringDetail(result.data);
+      setCurrentMatchData({
+        roundIndex: seedData.roundIndex,
+        seedIndex: seedData.seedIndex,
+        queryStringRefetch: queryString,
       });
       openModalScoring();
     } else {
-      setCurrentScoringDetail({ ...initialScoringDetail });
+      setCurrentScoringDetail(null);
+      console.error("Error mengambil data detail scoring match ini:", result.error);
     }
 
     setLoading(false);
@@ -290,20 +283,28 @@ function Eliminasi() {
     { id: "1", label: "Babak 4" },
   ];
 
+  const [currentScoringDetail, setCurrentScoringDetail] = React.useState(null);
+  const [currentMatchData, setCurrentMatchData] = React.useState(null);
   const [isModalScoringOpen, setModalScoringOpen] = React.useState(false);
 
   const openModalScoring = () => setModalScoringOpen(true);
+
   const closeModalScoring = () => {
     setModalScoringOpen(false);
-    setCurrentScoringDetail({ ...initialScoringDetail }); // reset data current detail kalau modal gak aktif
+    setCurrentScoringDetail(null);
+    setCurrentMatchData(null);
+    getEventEliminationTemplate();
   };
-  const toggleModalScoring = () => setModalScoringOpen((isOpen) => !isOpen);
 
-  const modalControl = {
-    isModalScoringOpen,
-    toggleModalScoring,
-    closeModalScoring,
-    openModalScoring,
+  const toggleModalScoring = () => {
+    setModalScoringOpen((isOpen) => !isOpen);
+    if (isModalScoringOpen) {
+      closeModalScoring();
+    }
+  };
+
+  const handleSavePermanent = () => {
+    getEventEliminationTemplate();
   };
 
   return (
@@ -418,11 +419,37 @@ function Eliminasi() {
                         }}
                       />
 
-                      {currentScoringDetail.scoringData?.length && (
+                      {isModalScoringOpen && currentScoringDetail?.length && currentMatchData && (
                         <ModalScoring
-                          data={currentScoringDetail}
-                          modalControl={modalControl}
-                          onSavePermanent={() => getEventEliminationTemplate()}
+                          matchData={{
+                            ...currentMatchData,
+                            ...matches.rounds[currentMatchData.roundIndex].seeds[
+                              currentMatchData.seedIndex
+                            ],
+                            updated: matches.updated,
+                          }}
+                          scoringDetail={currentScoringDetail}
+                          onChangeScoringDetail={(index, ev) => {
+                            setCurrentScoringDetail((currentDetail) => {
+                              const scoringDetailUpdated = [...currentDetail];
+                              scoringDetailUpdated[index].scores = { ...ev };
+                              return scoringDetailUpdated;
+                            });
+                          }}
+                          refetchScoreDetail={async () => {
+                            const result = await ScoringService.findParticipantScoreDetail(
+                              currentMatchData.queryStringRefetch
+                            );
+                            if (result.success && result.data) {
+                              setCurrentScoringDetail(result.data);
+                            }
+                            return result;
+                          }}
+                          isOpen={isModalScoringOpen}
+                          onToggle={toggleModalScoring}
+                          onClosed={closeModalScoring}
+                          onSavePermanent={handleSavePermanent}
+                          scoringTypeOptions={scoringTypeOptions}
                         />
                       )}
                     </BaganView>

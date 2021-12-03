@@ -12,6 +12,7 @@ import {
   convertBase64,
 } from "../utils";
 import { DEJAVU_SANS } from "../utils/font-family-list";
+import { certificateFields } from "constants/index";
 
 import { Container, Col, Row, Card, Button, Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
@@ -24,6 +25,8 @@ import FontBoldToggle from "../components/FontBoldToggle";
 import ColorPickerContainer from "../components/ColorPickerContainer";
 import PreviewCanvas from "../components/preview/PreviewCanvas";
 
+const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
+
 const defaultEditorData = {
   paperSize: "A4", // || [1280, 908] || letter
   backgroundUrl: undefined,
@@ -32,21 +35,21 @@ const defaultEditorData = {
   backgroundImage: undefined, // base64, yang nanti diupload
   fields: [
     {
-      name: "member_name",
+      name: LABEL_MEMBER_NAME,
       x: 640,
       y: 280,
       fontFamily: DEJAVU_SANS,
       fontSize: 60,
     },
     {
-      name: "peringkat_name",
+      name: LABEL_RANK,
       x: 640,
       y: 370,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
-      name: "kategori_name",
+      name: LABEL_CATEGORY_NAME,
       x: 640,
       y: 430,
       fontFamily: DEJAVU_SANS,
@@ -86,14 +89,14 @@ export default function CertificateNew() {
 
       if (certificate) {
         // Data editor dari data sertifikat yang sudah ada di server
-        const editorDataGet = JSON.parse(certificate.editorData);
+        const parsedEditorData = certificate.editorData ? JSON.parse(certificate.editorData) : "";
         setEditorData({
           ...defaultEditorData,
           typeCertificate: currentCertificateType,
           certificateId: certificate.id,
           backgroundUrl: certificate.backgroundUrl,
-          backgroundImage: editorDataGet.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
-          fields: editorDataGet.fields,
+          backgroundImage: parsedEditorData.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
+          fields: parsedEditorData.fields || defaultEditorData.fields,
         });
       } else {
         // Dari yang belum ada, dikenali dari gak ada `certificateId`-nya

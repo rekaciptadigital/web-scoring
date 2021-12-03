@@ -12,6 +12,10 @@ const boundingStroke = {
   },
 };
 
+function PlaceholderString({ children }) {
+  return <React.Fragment>&laquo;{children}&raquo;</React.Fragment>;
+}
+
 export default function EditorFieldText({ name, data = {}, onSelected, onChange, selected }) {
   const { y, fontFamily, fontSize, color, fontWeight } = data;
 
@@ -22,7 +26,6 @@ export default function EditorFieldText({ name, data = {}, onSelected, onChange,
     boundingStroke.idle.dashArray
   );
 
-  const placeholderString = `{%${name}%}`;
   const translatePosition = { x: 0, y };
 
   React.useEffect(() => {
@@ -71,7 +74,7 @@ export default function EditorFieldText({ name, data = {}, onSelected, onChange,
         onMouseOver={() => highlightOnMouseOver()}
         onMouseLeave={() => idleOnMouseLeave()}
       >
-        {placeholderString}
+        <PlaceholderString>{name}</PlaceholderString>
 
         <span
           style={{

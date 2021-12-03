@@ -1,7 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { certificateFields } from "constants/index";
+
 import EditorFieldText from "./EditorFieldText";
 import QrCodeField from "./QrCodeField";
+
+const { LABEL_RANK } = certificateFields;
 
 export default function EditorCanvasHTML({ data, currentObject, onChange, onSelect }) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
@@ -34,7 +38,7 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
 
         {fields?.length ? (
           fields.map((field) => {
-            if (field.name === "peringkat_name" && data.typeCertificate !== 2) {
+            if (field.name === LABEL_RANK && data.typeCertificate !== 2) {
               return;
             }
             return (

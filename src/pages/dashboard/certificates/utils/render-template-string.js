@@ -1,3 +1,7 @@
+import { certificateFields, certificateTypes } from "constants/index";
+
+const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
+
 function renderTemplateString(editorData) {
   const documentTitle = editorData.title || "My Archery Certificate";
 
@@ -40,16 +44,16 @@ function renderTemplateString(editorData) {
         margin: 0;
       }
 
-      ${renderCssField("member_name", editorData.fields[0])}
-      ${renderCssField("peringkat_name", editorData.fields[1])}
-      ${renderCssField("kategori_name", editorData.fields[2])}
+      ${renderCssField(LABEL_MEMBER_NAME, editorData.fields[0])}
+      ${renderCssField(LABEL_RANK, editorData.fields[1])}
+      ${renderCssField(LABEL_CATEGORY_NAME, editorData.fields[2])}
     </style>
   </head>
 
   <body>
-    ${renderFieldText("member_name")}
-    ${editorData.typeCertificate === 2 ? renderFieldText("peringkat_name") : ""}
-    ${renderFieldText("kategori_name")}
+    ${renderFieldText(LABEL_MEMBER_NAME)}
+    ${editorData.typeCertificate === certificateTypes.WINNER ? renderFieldText(LABEL_RANK) : ""}
+    ${renderFieldText(LABEL_CATEGORY_NAME)}
     ${renderQrCode()}
   </body>
 </html>`;
@@ -86,7 +90,7 @@ function renderFieldText(name) {
 }
 
 function renderQrCode() {
-  const urlPlaceholder = "{%sertif_verif_url%}";
+  const urlPlaceholder = "{%certificate_verify_url%}";
   return `
     <div class="qr-code-container">
       <barcode

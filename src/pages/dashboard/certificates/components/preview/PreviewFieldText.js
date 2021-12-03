@@ -1,10 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
+import { certificateFields } from "constants/index";
+
+const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
 
 const previewTexts = {
-  member_name: "Morgan Lundin",
-  peringkat_name: "Juara 1",
-  kategori_name: "Individu - Umum - Barebow - 50mm",
+  [LABEL_MEMBER_NAME]: "Morgan Lundin",
+  [LABEL_RANK]: "1",
+  [LABEL_CATEGORY_NAME]: "Individu - Umum - Barebow - 50m",
 };
 
 export default function PreviewFieldText({ name, data = {} }) {

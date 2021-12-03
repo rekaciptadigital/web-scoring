@@ -1,7 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { certificateFields } from "constants/index";
+
 import PreviewFieldText from "./PreviewFieldText";
 import QrCodeField from "../QrCodeField";
+
+const { LABEL_RANK } = certificateFields;
 
 export default function PreviewCanvas({ data }) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
@@ -19,7 +23,7 @@ export default function PreviewCanvas({ data }) {
       >
         {fields?.length ? (
           fields.map((field) => {
-            if (field.name === "peringkat_name" && data.typeCertificate !== 2) {
+            if (field.name === LABEL_RANK && data.typeCertificate !== 2) {
               return;
             }
             return <PreviewFieldText key={field.name} name={field.name} data={field} />;

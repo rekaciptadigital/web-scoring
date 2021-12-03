@@ -90,7 +90,7 @@ function renderFieldText(name) {
 }
 
 function renderQrCode() {
-  const urlPlaceholder = "{%sertif_verif_url%}";
+  const urlPlaceholder = "{%certificate_verify_url%}";
   return `
     <div class="qr-code-container">
       <barcode

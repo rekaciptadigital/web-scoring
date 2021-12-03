@@ -1,4 +1,4 @@
-import { certificateFields } from "constants/index";
+import { certificateFields, certificateTypes } from "constants/index";
 
 const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
 
@@ -52,7 +52,7 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText(LABEL_MEMBER_NAME)}
-    ${editorData.typeCertificate === 2 ? renderFieldText(LABEL_RANK) : ""}
+    ${editorData.typeCertificate === certificateTypes.WINNER ? renderFieldText(LABEL_RANK) : ""}
     ${renderFieldText(LABEL_CATEGORY_NAME)}
     ${renderQrCode()}
   </body>

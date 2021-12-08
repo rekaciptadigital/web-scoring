@@ -8,6 +8,8 @@ import { ButtonBlue, ButtonBlueOutline } from "components/ma";
 import { users, user } from "./events/home/utils/icon-svgs";
 import IconAdd from "components/icons/EventAdd";
 
+const URL_CREATE_EVENT = "/dashboard/events/new/prepare";
+
 const Dashboard = () => {
   return (
     <div className="page-content">
@@ -71,19 +73,21 @@ const Dashboard = () => {
         <div className="d-flex justify-content-between align-items-end my-3">
           <h3 className="mb-0">Events</h3>
           <div>
-            <ButtonBlue>+ Tambah Event</ButtonBlue>
+            <ButtonBlue tag="a" href={URL_CREATE_EVENT}>
+              + Tambah Event
+            </ButtonBlue>
           </div>
         </div>
 
         <Row>
           <Col md={4}>
-            <ThumbnailEvent />
+            <ThumbnailEvent href={URL_CREATE_EVENT} />
           </Col>
           <Col md={4}>
-            <ThumbnailEvent />
+            <ThumbnailEvent href={URL_CREATE_EVENT} />
           </Col>
           <Col md={4}>
-            <ThumbnailEvent />
+            <ThumbnailEvent href={URL_CREATE_EVENT} />
           </Col>
         </Row>
       </Container>
@@ -93,10 +97,10 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-function ThumbnailEvent() {
+function ThumbnailEvent({ href }) {
   return (
     <ThumbnailEventWrapper>
-      <a className="action-button">
+      <a className="action-button" href={href}>
         <span className="action-icon">
           <IconAdd />
         </span>
@@ -114,13 +118,13 @@ const ThumbnailEventWrapper = styled.div`
   width: 100%;
   height: 240px;
   border-radius: 8px;
-  border: dashed 2px var(--ma-gray);
+  border: dashed 2px var(--ma-gray-400);
 
   background-color: #ffffff;
   transition: all 0.4s;
 
   .svg-icon-path {
-    stroke: var(--ma-gray);
+    stroke: var(--ma-gray-400);
   }
 
   .action-button {

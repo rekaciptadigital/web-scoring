@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
+import { eventConfigs } from "constants/index";
 
 import MetaTags from "react-meta-tags";
 import { Container, Row, Col } from "reactstrap";
@@ -15,12 +16,14 @@ const stepsList = [
   { step: 3, label: "Daftar sebagai Event DKI Jakarta Series" },
 ];
 
+const { EVENT_TYPES, MATCH_TYPES } = eventConfigs;
+
 export default function PreWizard() {
   const { currentStep, stepsTotal, goToNextStep, goToPreviousStep } = useWizardView(stepsList);
   const computeProgressValue = () => currentStep / stepsTotal;
 
-  const [eventType, setEventType] = React.useState("");
-  const [matchType, setMatchType] = React.useState("");
+  const [eventType, setEventType] = React.useState(EVENT_TYPES.FULLDAY);
+  const [matchType, setMatchType] = React.useState(MATCH_TYPES.TOURNAMENT);
   const [eventKey, setEventKey] = React.useState("");
 
   const handleEventTypeChange = (ev) => setEventType(ev.target.value);

@@ -34,7 +34,7 @@ const ButtonWrapper = styled.button`
   }
 `;
 
-const styles = {
+const variantStyles = {
   blue: {
     "--button-bg-color": "var(--ma-blue)",
     "--button-bg-color-hover": "#0f53bb",
@@ -72,9 +72,9 @@ function ButtonBase({ corner, color, style, ...props }) {
   const propsNew = {
     ...props,
     style: {
-      ...style,
-      ...styles[color],
+      ...variantStyles[color],
       "--button-corner": withPx(corner),
+      ...style,
     },
   };
 
@@ -101,6 +101,10 @@ function ButtonOutlineBlue(props) {
   return <ButtonBase color="outline-blue" {...props} />;
 }
 
+function ButtonSmallBlue(props) {
+  return <ButtonBase color="blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
+}
+
 const ButtonBlueOutline = styled(BSButton)`
   &,
   &:focus,
@@ -118,4 +122,12 @@ const ButtonBlueOutline = styled(BSButton)`
   }
 `;
 
-export { Button, ButtonBlue, ButtonRed, ButtonBlueOutline, ButtonOutline, ButtonOutlineBlue };
+export {
+  Button,
+  ButtonBlue,
+  ButtonRed,
+  ButtonBlueOutline,
+  ButtonOutline,
+  ButtonOutlineBlue,
+  ButtonSmallBlue,
+};

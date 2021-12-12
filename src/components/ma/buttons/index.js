@@ -1,24 +1,107 @@
+import * as React from "react";
 import styled from "styled-components";
+import { Button as BSButton } from "reactstrap";
 
-import { Button } from "reactstrap";
-
-export const ButtonBlue = styled(Button)`
+const ButtonWrapper = styled.button`
   &,
   &:focus,
   &:active {
-    background-color: var(--ma-blue);
-    border: solid 1px var(--ma-blue);
-    color: #ffffff;
+    display: inline-block;
+    padding: 0.47rem 0.75rem;
+    border: solid 1px var(--button-outline-color, var(--ma-gray-100));
+    border-radius: var(--button-corner, 0.25rem);
     box-shadow: none;
+    background-color: var(--button-bg-color, var(--ma-gray-100));
+
+    color: var(--button-font-color, var(--ma-txt-black));
+    text-decoration: none;
+    line-height: 1.5;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   }
 
   &:hover {
-    background-color: #0f53bb;
-    border: solid 1px #0f53bb;
+    background-color: var(--button-bg-color-hover, var(--ma-gray-50));
+    border: solid 1px var(--button-outline-color, var(--ma-gray-100));
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: var(--button-font-color-hover, var(--ma-txt-black));
   }
 `;
 
-export const ButtonBlueOutline = styled(Button)`
+const styles = {
+  blue: {
+    "--button-bg-color": "var(--ma-blue)",
+    "--button-bg-color-hover": "#0f53bb",
+    "--button-outline-color": "var(--ma-blue)",
+    "--button-font-color": "#ffffff",
+    "--button-font-color-hover": "#ffffff",
+  },
+  red: {
+    "--button-bg-color": "var(--ma-red)",
+    "--button-bg-color-hover": "#cf1730",
+    "--button-outline-color": "var(--ma-red)",
+    "--button-font-color": "#ffffff",
+    "--button-font-color-hover": "#ffffff",
+  },
+  outline: {
+    "--button-bg-color": "none",
+    "--button-outline-color": "var(--ma-gray-400)",
+    "--button-font-color": "var(--ma-gray-500)",
+    "--button-font-color-hover": "var(--ma-gray-600)",
+  },
+  "outline-blue": {
+    "--button-bg-color": "none",
+    "--button-bg-color-hover": "var(--ma-blue)",
+    "--button-outline-color": "var(--ma-blue)",
+    "--button-font-color": "var(--ma-blue)",
+    "--button-font-color-hover": "#ffffff",
+  },
+};
+
+function ButtonBase({ corner, color, style, ...props }) {
+  const withPx = (number) => {
+    return number ? `${number}px` : undefined;
+  };
+
+  const propsNew = {
+    ...props,
+    style: {
+      ...style,
+      ...styles[color],
+      "--button-corner": withPx(corner),
+    },
+  };
+
+  return <ButtonWrapper {...propsNew} />;
+}
+
+function Button(props) {
+  return <ButtonBase {...props} />;
+}
+
+function ButtonBlue(props) {
+  return <ButtonBase color="blue" {...props} />;
+}
+
+function ButtonRed(props) {
+  return <ButtonBase color="red" {...props} />;
+}
+
+function ButtonOutline(props) {
+  return <ButtonBase color="outline" {...props} />;
+}
+
+function ButtonOutlineBlue(props) {
+  return <ButtonBase color="outline-blue" {...props} />;
+}
+
+const ButtonBlueOutline = styled(BSButton)`
   &,
   &:focus,
   &:active {
@@ -35,18 +118,4 @@ export const ButtonBlueOutline = styled(Button)`
   }
 `;
 
-export const ButtonRed = styled(Button)`
-  &,
-  &:focus,
-  &:active {
-    background-color: var(--ma-red);
-    border: solid 1px var(--ma-red);
-    color: #ffffff;
-    box-shadow: none;
-  }
-
-  &:hover {
-    background-color: #cf1730;
-    border: solid 1px #cf1730;
-  }
-`;
+export { Button, ButtonBlue, ButtonRed, ButtonBlueOutline, ButtonOutline, ButtonOutlineBlue };

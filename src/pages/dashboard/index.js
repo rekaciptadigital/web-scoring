@@ -73,7 +73,7 @@ const Dashboard = () => {
         <div className="d-flex justify-content-between align-items-end my-3">
           <h3 className="mb-0">Events</h3>
           <div>
-            <ButtonBlue tag="a" href={URL_CREATE_EVENT}>
+            <ButtonBlue as="a" href={URL_CREATE_EVENT} corner={8}>
               + Tambah Event
             </ButtonBlue>
           </div>

@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
+import { Link } from "react-router-dom";
 import Calendar from "components/icons/Calendar";
 import MapPin from "components/icons/MapPin";
 import Panah from "components/icons/Panah";
@@ -114,7 +115,7 @@ const EventItemCardWrapper = styled.div`
 `;
 
 function EventItemCard({ event }) {
-  const hrefToEventHome = event?.id ? `/dashboard/event/${event.id}/home` : "";
+  const hrefToEventHome = event?.id ? `/dashboard/event/${event.id}/home` : "#";
 
   return (
     <EventItemCardWrapper>
@@ -129,9 +130,9 @@ function EventItemCard({ event }) {
       </div>
 
       <div className="event-footer">
-        <a className="event-link" href={hrefToEventHome}>
+        <Link className="event-link" to={hrefToEventHome}>
           <i className="bx bx-right-arrow-alt fs-3" style={{ color: "var(--ma-blue)" }} />
-        </a>
+        </Link>
       </div>
     </EventItemCardWrapper>
   );

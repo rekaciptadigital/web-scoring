@@ -1,5 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
+
+import { Link } from "react-router-dom";
 import IconAdd from "components/icons/EventAdd";
 
 const EventAddCardWrapper = styled.div`
@@ -71,12 +73,12 @@ const EventAddCardWrapper = styled.div`
 export default function EventAddCard({ href, style }) {
   return (
     <EventAddCardWrapper style={style}>
-      <a className="action-button" href={href}>
+      <Link className="action-button" to={href}>
         <span className="action-icon">
           <IconAdd />
         </span>
         <span className="action-label">Tambah Event</span>
-      </a>
+      </Link>
     </EventAddCardWrapper>
   );
 }

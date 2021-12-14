@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import * as AuthStore from "store/slice/authentication";
 import { AdminService } from "services";
 
+import { Link } from "react-router-dom";
 import { Card, CardBody } from "reactstrap";
 import { ButtonBlueOutline } from "components/ma";
 import { user } from "pages/dashboard/events/home/utils/icon-svgs";
@@ -147,7 +148,7 @@ function CardUserProfile() {
                 </p>
 
                 <div className="float-end">
-                  <ButtonBlueOutline tag="a" className="menu-link" href="">
+                  <ButtonBlueOutline tag={Link} className="menu-link" to="#">
                     Edit Profil
                   </ButtonBlueOutline>
                 </div>

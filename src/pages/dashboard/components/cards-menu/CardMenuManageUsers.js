@@ -1,5 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
+
+import { Link } from "react-router-dom";
 import { Card, CardBody } from "reactstrap";
 import { users } from "pages/dashboard/events/home/utils/icon-svgs";
 
@@ -108,9 +110,9 @@ function CardMenuManageUsers() {
         <p>Mengatur pengguna seperti manager event</p>
 
         <div className="float-end">
-          <a className="menu-link" href="">
+          <Link className="menu-link" to="#">
             <i className="bx bx-right-arrow-alt fs-3" style={{ color: "var(--ma-blue)" }} />
-          </a>
+          </Link>
         </div>
       </CardBody>
     </CardMenuContainer>

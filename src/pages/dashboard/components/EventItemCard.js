@@ -5,7 +5,56 @@ import Calendar from "components/icons/Calendar";
 import MapPin from "components/icons/MapPin";
 import Panah from "components/icons/Panah";
 
-const ThumbnailEventWrapper = styled.div`
+const formatDate = (datetimeString) => {
+  // YYYY-MM-DD
+  const date = datetimeString.split(" ")[0].split("-");
+  // DD/MM/YYYY
+  return date.reverse().join("/");
+};
+
+const InfoDisplayWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+
+  .icon {
+    transform: translateY(-2px);
+  }
+`;
+
+function EventCity({ children, city }) {
+  const cityTextLabel = children || city || "Lokasi tidak tersedia";
+  return (
+    <InfoDisplayWrapper>
+      <span className="icon">
+        <MapPin />
+      </span>
+      <span>{cityTextLabel}</span>
+    </InfoDisplayWrapper>
+  );
+}
+
+function EventDateRange({ from, to }) {
+  const isDateAvailable = from && to;
+
+  const dateRange = isDateAvailable
+    ? `${formatDate(from)} - ${formatDate(to)}`
+    : "Tanggal tidak tersedia";
+
+  return (
+    <InfoDisplayWrapper>
+      <span className="icon">
+        <Calendar size={16} />
+      </span>
+      <span>{dateRange}</span>
+    </InfoDisplayWrapper>
+  );
+}
+
+const EventItemCardWrapper = styled.div`
   position: relative;
 
   display: flex;
@@ -18,6 +67,7 @@ const ThumbnailEventWrapper = styled.div`
   border-radius: 8px;
 
   background-color: #ffffff;
+  transition: all 0.4s;
 
   .event-body {
     overflow-y: hidden;
@@ -28,19 +78,6 @@ const ThumbnailEventWrapper = styled.div`
 
     .event-title {
       color: var(--ma-blue);
-    }
-
-    .event-city {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-
-      margin-bottom: 0.5rem;
-      font-size: 14px;
-
-      .event-city-icon {
-        transform: translateY(-2px);
-      }
     }
 
     .event-dates {
@@ -70,57 +107,25 @@ const ThumbnailEventWrapper = styled.div`
       left: 0;
     }
   }
+
+  &:hover {
+    box-shadow: 0 0.25rem 0.8rem rgb(18 38 63 / 7.5%);
+  }
 `;
 
-function City({ city, children }) {
-  if (!(city || children)) {
-    return null;
-  }
-  return (
-    <div className="event-city">
-      <span className="event-city-icon">
-        <MapPin />
-      </span>
-      <span>{children || city}</span>
-    </div>
-  );
-}
-
-const formatDate = (dateString) => {
-  return [...dateString.split(" ")[0].split("-")].reverse().join("/");
-};
-
-function EventDates({ from, to }) {
-  if (!from || !to) {
-    return null;
-  }
-
-  return (
-    <div className="event-dates">
-      <span className="event-dates-icon">
-        <Calendar size={16} />
-      </span>
-
-      <span>
-        {formatDate(from)} - {formatDate(to)}
-      </span>
-    </div>
-  );
-}
-
-export default function ThumbnailEvent({ event }) {
+function EventItemCard({ event }) {
   const hrefToEventHome = event?.id ? `/dashboard/event/${event.id}/home` : "";
 
   return (
-    <ThumbnailEventWrapper>
+    <EventItemCardWrapper>
       <div className="event-body">
         <div className="event-icon">
           <Panah size={28} color="#afafaf" />
         </div>
         <h4 className="event-title">{event.eventName}</h4>
-        <City>{event.city || "Mock City"}</City>
+        <EventCity>{event.city}</EventCity>
 
-        <EventDates from={event.eventStartDatetime} to={event.eventEndDatetime} />
+        <EventDateRange from={event.eventStartDatetime} to={event.eventEndDatetime} />
       </div>
 
       <div className="event-footer">
@@ -128,6 +133,8 @@ export default function ThumbnailEvent({ event }) {
           <i className="bx bx-right-arrow-alt fs-3" style={{ color: "var(--ma-blue)" }} />
         </a>
       </div>
-    </ThumbnailEventWrapper>
+    </EventItemCardWrapper>
   );
 }
+
+export default EventItemCard;

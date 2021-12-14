@@ -1,37 +1,35 @@
 import * as React from "react";
+import styled from "styled-components";
 import { EventsService } from "services";
 
 import { Row, Col } from "reactstrap";
-import ThumbnailEvent from "./ThumbnailEvent";
-import ThumbnailAdd from "./ThumbnailAdd";
+import EventThumbnailCard from "./EventThumbnailCard";
 
-const URL_CREATE_EVENT = "/dashboard/events/new/prepare";
-
-function computeLatestThree(initialData) {
+function makeThumbnailList(initialData) {
   const container = [null, null, null];
-
   if (!initialData?.length) {
     return container;
   }
-
   initialData.forEach((event, index) => {
     container[index] = event;
   });
-
   return container;
-
-  /**
-   * Logic alternatif untuk render versi 1 tombol add aja:
-   */
-  /* 
-  if (initialData?.length < 3) {
-    return [...initialData, null];
-  } else if (initialData?.length === 3) {
-    return initialData;
-  }
-  return [null];
-  */
 }
+
+const EventLoadingIndicator = styled.div`
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 240px;
+  padding: 1.5rem 1.5rem 0.85rem 1.5rem;
+  border-radius: 8px;
+
+  background-color: #ffffff;
+`;
 
 function LatestEventList() {
   const [events, setEvents] = React.useState(null);
@@ -51,30 +49,22 @@ function LatestEventList() {
     return (
       <Row>
         <Col md={4}>
-          <div>Loading...</div>
+          <EventLoadingIndicator>Sedang memuat data event...</EventLoadingIndicator>
         </Col>
       </Row>
     );
   }
 
-  const latestThreeEvents = computeLatestThree(events);
-
   return (
     <Row>
-      {latestThreeEvents?.map((event, index) => {
-        if (!event) {
+      {events &&
+        makeThumbnailList(events).map((event, index) => {
           return (
             <Col key={index} md={4}>
-              <ThumbnailAdd href={URL_CREATE_EVENT} />
+              <EventThumbnailCard event={event} />
             </Col>
           );
-        }
-        return (
-          <Col key={index} md={4}>
-            <ThumbnailEvent event={event} />
-          </Col>
-        );
-      })}
+        })}
     </Row>
   );
 }

@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import IconAdd from "components/icons/EventAdd";
 
-const ThumbnailAddWrapper = styled.div`
+const EventAddCardWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -68,15 +68,15 @@ const ThumbnailAddWrapper = styled.div`
   }
 `;
 
-export default function ThumbnailAdd({ href, style }) {
+export default function EventAddCard({ href, style }) {
   return (
-    <ThumbnailAddWrapper style={style}>
+    <EventAddCardWrapper style={style}>
       <a className="action-button" href={href}>
         <span className="action-icon">
           <IconAdd />
         </span>
         <span className="action-label">Tambah Event</span>
       </a>
-    </ThumbnailAddWrapper>
+    </EventAddCardWrapper>
   );
 }

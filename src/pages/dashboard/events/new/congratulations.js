@@ -14,20 +14,6 @@ import ShareFacebook from "components/icons/social-share/Facebook";
 import ShareTwitter from "components/icons/social-share/Twitter";
 import CopyChain from "components/icons/CopyChain";
 
-export default function Congratulations() {
-  return (
-    <div className="page-content">
-      <MetaTags>
-        <title>Event baru berhasil dibuat! | MyArchery.id</title>
-      </MetaTags>
-
-      <Container fluid className="mt-4 mb-5">
-        <ContentArea />
-      </Container>
-    </div>
-  );
-}
-
 const CongratulationCardContainer = styled.div`
   width: 100%;
 
@@ -36,7 +22,7 @@ const CongratulationCardContainer = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
 
     margin: auto;
     margin-top: 4rem;
@@ -50,12 +36,14 @@ const CongratulationCardContainer = styled.div`
     text-align: center;
 
     .heading {
+      margin-bottom: 1rem;
       font-size: 2rem;
       font-weight: 400;
     }
 
     .link-textbox {
       position: relative;
+      margin-bottom: 1rem;
 
       .link-textbox-input {
         display: inline-block;
@@ -99,7 +87,7 @@ const CongratulationCardContainer = styled.div`
     }
 
     .social-share-box {
-      margin-top: -0.8rem;
+      margin-bottom: 1rem;
       padding: 0.5rem 0;
 
       .heading-share-to {
@@ -126,7 +114,7 @@ const CongratulationCardContainer = styled.div`
   }
 `;
 
-function ContentArea() {
+function CongratulationsContent({ withSocialSharing }) {
   const { search } = useLocation();
   const eventId = queryString.parse(search)?.event;
 
@@ -150,25 +138,17 @@ function ContentArea() {
   };
 
   if (!eventId || eventError) {
-    return (
-      <CongratulationCardContainer>
-        <div className="card-congratulations">Event tidak valid</div>
-      </CongratulationCardContainer>
-    );
+    return <div className="card-congratulations">Event tidak valid</div>;
   }
 
   if (!event) {
-    return (
-      <CongratulationCardContainer>
-        <div className="card-congratulations">Sedang memuat data event...</div>
-      </CongratulationCardContainer>
-    );
+    return <div className="card-congratulations">Sedang memuat data event...</div>;
   }
 
   if (event) {
     return (
-      <CongratulationCardContainer>
-        <div className="card-congratulations">
+      <div className="card-congratulations">
+        <div>
           <h1 className="heading">Selamat Eventmu Sudah Live</h1>
 
           <div className="link-textbox">
@@ -179,7 +159,9 @@ function ContentArea() {
               </a>
             </span>
           </div>
+        </div>
 
+        {withSocialSharing && (
           <div className="social-share-box">
             <h6 className="heading-share-to">Share to</h6>
             <ul className="list-social-media">
@@ -202,14 +184,30 @@ function ContentArea() {
               </li>
             </ul>
           </div>
+        )}
 
-          <div>
-            <ButtonBlue as={Link} to="/dashboard">
-              Kembali ke Dashboard
-            </ButtonBlue>
-          </div>
+        <div>
+          <ButtonBlue as={Link} to="/dashboard">
+            Kembali ke Dashboard
+          </ButtonBlue>
         </div>
-      </CongratulationCardContainer>
+      </div>
     );
   }
+}
+
+export default function PageCongratulations() {
+  return (
+    <div className="page-content">
+      <MetaTags>
+        <title>Event baru berhasil dibuat! | MyArchery.id</title>
+      </MetaTags>
+
+      <Container fluid className="mt-4 mb-5">
+        <CongratulationCardContainer>
+          <CongratulationsContent />
+        </CongratulationCardContainer>
+      </Container>
+    </div>
+  );
 }

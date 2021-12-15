@@ -41,6 +41,19 @@ const CongratulationCardContainer = styled.div`
       font-weight: 400;
     }
 
+    &.invalid {
+      justify-content: center;
+
+      .heading {
+        font-size: 1.5rem;
+        color: var(--ma-gray-400)
+      }
+
+      > *:first-child {
+        margin-bottom: 1.5rem;
+      }
+    }
+
     .link-textbox {
       position: relative;
       margin-bottom: 1rem;
@@ -138,7 +151,16 @@ function CongratulationsContent({ withSocialSharing }) {
   };
 
   if (!eventId || eventError) {
-    return <div className="card-congratulations">Event tidak valid</div>;
+    return (
+      <div className="card-congratulations invalid">
+        <h3 className="mt-4 heading">Event tidak valid</h3>
+        <div>
+          <ButtonBlue as={Link} to="/dashboard">
+            Kembali ke Dashboard
+          </ButtonBlue>
+        </div>
+      </div>
+    );
   }
 
   if (!event) {

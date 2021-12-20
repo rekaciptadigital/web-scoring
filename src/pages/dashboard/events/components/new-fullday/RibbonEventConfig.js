@@ -54,13 +54,6 @@ export function RibbonEventConfig() {
             <strong>Jenis Pertandingan</strong>
             <span className="ms-2">Turnamen</span>
           </li>
-
-          <li className="ribbon-config-item">
-            <span className="me-2">
-              <Panah />
-            </span>
-            <strong>DKI Jakarta Series</strong>
-          </li>
         </ul>
 
         <div className="ms-3">

@@ -2,12 +2,12 @@ import * as React from "react";
 import styled from "styled-components";
 import Select from "react-select";
 
-const optionsCategory = [
-  { label: "Barebow", value: "Barebow" },
-  { label: "Compound", value: "Compound" },
-  { label: "Recurve", value: "Recurve" },
-  { label: "Standard Bow", value: "Standard Bow" },
-  { label: "Recurve FITA", value: "Recurve FITA" },
+const optionsJenisRegu = [
+  { label: "Individu Putra", value: "Individu Putra" },
+  { label: "Individu Putri", value: "Individu Putri" },
+  { label: "Beregu Putra", value: "Beregu Putra" },
+  { label: "Beregu Putri", value: "Beregu Putri" },
+  { label: "Beregu Campuran", value: "Beregu Campuran" },
 ];
 
 const FieldSelectWrapper = styled.div`
@@ -28,7 +28,7 @@ const FieldSelectWrapper = styled.div`
 const customSelectStyles = {
   control: (provided) => ({
     ...provided,
-    borderColor: "transparent",
+    minHeight: undefined,
   }),
   valueContainer: (provided) => ({
     ...provided,
@@ -36,42 +36,41 @@ const customSelectStyles = {
   }),
   input: (provided) => ({
     ...provided,
-    fontSize: 24,
+    color: "#6a7187",
+    fontSize: 12,
     padding: 0,
     marginTop: 0,
     marginBottom: 0,
   }),
   singleValue: (provided) => ({
     ...provided,
-    fontSize: 24,
+    color: "#6a7187",
+    fontSize: 12,
   }),
   placeholder: (provided) => ({
     ...provided,
-    fontSize: 24,
-  }),
-  indicatorSeparator: (provided) => ({
-    ...provided,
-    backgroundColor: "transparent",
+    color: "#6a7187",
+    fontSize: 12,
+    opacity: 0.6,
   }),
   dropdownIndicator: (provided) => ({
     ...provided,
-    padding: 14,
-    color: "var(--ma-blue)",
-    ":hover": {
-      color: "var(--ma-blue)",
-    },
+    padding: 7,
   }),
 };
 
-function FieldSelectCategory({ name, placeholder, defaultValue, value, onChange }) {
+function FieldSelectJenisRegu({ children, label, name, required, placeholder, value, onChange }) {
   return (
     <FieldSelectWrapper>
+      <label className="field-label">
+        {children || label}
+        {required && <span className="field-required">*</span>}
+      </label>
       <Select
         styles={customSelectStyles}
         name={name}
         placeholder={placeholder}
-        options={optionsCategory}
-        defaultValue={defaultValue}
+        options={optionsJenisRegu}
         value={value}
         onChange={onChange}
       />
@@ -79,4 +78,4 @@ function FieldSelectCategory({ name, placeholder, defaultValue, value, onChange 
   );
 }
 
-export default FieldSelectCategory;
+export default FieldSelectJenisRegu;

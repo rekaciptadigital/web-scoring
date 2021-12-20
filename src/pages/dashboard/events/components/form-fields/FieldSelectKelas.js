@@ -2,6 +2,13 @@ import * as React from "react";
 import styled from "styled-components";
 import Select from "react-select";
 
+const optionsKelas = [
+  { label: "Umum", value: "Umum" },
+  { label: "U-16", value: "U-16" },
+  { label: "U-21", value: "U-21" },
+  { label: "U-23", value: "U-23" },
+];
+
 const FieldSelectWrapper = styled.div`
   .field-label {
     display: inline-block;
@@ -18,14 +25,9 @@ const FieldSelectWrapper = styled.div`
 `;
 
 const customSelectStyles = {
-  control: (provided, { isFocused }) => ({
+  control: (provided) => ({
     ...provided,
-    minHeight: 36,
-    backgroundColor: "var(--ma-blue)",
-    borderColor: isFocused ? "#2684ff" : "var(--ma-blue)",
-    ":hover": {
-      borderColor: "#2684ff",
-    },
+    minHeight: undefined,
   }),
   valueContainer: (provided) => ({
     ...provided,
@@ -33,7 +35,7 @@ const customSelectStyles = {
   }),
   input: (provided) => ({
     ...provided,
-    color: "#ffffff",
+    color: "#6a7187",
     fontSize: 12,
     padding: 0,
     marginTop: 0,
@@ -41,39 +43,22 @@ const customSelectStyles = {
   }),
   singleValue: (provided) => ({
     ...provided,
-    color: "#ffffff",
+    color: "#6a7187",
     fontSize: 12,
   }),
   placeholder: (provided) => ({
     ...provided,
-    color: "#ffffff",
+    color: "#6a7187",
     fontSize: 12,
+    opacity: 0.6,
   }),
   dropdownIndicator: (provided) => ({
     ...provided,
     padding: 7,
-    color: "#ffffff",
-    ":hover": {
-      color: "#ffffff",
-    },
   }),
 };
 
-// TODO: tambah beberapa props berikut:
-/*
-   - disabled
-   - ...
- */
-function FieldSelectKelas({
-  children,
-  label,
-  name,
-  placeholder,
-  required,
-  options,
-  value,
-  onChange,
-}) {
+function FieldSelectKelas({ children, label, name, required, placeholder, value, onChange }) {
   return (
     <FieldSelectWrapper>
       <label className="field-label">
@@ -84,7 +69,7 @@ function FieldSelectKelas({
         styles={customSelectStyles}
         name={name}
         placeholder={placeholder}
-        options={options}
+        options={optionsKelas}
         value={value}
         onChange={onChange}
       />

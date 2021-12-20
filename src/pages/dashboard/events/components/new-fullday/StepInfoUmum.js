@@ -74,7 +74,7 @@ const FieldInput = styled.div`
   }
 `;
 
-export function Step1() {
+export function StepInfoUmum() {
   return (
     <FormSheet>
       <h3 className="mb-3">Banner Event</h3>

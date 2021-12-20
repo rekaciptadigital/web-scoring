@@ -67,7 +67,7 @@ const FieldPriceWrapper = styled.div`
   }
 `;
 
-function FieldInputPrice({ children, label, name }) {
+function FieldInputPrice({ children, label, name, disabled }) {
   const fieldID = name ? `field-price-${name}` : undefined;
 
   return (
@@ -77,7 +77,13 @@ function FieldInputPrice({ children, label, name }) {
       </label>
       <div className="field-group-price">
         <span className="field-price-currency-symbol">Rp</span>
-        <input className="field-price-input" id={fieldID} placeholder="1,234.00" name={name} />
+        <input
+          className="field-price-input"
+          id={fieldID}
+          placeholder="1,234.00"
+          name={name}
+          disabled={disabled}
+        />
       </div>
     </FieldPriceWrapper>
   );

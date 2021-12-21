@@ -8,7 +8,6 @@ import { Container, Row, Col } from "reactstrap";
 import { WizardView, WizardViewContent, ProgressBarLine } from "components/ma";
 import Step1 from "../components/pre-wizard/Step1";
 import Step2 from "../components/pre-wizard/Step2";
-import Step3 from "../components/pre-wizard/Step3";
 
 const stepsList = [
   { step: 1, label: "Tentukan jenis waktu pelaksanaan" },
@@ -24,11 +23,9 @@ export default function PreWizard() {
 
   const [eventType, setEventType] = React.useState(EVENT_TYPES.FULLDAY);
   const [matchType, setMatchType] = React.useState(MATCH_TYPES.TOURNAMENT);
-  const [eventKey, setEventKey] = React.useState("");
 
   const handleEventTypeChange = (ev) => setEventType(ev.target.value);
   const handleMatchTypeChange = (ev) => setMatchType(ev.target.value);
-  const handleEventKeyChange = (ev) => setEventKey(ev.target.value);
 
   const shouldButtonNextDisabled = () => {
     if (currentStep === 1 && !eventType) {
@@ -73,14 +70,10 @@ export default function PreWizard() {
                 <WizardViewContent>
                   <Step2 matchType={matchType} onChange={handleMatchTypeChange} />
                 </WizardViewContent>
-
-                <WizardViewContent>
-                  <Step3 eventKey={eventKey} onChange={handleEventKeyChange} />
-                </WizardViewContent>
               </WizardView>
 
               <ActionButtonGroup className="mt-5">
-                {currentStep === 3 ? (
+                {currentStep === 2 ? (
                   <a className="button-action next" href="/dashboard/events/new/fullday">
                     Buat Event
                   </a>

@@ -11,6 +11,7 @@ import {
   StepKategori,
   RibbonEventConfig,
 } from "../components/new-fullday";
+import { PreviewPortal } from "../components/preview";
 
 const stepsData = [
   {
@@ -41,6 +42,7 @@ const EventsNewFullday = () => {
     useWizardView(stepsData);
 
   const [eventData, setEventData] = React.useState(initialEventData);
+  const [isPreviewActive, setPreviewActive] = React.useState(false);
 
   const handleStepChange = (ev) => {
     setEventData(ev?.target?.value || { ...initialEventData });
@@ -123,7 +125,12 @@ const EventsNewFullday = () => {
                       >
                         Kembali
                       </Button>
-                      <ButtonBlue corner="8" style={{ width: 100 }}>
+
+                      <ButtonBlue
+                        corner="8"
+                        style={{ width: 100 }}
+                        onClick={() => setPreviewActive(true)}
+                      >
                         Preview
                       </ButtonBlue>
                     </div>
@@ -134,6 +141,12 @@ const EventsNewFullday = () => {
           </Row>
         </Container>
       </div>
+
+      <PreviewPortal
+        isActive={isPreviewActive}
+        eventData={eventData}
+        onClose={() => setPreviewActive(false)}
+      />
     </React.Fragment>
   );
 };

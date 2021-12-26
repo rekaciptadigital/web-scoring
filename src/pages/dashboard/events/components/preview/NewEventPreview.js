@@ -32,7 +32,8 @@ const PageWrapper = styled.div`
 
   .event-countdown-box {
     padding: 16px 18px;
-    box-shadow: 0 0.25rem 0.75rem rgb(18 38 63 / 5%);
+    border-radius: 4px;
+    box-shadow: 0 0.1rem 0.5rem rgb(18 38 63 / 10%);
     text-align: center;
 
     > *:not(:first-child) {
@@ -115,7 +116,7 @@ const PageWrapper = styled.div`
   }
 `;
 
-function NewEventPreview() {
+function NewEventPreview({ eventData }) {
   return (
     <PageWrapper>
       <Container fluid>
@@ -123,33 +124,53 @@ function NewEventPreview() {
 
         <Row className="mt-3">
           <Col md="8">
-            <h1 className="event-heading">Pro Archery - 2022</h1>
+            <h1 className="event-heading">{eventData.eventName}</h1>
             <div>Oleh Pro Archery Club</div>
 
             <div className="mt-5">
-              <h5>Deskripsi</h5>
-              <p>
-                Kegiatan scoring untuk kembali menumbuhkan semangat berlatih panahan serta ajang
-                silaturahmi secara langsung sesuai dengan protocol Kesehatan saat ini.
-              </p>
+              {/* Optional field */}
+              {eventData?.description && (
+                <React.Fragment>
+                  <h5>Deskripsi</h5>
+                  <p>{eventData.description}</p>
+                </React.Fragment>
+              )}
 
+              {/* Required fields */}
               <h5>Waktu &amp; Tempat</h5>
-              <p>
-                Tanggal event : 01 Februari 2022 - 28 Februari 2022 Lokasi : Lapangan Panahan Utama
-                Pro Archery Kota : Bekasi Lapangan : Outdoor
-              </p>
+              <table className="mb-3">
+                <tbody>
+                  <tr>
+                    <td>Tanggal Event</td>
+                    <td>:</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Lokasi</td>
+                    <td>:</td>
+                    <td>{eventData.location}</td>
+                  </tr>
+                  <tr>
+                    <td>Kota</td>
+                    <td>:</td>
+                    <td>{eventData.city}</td>
+                  </tr>
+                  <tr>
+                    <td>Lapangan</td>
+                    <td>:</td>
+                    <td>{eventData.locationType}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-              <h5>Deskripsi</h5>
-              <p>
-                Kegiatan scoring untuk kembali menumbuhkan semangat berlatih panahan serta ajang
-                silaturahmi secara langsung sesuai dengan protocol Kesehatan saat ini.
-              </p>
+              {eventData.eventInformations?.map((info) => (
+                <React.Fragment key={info.key}>
+                  <h5>{info.title}</h5>
+                  <p>{info.description}</p>
+                </React.Fragment>
+              ))}
 
-              <h5>Waktu &amp; Tempat</h5>
-              <p>
-                Tanggal event : 01 Februari 2022 - 28 Februari 2022 Lokasi : Lapangan Panahan Utama
-                Pro Archery Kota : Bekasi Lapangan : Outdoor
-              </p>
+              <h5>Biaya Registrasi</h5>
             </div>
           </Col>
 

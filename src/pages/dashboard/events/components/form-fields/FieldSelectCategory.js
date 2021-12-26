@@ -63,15 +63,22 @@ const customSelectStyles = {
   }),
 };
 
-function FieldSelectCategory({ name, placeholder, defaultValue, value, onChange }) {
+function FieldSelectCategory({
+  name,
+  placeholder = "Pilih Kategori",
+  options = optionsCategory,
+  isOptionDisabled,
+  value = { label: "Barebow", value: "Barebow" },
+  onChange,
+}) {
   return (
     <FieldSelectWrapper>
       <Select
         styles={customSelectStyles}
         name={name}
         placeholder={placeholder}
-        options={optionsCategory}
-        defaultValue={defaultValue}
+        options={options}
+        isOptionDisabled={isOptionDisabled}
         value={value}
         onChange={onChange}
       />

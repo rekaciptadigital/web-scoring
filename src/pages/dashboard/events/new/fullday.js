@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventConfigs } from "constants/index";
+import { eventDataReducer } from "../hooks/create-event-data";
 
 import MetaTags from "react-meta-tags";
 import { Container, Row, Col } from "reactstrap";
@@ -35,18 +36,36 @@ const { EVENT_TYPES } = eventConfigs;
 
 const initialEventData = {
   eventType: EVENT_TYPES.FULLDAY,
+  eventName: "Event Memanah Bergengsi 2099",
+  description: "Meningkatkan tumbuh kembang anak.",
+  location: "The HuB Cibubububur",
+  locationType: "Both",
+  city: "Semarang",
+  extraInfos: [],
+  eventCategories: [
+    {
+      key: 1,
+      competitionCategory: { label: "Barebow", value: "Barebow" },
+      categoryDetails: [
+        {
+          key: 1,
+          categoryKey: 1,
+          competitionCategory: "",
+          ageCategory: "",
+          teamCategory: "",
+          distance: "",
+          quota: "",
+        },
+      ],
+    },
+  ],
 };
 
 const EventsNewFullday = () => {
   const { steps, stepsTotal, currentStep, currentLabel, goToStep, goToPreviousStep, goToNextStep } =
     useWizardView(stepsData);
-
-  const [eventData, setEventData] = React.useState(initialEventData);
-  const [isPreviewActive, setPreviewActive] = React.useState(false);
-
-  const handleStepChange = (ev) => {
-    setEventData(ev?.target?.value || { ...initialEventData });
-  };
+  const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
+  const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
 
   return (
     <React.Fragment>
@@ -83,15 +102,15 @@ const EventsNewFullday = () => {
                 <div className="content-scrollable-inner">
                   <WizardView currentStep={currentStep}>
                     <WizardViewContent>
-                      <StepInfoUmum eventData={eventData} onChange={handleStepChange} />
+                      <StepInfoUmum eventData={eventData} updateEventData={updateEventData} />
                     </WizardViewContent>
 
                     <WizardViewContent>
-                      <StepKategori categories={eventData} onChange={handleStepChange} />
+                      <StepKategori eventData={eventData} updateEventData={updateEventData} />
                     </WizardViewContent>
 
                     <WizardViewContent>
-                      <StepBiaya eventData={eventData} onChange={handleStepChange} />
+                      <StepBiaya eventData={eventData} updateEventData={updateEventData} />
                     </WizardViewContent>
                   </WizardView>
 
@@ -129,7 +148,7 @@ const EventsNewFullday = () => {
                       <ButtonBlue
                         corner="8"
                         style={{ width: 100 }}
-                        onClick={() => setPreviewActive(true)}
+                        onClick={() => setShouldShowPreview(true)}
                       >
                         Preview
                       </ButtonBlue>
@@ -143,9 +162,9 @@ const EventsNewFullday = () => {
       </div>
 
       <PreviewPortal
-        isActive={isPreviewActive}
+        isActive={shouldShowPreview}
         eventData={eventData}
-        onClose={() => setPreviewActive(false)}
+        onClose={() => setShouldShowPreview(false)}
       />
     </React.Fragment>
   );

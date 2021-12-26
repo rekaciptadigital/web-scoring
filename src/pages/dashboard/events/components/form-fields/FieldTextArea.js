@@ -1,11 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
 
-const FieldInputTextWrapper = styled.div`
+const FieldTextAreaWrapper = styled.div`
   .field-label {
     display: inline-block;
     color: var(--ma-gray-600);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: normal;
     margin-bottom: 4px;
 
@@ -14,11 +14,11 @@ const FieldInputTextWrapper = styled.div`
     }
   }
 
-  .field-input-text {
+  .field-textarea {
     display: block;
     width: 100%;
     padding: 8px 12px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
     color: #6a7187;
@@ -47,32 +47,24 @@ const FieldInputTextWrapper = styled.div`
   }
 `;
 
-function FieldInputTextSmall({
-  children,
-  label,
-  required,
-  name,
-  placeholder,
-  value = "",
-  onChange,
-}) {
-  const fieldID = `field-${name}`;
+function FieldTextArea({ children, label, name, placeholder, value = "", onChange }) {
+  const handleTextChange = (ev) => {
+    onChange?.(ev.target.value);
+  };
+
   return (
-    <FieldInputTextWrapper>
-      <label className="field-label" htmlFor={fieldID}>
-        {children || label}
-        {required && <span className="field-required">*</span>}
-      </label>
-      <input
-        id={fieldID}
-        className="field-input-text"
+    <FieldTextAreaWrapper>
+      {(children || label) && <label className="field-label">{children || label}</label>}
+      <textarea
+        className="field-textarea"
+        rows="3"
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={handleTextChange}
       />
-    </FieldInputTextWrapper>
+    </FieldTextAreaWrapper>
   );
 }
 
-export default FieldInputTextSmall;
+export default FieldTextArea;

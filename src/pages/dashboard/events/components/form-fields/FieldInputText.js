@@ -18,7 +18,7 @@ const FieldInputTextWrapper = styled.div`
     display: block;
     width: 100%;
     padding: 8px 12px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
     color: #6a7187;
@@ -48,18 +48,24 @@ const FieldInputTextWrapper = styled.div`
 `;
 
 function FieldInputText({ children, label, required, name, placeholder, value, onChange }) {
+  const handleChange = (ev) => {
+    onChange?.(ev.target.value);
+  };
+
   return (
     <FieldInputTextWrapper>
-      <label className="field-label">
-        {children || label}
-        {required && <span className="field-required">*</span>}
-      </label>
+      {(children || label) && (
+        <label className="field-label">
+          {children || label}
+          {required && <span className="field-required">*</span>}
+        </label>
+      )}
       <input
         className="field-input-text"
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
       />
     </FieldInputTextWrapper>
   );

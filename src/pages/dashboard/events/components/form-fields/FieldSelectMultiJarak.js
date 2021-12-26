@@ -59,7 +59,15 @@ const customSelectStyles = {
   }),
 };
 
-function FieldSelectMultiJarak({ children, label, name, required, placeholder, value, onChange }) {
+function FieldSelectMultiJarak({
+  children,
+  label,
+  name,
+  required,
+  placeholder,
+  value = "",
+  onChange,
+}) {
   return (
     <FieldSelectWrapper>
       <label className="field-label">

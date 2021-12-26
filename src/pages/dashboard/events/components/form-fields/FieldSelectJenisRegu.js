@@ -59,7 +59,15 @@ const customSelectStyles = {
   }),
 };
 
-function FieldSelectJenisRegu({ children, label, name, required, placeholder, value, onChange }) {
+function FieldSelectJenisRegu({
+  children,
+  label,
+  name,
+  required,
+  placeholder,
+  value = "",
+  onChange,
+}) {
   return (
     <FieldSelectWrapper>
       <label className="field-label">

@@ -1,80 +1,72 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { Row, Col } from "reactstrap";
+import SweetAlert from "react-bootstrap-sweetalert";
+import { Row, Col, Modal, ModalBody } from "reactstrap";
+import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import FormSheet from "../FormSheet";
-import { TextEditor } from "components";
 import PosterImagePicker from "../PosterImagePicker";
-import { FieldInputText, FieldSelect, FieldSelectRadio } from "../form-fields";
+import { FieldInputText, FieldTextArea, FieldSelect, FieldSelectRadio } from "../form-fields";
 
-const FieldInput = styled.div`
-  .field-label,
-  .field-date-label {
-    display: inline-block;
-    color: var(--ma-gray-600);
-    font-size: 14px;
-    font-weight: normal;
-    margin-bottom: 4px;
+export function StepInfoUmum({ eventData, updateEventData }) {
+  const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
+  const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
+  const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
 
-    .field-required {
-      color: var(--ma-red);
-    }
-  }
+  const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
+  const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
 
-  .field-date-label {
-    font-size: 12px;
-  }
+  const handleModalEditInfoOpen = (key) => setKeyExtraInfoEdited(key);
+  const handleModalEditInfoClose = () => setKeyExtraInfoEdited(null);
 
-  .field-radio-label {
-    display: flex;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 500;
+  const handleNameChange = (value) => {
+    updateEventData({ eventName: value });
+  };
 
-    .field-radio-input {
-      margin-right: 0.5rem; /* 8px, dari 1rem = 16px di :root */
-    }
-  }
+  const handleDescriptionChange = (value) => {
+    updateEventData({ description: value });
+  };
 
-  .field-input-text,
-  .field-input-date {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #6a7187;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
+  const handleLocationChange = (value) => {
+    updateEventData({ location: value });
+  };
 
-    border-radius: 0.25rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  const handleLocationTypeChange = (radioValue) => {
+    const { value } = radioValue;
+    updateEventData({ locationType: value });
+  };
 
-    &::placeholder {
-      color: #6a7187;
-      opacity: 0.6;
-    }
+  const handleCityChange = (selectValue) => {
+    const { value } = selectValue;
+    updateEventData({ city: value });
+  };
 
-    &:focus {
-      border-color: #2684ff;
-      box-shadow: 0 0 0 1px #2684ff;
-    }
+  const handleAddInformation = (value) => {
+    updateEventData({
+      type: "ADD_EXTRA_INFO",
+      value: {
+        title: value.title,
+        description: value.description,
+      },
+    });
+  };
 
-    &:disabled,
-    &[readonly] {
-      background-color: #eff2f7;
-      opacity: 1;
-    }
-  }
+  const handleEditInformation = (value) => {
+    updateEventData({
+      type: "EDIT_EXTRA_INFO",
+      key: value.key,
+      value: {
+        title: value.title,
+        description: value.description,
+      },
+    });
+  };
 
-  .field-input-date {
-    font-size: 12px;
-  }
-`;
+  const handleRemoveInformation = (targetInfo) => {
+    updateEventData({ type: "REMOVE_EXTRA_INFO", key: targetInfo.key });
+    setKeyExtraInfoRemoved(null);
+  };
 
-export function StepInfoUmum() {
   return (
     <FormSheet>
       <h3 className="mb-3">Banner Event</h3>
@@ -82,19 +74,64 @@ export function StepInfoUmum() {
       <PosterImagePicker image={undefined} onChange={(ev) => alert(ev?.target?.value)} />
 
       <hr />
-      <h3 className="mt-4 mb-3">Judul dan Deskripsi</h3>
+      <h3 className="mt-4 mb-3">Detail Event</h3>
 
       <Row>
         <Col md={12} className="mt-2">
-          <FieldInputText required name="eventName" placeholder="Nama Event">
+          <FieldInputText
+            required
+            name="eventName"
+            placeholder="Nama Event"
+            value={eventData.eventName}
+            onChange={handleNameChange}
+          >
             Nama Event
           </FieldInputText>
         </Col>
 
+        <Col md={12} className="mt-2">
+          <FieldTextArea
+            name="description"
+            placeholder="Deskripsi"
+            value={eventData.description}
+            onChange={handleDescriptionChange}
+          >
+            Deskripsi <span className="">&#40;Opsional&#41;</span>
+          </FieldTextArea>
+        </Col>
+      </Row>
+
+      <hr />
+      <h3 className="mt-4 mb-3">Waktu dan Tempat</h3>
+
+      <Row>
         <Col md={6} className="mt-2">
-          <FieldInputText required name="location" placeholder="Lokasi">
+          <FieldInputText
+            required
+            name="location"
+            placeholder="Lokasi"
+            value={eventData.location}
+            onChange={handleLocationChange}
+          >
             Lokasi
           </FieldInputText>
+
+          <div className="mt-3">
+            <FieldSelectRadio
+              name="locationType"
+              options={[
+                { label: "Indoor", value: "Indoor" },
+                { label: "Outdoor", value: "Outdoor" },
+                { label: "Both", value: "Both" },
+              ]}
+              value={
+                eventData?.locationType
+                  ? { label: eventData.locationType, value: eventData.locationType }
+                  : undefined
+              }
+              onChange={handleLocationTypeChange}
+            />
+          </div>
         </Col>
 
         <Col md={6} className="mt-2">
@@ -106,87 +143,262 @@ export function StepInfoUmum() {
               { label: "Bekasi", value: "Bekasi" },
               { label: "Jakarta", value: "Jakarta" },
             ]}
+            value={eventData?.city ? { label: eventData.city, value: eventData.city } : undefined}
+            onChange={handleCityChange}
           >
             Kota
           </FieldSelect>
         </Col>
-
-        <Col md={6} className="mt-2">
-          <FieldSelectRadio
-            name="locationType"
-            options={[
-              { label: "Indoor", value: "indoor" },
-              { label: "Outdoor", value: "outdoor" },
-              { label: "Both", value: "both" },
-            ]}
-          />
-        </Col>
       </Row>
-
-      <h5
-        className="mt-3 mb-3"
-        style={{ color: "var(--ma-gray-600)", fontSize: 14, fontWeight: "normal" }}
-      >
-        Tanggal Pendaftaran dan Lomba
-      </h5>
 
       <Row>
         <Col md={4}>
-          <FieldInput>
-            <label className="field-date-label">Buka Pendaftaran</label>
-            <input
-              className="field-input-date"
-              placeholder="DD/MM/YYYY"
-              name="registrationDateStart"
-              required
-            />
-          </FieldInput>
+          <FieldInputText placeholder="DD/MM/YYYY" name="registrationDateStart" required>
+            Mulai Pendaftaran
+          </FieldInputText>
         </Col>
 
         <Col md={2}>
-          <FieldInput>
-            <label className="field-date-label">Jam Buka</label>
-            <input
-              className="field-input-date"
-              placeholder="00:00"
-              name="registrationTimeStart"
-              required
-            />
-          </FieldInput>
+          <FieldInputText placeholder="00:00" name="registrationTimeStart" required>
+            Jam Buka
+          </FieldInputText>
         </Col>
 
         <Col md={4}>
-          <FieldInput>
-            <label className="field-date-label">Tutup Pendaftaran</label>
-            <input
-              className="field-input-date"
-              placeholder="DD/MM/YYYY"
-              name="registrationDateEnd"
-              required
-            />
-          </FieldInput>
+          <FieldInputText placeholder="DD/MM/YYYY" name="registrationDateEnd" required>
+            Tutup Pendaftaran
+          </FieldInputText>
         </Col>
 
         <Col md={2}>
-          <FieldInput>
-            <label className="field-date-label">Jam Tutup</label>
-            <input
-              className="field-input-date"
-              placeholder="00:00"
-              name="registrationTimeEnd"
-              required
-            />
-          </FieldInput>
-        </Col>
-
-        <Col md={12}>
-          <TextEditor
-            label="Deskripsi Tambahan"
-            name="description"
-            placeholder="Hadiah kompetisi, Flow lomba, peraturan, informasi tambahan mengenai lomba..."
-          />
+          <FieldInputText placeholder="00:00" name="registrationTimeEnd" required>
+            Jam Tutup
+          </FieldInputText>
         </Col>
       </Row>
+
+      <Row>
+        <Col md={4}>
+          <FieldInputText placeholder="DD/MM/YYYY" name="eventDateStart" required>
+            Mulai Lomba
+          </FieldInputText>
+        </Col>
+
+        <Col md={2}>
+          <FieldInputText placeholder="00:00" name="eventTimeStart" required>
+            Jam Mulai
+          </FieldInputText>
+        </Col>
+
+        <Col md={4}>
+          <FieldInputText placeholder="DD/MM/YYYY" name="eventDateEnd" required>
+            Akhir Lomba
+          </FieldInputText>
+        </Col>
+
+        <Col md={2}>
+          <FieldInputText placeholder="00:00" name="eventTimeEnd" required>
+            Jam Akhir
+          </FieldInputText>
+        </Col>
+      </Row>
+
+      <hr />
+      <h3 className="mt-4 mb-3">Informasi Event</h3>
+
+      <ButtonOutlineBlue corner="8" style={{ width: "100%" }} onClick={handleModalAddInfoShow}>
+        + Tambah Informasi
+      </ButtonOutlineBlue>
+
+      <ModalExtraInfoEditor
+        showEditor={shouldShowAddExtraInfo}
+        onSave={handleAddInformation}
+        onClose={handleModalAddInfoClose}
+      />
+
+      <div>
+        {eventData.extraInfos?.map((info) => (
+          <ExtraInfoItem key={info.key} className="mt-4">
+            <div className="info-body">
+              <div className="info-body-content">
+                <h5>{info.title || "Judul tidak tersedia"}</h5>
+                <p className="mb-0">{info.description || "Konten tidak tersedia"}</p>
+              </div>
+
+              <div>
+                <a className="info-button-edit" onClick={() => handleModalEditInfoOpen(info.key)}>
+                  &gt;
+                </a>
+              </div>
+
+              <ModalExtraInfoEditor
+                showEditor={keyExtraInfoEdited === info.key}
+                infoData={info}
+                onSave={handleEditInformation}
+                onClose={handleModalEditInfoClose}
+              />
+            </div>
+
+            <div>
+              <Button
+                style={{ color: "var(--ma-red)" }}
+                onClick={() => setKeyExtraInfoRemoved(info.key)}
+              >
+                <i className="bx bx-trash font-size-18 align-middle" />
+              </Button>
+
+              <AlertDeleteInfo
+                showAlert={keyExtraInfoRemoved === info.key}
+                onConfirm={() => handleRemoveInformation(info)}
+                onCancel={() => setKeyExtraInfoRemoved(null)}
+              />
+            </div>
+          </ExtraInfoItem>
+        ))}
+      </div>
     </FormSheet>
   );
 }
+
+function ModalExtraInfoEditor({ showEditor, ...props }) {
+  if (!showEditor) {
+    return null;
+  }
+  return <ExtraInfoEditor {...props} />;
+}
+
+function ExtraInfoEditor({ infoData, onSave, onClose }) {
+  const [title, setTitle] = React.useState(infoData?.title || "");
+  const [description, setDescription] = React.useState(infoData?.description || "");
+
+  const initialTitle = React.useRef(title);
+  const initialDescription = React.useRef(description);
+
+  const shouldSubmitAllowed = () => {
+    const isRequiredAll = title && description;
+    const isEdited = title !== initialTitle.current || description !== initialDescription.current;
+    return isRequiredAll && isEdited;
+  };
+
+  const handleCloseModal = () => {
+    setTitle("");
+    setDescription("");
+    onClose?.();
+  };
+
+  const handleClickSave = () => {
+    if (!shouldSubmitAllowed()) {
+      return;
+    }
+    onSave?.({
+      key: infoData?.key,
+      title: title,
+      description: description,
+    });
+    handleCloseModal();
+  };
+
+  return (
+    <Modal isOpen>
+      <ModalBody>
+        <h4>{infoData ? "Ubah Informasi" : "Tambahkan Informasi"}</h4>
+
+        <div className="mt-4">
+          <FieldInputText
+            name="info-title"
+            placeholder="Judul Infomasi"
+            value={title}
+            onChange={(value) => {
+              setTitle(value);
+            }}
+          >
+            Judul Informasi
+          </FieldInputText>
+        </div>
+
+        <div className="mt-4">
+          <FieldTextArea
+            name="info-description"
+            placeholder="Deskripsi"
+            value={description}
+            onChange={(value) => {
+              setDescription(value);
+            }}
+          >
+            Deskripsi
+          </FieldTextArea>
+        </div>
+
+        <div className="mt-4 d-flex justify-content-end" style={{ gap: "0.5rem" }}>
+          <Button style={{ color: "var(--ma-blue)" }} onClick={handleCloseModal}>
+            Batal
+          </Button>
+          <ButtonBlue onClick={handleClickSave} disabled={!shouldSubmitAllowed()}>
+            Simpan
+          </ButtonBlue>
+        </div>
+      </ModalBody>
+    </Modal>
+  );
+}
+
+function AlertDeleteInfo({ showAlert, onConfirm, onCancel }) {
+  return (
+    <SweetAlert
+      show={showAlert}
+      title={
+        <i className="bx bx-trash font-size-18 align-middle" style={{ color: "var(--ma-red)" }} />
+      }
+      custom
+      btnSize="md"
+      showCancel
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+      style={{ padding: "30px 40px" }}
+      customButtons={
+        <div className="d-flex flex-column w-100" style={{ gap: "0.5rem" }}>
+          <Button style={{ color: "var(--ma-red)" }} onClick={onConfirm}>
+            Hapus
+          </Button>
+          <ButtonBlue onClick={onCancel}>Batalkan</ButtonBlue>
+        </div>
+      }
+    >
+      <p className="text-muted">Yakin akan hapus informasi ini?</p>
+    </SweetAlert>
+  );
+}
+
+const ExtraInfoItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  .info-body {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    border-radius: 8;
+    border: solid 1px var(--ma-gray-100);
+
+    .info-body-content {
+      flex-grow: 1;
+      padding: 1.5rem;
+    }
+
+    .info-button-edit {
+      padding: 1.5rem;
+
+      &::after {
+        content: " ";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+    }
+  }
+`;

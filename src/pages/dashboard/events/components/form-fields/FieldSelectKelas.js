@@ -58,7 +58,7 @@ const customSelectStyles = {
   }),
 };
 
-function FieldSelectKelas({ children, label, name, required, placeholder, value, onChange }) {
+function FieldSelectKelas({ children, label, name, required, placeholder, value = "", onChange }) {
   return (
     <FieldSelectWrapper>
       <label className="field-label">

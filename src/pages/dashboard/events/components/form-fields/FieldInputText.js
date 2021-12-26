@@ -48,6 +48,8 @@ const FieldInputTextWrapper = styled.div`
 `;
 
 function FieldInputText({ children, label, required, name, placeholder, value, onChange }) {
+  const fieldID = name ? `field-input-${name}` : undefined;
+
   const handleChange = (ev) => {
     onChange?.(ev.target.value);
   };
@@ -55,13 +57,14 @@ function FieldInputText({ children, label, required, name, placeholder, value, o
   return (
     <FieldInputTextWrapper>
       {(children || label) && (
-        <label className="field-label">
+        <label className="field-label" htmlFor={fieldID}>
           {children || label}
           {required && <span className="field-required">*</span>}
         </label>
       )}
       <input
         className="field-input-text"
+        id={fieldID}
         name={name}
         placeholder={placeholder}
         value={value}

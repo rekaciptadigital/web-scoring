@@ -1,4 +1,5 @@
 import * as React from "react";
+import { stringUtil } from "utils";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventConfigs } from "constants/index";
 import { eventDataReducer } from "../hooks/create-event-data";
@@ -34,6 +35,7 @@ const stepsData = [
 
 const { EVENT_TYPES } = eventConfigs;
 
+const initialEventCategoryKey = stringUtil.createRandom();
 const initialEventData = {
   eventType: EVENT_TYPES.FULLDAY,
   eventName: "Event Memanah Bergengsi 2099",
@@ -44,12 +46,12 @@ const initialEventData = {
   extraInfos: [],
   eventCategories: [
     {
-      key: 1,
+      key: initialEventCategoryKey,
       competitionCategory: { label: "Barebow", value: "Barebow" },
       categoryDetails: [
         {
-          key: 1,
-          categoryKey: 1,
+          key: stringUtil.createRandom(),
+          categoryKey: initialEventCategoryKey,
           competitionCategory: "",
           ageCategory: "",
           teamCategory: "",
@@ -59,6 +61,9 @@ const initialEventData = {
       ],
     },
   ],
+  isFlatRegistrationFee: true,
+  registrationFee: "",
+  registrationFees: [],
 };
 
 const EventsNewFullday = () => {
@@ -66,6 +71,10 @@ const EventsNewFullday = () => {
     useWizardView(stepsData);
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
   const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentStep]);
 
   return (
     <React.Fragment>
@@ -122,14 +131,18 @@ const EventsNewFullday = () => {
                       {currentStep > 1 && (
                         <a onClick={() => goToPreviousStep()}>
                           <i className="mdi mdi-chevron-up" />
-                          <span className="ms-1">Previous</span>
+                          <span className="ms-1">
+                            {stepsData.find((step) => step.step === currentStep - 1).label}
+                          </span>
                         </a>
                       )}
 
                       {currentStep < stepsTotal && (
                         <a onClick={() => goToNextStep()}>
                           <i className="mdi mdi-chevron-down" />
-                          <span className="ms-1">Next</span>
+                          <span className="ms-1">
+                            {stepsData.find((step) => step.step === currentStep + 1).label}
+                          </span>
                         </a>
                       )}
                     </div>

@@ -69,10 +69,10 @@ function CategoryDetailList({ details, updateEventData }) {
 
               <div className="field-grid">
                 <FieldSelectJenisRegu
-                  name={`teamType-${detail.categoryKey}-${detail.key}`}
+                  name={`teamCategory-${detail.categoryKey}-${detail.key}`}
                   placeholder="Pilih Jenis Regu"
-                  value={detail.teamType}
-                  onChange={(value) => handleDetailFieldChange(detail, "teamType", value)}
+                  value={detail.teamCategory}
+                  onChange={(value) => handleDetailFieldChange(detail, "teamCategory", value)}
                 >
                   Jenis Regu
                 </FieldSelectJenisRegu>

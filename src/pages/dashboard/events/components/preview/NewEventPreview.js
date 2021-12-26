@@ -1,17 +1,278 @@
 import * as React from "react";
 import styled from "styled-components";
+import classnames from "classnames";
+import { useWizardView } from "utils/hooks/wizard-view";
 
+import CurrencyFormat from "react-currency-format";
 import { Container, Row, Col } from "reactstrap";
-import { Button, ButtonOutline } from "components/ma";
+import { Button, ButtonOutline, WizardView, WizardViewContent } from "components/ma";
+
+const TEAM_INDIVIDUAL = "individual";
+const TEAM_MALE = "maleTeam";
+const TEAM_FEMALE = "femaleTeam";
+const TEAM_MIXED = "mixedTeam";
+
+const categoryTabsList = [
+  { step: 1, label: "Individu", teamCategory: TEAM_INDIVIDUAL },
+  { step: 2, label: "Male Team", teamCategory: TEAM_MALE },
+  { step: 3, label: "Female Team", teamCategory: TEAM_FEMALE },
+  { step: 4, label: "Mixed Team", teamCategory: TEAM_MIXED },
+];
+
+function computeCategoriesByTeam(categoriesData) {
+  const categoriesByTeam = {
+    [TEAM_INDIVIDUAL]: [],
+    [TEAM_MALE]: [],
+    [TEAM_FEMALE]: [],
+    [TEAM_MIXED]: [],
+  };
+
+  categoriesData.forEach((competition) => {
+    competition.categoryDetails.forEach((detail) => {
+      detail.distance?.forEach((distanceItem, index) => {
+        const newCategory = {
+          ...detail,
+          key: `${detail.key}-${index + 1}`,
+          competitionCategory: competition.competitionCategory?.value,
+          ageCategory: detail.ageCategory?.value,
+          distance: distanceItem.value,
+          teamCategory: detail.teamCategory?.value,
+        };
+
+        if (
+          detail.teamCategory?.value === "Individu Putra" ||
+          detail.teamCategory?.value === "Individu Putri"
+        ) {
+          categoriesByTeam[TEAM_INDIVIDUAL].push(newCategory);
+        } else if (detail.teamCategory?.value === "Beregu Putra") {
+          categoriesByTeam[TEAM_MALE].push(newCategory);
+        } else if (detail.teamCategory?.value === "Beregu Putri") {
+          categoriesByTeam[TEAM_FEMALE].push(newCategory);
+        } else if (detail.teamCategory?.value === "Beregu Campuran") {
+          categoriesByTeam[TEAM_MIXED].push(newCategory);
+        }
+      });
+    });
+  });
+
+  return categoriesByTeam;
+}
+
+function NewEventPreview({ eventData }) {
+  const { steps, currentStep, goToStep } = useWizardView(categoryTabsList);
+
+  const categoriesByTeam = React.useMemo(
+    () => computeCategoriesByTeam(eventData.eventCategories),
+    []
+  );
+
+  return (
+    <PageWrapper>
+      <Container fluid>
+        <div className="event-banner">
+          <img className="event-banner-image" src={eventData.bannerImage?.preview} />
+        </div>
+
+        <Row className="mt-3">
+          <Col md="8">
+            <h1 className="event-heading">{eventData.eventName}</h1>
+            <div>Oleh Pro Archery Club</div>
+
+            <div className="content-section mt-5">
+              {/* Optional field */}
+              {eventData?.description && (
+                <React.Fragment>
+                  <h5 className="content-info-heading">Deskripsi</h5>
+                  <p>{eventData.description}</p>
+                </React.Fragment>
+              )}
+
+              {/* Required fields */}
+              <h5 className="content-info-heading">Waktu &amp; Tempat</h5>
+              <table className="mb-3 content-info-time-place">
+                <tbody>
+                  <tr>
+                    <td>Tanggal Event</td>
+                    <td>:</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Lokasi</td>
+                    <td>:</td>
+                    <td>{eventData.location}</td>
+                  </tr>
+                  <tr>
+                    <td>Kota</td>
+                    <td>:</td>
+                    <td>{eventData.city}</td>
+                  </tr>
+                  <tr>
+                    <td>Lapangan</td>
+                    <td>:</td>
+                    <td>{eventData.locationType}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {eventData.extraInfos?.map((info) => (
+                <React.Fragment key={info.key}>
+                  <h5 className="content-info-heading">{info.title}</h5>
+                  <p>{info.description}</p>
+                </React.Fragment>
+              ))}
+
+              <h5 className="content-info-heading">Biaya Registrasi</h5>
+              <p>
+                Tanggal Registrasi:
+                <br />
+                Mulai dari{" "}
+                {eventData.registrationFee ? (
+                  <CurrencyFormat
+                    displayType={"text"}
+                    value={eventData.registrationFee}
+                    prefix="Rp&nbsp;"
+                    thousandSeparator={"."}
+                    decimalSeparator={","}
+                    decimalScale={2}
+                    fixedDecimalScale
+                  />
+                ) : (
+                  <React.Fragment>
+                    Rp <span>&laquo;data harga tidak tersedia&raquo;</span>
+                  </React.Fragment>
+                )}
+              </p>
+            </div>
+          </Col>
+
+          <Col md="4">
+            <div className="event-notice-find">
+              Temukan lebih banyak event panahan di{" "}
+              <a className="event-preview-link">myarchery.id</a>
+            </div>
+
+            <div className="event-countdown-box">
+              <h5>Waktu tersisa</h5>
+
+              <div className="countdown-timer">
+                <div className="countdown-item">
+                  266
+                  <span className="timer-unit">Hari</span>
+                </div>
+                <div className="countdown-item">
+                  266
+                  <span className="timer-unit">Jam</span>
+                </div>
+                <div className="countdown-item">
+                  266
+                  <span className="timer-unit">Menit</span>
+                </div>
+                <div className="countdown-item">
+                  266
+                  <span className="timer-unit">Detik</span>
+                </div>
+              </div>
+
+              <Button style={{ width: "100%" }} disabled className="button-preview">
+                Daftar
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              <ButtonOutline disabled className="button-preview-outline button-leaderboard">
+                Leaderboard &amp; Hasil
+              </ButtonOutline>
+            </div>
+          </Col>
+        </Row>
+
+        <div className="mt-4">
+          <h5 className="text-black">Kategori Lomba</h5>
+
+          <div className="event-team-tabs mt-3 mb-4">
+            {steps.map((tabItem) => (
+              <div key={tabItem.step}>
+                <button
+                  className={classnames("event-team-item", {
+                    "team-active": currentStep === tabItem.step,
+                  })}
+                  onClick={() => goToStep(tabItem.step)}
+                >
+                  {tabItem.label}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <WizardView currentStep={currentStep}>
+            <WizardViewContent>
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_INDIVIDUAL]} />
+            </WizardViewContent>
+            <WizardViewContent>
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_MALE]} />
+            </WizardViewContent>
+            <WizardViewContent>
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_FEMALE]} />
+            </WizardViewContent>
+            <WizardViewContent>
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_MIXED]} />
+            </WizardViewContent>
+          </WizardView>
+        </div>
+      </Container>
+    </PageWrapper>
+  );
+}
+
+function EventCategoryGrid({ categories }) {
+  return (
+    <div className="event-category-grid">
+      {categories.map((category, index) => (
+        <div key={index} className="event-category-card">
+          <h5 className="heading-category-name">
+            {category.ageCategory} - {category.competitionCategory} - {category.distance}
+          </h5>
+          <div className="mt-4 body-category-detail">
+            <div>
+              <span className="category-quota-label">0&#47;{category.quota}</span>
+            </div>
+            <div>
+              <ButtonOutline
+                disabled
+                corner="8"
+                className="button-preview button-card-regist"
+                style={{ width: 120 }}
+              >
+                Daftar
+              </ButtonOutline>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const PageWrapper = styled.div`
   margin: 40px 0;
   font-family: "Inter";
 
   .event-banner {
+    position: relative;
     width: 100%;
-    height: 420px;
+    padding-top: 42%;
     background-color: var(--ma-gray-600);
+
+    .event-banner-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .event-heading {
@@ -19,8 +280,50 @@ const PageWrapper = styled.div`
     color: var(--ma-blue);
   }
 
+  .content-section {
+    color: #000000;
+
+    .content-info-heading {
+      margin-top: 2rem;
+      color: #000000;
+    }
+
+    .content-info-time-place td {
+      cursor: initial;
+    }
+  }
+
   .event-preview-link {
     color: var(--ma-blue);
+  }
+
+  .button-preview {
+    transition: all 0.2s;
+
+    &:hover {
+      box-shadow: none;
+      opacity: 0.4;
+    }
+  }
+
+  .button-preview-outline {
+    transition: all 0.2s;
+
+    &:disabled {
+      background-color: transparent;
+      border: solid 1px var(--ma-gray-200) !important;
+      color: var(--ma-gray-400);
+    }
+
+    &:hover {
+      box-shadow: none;
+      opacity: 0.7;
+    }
+  }
+
+  .button-leaderboard {
+    width: 100%;
+    text-align: center;
   }
 
   .event-notice-find {
@@ -28,6 +331,7 @@ const PageWrapper = styled.div`
     padding: 8px 12px;
     border-radius: 8px;
     background-color: #f3f3f3;
+    color: #000000;
   }
 
   .event-countdown-box {
@@ -35,6 +339,11 @@ const PageWrapper = styled.div`
     border-radius: 4px;
     box-shadow: 0 0.1rem 0.5rem rgb(18 38 63 / 10%);
     text-align: center;
+    color: #000000;
+
+    h5 {
+      color: #000000;
+    }
 
     > *:not(:first-child) {
       margin-top: 1rem;
@@ -68,7 +377,7 @@ const PageWrapper = styled.div`
     display: flex;
     list-style: none;
     padding: 0;
-    gap: 1rem;
+    gap: 0.75rem;
 
     .event-team-item {
       display: inline-block;
@@ -76,7 +385,6 @@ const PageWrapper = styled.div`
       border-radius: 2rem;
       border: solid 1px var(--ma-gray-400);
       background-color: transparent;
-      font-size: 1rem;
       color: var(--ma-gray-500);
 
       &.team-active {
@@ -94,8 +402,23 @@ const PageWrapper = styled.div`
     .event-category-card {
       padding: 12px 1rem;
       border-radius: 4px;
-      box-shadow: 0 0.25rem 1rem rgb(18 38 63 / 5%);
       background-color: #ffffff;
+      transition: box-shadow 0.5s, transform 0.25s;
+
+      &:hover {
+        box-shadow: 0 0.3rem 0.75rem rgb(18 38 63 / 10%);
+        transform: translateY(-0.75px);
+
+        .button-card-regist {
+          border-color: var(--ma-blue);
+          background-color: var(--ma-blue);
+
+          &:hover {
+            border-color: var(--ma-gray-400);
+            background-color: var(--ma-gray-400);
+          }
+        }
+      }
 
       .heading-category-name {
         color: var(--ma-blue);
@@ -115,141 +438,5 @@ const PageWrapper = styled.div`
     }
   }
 `;
-
-function NewEventPreview({ eventData }) {
-  return (
-    <PageWrapper>
-      <Container fluid>
-        <div className="event-banner">Gambar</div>
-
-        <Row className="mt-3">
-          <Col md="8">
-            <h1 className="event-heading">{eventData.eventName}</h1>
-            <div>Oleh Pro Archery Club</div>
-
-            <div className="mt-5">
-              {/* Optional field */}
-              {eventData?.description && (
-                <React.Fragment>
-                  <h5>Deskripsi</h5>
-                  <p>{eventData.description}</p>
-                </React.Fragment>
-              )}
-
-              {/* Required fields */}
-              <h5>Waktu &amp; Tempat</h5>
-              <table className="mb-3">
-                <tbody>
-                  <tr>
-                    <td>Tanggal Event</td>
-                    <td>:</td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Lokasi</td>
-                    <td>:</td>
-                    <td>{eventData.location}</td>
-                  </tr>
-                  <tr>
-                    <td>Kota</td>
-                    <td>:</td>
-                    <td>{eventData.city}</td>
-                  </tr>
-                  <tr>
-                    <td>Lapangan</td>
-                    <td>:</td>
-                    <td>{eventData.locationType}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              {eventData.eventInformations?.map((info) => (
-                <React.Fragment key={info.key}>
-                  <h5>{info.title}</h5>
-                  <p>{info.description}</p>
-                </React.Fragment>
-              ))}
-
-              <h5>Biaya Registrasi</h5>
-            </div>
-          </Col>
-
-          <Col md="4">
-            <div className="event-notice-find">
-              Temukan lebih banyak event panahan di{" "}
-              <a className="event-preview-link">myarchery.id</a>
-            </div>
-
-            <div className="event-countdown-box">
-              <h5>Waktu tersisa</h5>
-
-              <div className="countdown-timer">
-                <div className="countdown-item">
-                  266
-                  <span className="timer-unit">Hari</span>
-                </div>
-                <div className="countdown-item">
-                  266
-                  <span className="timer-unit">Jam</span>
-                </div>
-                <div className="countdown-item">
-                  266
-                  <span className="timer-unit">Menit</span>
-                </div>
-                <div className="countdown-item">
-                  266
-                  <span className="timer-unit">Detik</span>
-                </div>
-              </div>
-
-              <Button style={{ width: "100%" }}>Daftar</Button>
-            </div>
-
-            <div className="mt-4">
-              <ButtonOutline style={{ width: "100%" }}>Leaderboard &amp; Hasil</ButtonOutline>
-            </div>
-          </Col>
-        </Row>
-
-        <div>
-          <h5>Kategori Lomba</h5>
-
-          <div className="event-team-tabs mt-3 mb-4">
-            <div>
-              <button className="event-team-item team-active">Individu</button>
-            </div>
-            <div>
-              <button className="event-team-item">Male Team</button>
-            </div>
-            <div>
-              <button className="event-team-item">Female Team</button>
-            </div>
-            <div>
-              <button className="event-team-item">Mixed Team</button>
-            </div>
-          </div>
-
-          <div className="event-category-grid">
-            {[1, 1, 1, 1, 1, 1].map((category, index) => (
-              <div key={index} className="event-category-card">
-                <h4 className="heading-category-name">Umum - Barebow - 50m</h4>
-                <div className="mt-4 body-category-detail">
-                  <div>
-                    <span className="category-quota-label">0/100</span>
-                  </div>
-                  <div>
-                    <ButtonOutline disabled corner="8" style={{ width: 100 }}>
-                      Daftar
-                    </ButtonOutline>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Container>
-    </PageWrapper>
-  );
-}
 
 export default NewEventPreview;

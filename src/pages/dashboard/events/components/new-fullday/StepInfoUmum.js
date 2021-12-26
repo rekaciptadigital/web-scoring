@@ -19,6 +19,25 @@ export function StepInfoUmum({ eventData, updateEventData }) {
   const handleModalEditInfoOpen = (key) => setKeyExtraInfoEdited(key);
   const handleModalEditInfoClose = () => setKeyExtraInfoEdited(null);
 
+  const handlePickBannerChange = (ev) => {
+    if (!ev.target.files?.[0]) {
+      return;
+    }
+
+    const imageRawData = ev.target.files[0];
+    const imagePreviewUrl = URL.createObjectURL(imageRawData);
+    updateEventData({
+      bannerImage: {
+        preview: imagePreviewUrl,
+        raw: imageRawData,
+      },
+    });
+  };
+
+  const handleRemoveBannerImage = () => {
+    updateEventData({ bannerImage: undefined });
+  };
+
   const handleNameChange = (value) => {
     updateEventData({ eventName: value });
   };
@@ -70,8 +89,11 @@ export function StepInfoUmum({ eventData, updateEventData }) {
   return (
     <FormSheet>
       <h3 className="mb-3">Banner Event</h3>
-
-      <PosterImagePicker image={undefined} onChange={(ev) => alert(ev?.target?.value)} />
+      <PosterImagePicker
+        image={eventData.bannerImage}
+        onChange={handlePickBannerChange}
+        onRemove={handleRemoveBannerImage}
+      />
 
       <hr />
       <h3 className="mt-4 mb-3">Detail Event</h3>
@@ -227,7 +249,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
 
               <div>
                 <a className="info-button-edit" onClick={() => handleModalEditInfoOpen(info.key)}>
-                  &gt;
+                  &#10097;
                 </a>
               </div>
 
@@ -390,6 +412,7 @@ const ExtraInfoItem = styled.div`
 
     .info-button-edit {
       padding: 1.5rem;
+      color: var(--ma-blue);
 
       &::after {
         content: " ";

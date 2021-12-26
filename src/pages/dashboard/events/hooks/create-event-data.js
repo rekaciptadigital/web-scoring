@@ -1,6 +1,4 @@
-let extraInfoKeyNext = 1;
-let categoryKeyNext = 2; // sudah ada default 1 item
-let categoryDetailKeyNext = 2; // sudah ada default 1 item
+import { stringUtil } from "utils";
 
 function eventDataReducer(state, action) {
   switch (action.type) {
@@ -10,7 +8,7 @@ function eventDataReducer(state, action) {
     case "ADD_EXTRA_INFO": {
       return {
         ...state,
-        extraInfos: [...state.extraInfos, { key: extraInfoKeyNext++, ...action.value }],
+        extraInfos: [...state.extraInfos, { key: stringUtil.createRandom(), ...action.value }],
       };
     }
 
@@ -49,8 +47,8 @@ function eventDataReducer(state, action) {
     }
 
     case "ADD_EVENT_CATEGORY": {
-      const categoryKey = categoryKeyNext++;
-      const detailKey = categoryDetailKeyNext++;
+      const categoryKey = stringUtil.createRandom();
+      const detailKey = stringUtil.createRandom();
 
       const newEventCategory = {
         key: categoryKey,
@@ -59,7 +57,7 @@ function eventDataReducer(state, action) {
             categoryKey: categoryKey,
             key: detailKey,
             ageCategory: "",
-            teamType: "",
+            teamCategory: "",
             distance: "",
             quota: "",
           },
@@ -113,7 +111,7 @@ function eventDataReducer(state, action) {
     case "COPY_EVENT_CATEGORY_DETAIL": {
       const { eventCategories } = state;
       const { categoryKey, detailKey } = action;
-      const newCopyDetailKey = categoryDetailKeyNext++;
+      const newCopyDetailKey = stringUtil.createRandom();
 
       const updatedEventCategories = eventCategories.map((category) => {
         if (category.key !== categoryKey) {
@@ -159,6 +157,40 @@ function eventDataReducer(state, action) {
       return { ...state, eventCategories: updatedCategories };
     }
     // --- end Category Detail
+
+    /**
+     * Registration Fees
+     */
+    case "UPDATE_REGISTRATION_FEES": {
+      const { value } = action;
+
+      const byTeamCategory = (fee) => fee.teamCategory === value.teamCategory;
+      const targetFeeItem = state.registrationFees.find(byTeamCategory);
+      if (!targetFeeItem) {
+        const newFeeItem = {
+          teamCategory: value.teamCategory,
+          amount: value.amount,
+        };
+        return { ...state, registrationFees: [...state.registrationFees, newFeeItem] };
+      }
+
+      const updatedRegistrationFees = state.registrationFees.map((fee) => {
+        if (fee.teamCategory !== value.teamCategory) {
+          return fee;
+        }
+        return { ...fee, amount: value.amount };
+      });
+
+      return { ...state, registrationFees: updatedRegistrationFees };
+    }
+
+    case "TOGGLE_FIELD": {
+      const { field } = action;
+      return {
+        ...state,
+        [field]: !state[field],
+      };
+    }
 
     default: {
       if (action) {

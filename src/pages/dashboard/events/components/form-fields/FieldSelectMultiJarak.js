@@ -3,11 +3,11 @@ import styled from "styled-components";
 import Select from "react-select";
 
 const optionsJarak = [
-  { label: "16 m", value: "16m" },
-  { label: "20 m", value: "20m" },
-  { label: "30 m", value: "30m" },
-  { label: "40 m", value: "40m" },
-  { label: "50 m", value: "50m" },
+  { label: "16m", value: "16m" },
+  { label: "20m", value: "20m" },
+  { label: "30m", value: "30m" },
+  { label: "40m", value: "40m" },
+  { label: "50m", value: "50m" },
 ];
 
 const FieldSelectWrapper = styled.div`

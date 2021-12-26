@@ -5,13 +5,43 @@ import { Row, Col } from "reactstrap";
 import FormSheet from "../FormSheet";
 import { FieldInputPrice } from "../form-fields";
 
-export function StepBiaya() {
-  const [variativePricesToggle, setVariativePricesToggle] = React.useState(false);
+export function StepBiaya({ eventData, updateEventData }) {
+  const handleRegistrationFeeChange = (value) => {
+    updateEventData({ registrationFee: value });
+  };
+
+  const handleToggleFlatFeeChange = () => {
+    updateEventData({ type: "TOGGLE_FIELD", field: "isFlatRegistrationFee" });
+  };
+
+  const handleVarietyFeesChange = (teamCategory, value) => {
+    updateEventData({
+      type: "UPDATE_REGISTRATION_FEES",
+      value: {
+        teamCategory,
+        amount: value,
+      },
+    });
+  };
+
+  const computeFeeAmountByTeamCategory = (teamCategory) => {
+    const byTeamCategory = (fee) => fee.teamCategory === teamCategory;
+    const feeData = eventData.registrationFees.find(byTeamCategory);
+    return feeData?.amount || "";
+  };
+
   return (
     <FormSheet>
       <Row>
         <Col md={3}>
-          <FieldInputPrice name="type-normal">Biaya Registrasi</FieldInputPrice>
+          <FieldInputPrice
+            name="type-normal"
+            value={eventData?.registrationFee || ""}
+            onChange={handleRegistrationFeeChange}
+            disabled={!eventData.isFlatRegistrationFee}
+          >
+            Biaya Registrasi
+          </FieldInputPrice>
         </Col>
 
         <Col
@@ -22,8 +52,8 @@ export function StepBiaya() {
           <div>Harga jenis regu berbeda</div>
           <div>
             <Switch
-              checked={variativePricesToggle}
-              onChange={(next) => setVariativePricesToggle(next)}
+              checked={!eventData.isFlatRegistrationFee}
+              onChange={handleToggleFlatFeeChange}
               offColor="#eeeeee"
               onColor="#B4C6E2"
               onHandleColor="#0d47a1"
@@ -40,25 +70,45 @@ export function StepBiaya() {
 
       <Row className="mt-3">
         <Col md={3}>
-          <FieldInputPrice name="normal-individual" disabled={!variativePricesToggle}>
+          <FieldInputPrice
+            name="normal-individual"
+            disabled={eventData.isFlatRegistrationFee}
+            value={computeFeeAmountByTeamCategory("individual")}
+            onChange={(value) => handleVarietyFeesChange("individual", value)}
+          >
             Individual
           </FieldInputPrice>
         </Col>
 
         <Col md={3}>
-          <FieldInputPrice name="normal-male-team" disabled={!variativePricesToggle}>
+          <FieldInputPrice
+            name="normal-male-team"
+            disabled={eventData.isFlatRegistrationFee}
+            value={computeFeeAmountByTeamCategory("maleTeam")}
+            onChange={(value) => handleVarietyFeesChange("maleTeam", value)}
+          >
             Male Team
           </FieldInputPrice>
         </Col>
 
         <Col md={3}>
-          <FieldInputPrice name="normal-female-team" disabled={!variativePricesToggle}>
+          <FieldInputPrice
+            name="normal-female-team"
+            disabled={eventData.isFlatRegistrationFee}
+            value={computeFeeAmountByTeamCategory("femaleTeam")}
+            onChange={(value) => handleVarietyFeesChange("femaleTeam", value)}
+          >
             Female Team
           </FieldInputPrice>
         </Col>
 
         <Col md={3}>
-          <FieldInputPrice name="normal-mixed-team" disabled={!variativePricesToggle}>
+          <FieldInputPrice
+            name="normal-mixed-team"
+            disabled={eventData.isFlatRegistrationFee}
+            value={computeFeeAmountByTeamCategory("mixedTeam")}
+            onChange={(value) => handleVarietyFeesChange("mixedTeam", value)}
+          >
             Mixed Team
           </FieldInputPrice>
         </Col>

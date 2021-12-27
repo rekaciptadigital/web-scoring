@@ -47,7 +47,15 @@ const FieldInputTextWrapper = styled.div`
   }
 `;
 
-function FieldInputTextSmall({ children, label, required, name, placeholder, value, onChange }) {
+function FieldInputTextSmall({
+  children,
+  label,
+  required,
+  name,
+  placeholder,
+  value = "",
+  onChange,
+}) {
   const fieldID = `field-${name}`;
   return (
     <FieldInputTextWrapper>

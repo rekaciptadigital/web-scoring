@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-const FieldInputTextWrapper = styled.div`
+const FieldTextAreaWrapper = styled.div`
   .field-label {
     display: inline-block;
     color: var(--ma-gray-600);
@@ -14,7 +14,7 @@ const FieldInputTextWrapper = styled.div`
     }
   }
 
-  .field-input-text {
+  .field-textarea {
     display: block;
     width: 100%;
     padding: 8px 12px;
@@ -47,31 +47,31 @@ const FieldInputTextWrapper = styled.div`
   }
 `;
 
-function FieldInputText({ children, label, required, name, placeholder, value, onChange }) {
+function FieldTextArea({ children, label, name, placeholder, value = "", onChange }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
-  const handleChange = (ev) => {
+  const handleTextChange = (ev) => {
     onChange?.(ev.target.value);
   };
 
   return (
-    <FieldInputTextWrapper>
+    <FieldTextAreaWrapper>
       {(children || label) && (
         <label className="field-label" htmlFor={fieldID}>
           {children || label}
-          {required && <span className="field-required">*</span>}
         </label>
       )}
-      <input
-        className="field-input-text"
+      <textarea
+        className="field-textarea"
         id={fieldID}
+        rows="3"
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={handleChange}
+        onChange={handleTextChange}
       />
-    </FieldInputTextWrapper>
+    </FieldTextAreaWrapper>
   );
 }
 
-export default FieldInputText;
+export default FieldTextArea;

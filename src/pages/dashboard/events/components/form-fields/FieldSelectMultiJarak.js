@@ -2,11 +2,12 @@ import * as React from "react";
 import styled from "styled-components";
 import Select from "react-select";
 
-const optionsKelas = [
-  { label: "Umum", value: "Umum" },
-  { label: "U-16", value: "U-16" },
-  { label: "U-21", value: "U-21" },
-  { label: "U-23", value: "U-23" },
+const optionsJarak = [
+  { label: "16m", value: "16m" },
+  { label: "20m", value: "20m" },
+  { label: "30m", value: "30m" },
+  { label: "40m", value: "40m" },
+  { label: "50m", value: "50m" },
 ];
 
 const FieldSelectWrapper = styled.div`
@@ -58,7 +59,15 @@ const customSelectStyles = {
   }),
 };
 
-function FieldSelectKelas({ children, label, name, required, placeholder, value = "", onChange }) {
+function FieldSelectMultiJarak({
+  children,
+  label,
+  name,
+  required,
+  placeholder,
+  value = "",
+  onChange,
+}) {
   return (
     <FieldSelectWrapper>
       <label className="field-label">
@@ -68,8 +77,9 @@ function FieldSelectKelas({ children, label, name, required, placeholder, value 
       <Select
         styles={customSelectStyles}
         name={name}
+        isMulti
         placeholder={placeholder}
-        options={optionsKelas}
+        options={optionsJarak}
         value={value}
         onChange={onChange}
       />
@@ -77,4 +87,4 @@ function FieldSelectKelas({ children, label, name, required, placeholder, value 
   );
 }
 
-export default FieldSelectKelas;
+export default FieldSelectMultiJarak;

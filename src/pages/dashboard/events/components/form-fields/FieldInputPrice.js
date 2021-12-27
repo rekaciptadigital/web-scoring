@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import CurrencyFormat from "react-currency-format";
 
 const FieldPriceWrapper = styled.div`
   .field-price-label {
@@ -67,8 +68,12 @@ const FieldPriceWrapper = styled.div`
   }
 `;
 
-function FieldInputPrice({ children, label, name }) {
+function FieldInputPrice({ children, label, name, disabled, value, onChange }) {
   const fieldID = name ? `field-price-${name}` : undefined;
+
+  const handleChange = (ev) => {
+    onChange?.(ev.floatValue || "");
+  };
 
   return (
     <FieldPriceWrapper>
@@ -77,7 +82,20 @@ function FieldInputPrice({ children, label, name }) {
       </label>
       <div className="field-group-price">
         <span className="field-price-currency-symbol">Rp</span>
-        <input className="field-price-input" id={fieldID} placeholder="1,234.00" name={name} />
+        <CurrencyFormat
+          displayType={"input"}
+          className="field-price-input"
+          id={fieldID}
+          name={name}
+          value={value || ""}
+          onValueChange={handleChange}
+          placeholder="0,00"
+          disabled={disabled}
+          thousandSeparator={"."}
+          decimalSeparator={","}
+          decimalScale={2}
+          fixedDecimalScale
+        />
       </div>
     </FieldPriceWrapper>
   );

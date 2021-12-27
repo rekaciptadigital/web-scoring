@@ -24,7 +24,7 @@ const customSelectStyles = {
   input: (provided) => ({
     ...provided,
     color: "#6a7187",
-    fontSize: 16,
+    fontSize: 14,
     padding: 0,
     marginTop: 0,
     marginBottom: 0,
@@ -32,12 +32,12 @@ const customSelectStyles = {
   singleValue: (provided) => ({
     ...provided,
     color: "#6a7187",
-    fontSize: 16,
+    fontSize: 14,
   }),
   placeholder: (provided) => ({
     ...provided,
     color: "#6a7187",
-    fontSize: 16,
+    fontSize: 14,
     opacity: 0.6,
   }),
 };

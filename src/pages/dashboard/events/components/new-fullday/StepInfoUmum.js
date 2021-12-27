@@ -6,7 +6,14 @@ import { Row, Col, Modal, ModalBody } from "reactstrap";
 import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import FormSheet from "../FormSheet";
 import PosterImagePicker from "../PosterImagePicker";
-import { FieldInputText, FieldTextArea, FieldSelect, FieldSelectRadio } from "../form-fields";
+import {
+  FieldInputText,
+  FieldTextArea,
+  FieldSelect,
+  FieldSelectRadio,
+  FieldInputDate,
+  FieldInputTime,
+} from "../form-fields";
 
 export function StepInfoUmum({ eventData, updateEventData }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
@@ -38,16 +45,8 @@ export function StepInfoUmum({ eventData, updateEventData }) {
     updateEventData({ bannerImage: undefined });
   };
 
-  const handleNameChange = (value) => {
-    updateEventData({ eventName: value });
-  };
-
-  const handleDescriptionChange = (value) => {
-    updateEventData({ description: value });
-  };
-
-  const handleLocationChange = (value) => {
-    updateEventData({ location: value });
+  const handleFieldChange = (field, value) => {
+    updateEventData({ [field]: value });
   };
 
   const handleLocationTypeChange = (radioValue) => {
@@ -105,7 +104,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             name="eventName"
             placeholder="Nama Event"
             value={eventData.eventName}
-            onChange={handleNameChange}
+            onChange={(value) => handleFieldChange("eventName", value)}
           >
             Nama Event
           </FieldInputText>
@@ -116,7 +115,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             name="description"
             placeholder="Deskripsi"
             value={eventData.description}
-            onChange={handleDescriptionChange}
+            onChange={(value) => handleFieldChange("description", value)}
           >
             Deskripsi <span className="">&#40;Opsional&#41;</span>
           </FieldTextArea>
@@ -133,7 +132,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             name="location"
             placeholder="Lokasi"
             value={eventData.location}
-            onChange={handleLocationChange}
+            onChange={(value) => handleFieldChange("location", value)}
           >
             Lokasi
           </FieldInputText>
@@ -175,53 +174,101 @@ export function StepInfoUmum({ eventData, updateEventData }) {
 
       <Row>
         <Col md={4}>
-          <FieldInputText placeholder="DD/MM/YYYY" name="registrationDateStart" required>
+          <FieldInputDate
+            placeholder="DD/MM/YYYY"
+            name="registrationDateStart"
+            required
+            value={eventData.registrationDateStart}
+            onChange={(value) => handleFieldChange("registrationDateStart", value)}
+          >
             Mulai Pendaftaran
-          </FieldInputText>
+          </FieldInputDate>
         </Col>
 
         <Col md={2}>
-          <FieldInputText placeholder="00:00" name="registrationTimeStart" required>
+          <FieldInputTime
+            placeholder="00:00"
+            name="registrationTimeStart"
+            required
+            value={eventData.registrationTimeStart}
+            onChange={(value) => handleFieldChange("registrationTimeStart", value)}
+          >
             Jam Buka
-          </FieldInputText>
+          </FieldInputTime>
         </Col>
 
         <Col md={4}>
-          <FieldInputText placeholder="DD/MM/YYYY" name="registrationDateEnd" required>
+          <FieldInputDate
+            placeholder="DD/MM/YYYY"
+            name="registrationDateEnd"
+            required
+            value={eventData.registrationDateEnd}
+            onChange={(value) => handleFieldChange("registrationDateEnd", value)}
+          >
             Tutup Pendaftaran
-          </FieldInputText>
+          </FieldInputDate>
         </Col>
 
         <Col md={2}>
-          <FieldInputText placeholder="00:00" name="registrationTimeEnd" required>
+          <FieldInputTime
+            placeholder="00:00"
+            name="registrationTimeEnd"
+            required
+            value={eventData.registrationTimeEnd}
+            onChange={(value) => handleFieldChange("registrationTimeEnd", value)}
+          >
             Jam Tutup
-          </FieldInputText>
+          </FieldInputTime>
         </Col>
       </Row>
 
       <Row>
         <Col md={4}>
-          <FieldInputText placeholder="DD/MM/YYYY" name="eventDateStart" required>
+          <FieldInputDate
+            placeholder="DD/MM/YYYY"
+            name="eventDateStart"
+            required
+            value={eventData.eventDateStart}
+            onChange={(value) => handleFieldChange("eventDateStart", value)}
+          >
             Mulai Lomba
-          </FieldInputText>
+          </FieldInputDate>
         </Col>
 
         <Col md={2}>
-          <FieldInputText placeholder="00:00" name="eventTimeStart" required>
+          <FieldInputTime
+            placeholder="00:00"
+            name="eventTimeStart"
+            required
+            value={eventData.eventTimeStart}
+            onChange={(value) => handleFieldChange("eventTimeStart", value)}
+          >
             Jam Mulai
-          </FieldInputText>
+          </FieldInputTime>
         </Col>
 
         <Col md={4}>
-          <FieldInputText placeholder="DD/MM/YYYY" name="eventDateEnd" required>
+          <FieldInputDate
+            placeholder="DD/MM/YYYY"
+            name="eventDateEnd"
+            required
+            value={eventData.eventDateEnd}
+            onChange={(value) => handleFieldChange("eventDateEnd", value)}
+          >
             Akhir Lomba
-          </FieldInputText>
+          </FieldInputDate>
         </Col>
 
         <Col md={2}>
-          <FieldInputText placeholder="00:00" name="eventTimeEnd" required>
+          <FieldInputTime
+            placeholder="00:00"
+            name="eventTimeEnd"
+            required
+            value={eventData.eventTimeEnd}
+            onChange={(value) => handleFieldChange("eventTimeEnd", value)}
+          >
             Jam Akhir
-          </FieldInputText>
+          </FieldInputTime>
         </Col>
       </Row>
 

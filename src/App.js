@@ -5,6 +5,7 @@ import { AuthenticationMiddleware } from "./middlewares";
 import { authenticationRoutes, dashboardRoutes, certificateRoutes, workingRoutes } from "./routes";
 
 import "./assets/scss/theme.scss";
+import "react-datepicker/dist/react-datepicker.css";
 
 const App = () => {
   return (

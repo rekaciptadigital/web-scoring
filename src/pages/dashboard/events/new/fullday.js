@@ -55,7 +55,7 @@ const initialEventData = {
           competitionCategory: "",
           ageCategory: "",
           teamCategory: "",
-          distance: "",
+          distance: [],
           quota: "",
         },
       ],

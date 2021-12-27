@@ -8,3 +8,5 @@ export { default as FieldSelectMultiJarak } from "./FieldSelectMultiJarak";
 export { default as FieldSelectJenisRegu } from "./FieldSelectJenisRegu";
 export { default as FieldSelectRadio } from "./FieldSelectRadio";
 export { default as FieldInputPrice } from "./FieldInputPrice";
+export { default as FieldInputDate } from "./FieldInputDate";
+export { default as FieldInputTime } from "./FieldInputTime";

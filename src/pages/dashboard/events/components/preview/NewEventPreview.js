@@ -1,11 +1,14 @@
 import * as React from "react";
 import styled from "styled-components";
-import classnames from "classnames";
 import { useWizardView } from "utils/hooks/wizard-view";
 
 import CurrencyFormat from "react-currency-format";
 import { Container, Row, Col } from "reactstrap";
 import { Button, ButtonOutline, WizardView, WizardViewContent } from "components/ma";
+
+import classnames from "classnames";
+import format from "date-fns/format";
+import id from "date-fns/locale/id";
 
 const TEAM_INDIVIDUAL = "individual";
 const TEAM_MALE = "maleTeam";
@@ -28,7 +31,7 @@ function computeCategoriesByTeam(categoriesData) {
   };
 
   categoriesData.forEach((competition) => {
-    competition.categoryDetails.forEach((detail) => {
+    competition.categoryDetails?.forEach((detail) => {
       detail.distance?.forEach((distanceItem, index) => {
         const newCategory = {
           ...detail,
@@ -92,9 +95,19 @@ function NewEventPreview({ eventData }) {
               <table className="mb-3 content-info-time-place">
                 <tbody>
                   <tr>
-                    <td>Tanggal Event</td>
-                    <td>:</td>
-                    <td></td>
+                    <td style={{ minWidth: 120 }}>Tanggal Event</td>
+                    <td style={{ minWidth: "0.5rem" }}>:</td>
+                    <td>
+                      {eventData.eventDateStart && eventData.eventDateEnd ? (
+                        <React.Fragment>
+                          {format(eventData.eventDateStart, "d MMMM yyyy", { locale: id })}
+                          &nbsp;-&nbsp;
+                          {format(eventData.eventDateEnd, "d MMMM yyyy", { locale: id })}
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment>&mdash;</React.Fragment>
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td>Lokasi</td>
@@ -123,24 +136,16 @@ function NewEventPreview({ eventData }) {
 
               <h5 className="content-info-heading">Biaya Registrasi</h5>
               <p>
-                Tanggal Registrasi:
-                <br />
-                Mulai dari{" "}
-                {eventData.registrationFee ? (
-                  <CurrencyFormat
-                    displayType={"text"}
-                    value={eventData.registrationFee}
-                    prefix="Rp&nbsp;"
-                    thousandSeparator={"."}
-                    decimalSeparator={","}
-                    decimalScale={2}
-                    fixedDecimalScale
-                  />
-                ) : (
+                {eventData.registrationDateStart && eventData.registrationDateEnd && (
                   <React.Fragment>
-                    Rp <span>&laquo;data harga tidak tersedia&raquo;</span>
+                    Tanggal registrasi{" "}
+                    {format(eventData.registrationDateStart, "d MMMM yyyy", { locale: id })}
+                    &nbsp;-&nbsp;
+                    {format(eventData.registrationDateEnd, "d MMMM yyyy", { locale: id })}
+                    <br />
                   </React.Fragment>
                 )}
+                <CopywritingRegistrationFee eventData={eventData} />
               </p>
             </div>
           </Col>
@@ -221,6 +226,39 @@ function NewEventPreview({ eventData }) {
         </div>
       </Container>
     </PageWrapper>
+  );
+}
+
+function CopywritingRegistrationFee({ eventData }) {
+  const computeDisplayFee = () => {
+    if (eventData.isFlatRegistrationFee) {
+      return eventData.registrationFee;
+    }
+    const lowestFee = eventData.registrationFees?.sort(lowToHigh)[0].amount;
+    return lowestFee;
+  };
+
+  if (!eventData.registrationFee && !eventData.registrationFees?.length) {
+    return (
+      <React.Fragment>
+        Mulai dari Rp <span>&laquo;data harga tidak tersedia&raquo;</span>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <React.Fragment>
+      Mulai dari{" "}
+      <CurrencyFormat
+        displayType={"text"}
+        value={computeDisplayFee()}
+        prefix="Rp&nbsp;"
+        thousandSeparator={"."}
+        decimalSeparator={","}
+        decimalScale={2}
+        fixedDecimalScale
+      />
+    </React.Fragment>
   );
 }
 
@@ -438,5 +476,15 @@ const PageWrapper = styled.div`
     }
   }
 `;
+
+const lowToHigh = (feeA, feeB) => {
+  if (feeA.amount === feeB.amount) {
+    return 0;
+  }
+  if (feeA.amount < feeB.amount) {
+    return -1;
+  }
+  return 1;
+};
 
 export default NewEventPreview;

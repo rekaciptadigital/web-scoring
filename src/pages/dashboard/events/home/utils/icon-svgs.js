@@ -4,4 +4,6 @@ import target from "assets/images/icons/event-menu-target.svg";
 import userPlus from "assets/images/icons/event-menu-user-plus.svg";
 import fileText from "assets/images/icons/event-menu-file-text.svg";
 
-export { panah, users, target, userPlus, fileText };
+import user from "assets/icons/user.svg";
+
+export { panah, users, target, userPlus, fileText, user };

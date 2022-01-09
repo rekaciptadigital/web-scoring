@@ -34,7 +34,7 @@ function FieldInputTime({
         placeholderText={placeholder}
         locale={id}
         timeFormat="H:mm"
-        dateFormat="h:mm"
+        dateFormat="H:mm"
         timeIntervals={interval || 15}
         timeCaption="Pukul"
         showTimeSelect

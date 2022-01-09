@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import styled from "styled-components";
 
 import { List, ListInlineItem } from "reactstrap";
+import { LoadingScreen } from "components";
 import { Button, ButtonBlue } from "components/ma";
 import NewEventPreview from "./NewEventPreview";
 
@@ -45,7 +46,9 @@ const StyledPreviewContainer = styled.div`
   }
 `;
 
-function FullScreenPreviewContainer({ children, onClose }) {
+function FullScreenPreviewContainer({ children, isLoading, onClose, onSave }) {
+  const handleSaveEvent = () => onSave?.();
+
   React.useEffect(() => {
     // Mencegah scrolling dari konten asli halaman form
     // ketika preview terbuka
@@ -76,7 +79,9 @@ function FullScreenPreviewContainer({ children, onClose }) {
               </ListInlineItem>
 
               <ListInlineItem className="d-flex justify-content-center align-items-center">
-                <Button style={{ width: 100, color: "var(--ma-blue)" }}>Simpan</Button>
+                <Button onClick={handleSaveEvent} style={{ width: 100, color: "var(--ma-blue)" }}>
+                  Simpan
+                </Button>
               </ListInlineItem>
 
               <ListInlineItem className="d-flex justify-content-center align-items-center">
@@ -87,11 +92,12 @@ function FullScreenPreviewContainer({ children, onClose }) {
         </div>
         <div className="preview-content">{children}</div>
       </div>
+      <LoadingScreen loading={isLoading} />
     </StyledPreviewContainer>
   );
 }
 
-function PreviewPortal({ isActive, eventData, onClose }) {
+function PreviewPortal({ isActive, isLoading, eventData, onClose, onSave }) {
   const portalRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -108,7 +114,7 @@ function PreviewPortal({ isActive, eventData, onClose }) {
 
   if (portalRef.current && isActive) {
     return ReactDOM.createPortal(
-      <FullScreenPreviewContainer onClose={onClose}>
+      <FullScreenPreviewContainer isLoading={isLoading} onClose={onClose} onSave={onSave}>
         <NewEventPreview eventData={eventData} />
       </FullScreenPreviewContainer>,
       portalRef.current

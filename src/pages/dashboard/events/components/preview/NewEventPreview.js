@@ -117,7 +117,7 @@ function NewEventPreview({ eventData }) {
                   <tr>
                     <td>Kota</td>
                     <td>:</td>
-                    <td>{eventData.city}</td>
+                    <td>{eventData.city?.label}</td>
                   </tr>
                   <tr>
                     <td>Lapangan</td>

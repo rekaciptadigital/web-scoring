@@ -55,8 +55,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
   };
 
   const handleCityChange = (selectValue) => {
-    const { value } = selectValue;
-    updateEventData({ city: value });
+    updateEventData({ city: selectValue });
   };
 
   const handleAddInformation = (value) => {
@@ -163,8 +162,9 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             options={[
               { label: "Bekasi", value: "Bekasi" },
               { label: "Jakarta", value: "Jakarta" },
+              { label: "Semarang", value: 3374 },
             ]}
-            value={eventData?.city ? { label: eventData.city, value: eventData.city } : undefined}
+            value={eventData?.city || null}
             onChange={handleCityChange}
           >
             Kota

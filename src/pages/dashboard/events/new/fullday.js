@@ -95,46 +95,25 @@ const EventsNewFullday = () => {
   const handleSaveEvent = async () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading" }));
 
-    const bannerImageBase64 = eventData.bannerImage?.raw
-      ? await imageToBase64(eventData.bannerImage.raw)
-      : undefined;
-
-    const generatedCategories = makeEventCategories(eventData.eventCategories);
-    const categoriesWithFees = makeCategoryFees(eventData, generatedCategories);
-
-    const payload = {
-      status: PUBLICATION_TYPES.DRAFT,
-      eventType: eventData.eventType,
-      eventCompetition: eventData.eventCompetition,
-      publicInformation: {
-        eventName: eventData.eventName,
-        eventBanner: bannerImageBase64,
-        eventDescription: eventData.description,
-        eventLocation: eventData.location,
-        eventCity: eventData.city?.value,
-        eventLocation_type: eventData.locationType,
-        eventStart_register: formatServerDatetime(
-          eventData.registrationDateStart,
-          eventData.registrationTimeStart
-        ),
-        eventEnd_register: formatServerDatetime(
-          eventData.registrationDateEnd,
-          eventData.registrationTimeEnd
-        ),
-        eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
-        eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
-      },
-      more_information: eventData.extraInfos.map((info) => ({
-        title: info.title,
-        description: info.description,
-      })),
-      event_categories: categoriesWithFees,
-    };
-
+    const payload = await makeEventPayload(eventData, { status: PUBLICATION_TYPES.DRAFT });
     const result = await EventsService.register(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       // TODO: redirect ke page "Sedikit Lagi" step 1
+    } else {
+      setSavingEventStatus((state) => ({ ...state, status: "error" }));
+      // TODO: popup error 422
+    }
+  };
+
+  const handlePublishEvent = async () => {
+    setSavingEventStatus((state) => ({ ...state, status: "loading" }));
+
+    const payload = await makeEventPayload(eventData, { status: PUBLICATION_TYPES.PUBLISHED });
+    const result = await EventsService.register(payload);
+    if (result.success) {
+      setSavingEventStatus((state) => ({ ...state, status: "success" }));
+      // TODO: redirect ke page "Sedikit Lagi" step 2
     } else {
       setSavingEventStatus((state) => ({ ...state, status: "error" }));
       // TODO: popup error 422
@@ -249,6 +228,7 @@ const EventsNewFullday = () => {
         eventData={eventData}
         onClose={() => setShouldShowPreview(false)}
         onSave={handleSaveEvent}
+        onPublish={handlePublishEvent}
       />
     </React.Fragment>
   );
@@ -269,6 +249,44 @@ async function imageToBase64(imageFileRaw) {
       resolve(baseURL);
     };
   });
+}
+
+async function makeEventPayload(eventData, options) {
+  const bannerImageBase64 = eventData.bannerImage?.raw
+    ? await imageToBase64(eventData.bannerImage.raw)
+    : undefined;
+
+  const generatedCategories = makeEventCategories(eventData.eventCategories);
+  const categoriesWithFees = makeCategoryFees(eventData, generatedCategories);
+
+  return {
+    status: options.status || PUBLICATION_TYPES.DRAFT,
+    eventType: eventData.eventType,
+    eventCompetition: eventData.eventCompetition,
+    publicInformation: {
+      eventName: eventData.eventName,
+      eventBanner: bannerImageBase64,
+      eventDescription: eventData.description,
+      eventLocation: eventData.location,
+      eventCity: eventData.city?.value,
+      eventLocation_type: eventData.locationType,
+      eventStart_register: formatServerDatetime(
+        eventData.registrationDateStart,
+        eventData.registrationTimeStart
+      ),
+      eventEnd_register: formatServerDatetime(
+        eventData.registrationDateEnd,
+        eventData.registrationTimeEnd
+      ),
+      eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
+      eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
+    },
+    more_information: eventData.extraInfos.map((info) => ({
+      title: info.title,
+      description: info.description,
+    })),
+    event_categories: categoriesWithFees,
+  };
 }
 
 function makeEventCategories(categoriesData) {

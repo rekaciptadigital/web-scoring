@@ -46,8 +46,9 @@ const StyledPreviewContainer = styled.div`
   }
 `;
 
-function FullScreenPreviewContainer({ children, isLoading, onClose, onSave }) {
+function FullScreenPreviewContainer({ children, isLoading, onClose, onSave, onPublish }) {
   const handleSaveEvent = () => onSave?.();
+  const handlePublishEvent = () => onPublish?.();
 
   React.useEffect(() => {
     // Mencegah scrolling dari konten asli halaman form
@@ -85,7 +86,9 @@ function FullScreenPreviewContainer({ children, isLoading, onClose, onSave }) {
               </ListInlineItem>
 
               <ListInlineItem className="d-flex justify-content-center align-items-center">
-                <ButtonBlue style={{ width: 100 }}>Publish</ButtonBlue>
+                <ButtonBlue onClick={handlePublishEvent} style={{ width: 100 }}>
+                  Publish
+                </ButtonBlue>
               </ListInlineItem>
             </List>
           </div>
@@ -97,7 +100,7 @@ function FullScreenPreviewContainer({ children, isLoading, onClose, onSave }) {
   );
 }
 
-function PreviewPortal({ isActive, isLoading, eventData, onClose, onSave }) {
+function PreviewPortal({ isActive, isLoading, eventData, onClose, onSave, onPublish }) {
   const portalRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -114,7 +117,12 @@ function PreviewPortal({ isActive, isLoading, eventData, onClose, onSave }) {
 
   if (portalRef.current && isActive) {
     return ReactDOM.createPortal(
-      <FullScreenPreviewContainer isLoading={isLoading} onClose={onClose} onSave={onSave}>
+      <FullScreenPreviewContainer
+        isLoading={isLoading}
+        onClose={onClose}
+        onSave={onSave}
+        onPublish={onPublish}
+      >
         <NewEventPreview eventData={eventData} />
       </FullScreenPreviewContainer>,
       portalRef.current

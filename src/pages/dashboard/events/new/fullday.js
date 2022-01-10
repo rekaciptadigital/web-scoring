@@ -234,7 +234,7 @@ const EventsNewFullday = () => {
 
 function formatServerDatetime(date, time) {
   const dateString = format(date, "yyyy-MM-dd");
-  const timeString = format(time, "HH-mm-ss");
+  const timeString = format(time, "HH:mm:ss");
   return `${dateString} ${timeString}`;
 }
 

@@ -90,7 +90,7 @@ export function StepBiaya({ eventData, updateEventData }) {
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MALE)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MALE, value)}
           >
-            Male Team
+            Beregu Putra
           </FieldInputPrice>
         </Col>
 
@@ -101,7 +101,7 @@ export function StepBiaya({ eventData, updateEventData }) {
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_FEMALE)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_FEMALE, value)}
           >
-            Female Team
+            Beregu Putri
           </FieldInputPrice>
         </Col>
 
@@ -112,7 +112,7 @@ export function StepBiaya({ eventData, updateEventData }) {
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MIXED)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MIXED, value)}
           >
-            Mixed Team
+            Beregu Campuran
           </FieldInputPrice>
         </Col>
       </Row>

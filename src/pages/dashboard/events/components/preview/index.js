@@ -87,7 +87,7 @@ function FullScreenPreviewContainer({ children, isLoading, onClose, onSave, onPu
 
               <ListInlineItem className="d-flex justify-content-center align-items-center">
                 <ButtonBlue onClick={handlePublishEvent} style={{ width: 100 }}>
-                  Publish
+                  Publikasi
                 </ButtonBlue>
               </ListInlineItem>
             </List>

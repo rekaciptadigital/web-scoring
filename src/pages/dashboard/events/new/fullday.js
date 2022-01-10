@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import { stringUtil } from "utils";
 import { useWizardView } from "utils/hooks/wizard-view";
@@ -83,6 +84,7 @@ const initialEventData = {
 };
 
 const EventsNewFullday = () => {
+  const history = useHistory();
   const { steps, stepsTotal, currentStep, currentLabel, goToStep, goToPreviousStep, goToNextStep } =
     useWizardView(stepsData);
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
@@ -99,7 +101,8 @@ const EventsNewFullday = () => {
     const result = await EventsService.register(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
-      // TODO: redirect ke page "Sedikit Lagi" step 1
+      const eventId = result.data?.id;
+      eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
       setSavingEventStatus((state) => ({ ...state, status: "error" }));
       // TODO: popup error 422
@@ -113,7 +116,8 @@ const EventsNewFullday = () => {
     const result = await EventsService.register(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
-      // TODO: redirect ke page "Sedikit Lagi" step 2
+      const eventId = result.data?.id;
+      eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
       setSavingEventStatus((state) => ({ ...state, status: "error" }));
       // TODO: popup error 422
@@ -211,7 +215,7 @@ const EventsNewFullday = () => {
                         style={{ width: 100 }}
                         onClick={() => setShouldShowPreview(true)}
                       >
-                        Preview
+                        Pratinjau
                       </ButtonBlue>
                     </div>
                   )}

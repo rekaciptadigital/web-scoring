@@ -2,6 +2,7 @@
 import EventsNewFullday from "pages/dashboard/events/new/fullday";
 import EventsNewMarathon from "pages/dashboard/events/new/marathon";
 import PreWizard from "pages/dashboard/events/new/pre-wizard";
+import PagePrePublish from "pages/dashboard/events/new/pre-publish";
 import PageCongratulations from "pages/dashboard/events/new/congratulations";
 import ScoringNew from "pages/dashboard/scoring/new";
 import Dashboard from "../pages/dashboard";
@@ -32,6 +33,7 @@ const dashboardRoutes = [
   { path: "/dashboard/eliminasi/:event_id", component: Eliminasi },
 
   { path: "/dashboard/events/new/prepare", component: PreWizard },
+  { path: "/dashboard/events/new/prepublish", component: PagePrePublish },
   { path: "/dashboard/events/new/congratulations", component: PageCongratulations },
 
   // this route should be at the end of all other routes

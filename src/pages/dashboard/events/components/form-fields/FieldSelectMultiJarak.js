@@ -1,14 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import Select from "react-select";
+import { useArcheryCategories } from "utils/hooks/archery-categories";
+import { EventsService } from "services";
 
-const optionsJarak = [
-  { label: "16m", value: "16m" },
-  { label: "20m", value: "20m" },
-  { label: "30m", value: "30m" },
-  { label: "40m", value: "40m" },
-  { label: "50m", value: "50m" },
-];
+import Select from "react-select";
 
 const FieldSelectWrapper = styled.div`
   .field-label {
@@ -68,6 +63,7 @@ function FieldSelectMultiJarak({
   value = "",
   onChange,
 }) {
+  const { options: optionsJarak } = useArcheryCategories(EventsService.getEventDistanceCategories);
   return (
     <FieldSelectWrapper>
       <label className="field-label">

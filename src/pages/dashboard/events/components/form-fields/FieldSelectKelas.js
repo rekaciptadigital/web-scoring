@@ -1,13 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import Select from "react-select";
+import { useArcheryCategories } from "utils/hooks/archery-categories";
+import { EventsService } from "services";
 
-const optionsKelas = [
-  { label: "Umum", value: "Umum" },
-  { label: "U-16", value: "U-16" },
-  { label: "U-21", value: "U-21" },
-  { label: "U-23", value: "U-23" },
-];
+import Select from "react-select";
 
 const FieldSelectWrapper = styled.div`
   .field-label {
@@ -59,6 +55,7 @@ const customSelectStyles = {
 };
 
 function FieldSelectKelas({ children, label, name, required, placeholder, value = "", onChange }) {
+  const { options: optionsKelas } = useArcheryCategories(EventsService.getEventAgeCategories);
   return (
     <FieldSelectWrapper>
       <label className="field-label">

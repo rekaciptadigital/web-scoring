@@ -25,6 +25,18 @@ export default {
     getEventMemberScoring(qs) {
         return API.get("/api/v1/archery/scorer/participant", qs)
     },
+    getEventCompetitionCategories(qs = null) {
+        return API.get("/web/v1/archery/competition-categories", qs);
+    },
+    getEventAgeCategories(qs = null) {
+        return API.get("/web/v1/archery/age-categories", qs);
+    },
+    getEventDistanceCategories(qs = null) {
+        return API.get("/web/v1/archery/distance-categories", qs);
+    },
+    getEventTeamCategories(qs = null) {
+        return API.get("/web/v1/archery/team-categories", qs);
+    },
     getEventCategoryDetails(qs = null) {
         return API.get("/web/v1/archery/category-details", qs);
     },

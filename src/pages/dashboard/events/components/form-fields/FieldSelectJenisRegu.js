@@ -1,14 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import Select from "react-select";
+import { useArcheryCategories } from "utils/hooks/archery-categories";
+import { EventsService } from "services";
 
-const optionsJenisRegu = [
-  { label: "Individu Putra", value: "Individu Putra" },
-  { label: "Individu Putri", value: "Individu Putri" },
-  { label: "Beregu Putra", value: "Beregu Putra" },
-  { label: "Beregu Putri", value: "Beregu Putri" },
-  { label: "Beregu Campuran", value: "Beregu Campuran" },
-];
+import Select from "react-select";
 
 const FieldSelectWrapper = styled.div`
   .field-label {
@@ -68,6 +63,7 @@ function FieldSelectJenisRegu({
   value = "",
   onChange,
 }) {
+  const { options: optionsJenisRegu } = useArcheryCategories(EventsService.getEventTeamCategories);
   return (
     <FieldSelectWrapper>
       <label className="field-label">

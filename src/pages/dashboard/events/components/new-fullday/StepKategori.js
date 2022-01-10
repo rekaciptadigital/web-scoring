@@ -1,19 +1,17 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useArcheryCategories } from "utils/hooks/archery-categories";
+import { EventsService } from "services";
 
 import { ButtonOutlineBlue } from "components/ma";
 import FormSheet from "../FormSheet";
 import { CategoryItem } from "../form-category";
 
-const categoryOptions = [
-  { label: "Barebow", value: "Barebow" },
-  { label: "Compound", value: "Compound" },
-  { label: "Recurve", value: "Recurve" },
-  { label: "Standard Bow", value: "Standard Bow" },
-  { label: "Recurve FITA", value: "Recurve FITA" },
-];
-
 export function StepKategori({ eventData, updateEventData }) {
+  const { options: categoryOptions } = useArcheryCategories(
+    EventsService.getEventCompetitionCategories
+  );
+
   const handleClickAddCategory = () => {
     if (eventData.eventCategories.length === categoryOptions.length) {
       return;
@@ -29,6 +27,7 @@ export function StepKategori({ eventData, updateEventData }) {
             <CategoryItem
               key={category.key}
               category={category}
+              categoryOptions={categoryOptions}
               eventData={eventData}
               updateEventData={updateEventData}
             />

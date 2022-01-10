@@ -7,15 +7,7 @@ import CategoryDetailList from "./CategoryDetailList";
 
 import Del from "components/icons/Del";
 
-const categoryOptions = [
-  { label: "Barebow", value: "Barebow" },
-  { label: "Compound", value: "Compound" },
-  { label: "Recurve", value: "Recurve" },
-  { label: "Standard Bow", value: "Standard Bow" },
-  { label: "Recurve FITA", value: "Recurve FITA" },
-];
-
-function CategoryItem({ category, eventData, updateEventData }) {
+function CategoryItem({ category, categoryOptions, eventData, updateEventData }) {
   const handleClickRemoveCategory = (targetCategory) => {
     updateEventData({ type: "REMOVE_EVENT_CATEGORY", categoryKey: targetCategory.key });
   };

@@ -40,6 +40,7 @@ function PagePrePublish() {
 
   const { eventId } = queryString.parse(location.search);
   const event = eventData.data;
+  const isLoadingEvent = eventData.status === "loading";
 
   React.useEffect(() => {
     const fetchEvent = async () => {
@@ -75,9 +76,9 @@ function PagePrePublish() {
               </div>
             </div>
           </div>
-        ) : !event ? (
+        ) : isLoadingEvent ? (
           <div>Sedang memuat data event...</div>
-        ) : (
+        ) : event ? (
           <Row>
             <Col md="4">
               <CardFlatBasic>
@@ -145,6 +146,8 @@ function PagePrePublish() {
               </WizardView>
             </Col>
           </Row>
+        ) : (
+          <div>Gagal memuat data event.</div>
         )}
       </Container>
     </div>
@@ -152,6 +155,32 @@ function PagePrePublish() {
 }
 
 function PanelJadwalKualifikasi({ eventId, isSuccess = false }) {
+  const [categoryDetails, setCategoryDetails] = React.useState({
+    status: "idle",
+    data: null,
+    errors: null,
+  });
+
+  const isLoadingCategories = categoryDetails.status === "loading";
+
+  React.useEffect(() => {
+    if (isSuccess) {
+      return;
+    }
+
+    const fetchCategoryDetails = async () => {
+      setCategoryDetails((state) => ({ ...state, status: "loading" }));
+      const result = await EventsService.getEventCategoryDetails({ event_id: eventId });
+      if (result.success) {
+        setCategoryDetails((state) => ({ ...state, status: "success", data: result.data }));
+      } else {
+        setCategoryDetails((state) => ({ ...state, status: "error", errors: result.errors }));
+      }
+    };
+
+    fetchCategoryDetails();
+  }, [isSuccess]);
+
   if (!isSuccess) {
     return (
       <div>
@@ -168,9 +197,22 @@ function PanelJadwalKualifikasi({ eventId, isSuccess = false }) {
         </QualificationScheduleHeader>
 
         <div>
-          {[1, 2, 3].map((id) => (
-            <CardCategorySchedule key={id}>Kategori &gt; Jadwal</CardCategorySchedule>
-          ))}
+          {isLoadingCategories ? (
+            <CardCategorySchedule>Sedang memuat data kategori event</CardCategorySchedule>
+          ) : categoryDetails?.length ? (
+            categoryDetails.map((id) => (
+              <CardCategorySchedule key={id}>Kategori &gt; Jadwal</CardCategorySchedule>
+            ))
+          ) : (
+            <CardCategorySchedule>
+              <div>Kategori event tidak tersedia.</div>
+              <div className="mt-2">
+                <Button as={Link} to="/dashboard">
+                  Kembali ke Dashboard EO
+                </Button>
+              </div>
+            </CardCategorySchedule>
+          )}
         </div>
       </div>
     );
@@ -198,9 +240,12 @@ const QualificationScheduleHeader = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  margin-bottom: 1.5rem;
 
   .heading-left {
+    flex-grow: 1;
   }
+
   .buttons-right {
     display: flex;
     align-items: flex-start;

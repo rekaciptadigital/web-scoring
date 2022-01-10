@@ -1,9 +1,12 @@
 import * as React from "react";
-import Switch from "react-switch";
+import { eventCategories } from "constants/index";
 
+import Switch from "react-switch";
 import { Row, Col } from "reactstrap";
 import FormSheet from "../FormSheet";
 import { FieldInputPrice } from "../form-fields";
+
+const { TEAM_CATEGORIES } = eventCategories;
 
 export function StepBiaya({ eventData, updateEventData }) {
   const handleRegistrationFeeChange = (value) => {
@@ -73,8 +76,8 @@ export function StepBiaya({ eventData, updateEventData }) {
           <FieldInputPrice
             name="normal-individual"
             disabled={eventData.isFlatRegistrationFee}
-            value={computeFeeAmountByTeamCategory("individual")}
-            onChange={(value) => handleVarietyFeesChange("individual", value)}
+            value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_INDIVIDUAL)}
+            onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL, value)}
           >
             Individual
           </FieldInputPrice>
@@ -84,8 +87,8 @@ export function StepBiaya({ eventData, updateEventData }) {
           <FieldInputPrice
             name="normal-male-team"
             disabled={eventData.isFlatRegistrationFee}
-            value={computeFeeAmountByTeamCategory("maleTeam")}
-            onChange={(value) => handleVarietyFeesChange("maleTeam", value)}
+            value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MALE)}
+            onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MALE, value)}
           >
             Male Team
           </FieldInputPrice>
@@ -95,8 +98,8 @@ export function StepBiaya({ eventData, updateEventData }) {
           <FieldInputPrice
             name="normal-female-team"
             disabled={eventData.isFlatRegistrationFee}
-            value={computeFeeAmountByTeamCategory("femaleTeam")}
-            onChange={(value) => handleVarietyFeesChange("femaleTeam", value)}
+            value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_FEMALE)}
+            onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_FEMALE, value)}
           >
             Female Team
           </FieldInputPrice>
@@ -106,8 +109,8 @@ export function StepBiaya({ eventData, updateEventData }) {
           <FieldInputPrice
             name="normal-mixed-team"
             disabled={eventData.isFlatRegistrationFee}
-            value={computeFeeAmountByTeamCategory("mixedTeam")}
-            onChange={(value) => handleVarietyFeesChange("mixedTeam", value)}
+            value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MIXED)}
+            onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MIXED, value)}
           >
             Mixed Team
           </FieldInputPrice>

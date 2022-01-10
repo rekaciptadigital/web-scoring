@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
+import { eventCategories } from "constants/index";
 
 import CurrencyFormat from "react-currency-format";
 import { Container, Row, Col } from "reactstrap";
@@ -10,24 +11,21 @@ import classnames from "classnames";
 import format from "date-fns/format";
 import id from "date-fns/locale/id";
 
-const TEAM_INDIVIDUAL = "individual";
-const TEAM_MALE = "maleTeam";
-const TEAM_FEMALE = "femaleTeam";
-const TEAM_MIXED = "mixedTeam";
+const { TEAM_CATEGORIES } = eventCategories;
 
 const categoryTabsList = [
-  { step: 1, label: "Individu", teamCategory: TEAM_INDIVIDUAL },
-  { step: 2, label: "Male Team", teamCategory: TEAM_MALE },
-  { step: 3, label: "Female Team", teamCategory: TEAM_FEMALE },
-  { step: 4, label: "Mixed Team", teamCategory: TEAM_MIXED },
+  { step: 1, label: "Individu", teamCategory: TEAM_CATEGORIES.TEAM_INDIVIDUAL },
+  { step: 2, label: "Male Team", teamCategory: TEAM_CATEGORIES.TEAM_MALE },
+  { step: 3, label: "Female Team", teamCategory: TEAM_CATEGORIES.TEAM_FEMALE },
+  { step: 4, label: "Mixed Team", teamCategory: TEAM_CATEGORIES.TEAM_MIXED },
 ];
 
 function computeCategoriesByTeam(categoriesData) {
   const categoriesByTeam = {
-    [TEAM_INDIVIDUAL]: [],
-    [TEAM_MALE]: [],
-    [TEAM_FEMALE]: [],
-    [TEAM_MIXED]: [],
+    [TEAM_CATEGORIES.TEAM_INDIVIDUAL]: [],
+    [TEAM_CATEGORIES.TEAM_MALE]: [],
+    [TEAM_CATEGORIES.TEAM_FEMALE]: [],
+    [TEAM_CATEGORIES.TEAM_MIXED]: [],
   };
 
   categoriesData.forEach((competition) => {
@@ -43,16 +41,16 @@ function computeCategoriesByTeam(categoriesData) {
         };
 
         if (
-          detail.teamCategory?.value === "Individu Putra" ||
-          detail.teamCategory?.value === "Individu Putri"
+          detail.teamCategory?.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+          detail.teamCategory?.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
         ) {
-          categoriesByTeam[TEAM_INDIVIDUAL].push(newCategory);
+          categoriesByTeam[TEAM_CATEGORIES.TEAM_INDIVIDUAL].push(newCategory);
         } else if (detail.teamCategory?.value === "Beregu Putra") {
-          categoriesByTeam[TEAM_MALE].push(newCategory);
+          categoriesByTeam[TEAM_CATEGORIES.TEAM_MALE].push(newCategory);
         } else if (detail.teamCategory?.value === "Beregu Putri") {
-          categoriesByTeam[TEAM_FEMALE].push(newCategory);
+          categoriesByTeam[TEAM_CATEGORIES.TEAM_FEMALE].push(newCategory);
         } else if (detail.teamCategory?.value === "Beregu Campuran") {
-          categoriesByTeam[TEAM_MIXED].push(newCategory);
+          categoriesByTeam[TEAM_CATEGORIES.TEAM_MIXED].push(newCategory);
         }
       });
     });
@@ -211,16 +209,16 @@ function NewEventPreview({ eventData }) {
 
           <WizardView currentStep={currentStep}>
             <WizardViewContent>
-              <EventCategoryGrid categories={categoriesByTeam[TEAM_INDIVIDUAL]} />
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_CATEGORIES.TEAM_INDIVIDUAL]} />
             </WizardViewContent>
             <WizardViewContent>
-              <EventCategoryGrid categories={categoriesByTeam[TEAM_MALE]} />
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_CATEGORIES.TEAM_MALE]} />
             </WizardViewContent>
             <WizardViewContent>
-              <EventCategoryGrid categories={categoriesByTeam[TEAM_FEMALE]} />
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_CATEGORIES.TEAM_FEMALE]} />
             </WizardViewContent>
             <WizardViewContent>
-              <EventCategoryGrid categories={categoriesByTeam[TEAM_MIXED]} />
+              <EventCategoryGrid categories={categoriesByTeam[TEAM_CATEGORIES.TEAM_MIXED]} />
             </WizardViewContent>
           </WizardView>
         </div>

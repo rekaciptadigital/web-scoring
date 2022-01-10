@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import { stringUtil } from "utils";
 import { useWizardView } from "utils/hooks/wizard-view";
-import { eventConfigs } from "constants/index";
+import { eventConfigs, eventCategories } from "constants/index";
 import { eventDataReducer } from "../hooks/create-event-data";
 import { EventsService } from "services";
 
@@ -37,13 +37,7 @@ const stepsData = [
 ];
 
 const { EVENT_TYPES, MATCH_TYPES, PUBLICATION_TYPES } = eventConfigs;
-
-const TEAM_INDIVIDUAL = "individual";
-const TEAM_INDIVIDUAL_MALE = "individualMale";
-const TEAM_INDIVIDUAL_FEMALE = "individualFemale";
-const TEAM_MALE = "maleTeam";
-const TEAM_FEMALE = "femaleTeam";
-const TEAM_MIXED = "mixedTeam";
+const { TEAM_CATEGORIES } = eventCategories;
 
 const initialEventCategoryKey = stringUtil.createRandom();
 const initialDetailKey = stringUtil.createRandom();
@@ -76,10 +70,10 @@ const initialEventData = {
   isFlatRegistrationFee: true,
   registrationFee: "",
   registrationFees: [
-    { key: 1, teamCategory: TEAM_INDIVIDUAL, amount: "" },
-    { key: 2, teamCategory: TEAM_MALE, amount: "" },
-    { key: 3, teamCategory: TEAM_FEMALE, amount: "" },
-    { key: 4, teamCategory: TEAM_MIXED, amount: "" },
+    { key: 1, teamCategory: TEAM_CATEGORIES.TEAM_INDIVIDUAL, amount: "" },
+    { key: 2, teamCategory: TEAM_CATEGORIES.TEAM_MALE, amount: "" },
+    { key: 3, teamCategory: TEAM_CATEGORIES.TEAM_FEMALE, amount: "" },
+    { key: 4, teamCategory: TEAM_CATEGORIES.TEAM_MIXED, amount: "" },
   ],
 };
 
@@ -304,21 +298,8 @@ function makeEventCategories(categoriesData) {
           age_category_id: detail.ageCategory?.value,
           distance_id: distanceItem.value,
           quota: detail.quota,
-          team_category_id: undefined,
+          team_category_id: detail.teamCategory?.value,
         };
-
-        if (detail.teamCategory?.value === "Individu Putra") {
-          newCategory.team_category_id = TEAM_INDIVIDUAL_MALE;
-        } else if (detail.teamCategory?.value === "Individu Putri") {
-          newCategory.team_category_id = TEAM_INDIVIDUAL_FEMALE;
-        } else if (detail.teamCategory?.value === "Beregu Putra") {
-          newCategory.team_category_id = TEAM_MALE;
-        } else if (detail.teamCategory?.value === "Beregu Putri") {
-          newCategory.team_category_id = TEAM_FEMALE;
-        } else if (detail.teamCategory?.value === "Beregu Campuran") {
-          newCategory.team_category_id = TEAM_MIXED;
-        }
-
         generatedCategories.push(newCategory);
       });
     });
@@ -334,9 +315,9 @@ function makeCategoryFees(eventData, categoriesData) {
 
   const categoriesWithTeamFees = categoriesData.map((category) => {
     const targetTeamCategory =
-      category.team_category_id === TEAM_INDIVIDUAL_MALE ||
-      category.team_category_id === TEAM_INDIVIDUAL_FEMALE
-        ? TEAM_INDIVIDUAL
+      category.team_category_id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+      category.team_category_id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+        ? TEAM_CATEGORIES.TEAM_INDIVIDUAL
         : category.team_category_id;
 
     const feeItem = eventData.registrationFees.find(

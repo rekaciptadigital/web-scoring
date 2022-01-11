@@ -2,6 +2,7 @@ const SCHEDULING = {
   INIT: "INIT_SCHEDULING",
   COMMON: "COMMON_SCHEDULES",
   SINGLE: "SINGLE_SCHEDULE",
+  BULK: "BULK_SCHEDULES",
 };
 
 function schedulingReducer(state, action) {
@@ -43,6 +44,14 @@ function schedulingReducer(state, action) {
             common: { date: "", timeStart: "", timeEnd: "" },
           },
         },
+      };
+    }
+
+    case SCHEDULING.BULK: {
+      const { competitionCategory, payload } = action;
+      return {
+        ...state,
+        data: { ...state.data, [competitionCategory]: { ...payload } },
       };
     }
 

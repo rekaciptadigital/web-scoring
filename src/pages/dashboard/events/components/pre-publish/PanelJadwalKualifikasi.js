@@ -49,6 +49,14 @@ function PanelJadwalKualifikasi({ eventId, eventData, onPublishSuccess }) {
     });
   };
 
+  const updateBulkSchedules = ({ competitionCategory, payload }) => {
+    dispatchScheduling({
+      type: SCHEDULING.BULK,
+      competitionCategory,
+      payload,
+    });
+  };
+
   const handleClickSaveSchedule = () => {
     setSubmitStatus((state) => ({ ...state, status: "loading", errors: null }));
     // TODO: fetch endpoint qualification time/schedule
@@ -129,6 +137,7 @@ function PanelJadwalKualifikasi({ eventId, eventData, onPublishSuccess }) {
                   scheduleGroup={schedulesData[competition]}
                   onCommonChange={updateCommonSchedule}
                   onSingleChange={updateSingleSchedule}
+                  onCancelEdit={updateBulkSchedules}
                 />
               );
             })
@@ -175,13 +184,40 @@ function CategoryScheduleEditor({
   scheduleGroup,
   onCommonChange,
   onSingleChange,
+  onCancelEdit,
 }) {
+  const [editMode, setEditMode] = React.useState({ status: "closed", initialSchedules: null });
+
+  const isEditMode = editMode.status === "open";
+
   const handleCommonScheduleChange = (payload) => {
     onCommonChange?.(payload);
   };
 
   const handleSingleScheduleChange = (payload) => {
     onSingleChange?.(payload);
+  };
+
+  const handleOpenEditSchedule = () => {
+    const currentSchedules = { ...scheduleGroup };
+    setEditMode((state) => ({
+      ...state,
+      status: "open",
+      initialSchedules: currentSchedules,
+    }));
+  };
+
+  const handleCloseEditSchedule = () => {
+    setEditMode((state) => ({
+      ...state,
+      status: "closed",
+      initialSchedules: null,
+    }));
+  };
+
+  const handleCancelEditSchedule = (payload) => {
+    onCancelEdit?.(payload);
+    handleCloseEditSchedule();
   };
 
   return (
@@ -230,8 +266,28 @@ function CategoryScheduleEditor({
           </div>
         </div>
 
-        <div className="mt-4" style={{ flexBasis: "40%", textAlign: "right" }}>
-          <ButtonOutlineBlue>Ubah Detail</ButtonOutlineBlue>
+        <div
+          className="mt-4 d-flex justify-content-end"
+          style={{ flexBasis: "40%", textAlign: "right", gap: "0.5rem" }}
+        >
+          {isEditMode ? (
+            <React.Fragment>
+              <Button
+                style={{ color: "var(--ma-blue)" }}
+                onClick={() =>
+                  handleCancelEditSchedule({
+                    competitionCategory: competition,
+                    payload: editMode.initialSchedules,
+                  })
+                }
+              >
+                Batal
+              </Button>
+              <ButtonOutlineBlue onClick={handleCloseEditSchedule}>Simpan</ButtonOutlineBlue>
+            </React.Fragment>
+          ) : (
+            <ButtonOutlineBlue onClick={handleOpenEditSchedule}>Ubah Detail</ButtonOutlineBlue>
+          )}
         </div>
       </div>
 
@@ -264,7 +320,7 @@ function CategoryScheduleEditor({
                   <td width="20%">
                     <div>
                       <FieldInputDateSmall
-                        disabled={true}
+                        disabled={!isEditMode}
                         value={schedule.date}
                         onChange={(value) =>
                           handleSingleScheduleChange({
@@ -280,7 +336,7 @@ function CategoryScheduleEditor({
                   <td width="30%">
                     <div className="d-flex" style={{ gap: "0.5rem" }}>
                       <FieldInputTimeSmall
-                        disabled={true}
+                        disabled={!isEditMode}
                         value={schedule.timeStart}
                         onChange={(value) =>
                           handleSingleScheduleChange({
@@ -292,7 +348,7 @@ function CategoryScheduleEditor({
                       />
 
                       <FieldInputTimeSmall
-                        disabled={true}
+                        disabled={!isEditMode}
                         value={schedule.timeEnd}
                         onChange={(value) =>
                           handleSingleScheduleChange({

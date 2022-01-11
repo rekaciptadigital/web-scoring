@@ -7,20 +7,11 @@ import { useWizardView } from "utils/hooks/wizard-view";
 import { EventsService } from "services";
 
 import MetaTags from "react-meta-tags";
-import { Container, Row, Col, Table } from "reactstrap";
-import DatePicker from "react-datepicker";
-import {
-  WizardView,
-  WizardViewContent,
-  Button,
-  ButtonBlue,
-  ButtonOutlineBlue,
-} from "components/ma";
-
-import id from "date-fns/locale/id";
+import { Container, Row, Col } from "reactstrap";
+import { WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
+import PanelJadwalKualifikasi from "../components/pre-publish/PanelJadwalKualifikasi";
 
 import imageIllustrationSaveSuccess from "assets/images/events/create-event-save-success.png";
-import imageIllustrationQualificationSuccess from "assets/images/events/create-event-qualification-schedule-success.png";
 import imageIllustrationEventReady from "assets/images/events/create-event-event-ready.png";
 
 const stepsList = [
@@ -147,7 +138,7 @@ function PagePrePublish() {
                   <div>
                     <IllustrationEventReady />
                     <PanelContent>
-                      <h2>{eventDetailData.eventName} sudah siap!</h2>
+                      <h2>{eventDetailData.publicInformation.eventName} sudah siap!</h2>
                       <div>
                         Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage
                         Event. Buat lebih banyak event di Dashboard EO.
@@ -170,180 +161,11 @@ function PagePrePublish() {
   );
 }
 
-function PanelJadwalKualifikasi({ eventId, isSuccess = false }) {
-  const [groupedCategoryDetails, setGroupedCategoryDetails] = React.useState({
-    status: "idle",
-    data: null,
-    errors: null,
-  });
-
-  const isLoadingCategories = groupedCategoryDetails.status === "loading";
-  const categoryDetailsByCompetitionCateg = groupedCategoryDetails.data;
-  const categoryGroups = groupedCategoryDetails.data
-    ? Object.keys(groupedCategoryDetails.data)
-    : [];
-
-  React.useEffect(() => {
-    if (isSuccess) {
-      return;
-    }
-
-    const fetchCategoryDetails = async () => {
-      setGroupedCategoryDetails((state) => ({ ...state, status: "loading", errors: null }));
-      const result = await EventsService.getEventCategoryDetails({ event_id: eventId });
-      if (result.success) {
-        setGroupedCategoryDetails((state) => ({ ...state, status: "success", data: result.data }));
-      } else {
-        setGroupedCategoryDetails((state) => ({
-          ...state,
-          status: "error",
-          errors: result.errors,
-        }));
-      }
-    };
-
-    fetchCategoryDetails();
-  }, [isSuccess]);
-
-  if (!isSuccess) {
-    return (
-      <div>
-        <QualificationScheduleHeader>
-          <div className="heading-left">
-            <h3>Jadwal Kualifikasi</h3>
-            <div>Pengaturan jadwal tiap kategori</div>
-          </div>
-
-          <div className="buttons-right">
-            <Button style={{ color: "var(--ma-blue)" }}>Simpan</Button>
-            <ButtonBlue>Terapkan</ButtonBlue>
-          </div>
-        </QualificationScheduleHeader>
-
-        <div>
-          {isLoadingCategories ? (
-            <CardCategorySchedule>Sedang memuat data kategori event</CardCategorySchedule>
-          ) : categoryDetailsByCompetitionCateg && categoryGroups.length ? (
-            categoryGroups.map((competitionCategory) => {
-              const categoryDetails = categoryDetailsByCompetitionCateg[competitionCategory];
-              return (
-                <CardCategorySchedule key={competitionCategory}>
-                  <div
-                    className="d-flex align-items-start justify-content-between mb-4"
-                    style={{ gap: "0.5rem" }}
-                  >
-                    <div className="d-flex" style={{ gap: "0.5rem" }}>
-                      <div style={{ flexBasis: "30%" }}>
-                        <div>Kategori</div>
-                        <h4 className="mt-2">{competitionCategory}</h4>
-                      </div>
-
-                      <div className="d-flex" style={{ flexBasis: "70%", gap: "0.5rem" }}>
-                        <FieldInputDateSmall label="Tanggal" />
-                        <FieldInputTimeSmall label="Jam Mulai" />
-                        <FieldInputTimeSmall label="Jam Selesai" />
-                      </div>
-                    </div>
-
-                    <div className="mt-4" style={{ flexBasis: "40%", textAlign: "right" }}>
-                      <ButtonOutlineBlue>Ubah Detail</ButtonOutlineBlue>
-                    </div>
-                  </div>
-
-                  <Table>
-                    <thead>
-                      <tr>
-                        <th>Kelas</th>
-                        <th>Jenis Regu</th>
-                        <th>Jarak</th>
-                        <th>Tanggal</th>
-                        <th>Jam Kualifikasi</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {categoryDetails.map((categoryDetail) => (
-                        <tr key={categoryDetail.eventCategoryDetailsId}>
-                          <td>{categoryDetail.ageCategory}</td>
-                          <td>{categoryDetail.teamCategory}</td>
-                          <td>{categoryDetail.distancesCategory}</td>
-                          <td width="20%">
-                            <div>
-                              <FieldInputDateSmall disabled />
-                            </div>
-                          </td>
-                          <td width="30%">
-                            <div className="d-flex" style={{ gap: "0.5rem" }}>
-                              <FieldInputTimeSmall disabled />
-                              <FieldInputTimeSmall disabled />
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </CardCategorySchedule>
-              );
-            })
-          ) : (
-            <CardCategorySchedule>
-              <div>Kategori event tidak tersedia.</div>
-              <div className="mt-2">
-                <Button as={Link} to="/dashboard">
-                  Kembali ke Dashboard EO
-                </Button>
-              </div>
-            </CardCategorySchedule>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <IllustrationQualificationSuccess />
-      <PanelContent>
-        <h3>Jadwal Kualifikasi berhasil disimpan</h3>
-        <div>
-          Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage Event. Buat
-          lebih banyak event di Dashboard EO.
-        </div>
-        <div className="action-buttons">
-          <ButtonToDashboardEO />
-          <ButtonToManageEvent eventId={eventId} />
-        </div>
-      </PanelContent>
-    </div>
-  );
-}
-
-const QualificationScheduleHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-
-  .heading-left {
-    flex-grow: 1;
-  }
-
-  .buttons-right {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-`;
-
 const CardFlatBasic = styled.div`
   margin-bottom: 2rem;
   padding: 24px;
   border-radius: 8px;
   background-color: #ffffff;
-`;
-
-const CardCategorySchedule = styled(CardFlatBasic)`
-  padding: 20px;
 `;
 
 const StepItem = styled.div`
@@ -429,16 +251,6 @@ const IllustrationSaveSuccess = styled.div`
   background-size: contain;
 `;
 
-const IllustrationQualificationSuccess = styled.div`
-  margin-bottom: 72px;
-  width: 100%;
-  min-height: 239px;
-  background-image: url(${imageIllustrationQualificationSuccess});
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-`;
-
 const IllustrationEventReady = styled.div`
   margin-bottom: 72px;
   width: 100%;
@@ -464,173 +276,5 @@ function ButtonToManageEvent({ eventId }) {
     </ButtonBlue>
   );
 }
-
-function FieldInputDateSmall({
-  children,
-  label,
-  required,
-  name,
-  placeholder = "DD/MM/YYYY",
-  value,
-  onChange,
-  disabled,
-}) {
-  const fieldID = name ? `field-input-${name}` : undefined;
-
-  return (
-    <FieldInputDateWrapper>
-      {(children || label) && (
-        <label className="field-label" htmlFor={fieldID}>
-          {children || label}
-          {required && <span className="field-required">*</span>}
-        </label>
-      )}
-      <DatePicker
-        className="field-input-date"
-        id={fieldID}
-        name={name}
-        selected={value}
-        onChange={(date) => onChange?.(date)}
-        placeholderText={placeholder}
-        locale={id}
-        dateFormat="dd/MM/yyyy"
-        disabled={disabled}
-      />
-    </FieldInputDateWrapper>
-  );
-}
-
-const FieldInputDateWrapper = styled.div`
-  .field-label {
-    display: inline-block;
-    color: var(--ma-gray-600);
-    /* font-size: 14px; */
-    font-weight: normal;
-    margin-bottom: 4px;
-
-    .field-required {
-      color: var(--ma-red);
-    }
-  }
-
-  .field-input-date {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    /* font-size: 14px; */
-    font-weight: 400;
-    line-height: 1.5;
-    color: #6a7187;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-
-    border-radius: 0.25rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-
-    &::placeholder {
-      color: #6a7187;
-      opacity: 0.6;
-    }
-
-    &:focus {
-      border-color: #2684ff;
-      box-shadow: 0 0 0 1px #2684ff;
-    }
-
-    &:disabled,
-    &[readonly] {
-      background-color: #eff2f7;
-      opacity: 1;
-    }
-  }
-`;
-
-function FieldInputTimeSmall({
-  children,
-  label,
-  required,
-  name,
-  placeholder = "00:00",
-  value,
-  onChange,
-  interval,
-  disabled,
-}) {
-  const fieldID = name ? `field-input-${name}` : undefined;
-
-  return (
-    <FieldInputTimeWrapper>
-      {(children || label) && (
-        <label className="field-label" htmlFor={fieldID}>
-          {children || label}
-          {required && <span className="field-required">*</span>}
-        </label>
-      )}
-      <DatePicker
-        className="field-input-time"
-        id={fieldID}
-        name={name}
-        selected={value}
-        onChange={(date) => onChange?.(date)}
-        placeholderText={placeholder}
-        locale={id}
-        timeFormat="H:mm"
-        dateFormat="H:mm"
-        timeIntervals={interval || 15}
-        timeCaption="Pukul"
-        showTimeSelect
-        showTimeSelectOnly
-        disabled={disabled}
-      />
-    </FieldInputTimeWrapper>
-  );
-}
-
-const FieldInputTimeWrapper = styled.div`
-  .field-label {
-    display: inline-block;
-    color: var(--ma-gray-600);
-    /* font-size: 14px; */
-    font-weight: normal;
-    margin-bottom: 4px;
-
-    .field-required {
-      color: var(--ma-red);
-    }
-  }
-
-  .field-input-time {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    /* font-size: 14px; */
-    font-weight: 400;
-    line-height: 1.5;
-    color: #6a7187;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-
-    border-radius: 0.25rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-
-    &::placeholder {
-      color: #6a7187;
-      opacity: 0.6;
-    }
-
-    &:focus {
-      border-color: #2684ff;
-      box-shadow: 0 0 0 1px #2684ff;
-    }
-
-    &:disabled,
-    &[readonly] {
-      background-color: #eff2f7;
-      opacity: 1;
-    }
-  }
-`;
 
 export default PagePrePublish;

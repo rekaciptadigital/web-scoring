@@ -16,6 +16,9 @@ export default {
     getEventById(qs) {
         return API.get("/web/v1/archery/events/"+qs.id, qs)
     },
+    getEventDetailById(qs) {
+        return API.get("/web/v1/archery/events/detail", qs);
+    },
     getEventMember(qs) {
         return API.get("/web/v1/archery/events/participant/members", qs)
     },

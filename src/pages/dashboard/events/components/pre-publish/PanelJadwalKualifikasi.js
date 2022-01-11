@@ -12,7 +12,7 @@ import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import id from "date-fns/locale/id";
 import imageIllustrationQualificationSuccess from "assets/images/events/create-event-qualification-schedule-success.png";
 
-function PanelJadwalKualifikasi({ eventId, eventData, onPublishSuccess }) {
+function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
   const [groupedCategoryDetails, setGroupedCategoryDetails] = React.useState({
     status: "idle",
     data: null,
@@ -90,10 +90,7 @@ function PanelJadwalKualifikasi({ eventId, eventData, onPublishSuccess }) {
         setGroupedCategoryDetails((state) => ({ ...state, status: "success", data: result.data }));
         dispatchScheduling({
           type: SCHEDULING.INIT,
-          payload: makeSchedulingData(result.data, {
-            initialDateStart: eventData.publicInformation.eventStart,
-            initialDateEnd: eventData.publicInformation.eventEnd,
-          }),
+          payload: makeSchedulingData(result.data),
         });
       } else {
         setGroupedCategoryDetails((state) => ({
@@ -601,13 +598,9 @@ function ButtonToManageEvent({ eventId }) {
   );
 }
 
-function makeSchedulingData(groupedData, { initialDateStart, initialDateEnd }) {
+function makeSchedulingData(groupedData) {
   const transformedSchedules = {};
-  const makeInitialSchedule = () => ({
-    date: new Date(initialDateStart),
-    timeStart: new Date(initialDateStart),
-    timeEnd: new Date(initialDateEnd),
-  });
+  const makeInitialSchedule = () => ({ date: "", timeStart: "", timeEnd: "" });
 
   for (const competitionCategory in groupedData) {
     transformedSchedules[competitionCategory] = {};

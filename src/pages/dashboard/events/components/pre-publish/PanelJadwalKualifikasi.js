@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { format } from "date-fns";
 import { schedulingReducer, SCHEDULING } from "../../hooks/qualification-scheduling-data";
 import { EventsService } from "services";
 
@@ -10,7 +11,6 @@ import { LoadingScreen } from "components";
 import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 
 import id from "date-fns/locale/id";
-import imageIllustrationQualificationSuccess from "assets/images/events/create-event-qualification-schedule-success.png";
 
 function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
   const [groupedCategoryDetails, setGroupedCategoryDetails] = React.useState({
@@ -30,7 +30,6 @@ function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
   const { data: schedulesData } = scheduling;
 
   const isSaveLoading = submitStatus.status === "loading";
-  const isSaveSuccess = submitStatus.status === "success";
 
   const updateCommonSchedule = ({ competitionCategory, ...payload }) => {
     dispatchScheduling({
@@ -57,32 +56,19 @@ function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
     });
   };
 
-  const handleClickSaveSchedule = () => {
+  const handleClickSaveSchedule = async () => {
     setSubmitStatus((state) => ({ ...state, status: "loading", errors: null }));
-    // TODO: fetch endpoint qualification time/schedule
-
-    // mock process
-    setTimeout(() => {
+    const payload = makeSchedulesPayload(schedulesData);
+    const result = await EventsService.storeQualificationSchedules(payload);
+    if (result.success) {
       setSubmitStatus((state) => ({ ...state, status: "success" }));
-    }, 1500);
-  };
-
-  const handleClickPublish = () => {
-    setSubmitStatus((state) => ({ ...state, status: "loading", errors: null }));
-    // TODO: 1. fetch endpoint qualification time/schedule
-    // TODO: 2. ketika sukses, fetch endpoint update status
-
-    // mock process
-    setTimeout(() => {
       onPublishSuccess?.();
-    }, 1500);
+    } else {
+      setSubmitStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+    }
   };
 
   React.useEffect(() => {
-    if (isSaveSuccess) {
-      return;
-    }
-
     const fetchCategoryDetails = async () => {
       setGroupedCategoryDetails((state) => ({ ...state, status: "loading", errors: null }));
       const result = await EventsService.getEventCategoryDetails({ event_id: eventId });
@@ -102,73 +88,49 @@ function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
     };
 
     fetchCategoryDetails();
-  }, [isSaveSuccess]);
-
-  if (!isSaveSuccess) {
-    return (
-      <div>
-        <QualificationScheduleHeader>
-          <div className="heading-left">
-            <h3>Jadwal Kualifikasi</h3>
-            <div>Pengaturan jadwal tiap kategori</div>
-          </div>
-
-          <div className="buttons-right">
-            <Button style={{ color: "var(--ma-blue)" }} onClick={handleClickSaveSchedule}>
-              Simpan
-            </Button>
-            <ButtonBlue onClick={handleClickPublish}>Terapkan</ButtonBlue>
-          </div>
-        </QualificationScheduleHeader>
-
-        <div>
-          {isLoadingCategoryDetails ? (
-            <CardCategorySchedule>Sedang memuat data kategori event</CardCategorySchedule>
-          ) : categoryDetailsData && competitionCategories.length && schedulesData ? (
-            competitionCategories.map((competition) => {
-              return (
-                <CategoryScheduleEditor
-                  key={competition}
-                  competition={competition}
-                  categoryDetails={categoryDetailsData[competition]}
-                  scheduleGroup={schedulesData[competition]}
-                  onCommonChange={updateCommonSchedule}
-                  onSingleChange={updateSingleSchedule}
-                  onCancelEdit={updateBulkSchedules}
-                />
-              );
-            })
-          ) : (
-            <CardCategorySchedule>
-              <div>Kategori event tidak tersedia.</div>
-              <div className="mt-2">
-                <Button as={Link} to="/dashboard">
-                  Kembali ke Dashboard EO
-                </Button>
-              </div>
-            </CardCategorySchedule>
-          )}
-        </div>
-
-        <LoadingScreen loading={isSaveLoading} />
-      </div>
-    );
-  }
+  }, []);
 
   return (
     <div>
-      <IllustrationQualificationSuccess />
-      <PanelContent>
-        <h3>Jadwal Kualifikasi berhasil disimpan</h3>
-        <div>
-          Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage Event. Buat
-          lebih banyak event di Dashboard EO.
+      <QualificationScheduleHeader>
+        <div className="heading-left">
+          <h3>Jadwal Kualifikasi</h3>
+          <div>Pengaturan jadwal tiap kategori</div>
         </div>
-        <div className="action-buttons">
-          <ButtonToDashboardEO />
-          <ButtonToManageEvent eventId={eventId} />
+
+        <div className="buttons-right">
+          <ButtonBlue onClick={handleClickSaveSchedule}>Simpan</ButtonBlue>
         </div>
-      </PanelContent>
+      </QualificationScheduleHeader>
+
+      <div>
+        {isLoadingCategoryDetails ? (
+          <CardCategorySchedule>Sedang memuat data kategori event</CardCategorySchedule>
+        ) : categoryDetailsData && competitionCategories.length && schedulesData ? (
+          competitionCategories.map((competition) => {
+            return (
+              <CategoryScheduleEditor
+                key={competition}
+                competition={competition}
+                categoryDetails={categoryDetailsData[competition]}
+                scheduleGroup={schedulesData[competition]}
+                onCommonChange={updateCommonSchedule}
+                onSingleChange={updateSingleSchedule}
+                onCancelEdit={updateBulkSchedules}
+              />
+            );
+          })
+        ) : (
+          <CardCategorySchedule>
+            <div>Kategori event tidak tersedia.</div>
+            <div className="mt-2">
+              <Button as={Link} to="/dashboard">
+                Kembali ke Dashboard EO
+              </Button>
+            </div>
+          </CardCategorySchedule>
+        )}
+      </div>
 
       <LoadingScreen loading={isSaveLoading} />
     </div>
@@ -395,16 +357,6 @@ const QualificationScheduleHeader = styled.div`
   }
 `;
 
-const IllustrationQualificationSuccess = styled.div`
-  margin-bottom: 72px;
-  width: 100%;
-  min-height: 239px;
-  background-image: url(${imageIllustrationQualificationSuccess});
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-`;
-
 function FieldInputDateSmall({
   children,
   label,
@@ -571,33 +523,6 @@ const FieldInputTimeWrapper = styled.div`
   }
 `;
 
-const PanelContent = styled.div`
-  text-align: center;
-
-  .action-buttons {
-    margin-top: 2.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 0.75rem;
-  }
-`;
-
-function ButtonToDashboardEO() {
-  return (
-    <Button style={{ color: "var(--ma-blue)" }} as={Link} to="/dashboard">
-      Dashboard EO
-    </Button>
-  );
-}
-
-function ButtonToManageEvent({ eventId }) {
-  return (
-    <ButtonBlue as={Link} to={`/dashboard/event/${eventId}/home`}>
-      Manage Event
-    </ButtonBlue>
-  );
-}
-
 function makeSchedulingData(groupedData) {
   const transformedSchedules = {};
   const makeInitialSchedule = () => ({ date: "", timeStart: "", timeEnd: "" });
@@ -611,6 +536,32 @@ function makeSchedulingData(groupedData) {
     transformedSchedules[competitionCategory].common = makeInitialSchedule();
   }
   return transformedSchedules;
+}
+
+function makeSchedulesPayload(schedules) {
+  const qualificationTime = [];
+  for (const competitionCategory in schedules) {
+    const scheduleGroup = schedules[competitionCategory];
+    for (const detailId in scheduleGroup) {
+      if (detailId === "common") {
+        continue;
+      }
+      const schedule = scheduleGroup[detailId];
+      const schedulePayloadItem = {
+        category_detail_id: detailId,
+        event_start_datetime: formatServerDatetime(schedule.date, schedule.timeStart),
+        event_end_datetime: formatServerDatetime(schedule.date, schedule.timeEnd),
+      };
+      qualificationTime.push(schedulePayloadItem);
+    }
+  }
+  return { qualificationTime };
+}
+
+function formatServerDatetime(date, time) {
+  const dateString = format(date, "yyyy-MM-dd");
+  const timeString = format(time, "HH:mm:ss");
+  return `${dateString} ${timeString}`;
 }
 
 export default PanelJadwalKualifikasi;

@@ -46,14 +46,14 @@ function PagePrePublish() {
   const eventDetailData = eventDetail.data;
   const isLoadingEvent = eventDetail.status === "loading";
 
+  const handlePublishSuccess = () => goToStep(3); // screen "sudah siap"
+
   React.useEffect(() => {
     const fetchEvent = async () => {
       setEventDetail((state) => ({ ...state, status: "loading" }));
       const result = await EventsService.getEventDetailById({ id: eventId });
       if (result.success) {
         setEventDetail((state) => ({ ...state, status: "success", data: result.data }));
-        const stepToActivate = result.data.status === 0 ? 1 : 2;
-        goToStep(stepToActivate);
       } else {
         setEventDetail((state) => ({ ...state, status: "error", errors: result.errors }));
       }
@@ -61,6 +61,22 @@ function PagePrePublish() {
 
     fetchEvent();
   }, []);
+
+  React.useEffect(() => {
+    if (!eventDetailData) {
+      return;
+    }
+
+    // TODO: cek apakah nama properti di data API ini `scheduleStatus` atau lain
+    const { eventStatus, scheduleStatus } = eventDetailData.publicInformation;
+    if (eventStatus === 1 && scheduleStatus === 1) {
+      goToStep(3); // konfirmasi sudah siap
+    } else if (eventStatus === 1) {
+      goToStep(2); // set jadwal kualifikasi
+    } else {
+      goToStep(1); // konfirmasi draft
+    }
+  }, [eventDetailData]);
 
   return (
     <div className="page-content">
@@ -131,6 +147,7 @@ function PagePrePublish() {
                   <PanelJadwalKualifikasi
                     eventId={eventId}
                     eventData={eventDetailData}
+                    onPublishSuccess={handlePublishSuccess}
                   />
                 </WizardViewContent>
 

@@ -295,13 +295,23 @@ function makeEventDetailState(initialData) {
 }
 
 function makeCategoryDetailState(categoryDetailData) {
-  const groupedCategoryDetail = {};
-  for (const detail of categoryDetailData) {
-    const { competitionCategoryId } = detail;
-    if (!groupedCategoryDetail[competitionCategoryId]) {
-      groupedCategoryDetail[competitionCategoryId] = [];
+  const sortedCategoryDetail = categoryDetailData.sort((a, b) => {
+    if (a.categoryDetailsId === b.categoryDetailsId) {
+      return 0;
     }
-    groupedCategoryDetail[competitionCategoryId].push(detail);
+    if (a.categoryDetailsId < b.categoryDetailsId) {
+      return -1;
+    }
+    return 1;
+  });
+
+  const groupedCategoryDetail = {};
+  for (const detail of sortedCategoryDetail) {
+    const { competitionCategoryId } = detail;
+    if (!groupedCategoryDetail[competitionCategoryId.label]) {
+      groupedCategoryDetail[competitionCategoryId.label] = [];
+    }
+    groupedCategoryDetail[competitionCategoryId.label].push(detail);
   }
 
   const eventCategories = [];
@@ -314,10 +324,9 @@ function makeCategoryDetailState(categoryDetailData) {
         key: stringUtil.createRandom(),
         categoryKey: eventCategoryKey,
         competitionCategory: detail.competitionCategoryId,
-        // TODO: update ke `label` ke `name` setelah API di-update
-        ageCategory: { value: detail.ageCategoryId, label: detail.ageCategoryId },
-        teamCategory: { value: detail.teamCategoryId, label: detail.teamCategoryId },
-        distance: { value: detail.distanceId, label: detail.distanceId },
+        ageCategory: { value: detail.ageCategoryId.id, label: detail.ageCategoryId.label },
+        teamCategory: { value: detail.teamCategoryId.id, label: detail.teamCategoryId.label },
+        distance: { value: detail.distanceId.id, label: detail.distanceId.label },
         quota: detail.quota,
       })),
     };

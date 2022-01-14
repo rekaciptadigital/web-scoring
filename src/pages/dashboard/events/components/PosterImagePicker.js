@@ -5,7 +5,9 @@ import { ButtonBlue } from "components/ma";
 
 export default function PosterImagePicker({ image, onChange, onRemove }) {
   const computeStyleBackgroundImage = () => {
-    return !image ? {} : { "--picker-poster-image-url": `url(${image.preview})` };
+    return !image?.preview && !image?.originalUrl
+      ? {}
+      : { "--picker-poster-image-url": `url("${image.preview || image.originalUrl}")` };
   };
 
   return (

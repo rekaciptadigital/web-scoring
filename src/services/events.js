@@ -48,5 +48,8 @@ export default {
     },
     storeQualificationSchedules(data) {
         return API.post("/web/v1/archery/qualification-time", data, null, true);
+    },
+    updateCategoryFee(data = null, qs = null) {
+        return API.put("/web/v1/archery/events/category-fee", data, qs, true);
     }
 }

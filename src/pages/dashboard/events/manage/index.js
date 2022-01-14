@@ -86,14 +86,25 @@ const PageEventDetailManage = () => {
   const [isEventPublished, setIsEventPublished] = React.useState(true);
   const [fetchingEventStatus, setFetchingEventStatus] = React.useState({
     status: "idle",
-    error: null,
+    errors: null,
+    attemptCounts: 0,
   });
-  const [savingEventStatus, setSavingEventStatus] = React.useState({ status: "idle", error: null });
+  const [savingEventStatus, setSavingEventStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
   const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
 
   const isLoading = savingEventStatus.status === "loading";
 
-  const handleSaveEdit = async (stepNumber) => {
+  const incrementAttemptCounts = () => {
+    setFetchingEventStatus((state) => ({
+      ...state,
+      attemptCounts: state.attemptCounts + 1,
+    }));
+  };
+
+  const handleClickSave = async (stepNumber) => {
     if (stepNumber === 1) {
       const payload = await makeCommonDataPayload(eventData);
       console.table(payload);
@@ -101,8 +112,31 @@ const PageEventDetailManage = () => {
       const payload = await makeCategoryDetailsPayload(eventData);
       console.table(payload);
     } else if (stepNumber === 3) {
-      const payload = await makeFeesPayload(eventData);
-      console.table(payload);
+      handleSaveRegistrationFees();
+    }
+  };
+
+  const handleSaveRegistrationFees = async () => {
+    // Validate empty fields
+    if (eventData.isFlatRegistrationFee && !eventData.registrationFee) {
+      // TODO: ganti pakai sweet alert?
+      alert("inputan harga flat masih kosong");
+      return;
+    }
+    if (!eventData.isFlatRegistrationFee && !eventData.registrationFees?.length) {
+      // TODO: ganti pakai sweet alert?
+      alert("inputan harga per tim masih kosong");
+      return;
+    }
+
+    setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const payload = makeFeesPayload({ event_id, ...eventData });
+    const result = await EventsService.updateCategoryFee(payload);
+    if (result.success) {
+      setSavingEventStatus((state) => ({ ...state, status: "success" }));
+      incrementAttemptCounts();
+    } else {
+      setSavingEventStatus((state) => ({ ...state, status: "error" }));
     }
   };
 
@@ -111,7 +145,7 @@ const PageEventDetailManage = () => {
   };
 
   const handlePublishEvent = async () => {
-    setSavingEventStatus((state) => ({ ...state, status: "loading" }));
+    setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
 
     const payload = await makeEventPayload(eventData, { status: PUBLICATION_TYPES.PUBLISHED });
     const result = await EventsService.register(payload);
@@ -135,11 +169,11 @@ const PageEventDetailManage = () => {
         updateEventData(eventDetailData);
         setIsEventPublished(Boolean(result.data.publicInformation.eventStatus));
       } else {
-        setFetchingEventStatus((state) => ({ ...state, status: "error", errrors: result.errors }));
+        setFetchingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
       }
     };
     getEventDetail();
-  }, []);
+  }, [fetchingEventStatus.attemptCounts]);
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
@@ -181,7 +215,7 @@ const PageEventDetailManage = () => {
                       <div className="d-flex justify-content-end" style={{ gap: "0.5rem" }}>
                         <Button
                           style={{ color: "var(--ma-blue)" }}
-                          onClick={() => handleSaveEdit(currentStep)}
+                          onClick={() => handleClickSave(currentStep)}
                         >
                           Simpan
                         </Button>
@@ -199,7 +233,7 @@ const PageEventDetailManage = () => {
                   <WizardView currentStep={currentStep}>
                     <WizardViewContent>
                       <StepInfoUmum
-                        fetchingStatus={fetchingEventStatus}
+                        fetchingStatus={savingEventStatus}
                         eventData={eventData}
                         updateEventData={updateEventData}
                       />
@@ -210,7 +244,11 @@ const PageEventDetailManage = () => {
                     </WizardViewContent>
 
                     <WizardViewContent>
-                      <StepBiaya eventData={eventData} updateEventData={updateEventData} />
+                      <StepBiaya
+                        fetchingStatus={savingEventStatus}
+                        eventData={eventData}
+                        updateEventData={updateEventData}
+                      />
                     </WizardViewContent>
                   </WizardView>
 
@@ -340,15 +378,18 @@ function makeRegistrationFeesState(eventCategories) {
   const registrationFees = [];
   const uniqueTeams = new Set();
   const uniqueFees = new Set();
+
   for (const category of eventCategories) {
     if (registrationFees.length >= 4) {
       break;
     }
+
     const targetTeam =
-      category.teamCategoryId === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
-      category.teamCategoryId === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+      category.teamCategoryId.id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+      category.teamCategoryId.id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
         ? TEAM_CATEGORIES.TEAM_INDIVIDUAL
-        : category.teamCategoryId;
+        : category.teamCategoryId.id;
+
     if (!uniqueTeams.has(targetTeam)) {
       uniqueTeams.add(targetTeam);
       uniqueFees.add(Number(category.fee));
@@ -357,9 +398,13 @@ function makeRegistrationFeesState(eventCategories) {
   }
 
   const isFlatRegistrationFee = uniqueFees.size === 1;
-  const registrationFee = isFlatRegistrationFee ? uniqueFees.values[0] : "";
+  const registrationFee = isFlatRegistrationFee ? [...uniqueFees][0] : "";
 
-  return { isFlatRegistrationFee, registrationFee, registrationFees };
+  return {
+    isFlatRegistrationFee,
+    registrationFee,
+    registrationFees: isFlatRegistrationFee ? [] : registrationFees,
+  };
 }
 
 async function makeCommonDataPayload(eventData) {
@@ -398,8 +443,39 @@ function makeCategoryDetailsPayload() {
   return {};
 }
 
-function makeFeesPayload() {
-  return {};
+function makeFeesPayload(eventData) {
+  if (eventData.isFlatRegistrationFee) {
+    const teamCategories = [
+      TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE,
+      TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE,
+      TEAM_CATEGORIES.TEAM_MALE,
+      TEAM_CATEGORIES.TEAM_FEMALE,
+      TEAM_CATEGORIES.TEAM_MIXED,
+    ];
+
+    return {
+      event_id: eventData.event_id,
+      data: teamCategories.map((teamCategory) => ({
+        team_category_id: teamCategory,
+        fee: eventData.registrationFee,
+      })),
+    };
+  }
+
+  const feesData = [];
+  for (const fee of eventData.registrationFees) {
+    if (fee.teamCategory === TEAM_CATEGORIES.TEAM_INDIVIDUAL) {
+      feesData.push({ team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE, fee: fee.amount });
+      feesData.push({ team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE, fee: fee.amount });
+    } else {
+      feesData.push({ team_category_id: fee.teamCategory, fee: fee.amount });
+    }
+  }
+
+  return {
+    event_id: eventData.event_id,
+    data: feesData,
+  };
 }
 
 function formatServerDatetime(date, time) {

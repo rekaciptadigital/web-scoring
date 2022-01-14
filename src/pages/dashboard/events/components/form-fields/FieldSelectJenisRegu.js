@@ -41,6 +41,7 @@ const customSelectStyles = {
     ...provided,
     color: "#6a7187",
     fontSize: 12,
+    textTransform: "capitalize",
   }),
   placeholder: (provided) => ({
     ...provided,
@@ -51,6 +52,10 @@ const customSelectStyles = {
   dropdownIndicator: (provided) => ({
     ...provided,
     padding: 7,
+  }),
+  option: (provided) => ({
+    ...provided,
+    textTransform: "capitalize",
   }),
 };
 

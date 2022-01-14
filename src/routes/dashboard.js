@@ -6,7 +6,7 @@ import PagePrePublish from "pages/dashboard/events/new/pre-publish";
 import PageCongratulations from "pages/dashboard/events/new/congratulations";
 import ScoringNew from "pages/dashboard/scoring/new";
 import Dashboard from "../pages/dashboard";
-import EventDetailHome from "../pages/dashboard/events/home";
+import PageEventDetailHome from "../pages/dashboard/events/home";
 import PageEventDetailManage from "../pages/dashboard/events/manage";
 import ListCategory from "../pages/dashboard/category";
 import ListEvent from "../pages/dashboard/events";
@@ -22,7 +22,7 @@ import Eliminasi from "../pages/dashboard/eliminasi";
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
   { path: "/dashboard/events", component: ListEvent },
-  { path: "/dashboard/event/:event_id/home", component: EventDetailHome },
+  { path: "/dashboard/event/:event_id/home", component: PageEventDetailHome },
   { path: "/dashboard/event/:event_id/manage", component: PageEventDetailManage },
   { path: "/dashboard/member/:event_id", component: ListMember },
   { path: "/dashboard/category", component: ListCategory },

@@ -43,6 +43,9 @@ export default {
     getEventCategoryDetails(qs = null) {
         return API.get("/web/v1/archery/category-details", qs);
     },
+    getEventQualificationSchedules(qs = null) {
+        return API.get("/web/v1/archery/qualification-time", qs);
+    },
     storeQualificationSchedules(data) {
         return API.post("/web/v1/archery/qualification-time", data, null, true);
     }

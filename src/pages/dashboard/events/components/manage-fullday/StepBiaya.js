@@ -3,12 +3,15 @@ import { eventCategories } from "constants/index";
 
 import Switch from "react-switch";
 import { Row, Col } from "reactstrap";
+import { LoadingScreen } from "components";
 import FormSheet from "../FormSheet";
 import { FieldInputPrice } from "../form-fields";
 
 const { TEAM_CATEGORIES } = eventCategories;
 
-export function StepBiaya({ eventData, updateEventData }) {
+export function StepBiaya({ fetchingStatus, eventData, updateEventData }) {
+  const isLoading = fetchingStatus.status === "loading";
+
   const handleRegistrationFeeChange = (value) => {
     updateEventData({ registrationFee: value });
   };
@@ -116,6 +119,8 @@ export function StepBiaya({ eventData, updateEventData }) {
           </FieldInputPrice>
         </Col>
       </Row>
+
+      <LoadingScreen loading={isLoading} />
     </FormSheet>
   );
 }

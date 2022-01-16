@@ -9,8 +9,8 @@ import { FieldInputPrice } from "../form-fields";
 
 const { TEAM_CATEGORIES } = eventCategories;
 
-export function StepBiaya({ fetchingStatus, eventData, updateEventData }) {
-  const isLoading = fetchingStatus.status === "loading";
+export function StepBiaya({ savingStatus, eventData, updateEventData }) {
+  const isLoading = savingStatus.status === "loading";
 
   const handleRegistrationFeeChange = (value) => {
     updateEventData({ registrationFee: value });

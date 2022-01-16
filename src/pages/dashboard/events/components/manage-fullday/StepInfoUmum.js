@@ -16,12 +16,12 @@ import {
   FieldInputTime,
 } from "../form-fields";
 
-export function StepInfoUmum({ fetchingStatus, eventData, updateEventData }) {
+export function StepInfoUmum({ savingStatus, eventData, updateEventData }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
 
-  const isLoading = fetchingStatus.status === "loading";
+  const isLoading = savingStatus.status === "loading";
 
   const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
   const handleModalAddInfoClose = () => setShowAddExtraInfo(false);

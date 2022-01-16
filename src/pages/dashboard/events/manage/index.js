@@ -255,7 +255,7 @@ const PageEventDetailManage = () => {
                   <WizardView currentStep={currentStep}>
                     <WizardViewContent>
                       <StepInfoUmum
-                        fetchingStatus={savingEventStatus}
+                        savingStatus={savingEventStatus}
                         eventData={eventData}
                         updateEventData={updateEventData}
                       />
@@ -271,7 +271,7 @@ const PageEventDetailManage = () => {
 
                     <WizardViewContent>
                       <StepBiaya
-                        fetchingStatus={savingEventStatus}
+                        savingStatus={savingEventStatus}
                         eventData={eventData}
                         updateEventData={updateEventData}
                       />

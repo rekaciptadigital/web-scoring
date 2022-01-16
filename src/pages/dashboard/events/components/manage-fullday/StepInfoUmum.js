@@ -17,7 +17,7 @@ import {
   FieldInputTime,
 } from "../form-fields";
 
-export function StepInfoUmum({ savingStatus, onSaveSuccess, eventData, updateEventData }) {
+export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, updateEventData }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
@@ -60,27 +60,6 @@ export function StepInfoUmum({ savingStatus, onSaveSuccess, eventData, updateEve
 
   const handleCityChange = (selectValue) => {
     updateEventData({ city: selectValue });
-  };
-
-  const handleAddInformation = (value) => {
-    updateEventData({
-      type: "ADD_EXTRA_INFO",
-      value: {
-        title: value.title,
-        description: value.description,
-      },
-    });
-  };
-
-  const handleEditInformation = (value) => {
-    updateEventData({
-      type: "EDIT_EXTRA_INFO",
-      key: value.key,
-      value: {
-        title: value.title,
-        description: value.description,
-      },
-    });
   };
 
   const handleRemoveInformation = (targetInfo) => {
@@ -284,8 +263,9 @@ export function StepInfoUmum({ savingStatus, onSaveSuccess, eventData, updateEve
       </ButtonOutlineBlue>
 
       <ModalExtraInfoEditor
+        eventId={eventId}
         showEditor={shouldShowAddExtraInfo}
-        onSave={handleAddInformation}
+        onSaveSuccess={onSaveSuccess}
         onClose={handleModalAddInfoClose}
       />
 
@@ -305,9 +285,9 @@ export function StepInfoUmum({ savingStatus, onSaveSuccess, eventData, updateEve
               </div>
 
               <ModalExtraInfoEditor
+                eventId={eventId}
                 showEditor={keyExtraInfoEdited === info.key}
                 infoData={info}
-                onSave={handleEditInformation}
                 onSaveSuccess={onSaveSuccess}
                 onClose={handleModalEditInfoClose}
               />
@@ -343,7 +323,7 @@ function ModalExtraInfoEditor({ showEditor, ...props }) {
   return <ExtraInfoEditor {...props} />;
 }
 
-function ExtraInfoEditor({ infoData, onSaveSuccess, onClose }) {
+function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
   const [title, setTitle] = React.useState(infoData?.title || "");
   const [description, setDescription] = React.useState(infoData?.description || "");
   const [savingStatus, setSavingStatus] = React.useState({ status: "idle", errors: null });
@@ -372,6 +352,7 @@ function ExtraInfoEditor({ infoData, onSaveSuccess, onClose }) {
     }
 
     if (isEditMode) {
+      // UPDATE DATA
       setSavingStatus((state) => ({ ...state, status: "loading", errors: null }));
 
       const payload = {
@@ -381,6 +362,24 @@ function ExtraInfoEditor({ infoData, onSaveSuccess, onClose }) {
       };
 
       const result = await EventsService.updateMoreInfos(payload, { id: infoData.id });
+      if (result.success) {
+        setSavingStatus((state) => ({ ...state, status: "success" }));
+        onSaveSuccess?.();
+        handleCloseModal();
+      } else {
+        setSavingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      }
+    } else {
+      // ADD NEW DATA
+      setSavingStatus((state) => ({ ...state, status: "loading", errors: null }));
+
+      const payload = {
+        event_id: eventId,
+        title: title,
+        description: description,
+      };
+
+      const result = await EventsService.storeMoreInfos(payload);
       if (result.success) {
         setSavingStatus((state) => ({ ...state, status: "success" }));
         onSaveSuccess?.();

@@ -106,13 +106,24 @@ const PageEventDetailManage = () => {
 
   const handleClickSave = async (stepNumber) => {
     if (stepNumber === 1) {
-      const payload = await makeCommonDataPayload(eventData);
-      console.table(payload);
+      handleSaveEventDetails();
     } else if (stepNumber === 2) {
       const payload = await makeCategoryDetailsPayload(eventData);
       console.table(payload);
     } else if (stepNumber === 3) {
       handleSaveRegistrationFees();
+    }
+  };
+
+  const handleSaveEventDetails = async () => {
+    setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const payload = await makeEventDetailsPayload({ event_id, ...eventData });
+    const result = await EventsService.updateEvent(payload);
+    if (result.success) {
+      setSavingEventStatus((state) => ({ ...state, status: "success" }));
+      incrementAttemptCounts();
+    } else {
+      setSavingEventStatus((state) => ({ ...state, status: "error" }));
     }
   };
 
@@ -407,35 +418,32 @@ function makeRegistrationFeesState(eventCategories) {
   };
 }
 
-async function makeCommonDataPayload(eventData) {
+async function makeEventDetailsPayload(eventData) {
   const bannerImageBase64 = eventData.bannerImage?.raw
     ? await imageToBase64(eventData.bannerImage.raw)
     : undefined;
 
   return {
-    publicInformation: {
-      eventName: eventData.eventName,
-      eventBanner: bannerImageBase64,
-      eventDescription: eventData.description,
-      eventLocation: eventData.location,
-      eventCity: eventData.city?.value,
-      eventLocation_type: eventData.locationType,
-      eventStart_register: formatServerDatetime(
-        eventData.registrationDateStart,
-        eventData.registrationTimeStart
-      ),
-      eventEnd_register: formatServerDatetime(
-        eventData.registrationDateEnd,
-        eventData.registrationTimeEnd
-      ),
-      eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
-      eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
-    },
-    more_information: eventData.extraInfos.map((info) => ({
-      title: info.title,
-      description: info.description,
-      eventId: info.eventId,
-    })),
+    id: eventData.event_id,
+    eventType: "Full_day",
+    eventCompetition: "Tournament",
+    status: 0, // status ketika save harus tetep `0` (draft)
+    eventName: eventData.eventName,
+    eventBanner: bannerImageBase64, // harus opsional
+    eventDescription: eventData.description,
+    eventLocation: eventData.location,
+    eventCity: eventData.city?.value,
+    eventLocation_type: eventData.locationType,
+    eventStart_register: formatServerDatetime(
+      eventData.registrationDateStart,
+      eventData.registrationTimeStart
+    ),
+    eventEnd_register: formatServerDatetime(
+      eventData.registrationDateEnd,
+      eventData.registrationTimeEnd
+    ),
+    eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
+    eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
   };
 }
 

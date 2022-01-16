@@ -51,5 +51,8 @@ export default {
     },
     updateCategoryFee(data = null, qs = null) {
         return API.put("/web/v1/archery/events/category-fee", data, qs, true);
+    },
+    updateEvent(data = null, qs = null) {
+        return API.put("/web/v1/archery/events", data, qs, true);
     }
 }

@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Row, Col, Modal, ModalBody } from "reactstrap";
+import { LoadingScreen } from "components";
 import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import FormSheet from "../FormSheet";
 import PosterImagePicker from "../PosterImagePicker";
@@ -85,10 +86,6 @@ export function StepInfoUmum({ fetchingStatus, eventData, updateEventData }) {
     updateEventData({ type: "REMOVE_EXTRA_INFO", key: targetInfo.key });
     setKeyExtraInfoRemoved(null);
   };
-
-  if (isLoading) {
-    return <FormSheet>Sedang memuat data event...</FormSheet>;
-  }
 
   return (
     <FormSheet>
@@ -331,6 +328,8 @@ export function StepInfoUmum({ fetchingStatus, eventData, updateEventData }) {
           </ExtraInfoItem>
         ))}
       </div>
+
+      <LoadingScreen loading={isLoading} />
     </FormSheet>
   );
 }

@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import { EventsService } from "services";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Row, Col, Modal, ModalBody } from "reactstrap";
@@ -16,7 +17,7 @@ import {
   FieldInputTime,
 } from "../form-fields";
 
-export function StepInfoUmum({ savingStatus, eventData, updateEventData }) {
+export function StepInfoUmum({ savingStatus, onSaveSuccess, eventData, updateEventData }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
@@ -307,6 +308,7 @@ export function StepInfoUmum({ savingStatus, eventData, updateEventData }) {
                 showEditor={keyExtraInfoEdited === info.key}
                 infoData={info}
                 onSave={handleEditInformation}
+                onSaveSuccess={onSaveSuccess}
                 onClose={handleModalEditInfoClose}
               />
             </div>
@@ -341,12 +343,16 @@ function ModalExtraInfoEditor({ showEditor, ...props }) {
   return <ExtraInfoEditor {...props} />;
 }
 
-function ExtraInfoEditor({ infoData, onSave, onClose }) {
+function ExtraInfoEditor({ infoData, onSaveSuccess, onClose }) {
   const [title, setTitle] = React.useState(infoData?.title || "");
   const [description, setDescription] = React.useState(infoData?.description || "");
+  const [savingStatus, setSavingStatus] = React.useState({ status: "idle", errors: null });
 
   const initialTitle = React.useRef(title);
   const initialDescription = React.useRef(description);
+
+  const isEditMode = Boolean(infoData);
+  const isLoading = savingStatus.status === "loading";
 
   const shouldSubmitAllowed = () => {
     const isRequiredAll = title && description;
@@ -360,22 +366,35 @@ function ExtraInfoEditor({ infoData, onSave, onClose }) {
     onClose?.();
   };
 
-  const handleClickSave = () => {
+  const handleClickSave = async () => {
     if (!shouldSubmitAllowed()) {
       return;
     }
-    onSave?.({
-      key: infoData?.key,
-      title: title,
-      description: description,
-    });
-    handleCloseModal();
+
+    if (isEditMode) {
+      setSavingStatus((state) => ({ ...state, status: "loading", errors: null }));
+
+      const payload = {
+        event_id: infoData.eventId,
+        title: title,
+        description: description,
+      };
+
+      const result = await EventsService.updateMoreInfos(payload, { id: infoData.id });
+      if (result.success) {
+        setSavingStatus((state) => ({ ...state, status: "success" }));
+        onSaveSuccess?.();
+        handleCloseModal();
+      } else {
+        setSavingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      }
+    }
   };
 
   return (
     <Modal isOpen>
       <ModalBody>
-        <h4>{infoData ? "Ubah Informasi" : "Tambahkan Informasi"}</h4>
+        <h4>{isEditMode ? "Ubah Informasi" : "Tambahkan Informasi"}</h4>
 
         <div className="mt-4">
           <FieldInputText
@@ -411,6 +430,8 @@ function ExtraInfoEditor({ infoData, onSave, onClose }) {
             Simpan
           </ButtonBlue>
         </div>
+
+        <LoadingScreen loading={isLoading} />
       </ModalBody>
     </Modal>
   );

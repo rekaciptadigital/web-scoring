@@ -57,5 +57,8 @@ export default {
     },
     updateCategoryDetails(data = null, qs = null) {
         return API.put("/web/v1/archery/category-details", data, qs, true);
+    },
+    updateMoreInfos(data = null, qs = null) {
+        return API.put("/web/v1/archery/more-information", data, qs, true);
     }
 }

@@ -256,6 +256,7 @@ const PageEventDetailManage = () => {
                     <WizardViewContent>
                       <StepInfoUmum
                         savingStatus={savingEventStatus}
+                        onSaveSuccess={() => incrementAttemptCounts()}
                         eventData={eventData}
                         updateEventData={updateEventData}
                       />

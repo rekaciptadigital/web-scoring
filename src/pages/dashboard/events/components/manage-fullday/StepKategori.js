@@ -4,13 +4,16 @@ import { useArcheryCategories } from "utils/hooks/archery-categories";
 import { EventsService } from "services";
 
 import { ButtonOutlineBlue } from "components/ma";
+import { LoadingScreen } from "components";
 import FormSheet from "../FormSheet";
 import CategoryItem from "./CategoryItem";
 
-export function StepKategori({ eventData, updateEventData }) {
+export function StepKategori({ savingStatus, eventData, updateEventData }) {
   const { options: categoryOptions } = useArcheryCategories(
     EventsService.getEventCompetitionCategories
   );
+
+  const isLoading = savingStatus.status === "loading";
 
   const handleClickAddCategory = () => {
     if (eventData.eventCategories.length === categoryOptions.length) {
@@ -40,6 +43,8 @@ export function StepKategori({ eventData, updateEventData }) {
           </ButtonOutlineBlue>
         </div>
       </StyledCategoryList>
+
+      <LoadingScreen loading={isLoading} />
     </FormSheet>
   );
 }

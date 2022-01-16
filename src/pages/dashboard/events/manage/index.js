@@ -108,8 +108,7 @@ const PageEventDetailManage = () => {
     if (stepNumber === 1) {
       handleSaveEventDetails();
     } else if (stepNumber === 2) {
-      const payload = await makeCategoryDetailsPayload(eventData);
-      console.table(payload);
+      handleSaveCategoryDetails();
     } else if (stepNumber === 3) {
       handleSaveRegistrationFees();
     }
@@ -119,6 +118,18 @@ const PageEventDetailManage = () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
     const payload = await makeEventDetailsPayload({ event_id, ...eventData });
     const result = await EventsService.updateEvent(payload);
+    if (result.success) {
+      setSavingEventStatus((state) => ({ ...state, status: "success" }));
+      incrementAttemptCounts();
+    } else {
+      setSavingEventStatus((state) => ({ ...state, status: "error" }));
+    }
+  };
+
+  const handleSaveCategoryDetails = async () => {
+    setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const payload = makeCategoryDetailsPayload({ event_id, ...eventData });
+    const result = await EventsService.updateCategoryDetails(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       incrementAttemptCounts();
@@ -251,7 +262,11 @@ const PageEventDetailManage = () => {
                     </WizardViewContent>
 
                     <WizardViewContent>
-                      <StepKategori eventData={eventData} updateEventData={updateEventData} />
+                      <StepKategori
+                        savingStatus={savingEventStatus}
+                        eventData={eventData}
+                        updateEventData={updateEventData}
+                      />
                     </WizardViewContent>
 
                     <WizardViewContent>
@@ -371,12 +386,14 @@ function makeCategoryDetailState(categoryDetailData) {
       competitionCategory: { label: competitionCategoryId, value: competitionCategoryId },
       categoryDetails: groupedCategoryDetail[competitionCategoryId].map((detail) => ({
         key: stringUtil.createRandom(),
+        categoryDetailsId: detail.categoryDetailsId,
         categoryKey: eventCategoryKey,
         competitionCategory: detail.competitionCategoryId,
         ageCategory: { value: detail.ageCategoryId.id, label: detail.ageCategoryId.label },
         teamCategory: { value: detail.teamCategoryId.id, label: detail.teamCategoryId.label },
         distance: { value: detail.distanceId.id, label: detail.distanceId.label },
         quota: detail.quota,
+        fee: Number(detail.fee),
       })),
     };
     eventCategories.push(competitionGroup);
@@ -447,8 +464,27 @@ async function makeEventDetailsPayload(eventData) {
   };
 }
 
-function makeCategoryDetailsPayload() {
-  return {};
+function makeCategoryDetailsPayload(eventData) {
+  const { eventCategories } = eventData;
+
+  const generatedCategories = [];
+  eventCategories.forEach((competition) => {
+    competition.categoryDetails?.forEach((detail) => {
+      const newCategory = {
+        event_id: eventData.event_id,
+        id: detail.categoryDetailsId,
+        competition_category_id: competition.competitionCategory?.value,
+        age_category_id: detail.ageCategory?.value,
+        distance_id: detail.distance.value,
+        quota: detail.quota,
+        team_category_id: detail.teamCategory?.value,
+        fee: detail.fee, // harusnya opsional, disertakan aja biar gak error 500 dari server
+      };
+      generatedCategories.push(newCategory);
+    });
+  });
+
+  return { data: generatedCategories };
 }
 
 function makeFeesPayload(eventData) {

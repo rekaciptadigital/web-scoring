@@ -54,5 +54,8 @@ export default {
     },
     updateEvent(data = null, qs = null) {
         return API.put("/web/v1/archery/events", data, qs, true);
+    },
+    updateCategoryDetails(data = null, qs = null) {
+        return API.put("/web/v1/archery/category-details", data, qs, true);
     }
 }

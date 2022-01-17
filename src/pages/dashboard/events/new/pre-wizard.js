@@ -9,6 +9,9 @@ import { WizardView, WizardViewContent, ProgressBarLine } from "components/ma";
 import Step1 from "../components/pre-wizard/Step1";
 import Step2 from "../components/pre-wizard/Step2";
 
+import typeIllustration from "assets/images/events/create-event-wizard-event-type.png";
+import matchIllustration from "assets/images/events/create-event-wizard-event-competition.png";
+
 const stepsList = [
   { step: 1, label: "Tentukan jenis waktu pelaksanaan" },
   { step: 2, label: "Tentukan jenis pertandingan" },
@@ -46,14 +49,8 @@ export default function PreWizard() {
       <Container fluid className="mt-4 mb-5">
         <Row>
           <Col>
-            <div
-              className="d-flex justify-content-center align-items-center h-100"
-              style={{ color: "var(--bs-gray-500)" }}
-            >
-              <span style={{ border: "solid 1px var(--bs-gray-400)", padding: 10 }}>
-                TBD: gambar ilustrasi
-              </span>
-            </div>
+            {currentStep === 1 && <TypeIllustrationPanel />}
+            {currentStep === 2 && <MatchIllustrationPanel />}
           </Col>
 
           <Col>
@@ -104,6 +101,30 @@ export default function PreWizard() {
     </div>
   );
 }
+
+const TypeIllustrationPanel = styled.div`
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  height: 100%;
+
+  background-image: url(${typeIllustration});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+`;
+
+const MatchIllustrationPanel = styled.div`
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  height: 100%;
+
+  background-image: url(${matchIllustration});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+`;
 
 const ActionButtonGroup = styled.div`
   .button-action {

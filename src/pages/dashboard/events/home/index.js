@@ -25,6 +25,14 @@ function PageEventDetailHome() {
     }
   };
 
+  const computeHrefScheduleMenu = () => {
+    if (!isQualificationSchedulesSet) {
+      return `/dashboard/events/new/prepublish?eventId=${event_id}`;
+    }
+    // TODO: ke page manage jadwal & skor yang sebenernya
+    return "#";
+  };
+
   React.useEffect(() => {
     const getEventDetail = async () => {
       const result = await EventsService.getEventDetailById({ id: event_id });
@@ -80,7 +88,7 @@ function PageEventDetailHome() {
               />
               <CardMenu
                 menu={eventMenus[3]}
-                href={eventMenus[3].computeLink(event_id)}
+                href={computeHrefScheduleMenu}
                 disabled={!isEventPublished}
                 badge={
                   !isQualificationSchedulesSet && <span>&#40; &#8505; &#41; belum diatur</span>

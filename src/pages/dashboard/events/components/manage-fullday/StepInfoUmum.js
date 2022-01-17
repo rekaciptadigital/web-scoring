@@ -459,12 +459,12 @@ function AlertDeleteInfo({ showAlert, onConfirm, onCancel }) {
       onCancel={onCancel}
       style={{ padding: "30px 40px" }}
       customButtons={
-        <div className="d-flex flex-column w-100" style={{ gap: "0.5rem" }}>
+        <span className="d-flex flex-column w-100" style={{ gap: "0.5rem" }}>
           <Button style={{ color: "var(--ma-red)" }} onClick={onConfirm}>
             Hapus
           </Button>
           <ButtonBlue onClick={onCancel}>Batalkan</ButtonBlue>
-        </div>
+        </span>
       }
     >
       <p className="text-muted">Yakin akan hapus informasi ini?</p>

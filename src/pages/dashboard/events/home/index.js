@@ -81,6 +81,7 @@ function PageEventDetailHome() {
               <CardMenu
                 menu={eventMenus[3]}
                 href={eventMenus[3].computeLink(event_id)}
+                disabled={!isEventPublished}
                 badge={
                   !isQualificationSchedulesSet && <span>&#40; &#8505; &#41; belum diatur</span>
                 }

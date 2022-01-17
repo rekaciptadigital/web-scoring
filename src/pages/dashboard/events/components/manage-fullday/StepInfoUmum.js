@@ -21,8 +21,10 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
+  const [removingStatus, setRemovingStatus] = React.useState({ status: "idle", errors: null });
 
   const isLoading = savingStatus.status === "loading";
+  const isRemovingInfo = removingStatus.status === "loading";
 
   const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
   const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
@@ -62,8 +64,15 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
     updateEventData({ city: selectValue });
   };
 
-  const handleRemoveInformation = (targetInfo) => {
-    updateEventData({ type: "REMOVE_EXTRA_INFO", key: targetInfo.key });
+  const handleRemoveInformation = async (targetInfo) => {
+    setRemovingStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const result = await EventsService.deleteMoreInfos({ id: targetInfo.id });
+    if (result.success) {
+      setRemovingStatus((state) => ({ ...state, status: "success" }));
+      onSaveSuccess?.();
+    } else {
+      setRemovingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+    }
     setKeyExtraInfoRemoved(null);
   };
 
@@ -311,7 +320,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
         ))}
       </div>
 
-      <LoadingScreen loading={isLoading} />
+      <LoadingScreen loading={isLoading || isRemovingInfo} />
     </FormSheet>
   );
 }

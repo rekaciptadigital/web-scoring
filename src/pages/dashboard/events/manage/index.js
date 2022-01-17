@@ -349,6 +349,9 @@ function makeEventDetailState(initialData) {
     eventTimeEnd: parseISO("2022-03-12 17:07"),
     extraInfos: moreInformation.map((info) => ({
       key: stringUtil.createRandom(),
+      // Butuh ID untuk edit dan hapus.
+      // Belum ada di data respon.
+      id: info.id || "",
       eventId: info.eventId,
       title: info.title,
       description: info.description,

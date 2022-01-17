@@ -41,16 +41,23 @@ function PagePrePublish() {
     data: null,
     errors: null,
   });
+  const [qualificationSchedules, setQualificationSchedules] = React.useState({
+    status: "idle",
+    data: null,
+    errors: null,
+  });
 
   const { eventId } = queryString.parse(location.search);
   const eventDetailData = eventDetail.data;
+  const qualificationSchedulesData = qualificationSchedules.data;
   const isLoadingEvent = eventDetail.status === "loading";
+  const isLoadingQualificationSchedules = qualificationSchedules.status === "loading";
 
   const handlePublishSuccess = () => goToStep(3); // screen "sudah siap"
 
   React.useEffect(() => {
     const fetchEvent = async () => {
-      setEventDetail((state) => ({ ...state, status: "loading" }));
+      setEventDetail((state) => ({ ...state, status: "loading", errors: null }));
       const result = await EventsService.getEventDetailById({ id: eventId });
       if (result.success) {
         setEventDetail((state) => ({ ...state, status: "success", data: result.data }));
@@ -59,24 +66,41 @@ function PagePrePublish() {
       }
     };
 
+    const getQualificationSchedules = async () => {
+      setQualificationSchedules((state) => ({ ...state, status: "loading", errors: null }));
+      const result = await EventsService.getEventQualificationSchedules({ event_id: eventId });
+      if (result.success) {
+        setQualificationSchedules((state) => ({ ...state, status: "success", data: result.data }));
+      } else {
+        setQualificationSchedules((state) => ({
+          ...state,
+          status: "error",
+          errors: result.errors,
+        }));
+      }
+    };
+
     fetchEvent();
+    getQualificationSchedules();
   }, []);
 
   React.useEffect(() => {
-    if (!eventDetailData) {
+    if (!eventDetailData || !qualificationSchedulesData) {
       return;
     }
 
-    // TODO: cek apakah nama properti di data API ini `scheduleStatus` atau lain
-    const { eventStatus, scheduleStatus } = eventDetailData.publicInformation;
-    if (eventStatus === 1 && scheduleStatus === 1) {
+    const { eventStatus } = eventDetailData.publicInformation;
+    const isPublished = Boolean(parseInt(eventStatus));
+    const isQualificationSchedulesSet = qualificationSchedulesData.length;
+
+    if (isPublished && isQualificationSchedulesSet) {
       goToStep(3); // konfirmasi sudah siap
-    } else if (eventStatus === 1) {
+    } else if (isPublished) {
       goToStep(2); // set jadwal kualifikasi
     } else {
       goToStep(1); // konfirmasi draft
     }
-  }, [eventDetailData]);
+  }, [eventDetailData, qualificationSchedulesData]);
 
   return (
     <div className="page-content">
@@ -96,7 +120,7 @@ function PagePrePublish() {
               </div>
             </div>
           </div>
-        ) : isLoadingEvent ? (
+        ) : isLoadingEvent || isLoadingQualificationSchedules ? (
           <div>Sedang memuat data event...</div>
         ) : eventDetailData ? (
           <Row>

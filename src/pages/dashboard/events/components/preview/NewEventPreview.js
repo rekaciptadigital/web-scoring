@@ -34,10 +34,10 @@ function computeCategoriesByTeam(categoriesData) {
         const newCategory = {
           ...detail,
           key: `${detail.key}-${index + 1}`,
-          competitionCategory: competition.competitionCategory?.value,
-          ageCategory: detail.ageCategory?.value,
-          distance: distanceItem.value,
-          teamCategory: detail.teamCategory?.value,
+          competitionCategory: competition.competitionCategory?.label,
+          ageCategory: detail.ageCategory?.label,
+          distance: distanceItem.label,
+          teamCategory: detail.teamCategory?.label,
         };
 
         if (
@@ -45,12 +45,8 @@ function computeCategoriesByTeam(categoriesData) {
           detail.teamCategory?.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
         ) {
           categoriesByTeam[TEAM_CATEGORIES.TEAM_INDIVIDUAL].push(newCategory);
-        } else if (detail.teamCategory?.value === "Beregu Putra") {
-          categoriesByTeam[TEAM_CATEGORIES.TEAM_MALE].push(newCategory);
-        } else if (detail.teamCategory?.value === "Beregu Putri") {
-          categoriesByTeam[TEAM_CATEGORIES.TEAM_FEMALE].push(newCategory);
-        } else if (detail.teamCategory?.value === "Beregu Campuran") {
-          categoriesByTeam[TEAM_CATEGORIES.TEAM_MIXED].push(newCategory);
+        } else if (detail.teamCategory?.value) {
+          categoriesByTeam[detail.teamCategory.value].push(newCategory);
         }
       });
     });

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import { ButtonSmallBlue } from "components/ma";
@@ -57,7 +58,9 @@ export function RibbonEventConfig() {
         </ul>
 
         <div className="ms-3">
-          <ButtonSmallBlue>Ubah</ButtonSmallBlue>
+          <ButtonSmallBlue as={Link} to="/dashboard/events/new/prepare">
+            Ubah
+          </ButtonSmallBlue>
         </div>
       </div>
     </RibbonWrapper>

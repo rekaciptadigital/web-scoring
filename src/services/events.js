@@ -66,5 +66,8 @@ export default {
     },
     updateMoreInfos(data = null, qs = null) {
         return API.put("/web/v1/archery/more-information", data, qs, true);
+    },
+    setPublished(data, qs = null) {
+        return API.post("/web/v1/archery/events/update-status", data, qs, true);
     }
 }

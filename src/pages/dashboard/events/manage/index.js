@@ -172,11 +172,9 @@ const PageEventDetailManage = () => {
   const handlePublishEvent = async () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
 
-    const payload = await makeEventPayload(eventData, { status: PUBLICATION_TYPES.PUBLISHED });
-    const result = await EventsService.register(payload);
+    const result = await EventsService.setPublished({ status: 1 }, { id: eventId });
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
-      const eventId = result.data?.id;
       eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
       setSavingEventStatus((state) => ({ ...state, status: "error" }));

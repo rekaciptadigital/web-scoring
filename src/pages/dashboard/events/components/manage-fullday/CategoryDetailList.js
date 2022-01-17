@@ -42,12 +42,15 @@ function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
     }
   };
 
-  const handleRemoveDetail = (detail) => {
-    updateEventData({
-      type: "REMOVE_EVENT_CATEGORY_DETAIL",
-      categoryKey: detail.categoryKey,
-      detailKey: detail.key,
-    });
+  const handleRemoveDetail = async (detail) => {
+    setAddingCategoryStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const result = await EventsService.deleteCategoryDetails({ id: detail.categoryDetailsId });
+    if (result.success) {
+      setAddingCategoryStatus((state) => ({ ...state, status: "success" }));
+      onSuccess?.();
+    } else {
+      setAddingCategoryStatus((state) => ({ ...state, status: "error" }));
+    }
   };
 
   const handleDetailFieldChange = (detail, field, value) => {

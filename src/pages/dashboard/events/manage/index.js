@@ -8,6 +8,7 @@ import { eventDataReducer } from "../hooks/create-event-data";
 import { EventsService } from "services";
 
 import MetaTags from "react-meta-tags";
+import SweetAlert from "react-bootstrap-sweetalert";
 import { Container, Row, Col } from "reactstrap";
 import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
 import {
@@ -16,7 +17,7 @@ import {
   StepKategori,
   RibbonEventConfig,
 } from "../components/manage-fullday";
-import { PreviewPortal } from "../components/preview";
+import { PreviewPortal } from "../components/manage-fullday/preview";
 
 const stepsData = [
   {
@@ -94,6 +95,7 @@ const PageEventDetailManage = () => {
     errors: null,
   });
   const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
+  const [shouldShowConfirmPublication, setShouldShowConfirmPublication] = React.useState(false);
 
   const eventId = parseInt(event_id);
   const isLoading = savingEventStatus.status === "loading";
@@ -163,9 +165,9 @@ const PageEventDetailManage = () => {
     }
   };
 
-  const handlePublishEdit = () => {
-    alert("Publikasi, yakin?");
-  };
+  const handleClickPublish = () => setShouldShowConfirmPublication(true);
+
+  const handleCancelPublish = () => setShouldShowConfirmPublication(false);
 
   const handlePublishEvent = async () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
@@ -243,7 +245,7 @@ const PageEventDetailManage = () => {
                           Simpan
                         </Button>
                         {!isEventPublished && (
-                          <ButtonBlue onClick={handlePublishEdit}>Publikasi</ButtonBlue>
+                          <ButtonBlue onClick={handleClickPublish}>Publikasi</ButtonBlue>
                         )}
                       </div>
                     </div>
@@ -314,16 +316,59 @@ const PageEventDetailManage = () => {
         </Container>
       </div>
 
+      <AlertConfirmPublication
+        showAlert={shouldShowConfirmPublication}
+        onPublish={() => {
+          handlePublishEvent();
+          setShouldShowConfirmPublication(false);
+        }}
+        onPreview={() => {
+          setShouldShowPreview(true);
+          setShouldShowConfirmPublication(false);
+        }}
+        onCancel={handleCancelPublish}
+      />
+
       <PreviewPortal
         isActive={shouldShowPreview}
         isLoading={isLoading}
         eventData={eventData}
         onClose={() => setShouldShowPreview(false)}
-        onPublish={handlePublishEvent}
+        onPublish={() => {
+          handlePublishEvent();
+          setShouldShowPreview(false);
+        }}
       />
     </React.Fragment>
   );
 };
+
+function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) {
+  return (
+    <SweetAlert
+      show={showAlert}
+      title=""
+      custom
+      btnSize="md"
+      onConfirm={onPublish}
+      onCancel={onCancel}
+      style={{ padding: "30px 40px" }}
+      customButtons={
+        <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
+          <ButtonBlue onClick={onPreview} style={{ minWidth: 120 }}>
+            Lihat Pratinjau
+          </ButtonBlue>
+
+          <Button onClick={onPublish} style={{ color: "var(--ma-blue)", minWidth: 120 }}>
+            Publikasi
+          </Button>
+        </span>
+      }
+    >
+      <p className="text-muted">Event akan dipublikasikan</p>
+    </SweetAlert>
+  );
+}
 
 function makeEventDetailState(initialData) {
   const { publicInformation, moreInformation, eventCategories } = initialData;

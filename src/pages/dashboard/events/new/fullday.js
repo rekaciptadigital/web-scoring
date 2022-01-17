@@ -130,7 +130,7 @@ const EventsNewFullday = () => {
 
       <div className="page-content" style={{ marginTop: 0 }}>
         <MetaTags>
-          <title>Registrasi Event Baru | MyArchery.id</title>
+          <title>Buat Event Baru | MyArchery.id</title>
         </MetaTags>
 
         <Container fluid>

@@ -44,7 +44,7 @@ export default function PreWizard() {
   return (
     <div className="page-content">
       <MetaTags>
-        <title>... persiapan registrasi event baru | MyArchery.id</title>
+        <title>Persiapkan event baru yang dibuat | MyArchery.id</title>
       </MetaTags>
 
       <Container fluid className="mt-4 mb-5">

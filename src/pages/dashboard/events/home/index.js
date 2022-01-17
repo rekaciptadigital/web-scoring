@@ -18,10 +18,20 @@ function PageEventDetailHome() {
 
   const renderManageEventMenuBadge = () => {
     if (!isEventPublished && !isQualificationSchedulesSet) {
-      return <span>&#40; &#8505; &#41; draft</span>;
+      return (
+        <InfoGrayBadge>
+          <span className="icon-info">&#8505;</span>
+          <span>Draft</span>
+        </InfoGrayBadge>
+      );
     }
     if (!isQualificationSchedulesSet) {
-      return <span style={{ color: "green" }}>&#40;&#10003;&#41; Terpublikasi</span>;
+      return (
+        <PublishedBadge>
+          <span className="icon-check">&#10003;</span>
+          <span>Terpublikasi</span>
+        </PublishedBadge>
+      );
     }
   };
 
@@ -91,7 +101,12 @@ function PageEventDetailHome() {
                 href={computeHrefScheduleMenu}
                 disabled={!isEventPublished}
                 badge={
-                  !isQualificationSchedulesSet && <span>&#40; &#8505; &#41; belum diatur</span>
+                  !isQualificationSchedulesSet && (
+                    <InfoGrayBadge>
+                      <span className="icon-info">&#8505;</span>
+                      <span>Belum Diatur</span>
+                    </InfoGrayBadge>
+                  )
                 }
               />
               <CardMenu
@@ -123,6 +138,50 @@ const MenuGridWrapper = styled.div`
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+`;
+
+const InfoGrayBadge = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 2rem;
+  background-color: var(--ma-gray-100);
+  font-size: 12px;
+
+  .icon-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: #ffffff;
+    color: var(--ma-gray-400);
+    font-size: 15px;
+    font-style: italic;
+  }
+`;
+
+const PublishedBadge = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+
+  .icon-check {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: #3aa76d;
+    color: #ffffff;
+    font-size: 15px;
+  }
 `;
 
 export default PageEventDetailHome;

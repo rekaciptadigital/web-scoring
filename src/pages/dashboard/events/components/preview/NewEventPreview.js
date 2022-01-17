@@ -73,7 +73,8 @@ function NewEventPreview({ eventData }) {
         <Row className="mt-3">
           <Col md="8">
             <h1 className="event-heading">{eventData.eventName}</h1>
-            <div>Oleh Pro Archery Club</div>
+            {/* TODO: data pembuat event */}
+            {eventData?.author?.name && <div>Oleh {"Pro Archery Club"}</div>}
 
             <div className="content-section mt-5">
               {/* Optional field */}

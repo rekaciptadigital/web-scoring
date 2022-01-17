@@ -1,17 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { ButtonOutline } from "components/ma";
 import { FieldSelectCategory } from "../form-fields";
 import CategoryDetailList from "./CategoryDetailList";
 
-import Del from "components/icons/Del";
-
 function CategoryItem({ category, categoryOptions, eventData, updateEventData }) {
-  const handleClickRemoveCategory = (targetCategory) => {
-    updateEventData({ type: "REMOVE_EVENT_CATEGORY", categoryKey: targetCategory.key });
-  };
-
   const handleCategoryNameChange = (category, value) => {
     updateEventData({ type: "UPDATE_EVENT_CATEGORY", key: category.key, value });
   };
@@ -37,12 +30,6 @@ function CategoryItem({ category, categoryOptions, eventData, updateEventData })
             value={category.competitionCategory}
             onChange={(value) => handleCategoryNameChange(category, value)}
           />
-        </div>
-
-        <div className="top-grid-actions">
-          <ButtonOutline onClick={() => handleClickRemoveCategory(category)}>
-            <Del />
-          </ButtonOutline>
         </div>
       </div>
       <h5 className="mt-3 mb-3 fw-normal">Detail Kategori</h5>

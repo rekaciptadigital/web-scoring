@@ -95,6 +95,7 @@ const PageEventDetailManage = () => {
   });
   const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
 
+  const eventId = parseInt(event_id);
   const isLoading = savingEventStatus.status === "loading";
 
   const incrementAttemptCounts = () => {
@@ -116,7 +117,7 @@ const PageEventDetailManage = () => {
 
   const handleSaveEventDetails = async () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
-    const payload = await makeEventDetailsPayload({ event_id, ...eventData });
+    const payload = await makeEventDetailsPayload({ event_id: eventId, ...eventData });
     const result = await EventsService.updateEvent(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
@@ -128,7 +129,7 @@ const PageEventDetailManage = () => {
 
   const handleSaveCategoryDetails = async () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
-    const payload = makeCategoryDetailsPayload({ event_id, ...eventData });
+    const payload = makeCategoryDetailsPayload({ event_id: eventId, ...eventData });
     const result = await EventsService.updateCategoryDetails(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
@@ -152,7 +153,7 @@ const PageEventDetailManage = () => {
     }
 
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
-    const payload = makeFeesPayload({ event_id, ...eventData });
+    const payload = makeFeesPayload({ event_id: eventId, ...eventData });
     const result = await EventsService.updateCategoryFee(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
@@ -184,7 +185,7 @@ const PageEventDetailManage = () => {
   React.useEffect(() => {
     const getEventDetail = async () => {
       setFetchingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
-      const result = await EventsService.getEventDetailById({ id: event_id });
+      const result = await EventsService.getEventDetailById({ id: eventId });
       if (result.success) {
         setFetchingEventStatus((state) => ({ ...state, status: "success" }));
         const eventDetailData = makeEventDetailState(result.data);
@@ -255,7 +256,7 @@ const PageEventDetailManage = () => {
                   <WizardView currentStep={currentStep}>
                     <WizardViewContent>
                       <StepInfoUmum
-                        eventId={event_id}
+                        eventId={eventId}
                         savingStatus={savingEventStatus}
                         onSaveSuccess={() => incrementAttemptCounts()}
                         eventData={eventData}

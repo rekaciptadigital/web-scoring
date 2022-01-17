@@ -35,7 +35,7 @@ const stepsList = [
 
 function PagePrePublish() {
   const location = useLocation();
-  const { steps, currentStep, goToStep } = useWizardView(stepsList);
+  const { steps, currentStep, currentLabel, goToStep } = useWizardView(stepsList);
   const [eventDetail, setEventDetail] = React.useState({
     status: "idle",
     data: null,
@@ -105,7 +105,7 @@ function PagePrePublish() {
   return (
     <div className="page-content">
       <MetaTags>
-        <title>Atur pertandingan | MyArchery.id</title>
+        <title>{currentLabel || "Sedikit Lagi!"} | MyArchery.id</title>
       </MetaTags>
 
       <Container fluid className="my-5">

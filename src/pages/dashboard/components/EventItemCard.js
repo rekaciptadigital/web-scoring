@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import { EventsService } from "services";
 
 import { Link } from "react-router-dom";
 import Calendar from "components/icons/Calendar";
@@ -115,7 +116,27 @@ const EventItemCardWrapper = styled.div`
 `;
 
 function EventItemCard({ event }) {
+  const [eventDetail, setEventDetail] = React.useState({
+    status: "idle",
+    data: null,
+    errors: null,
+  });
+
+  const eventDetailData = eventDetail.data;
   const hrefToEventHome = event?.id ? `/dashboard/event/${event.id}/home` : "#";
+
+  React.useEffect(() => {
+    const getEventDetail = async () => {
+      setEventDetail((state) => ({ ...state, status: "loading", errors: null }));
+      const result = await EventsService.getEventDetailById({ id: event.id });
+      if (result.success) {
+        setEventDetail((state) => ({ ...state, status: "success", data: result.data }));
+      } else {
+        setEventDetail((state) => ({ ...state, status: "error", errors: result.errors }));
+      }
+    };
+    getEventDetail();
+  }, []);
 
   return (
     <EventItemCardWrapper>
@@ -123,10 +144,15 @@ function EventItemCard({ event }) {
         <div className="event-icon">
           <Panah size={28} color="#afafaf" />
         </div>
-        <h4 className="event-title">{event.eventName}</h4>
-        <EventCity>{event.city}</EventCity>
+        <h4 className="event-title">
+          {eventDetailData?.publicInformation.eventName || "Nama Event tidak tersedia"}
+        </h4>
+        <EventCity>{eventDetailData?.publicInformation.eventCity?.nameCity}</EventCity>
 
-        <EventDateRange from={event.eventStartDatetime} to={event.eventEndDatetime} />
+        <EventDateRange
+          from={eventDetailData?.publicInformation.eventStart}
+          to={eventDetailData?.publicInformation.eventEnd}
+        />
       </div>
 
       <div className="event-footer">

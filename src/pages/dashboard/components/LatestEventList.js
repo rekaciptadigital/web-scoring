@@ -10,7 +10,8 @@ function makeThumbnailList(initialData) {
   if (!initialData?.length) {
     return container;
   }
-  initialData.forEach((event, index) => {
+  const lastThreeData = initialData.slice(0, 3);
+  lastThreeData.forEach((event, index) => {
     container[index] = event;
   });
   return container;

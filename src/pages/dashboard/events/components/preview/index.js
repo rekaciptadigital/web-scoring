@@ -69,7 +69,7 @@ function FullScreenPreviewContainer({ children, isLoading, onClose, onSave, onPu
         <div className="preview-toolbar-top">
           <div className="navbar-header" style={{ paddingLeft: 12 }}>
             <div className="d-flex">
-              <h3 className="m-0">Preview</h3>
+              <h3 className="m-0">Pratinjau</h3>
             </div>
 
             <List className="d-none d-lg-flex my-auto">

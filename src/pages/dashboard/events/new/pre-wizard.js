@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventConfigs } from "constants/index";
@@ -71,9 +72,9 @@ export default function PreWizard() {
 
               <ActionButtonGroup className="mt-5">
                 {currentStep === 2 ? (
-                  <a className="button-action next" href="/dashboard/events/new/fullday">
+                  <Link className="button-action next" to="/dashboard/events/new/fullday">
                     Buat Event
-                  </a>
+                  </Link>
                 ) : (
                   <button
                     className="button-action next"
@@ -85,9 +86,9 @@ export default function PreWizard() {
                 )}
 
                 {currentStep === 1 ? (
-                  <a className="button-action back" href="/dashboard">
+                  <Link className="button-action back" to="/dashboard">
                     Kembali
-                  </a>
+                  </Link>
                 ) : (
                   <button className="button-action back" onClick={() => goToPreviousStep()}>
                     Kembali

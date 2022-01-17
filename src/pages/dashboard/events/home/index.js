@@ -81,7 +81,10 @@ function PageEventDetailHome() {
                 <p>Atur eventmu di sini</p>
               </div>
               <div>
-                <Link to="/dashboard">&larr; Ke Dashboard EO</Link>
+                <LinkToDashboard to="/dashboard">
+                  <i className="bx bx-left-arrow-alt fs-4" />
+                  <span>Ke Dashboard EO</span>
+                </LinkToDashboard>
               </div>
             </div>
 
@@ -133,6 +136,21 @@ function PageEventDetailHome() {
     </div>
   );
 }
+
+const LinkToDashboard = styled(Link)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 10px 12px;
+  border-radius: 2rem;
+  background-color: var(--ma-gray-100);
+  color: var(--ma-blue);
+
+  &:hover {
+    color: var(--ma-blue);
+  }
+`;
 
 const MenuGridWrapper = styled.div`
   display: grid;

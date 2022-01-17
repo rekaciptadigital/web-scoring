@@ -11,6 +11,7 @@ import { LoadingScreen } from "components";
 import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 
 import id from "date-fns/locale/id";
+import classnames from "classnames";
 
 function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
   const [groupedCategoryDetails, setGroupedCategoryDetails] = React.useState({
@@ -20,6 +21,8 @@ function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
   });
   const [scheduling, dispatchScheduling] = React.useReducer(schedulingReducer, { data: null });
   const [submitStatus, setSubmitStatus] = React.useState({ status: "idle", errors: null });
+  const [isFormDirty, setIsFormDirty] = React.useState(false);
+  const [validationErrors, setValidationErrors] = React.useState({});
 
   const isLoadingCategoryDetails = groupedCategoryDetails.status === "loading";
   const categoryDetailsData = groupedCategoryDetails.data;
@@ -56,7 +59,41 @@ function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
     });
   };
 
+  const runValidation = () => {
+    const validationErrors = {};
+    for (const competitionGroup in schedulesData) {
+      const schedules = schedulesData[competitionGroup];
+      for (const scheduleId in schedules) {
+        if (scheduleId === "common") {
+          continue;
+        }
+        const schedule = schedules[scheduleId];
+        if (!schedule.date) {
+          validationErrors[`schedule-date-${scheduleId}`] = ["required"];
+        }
+        if (!schedule.timeStart) {
+          validationErrors[`schedule-time-start-${scheduleId}`] = ["required"];
+        }
+        if (!schedule.timeEnd) {
+          validationErrors[`schedule-time-end-${scheduleId}`] = ["required"];
+        }
+      }
+    }
+    setValidationErrors(validationErrors);
+    return validationErrors;
+  };
+
   const handleClickSaveSchedule = async () => {
+    if (!isFormDirty) {
+      setIsFormDirty(true);
+    }
+
+    // Validate inputs, required
+    const validationErrors = runValidation();
+    if (Object.keys(validationErrors)?.length) {
+      return;
+    }
+
     setSubmitStatus((state) => ({ ...state, status: "loading", errors: null }));
     const payload = makeSchedulesPayload(schedulesData);
     const result = await EventsService.storeQualificationSchedules(payload);
@@ -90,6 +127,13 @@ function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
     fetchCategoryDetails();
   }, []);
 
+  React.useEffect(() => {
+    if (!isFormDirty) {
+      return;
+    }
+    runValidation();
+  }, [isFormDirty, schedulesData]);
+
   return (
     <div>
       <QualificationScheduleHeader>
@@ -117,6 +161,7 @@ function PanelJadwalKualifikasi({ eventId, onPublishSuccess }) {
                 onCommonChange={updateCommonSchedule}
                 onSingleChange={updateSingleSchedule}
                 onCancelEdit={updateBulkSchedules}
+                validationErrors={validationErrors}
               />
             );
           })
@@ -144,6 +189,7 @@ function CategoryScheduleEditor({
   onCommonChange,
   onSingleChange,
   onCancelEdit,
+  validationErrors,
 }) {
   const [editMode, setEditMode] = React.useState({ status: "closed", initialSchedules: null });
 
@@ -270,6 +316,9 @@ function CategoryScheduleEditor({
               distancesCategory,
             }) => {
               const schedule = scheduleGroup[detailId];
+              const fieldNameDate = `schedule-date-${detailId}`;
+              const fieldNameTimeStart = `schedule-time-start-${detailId}`;
+              const fieldNameTimeEnd = `schedule-time-end-${detailId}`;
               return (
                 <tr key={detailId}>
                   <td>{ageCategory}</td>
@@ -280,6 +329,7 @@ function CategoryScheduleEditor({
                     <div>
                       <FieldInputDateSmall
                         disabled={!isEditMode}
+                        name={fieldNameDate}
                         value={schedule.date}
                         onChange={(value) =>
                           handleSingleScheduleChange({
@@ -288,6 +338,7 @@ function CategoryScheduleEditor({
                             date: value,
                           })
                         }
+                        errors={validationErrors[fieldNameDate]}
                       />
                     </div>
                   </td>
@@ -296,6 +347,7 @@ function CategoryScheduleEditor({
                     <div className="d-flex" style={{ gap: "0.5rem" }}>
                       <FieldInputTimeSmall
                         disabled={!isEditMode}
+                        name={fieldNameTimeStart}
                         value={schedule.timeStart}
                         onChange={(value) =>
                           handleSingleScheduleChange({
@@ -304,10 +356,12 @@ function CategoryScheduleEditor({
                             timeStart: value,
                           })
                         }
+                        errors={validationErrors[fieldNameTimeStart]}
                       />
 
                       <FieldInputTimeSmall
                         disabled={!isEditMode}
+                        name={fieldNameTimeEnd}
                         value={schedule.timeEnd}
                         onChange={(value) =>
                           handleSingleScheduleChange({
@@ -316,6 +370,7 @@ function CategoryScheduleEditor({
                             timeEnd: value,
                           })
                         }
+                        errors={validationErrors[fieldNameTimeEnd]}
                       />
                     </div>
                   </td>
@@ -366,6 +421,7 @@ function FieldInputDateSmall({
   value,
   onChange,
   disabled,
+  errors,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -378,7 +434,7 @@ function FieldInputDateSmall({
         </label>
       )}
       <DatePicker
-        className="field-input-date"
+        className={classnames("field-input-date", { "error-invalid": errors?.length })}
         id={fieldID}
         name={name}
         selected={value}
@@ -396,7 +452,6 @@ const FieldInputDateWrapper = styled.div`
   .field-label {
     display: inline-block;
     color: var(--ma-gray-600);
-    /* font-size: 14px; */
     font-weight: normal;
     margin-bottom: 4px;
 
@@ -409,7 +464,6 @@ const FieldInputDateWrapper = styled.div`
     display: block;
     width: 100%;
     padding: 8px 12px;
-    /* font-size: 14px; */
     font-weight: 400;
     line-height: 1.5;
     color: #6a7187;
@@ -435,6 +489,10 @@ const FieldInputDateWrapper = styled.div`
       background-color: #eff2f7;
       opacity: 1;
     }
+
+    &.error-invalid {
+      border-color: var(--ma-red);
+    }
   }
 `;
 
@@ -448,6 +506,7 @@ function FieldInputTimeSmall({
   onChange,
   interval,
   disabled,
+  errors,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -460,7 +519,7 @@ function FieldInputTimeSmall({
         </label>
       )}
       <DatePicker
-        className="field-input-time"
+        className={classnames("field-input-time", { "error-invalid": errors?.length })}
         id={fieldID}
         name={name}
         selected={value}
@@ -519,6 +578,10 @@ const FieldInputTimeWrapper = styled.div`
     &[readonly] {
       background-color: #eff2f7;
       opacity: 1;
+    }
+
+    &.error-invalid {
+      border-color: var(--ma-red);
     }
   }
 `;

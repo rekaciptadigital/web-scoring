@@ -4,7 +4,14 @@ import styled from "styled-components";
 import { FieldSelectCategory } from "../form-fields";
 import CategoryDetailList from "./CategoryDetailList";
 
-function CategoryItem({ category, categoryOptions, eventData, updateEventData }) {
+function CategoryItem({
+  eventId,
+  category,
+  categoryOptions,
+  eventData,
+  updateEventData,
+  onSuccess,
+}) {
   const handleCategoryNameChange = (category, value) => {
     updateEventData({ type: "UPDATE_EVENT_CATEGORY", key: category.key, value });
   };
@@ -33,7 +40,12 @@ function CategoryItem({ category, categoryOptions, eventData, updateEventData })
         </div>
       </div>
       <h5 className="mt-3 mb-3 fw-normal">Detail Kategori</h5>
-      <CategoryDetailList details={category.categoryDetails} updateEventData={updateEventData} />
+      <CategoryDetailList
+        eventId={eventId}
+        details={category.categoryDetails}
+        updateEventData={updateEventData}
+        onSuccess={onSuccess}
+      />
     </StyledCategoryItem>
   );
 }

@@ -1,6 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
+import { EventsService } from "services";
 
+import { LoadingScreen } from "components";
 import { ButtonOutline } from "components/ma";
 import {
   FieldInputTextSmall,
@@ -12,13 +14,32 @@ import {
 import Copy from "components/icons/Copy";
 import Del from "components/icons/Del";
 
-function CategoryDetailList({ details, updateEventData }) {
-  const handleAddDetail = (detail) => {
-    updateEventData({
-      type: "COPY_EVENT_CATEGORY_DETAIL",
-      categoryKey: detail.categoryKey,
-      detailKey: detail.key,
-    });
+function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
+  const [addingCategoryStatus, setAddingCategoryStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
+
+  const isLoading = addingCategoryStatus.status === "loading";
+
+  const handleAddDetail = async (detail) => {
+    setAddingCategoryStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const payload = {
+      event_id: eventId,
+      age_category_id: detail.ageCategory.value,
+      competition_category_id: detail.competitionCategory.id,
+      distance_id: detail.distance.value,
+      team_category_id: detail.teamCategory.value,
+      quota: detail.quota,
+      fee: detail.fee,
+    };
+    const result = await EventsService.storeCategoryDetails(payload);
+    if (result.success) {
+      setAddingCategoryStatus((state) => ({ ...state, status: "success" }));
+      onSuccess?.();
+    } else {
+      setAddingCategoryStatus((state) => ({ ...state, status: "error" }));
+    }
   };
 
   const handleRemoveDetail = (detail) => {
@@ -105,6 +126,8 @@ function CategoryDetailList({ details, updateEventData }) {
           {index < details.length - 1 && <hr />}
         </React.Fragment>
       ))}
+
+      <LoadingScreen loading={isLoading} />
     </StyledDetailList>
   );
 }

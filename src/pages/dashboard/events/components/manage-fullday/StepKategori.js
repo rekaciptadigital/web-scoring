@@ -8,7 +8,7 @@ import { LoadingScreen } from "components";
 import FormSheet from "../FormSheet";
 import CategoryItem from "./CategoryItem";
 
-export function StepKategori({ savingStatus, eventData, updateEventData }) {
+export function StepKategori({ eventId, savingStatus, eventData, updateEventData, onSaveSuccess }) {
   const { options: categoryOptions } = useArcheryCategories(
     EventsService.getEventCompetitionCategories
   );
@@ -29,10 +29,12 @@ export function StepKategori({ savingStatus, eventData, updateEventData }) {
           return (
             <CategoryItem
               key={category.key}
+              eventId={eventId}
               category={category}
               categoryOptions={categoryOptions}
               eventData={eventData}
               updateEventData={updateEventData}
+              onSuccess={onSaveSuccess}
             />
           );
         })}

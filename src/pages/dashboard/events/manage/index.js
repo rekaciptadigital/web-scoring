@@ -266,9 +266,11 @@ const PageEventDetailManage = () => {
 
                     <WizardViewContent>
                       <StepKategori
+                        eventId={eventId}
                         savingStatus={savingEventStatus}
                         eventData={eventData}
                         updateEventData={updateEventData}
+                        onSaveSuccess={() => incrementAttemptCounts()}
                       />
                     </WizardViewContent>
 

@@ -9,17 +9,62 @@ import FormSheet from "../FormSheet";
 import CategoryItem from "./CategoryItem";
 
 export function StepKategori({ eventId, savingStatus, eventData, updateEventData, onSaveSuccess }) {
-  const { options: categoryOptions } = useArcheryCategories(
+  const { options: optionsCompetitionCategory } = useArcheryCategories(
     EventsService.getEventCompetitionCategories
   );
+  const { options: optionsAge } = useArcheryCategories(EventsService.getEventAgeCategories);
+  const { options: optionsDistance } = useArcheryCategories(
+    EventsService.getEventDistanceCategories
+  );
+  const { options: optionsTeamCategory } = useArcheryCategories(
+    EventsService.getEventTeamCategories
+  );
+  const [addingCategoryStatus, setAddingCategoryStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
 
   const isLoading = savingStatus.status === "loading";
+  const isAddingCategory = addingCategoryStatus.status === "loading";
 
-  const handleClickAddCategory = () => {
-    if (eventData.eventCategories.length === categoryOptions.length) {
+  const handleClickAddCategory = async () => {
+    if (eventData.eventCategories.length >= optionsCompetitionCategory.length) {
       return;
     }
-    updateEventData({ type: "ADD_EVENT_CATEGORY" });
+
+    setAddingCategoryStatus((state) => ({ ...state, status: "loading", errors: null }));
+
+    let chosenCompetitionCategory = null;
+    for (const option of optionsCompetitionCategory) {
+      const isOptionAlreadyChosen = eventData.eventCategories.some(
+        (category) => category.competitionCategory.value === option.value
+      );
+      if (isOptionAlreadyChosen) {
+        continue;
+      }
+      chosenCompetitionCategory = { ...option };
+      break;
+    }
+
+    const chosenAge = optionsAge.find((age) => age.value.toLowerCase() === "umum");
+
+    const payload = {
+      event_id: eventId,
+      competition_category_id: chosenCompetitionCategory.value,
+      age_category_id: chosenAge.value,
+      distance_id: optionsDistance[0].value,
+      team_category_id: optionsTeamCategory[0].value,
+      quota: 0,
+      fee: 0,
+    };
+
+    const result = await EventsService.storeCategoryDetails(payload);
+    if (result.success) {
+      setAddingCategoryStatus((state) => ({ ...state, status: "success" }));
+      onSaveSuccess?.();
+    } else {
+      setAddingCategoryStatus((state) => ({ ...state, status: "error" }));
+    }
   };
 
   return (
@@ -31,7 +76,7 @@ export function StepKategori({ eventId, savingStatus, eventData, updateEventData
               key={category.key}
               eventId={eventId}
               category={category}
-              categoryOptions={categoryOptions}
+              categoryOptions={optionsCompetitionCategory}
               eventData={eventData}
               updateEventData={updateEventData}
               onSuccess={onSaveSuccess}
@@ -40,13 +85,17 @@ export function StepKategori({ eventId, savingStatus, eventData, updateEventData
         })}
 
         <div className="bottom-section-add-category">
-          <ButtonOutlineBlue corner="8" onClick={handleClickAddCategory}>
+          <ButtonAddCategory
+            disabled={eventData.eventCategories.length >= optionsCompetitionCategory.length}
+            corner="8"
+            onClick={handleClickAddCategory}
+          >
             + Tambah Kategori
-          </ButtonOutlineBlue>
+          </ButtonAddCategory>
         </div>
       </StyledCategoryList>
 
-      <LoadingScreen loading={isLoading} />
+      <LoadingScreen loading={isLoading || isAddingCategory} />
     </FormSheet>
   );
 }
@@ -61,5 +110,11 @@ const StyledCategoryList = styled.div`
   .bottom-section-add-category {
     display: flex;
     justify-content: flex-end;
+  }
+`;
+
+const ButtonAddCategory = styled(ButtonOutlineBlue)`
+  &:disabled {
+    box-shadow: none;
   }
 `;

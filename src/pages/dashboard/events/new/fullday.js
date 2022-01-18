@@ -491,7 +491,36 @@ function useEventDataValidation(eventData) {
         }
       });
     } else {
+      // Hanya validasikan harga tim yang dipilih di kategori.
+      // Jenis tim yang tidak dipilih di kategori tidak diwajibkan diisi,
+      // sehingga tidak dihitung error.
+      const selectedTeamCategories = [];
+      for (const categoryGroup of eventData.eventCategories) {
+        for (const detail of categoryGroup.categoryDetails) {
+          if (!detail.teamCategory?.value) {
+            continue;
+          }
+
+          if (
+            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+          ) {
+            selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
+          } else {
+            selectedTeamCategories.push(detail.teamCategory?.value);
+          }
+        }
+      }
+
       for (const fee of eventData.registrationFees) {
+        const isTeamCategorySelected = selectedTeamCategories.some(
+          (team) => team === fee.teamCategory
+        );
+
+        if (!isTeamCategorySelected) {
+          continue;
+        }
+
         Step3.validate(`registrationFee-${fee.teamCategory}`, () => {
           if (!fee.amount) {
             return "required";

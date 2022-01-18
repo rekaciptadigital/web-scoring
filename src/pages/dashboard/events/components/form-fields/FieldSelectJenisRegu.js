@@ -1,14 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import Select from "react-select";
+import { useArcheryCategories } from "utils/hooks/archery-categories";
+import { EventsService } from "services";
 
-const optionsJenisRegu = [
-  { label: "Individu Putra", value: "Individu Putra" },
-  { label: "Individu Putri", value: "Individu Putri" },
-  { label: "Beregu Putra", value: "Beregu Putra" },
-  { label: "Beregu Putri", value: "Beregu Putri" },
-  { label: "Beregu Campuran", value: "Beregu Campuran" },
-];
+import Select from "react-select";
 
 const FieldSelectWrapper = styled.div`
   .field-label {
@@ -46,6 +41,7 @@ const customSelectStyles = {
     ...provided,
     color: "#6a7187",
     fontSize: 12,
+    textTransform: "capitalize",
   }),
   placeholder: (provided) => ({
     ...provided,
@@ -57,6 +53,23 @@ const customSelectStyles = {
     ...provided,
     padding: 7,
   }),
+  option: (provided) => ({
+    ...provided,
+    textTransform: "capitalize",
+  }),
+};
+
+const computeCustomStylesWithValidation = (errors) => {
+  if (errors?.length) {
+    return {
+      ...customSelectStyles,
+      control: (provided) => ({
+        ...provided,
+        border: "solid 1px var(--ma-red)",
+      }),
+    };
+  }
+  return customSelectStyles;
 };
 
 function FieldSelectJenisRegu({
@@ -67,7 +80,9 @@ function FieldSelectJenisRegu({
   placeholder,
   value = "",
   onChange,
+  errors,
 }) {
+  const { options: optionsJenisRegu } = useArcheryCategories(EventsService.getEventTeamCategories);
   return (
     <FieldSelectWrapper>
       <label className="field-label">
@@ -75,7 +90,7 @@ function FieldSelectJenisRegu({
         {required && <span className="field-required">*</span>}
       </label>
       <Select
-        styles={customSelectStyles}
+        styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder}
         options={optionsJenisRegu}

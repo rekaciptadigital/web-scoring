@@ -1,8 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
+import { EventsService } from "services";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Row, Col, Modal, ModalBody } from "reactstrap";
+import { LoadingScreen } from "components";
 import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import FormSheet from "../FormSheet";
 import PosterImagePicker from "../PosterImagePicker";
@@ -15,10 +17,14 @@ import {
   FieldInputTime,
 } from "../form-fields";
 
-export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
+export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, updateEventData }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
+  const [removingStatus, setRemovingStatus] = React.useState({ status: "idle", errors: null });
+
+  const isLoading = savingStatus.status === "loading";
+  const isRemovingInfo = removingStatus.status === "loading";
 
   const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
   const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
@@ -58,42 +64,25 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
     updateEventData({ city: selectValue });
   };
 
-  const handleAddInformation = (value) => {
-    updateEventData({
-      type: "ADD_EXTRA_INFO",
-      value: {
-        title: value.title,
-        description: value.description,
-      },
-    });
-  };
-
-  const handleEditInformation = (value) => {
-    updateEventData({
-      type: "EDIT_EXTRA_INFO",
-      key: value.key,
-      value: {
-        title: value.title,
-        description: value.description,
-      },
-    });
-  };
-
-  const handleRemoveInformation = (targetInfo) => {
-    updateEventData({ type: "REMOVE_EXTRA_INFO", key: targetInfo.key });
+  const handleRemoveInformation = async (targetInfo) => {
+    setRemovingStatus((state) => ({ ...state, status: "loading", errors: null }));
     setKeyExtraInfoRemoved(null);
+    const result = await EventsService.deleteMoreInfos({ id: targetInfo.id });
+    if (result.success) {
+      setRemovingStatus((state) => ({ ...state, status: "success" }));
+      onSaveSuccess?.();
+    } else {
+      setRemovingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+    }
   };
 
   return (
     <FormSheet>
-      <h3 className="mb-3">
-        Banner Event<span style={{ color: "var(--ma-red)" }}>*</span>
-      </h3>
+      <h3 className="mb-3">Banner Event</h3>
       <PosterImagePicker
         image={eventData.bannerImage}
         onChange={handlePickBannerChange}
         onRemove={handleRemoveBannerImage}
-        errors={validationErrors?.bannerImage}
       />
 
       <hr />
@@ -107,7 +96,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             placeholder="Nama Event"
             value={eventData.eventName}
             onChange={(value) => handleFieldChange("eventName", value)}
-            errors={validationErrors?.eventName}
           >
             Nama Event
           </FieldInputText>
@@ -136,7 +124,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             placeholder="Lokasi"
             value={eventData.location}
             onChange={(value) => handleFieldChange("location", value)}
-            errors={validationErrors?.location}
           >
             Lokasi
           </FieldInputText>
@@ -155,7 +142,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
                   : undefined
               }
               onChange={handleLocationTypeChange}
-              errors={validationErrors?.locationType}
             />
           </div>
         </Col>
@@ -167,7 +153,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             placeholder="Kota"
             value={eventData?.city || null}
             onChange={handleCityChange}
-            errors={validationErrors?.city}
           >
             Kota
           </FieldSelectCity>
@@ -182,7 +167,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.registrationDateStart}
             onChange={(value) => handleFieldChange("registrationDateStart", value)}
-            errors={validationErrors?.registrationDateStart}
           >
             Mulai Pendaftaran
           </FieldInputDate>
@@ -195,7 +179,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.registrationTimeStart}
             onChange={(value) => handleFieldChange("registrationTimeStart", value)}
-            errors={validationErrors?.registrationTimeStart}
           >
             Jam Buka
           </FieldInputTime>
@@ -208,7 +191,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.registrationDateEnd}
             onChange={(value) => handleFieldChange("registrationDateEnd", value)}
-            errors={validationErrors?.registrationDateEnd}
           >
             Tutup Pendaftaran
           </FieldInputDate>
@@ -221,7 +203,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.registrationTimeEnd}
             onChange={(value) => handleFieldChange("registrationTimeEnd", value)}
-            errors={validationErrors?.registrationTimeEnd}
           >
             Jam Tutup
           </FieldInputTime>
@@ -236,7 +217,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.eventDateStart}
             onChange={(value) => handleFieldChange("eventDateStart", value)}
-            errors={validationErrors?.eventDateStart}
           >
             Mulai Lomba
           </FieldInputDate>
@@ -249,7 +229,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.eventTimeStart}
             onChange={(value) => handleFieldChange("eventTimeStart", value)}
-            errors={validationErrors?.eventTimeStart}
           >
             Jam Mulai
           </FieldInputTime>
@@ -262,7 +241,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.eventDateEnd}
             onChange={(value) => handleFieldChange("eventDateEnd", value)}
-            errors={validationErrors?.eventDateEnd}
           >
             Akhir Lomba
           </FieldInputDate>
@@ -275,7 +253,6 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             required
             value={eventData.eventTimeEnd}
             onChange={(value) => handleFieldChange("eventTimeEnd", value)}
-            errors={validationErrors?.eventTimeEnd}
           >
             Jam Akhir
           </FieldInputTime>
@@ -290,8 +267,9 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
       </ButtonOutlineBlue>
 
       <ModalExtraInfoEditor
+        eventId={eventId}
         showEditor={shouldShowAddExtraInfo}
-        onSave={handleAddInformation}
+        onSaveSuccess={onSaveSuccess}
         onClose={handleModalAddInfoClose}
       />
 
@@ -311,9 +289,10 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
               </div>
 
               <ModalExtraInfoEditor
+                eventId={eventId}
                 showEditor={keyExtraInfoEdited === info.key}
                 infoData={info}
-                onSave={handleEditInformation}
+                onSaveSuccess={onSaveSuccess}
                 onClose={handleModalEditInfoClose}
               />
             </div>
@@ -335,6 +314,8 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
           </ExtraInfoItem>
         ))}
       </div>
+
+      <LoadingScreen loading={isLoading || isRemovingInfo} />
     </FormSheet>
   );
 }
@@ -346,12 +327,16 @@ function ModalExtraInfoEditor({ showEditor, ...props }) {
   return <ExtraInfoEditor {...props} />;
 }
 
-function ExtraInfoEditor({ infoData, onSave, onClose }) {
+function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
   const [title, setTitle] = React.useState(infoData?.title || "");
   const [description, setDescription] = React.useState(infoData?.description || "");
+  const [savingStatus, setSavingStatus] = React.useState({ status: "idle", errors: null });
 
   const initialTitle = React.useRef(title);
   const initialDescription = React.useRef(description);
+
+  const isEditMode = Boolean(infoData);
+  const isLoading = savingStatus.status === "loading";
 
   const shouldSubmitAllowed = () => {
     const isRequiredAll = title && description;
@@ -365,22 +350,54 @@ function ExtraInfoEditor({ infoData, onSave, onClose }) {
     onClose?.();
   };
 
-  const handleClickSave = () => {
+  const handleClickSave = async () => {
     if (!shouldSubmitAllowed()) {
       return;
     }
-    onSave?.({
-      key: infoData?.key,
-      title: title,
-      description: description,
-    });
-    handleCloseModal();
+
+    if (isEditMode) {
+      // UPDATE DATA
+      setSavingStatus((state) => ({ ...state, status: "loading", errors: null }));
+
+      const payload = {
+        event_id: infoData.eventId,
+        title: title,
+        description: description,
+      };
+
+      const result = await EventsService.updateMoreInfos(payload, { id: infoData.id });
+      if (result.success) {
+        setSavingStatus((state) => ({ ...state, status: "success" }));
+        onSaveSuccess?.();
+        handleCloseModal();
+      } else {
+        setSavingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      }
+    } else {
+      // ADD NEW DATA
+      setSavingStatus((state) => ({ ...state, status: "loading", errors: null }));
+
+      const payload = {
+        event_id: eventId,
+        title: title,
+        description: description,
+      };
+
+      const result = await EventsService.storeMoreInfos(payload, { id: eventId });
+      if (result.success) {
+        setSavingStatus((state) => ({ ...state, status: "success" }));
+        onSaveSuccess?.();
+        handleCloseModal();
+      } else {
+        setSavingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      }
+    }
   };
 
   return (
     <Modal isOpen>
       <ModalBody>
-        <h4>{infoData ? "Ubah Informasi" : "Tambahkan Informasi"}</h4>
+        <h4>{isEditMode ? "Ubah Informasi" : "Tambahkan Informasi"}</h4>
 
         <div className="mt-4">
           <FieldInputText
@@ -416,6 +433,8 @@ function ExtraInfoEditor({ infoData, onSave, onClose }) {
             Simpan
           </ButtonBlue>
         </div>
+
+        <LoadingScreen loading={isLoading} />
       </ModalBody>
     </Modal>
   );
@@ -435,12 +454,12 @@ function AlertDeleteInfo({ showAlert, onConfirm, onCancel }) {
       onCancel={onCancel}
       style={{ padding: "30px 40px" }}
       customButtons={
-        <div className="d-flex flex-column w-100" style={{ gap: "0.5rem" }}>
+        <span className="d-flex flex-column w-100" style={{ gap: "0.5rem" }}>
           <Button style={{ color: "var(--ma-red)" }} onClick={onConfirm}>
             Hapus
           </Button>
           <ButtonBlue onClick={onCancel}>Batalkan</ButtonBlue>
-        </div>
+        </span>
       }
     >
       <p className="text-muted">Yakin akan hapus informasi ini?</p>

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventConfigs } from "constants/index";
@@ -8,6 +9,9 @@ import { Container, Row, Col } from "reactstrap";
 import { WizardView, WizardViewContent, ProgressBarLine } from "components/ma";
 import Step1 from "../components/pre-wizard/Step1";
 import Step2 from "../components/pre-wizard/Step2";
+
+import typeIllustration from "assets/images/events/create-event-wizard-event-type.png";
+import matchIllustration from "assets/images/events/create-event-wizard-event-competition.png";
 
 const stepsList = [
   { step: 1, label: "Tentukan jenis waktu pelaksanaan" },
@@ -40,20 +44,14 @@ export default function PreWizard() {
   return (
     <div className="page-content">
       <MetaTags>
-        <title>... persiapan registrasi event baru | MyArchery.id</title>
+        <title>Persiapkan event baru yang dibuat | MyArchery.id</title>
       </MetaTags>
 
       <Container fluid className="mt-4 mb-5">
         <Row>
           <Col>
-            <div
-              className="d-flex justify-content-center align-items-center h-100"
-              style={{ color: "var(--bs-gray-500)" }}
-            >
-              <span style={{ border: "solid 1px var(--bs-gray-400)", padding: 10 }}>
-                TBD: gambar ilustrasi
-              </span>
-            </div>
+            {currentStep === 1 && <TypeIllustrationPanel />}
+            {currentStep === 2 && <MatchIllustrationPanel />}
           </Col>
 
           <Col>
@@ -74,9 +72,9 @@ export default function PreWizard() {
 
               <ActionButtonGroup className="mt-5">
                 {currentStep === 2 ? (
-                  <a className="button-action next" href="/dashboard/events/new/fullday">
+                  <Link className="button-action next" to="/dashboard/events/new/fullday">
                     Buat Event
-                  </a>
+                  </Link>
                 ) : (
                   <button
                     className="button-action next"
@@ -88,9 +86,9 @@ export default function PreWizard() {
                 )}
 
                 {currentStep === 1 ? (
-                  <a className="button-action back" href="/dashboard">
+                  <Link className="button-action back" to="/dashboard">
                     Kembali
-                  </a>
+                  </Link>
                 ) : (
                   <button className="button-action back" onClick={() => goToPreviousStep()}>
                     Kembali
@@ -104,6 +102,30 @@ export default function PreWizard() {
     </div>
   );
 }
+
+const TypeIllustrationPanel = styled.div`
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  height: 100%;
+
+  background-image: url(${typeIllustration});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+`;
+
+const MatchIllustrationPanel = styled.div`
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  height: 100%;
+
+  background-image: url(${matchIllustration});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+`;
 
 const ActionButtonGroup = styled.div`
   .button-action {

@@ -1,12 +1,16 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useArcheryCategories } from "utils/hooks/archery-categories";
+import { EventsService } from "services";
+
 import Select from "react-select";
 
 const FieldSelectWrapper = styled.div`
   .field-label {
     display: inline-block;
+
     color: var(--ma-gray-600);
-    font-size: 14px;
+    font-size: 12px;
     font-weight: normal;
     margin-bottom: 4px;
 
@@ -17,6 +21,10 @@ const FieldSelectWrapper = styled.div`
 `;
 
 const customSelectStyles = {
+  control: (provided) => ({
+    ...provided,
+    minHeight: undefined,
+  }),
   valueContainer: (provided) => ({
     ...provided,
     padding: "8px 12px",
@@ -24,7 +32,7 @@ const customSelectStyles = {
   input: (provided) => ({
     ...provided,
     color: "#6a7187",
-    fontSize: 14,
+    fontSize: 12,
     padding: 0,
     marginTop: 0,
     marginBottom: 0,
@@ -32,40 +40,22 @@ const customSelectStyles = {
   singleValue: (provided) => ({
     ...provided,
     color: "#6a7187",
-    fontSize: 14,
+    fontSize: 12,
   }),
   placeholder: (provided) => ({
     ...provided,
     color: "#6a7187",
-    fontSize: 14,
+    fontSize: 12,
     opacity: 0.6,
+  }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    padding: 7,
   }),
 };
 
-const computeCustomStylesWithValidation = (errors) => {
-  if (errors?.length) {
-    return {
-      ...customSelectStyles,
-      control: (provided) => ({
-        ...provided,
-        border: "solid 1px var(--ma-red)",
-      }),
-    };
-  }
-  return customSelectStyles;
-};
-
-function FieldSelect({
-  children,
-  label,
-  name,
-  placeholder,
-  required,
-  options,
-  value,
-  onChange,
-  errors,
-}) {
+function FieldSelectJarak({ children, label, name, required, placeholder, value = "", onChange }) {
+  const { options: optionsJarak } = useArcheryCategories(EventsService.getEventDistanceCategories);
   return (
     <FieldSelectWrapper>
       <label className="field-label">
@@ -73,10 +63,10 @@ function FieldSelect({
         {required && <span className="field-required">*</span>}
       </label>
       <Select
-        styles={computeCustomStylesWithValidation(errors)}
+        styles={customSelectStyles}
         name={name}
         placeholder={placeholder}
-        options={options}
+        options={optionsJarak}
         value={value}
         onChange={onChange}
       />
@@ -84,4 +74,4 @@ function FieldSelect({
   );
 }
 
-export default FieldSelect;
+export default FieldSelectJarak;

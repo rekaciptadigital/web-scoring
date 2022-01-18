@@ -1,8 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
+import classnames from "classnames";
 
 const FieldSelectRadioWrapper = styled.div`
   display: flex;
+
+  &.error-invalid {
+    box-shadow: 0 0 0 1px var(--ma-red);
+  }
 
   .field-radio-label {
     display: flex;
@@ -24,7 +29,7 @@ const FieldSelectRadioWrapper = styled.div`
   }
 `;
 
-function FieldSelectRadio({ name, options, value, onChange }) {
+function FieldSelectRadio({ name, options, value, onChange, errors }) {
   const handleSelectRadio = (ev) => {
     const {
       target: { value },
@@ -37,7 +42,7 @@ function FieldSelectRadio({ name, options, value, onChange }) {
   };
 
   return (
-    <FieldSelectRadioWrapper>
+    <FieldSelectRadioWrapper className={classnames({ "error-invalid": errors?.length })}>
       {options && options.length ? (
         options.map((option) => (
           <label key={option.value} className="field-radio-label">

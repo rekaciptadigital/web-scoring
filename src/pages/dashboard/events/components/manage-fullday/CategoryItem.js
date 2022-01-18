@@ -1,17 +1,17 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { ButtonOutline } from "components/ma";
 import { FieldSelectCategory } from "../form-fields";
 import CategoryDetailList from "./CategoryDetailList";
 
-import Del from "components/icons/Del";
-
-function CategoryItem({ category, categoryOptions, eventData, updateEventData, validationErrors }) {
-  const handleClickRemoveCategory = (targetCategory) => {
-    updateEventData({ type: "REMOVE_EVENT_CATEGORY", categoryKey: targetCategory.key });
-  };
-
+function CategoryItem({
+  eventId,
+  category,
+  categoryOptions,
+  eventData,
+  updateEventData,
+  onSuccess,
+}) {
   const handleCategoryNameChange = (category, value) => {
     updateEventData({ type: "UPDATE_EVENT_CATEGORY", key: category.key, value });
   };
@@ -36,22 +36,15 @@ function CategoryItem({ category, categoryOptions, eventData, updateEventData, v
             isOptionDisabled={handleDisablingCategoryOptions}
             value={category.competitionCategory}
             onChange={(value) => handleCategoryNameChange(category, value)}
-            errors={validationErrors?.[`${category.key}-competitionCategory`]}
           />
         </div>
-
-        <div className="top-grid-actions">
-          <ButtonOutline onClick={() => handleClickRemoveCategory(category)}>
-            <Del />
-          </ButtonOutline>
-        </div>
       </div>
-
       <h5 className="mt-3 mb-3 fw-normal">Detail Kategori</h5>
       <CategoryDetailList
+        eventId={eventId}
         details={category.categoryDetails}
         updateEventData={updateEventData}
-        validationErrors={validationErrors}
+        onSuccess={onSuccess}
       />
     </StyledCategoryItem>
   );

@@ -4,6 +4,7 @@ import styled from "styled-components";
 import DatePicker from "react-datepicker";
 
 import id from "date-fns/locale/id";
+import classnames from "classnames";
 
 function FieldInputDate({
   children,
@@ -13,6 +14,7 @@ function FieldInputDate({
   placeholder = "DD/MM/YYYY",
   value,
   onChange,
+  errors,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -25,7 +27,7 @@ function FieldInputDate({
         </label>
       )}
       <DatePicker
-        className="field-input-date"
+        className={classnames("field-input-date", { "error-invalid": errors?.length })}
         id={fieldID}
         name={name}
         selected={value}
@@ -80,6 +82,10 @@ const FieldInputDateWrapper = styled.div`
     &[readonly] {
       background-color: #eff2f7;
       opacity: 1;
+    }
+
+    &.error-invalid {
+      border-color: var(--ma-red);
     }
   }
 `;

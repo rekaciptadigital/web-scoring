@@ -1,32 +1,56 @@
 import * as React from "react";
 import styled from "styled-components";
+import { EventsService } from "services";
 
+import { LoadingScreen } from "components";
 import { ButtonOutline } from "components/ma";
 import {
   FieldInputTextSmall,
   FieldSelectKelas,
-  FieldSelectMultiJarak,
+  FieldSelectJarak,
   FieldSelectJenisRegu,
 } from "../form-fields";
 
 import Copy from "components/icons/Copy";
 import Del from "components/icons/Del";
 
-function CategoryDetailList({ details, updateEventData, validationErrors }) {
-  const handleAddDetail = (detail) => {
-    updateEventData({
-      type: "COPY_EVENT_CATEGORY_DETAIL",
-      categoryKey: detail.categoryKey,
-      detailKey: detail.key,
-    });
+function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
+  const [addingCategoryStatus, setAddingCategoryStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
+
+  const isLoading = addingCategoryStatus.status === "loading";
+
+  const handleAddDetail = async (detail) => {
+    setAddingCategoryStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const payload = {
+      event_id: eventId,
+      age_category_id: detail.ageCategory.value,
+      competition_category_id: detail.competitionCategory.id,
+      distance_id: detail.distance.value,
+      team_category_id: detail.teamCategory.value,
+      quota: detail.quota,
+      fee: detail.fee,
+    };
+    const result = await EventsService.storeCategoryDetails(payload);
+    if (result.success) {
+      setAddingCategoryStatus((state) => ({ ...state, status: "success" }));
+      onSuccess?.();
+    } else {
+      setAddingCategoryStatus((state) => ({ ...state, status: "error" }));
+    }
   };
 
-  const handleRemoveDetail = (detail) => {
-    updateEventData({
-      type: "REMOVE_EVENT_CATEGORY_DETAIL",
-      categoryKey: detail.categoryKey,
-      detailKey: detail.key,
-    });
+  const handleRemoveDetail = async (detail) => {
+    setAddingCategoryStatus((state) => ({ ...state, status: "loading", errors: null }));
+    const result = await EventsService.deleteCategoryDetails({ id: detail.categoryDetailsId });
+    if (result.success) {
+      setAddingCategoryStatus((state) => ({ ...state, status: "success" }));
+      onSuccess?.();
+    } else {
+      setAddingCategoryStatus((state) => ({ ...state, status: "error" }));
+    }
   };
 
   const handleDetailFieldChange = (detail, field, value) => {
@@ -51,22 +75,20 @@ function CategoryDetailList({ details, updateEventData, validationErrors }) {
                   placeholder="Pilih Kelas"
                   value={detail.ageCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "ageCategory", value)}
-                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-ageCategory`]}
                 >
                   Kelas
                 </FieldSelectKelas>
               </div>
 
               <div className="field-grid">
-                <FieldSelectMultiJarak
+                <FieldSelectJarak
                   name={`distance-${detail.categoryKey}-${detail.key}`}
                   placeholder="Pilih Jarak"
                   value={detail.distance}
                   onChange={(valueArray) => handleDetailFieldChange(detail, "distance", valueArray)}
-                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-distance`]}
                 >
                   Jarak
-                </FieldSelectMultiJarak>
+                </FieldSelectJarak>
               </div>
 
               <div className="field-grid">
@@ -75,7 +97,6 @@ function CategoryDetailList({ details, updateEventData, validationErrors }) {
                   placeholder="Pilih Jenis Regu"
                   value={detail.teamCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "teamCategory", value)}
-                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-teamCategory`]}
                 >
                   Jenis Regu
                 </FieldSelectJenisRegu>
@@ -89,7 +110,6 @@ function CategoryDetailList({ details, updateEventData, validationErrors }) {
                     const value = parseInt(ev.target.value) || "";
                     handleDetailFieldChange(detail, "quota", value);
                   }}
-                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-quota`]}
                 >
                   Kuota
                 </FieldInputTextSmall>
@@ -109,6 +129,8 @@ function CategoryDetailList({ details, updateEventData, validationErrors }) {
           {index < details.length - 1 && <hr />}
         </React.Fragment>
       ))}
+
+      <LoadingScreen loading={isLoading} />
     </StyledDetailList>
   );
 }

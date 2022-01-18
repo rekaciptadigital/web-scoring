@@ -1,9 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventCategories } from "constants/index";
-import * as AuthStore from "store/slice/authentication";
 
 import CurrencyFormat from "react-currency-format";
 import { Container, Row, Col } from "reactstrap";
@@ -17,48 +15,12 @@ const { TEAM_CATEGORIES } = eventCategories;
 
 const categoryTabsList = [
   { step: 1, label: "Individu", teamCategory: TEAM_CATEGORIES.TEAM_INDIVIDUAL },
-  { step: 2, label: "Male Team", teamCategory: TEAM_CATEGORIES.TEAM_MALE },
-  { step: 3, label: "Female Team", teamCategory: TEAM_CATEGORIES.TEAM_FEMALE },
-  { step: 4, label: "Mixed Team", teamCategory: TEAM_CATEGORIES.TEAM_MIXED },
+  { step: 2, label: "Beregu Putra", teamCategory: TEAM_CATEGORIES.TEAM_MALE },
+  { step: 3, label: "Beregu Putri", teamCategory: TEAM_CATEGORIES.TEAM_FEMALE },
+  { step: 4, label: "Beregu Campuran", teamCategory: TEAM_CATEGORIES.TEAM_MIXED },
 ];
 
-function computeCategoriesByTeam(categoriesData) {
-  const categoriesByTeam = {
-    [TEAM_CATEGORIES.TEAM_INDIVIDUAL]: [],
-    [TEAM_CATEGORIES.TEAM_MALE]: [],
-    [TEAM_CATEGORIES.TEAM_FEMALE]: [],
-    [TEAM_CATEGORIES.TEAM_MIXED]: [],
-  };
-
-  categoriesData.forEach((competition) => {
-    competition.categoryDetails?.forEach((detail) => {
-      detail.distance?.forEach((distanceItem, index) => {
-        const newCategory = {
-          ...detail,
-          key: `${detail.key}-${index + 1}`,
-          competitionCategory: competition.competitionCategory?.label,
-          ageCategory: detail.ageCategory?.label,
-          distance: distanceItem.label,
-          teamCategory: detail.teamCategory?.label,
-        };
-
-        if (
-          detail.teamCategory?.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
-          detail.teamCategory?.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
-        ) {
-          categoriesByTeam[TEAM_CATEGORIES.TEAM_INDIVIDUAL].push(newCategory);
-        } else if (detail.teamCategory?.value) {
-          categoriesByTeam[detail.teamCategory.value].push(newCategory);
-        }
-      });
-    });
-  });
-
-  return categoriesByTeam;
-}
-
-function NewEventPreview({ eventData }) {
-  const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
+function ManageEventPreview({ eventData }) {
   const { steps, currentStep, goToStep } = useWizardView(categoryTabsList);
 
   const categoriesByTeam = React.useMemo(
@@ -70,13 +32,14 @@ function NewEventPreview({ eventData }) {
     <PageWrapper>
       <Container fluid>
         <div className="event-banner">
-          <img className="event-banner-image" src={eventData.bannerImage?.preview} />
+          <img className="event-banner-image" src={eventData.bannerImage?.originalUrl} />
         </div>
 
         <Row className="mt-3">
           <Col md="8">
             <h1 className="event-heading">{eventData.eventName}</h1>
-            {userProfile?.name && <div>Oleh {userProfile.name}</div>}
+            {/* TODO: data pembuat event */}
+            {<div>Oleh {"Pro Archery Club"}</div>}
 
             <div className="content-section mt-5">
               {/* Optional field */}
@@ -474,6 +437,38 @@ const PageWrapper = styled.div`
   }
 `;
 
+function computeCategoriesByTeam(categoriesData) {
+  const categoriesByTeam = {
+    [TEAM_CATEGORIES.TEAM_INDIVIDUAL]: [],
+    [TEAM_CATEGORIES.TEAM_MALE]: [],
+    [TEAM_CATEGORIES.TEAM_FEMALE]: [],
+    [TEAM_CATEGORIES.TEAM_MIXED]: [],
+  };
+
+  categoriesData.forEach((competition) => {
+    competition.categoryDetails?.forEach((detail) => {
+      const newCategory = {
+        ...detail,
+        competitionCategory: competition.competitionCategory?.label,
+        ageCategory: detail.ageCategory?.label,
+        distance: detail.distance.label,
+        teamCategory: detail.teamCategory?.label,
+      };
+
+      if (
+        detail.teamCategory?.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+        detail.teamCategory?.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+      ) {
+        categoriesByTeam[TEAM_CATEGORIES.TEAM_INDIVIDUAL].push(newCategory);
+      } else if (detail.teamCategory?.value) {
+        categoriesByTeam[detail.teamCategory.value].push(newCategory);
+      }
+    });
+  });
+
+  return categoriesByTeam;
+}
+
 const lowToHigh = (feeA, feeB) => {
   if (feeA.amount === feeB.amount) {
     return 0;
@@ -484,4 +479,4 @@ const lowToHigh = (feeA, feeB) => {
   return 1;
 };
 
-export default NewEventPreview;
+export default ManageEventPreview;

@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import classnames from "classnames";
 
 const FieldInputTextWrapper = styled.div`
   .field-label {
@@ -44,10 +45,14 @@ const FieldInputTextWrapper = styled.div`
       background-color: #eff2f7;
       opacity: 1;
     }
+
+    &.error-invalid {
+      border-color: var(--ma-red);
+    }
   }
 `;
 
-function FieldInputText({ children, label, required, name, placeholder, value, onChange }) {
+function FieldInputText({ children, label, required, name, placeholder, value, onChange, errors }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
   const handleChange = (ev) => {
@@ -63,7 +68,7 @@ function FieldInputText({ children, label, required, name, placeholder, value, o
         </label>
       )}
       <input
-        className="field-input-text"
+        className={classnames("field-input-text", { "error-invalid": errors?.length })}
         id={fieldID}
         name={name}
         placeholder={placeholder}

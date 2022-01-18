@@ -2,6 +2,8 @@ import * as React from "react";
 import styled from "styled-components";
 import CurrencyFormat from "react-currency-format";
 
+import classnames from "classnames";
+
 const FieldPriceWrapper = styled.div`
   .field-price-label {
     display: inline-block;
@@ -64,11 +66,15 @@ const FieldPriceWrapper = styled.div`
         opacity: 1;
         background-color: #eff2f7;
       }
+
+      &.error-invalid {
+        border-color: var(--ma-red);
+      }
     }
   }
 `;
 
-function FieldInputPrice({ children, label, name, disabled, value, onChange }) {
+function FieldInputPrice({ children, label, name, disabled, value, onChange, errors }) {
   const fieldID = name ? `field-price-${name}` : undefined;
 
   const handleChange = (ev) => {
@@ -84,7 +90,7 @@ function FieldInputPrice({ children, label, name, disabled, value, onChange }) {
         <span className="field-price-currency-symbol">Rp</span>
         <CurrencyFormat
           displayType={"input"}
-          className="field-price-input"
+          className={classnames("field-price-input", { "error-invalid": errors?.length })}
           id={fieldID}
           name={name}
           value={value || ""}

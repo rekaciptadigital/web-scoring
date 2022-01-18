@@ -64,8 +64,14 @@ export default {
     deleteCategoryDetails(qs) {
         return API.deleteByParams("/web/v1/archery/category-details", qs);
     },
+    storeMoreInfos(data, qs = null) {
+        return API.post("/web/v1/archery/more-information", data, qs, true);
+    },
     updateMoreInfos(data = null, qs = null) {
         return API.put("/web/v1/archery/more-information", data, qs, true);
+    },
+    deleteMoreInfos(qs) {
+        return API.deleteByParams("/web/v1/archery/more-information", qs);
     },
     setPublished(data, qs = null) {
         return API.post("/web/v1/archery/events/update-status", data, qs, true);

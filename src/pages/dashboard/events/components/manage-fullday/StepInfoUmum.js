@@ -66,6 +66,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
 
   const handleRemoveInformation = async (targetInfo) => {
     setRemovingStatus((state) => ({ ...state, status: "loading", errors: null }));
+    setKeyExtraInfoRemoved(null);
     const result = await EventsService.deleteMoreInfos({ id: targetInfo.id });
     if (result.success) {
       setRemovingStatus((state) => ({ ...state, status: "success" }));
@@ -73,7 +74,6 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
     } else {
       setRemovingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
-    setKeyExtraInfoRemoved(null);
   };
 
   return (

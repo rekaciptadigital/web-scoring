@@ -9,7 +9,7 @@ import PosterImagePicker from "../PosterImagePicker";
 import {
   FieldInputText,
   FieldTextArea,
-  FieldSelect,
+  FieldSelectCity,
   FieldSelectRadio,
   FieldInputDate,
   FieldInputTime,
@@ -161,21 +161,16 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
         </Col>
 
         <Col md={6} className="mt-2">
-          <FieldSelect
+          <FieldSelectCity
             name="city"
             required
             placeholder="Kota"
-            options={[
-              { label: "Bekasi", value: "Bekasi" },
-              { label: "Jakarta", value: "Jakarta" },
-              { label: "Semarang", value: 3374 },
-            ]}
             value={eventData?.city || null}
             onChange={handleCityChange}
             errors={validationErrors?.city}
           >
             Kota
-          </FieldSelect>
+          </FieldSelectCity>
         </Col>
       </Row>
 

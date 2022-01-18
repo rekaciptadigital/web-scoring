@@ -59,6 +59,19 @@ const customSelectStyles = {
   }),
 };
 
+const computeCustomStylesWithValidation = (errors) => {
+  if (errors?.length) {
+    return {
+      ...customSelectStyles,
+      control: (provided) => ({
+        ...provided,
+        border: "solid 1px var(--ma-red)",
+      }),
+    };
+  }
+  return customSelectStyles;
+};
+
 function FieldSelectJenisRegu({
   children,
   label,
@@ -67,6 +80,7 @@ function FieldSelectJenisRegu({
   placeholder,
   value = "",
   onChange,
+  errors,
 }) {
   const { options: optionsJenisRegu } = useArcheryCategories(EventsService.getEventTeamCategories);
   return (
@@ -76,7 +90,7 @@ function FieldSelectJenisRegu({
         {required && <span className="field-required">*</span>}
       </label>
       <Select
-        styles={customSelectStyles}
+        styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder}
         options={optionsJenisRegu}

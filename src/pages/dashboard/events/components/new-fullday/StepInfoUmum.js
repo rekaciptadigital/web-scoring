@@ -15,7 +15,7 @@ import {
   FieldInputTime,
 } from "../form-fields";
 
-export function StepInfoUmum({ eventData, updateEventData }) {
+export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
@@ -86,11 +86,14 @@ export function StepInfoUmum({ eventData, updateEventData }) {
 
   return (
     <FormSheet>
-      <h3 className="mb-3">Banner Event</h3>
+      <h3 className="mb-3">
+        Banner Event<span style={{ color: "var(--ma-red)" }}>*</span>
+      </h3>
       <PosterImagePicker
         image={eventData.bannerImage}
         onChange={handlePickBannerChange}
         onRemove={handleRemoveBannerImage}
+        errors={validationErrors?.bannerImage}
       />
 
       <hr />
@@ -104,6 +107,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             placeholder="Nama Event"
             value={eventData.eventName}
             onChange={(value) => handleFieldChange("eventName", value)}
+            errors={validationErrors?.eventName}
           >
             Nama Event
           </FieldInputText>
@@ -132,6 +136,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             placeholder="Lokasi"
             value={eventData.location}
             onChange={(value) => handleFieldChange("location", value)}
+            errors={validationErrors?.location}
           >
             Lokasi
           </FieldInputText>
@@ -150,6 +155,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
                   : undefined
               }
               onChange={handleLocationTypeChange}
+              errors={validationErrors?.locationType}
             />
           </div>
         </Col>
@@ -166,6 +172,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             ]}
             value={eventData?.city || null}
             onChange={handleCityChange}
+            errors={validationErrors?.city}
           >
             Kota
           </FieldSelect>
@@ -180,6 +187,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.registrationDateStart}
             onChange={(value) => handleFieldChange("registrationDateStart", value)}
+            errors={validationErrors?.registrationDateStart}
           >
             Mulai Pendaftaran
           </FieldInputDate>
@@ -192,6 +200,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.registrationTimeStart}
             onChange={(value) => handleFieldChange("registrationTimeStart", value)}
+            errors={validationErrors?.registrationTimeStart}
           >
             Jam Buka
           </FieldInputTime>
@@ -204,6 +213,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.registrationDateEnd}
             onChange={(value) => handleFieldChange("registrationDateEnd", value)}
+            errors={validationErrors?.registrationDateEnd}
           >
             Tutup Pendaftaran
           </FieldInputDate>
@@ -216,6 +226,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.registrationTimeEnd}
             onChange={(value) => handleFieldChange("registrationTimeEnd", value)}
+            errors={validationErrors?.registrationTimeEnd}
           >
             Jam Tutup
           </FieldInputTime>
@@ -230,6 +241,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.eventDateStart}
             onChange={(value) => handleFieldChange("eventDateStart", value)}
+            errors={validationErrors?.eventDateStart}
           >
             Mulai Lomba
           </FieldInputDate>
@@ -242,6 +254,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.eventTimeStart}
             onChange={(value) => handleFieldChange("eventTimeStart", value)}
+            errors={validationErrors?.eventTimeStart}
           >
             Jam Mulai
           </FieldInputTime>
@@ -254,6 +267,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.eventDateEnd}
             onChange={(value) => handleFieldChange("eventDateEnd", value)}
+            errors={validationErrors?.eventDateEnd}
           >
             Akhir Lomba
           </FieldInputDate>
@@ -266,6 +280,7 @@ export function StepInfoUmum({ eventData, updateEventData }) {
             required
             value={eventData.eventTimeEnd}
             onChange={(value) => handleFieldChange("eventTimeEnd", value)}
+            errors={validationErrors?.eventTimeEnd}
           >
             Jam Akhir
           </FieldInputTime>

@@ -55,6 +55,19 @@ const customSelectStyles = {
   }),
 };
 
+const computeCustomStylesWithValidation = (errors) => {
+  if (errors?.length) {
+    return {
+      ...customSelectStyles,
+      control: (provided) => ({
+        ...provided,
+        border: "solid 1px var(--ma-red)",
+      }),
+    };
+  }
+  return customSelectStyles;
+};
+
 function FieldSelectCategory({
   name,
   placeholder = "Pilih Kategori",
@@ -62,11 +75,12 @@ function FieldSelectCategory({
   isOptionDisabled,
   value = { label: "Barebow", value: "Barebow" },
   onChange,
+  errors,
 }) {
   return (
     <FieldSelectWrapper>
       <Select
-        styles={customSelectStyles}
+        styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder}
         options={options}

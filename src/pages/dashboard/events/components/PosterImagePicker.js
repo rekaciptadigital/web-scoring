@@ -3,7 +3,9 @@ import styled from "styled-components";
 import { Button } from "reactstrap";
 import { ButtonBlue } from "components/ma";
 
-export default function PosterImagePicker({ image, onChange, onRemove }) {
+import classnames from "classnames";
+
+export default function PosterImagePicker({ image, onChange, onRemove, errors }) {
   const computeStyleBackgroundImage = () => {
     return !image?.preview && !image?.originalUrl
       ? {}
@@ -11,7 +13,10 @@ export default function PosterImagePicker({ image, onChange, onRemove }) {
   };
 
   return (
-    <PickerWrapper style={{ ...computeStyleBackgroundImage() }}>
+    <PickerWrapper
+      className={classnames({ "error-invalid": errors?.length })}
+      style={{ ...computeStyleBackgroundImage() }}
+    >
       <div className="image-overlay"></div>
       <div className="picker-body">
         <div className="mb-2">
@@ -54,6 +59,10 @@ const PickerWrapper = styled.div`
   background-position: center;
   background-size: cover;
   text-align: center;
+
+  &.error-invalid {
+    box-shadow: 0 0 0 2px var(--ma-red);
+  }
 
   .image-overlay {
     position: absolute;

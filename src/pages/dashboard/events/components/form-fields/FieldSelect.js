@@ -42,12 +42,30 @@ const customSelectStyles = {
   }),
 };
 
-// TODO: tambah beberapa props berikut:
-/*
-   - disabled
-   - ...
- */
-function FieldSelect({ children, label, name, placeholder, required, options, value, onChange }) {
+const computeCustomStylesWithValidation = (errors) => {
+  if (errors?.length) {
+    return {
+      ...customSelectStyles,
+      control: (provided) => ({
+        ...provided,
+        border: "solid 1px var(--ma-red)",
+      }),
+    };
+  }
+  return customSelectStyles;
+};
+
+function FieldSelect({
+  children,
+  label,
+  name,
+  placeholder,
+  required,
+  options,
+  value,
+  onChange,
+  errors,
+}) {
   return (
     <FieldSelectWrapper>
       <label className="field-label">
@@ -55,7 +73,7 @@ function FieldSelect({ children, label, name, placeholder, required, options, va
         {required && <span className="field-required">*</span>}
       </label>
       <Select
-        styles={customSelectStyles}
+        styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder}
         options={options}

@@ -54,7 +54,29 @@ const customSelectStyles = {
   }),
 };
 
-function FieldSelectKelas({ children, label, name, required, placeholder, value = "", onChange }) {
+const computeCustomStylesWithValidation = (errors) => {
+  if (errors?.length) {
+    return {
+      ...customSelectStyles,
+      control: (provided) => ({
+        ...provided,
+        border: "solid 1px var(--ma-red)",
+      }),
+    };
+  }
+  return customSelectStyles;
+};
+
+function FieldSelectKelas({
+  children,
+  label,
+  name,
+  required,
+  placeholder,
+  value = "",
+  onChange,
+  errors,
+}) {
   const { options: optionsKelas } = useArcheryCategories(EventsService.getEventAgeCategories);
   return (
     <FieldSelectWrapper>
@@ -63,7 +85,7 @@ function FieldSelectKelas({ children, label, name, required, placeholder, value 
         {required && <span className="field-required">*</span>}
       </label>
       <Select
-        styles={customSelectStyles}
+        styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder}
         options={optionsKelas}

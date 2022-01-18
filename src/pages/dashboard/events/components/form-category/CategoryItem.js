@@ -7,7 +7,7 @@ import CategoryDetailList from "./CategoryDetailList";
 
 import Del from "components/icons/Del";
 
-function CategoryItem({ category, categoryOptions, eventData, updateEventData }) {
+function CategoryItem({ category, categoryOptions, eventData, updateEventData, validationErrors }) {
   const handleClickRemoveCategory = (targetCategory) => {
     updateEventData({ type: "REMOVE_EVENT_CATEGORY", categoryKey: targetCategory.key });
   };
@@ -36,6 +36,7 @@ function CategoryItem({ category, categoryOptions, eventData, updateEventData })
             isOptionDisabled={handleDisablingCategoryOptions}
             value={category.competitionCategory}
             onChange={(value) => handleCategoryNameChange(category, value)}
+            errors={validationErrors?.[`${category.key}-competitionCategory`]}
           />
         </div>
 
@@ -47,7 +48,11 @@ function CategoryItem({ category, categoryOptions, eventData, updateEventData })
       </div>
 
       <h5 className="mt-3 mb-3 fw-normal">Detail Kategori</h5>
-      <CategoryDetailList details={category.categoryDetails} updateEventData={updateEventData} />
+      <CategoryDetailList
+        details={category.categoryDetails}
+        updateEventData={updateEventData}
+        validationErrors={validationErrors}
+      />
     </StyledCategoryItem>
   );
 }

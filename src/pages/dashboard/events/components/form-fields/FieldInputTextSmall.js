@@ -1,6 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
 
+import classnames from "classnames";
+
 const FieldInputTextWrapper = styled.div`
   .field-label {
     display: inline-block;
@@ -44,6 +46,10 @@ const FieldInputTextWrapper = styled.div`
       background-color: #eff2f7;
       opacity: 1;
     }
+
+    &.error-invalid {
+      border-color: var(--ma-red);
+    }
   }
 `;
 
@@ -55,6 +61,7 @@ function FieldInputTextSmall({
   placeholder,
   value = "",
   onChange,
+  errors,
 }) {
   const fieldID = `field-${name}`;
   return (
@@ -65,7 +72,7 @@ function FieldInputTextSmall({
       </label>
       <input
         id={fieldID}
-        className="field-input-text"
+        className={classnames("field-input-text", { "error-invalid": errors?.length })}
         name={name}
         placeholder={placeholder}
         value={value}

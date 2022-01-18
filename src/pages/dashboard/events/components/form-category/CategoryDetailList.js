@@ -12,7 +12,7 @@ import {
 import Copy from "components/icons/Copy";
 import Del from "components/icons/Del";
 
-function CategoryDetailList({ details, updateEventData }) {
+function CategoryDetailList({ details, updateEventData, validationErrors }) {
   const handleAddDetail = (detail) => {
     updateEventData({
       type: "COPY_EVENT_CATEGORY_DETAIL",
@@ -51,6 +51,7 @@ function CategoryDetailList({ details, updateEventData }) {
                   placeholder="Pilih Kelas"
                   value={detail.ageCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "ageCategory", value)}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-ageCategory`]}
                 >
                   Kelas
                 </FieldSelectKelas>
@@ -62,6 +63,7 @@ function CategoryDetailList({ details, updateEventData }) {
                   placeholder="Pilih Jarak"
                   value={detail.distance}
                   onChange={(valueArray) => handleDetailFieldChange(detail, "distance", valueArray)}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-distance`]}
                 >
                   Jarak
                 </FieldSelectMultiJarak>
@@ -73,6 +75,7 @@ function CategoryDetailList({ details, updateEventData }) {
                   placeholder="Pilih Jenis Regu"
                   value={detail.teamCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "teamCategory", value)}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-teamCategory`]}
                 >
                   Jenis Regu
                 </FieldSelectJenisRegu>
@@ -86,6 +89,7 @@ function CategoryDetailList({ details, updateEventData }) {
                     const value = parseInt(ev.target.value) || "";
                     handleDetailFieldChange(detail, "quota", value);
                   }}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-quota`]}
                 >
                   Kuota
                 </FieldInputTextSmall>

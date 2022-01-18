@@ -7,7 +7,7 @@ import { ButtonOutlineBlue } from "components/ma";
 import FormSheet from "../FormSheet";
 import { CategoryItem } from "../form-category";
 
-export function StepKategori({ eventData, updateEventData }) {
+export function StepKategori({ eventData, updateEventData, validationErrors }) {
   const { options: categoryOptions } = useArcheryCategories(
     EventsService.getEventCompetitionCategories
   );
@@ -30,6 +30,7 @@ export function StepKategori({ eventData, updateEventData }) {
               categoryOptions={categoryOptions}
               eventData={eventData}
               updateEventData={updateEventData}
+              validationErrors={validationErrors}
             />
           );
         })}

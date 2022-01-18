@@ -82,10 +82,26 @@ const EventsNewFullday = () => {
   const { steps, stepsTotal, currentStep, currentLabel, goToStep, goToPreviousStep, goToNextStep } =
     useWizardView(stepsData);
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
+  const { validate: validateForm, errors: validationErrors } = useEventDataValidation(eventData);
+
   const [savingEventStatus, setSavingEventStatus] = React.useState({ status: "idle", error: null });
   const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
 
   const isLoading = savingEventStatus.status === "loading";
+
+  const handleValidateBeforePreview = () => {
+    const onValid = () => setShouldShowPreview(true);
+
+    const onInvalid = (errors) => {
+      const lowToHigh = (a, b) => (a > b ? 1 : a < b ? -1 : 0);
+      const invalidSteps = Object.keys(errors)
+        .map((step) => parseInt(step))
+        .sort(lowToHigh);
+      goToStep(invalidSteps[0]);
+    };
+
+    validateForm({ onValid, onInvalid });
+  };
 
   // CREATE DRAFT
   const handleSaveEvent = async () => {
@@ -157,15 +173,27 @@ const EventsNewFullday = () => {
                 <div className="content-scrollable-inner">
                   <WizardView currentStep={currentStep}>
                     <WizardViewContent>
-                      <StepInfoUmum eventData={eventData} updateEventData={updateEventData} />
+                      <StepInfoUmum
+                        eventData={eventData}
+                        updateEventData={updateEventData}
+                        validationErrors={validationErrors[1] || {}}
+                      />
                     </WizardViewContent>
 
                     <WizardViewContent>
-                      <StepKategori eventData={eventData} updateEventData={updateEventData} />
+                      <StepKategori
+                        eventData={eventData}
+                        updateEventData={updateEventData}
+                        validationErrors={validationErrors[2] || {}}
+                      />
                     </WizardViewContent>
 
                     <WizardViewContent>
-                      <StepBiaya eventData={eventData} updateEventData={updateEventData} />
+                      <StepBiaya
+                        eventData={eventData}
+                        updateEventData={updateEventData}
+                        validationErrors={validationErrors[3] || {}}
+                      />
                     </WizardViewContent>
                   </WizardView>
 
@@ -207,7 +235,7 @@ const EventsNewFullday = () => {
                       <ButtonBlue
                         corner="8"
                         style={{ width: 100 }}
-                        onClick={() => setShouldShowPreview(true)}
+                        onClick={handleValidateBeforePreview}
                       >
                         Pratinjau
                       </ButtonBlue>
@@ -328,5 +356,192 @@ function makeCategoryFees(eventData, categoriesData) {
 
   return categoriesWithTeamFees;
 }
+
+function useEventDataValidation(eventData) {
+  const [validation, setValidation] = React.useState({ errors: {} });
+  const { errors: validationErrors } = validation;
+  const isValid = !Object.keys(validationErrors)?.length;
+
+  const ValidationErrors = ValidationErrorsByStep(validationErrors);
+
+  const validate = ({ onValid, onInvalid }) => {
+    const Step1 = StepGroupValidation();
+    const Step2 = StepGroupValidation();
+    const Step3 = StepGroupValidation();
+
+    // STEP 1: Informasi Umum
+    Step1.validate("bannerImage", () => {
+      if (!eventData.bannerImage?.raw) {
+        return "required";
+      }
+    });
+
+    Step1.validate("eventName", () => {
+      if (!eventData.eventName) {
+        return "required";
+      }
+    });
+
+    Step1.validate("location", () => {
+      if (!eventData.location) {
+        return "required";
+      }
+    });
+
+    Step1.validate("locationType", () => {
+      if (!eventData.locationType) {
+        return "required";
+      }
+    });
+
+    Step1.validate("city", () => {
+      if (!eventData.city?.value) {
+        return "required";
+      }
+    });
+
+    Step1.validate("registrationDateStart", () => {
+      if (!eventData.registrationDateStart) {
+        return "required";
+      }
+    });
+
+    Step1.validate("registrationDateEnd", () => {
+      if (!eventData.registrationDateEnd) {
+        return "required";
+      }
+    });
+
+    Step1.validate("registrationTimeStart", () => {
+      if (!eventData.registrationTimeStart) {
+        return "required";
+      }
+    });
+
+    Step1.validate("registrationTimeEnd", () => {
+      if (!eventData.registrationTimeEnd) {
+        return "required";
+      }
+    });
+
+    Step1.validate("eventDateStart", () => {
+      if (!eventData.eventDateStart) {
+        return "required";
+      }
+    });
+
+    Step1.validate("eventDateEnd", () => {
+      if (!eventData.eventDateEnd) {
+        return "required";
+      }
+    });
+
+    Step1.validate("eventTimeStart", () => {
+      if (!eventData.eventTimeStart) {
+        return "required";
+      }
+    });
+
+    Step1.validate("eventTimeEnd", () => {
+      if (!eventData.eventTimeEnd) {
+        return "required";
+      }
+    });
+
+    // STEP 2: Kategori
+    for (const categoryGroup of eventData.eventCategories) {
+      Step2.validate(`${categoryGroup.key}-competitionCategory`, () => {
+        if (!categoryGroup.competitionCategory?.value) {
+          return "required";
+        }
+      });
+
+      for (const detail of categoryGroup.categoryDetails) {
+        Step2.validate(`${categoryGroup.key}-${detail.key}-ageCategory`, () => {
+          if (!detail.ageCategory?.value) {
+            return "required";
+          }
+        });
+
+        Step2.validate(`${categoryGroup.key}-${detail.key}-distance`, () => {
+          if (!detail.distance?.length) {
+            return "required";
+          }
+        });
+
+        Step2.validate(`${categoryGroup.key}-${detail.key}-teamCategory`, () => {
+          if (!detail.teamCategory?.value) {
+            return "required";
+          }
+        });
+
+        Step2.validate(`${categoryGroup.key}-${detail.key}-quota`, () => {
+          if (!detail.quota) {
+            return "required";
+          }
+        });
+      }
+    }
+
+    // STEP 3: Biaya Registrasi
+    if (eventData.isFlatRegistrationFee) {
+      Step3.validate("registrationFee", () => {
+        if (!eventData.registrationFee) {
+          return "required";
+        }
+      });
+    } else {
+      for (const fee of eventData.registrationFees) {
+        Step3.validate(`registrationFee-${fee.teamCategory}`, () => {
+          if (!fee.amount) {
+            return "required";
+          }
+        });
+      }
+    }
+
+    ValidationErrors.addByGroup({ stepGroup: 1, errors: Step1.errors });
+    ValidationErrors.addByGroup({ stepGroup: 2, errors: Step2.errors });
+    ValidationErrors.addByGroup({ stepGroup: 3, errors: Step3.errors });
+
+    setValidation((state) => ({ ...state, errors: ValidationErrors.nextErrorsState }));
+
+    if (ValidationErrors.isNextValid()) {
+      onValid?.();
+    } else {
+      onInvalid?.(ValidationErrors.nextErrorsState);
+    }
+  };
+
+  return { isValid, errors: validationErrors, validate };
+}
+
+const ValidationErrorsByStep = (errorsState) => {
+  const nextErrorsState = { ...errorsState };
+  const isNextValid = () => !Object.keys(nextErrorsState)?.length;
+
+  const addByGroup = ({ stepGroup, errors }) => {
+    if (!Object.keys(errors)?.length) {
+      delete nextErrorsState[stepGroup];
+    } else {
+      nextErrorsState[stepGroup] = errors;
+    }
+  };
+
+  return { nextErrorsState, isNextValid, addByGroup };
+};
+
+const StepGroupValidation = () => {
+  const validationErrors = {};
+  return {
+    errors: validationErrors,
+    validate: (fieldName, validate) => {
+      const result = validate();
+      if (result) {
+        validationErrors[fieldName] = [result];
+      }
+    },
+  };
+};
 
 export default EventsNewFullday;

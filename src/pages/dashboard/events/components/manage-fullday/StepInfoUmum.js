@@ -388,7 +388,7 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
         description: description,
       };
 
-      const result = await EventsService.storeMoreInfos(payload);
+      const result = await EventsService.storeMoreInfos(payload, { id: eventId });
       if (result.success) {
         setSavingStatus((state) => ({ ...state, status: "success" }));
         onSaveSuccess?.();

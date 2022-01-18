@@ -1,7 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useSelector } from "react-redux";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventCategories } from "constants/index";
+import * as AuthStore from "store/slice/authentication";
 
 import CurrencyFormat from "react-currency-format";
 import { Container, Row, Col } from "reactstrap";
@@ -56,6 +58,7 @@ function computeCategoriesByTeam(categoriesData) {
 }
 
 function NewEventPreview({ eventData }) {
+  const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const { steps, currentStep, goToStep } = useWizardView(categoryTabsList);
 
   const categoriesByTeam = React.useMemo(
@@ -73,8 +76,7 @@ function NewEventPreview({ eventData }) {
         <Row className="mt-3">
           <Col md="8">
             <h1 className="event-heading">{eventData.eventName}</h1>
-            {/* TODO: data pembuat event */}
-            {eventData?.author?.name && <div>Oleh {"Pro Archery Club"}</div>}
+            {userProfile?.name && <div>Oleh {userProfile.name}</div>}
 
             <div className="content-section mt-5">
               {/* Optional field */}

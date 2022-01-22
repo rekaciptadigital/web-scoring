@@ -180,6 +180,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             placeholder="DD/MM/YYYY"
             name="registrationDateStart"
             required
+            minDate={new Date()}
             value={eventData.registrationDateStart}
             onChange={(value) => handleFieldChange("registrationDateStart", value)}
             errors={validationErrors?.registrationDateStart}
@@ -206,6 +207,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             placeholder="DD/MM/YYYY"
             name="registrationDateEnd"
             required
+            minDate={eventData.registrationDateStart || new Date()}
             value={eventData.registrationDateEnd}
             onChange={(value) => handleFieldChange("registrationDateEnd", value)}
             errors={validationErrors?.registrationDateEnd}
@@ -234,6 +236,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             placeholder="DD/MM/YYYY"
             name="eventDateStart"
             required
+            minDate={eventData.registrationDateEnd || eventData.registrationDateStart || new Date()}
             value={eventData.eventDateStart}
             onChange={(value) => handleFieldChange("eventDateStart", value)}
             errors={validationErrors?.eventDateStart}
@@ -260,6 +263,12 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             placeholder="DD/MM/YYYY"
             name="eventDateEnd"
             required
+            minDate={
+              eventData.eventDateStart ||
+              eventData.registrationDateEnd ||
+              eventData.registrationDateStart ||
+              new Date()
+            }
             value={eventData.eventDateEnd}
             onChange={(value) => handleFieldChange("eventDateEnd", value)}
             errors={validationErrors?.eventDateEnd}

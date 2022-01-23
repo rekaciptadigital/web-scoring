@@ -200,7 +200,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             maxTime={setHours(setMinutes(eventData.registrationDateStart, 59), 23)}
             value={eventData.registrationDateStart}
             onChange={(value) => updateEventData({ type: "REGISTRATION_START", payload: value })}
-            errors={validationErrors?.registrationTimeStart}
+            errors={validationErrors?.registrationDateStart}
           >
             Jam Buka
           </FieldInputTime>
@@ -240,7 +240,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             maxTime={setHours(setMinutes(eventData.registrationDateEnd, 59), 23)}
             value={eventData.registrationDateEnd}
             onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
-            errors={validationErrors?.registrationTimeEnd}
+            errors={validationErrors?.registrationDateEnd}
           >
             Jam Tutup
           </FieldInputTime>
@@ -277,7 +277,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             )}
             value={eventData.eventDateStart}
             onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
-            errors={validationErrors?.eventTimeStart}
+            errors={validationErrors?.eventDateStart}
           >
             Jam Mulai
           </FieldInputTime>
@@ -318,7 +318,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
             maxTime={setHours(setMinutes(eventData.eventDateEnd, 59), 23)}
             value={eventData.eventDateEnd}
             onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
-            errors={validationErrors?.eventTimeEnd}
+            errors={validationErrors?.eventDateEnd}
           >
             Jam Akhir
           </FieldInputTime>

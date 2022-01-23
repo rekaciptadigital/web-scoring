@@ -404,18 +404,6 @@ function useEventDataValidation(eventData) {
       }
     });
 
-    Step1.validate("registrationTimeStart", () => {
-      if (!eventData.registrationTimeStart) {
-        return "required";
-      }
-    });
-
-    Step1.validate("registrationTimeEnd", () => {
-      if (!eventData.registrationTimeEnd) {
-        return "required";
-      }
-    });
-
     Step1.validate("eventDateStart", () => {
       if (!eventData.eventDateStart) {
         return "required";
@@ -424,18 +412,6 @@ function useEventDataValidation(eventData) {
 
     Step1.validate("eventDateEnd", () => {
       if (!eventData.eventDateEnd) {
-        return "required";
-      }
-    });
-
-    Step1.validate("eventTimeStart", () => {
-      if (!eventData.eventTimeStart) {
-        return "required";
-      }
-    });
-
-    Step1.validate("eventTimeEnd", () => {
-      if (!eventData.eventTimeEnd) {
         return "required";
       }
     });

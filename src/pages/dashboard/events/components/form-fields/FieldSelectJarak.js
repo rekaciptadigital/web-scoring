@@ -54,7 +54,29 @@ const customSelectStyles = {
   }),
 };
 
-function FieldSelectJarak({ children, label, name, required, placeholder, value = "", onChange }) {
+const computeCustomStylesWithValidation = (errors) => {
+  if (errors?.length) {
+    return {
+      ...customSelectStyles,
+      control: (provided) => ({
+        ...provided,
+        border: "solid 1px var(--ma-red)",
+      }),
+    };
+  }
+  return customSelectStyles;
+};
+
+function FieldSelectJarak({
+  children,
+  label,
+  name,
+  required,
+  placeholder,
+  value = "",
+  onChange,
+  errors,
+}) {
   const { options: optionsJarak } = useArcheryCategories(EventsService.getEventDistanceCategories);
   return (
     <FieldSelectWrapper>
@@ -63,7 +85,7 @@ function FieldSelectJarak({ children, label, name, required, placeholder, value 
         {required && <span className="field-required">*</span>}
       </label>
       <Select
-        styles={customSelectStyles}
+        styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder}
         options={optionsJarak}

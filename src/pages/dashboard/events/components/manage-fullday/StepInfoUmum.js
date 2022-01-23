@@ -19,7 +19,14 @@ import {
 
 import { setHours, setMinutes } from "date-fns";
 
-export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, updateEventData }) {
+export function StepInfoUmum({
+  eventId,
+  savingStatus,
+  onSaveSuccess,
+  eventData,
+  updateEventData,
+  validationErrors = {},
+}) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
@@ -100,6 +107,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             placeholder="Nama Event"
             value={eventData.eventName}
             onChange={(value) => handleFieldChange("eventName", value)}
+            errors={validationErrors.eventName}
           >
             Nama Event
           </FieldInputText>
@@ -128,6 +136,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             placeholder="Lokasi"
             value={eventData.location}
             onChange={(value) => handleFieldChange("location", value)}
+            errors={validationErrors.location}
           >
             Lokasi
           </FieldInputText>
@@ -146,6 +155,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
                   : undefined
               }
               onChange={handleLocationTypeChange}
+              errors={validationErrors.locationType}
             />
           </div>
         </Col>
@@ -157,6 +167,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             placeholder="Kota"
             value={eventData?.city || null}
             onChange={handleCityChange}
+            errors={validationErrors.city}
           >
             Kota
           </FieldSelectCity>
@@ -171,6 +182,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             required
             value={eventData.registrationDateStart}
             onChange={(value) => updateEventData({ type: "REGISTRATION_START", payload: value })}
+            errors={validationErrors.registrationDateStart}
           >
             Mulai Pendaftaran
           </FieldInputDate>
@@ -185,6 +197,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             maxTime={setHours(setMinutes(eventData.registrationDateStart, 59), 23)}
             value={eventData.registrationDateStart}
             onChange={(value) => updateEventData({ type: "REGISTRATION_START", payload: value })}
+            errors={validationErrors.registrationDateStart}
           >
             Jam Buka
           </FieldInputTime>
@@ -198,6 +211,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             minDate={eventData.registrationDateStart}
             value={eventData.registrationDateEnd}
             onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
+            errors={validationErrors.registrationDateEnd}
           >
             Tutup Pendaftaran
           </FieldInputDate>
@@ -217,6 +231,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             maxTime={setHours(setMinutes(eventData.registrationDateEnd, 59), 23)}
             value={eventData.registrationDateEnd}
             onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
+            errors={validationErrors.registrationDateEnd}
           >
             Jam Tutup
           </FieldInputTime>
@@ -232,6 +247,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             minDate={eventData.registrationDateEnd || eventData.registrationDateStart}
             value={eventData.eventDateStart}
             onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
+            errors={validationErrors.eventDateStart}
           >
             Mulai Lomba
           </FieldInputDate>
@@ -252,6 +268,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             )}
             value={eventData.eventDateStart}
             onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
+            errors={validationErrors.eventDateStart}
           >
             Jam Mulai
           </FieldInputTime>
@@ -269,6 +286,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             }
             value={eventData.eventDateEnd}
             onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
+            errors={validationErrors.eventDateEnd}
           >
             Akhir Lomba
           </FieldInputDate>
@@ -287,6 +305,7 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
             maxTime={setHours(setMinutes(eventData.eventDateEnd, 59), 23)}
             value={eventData.eventDateEnd}
             onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
+            errors={validationErrors.eventDateEnd}
           >
             Jam Akhir
           </FieldInputTime>

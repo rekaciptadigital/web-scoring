@@ -9,7 +9,7 @@ import { FieldInputPrice } from "../form-fields";
 
 const { TEAM_CATEGORIES } = eventCategories;
 
-export function StepBiaya({ savingStatus, eventData, updateEventData }) {
+export function StepBiaya({ savingStatus, eventData, updateEventData, validationErrors = {} }) {
   const isLoading = savingStatus.status === "loading";
 
   const handleRegistrationFeeChange = (value) => {
@@ -81,6 +81,7 @@ export function StepBiaya({ savingStatus, eventData, updateEventData }) {
             disabled={eventData.isFlatRegistrationFee}
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_INDIVIDUAL)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL, value)}
+            errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_INDIVIDUAL}`]}
           >
             Individual
           </FieldInputPrice>
@@ -92,6 +93,7 @@ export function StepBiaya({ savingStatus, eventData, updateEventData }) {
             disabled={eventData.isFlatRegistrationFee}
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MALE)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MALE, value)}
+            errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_MALE}`]}
           >
             Beregu Putra
           </FieldInputPrice>
@@ -103,6 +105,7 @@ export function StepBiaya({ savingStatus, eventData, updateEventData }) {
             disabled={eventData.isFlatRegistrationFee}
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_FEMALE)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_FEMALE, value)}
+            errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_FEMALE}`]}
           >
             Beregu Putri
           </FieldInputPrice>
@@ -114,6 +117,7 @@ export function StepBiaya({ savingStatus, eventData, updateEventData }) {
             disabled={eventData.isFlatRegistrationFee}
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MIXED)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MIXED, value)}
+            errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_MIXED}`]}
           >
             Beregu Campuran
           </FieldInputPrice>

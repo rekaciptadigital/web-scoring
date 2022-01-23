@@ -260,10 +260,8 @@ const EventsNewFullday = () => {
   );
 };
 
-function formatServerDatetime(date, time) {
-  const dateString = format(date, "yyyy-MM-dd");
-  const timeString = format(time, "HH:mm:ss");
-  return `${dateString} ${timeString}`;
+function formatServerDatetime(date) {
+  return format(date, "yyyy-MM-dd HH:mm:ss");
 }
 
 async function imageToBase64(imageFileRaw) {
@@ -296,16 +294,10 @@ async function makeEventPayload(eventData, options) {
       eventLocation: eventData.location,
       eventCity: eventData.city?.value,
       eventLocation_type: eventData.locationType,
-      eventStart_register: formatServerDatetime(
-        eventData.registrationDateStart,
-        eventData.registrationTimeStart
-      ),
-      eventEnd_register: formatServerDatetime(
-        eventData.registrationDateEnd,
-        eventData.registrationTimeEnd
-      ),
-      eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
-      eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
+      eventStart_register: formatServerDatetime(eventData.registrationDateStart),
+      eventEnd_register: formatServerDatetime(eventData.registrationDateEnd),
+      eventStart: formatServerDatetime(eventData.eventDateStart),
+      eventEnd: formatServerDatetime(eventData.eventDateEnd),
     },
     more_information: eventData.extraInfos.map((info) => ({
       title: info.title,

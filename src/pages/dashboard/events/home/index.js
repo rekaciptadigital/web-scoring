@@ -7,6 +7,8 @@ import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
 import CardMenu from "../components/CardMenu";
 
+import IconCopy from "components/ma/icons/mono/copy";
+
 import { eventMenus } from "./utils/menus";
 
 function PageEventDetailHome() {
@@ -54,7 +56,7 @@ function PageEventDetailHome() {
     const getQualificationSchedules = async () => {
       const result = await EventsService.getEventQualificationSchedules({ event_id });
       if (result.success) {
-        setIsQualificationSchedulesSet(Boolean(result.data.length));
+        setIsQualificationSchedulesSet(Boolean(result.data?.length));
       }
     };
 
@@ -75,18 +77,19 @@ function PageEventDetailHome() {
       <Container fluid className="mt-4 mb-5">
         {eventDetail ? (
           <React.Fragment>
-            <div className="d-flex justify-content-between">
-              <div>
-                <h1>{eventDetail.publicInformation.eventName}</h1>
-                <p>Atur eventmu di sini</p>
-              </div>
+            <DashboardHeading className="mb-5">
+              <HeaderMain>
+                <h1 className="mb-3">{eventDetail.publicInformation.eventName}</h1>
+                <LandingPageLinkPlaceholder url={eventDetail.eventSlug} />
+              </HeaderMain>
+
               <div>
                 <LinkToDashboard to="/dashboard">
                   <i className="bx bx-left-arrow-alt fs-4" />
                   <span>Ke Dashboard EO</span>
                 </LinkToDashboard>
               </div>
-            </div>
+            </DashboardHeading>
 
             <MenuGridWrapper>
               <CardMenu
@@ -136,6 +139,16 @@ function PageEventDetailHome() {
     </div>
   );
 }
+
+const DashboardHeading = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+`;
+
+const HeaderMain = styled.div`
+  flex: 1 1 0%;
+`;
 
 const LinkToDashboard = styled(Link)`
   display: flex;
@@ -199,6 +212,54 @@ const PublishedBadge = styled.div`
     background-color: #3aa76d;
     color: #ffffff;
     font-size: 15px;
+  }
+`;
+
+function LandingPageLinkPlaceholder({ url = "" }) {
+  return (
+    <StyledLandingPageLink onClick={() => navigator.clipboard.writeText(url)}>
+      <StyledLinkInput value={url} placeholder="https://myarchery.id" disabled readOnly />
+      <span className="icon-copy">
+        <IconCopy size="20" />
+      </span>
+    </StyledLandingPageLink>
+  );
+}
+
+const StyledLandingPageLink = styled.div`
+  position: relative;
+  max-width: 27.5rem;
+  cursor: pointer;
+
+  .icon-copy {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: calc(14px + 1.5rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--ma-blue);
+  }
+`;
+
+const StyledLinkInput = styled.input`
+  display: block;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  border-radius: 0.25rem;
+  border: solid 1px var(--ma-gray-400);
+  background-color: transparent;
+  color: var(--ma-gray-600);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    background-color: #ffffff;
+    border-color: var(--ma-gray-200);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
   }
 `;
 

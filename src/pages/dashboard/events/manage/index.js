@@ -385,14 +385,10 @@ function makeEventDetailState(initialData) {
       label: publicInformation.eventCity.nameCity,
       value: publicInformation.eventCity.cityId,
     },
-    registrationDateStart: parseISO("2022-02-10"),
-    registrationTimeStart: parseISO("2022-02-10 16:46"),
-    registrationDateEnd: parseISO("2022-03-11"),
-    registrationTimeEnd: parseISO("2022-03-11 18:32"),
-    eventDateStart: parseISO("2022-03-12"),
-    eventTimeStart: parseISO("2022-03-12 13:55"),
-    eventDateEnd: parseISO("2022-03-12"),
-    eventTimeEnd: parseISO("2022-03-12 17:07"),
+    registrationDateStart: parseISO(publicInformation.eventStartRegister),
+    registrationDateEnd: parseISO(publicInformation.eventEndRegister),
+    eventDateStart: parseISO(publicInformation.eventStart),
+    eventDateEnd: parseISO(publicInformation.eventEnd),
     extraInfos: moreInformation.map((info) => ({
       key: stringUtil.createRandom(),
       // Butuh ID untuk edit dan hapus.
@@ -502,16 +498,10 @@ async function makeEventDetailsPayload(eventData) {
     eventLocation: eventData.location,
     eventCity: eventData.city?.value,
     eventLocation_type: eventData.locationType,
-    eventStart_register: formatServerDatetime(
-      eventData.registrationDateStart,
-      eventData.registrationTimeStart
-    ),
-    eventEnd_register: formatServerDatetime(
-      eventData.registrationDateEnd,
-      eventData.registrationTimeEnd
-    ),
-    eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
-    eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
+    eventStart_register: formatServerDatetime(eventData.registrationDateStart),
+    eventEnd_register: formatServerDatetime(eventData.registrationDateEnd),
+    eventStart: formatServerDatetime(eventData.eventDateStart),
+    eventEnd: formatServerDatetime(eventData.eventDateEnd),
   };
 }
 
@@ -573,10 +563,8 @@ function makeFeesPayload(eventData) {
   };
 }
 
-function formatServerDatetime(date, time) {
-  const dateString = format(date, "yyyy-MM-dd");
-  const timeString = format(time, "HH:mm:ss");
-  return `${dateString} ${timeString}`;
+function formatServerDatetime(date) {
+  return format(date, "yyyy-MM-dd HH:mm:ss");
 }
 
 async function imageToBase64(imageFileRaw) {

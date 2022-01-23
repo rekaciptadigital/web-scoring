@@ -38,7 +38,7 @@ function FieldInputTime({
         maxTime={maxTime}
         selected={value}
         onChange={(datetime) => {
-          if (!onChange) {
+          if (!onChange || !value) {
             return;
           }
           // Kalau diinput manual, date-nya fallback jadi "today".

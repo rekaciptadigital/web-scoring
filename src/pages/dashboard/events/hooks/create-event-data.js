@@ -8,15 +8,15 @@ function eventDataReducer(state, action) {
      */
     case "REGISTRATION_START": {
       let nextState = { ...state, registrationDateStart: action.payload };
-      if (action.payload > state.registrationDateEnd) {
+      if (action.payload > state.registrationDateEnd || !state.registrationDateEnd) {
         nextState = { ...nextState, registrationDateEnd: action.payload };
       }
 
-      if (action.payload > state.eventDateStart) {
+      if (action.payload > state.eventDateStart || !state.eventDateStart) {
         nextState = { ...nextState, eventDateStart: action.payload };
       }
 
-      if (action.payload > state.eventDateEnd) {
+      if (action.payload > state.eventDateEnd || !state.eventDateEnd) {
         nextState = { ...nextState, eventDateEnd: action.payload };
       }
 
@@ -25,11 +25,11 @@ function eventDataReducer(state, action) {
 
     case "REGISTRATION_END": {
       let nextState = { ...state, registrationDateEnd: action.payload };
-      if (action.payload > state.eventDateStart) {
+      if (action.payload > state.eventDateStart || !state.eventDateStart) {
         nextState = { ...nextState, eventDateStart: action.payload };
       }
 
-      if (action.payload > state.eventDateEnd) {
+      if (action.payload > state.eventDateEnd || !state.eventDateEnd) {
         nextState = { ...nextState, eventDateEnd: action.payload };
       }
 
@@ -43,7 +43,7 @@ function eventDataReducer(state, action) {
 
     case "EVENT_START": {
       let nextState = { ...state, eventDateStart: action.payload };
-      if (action.payload > state.eventDateEnd) {
+      if (action.payload > state.eventDateEnd || !state.eventDateEnd) {
         nextState = { ...nextState, eventDateEnd: action.payload };
       }
 

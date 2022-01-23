@@ -4,6 +4,7 @@ import styled from "styled-components";
 import DatePicker from "react-datepicker";
 
 import id from "date-fns/locale/id";
+import { setHours, setMinutes } from "date-fns";
 import classnames from "classnames";
 
 function FieldInputTime({
@@ -12,6 +13,8 @@ function FieldInputTime({
   required,
   name,
   placeholder = "00:00",
+  minTime,
+  maxTime,
   value,
   onChange,
   interval,
@@ -31,8 +34,20 @@ function FieldInputTime({
         className={classnames("field-input-time", { "error-invalid": errors?.length })}
         id={fieldID}
         name={name}
+        minTime={minTime}
+        maxTime={maxTime}
         selected={value}
-        onChange={(date) => onChange?.(date)}
+        onChange={(datetime) => {
+          if (!onChange) {
+            return;
+          }
+          // Kalau diinput manual, date-nya fallback jadi "today".
+          // Paksa date-nya jadi sesuai keadaan prop value sebelum di-update nilainya
+          const valueDateTime = datetime
+            ? setHours(setMinutes(value, datetime.getMinutes()), datetime.getHours())
+            : value;
+          onChange(valueDateTime);
+        }}
         placeholderText={placeholder}
         locale={id}
         timeFormat="H:mm"

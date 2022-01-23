@@ -1,7 +1,69 @@
+import { setHours, setMinutes } from "date-fns";
 import { stringUtil } from "utils";
 
 function eventDataReducer(state, action) {
   switch (action.type) {
+    /**
+     * Registration Datetime & Event Datetime
+     */
+    case "REGISTRATION_START": {
+      let nextState = { ...state, registrationDateStart: action.payload };
+      if (action.payload > state.registrationDateEnd) {
+        nextState = { ...nextState, registrationDateEnd: action.payload };
+      }
+
+      if (action.payload > state.eventDateStart) {
+        nextState = { ...nextState, eventDateStart: action.payload };
+      }
+
+      if (action.payload > state.eventDateEnd) {
+        nextState = { ...nextState, eventDateEnd: action.payload };
+      }
+
+      return nextState;
+    }
+
+    case "REGISTRATION_END": {
+      let nextState = { ...state, registrationDateEnd: action.payload };
+      if (action.payload > state.eventDateStart) {
+        nextState = { ...nextState, eventDateStart: action.payload };
+      }
+
+      if (action.payload > state.eventDateEnd) {
+        nextState = { ...nextState, eventDateEnd: action.payload };
+      }
+
+      // handle tanggal & jam sebelumnya
+      if (action.payload < state.registrationDateStart) {
+        nextState = { ...nextState, registrationDateEnd: state.registrationDateStart };
+      }
+
+      return nextState;
+    }
+
+    case "EVENT_START": {
+      let nextState = { ...state, eventDateStart: action.payload };
+      if (action.payload > state.eventDateEnd) {
+        nextState = { ...nextState, eventDateEnd: action.payload };
+      }
+
+      // handle tanggal & jam sebelumnya
+      if (action.payload < setHours(setMinutes(state.registrationDateEnd, 0), 0)) {
+        nextState = { ...nextState, eventDateStart: state.registrationDateEnd };
+      }
+      return nextState;
+    }
+
+    case "EVENT_END": {
+      let nextState = { ...state, eventDateEnd: action.payload };
+      // handle tanggal & jam sebelumnya
+      if (action.payload < state.eventDateStart) {
+        nextState = { ...nextState, eventDateEnd: state.eventDateStart };
+      }
+      return nextState;
+    }
+    // --- end Registration & Event Datetime
+
     /**
      * Extra Info
      */
@@ -29,6 +91,7 @@ function eventDataReducer(state, action) {
       const filteredExtraInfos = state.extraInfos.filter((info) => info.key !== action.key);
       return { ...state, extraInfos: filteredExtraInfos };
     }
+    // --- end Extra Info
 
     /**
      * Category
@@ -183,6 +246,7 @@ function eventDataReducer(state, action) {
 
       return { ...state, registrationFees: updatedRegistrationFees };
     }
+    // --- end Registration Fees
 
     case "TOGGLE_FIELD": {
       const { field } = action;

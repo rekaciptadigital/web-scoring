@@ -80,7 +80,9 @@ export function StepInfoUmum({ eventId, savingStatus, onSaveSuccess, eventData, 
 
   return (
     <FormSheet>
-      <h3 className="mb-3">Banner Event</h3>
+      <h3 className="mb-3">
+        Banner Event<span style={{ color: "var(--ma-red)" }}>*</span>
+      </h3>
       <PosterImagePicker
         image={eventData.bannerImage}
         onChange={handlePickBannerChange}

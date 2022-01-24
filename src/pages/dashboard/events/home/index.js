@@ -80,7 +80,9 @@ function PageEventDetailHome() {
             <DashboardHeading className="mb-5">
               <HeaderMain>
                 <h1 className="mb-3">{eventDetail.publicInformation.eventName}</h1>
-                <LandingPageLinkPlaceholder url={eventDetail.eventSlug} />
+                <LandingPageLinkPlaceholder
+                  url={eventDetail.publicInformation.eventUrl || "https://myarchery.id"}
+                />
               </HeaderMain>
 
               <div>
@@ -248,6 +250,7 @@ const StyledLandingPageLink = styled.div`
 const StyledLinkInput = styled.input`
   display: block;
   padding: 0.5rem 0.75rem;
+  padding-right: 2.5rem;
   width: 100%;
   border-radius: 0.25rem;
   border: solid 1px var(--ma-gray-400);

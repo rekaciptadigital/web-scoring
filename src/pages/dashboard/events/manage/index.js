@@ -1,4 +1,5 @@
 import * as React from "react";
+import styled from "styled-components";
 import { useParams, useHistory } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { stringUtil } from "utils";
@@ -84,6 +85,7 @@ const PageEventDetailManage = () => {
   const { steps, stepsTotal, currentStep, currentLabel, goToStep, goToPreviousStep, goToNextStep } =
     useWizardView(stepsData);
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
+  const { validate: validateForm, errors: validationErrors } = useEventDataValidation(eventData);
   const [isEventPublished, setIsEventPublished] = React.useState(true);
   const [fetchingEventStatus, setFetchingEventStatus] = React.useState({
     status: "idle",
@@ -109,11 +111,20 @@ const PageEventDetailManage = () => {
 
   const handleClickSave = async (stepNumber) => {
     if (stepNumber === 1) {
-      handleSaveEventDetails();
+      validateForm({
+        step: stepNumber,
+        onValid: () => handleSaveEventDetails(),
+      });
     } else if (stepNumber === 2) {
-      handleSaveCategoryDetails();
+      validateForm({
+        step: stepNumber,
+        onValid: () => handleSaveCategoryDetails(),
+      });
     } else if (stepNumber === 3) {
-      handleSaveRegistrationFees();
+      validateForm({
+        step: stepNumber,
+        onValid: () => handleSaveRegistrationFees(),
+      });
     }
   };
 
@@ -204,13 +215,13 @@ const PageEventDetailManage = () => {
 
   return (
     <React.Fragment>
-      <div style={{ marginTop: 133 }}>
+      <div>
         <RibbonEventConfig />
       </div>
 
-      <div className="page-content" style={{ marginTop: 0 }}>
+      <StyledPageWrapper>
         <MetaTags>
-          <title>Buat Event Baru | MyArchery.id</title>
+          <title>Atur Pertandingan | MyArchery.id</title>
         </MetaTags>
 
         <Container fluid>
@@ -261,6 +272,7 @@ const PageEventDetailManage = () => {
                         onSaveSuccess={() => incrementAttemptCounts()}
                         eventData={eventData}
                         updateEventData={updateEventData}
+                        validationErrors={validationErrors[1] || {}}
                       />
                     </WizardViewContent>
 
@@ -271,6 +283,7 @@ const PageEventDetailManage = () => {
                         eventData={eventData}
                         updateEventData={updateEventData}
                         onSaveSuccess={() => incrementAttemptCounts()}
+                        validationErrors={validationErrors[2] || {}}
                       />
                     </WizardViewContent>
 
@@ -279,6 +292,7 @@ const PageEventDetailManage = () => {
                         savingStatus={savingEventStatus}
                         eventData={eventData}
                         updateEventData={updateEventData}
+                        validationErrors={validationErrors[3] || {}}
                       />
                     </WizardViewContent>
                   </WizardView>
@@ -312,7 +326,7 @@ const PageEventDetailManage = () => {
             </Col>
           </Row>
         </Container>
-      </div>
+      </StyledPageWrapper>
 
       <AlertConfirmPublication
         showAlert={shouldShowConfirmPublication}
@@ -340,6 +354,11 @@ const PageEventDetailManage = () => {
     </React.Fragment>
   );
 };
+
+const StyledPageWrapper = styled.div`
+  margin: 2.5rem 0;
+  margin-top: 5rem;
+`;
 
 function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) {
   return (
@@ -385,14 +404,10 @@ function makeEventDetailState(initialData) {
       label: publicInformation.eventCity.nameCity,
       value: publicInformation.eventCity.cityId,
     },
-    registrationDateStart: parseISO("2022-02-10"),
-    registrationTimeStart: parseISO("2022-02-10 16:46"),
-    registrationDateEnd: parseISO("2022-03-11"),
-    registrationTimeEnd: parseISO("2022-03-11 18:32"),
-    eventDateStart: parseISO("2022-03-12"),
-    eventTimeStart: parseISO("2022-03-12 13:55"),
-    eventDateEnd: parseISO("2022-03-12"),
-    eventTimeEnd: parseISO("2022-03-12 17:07"),
+    registrationDateStart: parseISO(publicInformation.eventStartRegister),
+    registrationDateEnd: parseISO(publicInformation.eventEndRegister),
+    eventDateStart: parseISO(publicInformation.eventStart),
+    eventDateEnd: parseISO(publicInformation.eventEnd),
     extraInfos: moreInformation.map((info) => ({
       key: stringUtil.createRandom(),
       // Butuh ID untuk edit dan hapus.
@@ -440,9 +455,15 @@ function makeCategoryDetailState(categoryDetailData) {
         categoryDetailsId: detail.categoryDetailsId,
         categoryKey: eventCategoryKey,
         competitionCategory: detail.competitionCategoryId,
-        ageCategory: { value: detail.ageCategoryId.id, label: detail.ageCategoryId.label },
-        teamCategory: { value: detail.teamCategoryId.id, label: detail.teamCategoryId.label },
-        distance: { value: detail.distanceId.id, label: detail.distanceId.label },
+        ageCategory: detail.ageCategoryId
+          ? { value: detail.ageCategoryId.id, label: detail.ageCategoryId.label }
+          : null,
+        teamCategory: detail.teamCategoryId
+          ? { value: detail.teamCategoryId.id, label: detail.teamCategoryId.label }
+          : null,
+        distance: detail.distanceId
+          ? { value: detail.distanceId.id, label: detail.distanceId.label }
+          : null,
         quota: detail.quota,
         fee: Number(detail.fee),
       })),
@@ -461,6 +482,9 @@ function makeRegistrationFeesState(eventCategories) {
   for (const category of eventCategories) {
     if (registrationFees.length >= 4) {
       break;
+    }
+    if (!category.teamCategoryId) {
+      continue;
     }
 
     const targetTeam =
@@ -502,16 +526,10 @@ async function makeEventDetailsPayload(eventData) {
     eventLocation: eventData.location,
     eventCity: eventData.city?.value,
     eventLocation_type: eventData.locationType,
-    eventStart_register: formatServerDatetime(
-      eventData.registrationDateStart,
-      eventData.registrationTimeStart
-    ),
-    eventEnd_register: formatServerDatetime(
-      eventData.registrationDateEnd,
-      eventData.registrationTimeEnd
-    ),
-    eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
-    eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
+    eventStart_register: formatServerDatetime(eventData.registrationDateStart),
+    eventEnd_register: formatServerDatetime(eventData.registrationDateEnd),
+    eventStart: formatServerDatetime(eventData.eventDateStart),
+    eventEnd: formatServerDatetime(eventData.eventDateEnd),
   };
 }
 
@@ -573,10 +591,8 @@ function makeFeesPayload(eventData) {
   };
 }
 
-function formatServerDatetime(date, time) {
-  const dateString = format(date, "yyyy-MM-dd");
-  const timeString = format(time, "HH:mm:ss");
-  return `${dateString} ${timeString}`;
+function formatServerDatetime(date) {
+  return format(date, "yyyy-MM-dd HH:mm:ss");
 }
 
 async function imageToBase64(imageFileRaw) {
@@ -589,5 +605,186 @@ async function imageToBase64(imageFileRaw) {
     };
   });
 }
+
+function useEventDataValidation(eventData) {
+  const [validation, setValidation] = React.useState({ errors: {} });
+  const { errors: validationErrors } = validation;
+  const isValid = !Object.keys(validationErrors)?.length;
+
+  const ValidationErrors = ValidationErrorsByStep(validationErrors);
+
+  const validate = ({ step, onValid, onInvalid }) => {
+    const Step1 = StepGroupValidation();
+    const Step2 = StepGroupValidation();
+    const Step3 = StepGroupValidation();
+
+    // STEP 1: Informasi Umum
+    Step1.validate("eventName", () => {
+      if (!eventData.eventName) {
+        return "required";
+      }
+    });
+
+    Step1.validate("location", () => {
+      if (!eventData.location) {
+        return "required";
+      }
+    });
+
+    Step1.validate("locationType", () => {
+      if (!eventData.locationType) {
+        return "required";
+      }
+    });
+
+    Step1.validate("city", () => {
+      if (!eventData.city?.value) {
+        return "required";
+      }
+    });
+
+    Step1.validate("registrationDateStart", () => {
+      if (!eventData.registrationDateStart) {
+        return "required";
+      }
+    });
+
+    Step1.validate("registrationDateEnd", () => {
+      if (!eventData.registrationDateEnd) {
+        return "required";
+      }
+    });
+
+    Step1.validate("eventDateStart", () => {
+      if (!eventData.eventDateStart) {
+        return "required";
+      }
+    });
+
+    Step1.validate("eventDateEnd", () => {
+      if (!eventData.eventDateEnd) {
+        return "required";
+      }
+    });
+
+    // STEP 2: Kategori
+    for (const categoryGroup of eventData.eventCategories) {
+      Step2.validate(`${categoryGroup.key}-competitionCategory`, () => {
+        if (!categoryGroup.competitionCategory?.value) {
+          return "required";
+        }
+      });
+
+      for (const detail of categoryGroup.categoryDetails) {
+        Step2.validate(`${categoryGroup.key}-${detail.key}-ageCategory`, () => {
+          if (!detail.ageCategory?.value) {
+            return "required";
+          }
+        });
+
+        Step2.validate(`${categoryGroup.key}-${detail.key}-distance`, () => {
+          if (!detail.distance?.value) {
+            return "required";
+          }
+        });
+
+        Step2.validate(`${categoryGroup.key}-${detail.key}-teamCategory`, () => {
+          if (!detail.teamCategory?.value) {
+            return "required";
+          }
+        });
+
+        Step2.validate(`${categoryGroup.key}-${detail.key}-quota`, () => {
+          if (!detail.quota) {
+            return "required";
+          }
+        });
+      }
+    }
+
+    // STEP 3: Biaya Registrasi
+    if (eventData.isFlatRegistrationFee) {
+      Step3.validate("registrationFee", () => {
+        if (!eventData.registrationFee) {
+          return "required";
+        }
+      });
+    } else {
+      // Hanya validasikan harga tim yang dipilih di kategori.
+      // Jenis tim yang tidak dipilih di kategori tidak diwajibkan diisi,
+      // sehingga tidak dihitung error.
+      const selectedTeamCategories = [];
+      for (const categoryGroup of eventData.eventCategories) {
+        for (const detail of categoryGroup.categoryDetails) {
+          if (!detail.teamCategory?.value) {
+            continue;
+          }
+
+          if (
+            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+          ) {
+            selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
+          } else {
+            selectedTeamCategories.push(detail.teamCategory?.value);
+          }
+        }
+      }
+
+      for (const team of selectedTeamCategories) {
+        const byTeamCategory = (fee) => fee.teamCategory === team;
+        const feeData = eventData.registrationFees.find(byTeamCategory);
+
+        Step3.validate(`registrationFee-${team}`, () => {
+          if (!feeData?.amount) {
+            return "required";
+          }
+        });
+      }
+    }
+
+    step === 1 && ValidationErrors.addByGroup({ stepGroup: 1, errors: Step1.errors });
+    step === 2 && ValidationErrors.addByGroup({ stepGroup: 2, errors: Step2.errors });
+    step === 3 && ValidationErrors.addByGroup({ stepGroup: 3, errors: Step3.errors });
+
+    setValidation((state) => ({ ...state, errors: ValidationErrors.nextErrorsState }));
+
+    if (ValidationErrors.isNextValid()) {
+      onValid?.();
+    } else {
+      onInvalid?.(ValidationErrors.nextErrorsState);
+    }
+  };
+
+  return { isValid, errors: validationErrors, validate };
+}
+
+const ValidationErrorsByStep = (errorsState) => {
+  const nextErrorsState = { ...errorsState };
+  const isNextValid = () => !Object.keys(nextErrorsState)?.length;
+
+  const addByGroup = ({ stepGroup, errors }) => {
+    if (!Object.keys(errors)?.length) {
+      delete nextErrorsState[stepGroup];
+    } else {
+      nextErrorsState[stepGroup] = errors;
+    }
+  };
+
+  return { nextErrorsState, isNextValid, addByGroup };
+};
+
+const StepGroupValidation = () => {
+  const validationErrors = {};
+  return {
+    errors: validationErrors,
+    validate: (fieldName, validate) => {
+      const result = validate();
+      if (result) {
+        validationErrors[fieldName] = [result];
+      }
+    },
+  };
+};
 
 export default PageEventDetailManage;

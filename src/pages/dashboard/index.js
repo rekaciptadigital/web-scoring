@@ -1,4 +1,5 @@
 import * as React from "react";
+import styled from "styled-components";
 
 import MetaTags from "react-meta-tags";
 import { Container, Row, Col } from "reactstrap";
@@ -6,7 +7,7 @@ import { LatestEventList, CardUserProfile, CardMenuManageUsers } from "./compone
 
 const Dashboard = () => {
   return (
-    <div className="page-content">
+    <StyledPageWrapper>
       <MetaTags>
         <title>Dashboard | MyArchery.id</title>
       </MetaTags>
@@ -32,8 +33,12 @@ const Dashboard = () => {
 
         <LatestEventList />
       </Container>
-    </div>
+    </StyledPageWrapper>
   );
 };
+
+const StyledPageWrapper = styled.div`
+  margin: 4rem 0;
+`;
 
 export default Dashboard;

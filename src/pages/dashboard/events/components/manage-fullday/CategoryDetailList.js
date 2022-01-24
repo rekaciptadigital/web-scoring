@@ -14,7 +14,7 @@ import {
 import Copy from "components/icons/Copy";
 import Del from "components/icons/Del";
 
-function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
+function CategoryDetailList({ eventId, details, updateEventData, onSuccess, validationErrors }) {
   const [addingCategoryStatus, setAddingCategoryStatus] = React.useState({
     status: "idle",
     errors: null,
@@ -75,6 +75,7 @@ function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
                   placeholder="Pilih Kelas"
                   value={detail.ageCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "ageCategory", value)}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-ageCategory`]}
                 >
                   Kelas
                 </FieldSelectKelas>
@@ -86,6 +87,7 @@ function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
                   placeholder="Pilih Jarak"
                   value={detail.distance}
                   onChange={(valueArray) => handleDetailFieldChange(detail, "distance", valueArray)}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-distance`]}
                 >
                   Jarak
                 </FieldSelectJarak>
@@ -97,6 +99,7 @@ function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
                   placeholder="Pilih Jenis Regu"
                   value={detail.teamCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "teamCategory", value)}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-teamCategory`]}
                 >
                   Jenis Regu
                 </FieldSelectJenisRegu>
@@ -110,6 +113,7 @@ function CategoryDetailList({ eventId, details, updateEventData, onSuccess }) {
                     const value = parseInt(ev.target.value) || "";
                     handleDetailFieldChange(detail, "quota", value);
                   }}
+                  errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-quota`]}
                 >
                   Kuota
                 </FieldInputTextSmall>

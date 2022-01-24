@@ -1,4 +1,5 @@
 import * as React from "react";
+import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import { stringUtil } from "utils";
@@ -140,11 +141,11 @@ const EventsNewFullday = () => {
 
   return (
     <React.Fragment>
-      <div style={{ marginTop: 133 }}>
+      <div>
         <RibbonEventConfig />
       </div>
 
-      <div className="page-content" style={{ marginTop: 0 }}>
+      <StyledPageWrapper>
         <MetaTags>
           <title>Buat Event Baru | MyArchery.id</title>
         </MetaTags>
@@ -246,7 +247,7 @@ const EventsNewFullday = () => {
             </Col>
           </Row>
         </Container>
-      </div>
+      </StyledPageWrapper>
 
       <PreviewPortal
         isActive={shouldShowPreview}
@@ -260,10 +261,13 @@ const EventsNewFullday = () => {
   );
 };
 
-function formatServerDatetime(date, time) {
-  const dateString = format(date, "yyyy-MM-dd");
-  const timeString = format(time, "HH:mm:ss");
-  return `${dateString} ${timeString}`;
+const StyledPageWrapper = styled.div`
+  margin: 2.5rem 0;
+  margin-top: 5rem;
+`;
+
+function formatServerDatetime(date) {
+  return format(date, "yyyy-MM-dd HH:mm:ss");
 }
 
 async function imageToBase64(imageFileRaw) {
@@ -296,16 +300,10 @@ async function makeEventPayload(eventData, options) {
       eventLocation: eventData.location,
       eventCity: eventData.city?.value,
       eventLocation_type: eventData.locationType,
-      eventStart_register: formatServerDatetime(
-        eventData.registrationDateStart,
-        eventData.registrationTimeStart
-      ),
-      eventEnd_register: formatServerDatetime(
-        eventData.registrationDateEnd,
-        eventData.registrationTimeEnd
-      ),
-      eventStart: formatServerDatetime(eventData.eventDateStart, eventData.eventTimeStart),
-      eventEnd: formatServerDatetime(eventData.eventDateEnd, eventData.eventTimeEnd),
+      eventStart_register: formatServerDatetime(eventData.registrationDateStart),
+      eventEnd_register: formatServerDatetime(eventData.registrationDateEnd),
+      eventStart: formatServerDatetime(eventData.eventDateStart),
+      eventEnd: formatServerDatetime(eventData.eventDateEnd),
     },
     more_information: eventData.extraInfos.map((info) => ({
       title: info.title,
@@ -412,18 +410,6 @@ function useEventDataValidation(eventData) {
       }
     });
 
-    Step1.validate("registrationTimeStart", () => {
-      if (!eventData.registrationTimeStart) {
-        return "required";
-      }
-    });
-
-    Step1.validate("registrationTimeEnd", () => {
-      if (!eventData.registrationTimeEnd) {
-        return "required";
-      }
-    });
-
     Step1.validate("eventDateStart", () => {
       if (!eventData.eventDateStart) {
         return "required";
@@ -432,18 +418,6 @@ function useEventDataValidation(eventData) {
 
     Step1.validate("eventDateEnd", () => {
       if (!eventData.eventDateEnd) {
-        return "required";
-      }
-    });
-
-    Step1.validate("eventTimeStart", () => {
-      if (!eventData.eventTimeStart) {
-        return "required";
-      }
-    });
-
-    Step1.validate("eventTimeEnd", () => {
-      if (!eventData.eventTimeEnd) {
         return "required";
       }
     });

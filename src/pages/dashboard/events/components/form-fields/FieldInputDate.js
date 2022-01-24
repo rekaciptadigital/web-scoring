@@ -12,6 +12,7 @@ function FieldInputDate({
   required,
   name,
   placeholder = "DD/MM/YYYY",
+  minDate,
   value,
   onChange,
   errors,
@@ -30,6 +31,7 @@ function FieldInputDate({
         className={classnames("field-input-date", { "error-invalid": errors?.length })}
         id={fieldID}
         name={name}
+        minDate={minDate}
         selected={value}
         onChange={(date) => onChange?.(date)}
         placeholderText={placeholder}

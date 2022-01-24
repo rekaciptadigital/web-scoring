@@ -11,6 +11,7 @@ function CategoryItem({
   eventData,
   updateEventData,
   onSuccess,
+  validationErrors,
 }) {
   const handleCategoryNameChange = (category, value) => {
     updateEventData({ type: "UPDATE_EVENT_CATEGORY", key: category.key, value });
@@ -36,6 +37,7 @@ function CategoryItem({
             isOptionDisabled={handleDisablingCategoryOptions}
             value={category.competitionCategory}
             onChange={(value) => handleCategoryNameChange(category, value)}
+            errors={validationErrors?.[`${category.key}-competitionCategory`]}
           />
         </div>
       </div>
@@ -45,6 +47,7 @@ function CategoryItem({
         details={category.categoryDetails}
         updateEventData={updateEventData}
         onSuccess={onSuccess}
+        validationErrors={validationErrors}
       />
     </StyledCategoryItem>
   );

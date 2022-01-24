@@ -103,7 +103,7 @@ function PagePrePublish() {
   }, [eventDetailData, qualificationSchedulesData]);
 
   return (
-    <div className="page-content">
+    <StyledPageWrapper>
       <MetaTags>
         <title>{currentLabel || "Sedikit Lagi!"} | MyArchery.id</title>
       </MetaTags>
@@ -198,9 +198,13 @@ function PagePrePublish() {
           <div>Gagal memuat data event.</div>
         )}
       </Container>
-    </div>
+    </StyledPageWrapper>
   );
 }
+
+const StyledPageWrapper = styled.div`
+  margin: 2.5rem 0;
+`;
 
 const CardFlatBasic = styled.div`
   margin-bottom: 2rem;

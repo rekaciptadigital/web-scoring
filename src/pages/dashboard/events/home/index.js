@@ -65,7 +65,7 @@ function PageEventDetailHome() {
   }, []);
 
   return (
-    <div className="page-content">
+    <StyledPageWrapper>
       <MetaTags>
         {eventDetail ? (
           <title>Dashboard | Event {eventDetail.publicInformation.eventName}</title>
@@ -138,9 +138,13 @@ function PageEventDetailHome() {
           <div>Sedang memuat data event...</div>
         )}
       </Container>
-    </div>
+    </StyledPageWrapper>
   );
 }
+
+const StyledPageWrapper = styled.div`
+  margin: 4rem 0;
+`;
 
 const DashboardHeading = styled.div`
   display: flex;

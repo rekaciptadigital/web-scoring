@@ -1,4 +1,5 @@
 import * as React from "react";
+import styled from "styled-components";
 import { useParams, useHistory } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { stringUtil } from "utils";
@@ -214,13 +215,13 @@ const PageEventDetailManage = () => {
 
   return (
     <React.Fragment>
-      <div style={{ marginTop: 133 }}>
+      <div>
         <RibbonEventConfig />
       </div>
 
-      <div className="page-content" style={{ marginTop: 0 }}>
+      <StyledPageWrapper>
         <MetaTags>
-          <title>Buat Event Baru | MyArchery.id</title>
+          <title>Atur Pertandingan | MyArchery.id</title>
         </MetaTags>
 
         <Container fluid>
@@ -325,7 +326,7 @@ const PageEventDetailManage = () => {
             </Col>
           </Row>
         </Container>
-      </div>
+      </StyledPageWrapper>
 
       <AlertConfirmPublication
         showAlert={shouldShowConfirmPublication}
@@ -353,6 +354,11 @@ const PageEventDetailManage = () => {
     </React.Fragment>
   );
 };
+
+const StyledPageWrapper = styled.div`
+  margin: 2.5rem 0;
+  margin-top: 5rem;
+`;
 
 function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) {
   return (

@@ -1,4 +1,5 @@
 import * as React from "react";
+import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { format } from "date-fns";
 import { stringUtil } from "utils";
@@ -140,11 +141,11 @@ const EventsNewFullday = () => {
 
   return (
     <React.Fragment>
-      <div style={{ marginTop: 133 }}>
+      <div>
         <RibbonEventConfig />
       </div>
 
-      <div className="page-content" style={{ marginTop: 0 }}>
+      <StyledPageWrapper>
         <MetaTags>
           <title>Buat Event Baru | MyArchery.id</title>
         </MetaTags>
@@ -246,7 +247,7 @@ const EventsNewFullday = () => {
             </Col>
           </Row>
         </Container>
-      </div>
+      </StyledPageWrapper>
 
       <PreviewPortal
         isActive={shouldShowPreview}
@@ -259,6 +260,11 @@ const EventsNewFullday = () => {
     </React.Fragment>
   );
 };
+
+const StyledPageWrapper = styled.div`
+  margin: 2.5rem 0;
+  margin-top: 5rem;
+`;
 
 function formatServerDatetime(date) {
   return format(date, "yyyy-MM-dd HH:mm:ss");

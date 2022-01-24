@@ -42,7 +42,7 @@ export default function PreWizard() {
   };
 
   return (
-    <div className="page-content">
+    <StyledPageWrapper>
       <MetaTags>
         <title>Persiapkan event baru yang dibuat | MyArchery.id</title>
       </MetaTags>
@@ -99,9 +99,13 @@ export default function PreWizard() {
           </Col>
         </Row>
       </Container>
-    </div>
+    </StyledPageWrapper>
   );
 }
+
+const StyledPageWrapper = styled.div`
+  margin: 5rem 0;
+`;
 
 const TypeIllustrationPanel = styled.div`
   display: flex;

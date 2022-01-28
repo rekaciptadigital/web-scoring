@@ -12,12 +12,7 @@ import MetaTags from "react-meta-tags";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Container, Row, Col } from "reactstrap";
 import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
-import {
-  StepInfoUmum,
-  StepBiaya,
-  StepKategori,
-  RibbonEventConfig,
-} from "../components/manage-fullday";
+import { StepInfoUmum, StepBiaya, StepKategori } from "../components/manage-fullday";
 import { PreviewPortal } from "../components/manage-fullday/preview";
 
 const stepsData = [
@@ -215,10 +210,6 @@ const PageEventDetailManage = () => {
 
   return (
     <React.Fragment>
-      <div>
-        <RibbonEventConfig />
-      </div>
-
       <StyledPageWrapper>
         <MetaTags>
           <title>Atur Pertandingan | MyArchery.id</title>

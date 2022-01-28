@@ -37,7 +37,7 @@ const ButtonWrapper = styled.button`
     cursor: default;
     background-color: var(--ma-gray-400);
     border: solid 1px var(--ma-gray-400);
-    color: var(--ma-gray-200)
+    color: var(--ma-gray-200);
   }
 `;
 
@@ -112,6 +112,10 @@ function ButtonSmallBlue(props) {
   return <ButtonBase color="blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
 }
 
+function ButtonSmallOutlineBlue(props) {
+  return <ButtonBase color="outline-blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
+}
+
 const ButtonBlueOutline = styled(BSButton)`
   &,
   &:focus,
@@ -137,4 +141,5 @@ export {
   ButtonOutline,
   ButtonOutlineBlue,
   ButtonSmallBlue,
+  ButtonSmallOutlineBlue,
 };

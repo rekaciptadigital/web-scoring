@@ -2,7 +2,6 @@ import * as React from "react";
 import styled from "styled-components";
 import { EventsService } from "services";
 
-import { Row, Col } from "reactstrap";
 import EventThumbnailCard from "./EventThumbnailCard";
 
 function makeThumbnailList(initialData) {
@@ -48,26 +47,26 @@ function LatestEventList() {
 
   if (!events) {
     return (
-      <Row>
-        <Col md={4}>
-          <EventLoadingIndicator>Sedang memuat data event...</EventLoadingIndicator>
-        </Col>
-      </Row>
+      <EventGrid>
+        <EventLoadingIndicator>Sedang memuat data event...</EventLoadingIndicator>
+      </EventGrid>
     );
   }
 
   return (
-    <Row>
+    <EventGrid>
       {events &&
         makeThumbnailList(events).map((event, index) => {
-          return (
-            <Col key={index} md={4}>
-              <EventThumbnailCard event={event} />
-            </Col>
-          );
+          return <EventThumbnailCard key={index} event={event} />;
         })}
-    </Row>
+    </EventGrid>
   );
 }
+
+const EventGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+`;
 
 export default LatestEventList;

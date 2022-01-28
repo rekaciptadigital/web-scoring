@@ -102,7 +102,12 @@ const EventItemCardWrapper = styled.div`
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: flex-end;
     gap: 0.5rem;
+
+    .footer-date {
+      flex: 1 0 100%;
+    }
 
     .event-link::before {
       content: " ";
@@ -155,7 +160,7 @@ function EventItemCard({ event }) {
       </div>
 
       <div className="event-footer">
-        <div>
+        <div className="footer-date">
           <EventDateRange
             from={eventDetailData?.publicInformation.eventStart}
             to={eventDetailData?.publicInformation.eventEnd}

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-import { ButtonSmallBlue } from "components/ma";
+import { ButtonSmallOutlineBlue } from "components/ma";
 import Panah from "components/icons/Panah";
 import Calendar from "components/icons/Calendar";
 
@@ -58,9 +58,9 @@ export function RibbonEventConfig() {
         </ul>
 
         <div className="ms-3">
-          <ButtonSmallBlue as={Link} to="/dashboard/events/new/prepare">
+          <ButtonSmallOutlineBlue as={Link} to="/dashboard/events/new/prepare">
             Ubah
-          </ButtonSmallBlue>
+          </ButtonSmallOutlineBlue>
         </div>
       </div>
     </RibbonWrapper>

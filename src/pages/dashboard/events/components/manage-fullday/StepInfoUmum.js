@@ -116,7 +116,7 @@ export function StepInfoUmum({
         <Col md={12} className="mt-2">
           <FieldTextArea
             name="description"
-            placeholder="Deskripsi"
+            placeholder="Masukkan deskripsi singkat"
             value={eventData.description}
             onChange={(value) => handleFieldChange("description", value)}
           >
@@ -133,7 +133,7 @@ export function StepInfoUmum({
           <FieldInputText
             required
             name="location"
-            placeholder="Lokasi"
+            placeholder="Nama tempat acara"
             value={eventData.location}
             onChange={(value) => handleFieldChange("location", value)}
             errors={validationErrors.location}

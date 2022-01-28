@@ -348,7 +348,6 @@ const PageEventDetailManage = () => {
 
 const StyledPageWrapper = styled.div`
   margin: 2.5rem 0;
-  margin-top: 5rem;
 `;
 
 function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) {

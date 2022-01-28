@@ -263,7 +263,6 @@ const EventsNewFullday = () => {
 
 const StyledPageWrapper = styled.div`
   margin: 2.5rem 0;
-  margin-top: 5rem;
 `;
 
 function formatServerDatetime(date) {

@@ -11,6 +11,8 @@ import { Container, Row, Col } from "reactstrap";
 import { WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
 import PanelJadwalKualifikasi from "../components/pre-publish/PanelJadwalKualifikasi";
 
+import IconCopy from "components/ma/icons/mono/copy";
+
 import imageIllustrationSaveSuccess from "assets/images/events/create-event-save-success.png";
 import imageIllustrationEventReady from "assets/images/events/create-event-event-ready.png";
 
@@ -18,7 +20,8 @@ const stepsList = [
   {
     step: 1,
     label: "Atur Pertandingan",
-    description: "Selamat! Event pertandingan berhasil dipublikasi. Segera atur jadwal kualifikasi",
+    description:
+      "Selamat! Event pertandingan berhasil dipublikasi. Segera atur jadwal kualifikasi.",
   },
   {
     step: 2,
@@ -128,22 +131,54 @@ function PagePrePublish() {
               <CardFlatBasic>
                 <h2 className="mt-2 mb-4">Sedikit Lagi</h2>
                 <div>
-                  {steps.map((step) => (
-                    <StepItem
-                      key={step.step}
-                      className={classnames({ "step-remaining": step.step > currentStep })}
+                  <StepItem
+                    className={classnames({ "step-remaining": steps[0].step > currentStep })}
+                  >
+                    <StepNumbering
+                      className={classnames({ "step-active": steps[0].step === currentStep })}
                     >
-                      <StepNumbering
-                        className={classnames({ "step-active": step.step === currentStep })}
-                      >
-                        <StepNumber>&#10003;</StepNumber>
-                      </StepNumbering>
-                      <StepContent>
-                        <h5 className="step-heading">{step.label}</h5>
-                        <div className="step-description">{step.description}</div>
-                      </StepContent>
-                    </StepItem>
-                  ))}
+                      <StepNumber>&#10003;</StepNumber>
+                    </StepNumbering>
+                    <StepContent>
+                      <h5 className="step-heading">{steps[0].label}</h5>
+                      <div className="step-description">{steps[0].description}</div>
+                      {eventDetailData && (
+                        <LandingPageLinkPlaceholder
+                          gray
+                          className="mt-2"
+                          url={eventDetailData.publicInformation.eventUrl || "https://myarchery.id"}
+                        />
+                      )}
+                    </StepContent>
+                  </StepItem>
+
+                  <StepItem
+                    className={classnames({ "step-remaining": steps[1].step > currentStep })}
+                  >
+                    <StepNumbering
+                      className={classnames({ "step-active": steps[1].step === currentStep })}
+                    >
+                      <StepNumber>&#10003;</StepNumber>
+                    </StepNumbering>
+                    <StepContent>
+                      <h5 className="step-heading">{steps[1].label}</h5>
+                      <div className="step-description">{steps[1].description}</div>
+                    </StepContent>
+                  </StepItem>
+
+                  <StepItem
+                    className={classnames({ "step-remaining": steps[2].step > currentStep })}
+                  >
+                    <StepNumbering
+                      className={classnames({ "step-active": steps[2].step === currentStep })}
+                    >
+                      <StepNumber>&#10003;</StepNumber>
+                    </StepNumbering>
+                    <StepContent>
+                      <h5 className="step-heading">{steps[2].label}</h5>
+                      <div className="step-description">{steps[2].description}</div>
+                    </StepContent>
+                  </StepItem>
                 </div>
               </CardFlatBasic>
             </Col>
@@ -179,11 +214,21 @@ function PagePrePublish() {
                   <div>
                     <IllustrationEventReady />
                     <PanelContent>
-                      <h2>{eventDetailData.publicInformation.eventName} sudah siap!</h2>
-                      <div>
-                        Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage
-                        Event. Buat lebih banyak event di Dashboard EO.
-                      </div>
+                      <SectionContent>
+                        <h2>{eventDetailData.publicInformation.eventName} sudah siap!</h2>
+                        <p>
+                          Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage
+                          Event. Buat lebih banyak event di Dashboard EO. Dan berikut ini link Event
+                          Anda:
+                        </p>
+                      </SectionContent>
+
+                      <SectionLink>
+                        <LandingPageLinkPlaceholder
+                          url={eventDetailData.publicInformation.eventUrl || "https://myarchery.id"}
+                        />
+                      </SectionLink>
+
                       <div className="action-buttons">
                         <ButtonToDashboardEO />
                         <ButtonToManageEvent eventId={eventId} />
@@ -321,5 +366,86 @@ function ButtonToManageEvent({ eventId }) {
     </ButtonBlue>
   );
 }
+
+const SectionContent = styled.div`
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 36rem;
+`;
+
+const SectionLink = styled.div`
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 27.5rem;
+`;
+
+function LandingPageLinkPlaceholder({ url = "", gray, ...props }) {
+  const InputComp = gray ? StyledLinkInputGray : StyledLinkInput;
+  return (
+    <StyledLandingPageLink onClick={() => navigator.clipboard.writeText(url)} {...props}>
+      <InputComp value={url} placeholder="https://myarchery.id" disabled readOnly />
+      <span className="icon-copy">
+        <IconCopy size="20" />
+      </span>
+    </StyledLandingPageLink>
+  );
+}
+
+const StyledLandingPageLink = styled.div`
+  position: relative;
+  max-width: 27.5rem;
+  cursor: pointer;
+
+  .icon-copy {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: calc(14px + 1.5rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--ma-blue);
+  }
+`;
+
+const StyledLinkInput = styled.input`
+  display: block;
+  padding: 0.5rem 0.75rem;
+  padding-right: 2.5rem;
+  width: 100%;
+  border-radius: 0.25rem;
+  border: solid 1px var(--ma-gray-400);
+  background-color: transparent;
+  color: var(--ma-gray-600);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    background-color: #ffffff;
+    border-color: var(--ma-gray-200);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const StyledLinkInputGray = styled.input`
+  display: block;
+  padding: 0.5rem 0.75rem;
+  padding-right: 2.5rem;
+  width: 100%;
+  border-radius: 0.25rem;
+  border: solid 1px var(--ma-gray-50);
+  background-color: var(--ma-gray-50);
+  color: var(--ma-gray-600);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    background-color: #ffffff;
+    border-color: var(--ma-gray-200);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  }
+`;
 
 export default PagePrePublish;

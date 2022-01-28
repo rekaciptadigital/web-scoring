@@ -147,7 +147,7 @@ export function StepInfoUmum({
               options={[
                 { label: "Indoor", value: "Indoor" },
                 { label: "Outdoor", value: "Outdoor" },
-                { label: "Both", value: "Both" },
+                { label: "Keduanya", value: "Both" },
               ]}
               value={
                 eventData?.locationType
@@ -448,14 +448,14 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
   };
 
   return (
-    <Modal isOpen>
+    <Modal isOpen size="lg">
       <ModalBody>
-        <h4>{isEditMode ? "Ubah Informasi" : "Tambahkan Informasi"}</h4>
+        <h4>{isEditMode ? "Ubah Informasi" : "Tambah Informasi"}</h4>
 
         <div className="mt-4">
           <FieldInputText
             name="info-title"
-            placeholder="Judul Infomasi"
+            placeholder="Hadiah, Aturan Lomba, Peserta, dan lain sebagainya"
             value={title}
             onChange={(value) => {
               setTitle(value);
@@ -468,7 +468,7 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
         <div className="mt-4">
           <FieldTextArea
             name="info-description"
-            placeholder="Deskripsi"
+            placeholder="Masukkan deskripsi"
             value={description}
             onChange={(value) => {
               setDescription(value);

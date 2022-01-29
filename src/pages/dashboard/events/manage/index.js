@@ -14,6 +14,7 @@ import { Container, Row, Col } from "reactstrap";
 import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
 import { StepInfoUmum, StepBiaya, StepKategori } from "../components/manage-fullday";
 import { PreviewPortal } from "../components/manage-fullday/preview";
+import { BreadcrumbDashboard } from "../components/breadcrumb";
 
 import illustrationAlertPublication from "assets/images/events/alert-publication.svg";
 import "pages/dashboard/events/style-overrides/main-content.scss";
@@ -219,6 +220,8 @@ const PageEventDetailManage = () => {
         </MetaTags>
 
         <Container fluid>
+          <BreadcrumbDashboard to={`/dashboard/event/${eventId}/home`}>Kembali</BreadcrumbDashboard>
+
           <StickyContainer>
             <StickyItem>
               <StepList

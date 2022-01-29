@@ -7,6 +7,9 @@ import Panah from "components/icons/Panah";
 import Calendar from "components/icons/Calendar";
 
 const RibbonWrapper = styled.div`
+  position: relative;
+  z-index: 100;
+
   display: flex;
   justify-content: center;
   align-items: center;

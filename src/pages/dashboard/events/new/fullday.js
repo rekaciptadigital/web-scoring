@@ -165,12 +165,12 @@ const EventsNewFullday = () => {
             </StickyItem>
 
             <StickyItemSibling>
-              <Row>
+              <RowStickyHeader>
                 <Col>
                   <h2>{currentLabel}</h2>
                   <p>{steps[currentStep - 1].description}</p>
                 </Col>
-              </Row>
+              </RowStickyHeader>
 
               <div className="content-scrollable flex-grow-1 mb-5">
                 <div className="content-scrollable-inner">
@@ -287,6 +287,15 @@ const StickyItem = styled.div`
 
 const StickyItemSibling = styled.div`
   flex: 12 1 30rem;
+`;
+
+const RowStickyHeader = styled(Row)`
+  position: sticky;
+  top: 2.5rem;
+  z-index: 80;
+  background-color: var(--bs-body-bg);
+  padding-top: var(--ma-header-height);
+  margin-top: calc(-1 * var(--ma-header-height));
 `;
 
 function formatServerDatetime(date) {

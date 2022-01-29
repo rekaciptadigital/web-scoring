@@ -15,6 +15,8 @@ import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "com
 import { StepInfoUmum, StepBiaya, StepKategori } from "../components/manage-fullday";
 import { PreviewPortal } from "../components/manage-fullday/preview";
 
+import "pages/dashboard/events/style-overrides/main-content.scss";
+
 const stepsData = [
   {
     step: 1,
@@ -216,8 +218,8 @@ const PageEventDetailManage = () => {
         </MetaTags>
 
         <Container fluid>
-          <Row>
-            <Col md="3">
+          <StickyContainer>
+            <StickyItem>
               <StepList
                 steps={steps}
                 currentStep={currentStep}
@@ -225,9 +227,9 @@ const PageEventDetailManage = () => {
               >
                 Pertandingan
               </StepList>
-            </Col>
+            </StickyItem>
 
-            <Col lg="9" className="d-flex flex-column">
+            <StickyItemSibling>
               <Row>
                 <Col>
                   <div className="d-flex justify-content-between">
@@ -314,8 +316,8 @@ const PageEventDetailManage = () => {
                   )}
                 </div>
               </div>
-            </Col>
-          </Row>
+            </StickyItemSibling>
+          </StickyContainer>
         </Container>
       </StyledPageWrapper>
 
@@ -348,6 +350,28 @@ const PageEventDetailManage = () => {
 
 const StyledPageWrapper = styled.div`
   margin: 2.5rem 0;
+`;
+
+const StickyContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem;
+`;
+
+const StickyItem = styled.div`
+  position: sticky;
+  z-index: 100;
+  @media (max-width: 782px) {
+    position: static;
+  }
+
+  top: calc(70px + 2.5rem);
+  flex: 1 1 15rem;
+`;
+
+const StickyItemSibling = styled.div`
+  flex: 12 1 30rem;
 `;
 
 function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) {

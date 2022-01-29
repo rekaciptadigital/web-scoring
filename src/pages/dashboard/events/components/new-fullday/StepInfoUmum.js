@@ -177,151 +177,173 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
       </Row>
 
       <Row>
-        <Col md={4}>
-          <FieldInputDate
-            placeholder="DD/MM/YYYY"
-            name="registrationDateStart"
-            required
-            minDate={new Date()}
-            value={eventData.registrationDateStart}
-            onChange={(value) => updateEventData({ type: "REGISTRATION_START", payload: value })}
-            errors={validationErrors?.registrationDateStart}
-          >
-            Mulai Pendaftaran
-          </FieldInputDate>
+        <Col lg="6">
+          <Row>
+            <Col sm={8}>
+              <FieldInputDate
+                placeholder="DD/MM/YYYY"
+                name="registrationDateStart"
+                required
+                minDate={new Date()}
+                value={eventData.registrationDateStart}
+                onChange={(value) =>
+                  updateEventData({ type: "REGISTRATION_START", payload: value })
+                }
+                errors={validationErrors?.registrationDateStart}
+              >
+                Mulai Pendaftaran
+              </FieldInputDate>
+            </Col>
+
+            <Col sm={4}>
+              <FieldInputTime
+                placeholder="00:00"
+                name="registrationTimeStart"
+                required
+                minTime={setHours(setMinutes(eventData.registrationDateStart, 0), 0)}
+                maxTime={setHours(setMinutes(eventData.registrationDateStart, 59), 23)}
+                value={eventData.registrationDateStart}
+                onChange={(value) =>
+                  updateEventData({ type: "REGISTRATION_START", payload: value })
+                }
+                errors={validationErrors?.registrationDateStart}
+              >
+                Jam Buka
+              </FieldInputTime>
+            </Col>
+          </Row>
         </Col>
 
-        <Col md={2}>
-          <FieldInputTime
-            placeholder="00:00"
-            name="registrationTimeStart"
-            required
-            minTime={setHours(setMinutes(eventData.registrationDateStart, 0), 0)}
-            maxTime={setHours(setMinutes(eventData.registrationDateStart, 59), 23)}
-            value={eventData.registrationDateStart}
-            onChange={(value) => updateEventData({ type: "REGISTRATION_START", payload: value })}
-            errors={validationErrors?.registrationDateStart}
-          >
-            Jam Buka
-          </FieldInputTime>
-        </Col>
+        <Col lg="6">
+          <Row>
+            <Col sm={8}>
+              <FieldInputDate
+                placeholder="DD/MM/YYYY"
+                name="registrationDateEnd"
+                required
+                minDate={eventData.registrationDateStart || new Date()}
+                value={eventData.registrationDateEnd}
+                onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
+                errors={validationErrors?.registrationDateEnd}
+              >
+                Tutup Pendaftaran
+              </FieldInputDate>
+            </Col>
 
-        <Col md={4}>
-          <FieldInputDate
-            placeholder="DD/MM/YYYY"
-            name="registrationDateEnd"
-            required
-            minDate={eventData.registrationDateStart || new Date()}
-            value={eventData.registrationDateEnd}
-            onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
-            errors={validationErrors?.registrationDateEnd}
-          >
-            Tutup Pendaftaran
-          </FieldInputDate>
-        </Col>
-
-        <Col md={2}>
-          <FieldInputTime
-            placeholder="00:00"
-            name="registrationTimeEnd"
-            required
-            minTime={
-              setHours(setMinutes(eventData.registrationDateEnd, 0), 0) >
-              eventData.registrationDateStart
-                ? setHours(setMinutes(eventData.registrationDateEnd, 0), 0)
-                : setHours(
-                    setMinutes(
-                      eventData.registrationDateStart,
-                      getMinutes(eventData.registrationDateStart)
-                    ),
-                    getHours(eventData.registrationDateStart)
-                  )
-            }
-            maxTime={setHours(setMinutes(eventData.registrationDateEnd, 59), 23)}
-            value={eventData.registrationDateEnd}
-            onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
-            errors={validationErrors?.registrationDateEnd}
-          >
-            Jam Tutup
-          </FieldInputTime>
+            <Col sm={4}>
+              <FieldInputTime
+                placeholder="00:00"
+                name="registrationTimeEnd"
+                required
+                minTime={
+                  setHours(setMinutes(eventData.registrationDateEnd, 0), 0) >
+                  eventData.registrationDateStart
+                    ? setHours(setMinutes(eventData.registrationDateEnd, 0), 0)
+                    : setHours(
+                        setMinutes(
+                          eventData.registrationDateStart,
+                          getMinutes(eventData.registrationDateStart)
+                        ),
+                        getHours(eventData.registrationDateStart)
+                      )
+                }
+                maxTime={setHours(setMinutes(eventData.registrationDateEnd, 59), 23)}
+                value={eventData.registrationDateEnd}
+                onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
+                errors={validationErrors?.registrationDateEnd}
+              >
+                Jam Tutup
+              </FieldInputTime>
+            </Col>
+          </Row>
         </Col>
       </Row>
 
       <Row>
-        <Col md={4}>
-          <FieldInputDate
-            placeholder="DD/MM/YYYY"
-            name="eventDateStart"
-            required
-            minDate={eventData.registrationDateEnd || eventData.registrationDateStart || new Date()}
-            value={eventData.eventDateStart}
-            onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
-            errors={validationErrors?.eventDateStart}
-          >
-            Mulai Lomba
-          </FieldInputDate>
+        <Col lg="6">
+          <Row>
+            <Col sm={8}>
+              <FieldInputDate
+                placeholder="DD/MM/YYYY"
+                name="eventDateStart"
+                required
+                minDate={
+                  eventData.registrationDateEnd || eventData.registrationDateStart || new Date()
+                }
+                value={eventData.eventDateStart}
+                onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
+                errors={validationErrors?.eventDateStart}
+              >
+                Mulai Lomba
+              </FieldInputDate>
+            </Col>
+
+            <Col sm={4}>
+              <FieldInputTime
+                placeholder="00:00"
+                name="eventTimeStart"
+                required
+                minTime={setHours(
+                  setMinutes(eventData.eventDateStart || eventData.registrationDateEnd, 0),
+                  0
+                )}
+                maxTime={setHours(
+                  setMinutes(eventData.eventDateStart || eventData.registrationDateEnd, 59),
+                  23
+                )}
+                value={eventData.eventDateStart}
+                onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
+                errors={validationErrors?.eventDateStart}
+              >
+                Jam Mulai
+              </FieldInputTime>
+            </Col>
+          </Row>
         </Col>
 
-        <Col md={2}>
-          <FieldInputTime
-            placeholder="00:00"
-            name="eventTimeStart"
-            required
-            minTime={setHours(
-              setMinutes(eventData.eventDateStart || eventData.registrationDateEnd, 0),
-              0
-            )}
-            maxTime={setHours(
-              setMinutes(eventData.eventDateStart || eventData.registrationDateEnd, 59),
-              23
-            )}
-            value={eventData.eventDateStart}
-            onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
-            errors={validationErrors?.eventDateStart}
-          >
-            Jam Mulai
-          </FieldInputTime>
-        </Col>
+        <Col lg="6">
+          <Row>
+            <Col sm={8}>
+              <FieldInputDate
+                placeholder="DD/MM/YYYY"
+                name="eventDateEnd"
+                required
+                minDate={
+                  eventData.eventDateStart ||
+                  eventData.registrationDateEnd ||
+                  eventData.registrationDateStart ||
+                  new Date()
+                }
+                value={eventData.eventDateEnd}
+                onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
+                errors={validationErrors?.eventDateEnd}
+              >
+                Akhir Lomba
+              </FieldInputDate>
+            </Col>
 
-        <Col md={4}>
-          <FieldInputDate
-            placeholder="DD/MM/YYYY"
-            name="eventDateEnd"
-            required
-            minDate={
-              eventData.eventDateStart ||
-              eventData.registrationDateEnd ||
-              eventData.registrationDateStart ||
-              new Date()
-            }
-            value={eventData.eventDateEnd}
-            onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
-            errors={validationErrors?.eventDateEnd}
-          >
-            Akhir Lomba
-          </FieldInputDate>
-        </Col>
-
-        <Col md={2}>
-          <FieldInputTime
-            placeholder="00:00"
-            name="eventTimeEnd"
-            required
-            minTime={
-              setHours(setMinutes(eventData.eventDateEnd, 0), 0) > eventData.eventDateStart
-                ? setHours(setMinutes(eventData.eventDateEnd, 0), 0)
-                : setHours(
-                    setMinutes(eventData.eventDateStart, getMinutes(eventData.eventDateStart)),
-                    getHours(eventData.eventDateStart)
-                  )
-            }
-            maxTime={setHours(setMinutes(eventData.eventDateEnd, 59), 23)}
-            value={eventData.eventDateEnd}
-            onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
-            errors={validationErrors?.eventDateEnd}
-          >
-            Jam Akhir
-          </FieldInputTime>
+            <Col sm={4}>
+              <FieldInputTime
+                placeholder="00:00"
+                name="eventTimeEnd"
+                required
+                minTime={
+                  setHours(setMinutes(eventData.eventDateEnd, 0), 0) > eventData.eventDateStart
+                    ? setHours(setMinutes(eventData.eventDateEnd, 0), 0)
+                    : setHours(
+                        setMinutes(eventData.eventDateStart, getMinutes(eventData.eventDateStart)),
+                        getHours(eventData.eventDateStart)
+                      )
+                }
+                maxTime={setHours(setMinutes(eventData.eventDateEnd, 59), 23)}
+                value={eventData.eventDateEnd}
+                onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
+                errors={validationErrors?.eventDateEnd}
+              >
+                Jam Akhir
+              </FieldInputTime>
+            </Col>
+          </Row>
         </Col>
       </Row>
 

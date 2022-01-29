@@ -104,7 +104,7 @@ export function StepInfoUmum({
           <FieldInputText
             required
             name="eventName"
-            placeholder="Nama Event"
+            placeholder="Masukkan nama event"
             value={eventData.eventName}
             onChange={(value) => handleFieldChange("eventName", value)}
             errors={validationErrors.eventName}

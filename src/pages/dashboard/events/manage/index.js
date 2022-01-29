@@ -15,6 +15,7 @@ import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "com
 import { StepInfoUmum, StepBiaya, StepKategori } from "../components/manage-fullday";
 import { PreviewPortal } from "../components/manage-fullday/preview";
 
+import illustrationAlertPublication from "assets/images/events/alert-publication.svg";
 import "pages/dashboard/events/style-overrides/main-content.scss";
 
 const stepsData = [
@@ -383,23 +384,38 @@ function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) 
       btnSize="md"
       onConfirm={onPublish}
       onCancel={onCancel}
-      style={{ padding: "30px 40px" }}
+      style={{ width: 800, padding: "35px 88px", borderRadius: "1.25rem" }}
       customButtons={
         <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
-          <ButtonBlue onClick={onPreview} style={{ minWidth: 120 }}>
-            Lihat Pratinjau
+          <ButtonBlue onClick={onPublish} style={{ minWidth: 120 }}>
+            Publikasi
           </ButtonBlue>
 
-          <Button onClick={onPublish} style={{ color: "var(--ma-blue)", minWidth: 120 }}>
-            Publikasi
+          <Button onClick={onPreview} style={{ minWidth: 120, color: "var(--ma-blue)" }}>
+            Pratinjau
           </Button>
         </span>
       }
     >
-      <p className="text-muted">Event akan dipublikasikan</p>
+      <IllustationAlertPublication />
+      <h4>Lakukan Publikasi?</h4>
+      <p className="text-muted">
+        Klik Publikasi untuk publikasi event atau klik Pratinjau untuk memastikan ulang informasi
+        yang akan ditampilkan.
+      </p>
     </SweetAlert>
   );
 }
+
+const IllustationAlertPublication = styled.div`
+  margin-bottom: 2rem;
+  width: 100%;
+  min-height: 188px;
+  background-image: url(${illustrationAlertPublication});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+`;
 
 function makeEventDetailState(initialData) {
   const { publicInformation, moreInformation, eventCategories } = initialData;

@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import DatePicker from "react-datepicker";
+import { FieldErrorMessage } from "./FieldErrorMessage";
 
 import id from "date-fns/locale/id";
 import classnames from "classnames";
@@ -38,6 +39,7 @@ function FieldInputDate({
         locale={id}
         dateFormat="dd/MM/yyyy"
       />
+      <FieldErrorMessage errors={errors} />
     </FieldInputDateWrapper>
   );
 }

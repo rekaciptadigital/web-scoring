@@ -4,7 +4,10 @@ import { AuthLayout, DashboardHorizontalLayout } from "./layouts";
 import { AuthenticationMiddleware } from "./middlewares";
 import { authenticationRoutes, dashboardRoutes, certificateRoutes, workingRoutes } from "./routes";
 
+import { LayoutDashboard } from "layouts/ma";
+
 import "./assets/scss/theme.scss";
+import "react-datepicker/dist/react-datepicker.css";
 
 const App = () => {
   return (
@@ -31,7 +34,7 @@ const App = () => {
           {dashboardRoutes.map((route, idx) => (
             <AuthenticationMiddleware
               path={route.path}
-              layout={DashboardHorizontalLayout}
+              layout={LayoutDashboard}
               component={route.component}
               key={idx}
               isAuthProtected={true}

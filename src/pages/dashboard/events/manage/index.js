@@ -730,6 +730,10 @@ function useEventDataValidation(eventData) {
       if (!eventData.registrationDateEnd) {
         return "required";
       }
+
+      if (eventData.registrationDateEnd <= eventData.registrationDateStart) {
+        return "Tanggal dan jam tutup pendaftaran harus setelah waktu mulai pendaftaran";
+      }
     });
 
     Step1.validate("eventDateStart", () => {
@@ -741,6 +745,10 @@ function useEventDataValidation(eventData) {
     Step1.validate("eventDateEnd", () => {
       if (!eventData.eventDateEnd) {
         return "required";
+      }
+
+      if (eventData.eventDateEnd <= eventData.eventDateStart) {
+        return "Tanggal dan jam akhir lomba harus setelah waktu mulai lomba";
       }
     });
 

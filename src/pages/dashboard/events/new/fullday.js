@@ -10,6 +10,7 @@ import { EventsService } from "services";
 
 import MetaTags from "react-meta-tags";
 import { Container, Row, Col } from "reactstrap";
+import SweetAlert from "react-bootstrap-sweetalert";
 import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
 import {
   StepInfoUmum,
@@ -18,6 +19,8 @@ import {
   RibbonEventConfig,
 } from "../components/new-fullday";
 import { PreviewPortal } from "../components/preview";
+
+import IconAlertTriangle from "components/ma/icons/mono/alert-triangle";
 
 import "pages/dashboard/events/style-overrides/main-content.scss";
 
@@ -87,10 +90,14 @@ const EventsNewFullday = () => {
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
   const { validate: validateForm, errors: validationErrors } = useEventDataValidation(eventData);
 
-  const [savingEventStatus, setSavingEventStatus] = React.useState({ status: "idle", error: null });
+  const [savingEventStatus, setSavingEventStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
   const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
 
   const isLoading = savingEventStatus.status === "loading";
+  const isErrorSubmiting = savingEventStatus.status === "error";
 
   const handleValidateBeforePreview = () => {
     const onValid = () => setShouldShowPreview(true);
@@ -117,8 +124,7 @@ const EventsNewFullday = () => {
       const eventId = result.data?.id;
       eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
-      // TODO: popup error 422
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -132,8 +138,7 @@ const EventsNewFullday = () => {
       const eventId = result.data?.id;
       eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
-      // TODO: popup error 422
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -259,6 +264,8 @@ const EventsNewFullday = () => {
         onSave={handleSaveEvent}
         onPublish={handlePublishEvent}
       />
+
+      <AlertSubmitError isError={isErrorSubmiting} errors={savingEventStatus.errors} />
     </React.Fragment>
   );
 };
@@ -297,6 +304,71 @@ const RowStickyHeader = styled(Row)`
   padding-top: var(--ma-header-height);
   margin-top: calc(-1 * var(--ma-header-height));
 `;
+
+function AlertSubmitError({ isError, errors, onConfirm }) {
+  const [isAlertOpen, setAlertOpen] = React.useState(false);
+
+  const renderErrorMessages = () => {
+    if (errors && typeof errors === "string") {
+      return errors;
+    }
+
+    if (errors) {
+      const fields = Object.keys(errors);
+      const messages = fields.map(
+        (field) => `${errors[field].map((message) => `- ${message}\n`).join("")}`
+      );
+      if (messages.length) {
+        return `${messages.join("")}`;
+      }
+    }
+
+    return "Error tidak diketahui.";
+  };
+
+  const handleConfirm = () => {
+    setAlertOpen(false);
+    onConfirm?.();
+  };
+
+  React.useEffect(() => {
+    if (!isError) {
+      return;
+    }
+    setAlertOpen(true);
+  }, [isError]);
+
+  return (
+    <React.Fragment>
+      <SweetAlert
+        show={isAlertOpen}
+        title=""
+        custom
+        btnSize="md"
+        style={{ padding: "30px 40px", width: "720px" }}
+        onConfirm={handleConfirm}
+        customButtons={
+          <span className="d-flex flex-column w-100">
+            <ButtonBlue onClick={handleConfirm}>Tutup</ButtonBlue>
+          </span>
+        }
+      >
+        <h4>
+          <IconAlertTriangle />
+        </h4>
+        <div className="text-start">
+          <p>
+            Terdapat kendala teknis dalam memproses data. Coba kembali beberapa saat lagi, atau
+            silakan berikan pesan error berikut kepada technical support:
+          </p>
+          <pre className="p-3" style={{ backgroundColor: "var(--ma-gray-100)" }}>
+            {renderErrorMessages()}
+          </pre>
+        </div>
+      </SweetAlert>
+    </React.Fragment>
+  );
+}
 
 function formatServerDatetime(date) {
   return format(date, "yyyy-MM-dd HH:mm:ss");

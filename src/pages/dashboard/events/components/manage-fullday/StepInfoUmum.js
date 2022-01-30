@@ -190,9 +190,10 @@ export function StepInfoUmum({
                 name="registrationDateStart"
                 required
                 value={eventData.registrationDateStart}
-                onChange={(value) =>
-                  updateEventData({ type: "REGISTRATION_START", payload: value })
-                }
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "REGISTRATION_START", payload: value });
+                }}
                 errors={validationErrors.registrationDateStart}
               >
                 Mulai Pendaftaran
@@ -207,9 +208,10 @@ export function StepInfoUmum({
                 minTime={setHours(setMinutes(eventData.registrationDateStart, 0), 0)}
                 maxTime={setHours(setMinutes(eventData.registrationDateStart, 59), 23)}
                 value={eventData.registrationDateStart}
-                onChange={(value) =>
-                  updateEventData({ type: "REGISTRATION_START", payload: value })
-                }
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "REGISTRATION_START", payload: value });
+                }}
                 errors={validationErrors.registrationDateStart}
               >
                 Jam Buka
@@ -227,7 +229,10 @@ export function StepInfoUmum({
                 required
                 minDate={eventData.registrationDateStart}
                 value={eventData.registrationDateEnd}
-                onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "REGISTRATION_END", payload: value });
+                }}
                 errors={validationErrors.registrationDateEnd}
               >
                 Tutup Pendaftaran
@@ -247,7 +252,10 @@ export function StepInfoUmum({
                 }
                 maxTime={setHours(setMinutes(eventData.registrationDateEnd, 59), 23)}
                 value={eventData.registrationDateEnd}
-                onChange={(value) => updateEventData({ type: "REGISTRATION_END", payload: value })}
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "REGISTRATION_END", payload: value });
+                }}
                 errors={validationErrors.registrationDateEnd}
               >
                 Jam Tutup
@@ -267,7 +275,10 @@ export function StepInfoUmum({
                 required
                 minDate={eventData.registrationDateEnd || eventData.registrationDateStart}
                 value={eventData.eventDateStart}
-                onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "EVENT_START", payload: value });
+                }}
                 errors={validationErrors.eventDateStart}
               >
                 Mulai Lomba
@@ -288,7 +299,10 @@ export function StepInfoUmum({
                   23
                 )}
                 value={eventData.eventDateStart}
-                onChange={(value) => updateEventData({ type: "EVENT_START", payload: value })}
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "EVENT_START", payload: value });
+                }}
                 errors={validationErrors.eventDateStart}
               >
                 Jam Mulai
@@ -310,7 +324,10 @@ export function StepInfoUmum({
                   eventData.registrationDateStart
                 }
                 value={eventData.eventDateEnd}
-                onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "EVENT_END", payload: value });
+                }}
                 errors={validationErrors.eventDateEnd}
               >
                 Akhir Lomba
@@ -329,7 +346,10 @@ export function StepInfoUmum({
                 }
                 maxTime={setHours(setMinutes(eventData.eventDateEnd, 59), 23)}
                 value={eventData.eventDateEnd}
-                onChange={(value) => updateEventData({ type: "EVENT_END", payload: value })}
+                onChange={(value) => {
+                  !isFormDirty && setFormDirty(true);
+                  updateEventData({ type: "EVENT_END", payload: value });
+                }}
                 errors={validationErrors.eventDateEnd}
               >
                 Jam Akhir

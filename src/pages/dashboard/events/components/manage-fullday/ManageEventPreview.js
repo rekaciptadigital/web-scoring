@@ -1,7 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useSelector } from "react-redux";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventCategories } from "constants/index";
+import * as AuthStore from "store/slice/authentication";
 
 import CurrencyFormat from "react-currency-format";
 import { Container, Row, Col } from "reactstrap";
@@ -21,6 +23,7 @@ const categoryTabsList = [
 ];
 
 function ManageEventPreview({ eventData }) {
+  const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const { steps, currentStep, goToStep } = useWizardView(categoryTabsList);
 
   const categoriesByTeam = React.useMemo(
@@ -38,8 +41,7 @@ function ManageEventPreview({ eventData }) {
         <Row className="mt-3">
           <Col md="8">
             <h1 className="event-heading">{eventData.eventName}</h1>
-            {/* TODO: data pembuat event */}
-            {<div>Oleh {"Pro Archery Club"}</div>}
+            {userProfile?.name && <div>Oleh {userProfile.name}</div>}
 
             <div className="content-section mt-5">
               {/* Optional field */}
@@ -190,34 +192,89 @@ function ManageEventPreview({ eventData }) {
 }
 
 function CopywritingRegistrationFee({ eventData }) {
-  const computeDisplayFee = () => {
-    if (eventData.isFlatRegistrationFee) {
-      return eventData.registrationFee;
-    }
-    const lowestFee = eventData.registrationFees?.sort(lowToHigh)[0].amount;
-    return lowestFee;
-  };
+  if (eventData.isFlatRegistrationFee && !eventData.registrationFee) {
+    return <React.Fragment>Gratis</React.Fragment>;
+  }
 
-  if (!eventData.registrationFee && !eventData.registrationFees?.length) {
+  if (eventData.isFlatRegistrationFee) {
     return (
       <React.Fragment>
-        Mulai dari Rp <span>&laquo;data harga tidak tersedia&raquo;</span>
+        Mulai dari{" "}
+        <CurrencyFormat
+          displayType={"text"}
+          value={eventData.registrationFee}
+          prefix="Rp&nbsp;"
+          thousandSeparator={"."}
+          decimalSeparator={","}
+          decimalScale={2}
+          fixedDecimalScale
+        />
+      </React.Fragment>
+    );
+  }
+
+  if (eventData.registrationFees?.length) {
+    const selectedTeamCategories = [];
+    for (const categoryGroup of eventData.eventCategories) {
+      for (const detail of categoryGroup.categoryDetails) {
+        if (!detail.teamCategory?.value) {
+          continue;
+        }
+
+        if (
+          detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+          detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+        ) {
+          selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
+        } else {
+          selectedTeamCategories.push(detail.teamCategory?.value);
+        }
+      }
+    }
+
+    const onlySelectedCategory = (fee) => {
+      const isTeamCategorySelected = selectedTeamCategories.some(
+        (team) => team === fee.teamCategory
+      );
+      return isTeamCategorySelected && Boolean(fee.amount);
+    };
+
+    const lowToHigh = (feeA, feeB) => {
+      if (feeA.amount === feeB.amount) {
+        return 0;
+      }
+      if (feeA.amount < feeB.amount) {
+        return -1;
+      }
+      return 1;
+    };
+
+    const sortedFees = eventData.registrationFees.filter(onlySelectedCategory).sort(lowToHigh);
+    const lowestFee = sortedFees[0]?.amount;
+
+    return (
+      <React.Fragment>
+        Mulai dari{" "}
+        {lowestFee ? (
+          <CurrencyFormat
+            displayType={"text"}
+            value={lowestFee}
+            prefix="Rp&nbsp;"
+            thousandSeparator={"."}
+            decimalSeparator={","}
+            decimalScale={2}
+            fixedDecimalScale
+          />
+        ) : (
+          <React.Fragment>gratis</React.Fragment>
+        )}
       </React.Fragment>
     );
   }
 
   return (
     <React.Fragment>
-      Mulai dari{" "}
-      <CurrencyFormat
-        displayType={"text"}
-        value={computeDisplayFee()}
-        prefix="Rp&nbsp;"
-        thousandSeparator={"."}
-        decimalSeparator={","}
-        decimalScale={2}
-        fixedDecimalScale
-      />
+      <span>&laquo;Data harga tidak tersedia&raquo;</span>
     </React.Fragment>
   );
 }
@@ -468,15 +525,5 @@ function computeCategoriesByTeam(categoriesData) {
 
   return categoriesByTeam;
 }
-
-const lowToHigh = (feeA, feeB) => {
-  if (feeA.amount === feeB.amount) {
-    return 0;
-  }
-  if (feeA.amount < feeB.amount) {
-    return -1;
-  }
-  return 1;
-};
 
 export default ManageEventPreview;

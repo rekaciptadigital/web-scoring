@@ -16,6 +16,8 @@ import { StepInfoUmum, StepBiaya, StepKategori } from "../components/manage-full
 import { PreviewPortal } from "../components/manage-fullday/preview";
 import { BreadcrumbDashboard } from "../components/breadcrumb";
 
+import IconAlertTriangle from "components/ma/icons/mono/alert-triangle";
+
 import illustrationAlertPublication from "assets/images/events/alert-publication.svg";
 import "pages/dashboard/events/style-overrides/main-content.scss";
 
@@ -102,6 +104,7 @@ const PageEventDetailManage = () => {
 
   const eventId = parseInt(event_id);
   const isLoading = savingEventStatus.status === "loading";
+  const isErrorSubmiting = savingEventStatus.status === "loading";
 
   const incrementAttemptCounts = () => {
     setFetchingEventStatus((state) => ({
@@ -384,6 +387,7 @@ const PageEventDetailManage = () => {
           setShouldShowPreview(false);
         }}
       />
+      <AlertSubmitError isError={isErrorSubmiting} errors={savingEventStatus.errors} />
     </React.Fragment>
   );
 };
@@ -464,6 +468,71 @@ const IllustationAlertPublication = styled.div`
   background-position: center;
   background-size: contain;
 `;
+
+function AlertSubmitError({ isError, errors, onConfirm }) {
+  const [isAlertOpen, setAlertOpen] = React.useState(false);
+
+  const renderErrorMessages = () => {
+    if (errors && typeof errors === "string") {
+      return errors;
+    }
+
+    if (errors) {
+      const fields = Object.keys(errors);
+      const messages = fields.map(
+        (field) => `${errors[field].map((message) => `- ${message}\n`).join("")}`
+      );
+      if (messages.length) {
+        return `${messages.join("")}`;
+      }
+    }
+
+    return "Error tidak diketahui.";
+  };
+
+  const handleConfirm = () => {
+    setAlertOpen(false);
+    onConfirm?.();
+  };
+
+  React.useEffect(() => {
+    if (!isError) {
+      return;
+    }
+    setAlertOpen(true);
+  }, [isError]);
+
+  return (
+    <React.Fragment>
+      <SweetAlert
+        show={isAlertOpen}
+        title=""
+        custom
+        btnSize="md"
+        style={{ padding: "30px 40px", width: "720px" }}
+        onConfirm={handleConfirm}
+        customButtons={
+          <span className="d-flex flex-column w-100">
+            <ButtonBlue onClick={handleConfirm}>Tutup</ButtonBlue>
+          </span>
+        }
+      >
+        <h4>
+          <IconAlertTriangle />
+        </h4>
+        <div className="text-start">
+          <p>
+            Terdapat kendala teknis dalam memproses data. Coba kembali beberapa saat lagi, atau
+            silakan berikan pesan error berikut kepada technical support:
+          </p>
+          <pre className="p-3" style={{ backgroundColor: "var(--ma-gray-100)" }}>
+            {renderErrorMessages()}
+          </pre>
+        </div>
+      </SweetAlert>
+    </React.Fragment>
+  );
+}
 
 function makeEventDetailState(initialData) {
   const { publicInformation, moreInformation, eventCategories } = initialData;

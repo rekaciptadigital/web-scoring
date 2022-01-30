@@ -397,7 +397,6 @@ function useEventDataValidation(eventData) {
   const validate = ({ onValid, onInvalid }) => {
     const Step1 = StepGroupValidation();
     const Step2 = StepGroupValidation();
-    const Step3 = StepGroupValidation();
 
     // STEP 1: Informasi Umum
     Step1.validate("bannerImage", () => {
@@ -489,55 +488,8 @@ function useEventDataValidation(eventData) {
       }
     }
 
-    // STEP 3: Biaya Registrasi
-    if (eventData.isFlatRegistrationFee) {
-      Step3.validate("registrationFee", () => {
-        if (!eventData.registrationFee) {
-          return "required";
-        }
-      });
-    } else {
-      // Hanya validasikan harga tim yang dipilih di kategori.
-      // Jenis tim yang tidak dipilih di kategori tidak diwajibkan diisi,
-      // sehingga tidak dihitung error.
-      const selectedTeamCategories = [];
-      for (const categoryGroup of eventData.eventCategories) {
-        for (const detail of categoryGroup.categoryDetails) {
-          if (!detail.teamCategory?.value) {
-            continue;
-          }
-
-          if (
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
-          ) {
-            selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
-          } else {
-            selectedTeamCategories.push(detail.teamCategory?.value);
-          }
-        }
-      }
-
-      for (const fee of eventData.registrationFees) {
-        const isTeamCategorySelected = selectedTeamCategories.some(
-          (team) => team === fee.teamCategory
-        );
-
-        if (!isTeamCategorySelected) {
-          continue;
-        }
-
-        Step3.validate(`registrationFee-${fee.teamCategory}`, () => {
-          if (!fee.amount) {
-            return "required";
-          }
-        });
-      }
-    }
-
     ValidationErrors.addByGroup({ stepGroup: 1, errors: Step1.errors });
     ValidationErrors.addByGroup({ stepGroup: 2, errors: Step2.errors });
-    ValidationErrors.addByGroup({ stepGroup: 3, errors: Step3.errors });
 
     setValidation((state) => ({ ...state, errors: ValidationErrors.nextErrorsState }));
 

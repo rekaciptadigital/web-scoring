@@ -14,7 +14,15 @@ import {
 import Copy from "components/icons/Copy";
 import Del from "components/icons/Del";
 
-function CategoryDetailList({ eventId, details, updateEventData, onSuccess, validationErrors }) {
+function CategoryDetailList({
+  eventId,
+  details,
+  updateEventData,
+  onSuccess,
+  validationErrors,
+  isFormDirty,
+  setFormDirty,
+}) {
   const [addingCategoryStatus, setAddingCategoryStatus] = React.useState({
     status: "idle",
     errors: null,
@@ -54,6 +62,7 @@ function CategoryDetailList({ eventId, details, updateEventData, onSuccess, vali
   };
 
   const handleDetailFieldChange = (detail, field, value) => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({
       type: "UPDATE_EVENT_CATEGORY_DETAIL",
       detailKey: detail.key,

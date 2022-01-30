@@ -84,6 +84,8 @@ const PageEventDetailManage = () => {
   const { steps, stepsTotal, currentStep, currentLabel, goToStep, goToPreviousStep, goToNextStep } =
     useWizardView(stepsData);
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
+  const [isFormDirty, setFormDirty] = React.useState(false);
+  const [shouldShowSavingWarning, setShowSavingWarning] = React.useState(false);
   const { validate: validateForm, errors: validationErrors } = useEventDataValidation(eventData);
   const [isEventPublished, setIsEventPublished] = React.useState(true);
   const [fetchingEventStatus, setFetchingEventStatus] = React.useState({
@@ -109,6 +111,14 @@ const PageEventDetailManage = () => {
   };
 
   const handleClickSave = async (stepNumber) => {
+    if (!isFormDirty) {
+      return;
+    }
+
+    // reset to clean state
+    setFormDirty(false);
+    setShowSavingWarning(false);
+
     if (stepNumber === 1) {
       validateForm({
         step: stepNumber,
@@ -161,7 +171,16 @@ const PageEventDetailManage = () => {
     }
   };
 
-  const handleClickPublish = () => setShouldShowConfirmPublication(true);
+  const handleClickPublish = () => {
+    if (isFormDirty) {
+      setShowSavingWarning(true);
+      setTimeout(() => {
+        setShowSavingWarning(false);
+      }, 3000);
+      return;
+    }
+    setShouldShowConfirmPublication(true);
+  };
 
   const handleCancelPublish = () => setShouldShowConfirmPublication(false);
 
@@ -229,7 +248,10 @@ const PageEventDetailManage = () => {
                     </div>
 
                     <div>
-                      <div className="d-flex justify-content-end" style={{ gap: "0.5rem" }}>
+                      <div
+                        className="d-flex justify-content-end"
+                        style={{ position: "relative", gap: "0.5rem" }}
+                      >
                         <Button
                           style={{ color: "var(--ma-blue)" }}
                           onClick={() => handleClickSave(currentStep)}
@@ -238,6 +260,28 @@ const PageEventDetailManage = () => {
                         </Button>
                         {!isEventPublished && (
                           <ButtonBlue onClick={handleClickPublish}>Publikasi</ButtonBlue>
+                        )}
+                        {shouldShowSavingWarning && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "-1.75rem",
+                              right: 0,
+                              width: "300px",
+                              textAlign: "right",
+                            }}
+                          >
+                            <span
+                              style={{
+                                padding: "0.1rem 0.4rem",
+                                borderRadius: 6,
+                                backgroundColor: "var(--ma-yellow)",
+                                color: "var(--ma-blue)",
+                              }}
+                            >
+                              Simpan suntingan data terlebih dahulu
+                            </span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -256,6 +300,8 @@ const PageEventDetailManage = () => {
                         eventData={eventData}
                         updateEventData={updateEventData}
                         validationErrors={validationErrors[1] || {}}
+                        isFormDirty={isFormDirty}
+                        setFormDirty={setFormDirty}
                       />
                     </WizardViewContent>
 
@@ -267,6 +313,8 @@ const PageEventDetailManage = () => {
                         updateEventData={updateEventData}
                         onSaveSuccess={() => incrementAttemptCounts()}
                         validationErrors={validationErrors[2] || {}}
+                        isFormDirty={isFormDirty}
+                        setFormDirty={setFormDirty}
                       />
                     </WizardViewContent>
 
@@ -276,6 +324,8 @@ const PageEventDetailManage = () => {
                         eventData={eventData}
                         updateEventData={updateEventData}
                         validationErrors={validationErrors[3] || {}}
+                        isFormDirty={isFormDirty}
+                        setFormDirty={setFormDirty}
                       />
                     </WizardViewContent>
                   </WizardView>

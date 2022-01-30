@@ -12,8 +12,11 @@ function CategoryItem({
   updateEventData,
   onSuccess,
   validationErrors,
+  isFormDirty,
+  setFormDirty,
 }) {
   const handleCategoryNameChange = (category, value) => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({ type: "UPDATE_EVENT_CATEGORY", key: category.key, value });
   };
 
@@ -48,6 +51,8 @@ function CategoryItem({
         updateEventData={updateEventData}
         onSuccess={onSuccess}
         validationErrors={validationErrors}
+        isFormDirty={isFormDirty}
+        setFormDirty={setFormDirty}
       />
     </StyledCategoryItem>
   );

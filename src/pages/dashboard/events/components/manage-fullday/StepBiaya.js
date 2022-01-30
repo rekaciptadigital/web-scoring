@@ -9,18 +9,28 @@ import { FieldInputPrice } from "../form-fields";
 
 const { TEAM_CATEGORIES } = eventCategories;
 
-export function StepBiaya({ savingStatus, eventData, updateEventData, validationErrors = {} }) {
+export function StepBiaya({
+  savingStatus,
+  eventData,
+  updateEventData,
+  validationErrors = {},
+  isFormDirty,
+  setFormDirty,
+}) {
   const isLoading = savingStatus.status === "loading";
 
   const handleRegistrationFeeChange = (value) => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({ registrationFee: value });
   };
 
   const handleToggleFlatFeeChange = () => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({ type: "TOGGLE_FIELD", field: "isFlatRegistrationFee" });
   };
 
   const handleVarietyFeesChange = (teamCategory, value) => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({
       type: "UPDATE_REGISTRATION_FEES",
       value: {

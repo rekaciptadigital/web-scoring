@@ -26,6 +26,8 @@ export function StepInfoUmum({
   eventData,
   updateEventData,
   validationErrors = {},
+  isFormDirty,
+  setFormDirty,
 }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
@@ -42,6 +44,8 @@ export function StepInfoUmum({
   const handleModalEditInfoClose = () => setKeyExtraInfoEdited(null);
 
   const handlePickBannerChange = (ev) => {
+    !isFormDirty && setFormDirty(true);
+
     if (!ev.target.files?.[0]) {
       return;
     }
@@ -61,15 +65,18 @@ export function StepInfoUmum({
   };
 
   const handleFieldChange = (field, value) => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({ [field]: value });
   };
 
   const handleLocationTypeChange = (radioValue) => {
+    !isFormDirty && setFormDirty(true);
     const { value } = radioValue;
     updateEventData({ locationType: value });
   };
 
   const handleCityChange = (selectValue) => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({ city: selectValue });
   };
 

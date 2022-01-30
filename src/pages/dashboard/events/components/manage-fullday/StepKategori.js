@@ -15,6 +15,8 @@ export function StepKategori({
   updateEventData,
   onSaveSuccess,
   validationErrors = {},
+  isFormDirty,
+  setFormDirty,
 }) {
   const { options: optionsCompetitionCategory } = useArcheryCategories(
     EventsService.getEventCompetitionCategories
@@ -88,6 +90,8 @@ export function StepKategori({
               updateEventData={updateEventData}
               onSuccess={onSaveSuccess}
               validationErrors={validationErrors}
+              isFormDirty={isFormDirty}
+              setFormDirty={setFormDirty}
             />
           );
         })}

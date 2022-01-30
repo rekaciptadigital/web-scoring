@@ -473,43 +473,43 @@ function useEventDataValidation(eventData) {
     // STEP 1: Informasi Umum
     Step1.validate("bannerImage", () => {
       if (!eventData.bannerImage?.raw) {
-        return "required";
+        return "Wajib diisi";
       }
     });
 
     Step1.validate("eventName", () => {
       if (!eventData.eventName) {
-        return "required";
+        return "Wajib diisi";
       }
     });
 
     Step1.validate("location", () => {
       if (!eventData.location) {
-        return "required";
+        return "Wajib diisi";
       }
     });
 
     Step1.validate("locationType", () => {
       if (!eventData.locationType) {
-        return "required";
+        return "Wajib diisi";
       }
     });
 
     Step1.validate("city", () => {
       if (!eventData.city?.value) {
-        return "required";
+        return "Wajib diisi";
       }
     });
 
     Step1.validate("registrationDateStart", () => {
       if (!eventData.registrationDateStart) {
-        return "required";
+        return "Wajib diisi";
       }
     });
 
     Step1.validate("registrationDateEnd", () => {
       if (!eventData.registrationDateEnd) {
-        return "required";
+        return "Wajib diisi";
       }
 
       if (eventData.registrationDateEnd <= eventData.registrationDateStart) {
@@ -519,13 +519,13 @@ function useEventDataValidation(eventData) {
 
     Step1.validate("eventDateStart", () => {
       if (!eventData.eventDateStart) {
-        return "required";
+        return "Wajib diisi";
       }
     });
 
     Step1.validate("eventDateEnd", () => {
       if (!eventData.eventDateEnd) {
-        return "required";
+        return "Wajib diisi";
       }
 
       if (eventData.eventDateEnd <= eventData.eventDateStart) {
@@ -537,32 +537,32 @@ function useEventDataValidation(eventData) {
     for (const categoryGroup of eventData.eventCategories) {
       Step2.validate(`${categoryGroup.key}-competitionCategory`, () => {
         if (!categoryGroup.competitionCategory?.value) {
-          return "required";
+          return "Wajib diisi";
         }
       });
 
       for (const detail of categoryGroup.categoryDetails) {
         Step2.validate(`${categoryGroup.key}-${detail.key}-ageCategory`, () => {
           if (!detail.ageCategory?.value) {
-            return "required";
+            return "Wajib diisi";
           }
         });
 
         Step2.validate(`${categoryGroup.key}-${detail.key}-distance`, () => {
           if (!detail.distance?.length) {
-            return "required";
+            return "Wajib diisi";
           }
         });
 
         Step2.validate(`${categoryGroup.key}-${detail.key}-teamCategory`, () => {
           if (!detail.teamCategory?.value) {
-            return "required";
+            return "Wajib diisi";
           }
         });
 
         Step2.validate(`${categoryGroup.key}-${detail.key}-quota`, () => {
           if (!detail.quota) {
-            return "required";
+            return "Wajib diisi";
           }
         });
       }

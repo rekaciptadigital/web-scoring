@@ -10,6 +10,7 @@ import { EventsService } from "services";
 
 import MetaTags from "react-meta-tags";
 import { Container, Row, Col } from "reactstrap";
+import SweetAlert from "react-bootstrap-sweetalert";
 import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
 import {
   StepInfoUmum,
@@ -18,6 +19,10 @@ import {
   RibbonEventConfig,
 } from "../components/new-fullday";
 import { PreviewPortal } from "../components/preview";
+
+import IconAlertTriangle from "components/ma/icons/mono/alert-triangle";
+
+import "pages/dashboard/events/style-overrides/main-content.scss";
 
 const stepsData = [
   {
@@ -85,10 +90,14 @@ const EventsNewFullday = () => {
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
   const { validate: validateForm, errors: validationErrors } = useEventDataValidation(eventData);
 
-  const [savingEventStatus, setSavingEventStatus] = React.useState({ status: "idle", error: null });
+  const [savingEventStatus, setSavingEventStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
   const [shouldShowPreview, setShouldShowPreview] = React.useState(false);
 
   const isLoading = savingEventStatus.status === "loading";
+  const isErrorSubmiting = savingEventStatus.status === "error";
 
   const handleValidateBeforePreview = () => {
     const onValid = () => setShouldShowPreview(true);
@@ -115,8 +124,7 @@ const EventsNewFullday = () => {
       const eventId = result.data?.id;
       eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
-      // TODO: popup error 422
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -130,8 +138,7 @@ const EventsNewFullday = () => {
       const eventId = result.data?.id;
       eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
-      // TODO: popup error 422
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -151,8 +158,8 @@ const EventsNewFullday = () => {
         </MetaTags>
 
         <Container fluid>
-          <Row>
-            <Col md="3">
+          <StickyContainer>
+            <StickyItem>
               <StepList
                 steps={steps}
                 currentStep={currentStep}
@@ -160,15 +167,15 @@ const EventsNewFullday = () => {
               >
                 Pertandingan
               </StepList>
-            </Col>
+            </StickyItem>
 
-            <Col lg="9" className="d-flex flex-column">
-              <Row>
+            <StickyItemSibling>
+              <RowStickyHeader>
                 <Col>
                   <h2>{currentLabel}</h2>
                   <p>{steps[currentStep - 1].description}</p>
                 </Col>
-              </Row>
+              </RowStickyHeader>
 
               <div className="content-scrollable flex-grow-1 mb-5">
                 <div className="content-scrollable-inner">
@@ -244,8 +251,8 @@ const EventsNewFullday = () => {
                   )}
                 </div>
               </div>
-            </Col>
-          </Row>
+            </StickyItemSibling>
+          </StickyContainer>
         </Container>
       </StyledPageWrapper>
 
@@ -257,14 +264,111 @@ const EventsNewFullday = () => {
         onSave={handleSaveEvent}
         onPublish={handlePublishEvent}
       />
+
+      <AlertSubmitError isError={isErrorSubmiting} errors={savingEventStatus.errors} />
     </React.Fragment>
   );
 };
 
 const StyledPageWrapper = styled.div`
   margin: 2.5rem 0;
-  margin-top: 5rem;
 `;
+
+const StickyContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem;
+`;
+
+const StickyItem = styled.div`
+  position: sticky;
+  z-index: 100;
+  @media (max-width: 782px) {
+    position: static;
+  }
+
+  top: calc(70px + 2.5rem);
+  flex: 1 1 15rem;
+`;
+
+const StickyItemSibling = styled.div`
+  flex: 12 1 30rem;
+`;
+
+const RowStickyHeader = styled(Row)`
+  position: sticky;
+  top: 2.5rem;
+  z-index: 80;
+  background-color: var(--bs-body-bg);
+  padding-top: var(--ma-header-height);
+  margin-top: calc(-1 * var(--ma-header-height));
+`;
+
+function AlertSubmitError({ isError, errors, onConfirm }) {
+  const [isAlertOpen, setAlertOpen] = React.useState(false);
+
+  const renderErrorMessages = () => {
+    if (errors && typeof errors === "string") {
+      return errors;
+    }
+
+    if (errors) {
+      const fields = Object.keys(errors);
+      const messages = fields.map(
+        (field) => `${errors[field].map((message) => `- ${message}\n`).join("")}`
+      );
+      if (messages.length) {
+        return `${messages.join("")}`;
+      }
+    }
+
+    return "Error tidak diketahui.";
+  };
+
+  const handleConfirm = () => {
+    setAlertOpen(false);
+    onConfirm?.();
+  };
+
+  React.useEffect(() => {
+    if (!isError) {
+      return;
+    }
+    setAlertOpen(true);
+  }, [isError]);
+
+  return (
+    <React.Fragment>
+      <SweetAlert
+        show={isAlertOpen}
+        title=""
+        custom
+        btnSize="md"
+        style={{ padding: "30px 40px", width: "720px" }}
+        onConfirm={handleConfirm}
+        customButtons={
+          <span className="d-flex flex-column w-100">
+            <ButtonBlue onClick={handleConfirm}>Tutup</ButtonBlue>
+          </span>
+        }
+      >
+        <h4>
+          <IconAlertTriangle />
+        </h4>
+        <div className="text-start">
+          <p>
+            Terdapat kendala teknis dalam memproses data. Coba kembali beberapa saat lagi, atau
+            silakan berikan pesan error berikut kepada technical support:
+          </p>
+          <pre className="p-3" style={{ backgroundColor: "var(--ma-gray-100)" }}>
+            {renderErrorMessages()}
+          </pre>
+        </div>
+      </SweetAlert>
+    </React.Fragment>
+  );
+}
 
 function formatServerDatetime(date) {
   return format(date, "yyyy-MM-dd HH:mm:ss");
@@ -365,7 +469,6 @@ function useEventDataValidation(eventData) {
   const validate = ({ onValid, onInvalid }) => {
     const Step1 = StepGroupValidation();
     const Step2 = StepGroupValidation();
-    const Step3 = StepGroupValidation();
 
     // STEP 1: Informasi Umum
     Step1.validate("bannerImage", () => {
@@ -408,6 +511,10 @@ function useEventDataValidation(eventData) {
       if (!eventData.registrationDateEnd) {
         return "required";
       }
+
+      if (eventData.registrationDateEnd <= eventData.registrationDateStart) {
+        return "Tanggal dan jam tutup pendaftaran harus setelah waktu mulai pendaftaran";
+      }
     });
 
     Step1.validate("eventDateStart", () => {
@@ -419,6 +526,10 @@ function useEventDataValidation(eventData) {
     Step1.validate("eventDateEnd", () => {
       if (!eventData.eventDateEnd) {
         return "required";
+      }
+
+      if (eventData.eventDateEnd <= eventData.eventDateStart) {
+        return "Tanggal dan jam akhir lomba harus setelah waktu mulai lomba";
       }
     });
 
@@ -457,55 +568,8 @@ function useEventDataValidation(eventData) {
       }
     }
 
-    // STEP 3: Biaya Registrasi
-    if (eventData.isFlatRegistrationFee) {
-      Step3.validate("registrationFee", () => {
-        if (!eventData.registrationFee) {
-          return "required";
-        }
-      });
-    } else {
-      // Hanya validasikan harga tim yang dipilih di kategori.
-      // Jenis tim yang tidak dipilih di kategori tidak diwajibkan diisi,
-      // sehingga tidak dihitung error.
-      const selectedTeamCategories = [];
-      for (const categoryGroup of eventData.eventCategories) {
-        for (const detail of categoryGroup.categoryDetails) {
-          if (!detail.teamCategory?.value) {
-            continue;
-          }
-
-          if (
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
-          ) {
-            selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
-          } else {
-            selectedTeamCategories.push(detail.teamCategory?.value);
-          }
-        }
-      }
-
-      for (const fee of eventData.registrationFees) {
-        const isTeamCategorySelected = selectedTeamCategories.some(
-          (team) => team === fee.teamCategory
-        );
-
-        if (!isTeamCategorySelected) {
-          continue;
-        }
-
-        Step3.validate(`registrationFee-${fee.teamCategory}`, () => {
-          if (!fee.amount) {
-            return "required";
-          }
-        });
-      }
-    }
-
     ValidationErrors.addByGroup({ stepGroup: 1, errors: Step1.errors });
     ValidationErrors.addByGroup({ stepGroup: 2, errors: Step2.errors });
-    ValidationErrors.addByGroup({ stepGroup: 3, errors: Step3.errors });
 
     setValidation((state) => ({ ...state, errors: ValidationErrors.nextErrorsState }));
 

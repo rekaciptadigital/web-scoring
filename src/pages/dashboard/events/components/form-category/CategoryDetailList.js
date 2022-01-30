@@ -12,7 +12,7 @@ import {
 import Copy from "components/icons/Copy";
 import Del from "components/icons/Del";
 
-function CategoryDetailList({ details, updateEventData, validationErrors }) {
+function CategoryDetailList({ details, updateEventData, validationErrors, shouldDisableDelete }) {
   const handleAddDetail = (detail) => {
     updateEventData({
       type: "COPY_EVENT_CATEGORY_DETAIL",
@@ -100,7 +100,10 @@ function CategoryDetailList({ details, updateEventData, validationErrors }) {
               <ButtonOutline onClick={() => handleAddDetail(detail)}>
                 <Copy />
               </ButtonOutline>
-              <ButtonOutline onClick={() => handleRemoveDetail(detail)}>
+              <ButtonOutline
+                onClick={() => handleRemoveDetail(detail)}
+                disabled={shouldDisableDelete}
+              >
                 <Del />
               </ButtonOutline>
             </div>

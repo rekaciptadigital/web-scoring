@@ -8,6 +8,19 @@ import CategoryDetailList from "./CategoryDetailList";
 import Del from "components/icons/Del";
 
 function CategoryItem({ category, categoryOptions, eventData, updateEventData, validationErrors }) {
+  // Default kategori kompetisi ketika belum input apapun
+  // Defaultnya Barebow, atau kategori pertama yang diberi API
+  React.useEffect(() => {
+    if (!categoryOptions?.length || category.competitionCategory) {
+      return;
+    }
+    updateEventData({
+      type: "UPDATE_EVENT_CATEGORY",
+      key: category.key,
+      value: { ...categoryOptions[0] },
+    });
+  }, [categoryOptions, category]);
+
   const handleClickRemoveCategory = (targetCategory) => {
     updateEventData({ type: "REMOVE_EVENT_CATEGORY", categoryKey: targetCategory.key });
   };
@@ -41,7 +54,10 @@ function CategoryItem({ category, categoryOptions, eventData, updateEventData, v
         </div>
 
         <div className="top-grid-actions">
-          <ButtonOutline onClick={() => handleClickRemoveCategory(category)}>
+          <ButtonOutline
+            onClick={() => handleClickRemoveCategory(category)}
+            disabled={eventData.eventCategories.length <= 1}
+          >
             <Del />
           </ButtonOutline>
         </div>
@@ -52,6 +68,9 @@ function CategoryItem({ category, categoryOptions, eventData, updateEventData, v
         details={category.categoryDetails}
         updateEventData={updateEventData}
         validationErrors={validationErrors}
+        shouldDisableDelete={
+          eventData.eventCategories.length <= 1 && category.categoryDetails.length <= 1
+        }
       />
     </StyledCategoryItem>
   );

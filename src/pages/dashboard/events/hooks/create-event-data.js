@@ -112,9 +112,24 @@ function eventDataReducer(state, action) {
     case "ADD_EVENT_CATEGORY": {
       const categoryKey = stringUtil.createRandom();
       const detailKey = stringUtil.createRandom();
+      const { options } = action;
+
+      // Kasih default kategori kompetisi yang belum dipakai
+      let chosenCompetitionCategory = null;
+      for (const option of options) {
+        const isOptionAlreadyChosen = state.eventCategories.some(
+          (category) => category.competitionCategory?.value === option.value
+        );
+        if (isOptionAlreadyChosen) {
+          continue;
+        }
+        chosenCompetitionCategory = { ...option };
+        break;
+      }
 
       const newEventCategory = {
         key: categoryKey,
+        competitionCategory: chosenCompetitionCategory,
         categoryDetails: [
           {
             categoryKey: categoryKey,

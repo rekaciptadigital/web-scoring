@@ -14,6 +14,12 @@ import { Container, Row, Col } from "reactstrap";
 import { StepList, WizardView, WizardViewContent, Button, ButtonBlue } from "components/ma";
 import { StepInfoUmum, StepBiaya, StepKategori } from "../components/manage-fullday";
 import { PreviewPortal } from "../components/manage-fullday/preview";
+import { BreadcrumbDashboard } from "../components/breadcrumb";
+
+import IconAlertTriangle from "components/ma/icons/mono/alert-triangle";
+
+import illustrationAlertPublication from "assets/images/events/alert-publication.svg";
+import "pages/dashboard/events/style-overrides/main-content.scss";
 
 const stepsData = [
   {
@@ -80,6 +86,8 @@ const PageEventDetailManage = () => {
   const { steps, stepsTotal, currentStep, currentLabel, goToStep, goToPreviousStep, goToNextStep } =
     useWizardView(stepsData);
   const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
+  const [isFormDirty, setFormDirty] = React.useState(false);
+  const [shouldShowSavingWarning, setShowSavingWarning] = React.useState(false);
   const { validate: validateForm, errors: validationErrors } = useEventDataValidation(eventData);
   const [isEventPublished, setIsEventPublished] = React.useState(true);
   const [fetchingEventStatus, setFetchingEventStatus] = React.useState({
@@ -96,6 +104,7 @@ const PageEventDetailManage = () => {
 
   const eventId = parseInt(event_id);
   const isLoading = savingEventStatus.status === "loading";
+  const isErrorSubmiting = savingEventStatus.status === "loading";
 
   const incrementAttemptCounts = () => {
     setFetchingEventStatus((state) => ({
@@ -105,6 +114,14 @@ const PageEventDetailManage = () => {
   };
 
   const handleClickSave = async (stepNumber) => {
+    if (!isFormDirty) {
+      return;
+    }
+
+    // reset to clean state
+    setFormDirty(false);
+    setShowSavingWarning(false);
+
     if (stepNumber === 1) {
       validateForm({
         step: stepNumber,
@@ -116,10 +133,8 @@ const PageEventDetailManage = () => {
         onValid: () => handleSaveCategoryDetails(),
       });
     } else if (stepNumber === 3) {
-      validateForm({
-        step: stepNumber,
-        onValid: () => handleSaveRegistrationFees(),
-      });
+      // Field-field kosong di registration fees gak perlu divalidasi
+      handleSaveRegistrationFees();
     }
   };
 
@@ -148,18 +163,6 @@ const PageEventDetailManage = () => {
   };
 
   const handleSaveRegistrationFees = async () => {
-    // Validate empty fields
-    if (eventData.isFlatRegistrationFee && !eventData.registrationFee) {
-      // TODO: ganti pakai sweet alert?
-      alert("inputan harga flat masih kosong");
-      return;
-    }
-    if (!eventData.isFlatRegistrationFee && !eventData.registrationFees?.length) {
-      // TODO: ganti pakai sweet alert?
-      alert("inputan harga per tim masih kosong");
-      return;
-    }
-
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
     const payload = makeFeesPayload({ event_id: eventId, ...eventData });
     const result = await EventsService.updateCategoryFee(payload);
@@ -171,7 +174,16 @@ const PageEventDetailManage = () => {
     }
   };
 
-  const handleClickPublish = () => setShouldShowConfirmPublication(true);
+  const handleClickPublish = () => {
+    if (isFormDirty) {
+      setShowSavingWarning(true);
+      setTimeout(() => {
+        setShowSavingWarning(false);
+      }, 3000);
+      return;
+    }
+    setShouldShowConfirmPublication(true);
+  };
 
   const handleCancelPublish = () => setShouldShowConfirmPublication(false);
 
@@ -216,8 +228,10 @@ const PageEventDetailManage = () => {
         </MetaTags>
 
         <Container fluid>
-          <Row>
-            <Col md="3">
+          <BreadcrumbDashboard to={`/dashboard/event/${eventId}/home`}>Kembali</BreadcrumbDashboard>
+
+          <StickyContainer>
+            <StickyItem>
               <StepList
                 steps={steps}
                 currentStep={currentStep}
@@ -225,10 +239,10 @@ const PageEventDetailManage = () => {
               >
                 Pertandingan
               </StepList>
-            </Col>
+            </StickyItem>
 
-            <Col lg="9" className="d-flex flex-column">
-              <Row>
+            <StickyItemSibling>
+              <RowStickyHeader>
                 <Col>
                   <div className="d-flex justify-content-between">
                     <div>
@@ -237,7 +251,10 @@ const PageEventDetailManage = () => {
                     </div>
 
                     <div>
-                      <div className="d-flex justify-content-end" style={{ gap: "0.5rem" }}>
+                      <div
+                        className="d-flex justify-content-end"
+                        style={{ position: "relative", gap: "0.5rem" }}
+                      >
                         <Button
                           style={{ color: "var(--ma-blue)" }}
                           onClick={() => handleClickSave(currentStep)}
@@ -247,11 +264,33 @@ const PageEventDetailManage = () => {
                         {!isEventPublished && (
                           <ButtonBlue onClick={handleClickPublish}>Publikasi</ButtonBlue>
                         )}
+                        {shouldShowSavingWarning && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "-1.75rem",
+                              right: 0,
+                              width: "300px",
+                              textAlign: "right",
+                            }}
+                          >
+                            <span
+                              style={{
+                                padding: "0.1rem 0.4rem",
+                                borderRadius: 6,
+                                backgroundColor: "var(--ma-yellow)",
+                                color: "var(--ma-blue)",
+                              }}
+                            >
+                              Simpan suntingan data terlebih dahulu
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 </Col>
-              </Row>
+              </RowStickyHeader>
 
               <div className="content-scrollable flex-grow-1 mb-5">
                 <div className="content-scrollable-inner">
@@ -264,6 +303,8 @@ const PageEventDetailManage = () => {
                         eventData={eventData}
                         updateEventData={updateEventData}
                         validationErrors={validationErrors[1] || {}}
+                        isFormDirty={isFormDirty}
+                        setFormDirty={setFormDirty}
                       />
                     </WizardViewContent>
 
@@ -275,6 +316,8 @@ const PageEventDetailManage = () => {
                         updateEventData={updateEventData}
                         onSaveSuccess={() => incrementAttemptCounts()}
                         validationErrors={validationErrors[2] || {}}
+                        isFormDirty={isFormDirty}
+                        setFormDirty={setFormDirty}
                       />
                     </WizardViewContent>
 
@@ -284,6 +327,8 @@ const PageEventDetailManage = () => {
                         eventData={eventData}
                         updateEventData={updateEventData}
                         validationErrors={validationErrors[3] || {}}
+                        isFormDirty={isFormDirty}
+                        setFormDirty={setFormDirty}
                       />
                     </WizardViewContent>
                   </WizardView>
@@ -314,8 +359,8 @@ const PageEventDetailManage = () => {
                   )}
                 </div>
               </div>
-            </Col>
-          </Row>
+            </StickyItemSibling>
+          </StickyContainer>
         </Container>
       </StyledPageWrapper>
 
@@ -342,13 +387,44 @@ const PageEventDetailManage = () => {
           setShouldShowPreview(false);
         }}
       />
+      <AlertSubmitError isError={isErrorSubmiting} errors={savingEventStatus.errors} />
     </React.Fragment>
   );
 };
 
 const StyledPageWrapper = styled.div`
   margin: 2.5rem 0;
-  margin-top: 5rem;
+`;
+
+const StickyContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem;
+`;
+
+const StickyItem = styled.div`
+  position: sticky;
+  z-index: 100;
+  @media (max-width: 782px) {
+    position: static;
+  }
+
+  top: calc(70px + 2.5rem);
+  flex: 1 1 15rem;
+`;
+
+const StickyItemSibling = styled.div`
+  flex: 12 1 30rem;
+`;
+
+const RowStickyHeader = styled(Row)`
+  position: sticky;
+  top: 2.5rem;
+  z-index: 80;
+  background-color: var(--bs-body-bg);
+  padding-top: var(--ma-header-height);
+  margin-top: calc(-1 * var(--ma-header-height));
 `;
 
 function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) {
@@ -360,21 +436,101 @@ function AlertConfirmPublication({ showAlert, onPublish, onPreview, onCancel }) 
       btnSize="md"
       onConfirm={onPublish}
       onCancel={onCancel}
-      style={{ padding: "30px 40px" }}
+      style={{ width: 800, padding: "35px 88px", borderRadius: "1.25rem" }}
       customButtons={
         <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
-          <ButtonBlue onClick={onPreview} style={{ minWidth: 120 }}>
-            Lihat Pratinjau
+          <ButtonBlue onClick={onPublish} style={{ minWidth: 120 }}>
+            Publikasi
           </ButtonBlue>
 
-          <Button onClick={onPublish} style={{ color: "var(--ma-blue)", minWidth: 120 }}>
-            Publikasi
+          <Button onClick={onPreview} style={{ minWidth: 120, color: "var(--ma-blue)" }}>
+            Pratinjau
           </Button>
         </span>
       }
     >
-      <p className="text-muted">Event akan dipublikasikan</p>
+      <IllustationAlertPublication />
+      <h4>Lakukan Publikasi?</h4>
+      <p className="text-muted">
+        Klik Publikasi untuk publikasi event atau klik Pratinjau untuk memastikan ulang informasi
+        yang akan ditampilkan.
+      </p>
     </SweetAlert>
+  );
+}
+
+const IllustationAlertPublication = styled.div`
+  margin-bottom: 2rem;
+  width: 100%;
+  min-height: 188px;
+  background-image: url(${illustrationAlertPublication});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+`;
+
+function AlertSubmitError({ isError, errors, onConfirm }) {
+  const [isAlertOpen, setAlertOpen] = React.useState(false);
+
+  const renderErrorMessages = () => {
+    if (errors && typeof errors === "string") {
+      return errors;
+    }
+
+    if (errors) {
+      const fields = Object.keys(errors);
+      const messages = fields.map(
+        (field) => `${errors[field].map((message) => `- ${message}\n`).join("")}`
+      );
+      if (messages.length) {
+        return `${messages.join("")}`;
+      }
+    }
+
+    return "Error tidak diketahui.";
+  };
+
+  const handleConfirm = () => {
+    setAlertOpen(false);
+    onConfirm?.();
+  };
+
+  React.useEffect(() => {
+    if (!isError) {
+      return;
+    }
+    setAlertOpen(true);
+  }, [isError]);
+
+  return (
+    <React.Fragment>
+      <SweetAlert
+        show={isAlertOpen}
+        title=""
+        custom
+        btnSize="md"
+        style={{ padding: "30px 40px", width: "720px" }}
+        onConfirm={handleConfirm}
+        customButtons={
+          <span className="d-flex flex-column w-100">
+            <ButtonBlue onClick={handleConfirm}>Tutup</ButtonBlue>
+          </span>
+        }
+      >
+        <h4>
+          <IconAlertTriangle />
+        </h4>
+        <div className="text-start">
+          <p>
+            Terdapat kendala teknis dalam memproses data. Coba kembali beberapa saat lagi, atau
+            silakan berikan pesan error berikut kepada technical support:
+          </p>
+          <pre className="p-3" style={{ backgroundColor: "var(--ma-gray-100)" }}>
+            {renderErrorMessages()}
+          </pre>
+        </div>
+      </SweetAlert>
+    </React.Fragment>
   );
 }
 
@@ -607,7 +763,6 @@ function useEventDataValidation(eventData) {
   const validate = ({ step, onValid, onInvalid }) => {
     const Step1 = StepGroupValidation();
     const Step2 = StepGroupValidation();
-    const Step3 = StepGroupValidation();
 
     // STEP 1: Informasi Umum
     Step1.validate("eventName", () => {
@@ -644,6 +799,10 @@ function useEventDataValidation(eventData) {
       if (!eventData.registrationDateEnd) {
         return "required";
       }
+
+      if (eventData.registrationDateEnd <= eventData.registrationDateStart) {
+        return "Tanggal dan jam tutup pendaftaran harus setelah waktu mulai pendaftaran";
+      }
     });
 
     Step1.validate("eventDateStart", () => {
@@ -655,6 +814,10 @@ function useEventDataValidation(eventData) {
     Step1.validate("eventDateEnd", () => {
       if (!eventData.eventDateEnd) {
         return "required";
+      }
+
+      if (eventData.eventDateEnd <= eventData.eventDateStart) {
+        return "Tanggal dan jam akhir lomba harus setelah waktu mulai lomba";
       }
     });
 
@@ -693,50 +856,8 @@ function useEventDataValidation(eventData) {
       }
     }
 
-    // STEP 3: Biaya Registrasi
-    if (eventData.isFlatRegistrationFee) {
-      Step3.validate("registrationFee", () => {
-        if (!eventData.registrationFee) {
-          return "required";
-        }
-      });
-    } else {
-      // Hanya validasikan harga tim yang dipilih di kategori.
-      // Jenis tim yang tidak dipilih di kategori tidak diwajibkan diisi,
-      // sehingga tidak dihitung error.
-      const selectedTeamCategories = [];
-      for (const categoryGroup of eventData.eventCategories) {
-        for (const detail of categoryGroup.categoryDetails) {
-          if (!detail.teamCategory?.value) {
-            continue;
-          }
-
-          if (
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
-          ) {
-            selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
-          } else {
-            selectedTeamCategories.push(detail.teamCategory?.value);
-          }
-        }
-      }
-
-      for (const team of selectedTeamCategories) {
-        const byTeamCategory = (fee) => fee.teamCategory === team;
-        const feeData = eventData.registrationFees.find(byTeamCategory);
-
-        Step3.validate(`registrationFee-${team}`, () => {
-          if (!feeData?.amount) {
-            return "required";
-          }
-        });
-      }
-    }
-
     step === 1 && ValidationErrors.addByGroup({ stepGroup: 1, errors: Step1.errors });
     step === 2 && ValidationErrors.addByGroup({ stepGroup: 2, errors: Step2.errors });
-    step === 3 && ValidationErrors.addByGroup({ stepGroup: 3, errors: Step3.errors });
 
     setValidation((state) => ({ ...state, errors: ValidationErrors.nextErrorsState }));
 

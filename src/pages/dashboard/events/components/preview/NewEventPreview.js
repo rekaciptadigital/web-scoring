@@ -227,34 +227,89 @@ function NewEventPreview({ eventData }) {
 }
 
 function CopywritingRegistrationFee({ eventData }) {
-  const computeDisplayFee = () => {
-    if (eventData.isFlatRegistrationFee) {
-      return eventData.registrationFee;
-    }
-    const lowestFee = eventData.registrationFees?.sort(lowToHigh)[0].amount;
-    return lowestFee;
-  };
+  if (eventData.isFlatRegistrationFee && !eventData.registrationFee) {
+    return <React.Fragment>Gratis</React.Fragment>;
+  }
 
-  if (!eventData.registrationFee && !eventData.registrationFees?.length) {
+  if (eventData.isFlatRegistrationFee) {
     return (
       <React.Fragment>
-        Mulai dari Rp <span>&laquo;data harga tidak tersedia&raquo;</span>
+        Mulai dari{" "}
+        <CurrencyFormat
+          displayType={"text"}
+          value={eventData.registrationFee}
+          prefix="Rp&nbsp;"
+          thousandSeparator={"."}
+          decimalSeparator={","}
+          decimalScale={2}
+          fixedDecimalScale
+        />
+      </React.Fragment>
+    );
+  }
+
+  if (eventData.registrationFees?.length) {
+    const selectedTeamCategories = [];
+    for (const categoryGroup of eventData.eventCategories) {
+      for (const detail of categoryGroup.categoryDetails) {
+        if (!detail.teamCategory?.value) {
+          continue;
+        }
+
+        if (
+          detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+          detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+        ) {
+          selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
+        } else {
+          selectedTeamCategories.push(detail.teamCategory?.value);
+        }
+      }
+    }
+
+    const onlySelectedCategory = (fee) => {
+      const isTeamCategorySelected = selectedTeamCategories.some(
+        (team) => team === fee.teamCategory
+      );
+      return isTeamCategorySelected && Boolean(fee.amount);
+    };
+
+    const lowToHigh = (feeA, feeB) => {
+      if (feeA.amount === feeB.amount) {
+        return 0;
+      }
+      if (feeA.amount < feeB.amount) {
+        return -1;
+      }
+      return 1;
+    };
+
+    const sortedFees = eventData.registrationFees.filter(onlySelectedCategory).sort(lowToHigh);
+    const lowestFee = sortedFees[0]?.amount;
+
+    return (
+      <React.Fragment>
+        Mulai dari{" "}
+        {lowestFee ? (
+          <CurrencyFormat
+            displayType={"text"}
+            value={lowestFee}
+            prefix="Rp&nbsp;"
+            thousandSeparator={"."}
+            decimalSeparator={","}
+            decimalScale={2}
+            fixedDecimalScale
+          />
+        ) : (
+          <React.Fragment>gratis</React.Fragment>
+        )}
       </React.Fragment>
     );
   }
 
   return (
     <React.Fragment>
-      Mulai dari{" "}
-      <CurrencyFormat
-        displayType={"text"}
-        value={computeDisplayFee()}
-        prefix="Rp&nbsp;"
-        thousandSeparator={"."}
-        decimalSeparator={","}
-        decimalScale={2}
-        fixedDecimalScale
-      />
+      <span>&laquo;Data harga tidak tersedia&raquo;</span>
     </React.Fragment>
   );
 }
@@ -473,15 +528,5 @@ const PageWrapper = styled.div`
     }
   }
 `;
-
-const lowToHigh = (feeA, feeB) => {
-  if (feeA.amount === feeB.amount) {
-    return 0;
-  }
-  if (feeA.amount < feeB.amount) {
-    return -1;
-  }
-  return 1;
-};
 
 export default NewEventPreview;

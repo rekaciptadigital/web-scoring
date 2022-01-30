@@ -16,7 +16,7 @@ export function StepKategori({ eventData, updateEventData, validationErrors }) {
     if (eventData.eventCategories.length === categoryOptions.length) {
       return;
     }
-    updateEventData({ type: "ADD_EVENT_CATEGORY" });
+    updateEventData({ type: "ADD_EVENT_CATEGORY", options: categoryOptions });
   };
 
   return (
@@ -36,7 +36,11 @@ export function StepKategori({ eventData, updateEventData, validationErrors }) {
         })}
 
         <div className="bottom-section-add-category">
-          <ButtonOutlineBlue corner="8" onClick={handleClickAddCategory}>
+          <ButtonOutlineBlue
+            corner="8"
+            onClick={handleClickAddCategory}
+            disabled={eventData.eventCategories.length === categoryOptions.length}
+          >
             + Tambah Kategori
           </ButtonOutlineBlue>
         </div>

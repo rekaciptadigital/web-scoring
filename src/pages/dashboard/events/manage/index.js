@@ -120,10 +120,8 @@ const PageEventDetailManage = () => {
         onValid: () => handleSaveCategoryDetails(),
       });
     } else if (stepNumber === 3) {
-      validateForm({
-        step: stepNumber,
-        onValid: () => handleSaveRegistrationFees(),
-      });
+      // Field-field kosong di registration fees gak perlu divalidasi
+      handleSaveRegistrationFees();
     }
   };
 
@@ -152,18 +150,6 @@ const PageEventDetailManage = () => {
   };
 
   const handleSaveRegistrationFees = async () => {
-    // Validate empty fields
-    if (eventData.isFlatRegistrationFee && !eventData.registrationFee) {
-      // TODO: ganti pakai sweet alert?
-      alert("inputan harga flat masih kosong");
-      return;
-    }
-    if (!eventData.isFlatRegistrationFee && !eventData.registrationFees?.length) {
-      // TODO: ganti pakai sweet alert?
-      alert("inputan harga per tim masih kosong");
-      return;
-    }
-
     setSavingEventStatus((state) => ({ ...state, status: "loading", errors: null }));
     const payload = makeFeesPayload({ event_id: eventId, ...eventData });
     const result = await EventsService.updateCategoryFee(payload);
@@ -658,7 +644,6 @@ function useEventDataValidation(eventData) {
   const validate = ({ step, onValid, onInvalid }) => {
     const Step1 = StepGroupValidation();
     const Step2 = StepGroupValidation();
-    const Step3 = StepGroupValidation();
 
     // STEP 1: Informasi Umum
     Step1.validate("eventName", () => {
@@ -744,50 +729,8 @@ function useEventDataValidation(eventData) {
       }
     }
 
-    // STEP 3: Biaya Registrasi
-    if (eventData.isFlatRegistrationFee) {
-      Step3.validate("registrationFee", () => {
-        if (!eventData.registrationFee) {
-          return "required";
-        }
-      });
-    } else {
-      // Hanya validasikan harga tim yang dipilih di kategori.
-      // Jenis tim yang tidak dipilih di kategori tidak diwajibkan diisi,
-      // sehingga tidak dihitung error.
-      const selectedTeamCategories = [];
-      for (const categoryGroup of eventData.eventCategories) {
-        for (const detail of categoryGroup.categoryDetails) {
-          if (!detail.teamCategory?.value) {
-            continue;
-          }
-
-          if (
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
-            detail.teamCategory.value === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
-          ) {
-            selectedTeamCategories.push(TEAM_CATEGORIES.TEAM_INDIVIDUAL);
-          } else {
-            selectedTeamCategories.push(detail.teamCategory?.value);
-          }
-        }
-      }
-
-      for (const team of selectedTeamCategories) {
-        const byTeamCategory = (fee) => fee.teamCategory === team;
-        const feeData = eventData.registrationFees.find(byTeamCategory);
-
-        Step3.validate(`registrationFee-${team}`, () => {
-          if (!feeData?.amount) {
-            return "required";
-          }
-        });
-      }
-    }
-
     step === 1 && ValidationErrors.addByGroup({ stepGroup: 1, errors: Step1.errors });
     step === 2 && ValidationErrors.addByGroup({ stepGroup: 2, errors: Step2.errors });
-    step === 3 && ValidationErrors.addByGroup({ stepGroup: 3, errors: Step3.errors });
 
     setValidation((state) => ({ ...state, errors: ValidationErrors.nextErrorsState }));
 

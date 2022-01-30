@@ -104,7 +104,7 @@ const PageEventDetailManage = () => {
 
   const eventId = parseInt(event_id);
   const isLoading = savingEventStatus.status === "loading";
-  const isErrorSubmiting = savingEventStatus.status === "loading";
+  const isErrorSubmiting = savingEventStatus.status === "error";
 
   const incrementAttemptCounts = () => {
     setFetchingEventStatus((state) => ({
@@ -146,7 +146,7 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       incrementAttemptCounts();
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -158,7 +158,7 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       incrementAttemptCounts();
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -170,7 +170,7 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       incrementAttemptCounts();
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -195,8 +195,7 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error" }));
-      // TODO: popup error 422
+      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
 
@@ -704,7 +703,7 @@ function makeCategoryDetailsPayload(eventData) {
 }
 
 function makeFeesPayload(eventData) {
-  if (eventData.isFlatRegistrationFee) {
+  if (eventData.isFlatRegistrationFee || !eventData.registrationFees?.length) {
     const teamCategories = [
       TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE,
       TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE,

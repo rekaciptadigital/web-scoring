@@ -17,13 +17,7 @@ import {
 
 import { setHours, setMinutes, getMinutes, getHours } from "date-fns";
 
-export function StepInfoUmum({
-  eventData,
-  updateEventData,
-  validationErrors,
-  isFormDirty,
-  setFormDirty,
-}) {
+export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
@@ -35,8 +29,6 @@ export function StepInfoUmum({
   const handleModalEditInfoClose = () => setKeyExtraInfoEdited(null);
 
   const handlePickBannerChange = (ev) => {
-    !isFormDirty && setFormDirty(true);
-
     if (!ev.target.files?.[0]) {
       return;
     }

@@ -4,13 +4,15 @@ import { useWizardView } from "utils/hooks/wizard-view";
 
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
-import { StepsList, StepItem } from "./components";
+import { WizardView, WizardViewContent, Button } from "components/ma";
+import { StepsList, StepItem, FolderTabs, TabItem, FolderPanel } from "./components";
 import { BreadcrumbDashboard } from "../components/breadcrumb";
 
 import IconTarget from "components/ma/icons/mono/target";
 import IconScoreboard from "components/ma/icons/mono/scoreboard";
 import IconBranch from "components/ma/icons/mono/branch";
 import IconDiagram from "components/ma/icons/mono/diagram";
+import IconCalendar from "components/ma/icons/mono/calendar";
 
 import { StyledPageWrapper, StickyContainer, StickyItem, StickyItemSibling } from "./styles";
 
@@ -19,6 +21,11 @@ const stepsList = [
   { step: 2, label: "Skor Kualifikasi" },
   { step: 3, label: "Atur Eliminasi" },
   { step: 4, label: "Skor Eliminasi" },
+];
+
+const scheduleTabs = [
+  { step: 1, label: "Jadwal" },
+  { step: 2, label: "Bantalan" },
 ];
 
 const PageEventDetailSchedulingScoring = () => {
@@ -62,7 +69,26 @@ const PageEventDetailSchedulingScoring = () => {
               </StepsList>
             </StickyItem>
 
-            <StickyItemSibling>konten</StickyItemSibling>
+            <StickyItemSibling>
+              <WizardView currentStep={currentStep}>
+                <WizardViewContent>
+                  <div>
+                    <FolderTabs tabs={scheduleTabs}>
+                      <TabItem tab="1" icon={<IconCalendar size="16" />}>
+                        Jadwal
+                      </TabItem>
+
+                      <TabItem disabled tab="2" icon={<IconCalendar size="16" />}>
+                        Bantalan
+                      </TabItem>
+                    </FolderTabs>
+
+                    <FolderPanel>
+                    </FolderPanel>
+                  </div>
+                </WizardViewContent>
+              </WizardView>
+            </StickyItemSibling>
           </StickyContainer>
         </Container>
       </StyledPageWrapper>

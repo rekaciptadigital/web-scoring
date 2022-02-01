@@ -26,6 +26,7 @@ import IconDiagram from "components/ma/icons/mono/diagram";
 import IconCalendar from "components/ma/icons/mono/calendar";
 
 import { parseISO } from "date-fns";
+import classnames from "classnames";
 
 import {
   StyledPageWrapper,
@@ -65,12 +66,18 @@ const PageEventDetailSchedulingScoring = () => {
     data: null,
     errors: null,
   });
+  const [editMode, setEditMode] = React.useReducer((state, action) => ({ ...state, ...action }), {
+    currentId: null,
+    status: "closed",
+    initialSchedules: null,
+  });
   const [schedulingForm, dispatchShedulingForm] = React.useReducer(
     (state, action) => ({ ...state, ...action }),
     { isFormDirty: false, errors: {} }
   );
 
   const eventId = parseInt(event_id);
+
   const isLoadingCategoryDetails = groupedCategoryDetails.status === "loading";
   const categoryDetailsData = groupedCategoryDetails.data;
   const competitionCategories = groupedCategoryDetails.data
@@ -81,6 +88,8 @@ const PageEventDetailSchedulingScoring = () => {
   const isLoadingSchedules = scheduling.status === "loading";
 
   const { isFormDirty, errors: validationErrors } = schedulingForm;
+
+  const isEditMode = editMode.status === "open";
 
   React.useEffect(() => {
     const fetchCategoryDetails = async () => {
@@ -142,6 +151,10 @@ const PageEventDetailSchedulingScoring = () => {
   };
 
   const handleClickSaveSchedule = async () => {
+    if (isEditMode) {
+      return;
+    }
+
     if (!isFormDirty) {
       dispatchShedulingForm({ isFormDirty: true });
     }
@@ -238,8 +251,45 @@ const PageEventDetailSchedulingScoring = () => {
                         competitionCategories.map((competition, index) => {
                           const scheduleGroup = schedulesData[competition];
                           const categoryDetails = categoryDetailsData[competition];
+
+                          const shouldAllowEditing =
+                            isEditMode && editMode.currentId === competition;
+
+                          const handleOpenEditSchedule = () => {
+                            if (isEditMode) {
+                              return;
+                            }
+
+                            const currentSchedules = { ...scheduleGroup };
+                            setEditMode({
+                              currentId: competition,
+                              status: "open",
+                              initialSchedules: currentSchedules,
+                            });
+                          };
+
+                          const handleCloseEditSchedule = () => {
+                            setEditMode({
+                              currentId: null,
+                              status: "closed",
+                              initialSchedules: null,
+                            });
+                          };
+
+                          const handleCancelEditSchedule = (payload) => {
+                            dispatchScheduling({
+                              type: SCHEDULING_TYPE.BULK,
+                              competitionCategory: competition,
+                              payload,
+                            });
+                            handleCloseEditSchedule();
+                          };
+
                           return (
-                            <ScheduleGroupFormBox key={index}>
+                            <ScheduleGroupFormBox
+                              key={index}
+                              className={classnames({ "is-focused": shouldAllowEditing })}
+                            >
                               <div>
                                 <div>
                                   <div
@@ -258,6 +308,7 @@ const PageEventDetailSchedulingScoring = () => {
                                       >
                                         <FieldInputDateSmall
                                           label="Tanggal"
+                                          disabled={shouldAllowEditing}
                                           value={scheduleGroup.common.date}
                                           onChange={(value) =>
                                             dispatchScheduling({
@@ -269,6 +320,7 @@ const PageEventDetailSchedulingScoring = () => {
                                         />
                                         <FieldInputTimeSmall
                                           label="Jam Mulai"
+                                          disabled={shouldAllowEditing}
                                           value={scheduleGroup.common.timeStart}
                                           onChange={(value) => {
                                             dispatchScheduling({
@@ -280,6 +332,7 @@ const PageEventDetailSchedulingScoring = () => {
                                         />
                                         <FieldInputTimeSmall
                                           label="Jam Selesai"
+                                          disabled={shouldAllowEditing}
                                           value={scheduleGroup.common.timeEnd}
                                           onChange={(value) => {
                                             dispatchScheduling({
@@ -300,7 +353,24 @@ const PageEventDetailSchedulingScoring = () => {
                                         gap: "0.5rem",
                                       }}
                                     >
-                                      <ButtonOutlineBlue>Ubah Detail</ButtonOutlineBlue>
+                                      {shouldAllowEditing ? (
+                                        <React.Fragment>
+                                          <Button
+                                            onClick={() =>
+                                              handleCancelEditSchedule(editMode.initialSchedules)
+                                            }
+                                          >
+                                            Batal
+                                          </Button>
+                                          <ButtonOutlineBlue onClick={handleCloseEditSchedule}>
+                                            Simpan
+                                          </ButtonOutlineBlue>
+                                        </React.Fragment>
+                                      ) : (
+                                        <ButtonOutlineBlue onClick={handleOpenEditSchedule}>
+                                          Ubah Detail
+                                        </ButtonOutlineBlue>
+                                      )}
                                     </div>
                                   </div>
 
@@ -331,6 +401,15 @@ const PageEventDetailSchedulingScoring = () => {
                                         const fieldNameTimeStart = `schedule-time-start-${detailId}`;
                                         const fieldNameTimeEnd = `schedule-time-end-${detailId}`;
 
+                                        const handleSingleScheduleChange = (payload) => {
+                                          dispatchScheduling({
+                                            type: SCHEDULING_TYPE.SINGLE,
+                                            competitionCategory: competition,
+                                            detailId,
+                                            payload,
+                                          });
+                                        };
+
                                         return (
                                           <tr key={detailId}>
                                             <td>{ageCategory}</td>
@@ -342,9 +421,16 @@ const PageEventDetailSchedulingScoring = () => {
                                             <td width="20%">
                                               <div>
                                                 <FieldInputDateSmall
-                                                  disabled={!isEditMode}
+                                                  disabled={!shouldAllowEditing}
                                                   name={fieldNameDate}
                                                   value={schedule.date}
+                                                  onChange={(value) => {
+                                                    handleSingleScheduleChange({
+                                                      competitionCategory: competition,
+                                                      detailId,
+                                                      date: value,
+                                                    });
+                                                  }}
                                                   errors={validationErrors[fieldNameDate]}
                                                 />
                                               </div>
@@ -353,16 +439,30 @@ const PageEventDetailSchedulingScoring = () => {
                                             <td width="30%">
                                               <div className="d-flex" style={{ gap: "0.5rem" }}>
                                                 <FieldInputTimeSmall
-                                                  disabled={!isEditMode}
+                                                  disabled={!shouldAllowEditing}
                                                   name={fieldNameTimeStart}
                                                   value={schedule.timeStart}
+                                                  onChange={(value) => {
+                                                    handleSingleScheduleChange({
+                                                      competitionCategory: competition,
+                                                      detailId,
+                                                      timeStart: value,
+                                                    });
+                                                  }}
                                                   errors={validationErrors[fieldNameTimeStart]}
                                                 />
 
                                                 <FieldInputTimeSmall
-                                                  disabled={!isEditMode}
+                                                  disabled={!shouldAllowEditing}
                                                   name={fieldNameTimeEnd}
                                                   value={schedule.timeEnd}
+                                                  onChange={(value) => {
+                                                    handleSingleScheduleChange({
+                                                      competitionCategory: competition,
+                                                      detailId,
+                                                      timeEnd: value,
+                                                    });
+                                                  }}
                                                   errors={validationErrors[fieldNameTimeEnd]}
                                                 />
                                               </div>

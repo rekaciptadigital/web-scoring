@@ -48,6 +48,12 @@ const ScheduleGroupFormBox = styled.div`
   padding: 1.25rem;
   border: solid 1px var(--ma-gray-100);
   border-radius: 0.5rem;
+
+  transition: all 0.15s ease-in-out;
+
+  &.is-focused {
+    box-shadow: 0 0 0 2px #2684ff;
+  }
 `;
 
 export {

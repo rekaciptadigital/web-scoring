@@ -6,6 +6,7 @@ import { EventsService } from "services";
 
 import MetaTags from "react-meta-tags";
 import { Container, Table } from "reactstrap";
+import { LoadingScreen } from "components";
 import { WizardView, WizardViewContent, Button, ButtonOutlineBlue } from "components/ma";
 import {
   StepsList,
@@ -26,7 +27,7 @@ import IconBranch from "components/ma/icons/mono/branch";
 import IconDiagram from "components/ma/icons/mono/diagram";
 import IconCalendar from "components/ma/icons/mono/calendar";
 
-import { parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import classnames from "classnames";
 
 import {
@@ -56,11 +57,17 @@ const PageEventDetailSchedulingScoring = () => {
   const { currentStep, goToStep } = useWizardView(stepsList);
 
   const [groupedCategoryDetails, setGroupedCategoryDetails] = React.useReducer(
-    (state, action) => ({ ...state, ...action }),
+    (state, action) => {
+      if (action.type === "REFETCH") {
+        return { ...state, attempts: state.attempts + 1 };
+      }
+      return { ...state, ...action };
+    },
     {
       status: "idle",
       data: null,
       errors: null,
+      attempts: 0,
     }
   );
   const [scheduling, dispatchScheduling] = React.useReducer(schedulingReducer, {
@@ -77,6 +84,10 @@ const PageEventDetailSchedulingScoring = () => {
       flashMessage: "",
     }
   );
+  const [submitStatus, dispatchSubmitStatus] = React.useReducer(
+    (state, action) => ({ ...state, ...action }),
+    { status: "idle", errors: null }
+  );
   const [schedulingForm, dispatchShedulingForm] = React.useReducer(
     (state, action) => ({ ...state, ...action }),
     { isFormDirty: false, errors: {} }
@@ -85,6 +96,7 @@ const PageEventDetailSchedulingScoring = () => {
   const eventId = parseInt(event_id);
 
   const isLoadingCategoryDetails = groupedCategoryDetails.status === "loading";
+  const { attempts } = groupedCategoryDetails;
   const categoryDetailsData = groupedCategoryDetails.data;
   const competitionCategories = groupedCategoryDetails.data
     ? Object.keys(groupedCategoryDetails.data)
@@ -94,8 +106,18 @@ const PageEventDetailSchedulingScoring = () => {
   const isLoadingSchedules = scheduling.status === "loading";
 
   const { isFormDirty, errors: validationErrors } = schedulingForm;
+  const isFormInvalid = Boolean(Object.keys(validationErrors)?.length);
 
   const isEditMode = editMode.status === "open";
+  const isLoadingSubmit = submitStatus.status === "loading";
+
+  const setFormDirty = () => {
+    !isFormDirty && dispatchShedulingForm({ isFormDirty: true });
+  };
+
+  const setFormClean = () => {
+    isFormDirty && dispatchShedulingForm({ isFormDirty: false });
+  };
 
   function displayFlashMessage(message) {
     dispatchEditMode({ flashMessage: message });
@@ -110,13 +132,14 @@ const PageEventDetailSchedulingScoring = () => {
       const result = await EventsService.getEventCategoryDetails({ event_id: eventId });
       if (result.success) {
         setGroupedCategoryDetails({ status: "success", data: result.data });
+        setFormClean();
       } else {
         setGroupedCategoryDetails({ status: "error", errors: result.errors });
       }
     };
 
     fetchCategoryDetails();
-  }, []);
+  }, [attempts]);
 
   React.useEffect(() => {
     if (!categoryDetailsData) {
@@ -170,7 +193,7 @@ const PageEventDetailSchedulingScoring = () => {
     }
 
     if (!isFormDirty) {
-      dispatchShedulingForm({ isFormDirty: true });
+      return;
     }
 
     // Validate inputs, required
@@ -179,7 +202,15 @@ const PageEventDetailSchedulingScoring = () => {
       return;
     }
 
-    // TODO: submit
+    dispatchSubmitStatus({ status: "loading", errors: null });
+    const payload = makeSchedulesPayload(schedulesData);
+    const result = await EventsService.storeQualificationSchedules(payload);
+    if (result.success) {
+      dispatchSubmitStatus({ status: "success" });
+      setGroupedCategoryDetails({ type: "REFETCH" });
+    } else {
+      dispatchSubmitStatus({ status: "error", errors: result.errors });
+    }
   };
 
   React.useEffect(() => {
@@ -246,7 +277,12 @@ const PageEventDetailSchedulingScoring = () => {
                         </div>
 
                         <SchedulingFormActions>
-                          <Button onClick={handleClickSaveSchedule}>Simpan</Button>
+                          <Button
+                            disabled={!isFormDirty || isFormInvalid}
+                            onClick={handleClickSaveSchedule}
+                          >
+                            Simpan
+                          </Button>
                           {editMode.flashMessage && (
                             <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
                           )}
@@ -260,9 +296,9 @@ const PageEventDetailSchedulingScoring = () => {
                         </NoticeBarInfo>
                       )}
 
-                      {isLoadingCategoryDetails ? (
+                      {isLoadingCategoryDetails && !attempts ? (
                         <div>Sedang memuat data kategori event</div>
-                      ) : isLoadingSchedules ? (
+                      ) : isLoadingSchedules && !attempts ? (
                         <div>Sedang memuat data jadwal kualifikasi</div>
                       ) : competitionCategories.length && schedulesData ? (
                         competitionCategories.map((competition, index) => {
@@ -328,19 +364,21 @@ const PageEventDetailSchedulingScoring = () => {
                                           label="Tanggal"
                                           disabled={shouldAllowEditing}
                                           value={scheduleGroup.common.date}
-                                          onChange={(value) =>
+                                          onChange={(value) => {
+                                            setFormDirty();
                                             dispatchScheduling({
                                               type: SCHEDULING_TYPE.COMMON,
                                               competitionCategory: competition,
                                               payload: { date: value },
-                                            })
-                                          }
+                                            });
+                                          }}
                                         />
                                         <FieldInputTimeSmall
                                           label="Jam Mulai"
                                           disabled={shouldAllowEditing}
                                           value={scheduleGroup.common.timeStart}
                                           onChange={(value) => {
+                                            setFormDirty();
                                             dispatchScheduling({
                                               type: SCHEDULING_TYPE.COMMON,
                                               competitionCategory: competition,
@@ -353,6 +391,7 @@ const PageEventDetailSchedulingScoring = () => {
                                           disabled={shouldAllowEditing}
                                           value={scheduleGroup.common.timeEnd}
                                           onChange={(value) => {
+                                            setFormDirty();
                                             dispatchScheduling({
                                               type: SCHEDULING_TYPE.COMMON,
                                               competitionCategory: competition,
@@ -420,6 +459,7 @@ const PageEventDetailSchedulingScoring = () => {
                                         const fieldNameTimeEnd = `schedule-time-end-${detailId}`;
 
                                         const handleSingleScheduleChange = (payload) => {
+                                          setFormDirty();
                                           dispatchScheduling({
                                             type: SCHEDULING_TYPE.SINGLE,
                                             competitionCategory: competition,
@@ -505,6 +545,7 @@ const PageEventDetailSchedulingScoring = () => {
             </StickyItemSibling>
           </StickyContainer>
         </Container>
+        <LoadingScreen loading={isLoadingSubmit} />
       </StyledPageWrapper>
     </React.Fragment>
   );
@@ -541,6 +582,32 @@ function makeSchedulingData(groupedCategoryDetail, schedules) {
     transformedSchedules[competitionCategory].common = makeInitialSchedule();
   }
   return transformedSchedules;
+}
+
+function makeSchedulesPayload(schedules) {
+  const qualificationTime = [];
+  for (const competitionCategory in schedules) {
+    const scheduleGroup = schedules[competitionCategory];
+    for (const detailId in scheduleGroup) {
+      if (detailId === "common") {
+        continue;
+      }
+      const schedule = scheduleGroup[detailId];
+      const schedulePayloadItem = {
+        category_detail_id: detailId,
+        event_start_datetime: formatServerDatetime(schedule.date, schedule.timeStart),
+        event_end_datetime: formatServerDatetime(schedule.date, schedule.timeEnd),
+      };
+      qualificationTime.push(schedulePayloadItem);
+    }
+  }
+  return { qualificationTime };
+}
+
+function formatServerDatetime(date, time) {
+  const dateString = format(date, "yyyy-MM-dd");
+  const timeString = format(time, "HH:mm:ss");
+  return `${dateString} ${timeString}`;
 }
 
 export default PageEventDetailSchedulingScoring;

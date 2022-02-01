@@ -35,6 +35,8 @@ import {
   StickyContainer,
   StickyItem,
   StickyItemSibling,
+  StickyFolderHeader,
+  StickyBlindOverlay,
   QualificationScheduleHeader,
   ScheduleGroupFormBox,
   SchedulingFormActions,
@@ -259,43 +261,48 @@ const PageEventDetailSchedulingScoring = () => {
               <WizardView currentStep={currentStep}>
                 <WizardViewContent>
                   <div>
-                    <FolderTabs tabs={scheduleTabs}>
-                      <TabItem tab="1" icon={<IconCalendar size="16" />}>
-                        Jadwal
-                      </TabItem>
+                    <StickyFolderHeader>
+                      <StickyBlindOverlay />
+                      <FolderTabs tabs={scheduleTabs}>
+                        <TabItem tab="1" icon={<IconCalendar size="16" />}>
+                          Jadwal
+                        </TabItem>
 
-                      <TabItem disabled tab="2" icon={<IconCalendar size="16" />}>
-                        Bantalan
-                      </TabItem>
-                    </FolderTabs>
+                        <TabItem disabled tab="2" icon={<IconCalendar size="16" />}>
+                          Bantalan
+                        </TabItem>
+                      </FolderTabs>
 
-                    <FolderPanel>
-                      <QualificationScheduleHeader>
-                        <div>
-                          <h3>Jadwal Kualifikasi</h3>
-                          <div>Pengaturan jadwal tiap kategori</div>
-                        </div>
+                      <FolderPanel>
+                        <QualificationScheduleHeader>
+                          <div>
+                            <h3>Jadwal Kualifikasi</h3>
+                            <div>Pengaturan jadwal tiap kategori</div>
+                          </div>
 
-                        <SchedulingFormActions>
-                          <Button
-                            disabled={!isFormDirty || isFormInvalid}
-                            onClick={handleClickSaveSchedule}
-                          >
-                            Simpan
-                          </Button>
-                          {editMode.flashMessage && (
-                            <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
-                          )}
-                        </SchedulingFormActions>
-                      </QualificationScheduleHeader>
+                          <SchedulingFormActions>
+                            <Button
+                              disabled={!isFormDirty || isFormInvalid}
+                              onClick={handleClickSaveSchedule}
+                            >
+                              Simpan
+                            </Button>
+                            {editMode.flashMessage && (
+                              <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
+                            )}
+                          </SchedulingFormActions>
+                        </QualificationScheduleHeader>
 
-                      {categoryDetailsData && (
-                        <NoticeBarInfo>
-                          Anda tidak dapat mengatur kembali jika terdapat peserta yang telah
-                          mendaftar
-                        </NoticeBarInfo>
-                      )}
+                        {categoryDetailsData && (
+                          <NoticeBarInfo>
+                            Anda tidak dapat mengatur kembali jika terdapat peserta yang telah
+                            mendaftar
+                          </NoticeBarInfo>
+                        )}
+                      </FolderPanel>
+                    </StickyFolderHeader>
 
+                    <FolderPanel style={{ paddingTop: 3 }}>
                       {isLoadingCategoryDetails && !attempts ? (
                         <div>Sedang memuat data kategori event</div>
                       ) : isLoadingSchedules && !attempts ? (

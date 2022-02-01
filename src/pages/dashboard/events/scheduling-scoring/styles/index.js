@@ -26,6 +26,21 @@ const StickyItemSibling = styled.div`
   flex: 12 1 30rem;
 `;
 
+const StickyFolderHeader = styled.div`
+  position: sticky;
+  top: calc(70px + 2.5rem);
+  z-index: 100;
+`;
+
+const StickyBlindOverlay = styled.div`
+  position: absolute;
+  top: calc(-1 * (70px + 2.5rem));
+  z-index: -1;
+  background-color: var(--bs-body-bg);
+  width: 100%;
+  height: 240px;
+`;
+
 const QualificationScheduleHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -69,6 +84,8 @@ export {
   StickyContainer,
   StickyItem,
   StickyItemSibling,
+  StickyFolderHeader,
+  StickyBlindOverlay,
   QualificationScheduleHeader,
   ScheduleGroupFormBox,
   SchedulingFormActions,

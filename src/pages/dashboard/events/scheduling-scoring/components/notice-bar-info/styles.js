@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 const StyledWrapper = styled.div`
-  margin-bottom: 1.25rem;
   display: flex;
   justify-content: flex-start;
   align-items: center;

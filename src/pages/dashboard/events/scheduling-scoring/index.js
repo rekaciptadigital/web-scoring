@@ -65,6 +65,10 @@ const PageEventDetailSchedulingScoring = () => {
     data: null,
     errors: null,
   });
+  const [schedulingForm, dispatchShedulingForm] = React.useReducer(
+    (state, action) => ({ ...state, ...action }),
+    { isFormDirty: false, errors: {} }
+  );
 
   const eventId = parseInt(event_id);
   const isLoadingCategoryDetails = groupedCategoryDetails.status === "loading";
@@ -75,6 +79,8 @@ const PageEventDetailSchedulingScoring = () => {
 
   const { data: schedulesData } = scheduling;
   const isLoadingSchedules = scheduling.status === "loading";
+
+  const { isFormDirty, errors: validationErrors } = schedulingForm;
 
   React.useEffect(() => {
     const fetchCategoryDetails = async () => {
@@ -110,6 +116,51 @@ const PageEventDetailSchedulingScoring = () => {
 
     fetchScheduling();
   }, [categoryDetailsData]);
+
+  const runValidation = () => {
+    const validationErrors = {};
+    for (const competitionGroup in schedulesData) {
+      const schedules = schedulesData[competitionGroup];
+      for (const scheduleId in schedules) {
+        if (scheduleId === "common") {
+          continue;
+        }
+        const schedule = schedules[scheduleId];
+        if (!schedule.date) {
+          validationErrors[`schedule-date-${scheduleId}`] = ["required"];
+        }
+        if (!schedule.timeStart) {
+          validationErrors[`schedule-time-start-${scheduleId}`] = ["required"];
+        }
+        if (!schedule.timeEnd) {
+          validationErrors[`schedule-time-end-${scheduleId}`] = ["required"];
+        }
+      }
+    }
+    dispatchShedulingForm({ errors: validationErrors });
+    return validationErrors;
+  };
+
+  const handleClickSaveSchedule = async () => {
+    if (!isFormDirty) {
+      dispatchShedulingForm({ isFormDirty: true });
+    }
+
+    // Validate inputs, required
+    const validationErrors = runValidation();
+    if (Object.keys(validationErrors)?.length) {
+      return;
+    }
+
+    // TODO: submit
+  };
+
+  React.useEffect(() => {
+    if (!isFormDirty) {
+      return;
+    }
+    runValidation();
+  }, [isFormDirty, schedulesData]);
 
   return (
     <React.Fragment>
@@ -164,11 +215,11 @@ const PageEventDetailSchedulingScoring = () => {
                       <QualificationScheduleHeader>
                         <div>
                           <h3>Jadwal Kualifikasi</h3>
-                          <div>Hasil Kualifikasi Pertandingan</div>
+                          <div>Pengaturan jadwal tiap kategori</div>
                         </div>
 
                         <div>
-                          <Button>Simpan</Button>
+                          <Button onClick={handleClickSaveSchedule}>Simpan</Button>
                         </div>
                       </QualificationScheduleHeader>
 
@@ -294,6 +345,7 @@ const PageEventDetailSchedulingScoring = () => {
                                                   disabled={!isEditMode}
                                                   name={fieldNameDate}
                                                   value={schedule.date}
+                                                  errors={validationErrors[fieldNameDate]}
                                                 />
                                               </div>
                                             </td>
@@ -304,12 +356,14 @@ const PageEventDetailSchedulingScoring = () => {
                                                   disabled={!isEditMode}
                                                   name={fieldNameTimeStart}
                                                   value={schedule.timeStart}
+                                                  errors={validationErrors[fieldNameTimeStart]}
                                                 />
 
                                                 <FieldInputTimeSmall
                                                   disabled={!isEditMode}
                                                   name={fieldNameTimeEnd}
                                                   value={schedule.timeEnd}
+                                                  errors={validationErrors[fieldNameTimeEnd]}
                                                 />
                                               </div>
                                             </td>

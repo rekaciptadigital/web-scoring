@@ -16,6 +16,7 @@ import {
   FieldInputDateSmall,
   FieldInputTimeSmall,
   NoticeBarInfo,
+  BottomFlashMessage,
 } from "./components";
 import { BreadcrumbDashboard } from "../components/breadcrumb";
 
@@ -35,6 +36,7 @@ import {
   StickyItemSibling,
   QualificationScheduleHeader,
   ScheduleGroupFormBox,
+  SchedulingFormActions,
 } from "./styles";
 
 const stepsList = [
@@ -66,11 +68,15 @@ const PageEventDetailSchedulingScoring = () => {
     data: null,
     errors: null,
   });
-  const [editMode, setEditMode] = React.useReducer((state, action) => ({ ...state, ...action }), {
-    currentId: null,
-    status: "closed",
-    initialSchedules: null,
-  });
+  const [editMode, dispatchEditMode] = React.useReducer(
+    (state, action) => ({ ...state, ...action }),
+    {
+      currentId: null,
+      status: "closed",
+      initialSchedules: null,
+      flashMessage: "",
+    }
+  );
   const [schedulingForm, dispatchShedulingForm] = React.useReducer(
     (state, action) => ({ ...state, ...action }),
     { isFormDirty: false, errors: {} }
@@ -90,6 +96,13 @@ const PageEventDetailSchedulingScoring = () => {
   const { isFormDirty, errors: validationErrors } = schedulingForm;
 
   const isEditMode = editMode.status === "open";
+
+  function displayFlashMessage(message) {
+    dispatchEditMode({ flashMessage: message });
+    setTimeout(() => {
+      dispatchEditMode({ flashMessage: "" });
+    }, 3000);
+  }
 
   React.useEffect(() => {
     const fetchCategoryDetails = async () => {
@@ -152,6 +165,7 @@ const PageEventDetailSchedulingScoring = () => {
 
   const handleClickSaveSchedule = async () => {
     if (isEditMode) {
+      displayFlashMessage("Simpan terlebih dahulu jadwal yang diubah di bawah");
       return;
     }
 
@@ -231,9 +245,12 @@ const PageEventDetailSchedulingScoring = () => {
                           <div>Pengaturan jadwal tiap kategori</div>
                         </div>
 
-                        <div>
+                        <SchedulingFormActions>
                           <Button onClick={handleClickSaveSchedule}>Simpan</Button>
-                        </div>
+                          {editMode.flashMessage && (
+                            <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
+                          )}
+                        </SchedulingFormActions>
                       </QualificationScheduleHeader>
 
                       {categoryDetailsData && (
@@ -261,7 +278,7 @@ const PageEventDetailSchedulingScoring = () => {
                             }
 
                             const currentSchedules = { ...scheduleGroup };
-                            setEditMode({
+                            dispatchEditMode({
                               currentId: competition,
                               status: "open",
                               initialSchedules: currentSchedules,
@@ -269,10 +286,11 @@ const PageEventDetailSchedulingScoring = () => {
                           };
 
                           const handleCloseEditSchedule = () => {
-                            setEditMode({
+                            dispatchEditMode({
                               currentId: null,
                               status: "closed",
                               initialSchedules: null,
+                              flashMessage: "",
                             });
                           };
 

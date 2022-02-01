@@ -56,6 +56,14 @@ const ScheduleGroupFormBox = styled.div`
   }
 `;
 
+const SchedulingFormActions = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 1rem;
+`;
+
 export {
   StyledPageWrapper,
   StickyContainer,
@@ -63,4 +71,5 @@ export {
   StickyItemSibling,
   QualificationScheduleHeader,
   ScheduleGroupFormBox,
+  SchedulingFormActions,
 };

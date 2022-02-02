@@ -1,23 +1,16 @@
 import * as React from "react";
-import { useWizardView } from "utils/hooks/wizard-view";
+import { useFolderTabs } from "./hooks/folder-tabs";
 
 import { StyledTabs, StyledButtonItem, IconWrapper, FolderPanel } from "./styles";
 
 import classnames from "classnames";
 
-const TabsContext = React.createContext();
-
-function FolderTabs({ children, tabs }) {
-  const { currentStep: currentTab, goToStep: switchToTab } = useWizardView(tabs);
-  return (
-    <TabsContext.Provider value={{ currentTab, switchToTab }}>
-      <StyledTabs>{children}</StyledTabs>
-    </TabsContext.Provider>
-  );
+function FolderTabs({ children }) {
+  return <StyledTabs>{children}</StyledTabs>;
 }
 
 function TabItem({ children, disabled: disabledProp, icon, tab: tabProp }) {
-  const { currentTab, switchToTab } = React.useContext(TabsContext);
+  const { currentTab, switchToTab } = useFolderTabs();
   const tab = parseInt(tabProp);
 
   return (
@@ -35,3 +28,4 @@ function TabItem({ children, disabled: disabledProp, icon, tab: tabProp }) {
 }
 
 export { FolderTabs, TabItem, FolderPanel };
+export * from "./hooks/folder-tabs";

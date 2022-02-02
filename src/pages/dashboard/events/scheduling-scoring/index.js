@@ -312,7 +312,7 @@ const PageEventDetailSchedulingScoring = () => {
                           const scheduleGroup = schedulesData[competition];
                           const categoryDetails = categoryDetailsData[competition];
 
-                          const shouldAllowEditing =
+                          const shouldAllowEditMode =
                             isEditMode && editMode.currentId === competition;
 
                           const handleOpenEditSchedule = () => {
@@ -349,7 +349,7 @@ const PageEventDetailSchedulingScoring = () => {
                           return (
                             <ScheduleGroupFormBox
                               key={index}
-                              className={classnames({ "is-focused": shouldAllowEditing })}
+                              className={classnames({ "is-focused": shouldAllowEditMode })}
                             >
                               <div>
                                 <div>
@@ -369,7 +369,7 @@ const PageEventDetailSchedulingScoring = () => {
                                       >
                                         <FieldInputDateSmall
                                           label="Tanggal"
-                                          disabled={shouldAllowEditing}
+                                          disabled={shouldAllowEditMode}
                                           value={scheduleGroup.common.date}
                                           onChange={(value) => {
                                             setFormDirty();
@@ -382,7 +382,7 @@ const PageEventDetailSchedulingScoring = () => {
                                         />
                                         <FieldInputTimeSmall
                                           label="Jam Mulai"
-                                          disabled={shouldAllowEditing}
+                                          disabled={shouldAllowEditMode}
                                           value={scheduleGroup.common.timeStart}
                                           onChange={(value) => {
                                             setFormDirty();
@@ -395,7 +395,7 @@ const PageEventDetailSchedulingScoring = () => {
                                         />
                                         <FieldInputTimeSmall
                                           label="Jam Selesai"
-                                          disabled={shouldAllowEditing}
+                                          disabled={shouldAllowEditMode}
                                           value={scheduleGroup.common.timeEnd}
                                           onChange={(value) => {
                                             setFormDirty();
@@ -417,7 +417,7 @@ const PageEventDetailSchedulingScoring = () => {
                                         gap: "0.5rem",
                                       }}
                                     >
-                                      {shouldAllowEditing ? (
+                                      {shouldAllowEditMode ? (
                                         <React.Fragment>
                                           <Button
                                             onClick={() =>
@@ -465,6 +465,11 @@ const PageEventDetailSchedulingScoring = () => {
                                         const fieldNameTimeStart = `schedule-time-start-${detailId}`;
                                         const fieldNameTimeEnd = `schedule-time-end-${detailId}`;
 
+                                        const totalParticipant = detail.totalParticipant || 0;
+
+                                        const isInputAllowed =
+                                          shouldAllowEditMode && totalParticipant <= 0;
+
                                         const handleSingleScheduleChange = (payload) => {
                                           setFormDirty();
                                           dispatchScheduling({
@@ -486,7 +491,7 @@ const PageEventDetailSchedulingScoring = () => {
                                             <td width="20%">
                                               <div>
                                                 <FieldInputDateSmall
-                                                  disabled={!shouldAllowEditing}
+                                                  disabled={!isInputAllowed}
                                                   name={fieldNameDate}
                                                   value={schedule.date}
                                                   onChange={(value) => {
@@ -504,7 +509,7 @@ const PageEventDetailSchedulingScoring = () => {
                                             <td width="30%">
                                               <div className="d-flex" style={{ gap: "0.5rem" }}>
                                                 <FieldInputTimeSmall
-                                                  disabled={!shouldAllowEditing}
+                                                  disabled={!isInputAllowed}
                                                   name={fieldNameTimeStart}
                                                   value={schedule.timeStart}
                                                   onChange={(value) => {
@@ -518,7 +523,7 @@ const PageEventDetailSchedulingScoring = () => {
                                                 />
 
                                                 <FieldInputTimeSmall
-                                                  disabled={!shouldAllowEditing}
+                                                  disabled={!isInputAllowed}
                                                   name={fieldNameTimeEnd}
                                                   value={schedule.timeEnd}
                                                   onChange={(value) => {

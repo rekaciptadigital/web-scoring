@@ -55,11 +55,10 @@ function TabScheduling({ eventId }) {
 
   const [schedulingForm, dispatchShedulingForm] = React.useReducer(
     (state, action) => ({ ...state, ...action }),
-    { isFormDirty: false, errors: {} }
+    { isDirty: false, isFirstInit: true, errors: {}, warnings: {} }
   );
 
-  const { isFormDirty, errors: validationErrors } = schedulingForm;
-  const isFormInvalid = Boolean(Object.keys(validationErrors)?.length);
+  const { isFirstInit: isFormFirstInit, errors: validationErrors } = schedulingForm;
 
   const [submitStatus, dispatchSubmitStatus] = React.useReducer(
     (state, action) => ({ ...state, ...action }),
@@ -74,13 +73,10 @@ function TabScheduling({ eventId }) {
       return;
     }
 
-    if (!isFormDirty) {
-      return;
-    }
-
-    // Validate inputs, required
-    const validationErrors = runValidation();
-    if (Object.keys(validationErrors)?.length) {
+    dispatchShedulingForm({ isFirstInit: false });
+    const { isValid } = runValidation();
+    if (!isValid) {
+      displayFlashMessage("Tanggal, jam mulai dan jam selesai lomba harus lengkap");
       return;
     }
 
@@ -104,21 +100,12 @@ function TabScheduling({ eventId }) {
 
   const { data: schedulesData } = schedulingData;
 
-  const setFormDirty = () => {
-    !isFormDirty && dispatchShedulingForm({ isFormDirty: true });
-  };
-
-  const setFormClean = () => {
-    isFormDirty && dispatchShedulingForm({ isFormDirty: false });
-  };
-
   React.useEffect(() => {
     const fetchCategoryDetails = async () => {
       dispatchCategoryDetailsData({ status: "loading", errors: null });
       const result = await EventsService.getEventCategoryDetails({ event_id: eventId });
       if (result.success) {
         dispatchCategoryDetailsData({ status: "success", data: result.data });
-        setFormClean();
       } else {
         dispatchCategoryDetailsData({ status: "error", errors: result.errors });
       }
@@ -150,13 +137,30 @@ function TabScheduling({ eventId }) {
 
   const runValidation = () => {
     const validationErrors = {};
+    const validationWarnings = {};
     for (const competitionGroup in schedulesData) {
       const schedules = schedulesData[competitionGroup];
       for (const scheduleId in schedules) {
         if (scheduleId === "common") {
           continue;
         }
+
+        // Hanya validasikan kalau inputnya gak lengkap
+        // Kalau kosong semua malah gak papa, bisa diabaikan
         const schedule = schedules[scheduleId];
+        if (!schedule.date && !schedule.timeStart && !schedule.timeEnd) {
+          validationWarnings[`schedule-date-${scheduleId}`] = [
+            "Isi agar pendaftaran dapat dibuka.",
+          ];
+          validationWarnings[`schedule-time-start-${scheduleId}`] = [
+            "Isi agar pendaftaran dapat dibuka.",
+          ];
+          validationWarnings[`schedule-time-end-${scheduleId}`] = [
+            "Isi agar pendaftaran dapat dibuka.",
+          ];
+          continue;
+        }
+
         if (!schedule.date) {
           validationErrors[`schedule-date-${scheduleId}`] = ["required"];
         }
@@ -168,16 +172,17 @@ function TabScheduling({ eventId }) {
         }
       }
     }
-    dispatchShedulingForm({ errors: validationErrors });
-    return validationErrors;
+    dispatchShedulingForm({ errors: validationErrors, warnings: validationWarnings });
+    const isValid = !Object.keys(validationErrors)?.length;
+    return { validationErrors, validationWarnings, isValid };
   };
 
   React.useEffect(() => {
-    if (!isFormDirty) {
+    if (isFormFirstInit) {
       return;
     }
     runValidation();
-  }, [isFormDirty, schedulesData]);
+  }, [isFormFirstInit, schedulesData]);
 
   return (
     <React.Fragment>
@@ -189,9 +194,7 @@ function TabScheduling({ eventId }) {
           </div>
 
           <SchedulingFormActions>
-            <Button disabled={!isFormDirty || isFormInvalid} onClick={handleClickSaveSchedule}>
-              Simpan
-            </Button>
+            <Button onClick={handleClickSaveSchedule}>Simpan</Button>
             {editMode.flashMessage && (
               <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
             )}
@@ -217,8 +220,6 @@ function TabScheduling({ eventId }) {
             const shouldAllowEditMode = isEditMode && editMode.currentId === groupName;
 
             const handleCommonChange = (payload) => {
-              setFormDirty();
-
               const byHavingParticipants = (detail) => detail.totalParticipant > 0;
               const categoryDetailId = (detail) => detail.eventCategoryDetailsId;
 
@@ -368,7 +369,6 @@ function TabScheduling({ eventId }) {
                           const isInputAllowed = shouldAllowEditMode && totalParticipant <= 0;
 
                           const handleSingleScheduleChange = (payload) => {
-                            setFormDirty();
                             dispatchScheduling({
                               type: SCHEDULING_TYPE.SINGLE,
                               competitionCategory: groupName,
@@ -506,7 +506,12 @@ function makeSchedulesPayload(schedules) {
       if (detailId === "common") {
         continue;
       }
+
       const schedule = scheduleGroup[detailId];
+      if (!schedule.date || !schedule.timeStart || !schedule.timeEnd) {
+        continue;
+      }
+
       const schedulePayloadItem = {
         category_detail_id: detailId,
         event_start_datetime: formatServerDatetime(schedule.date, schedule.timeStart),

@@ -45,6 +45,10 @@ const FieldInputTimeWrapper = styled.div`
     &.error-invalid {
       border-color: var(--ma-red);
     }
+
+    &.warning-validation {
+      border-color: var(--ma-yellow);
+    }
   }
 `;
 

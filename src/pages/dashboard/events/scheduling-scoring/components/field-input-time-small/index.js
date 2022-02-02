@@ -18,6 +18,7 @@ function FieldInputTimeSmall({
   interval,
   disabled,
   errors,
+  warnings,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -30,7 +31,10 @@ function FieldInputTimeSmall({
         </label>
       )}
       <DatePicker
-        className={classnames("field-input-time", { "error-invalid": errors?.length })}
+        className={classnames("field-input-time", {
+          "error-invalid": errors?.length,
+          "warning-validation": warnings?.length,
+        })}
         id={fieldID}
         name={name}
         selected={value}

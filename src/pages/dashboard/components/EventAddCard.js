@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 import IconAdd from "components/icons/EventAdd";
 
 const EventAddCardWrapper = styled.div`
+  position: relative;
+  overflow: hidden;
+
   display: flex;
   justify-content: center;
   align-items: center;

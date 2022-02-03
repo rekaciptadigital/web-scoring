@@ -100,7 +100,7 @@ function PageEventDetailHome() {
               />
               <CardMenu
                 menu={eventMenus[2]}
-                href={eventMenus[2].computeLink(event_id)}
+                href={"#"}
                 disabled={!isQualificationSchedulesSet}
               />
               <CardMenu

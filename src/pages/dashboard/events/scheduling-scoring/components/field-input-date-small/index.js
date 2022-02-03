@@ -17,6 +17,7 @@ function FieldInputDateSmall({
   onChange,
   disabled,
   errors,
+  warnings,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -29,7 +30,10 @@ function FieldInputDateSmall({
         </label>
       )}
       <DatePicker
-        className={classnames("field-input-date", { "error-invalid": errors?.length })}
+        className={classnames("field-input-date", {
+          "error-invalid": errors?.length,
+          "warning-validation": warnings?.length,
+        })}
         id={fieldID}
         name={name}
         selected={value}

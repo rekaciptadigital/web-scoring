@@ -12,14 +12,20 @@ function schedulingReducer(state, action) {
     }
 
     case SCHEDULING_TYPE.COMMON: {
-      const { competitionCategory, payload } = action;
+      const { competitionCategory, payload, excludes } = action;
 
       const updatedCommonSchedule = { ...state.data[competitionCategory].common, ...payload };
 
       const previousSchedulesGroup = state.data[competitionCategory];
       const updatedSchedulesGroup = {};
       for (const detailId in previousSchedulesGroup) {
-        updatedSchedulesGroup[detailId] = { ...updatedCommonSchedule };
+        // Abaikan kategori yang termasuk di list `excludes`
+        const matchesDetailId = (id) => parseInt(id) === parseInt(detailId);
+        if (excludes?.length && excludes.some(matchesDetailId)) {
+          updatedSchedulesGroup[detailId] = previousSchedulesGroup[detailId];
+        } else {
+          updatedSchedulesGroup[detailId] = { ...updatedCommonSchedule };
+        }
       }
 
       return {

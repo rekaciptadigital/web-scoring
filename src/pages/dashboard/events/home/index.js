@@ -100,7 +100,7 @@ function PageEventDetailHome() {
               />
               <CardMenu
                 menu={eventMenus[2]}
-                href={"#"}
+                href={`/dashboard/member/${event_id}`}
                 disabled={!isQualificationSchedulesSet}
               />
               <CardMenu

@@ -538,7 +538,7 @@ function makeEventDetailState(initialData) {
 
   const eventCategoriesState = makeCategoryDetailState(eventCategories);
   const feesState = makeRegistrationFeesState(eventCategories);
-  const { isFlatRegistrationFee, registrationFee, registrationFees } = feesState;
+  const { isFlatRegistrationFee, registrationFee, registrationFees, registrationFeesID} = feesState;
 
   return {
     eventName: publicInformation.eventName,
@@ -563,6 +563,7 @@ function makeEventDetailState(initialData) {
       title: info.title,
       description: info.description,
     })),
+    registrationFeesID: registrationFeesID,
     eventCategories: eventCategoriesState,
     isFlatRegistrationFee,
     registrationFee,
@@ -622,39 +623,66 @@ function makeCategoryDetailState(categoryDetailData) {
 
 function makeRegistrationFeesState(eventCategories) {
   const registrationFees = [];
-  const uniqueTeams = new Set();
-  const uniqueFees = new Set();
-
+  const registrationFeesID = [];
+  
+  let checkFee = -1;
+  let isFlatRegistrationFee = true;
   for (const category of eventCategories) {
-    if (registrationFees.length >= 4) {
-      break;
-    }
-    if (!category.teamCategoryId) {
-      continue;
-    }
+    if(isFlatRegistrationFee && checkFee >= 0 && checkFee != Number(category.fee))
+      isFlatRegistrationFee = false;
 
-    const targetTeam =
-      category.teamCategoryId.id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
-      category.teamCategoryId.id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
-        ? TEAM_CATEGORIES.TEAM_INDIVIDUAL
-        : category.teamCategoryId.id;
-
-    if (!uniqueTeams.has(targetTeam)) {
-      uniqueTeams.add(targetTeam);
-      uniqueFees.add(Number(category.fee));
-      registrationFees.push({ teamCategory: targetTeam, amount: Number(category.fee) });
-    }
+    registrationFees.push({ teamCategory: category.teamCategoryId.id, amount: Number(category.fee) });
+    checkFee = Number(category.fee);
+    registrationFeesID[category.teamCategoryId.id] = 1;
   }
 
-  const isFlatRegistrationFee = uniqueFees.size === 1;
-  const registrationFee = isFlatRegistrationFee ? [...uniqueFees][0] : "";
+  const registrationFee = isFlatRegistrationFee ? checkFee : "";
+
 
   return {
     isFlatRegistrationFee,
     registrationFee,
-    registrationFees: isFlatRegistrationFee ? [] : registrationFees,
+    registrationFees: registrationFees,
+    registrationFeesID,
   };
 }
+
+// old func
+// function makeRegistrationFeesState(eventCategories) {
+//   const registrationFees = [];
+//   const uniqueTeams = new Set();
+//   const uniqueFees = new Set();
+  
+//   for (const category of eventCategories) {
+//     if (registrationFees.length >= 4) {
+//       break;
+//     }
+//     if (!category.teamCategoryId) {
+//       continue;
+//     }
+
+//     const targetTeam =
+//       category.teamCategoryId.id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE ||
+//       category.teamCategoryId.id === TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE
+//         ? TEAM_CATEGORIES.TEAM_INDIVIDUAL
+//         : category.teamCategoryId.id;
+
+//     if (!uniqueTeams.has(targetTeam)) {
+//       uniqueTeams.add(targetTeam);
+//       uniqueFees.add(Number(category.fee));
+//       registrationFees.push({ teamCategory: targetTeam, amount: Number(category.fee) });
+//     }
+//   }
+
+//   const isFlatRegistrationFee = uniqueFees.size === 1;
+//   const registrationFee = isFlatRegistrationFee ? [...uniqueFees][0] : "";
+
+//   return {
+//     isFlatRegistrationFee,
+//     registrationFee,
+//     registrationFees: isFlatRegistrationFee ? [] : registrationFees,
+//   };
+// }
 
 async function makeEventDetailsPayload(eventData) {
   const bannerImageBase64 = eventData.bannerImage?.raw

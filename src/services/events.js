@@ -14,7 +14,7 @@ export default {
         return API.get("/web/v1/archery/event-by-slug", qs)
     },
     getEventById(qs) {
-        return API.get("/web/v1/archery/events/"+qs.id, qs)
+        return API.get("/web/v1/archery/events/detail", qs)
     },
     getEventDetailById(qs) {
         return API.get("/web/v1/archery/events/detail", qs);

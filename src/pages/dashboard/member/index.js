@@ -29,9 +29,10 @@ function ListMember() {
             if (data) {
                 setEventDetail(data);
                 // getMember(data.flatCategories[0]);
-                let payload = {...data.flatCategories[0],
-                    id: `${data.flatCategories[0].teamCategoryId}.${data.flatCategories[0].ageCategoryId}.${data.flatCategories[0].competitionCategoryId}.${data.flatCategories[0].distanceId}`,
-                    "label":data.flatCategories[0].archeryEventCategoryLabel}
+                let payload = {...data.eventCategories[0],
+                    id: data.eventCategories[0].categoryDetailsId,
+                    "label":`${data.eventCategories[0].teamCategoryId.label}-${data.eventCategories[0].ageCategoryId.label}-${data.eventCategories[0].competitionCategoryId.label}-${data.eventCategories[0].distanceId.label}`}
+                
                 getMember(payload)
             }
         } else {
@@ -71,9 +72,10 @@ function ListMember() {
             const { data, errors, success, message } = await EventsService.getEventMember(
                 {
                     id:event_id,
-                    competition_category_id:payload.competitionCategoryId,
-                    "team_category_id":payload.teamCategoryId,
-                    "age_category_id":payload.ageCategoryId,
+                    competition_category_id:payload.competitionCategoryId.id,
+                    "team_category_id":payload.teamCategoryId.id,
+                    "age_category_id":payload.ageCategoryId.id,
+                    "category_id":payload.categoryDetailsId,
                     "status":status,
                 }
             );
@@ -110,11 +112,11 @@ function ListMember() {
                                         name='jenis'
                                         onChange={(v) => {getMember(v.value, statusFilter)}}
                                         options={
-                                            eventDetail?.flatCategories?.map((option) => {
+                                            eventDetail?.eventCategories?.map((option) => {
                                               return {
                                                 ...option,
-                                                id: `${option.teamCategoryId}.${option.ageCategoryId}.${option.competitionCategoryId}.${option.distanceId}`,
-                                                label: option.archeryEventCategoryLabel,
+                                                id: option.categoryDetailsId,
+                                                label: `${option.teamCategoryId.label}-${option.ageCategoryId.label}-${option.competitionCategoryId.label}-${option.distanceId.label}`,
                                               };
                                             }) || []
                                           }

@@ -57,8 +57,13 @@ class TableMember extends Component {
     
     const columns = [{
       dataField: 'id',
-      text: 'Id',
+      text: 'No',
       sort: true,
+      formatter: (cell, row) => {
+        return (
+          row.no
+        )
+      }
     }, {
       dataField: 'name',
       text: 'Name',

@@ -31,7 +31,7 @@ function ListMember() {
                 // getMember(data.flatCategories[0]);
                 let payload = {...data.eventCategories[0],
                     id: data.eventCategories[0].categoryDetailsId,
-                    "label":`${data.eventCategories[0].teamCategoryId.label}-${data.eventCategories[0].ageCategoryId.label}-${data.eventCategories[0].competitionCategoryId.label}-${data.eventCategories[0].distanceId.label}`}
+                    "label":`${data.eventCategories[0].teamCategoryId.label}-${data.eventCategories[0].ageCategoryId.label}-${data.eventCategories[0].competitionCategoryId.label}-${data.eventCategories[0].distanceId.label} (${data.eventCategories[0].totalParticipant}/${data.eventCategories[0].quota})`}
                 
                 getMember(payload)
             }
@@ -47,12 +47,15 @@ function ListMember() {
         setCategory(payload)
         setStatusFilter(status)
         let m =[];
-        if(!dataMembers[payload.label+"-"+status]){
-            dataMembers[payload.label+"-"+status] = data;
+        if(!dataMembers[payload.id+"-"+status]){
+            dataMembers[payload.id+"-"+status] = data;
             setDataMembers(dataMembers);
         }
-        data.map((d)=>{
+        let no = 0;
+        data.list.map((d)=>{
+            no = no+1;
             m.push({"id": d.member.id,
+            "no": no,
             "name": d.member.name,
             "email": d.email,
             "telepon": d.phoneNumber,
@@ -66,8 +69,8 @@ function ListMember() {
     }
     const getMember = async (payload,status = 0) => {
         try {
-            if(dataMembers[payload.label+"-"+status]){
-                return await setMemberMap(dataMembers[payload.label+"-"+status], payload,status)
+            if(dataMembers[payload.id+"-"+status]){
+                return await setMemberMap(dataMembers[payload.id+"-"+status], payload,status)
             }
             const { data, errors, success, message } = await EventsService.getEventMember(
                 {
@@ -116,7 +119,7 @@ function ListMember() {
                                               return {
                                                 ...option,
                                                 id: option.categoryDetailsId,
-                                                label: `${option.teamCategoryId.label}-${option.ageCategoryId.label}-${option.competitionCategoryId.label}-${option.distanceId.label}`,
+                                                label: `${option.teamCategoryId.label}-${option.ageCategoryId.label}-${option.competitionCategoryId.label}-${option.distanceId.label}  (${option.totalParticipant}/${option.quota})`,
                                               };
                                             }) || []
                                           }
@@ -125,10 +128,10 @@ function ListMember() {
                             </Col>
                             <Col md={4} sm={12}>
                                 <div className="d-block d-md-flex mt-md-0 mt-3">
-                                    <Button onClick={()=>getMember(category,0)} color={statusFilter == 0 ? "dark" : "outline-dark"}>Semua</Button>
-                                    <Button onClick={()=>getMember(category,1)} color={statusFilter == 1 ? "dark" : "outline-dark"}>Telah Dibayar</Button>
-                                    <Button onClick={()=>getMember(category,4)} color={statusFilter == 4 ? "dark" : "outline-dark"}>Menunggu Pembayaran</Button>
-                                    <Button onClick={()=>getMember(category,2)} color={statusFilter == 2 ? "dark" : "outline-dark"}>Pembayaran Kadarluarsa</Button>
+                                    <Button onClick={()=>getMember(category,0)} color={statusFilter == 0 ? "dark" : "outline-dark"}>Semua ({dataMembers[category.id+"-"+statusFilter]?.count?.all})</Button>
+                                    <Button onClick={()=>getMember(category,1)} color={statusFilter == 1 ? "dark" : "outline-dark"}>Telah Dibayar/ Terdaftar ({dataMembers[category.id+"-"+statusFilter]?.count?.success})</Button>
+                                    <Button onClick={()=>getMember(category,4)} color={statusFilter == 4 ? "dark" : "outline-dark"}>Menunggu Pembayaran ({dataMembers[category.id+"-"+statusFilter]?.count?.pending})</Button>
+                                    <Button onClick={()=>getMember(category,2)} color={statusFilter == 2 ? "dark" : "outline-dark"}>Pembayaran Kadarluarsa ({dataMembers[category.id+"-"+statusFilter]?.count?.expired})</Button>
                                 </div>
                             </Col>
                              <Col md={3} sm={12}>

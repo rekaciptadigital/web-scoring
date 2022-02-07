@@ -701,7 +701,7 @@ async function makeEventDetailsPayload(eventData) {
     id: eventData.event_id,
     eventType: "Full_day",
     eventCompetition: "Tournament",
-    status: 0, // status ketika save harus tetep `0` (draft)
+    status: eventData.status, // kirim status apapun yang ada sekarang
     eventName: eventData.eventName,
     eventBanner: bannerImageBase64, // harus opsional
     eventDescription: eventData.description,

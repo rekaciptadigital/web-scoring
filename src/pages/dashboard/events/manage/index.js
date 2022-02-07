@@ -146,7 +146,11 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       incrementAttemptCounts();
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      setSavingEventStatus((state) => ({
+        ...state,
+        status: "error",
+        errors: result.message ? "Mohon cek koneksi internet Anda." : result.errors,
+      }));
     }
   };
 
@@ -158,7 +162,11 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       incrementAttemptCounts();
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      setSavingEventStatus((state) => ({
+        ...state,
+        status: "error",
+        errors: result.message ? "Mohon cek koneksi internet Anda." : result.errors,
+      }));
     }
   };
 
@@ -199,7 +207,11 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      setSavingEventStatus((state) => ({
+        ...state,
+        status: "error",
+        errors: result.message ? "Mohon cek koneksi internet Anda." : result.errors,
+      }));
     }
   };
 
@@ -213,7 +225,11 @@ const PageEventDetailManage = () => {
         updateEventData(eventDetailData);
         setIsEventPublished(Boolean(result.data.publicInformation.eventStatus));
       } else {
-        setFetchingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+        setFetchingEventStatus((state) => ({
+          ...state,
+          status: "error",
+          errors: result.message ? "Mohon cek koneksi internet Anda." : result.errors,
+        }));
       }
     };
     getEventDetail();
@@ -547,6 +563,7 @@ function makeEventDetailState(initialData) {
     feesState;
 
   return {
+    status: publicInformation.eventStatus,
     eventName: publicInformation.eventName,
     bannerImage: { originalUrl: publicInformation.eventBanner, raw: null, preview: null },
     description: publicInformation.eventDescription,

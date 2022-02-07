@@ -170,7 +170,11 @@ const PageEventDetailManage = () => {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       incrementAttemptCounts();
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      setSavingEventStatus((state) => ({
+        ...state,
+        status: "error",
+        errors: result.message ? "Mohon cek koneksi internet Anda." : result.errors,
+      }));
     }
   };
 
@@ -481,6 +485,7 @@ function AlertSubmitError({ isError, errors, onConfirm }) {
       const messages = fields.map(
         (field) => `${errors[field].map((message) => `- ${message}\n`).join("")}`
       );
+
       if (messages.length) {
         return `${messages.join("")}`;
       }
@@ -538,7 +543,8 @@ function makeEventDetailState(initialData) {
 
   const eventCategoriesState = makeCategoryDetailState(eventCategories);
   const feesState = makeRegistrationFeesState(eventCategories);
-  const { isFlatRegistrationFee, registrationFee, registrationFees, registrationFeesID} = feesState;
+  const { isFlatRegistrationFee, registrationFee, registrationFees, registrationFeesID } =
+    feesState;
 
   return {
     eventName: publicInformation.eventName,
@@ -624,20 +630,22 @@ function makeCategoryDetailState(categoryDetailData) {
 function makeRegistrationFeesState(eventCategories) {
   const registrationFees = [];
   const registrationFeesID = [];
-  
+
   let checkFee = -1;
   let isFlatRegistrationFee = true;
   for (const category of eventCategories) {
-    if(isFlatRegistrationFee && checkFee >= 0 && checkFee != Number(category.fee))
+    if (isFlatRegistrationFee && checkFee >= 0 && checkFee != Number(category.fee))
       isFlatRegistrationFee = false;
 
-    registrationFees.push({ teamCategory: category.teamCategoryId.id, amount: Number(category.fee) });
+    registrationFees.push({
+      teamCategory: category.teamCategoryId.id,
+      amount: Number(category.fee),
+    });
     checkFee = Number(category.fee);
     registrationFeesID[category.teamCategoryId.id] = 1;
   }
 
   const registrationFee = isFlatRegistrationFee ? checkFee : "";
-
 
   return {
     isFlatRegistrationFee,
@@ -652,7 +660,7 @@ function makeRegistrationFeesState(eventCategories) {
 //   const registrationFees = [];
 //   const uniqueTeams = new Set();
 //   const uniqueFees = new Set();
-  
+
 //   for (const category of eventCategories) {
 //     if (registrationFees.length >= 4) {
 //       break;
@@ -744,7 +752,7 @@ function makeFeesPayload(eventData) {
       event_id: eventData.event_id,
       data: teamCategories.map((teamCategory) => ({
         team_category_id: teamCategory,
-        fee: eventData.registrationFee,
+        fee: eventData.registrationFee || 0,
       })),
     };
   }
@@ -752,10 +760,16 @@ function makeFeesPayload(eventData) {
   const feesData = [];
   for (const fee of eventData.registrationFees) {
     if (fee.teamCategory === TEAM_CATEGORIES.TEAM_INDIVIDUAL) {
-      feesData.push({ team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE, fee: fee.amount });
-      feesData.push({ team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE, fee: fee.amount });
+      feesData.push({
+        team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE,
+        fee: fee.amount || 0,
+      });
+      feesData.push({
+        team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE,
+        fee: fee.amount || 0,
+      });
     } else {
-      feesData.push({ team_category_id: fee.teamCategory, fee: fee.amount });
+      feesData.push({ team_category_id: fee.teamCategory, fee: fee.amount || 0 });
     }
   }
 

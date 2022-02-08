@@ -103,6 +103,13 @@ function TabBudRest() {
                               placeholder="No. bantalan"
                               disabled={!shouldAllowEdit}
                               value={budRest.start}
+                              onChange={(value) => {
+                                dispatchForm({
+                                  group: groupName,
+                                  categoryDetailId: detail.categoryDetailId,
+                                  payload: { start: Number(value) },
+                                });
+                              }}
                             />
                           </TDInput>
 
@@ -111,6 +118,13 @@ function TabBudRest() {
                               placeholder="No. bantalan"
                               disabled={!shouldAllowEdit}
                               value={budRest.end}
+                              onChange={(value) => {
+                                dispatchForm({
+                                  group: groupName,
+                                  categoryDetailId: detail.categoryDetailId,
+                                  payload: { end: Number(value) },
+                                });
+                              }}
                             />
                           </TDInput>
 
@@ -118,6 +132,13 @@ function TabBudRest() {
                             <FieldSelectBudRest
                               disabled={!shouldAllowEdit}
                               value={budRest.targetFace}
+                              onChange={(option) => {
+                                dispatchForm({
+                                  group: groupName,
+                                  categoryDetailId: detail.categoryDetailId,
+                                  payload: { targetFace: option },
+                                });
+                              }}
                             />
                           </TDInput>
                         </tr>

@@ -146,6 +146,20 @@ function budRestsFormReducer(state, action) {
     };
   }
 
+  if (action.group && action.categoryDetailId) {
+    const nextGroupState = { ...state.data[action.group] };
+    const originalState = nextGroupState[action.categoryDetailId];
+    nextGroupState[action.categoryDetailId] = { ...originalState, ...action.payload };
+
+    return {
+      ...state,
+      data: {
+        ...state.data,
+        [action.group]: nextGroupState,
+      },
+    };
+  }
+
   return state;
 }
 

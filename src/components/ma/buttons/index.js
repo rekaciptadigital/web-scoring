@@ -30,7 +30,7 @@ const ButtonWrapper = styled.button`
     background-color: var(--button-bg-color-hover, var(--ma-gray-50));
     border: solid 1px var(--button-outline-color, var(--ma-gray-100));
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
-    color: var(--button-font-color-hover, var(--ma-txt-black));
+    color: var(--button-font-color-hover, var(--ma-blue));
   }
 
   &:disabled {

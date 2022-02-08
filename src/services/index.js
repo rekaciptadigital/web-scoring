@@ -9,3 +9,4 @@ export { default as CategoryService } from "./category";
 export { default as EliminationService } from "./elimination";
 export { default as CertificateService } from "./certificate";
 export { default as ScoringService } from "./scoring";
+export { default as BudRestService } from "./bud-rest";

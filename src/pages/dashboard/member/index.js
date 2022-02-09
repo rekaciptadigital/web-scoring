@@ -144,7 +144,7 @@ function ListMember() {
                     value={category.label != undefined ? category : null}
                   />
                 </Col>
-                <Col md={4} sm={12}>
+                <Col md={7} sm={12}>
                   <div className="d-block d-md-flex mt-md-0 mt-3">
                     <Button
                       onClick={() => getMember(category, 0)}
@@ -175,7 +175,7 @@ function ListMember() {
                     </Button>
                   </div>
                 </Col>
-                <Col md={5} sm={12}>
+                <Col md={2} sm={12}>
                   <div className="d-block d-md-flex mt-md-0 mt-3 justify-content-end">
                     <a
                     href={dataExcel}

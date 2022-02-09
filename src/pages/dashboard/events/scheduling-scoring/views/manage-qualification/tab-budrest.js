@@ -2,13 +2,16 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useEventBudRests, useBudRestsForm } from "./hooks/bud-rests";
+import { BudRestService } from "services";
 
+import { LoadingScreen } from "components";
 import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import {
   FieldInputTextSmall,
   FieldSelectBudRest,
   FolderPanel,
   NoticeBarInfo,
+  AlertSubmitError,
 } from "../../components";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
@@ -25,6 +28,14 @@ function TabBudRest() {
     errors: formErrors,
     dispatch: dispatchForm,
   } = useBudRestsForm(eventBudRests, groupNames);
+  const {
+    isSubmitLoading,
+    errors: submitErrors,
+    isSubmitError,
+    setSubmitLoading,
+    setSubmitSuccess,
+    setSubmitError,
+  } = useSubmitStatus();
 
   // TODO: cek tanggal selesai lomba
   const shouldAllowEdit = true;
@@ -32,7 +43,7 @@ function TabBudRest() {
   const shouldShowGroupErrorMessages = (groupName) =>
     formErrors?.[groupName] && Object.keys(formErrors[groupName])?.length;
 
-  const handleClickSaveGroup = ({ group }) => {
+  const handleClickSaveGroup = async ({ group }) => {
     // validate inputs
     const validationErrors = {};
     iterateGroupData(
@@ -90,6 +101,19 @@ function TabBudRest() {
     );
 
     dispatchForm({ type: "INVALID", errors: validationErrors });
+
+    const isValid = !(validationErrors?.[group] && Object.keys(validationErrors?.[group])?.length);
+    if (!isValid) {
+      return;
+    }
+    setSubmitLoading();
+    const payload = makeSaveGroupPayload(form[group]);
+    const result = await BudRestService.setByEventId(payload, { event_id: eventId });
+    if (result.success) {
+      setSubmitSuccess();
+    } else {
+      setSubmitError(result.message || result.errors);
+    }
   };
 
   return (
@@ -247,6 +271,9 @@ function TabBudRest() {
             ))}
         </CategoryGroupsList>
       </FolderPanel>
+
+      <LoadingScreen loading={isSubmitLoading} />
+      <AlertSubmitError isError={isSubmitError} errors={submitErrors} />
     </React.Fragment>
   );
 }
@@ -336,8 +363,48 @@ function iterateGroupData(data, callback) {
       continue;
     }
     const item = data[id];
-    callback(item, id, index);
+    callback(item, parseInt(id), index);
   }
+}
+
+const TYPE_QUALIFICATION = "qualification";
+
+function makeSaveGroupPayload(data) {
+  const budRestsData = [];
+  iterateGroupData(data, (budRest, categoryDetailId) => {
+    budRestsData.push({
+      type: TYPE_QUALIFICATION,
+      archery_event_category_id: categoryDetailId,
+      bud_rest_start: budRest.start,
+      bud_rest_end: budRest.end,
+      target_face: budRest.targetFace.value,
+    });
+  });
+  return { event_category: budRestsData };
+}
+
+function useSubmitStatus() {
+  const [state, dispatch] = React.useReducer((state, action) => ({ ...state, ...action }), {
+    status: "idle",
+    errors: null,
+  });
+
+  const { status, errors } = state;
+
+  const isSubmitLoading = status === "loading";
+  const isSubmitError = status === "error" || errors;
+  const setSubmitLoading = () => dispatch({ status: "loading", errors: null });
+  const setSubmitSuccess = () => dispatch({ status: "success" });
+  const setSubmitError = (serverErrors) => dispatch({ status: "error", errors: serverErrors });
+
+  return {
+    ...state,
+    isSubmitLoading,
+    isSubmitError,
+    setSubmitLoading,
+    setSubmitSuccess,
+    setSubmitError,
+  };
 }
 
 export { TabBudRest };

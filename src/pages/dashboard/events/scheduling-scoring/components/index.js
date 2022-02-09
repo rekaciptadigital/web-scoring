@@ -6,3 +6,4 @@ export * from "./field-input-time-small";
 export * from "./field-select-budrest";
 export * from "./notice-bar-info";
 export * from "./bottom-flash-message";
+export * from "./alert-submit-error";

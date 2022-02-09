@@ -1,18 +1,18 @@
 import * as React from "react";
-import { EventsService, BudRestService } from "services";
+import { BudRestService } from "services";
 
 function makeBudRestsState(data) {
   const groupNames = data ? Object.keys(data) : [];
   const transformedData = {};
   for (const groupName in data) {
     transformedData[groupName] = data[groupName].map((categoryDetail) => ({
-      categoryDetailId: categoryDetail.eventCategoryDetailsId,
-      age: categoryDetail.ageCategory.label,
-      competition: categoryDetail.competitionCategory.label,
-      distance: categoryDetail.distancesCategory.label,
-      team: categoryDetail.teamCategory.label,
+      categoryDetailId: categoryDetail.id,
+      age: categoryDetail.ageCategoryDetail.label,
+      competition: categoryDetail.competitionCategoryDetail.label,
+      distance: categoryDetail.distanceDetail.label,
+      team: categoryDetail.categoryTeam.label,
       totalParticipants: categoryDetail.totalParticipant,
-      qualificationTimeStart: categoryDetail.qualificationTimeStart,
+      qualificationTimeStart: categoryDetail.qualificationStart || "",
       budRest: categoryDetail.budRest
         ? {
             id: categoryDetail.budRest.id,
@@ -91,7 +91,7 @@ function makeFormState(budRestsData) {
         transformedState[groupName][categoryDetail.categoryDetailId] = {
           categoryDetailId: categoryDetail.categoryDetailId,
           start: computedStartNumber,
-          end: computedStartNumber - 1 + computedRange,
+          end: computedStartNumber - 1 + computedRange || 1,
           targetFace: makeDefaultTargetFace(),
           totalParticipants: categoryDetail.totalParticipants,
         };
@@ -109,6 +109,7 @@ function makeFormState(budRestsData) {
           start: "",
           end: "",
           targetFace: makeDefaultTargetFace(),
+          totalParticipants: categoryDetail.totalParticipants,
         };
       } else {
         transformedState[groupName][categoryDetail.categoryDetailId] = {
@@ -117,6 +118,7 @@ function makeFormState(budRestsData) {
             value: categoryDetail.budRest.targetFace,
             label: categoryDetail.budRest.targetFace,
           },
+          totalParticipants: categoryDetail.totalParticipants,
         };
       }
     });

@@ -23,11 +23,7 @@ function TabBudRest() {
   const eventId = parseInt(event_id);
 
   const { data: eventBudRests, groupNames } = useEventBudRests(eventId);
-  const {
-    data: form,
-    errors: formErrors,
-    dispatch: dispatchForm,
-  } = useBudRestsForm(eventBudRests, groupNames);
+  const { data: form, errors: formErrors, dispatch: dispatchForm } = useBudRestsForm(eventBudRests);
   const {
     isSubmitLoading,
     errors: submitErrors,
@@ -213,12 +209,12 @@ function TabBudRest() {
                             <FieldInputTextSmall
                               placeholder="No. bantalan"
                               disabled={!shouldAllowEdit}
-                              value={budRest.start}
+                              value={shouldAllowEdit ? budRest.start : "—"}
                               onChange={(value) => {
                                 dispatchForm({
                                   group: groupName,
                                   categoryDetailId: detail.categoryDetailId,
-                                  payload: { start: Number(value) || 1 },
+                                  payload: { start: Number(value) },
                                 });
                               }}
                               errors={
@@ -233,12 +229,12 @@ function TabBudRest() {
                             <FieldInputTextSmall
                               placeholder="No. bantalan"
                               disabled={!shouldAllowEdit}
-                              value={budRest.end}
+                              value={shouldAllowEdit ? budRest.end : "—"}
                               onChange={(value) => {
                                 dispatchForm({
                                   group: groupName,
                                   categoryDetailId: detail.categoryDetailId,
-                                  payload: { end: Number(value) || 1 },
+                                  payload: { end: Number(value) },
                                 });
                               }}
                               errors={

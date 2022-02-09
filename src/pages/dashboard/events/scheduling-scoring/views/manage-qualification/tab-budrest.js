@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useEventBudRests, useBudRestsForm } from "./hooks/bud-rests";
+import { useEventDetail } from "./hooks/event-detail";
 import { BudRestService } from "services";
 
 import { LoadingScreen } from "components";
@@ -18,10 +19,13 @@ import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 
 import { FolderHeader, FolderHeaderActions } from "./styles";
 
+import { parseISO, isAfter } from "date-fns";
+
 function TabBudRest() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
 
+  const { data: eventDetail } = useEventDetail(event_id);
   const {
     data: eventBudRests,
     groupNames,
@@ -37,8 +41,9 @@ function TabBudRest() {
     setSubmitError,
   } = useSubmitStatus();
 
-  // TODO: cek tanggal selesai lomba
-  const shouldAllowEdit = true;
+  const shouldAllowEdit = eventDetail?.publicInformation?.eventEndRegister
+    ? isAfter(new Date(), parseISO(eventDetail.publicInformation.eventEndRegister))
+    : false;
 
   const shouldShowGroupErrorMessages = (groupName) =>
     formErrors?.[groupName] && Object.keys(formErrors[groupName])?.length;

@@ -1,6 +1,8 @@
 import * as React from "react";
 import { BudRestService } from "services";
 
+import { parseISO, isBefore } from "date-fns";
+
 function makeBudRestsState(data) {
   const groupNames = data ? Object.keys(data) : [];
   const transformedData = {};
@@ -75,6 +77,14 @@ function shouldRecommendDefaults(data) {
   return Boolean(data?.every(hasNoBudRest));
 }
 
+function shouldAllowEditBudRest(qualificationTimeStart, today, totalParticipants) {
+  const qualificationStart =
+    typeof qualificationTimeStart === "string"
+      ? parseISO(qualificationTimeStart)
+      : qualificationTimeStart;
+  return isBefore(today, qualificationStart) && totalParticipants > 0;
+}
+
 function makeFormState(budRestsData) {
   const transformedState = {};
   for (const groupName in budRestsData) {
@@ -99,6 +109,11 @@ function makeFormState(budRestsData) {
           end: computedStartNumber - 1 + computedRange || 1,
           targetFace: makeDefaultTargetFace(),
           totalParticipants: categoryDetail.totalParticipants,
+          isEditAllowed: shouldAllowEditBudRest(
+            categoryDetail.qualificationTimeStart,
+            new Date(),
+            categoryDetail.totalParticipants
+          ),
         };
 
         previousId = categoryDetail.categoryDetailId;
@@ -108,6 +123,12 @@ function makeFormState(budRestsData) {
     }
 
     budRestsData[groupName].forEach((categoryDetail) => {
+      const isEditAllowed = shouldAllowEditBudRest(
+        categoryDetail.qualificationTimeStart,
+        new Date(),
+        categoryDetail.totalParticipants
+      );
+
       if (!categoryDetail.budRest) {
         transformedState[groupName][categoryDetail.categoryDetailId] = {
           categoryDetailId: categoryDetail.categoryDetailId,
@@ -115,6 +136,7 @@ function makeFormState(budRestsData) {
           end: "",
           targetFace: makeDefaultTargetFace(),
           totalParticipants: categoryDetail.totalParticipants,
+          isEditAllowed: isEditAllowed,
         };
       } else {
         transformedState[groupName][categoryDetail.categoryDetailId] = {
@@ -124,6 +146,7 @@ function makeFormState(budRestsData) {
             label: categoryDetail.budRest.targetFace,
           },
           totalParticipants: categoryDetail.totalParticipants,
+          isEditAllowed: isEditAllowed,
         };
       }
     });
@@ -142,6 +165,9 @@ function budRestsFormReducer(state, action) {
 
     for (const id in nextGroupData) {
       const previousData = nextGroupData[id];
+      if (!previousData.isEditAllowed) {
+        continue;
+      }
       nextGroupData[id] = { ...previousData, targetFace: action.payload };
     }
 

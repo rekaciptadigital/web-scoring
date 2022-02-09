@@ -131,7 +131,11 @@ function TabBudRest() {
           </FolderHeaderActions>
         </FolderHeader>
 
-        {!shouldAllowEdit && (
+        {shouldAllowEdit ? (
+          <NoticeBarInfo>
+            Bantalan hanya bisa diubah sebelum tanggal kualifikasi masing-masing kategori
+          </NoticeBarInfo>
+        ) : (
           <NoticeBarInfo>Pengaturan aktif apabila pendaftaran lomba telah ditutup</NoticeBarInfo>
         )}
       </FolderPanel>
@@ -213,7 +217,7 @@ function TabBudRest() {
                           <TDInput>
                             <FieldInputTextSmall
                               placeholder="No. bantalan"
-                              disabled={!shouldAllowEdit}
+                              disabled={!shouldAllowEdit || !budRest.isEditAllowed}
                               value={shouldAllowEdit ? budRest.start : "—"}
                               onChange={(value) => {
                                 dispatchForm({
@@ -233,7 +237,7 @@ function TabBudRest() {
                           <TDInput>
                             <FieldInputTextSmall
                               placeholder="No. bantalan"
-                              disabled={!shouldAllowEdit}
+                              disabled={!shouldAllowEdit || !budRest.isEditAllowed}
                               value={shouldAllowEdit ? budRest.end : "—"}
                               onChange={(value) => {
                                 dispatchForm({
@@ -252,7 +256,7 @@ function TabBudRest() {
 
                           <TDInput>
                             <FieldSelectBudRest
-                              disabled={!shouldAllowEdit}
+                              disabled={!shouldAllowEdit || !budRest.isEditAllowed}
                               value={budRest.targetFace}
                               onChange={(option) => {
                                 dispatchForm({

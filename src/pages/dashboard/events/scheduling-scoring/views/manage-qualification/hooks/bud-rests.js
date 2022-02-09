@@ -93,6 +93,7 @@ function makeFormState(budRestsData) {
           start: computedStartNumber,
           end: computedStartNumber - 1 + computedRange,
           targetFace: makeDefaultTargetFace(),
+          totalParticipants: categoryDetail.totalParticipants,
         };
 
         previousId = categoryDetail.categoryDetailId;
@@ -144,6 +145,10 @@ function budRestsFormReducer(state, action) {
         [action.groupName]: nextGroupData,
       },
     };
+  }
+
+  if (action.type === "INVALID") {
+    return { ...state, errors: action.errors };
   }
 
   if (action.group && action.categoryDetailId) {

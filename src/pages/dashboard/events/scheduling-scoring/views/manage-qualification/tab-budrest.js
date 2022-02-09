@@ -11,6 +11,8 @@ import {
   NoticeBarInfo,
 } from "../../components";
 
+import IconAlertCircle from "components/ma/icons/mono/alert-circle";
+
 import { FolderHeader, FolderHeaderActions } from "./styles";
 
 function TabBudRest() {
@@ -18,9 +20,77 @@ function TabBudRest() {
   const eventId = parseInt(event_id);
 
   const { data: eventBudRests, groupNames } = useEventBudRests(eventId);
-  const { data: form, dispatch: dispatchForm } = useBudRestsForm(eventBudRests, groupNames);
+  const {
+    data: form,
+    errors: formErrors,
+    dispatch: dispatchForm,
+  } = useBudRestsForm(eventBudRests, groupNames);
 
+  // TODO: cek tanggal selesai lomba
   const shouldAllowEdit = true;
+
+  const shouldShowGroupErrorMessages = (groupName) =>
+    formErrors?.[groupName] && Object.keys(formErrors[groupName])?.length;
+
+  const handleClickSaveGroup = ({ group }) => {
+    // validate inputs
+    const validationErrors = {};
+    iterateGroupData(
+      form[group],
+      ({ start, end, targetFace, totalParticipants }, categoryDetailId) => {
+        // 1. Validasi nomor bantalan yang sama
+        // cek item sekarang dengan item-item lain di kelompok kategori
+        iterateGroupData(form[group], (budRestCheck, idCheck) => {
+          if (categoryDetailId === idCheck) {
+            return;
+          }
+
+          const isStartNumberSame = start === budRestCheck.start;
+
+          if (isStartNumberSame) {
+            if (!validationErrors[group]) {
+              validationErrors[group] = {};
+            }
+            const notIdenticalMessage = "Mulai & akhir antar detail kategori tidak boleh sama";
+            validationErrors[group][`${group}-${categoryDetailId}-start`] = [notIdenticalMessage];
+            validationErrors[group][`${group}-${categoryDetailId}-end`] = [notIdenticalMessage];
+            const previousMessages = validationErrors[group].messages;
+            if (
+              Array.isArray(previousMessages) &&
+              !previousMessages.some((message) => message === notIdenticalMessage)
+            ) {
+              previousMessages.push(notIdenticalMessage);
+            }
+            validationErrors[group].messages = previousMessages || [notIdenticalMessage];
+          }
+        });
+
+        // 2. Validasi jumlah bantalan yang diset
+        const referenceRange = totalParticipants / targetFace.value;
+        const inputRange = end - start + 1;
+        const isInsufficient = inputRange < referenceRange;
+
+        if (isInsufficient) {
+          if (!validationErrors[group]) {
+            validationErrors[group] = {};
+          }
+          const insufficientMessage = "Jumlah bantalan kurang";
+          validationErrors[group][`${group}-${categoryDetailId}-start`] = [insufficientMessage];
+          validationErrors[group][`${group}-${categoryDetailId}-end`] = [insufficientMessage];
+          const previousMessages = validationErrors[group].messages;
+          if (
+            Array.isArray(previousMessages) &&
+            !previousMessages.some((message) => message === insufficientMessage)
+          ) {
+            previousMessages.push(insufficientMessage);
+          }
+          validationErrors[group].messages = previousMessages || [insufficientMessage];
+        }
+      }
+    );
+
+    dispatchForm({ type: "INVALID", errors: validationErrors });
+  };
 
   return (
     <React.Fragment>
@@ -32,7 +102,7 @@ function TabBudRest() {
           </div>
 
           <FolderHeaderActions>
-            <ButtonBlue disabled={!shouldAllowEdit}>Simpan</ButtonBlue>
+            {false && <ButtonBlue disabled={!shouldAllowEdit}>Simpan</ButtonBlue>}
           </FolderHeaderActions>
         </FolderHeader>
 
@@ -71,9 +141,26 @@ function TabBudRest() {
                   </HeaderMiddleControl>
 
                   <HeaderActions>
-                    {shouldAllowEdit && <ButtonOutlineBlue>Simpan</ButtonOutlineBlue>}
+                    {shouldAllowEdit && (
+                      <ButtonOutlineBlue onClick={() => handleClickSaveGroup({ group: groupName })}>
+                        Simpan
+                      </ButtonOutlineBlue>
+                    )}
                   </HeaderActions>
                 </GroupHeader>
+
+                {shouldShowGroupErrorMessages(groupName) && (
+                  <ErrorMessagesBar>
+                    {formErrors[groupName].messages.map((message, index) => (
+                      <ValidationMessagePill key={index}>
+                        <span>
+                          <IconAlertCircle size="20" />
+                        </span>
+                        <span>{message}</span>
+                      </ValidationMessagePill>
+                    ))}
+                  </ErrorMessagesBar>
+                )}
 
                 <table className="table table-responsive">
                   <thead>
@@ -107,9 +194,14 @@ function TabBudRest() {
                                 dispatchForm({
                                   group: groupName,
                                   categoryDetailId: detail.categoryDetailId,
-                                  payload: { start: Number(value) },
+                                  payload: { start: Number(value) || 1 },
                                 });
                               }}
+                              errors={
+                                formErrors?.[groupName]?.[
+                                  `${groupName}-${detail.categoryDetailId}-start`
+                                ]
+                              }
                             />
                           </TDInput>
 
@@ -122,9 +214,14 @@ function TabBudRest() {
                                 dispatchForm({
                                   group: groupName,
                                   categoryDetailId: detail.categoryDetailId,
-                                  payload: { end: Number(value) },
+                                  payload: { end: Number(value) || 1 },
                                 });
                               }}
+                              errors={
+                                formErrors?.[groupName]?.[
+                                  `${groupName}-${detail.categoryDetailId}-end`
+                                ]
+                              }
                             />
                           </TDInput>
 
@@ -197,6 +294,28 @@ const HeaderActions = styled.div`
   gap: 0.5rem;
 `;
 
+const ErrorMessagesBar = styled.div`
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+
+  > * + * {
+    margin-left: 0.5rem;
+  }
+`;
+
+const ValidationMessagePill = styled.span`
+  display: inline-block;
+  padding: 0.375rem 0.5rem;
+  padding-right: 0.75rem;
+  border-radius: 2rem;
+  background-color: var(--ma-red);
+  color: #ffffff;
+
+  > * + * {
+    margin-left: 0.5rem;
+  }
+`;
+
 const THCateg = styled.th`
   text-transform: uppercase;
 `;
@@ -208,5 +327,17 @@ const TDCateg = styled.td`
 const TDInput = styled.td`
   width: 7.5rem;
 `;
+
+function iterateGroupData(data, callback) {
+  let index = -1;
+  for (const id in data) {
+    index = index + 1;
+    if (id === "common") {
+      continue;
+    }
+    const item = data[id];
+    callback(item, id, index);
+  }
+}
 
 export { TabBudRest };

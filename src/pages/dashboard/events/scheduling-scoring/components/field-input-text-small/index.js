@@ -10,7 +10,7 @@ function FieldInputTextSmall({
   required,
   name,
   placeholder,
-  value,
+  value = 1,
   onChange,
   disabled,
   errors,

@@ -22,7 +22,11 @@ function TabBudRest() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
 
-  const { data: eventBudRests, groupNames } = useEventBudRests(eventId);
+  const {
+    data: eventBudRests,
+    groupNames,
+    refetch: refetchEventBudRests,
+  } = useEventBudRests(eventId);
   const { data: form, errors: formErrors, dispatch: dispatchForm } = useBudRestsForm(eventBudRests);
   const {
     isSubmitLoading,
@@ -107,6 +111,7 @@ function TabBudRest() {
     const result = await BudRestService.setByEventId(payload, { event_id: eventId });
     if (result.success) {
       setSubmitSuccess();
+      refetchEventBudRests();
     } else {
       setSubmitError(result.message || result.errors);
     }

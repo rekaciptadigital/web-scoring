@@ -33,6 +33,9 @@ function budRestsReducer(state, action) {
     const { data, groupNames } = makeBudRestsState(action.data);
     return { ...state, status: "success", data, groupNames };
   }
+  if (action.type === "REFETCH") {
+    return { ...state, attempts: state.attempts + 1 };
+  }
   return { ...state, ...action };
 }
 
@@ -60,7 +63,9 @@ function useEventBudRests(eventId) {
     fetchBudRests();
   }, [attempts]);
 
-  return { ...budRests, state: budRests, dispatch };
+  const refetch = () => dispatch({ type: "REFETCH" });
+
+  return { ...budRests, state: budRests, dispatch, refetch };
 }
 
 const makeDefaultTargetFace = () => ({ value: 4, label: 4 });
@@ -78,9 +83,9 @@ function makeFormState(budRestsData) {
     transformedState[groupName] = {};
     transformedState[groupName].common = { targetFace: makeDefaultTargetFace() };
 
+    // Atur rekomendasi nilai inputan default
+    // Dijalankan hanya ketika kelompok kategori belum ada data bantalannya sama sekali
     if (shouldRecommend) {
-      // Atur rekomendasi nilai inputan default
-      // Dijalankan hanya ketika bantalan di kelompok kategori belum pernah diatur sama sekali
       let previousId = -1;
       const { value: defaultTargetFaceNumber } = transformedState[groupName].common.targetFace;
 

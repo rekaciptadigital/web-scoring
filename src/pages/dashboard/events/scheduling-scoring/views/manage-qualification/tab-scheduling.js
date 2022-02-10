@@ -16,7 +16,7 @@ import {
 import classnames from "classnames";
 import { parseISO, format } from "date-fns";
 
-import { QualificationScheduleHeader, ScheduleGroupFormBox, SchedulingFormActions } from "./styles";
+import { FolderHeader, FolderHeaderActions, ScheduleGroupFormBox } from "./styles";
 
 function TabScheduling({ eventId }) {
   const [categoryDetailsData, dispatchCategoryDetailsData] = React.useReducer(
@@ -187,19 +187,19 @@ function TabScheduling({ eventId }) {
   return (
     <React.Fragment>
       <FolderPanel>
-        <QualificationScheduleHeader>
+        <FolderHeader>
           <div>
             <h3>Jadwal Kualifikasi</h3>
             <div>Pengaturan jadwal tiap kategori</div>
           </div>
 
-          <SchedulingFormActions>
+          <FolderHeaderActions>
             <Button onClick={handleClickSaveSchedule}>Simpan</Button>
             {editMode.flashMessage && (
               <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
             )}
-          </SchedulingFormActions>
-        </QualificationScheduleHeader>
+          </FolderHeaderActions>
+        </FolderHeader>
 
         {categoryDetails && (
           <NoticeBarInfo>

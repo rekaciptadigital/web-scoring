@@ -382,6 +382,9 @@ const TYPE_QUALIFICATION = "qualification";
 function makeSaveGroupPayload(data) {
   const budRestsData = [];
   iterateGroupData(data, (budRest, categoryDetailId) => {
+    if (!budRest.isEditAllowed) {
+      return;
+    }
     budRestsData.push({
       type: TYPE_QUALIFICATION,
       archery_event_category_id: categoryDetailId,

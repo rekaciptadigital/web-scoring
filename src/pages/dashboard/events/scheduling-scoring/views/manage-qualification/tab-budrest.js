@@ -148,137 +148,162 @@ function TabBudRest() {
       <FolderPanel style={{ paddingTop: 3 }}>
         <CategoryGroupsList>
           {Boolean(groupNames?.length) &&
-            groupNames.map((groupName) => (
-              <CategoryGroup key={groupName}>
-                <GroupHeader>
-                  <HeaderTitle>
-                    <div>Kategori</div>
-                    <h4>{groupName}</h4>
-                  </HeaderTitle>
+            groupNames.map((groupName) => {
+              const shouldDisableAllInputs = () => {
+                const reducerForAllEditsNotAllowed = (state, category) => {
+                  const budRest = form[groupName][category.categoryDetailId];
+                  return state && !budRest.isEditAllowed;
+                };
+                return eventBudRests && form
+                  ? eventBudRests[groupName].reduce(reducerForAllEditsNotAllowed, true)
+                  : false;
+              };
 
-                  <HeaderMiddleControl>
-                    <FieldTargetFace>
-                      <FieldSelectBudRest
-                        disabled={!shouldAllowEdit}
-                        value={form?.[groupName]?.common.targetFace}
-                        onChange={(option) => {
-                          dispatchForm({
-                            type: "CHANGE_COMMON",
-                            groupName,
-                            payload: option,
-                          });
-                        }}
-                      >
-                        Target Face
-                      </FieldSelectBudRest>
-                    </FieldTargetFace>
-                  </HeaderMiddleControl>
+              const allInputsDisabled = shouldDisableAllInputs();
 
-                  <HeaderActions>
-                    {shouldAllowEdit && (
-                      <ButtonOutlineBlue onClick={() => handleClickSaveGroup({ group: groupName })}>
-                        Simpan
-                      </ButtonOutlineBlue>
-                    )}
-                  </HeaderActions>
-                </GroupHeader>
+              return (
+                <CategoryGroup key={groupName}>
+                  <GroupHeader>
+                    <HeaderTitle>
+                      <div>Kategori</div>
+                      <h4>{groupName}</h4>
+                    </HeaderTitle>
 
-                {shouldShowGroupErrorMessages(groupName) && (
-                  <ErrorMessagesBar>
-                    {formErrors[groupName].messages.map((message, index) => (
-                      <ValidationMessagePill key={index}>
-                        <span>
-                          <IconAlertCircle size="20" />
-                        </span>
-                        <span>{message}</span>
-                      </ValidationMessagePill>
-                    ))}
-                  </ErrorMessagesBar>
-                )}
+                    <HeaderMiddleControl>
+                      <FieldTargetFace>
+                        <FieldSelectBudRest
+                          disabled={!shouldAllowEdit || allInputsDisabled}
+                          value={form?.[groupName]?.common.targetFace}
+                          onChange={(option) => {
+                            dispatchForm({
+                              type: "CHANGE_COMMON",
+                              groupName,
+                              payload: option,
+                            });
+                          }}
+                        >
+                          Target Face
+                        </FieldSelectBudRest>
+                      </FieldTargetFace>
+                    </HeaderMiddleControl>
 
-                <table className="table table-responsive">
-                  <thead>
-                    <tr>
-                      <THCateg>Kelas</THCateg>
-                      <THCateg>Jenis Regu</THCateg>
-                      <THCateg>Jarak</THCateg>
-                      <THCateg>Peserta</THCateg>
-                      <THCateg>Mulai</THCateg>
-                      <THCateg>Akhir</THCateg>
-                      <THCateg>Target Face</THCateg>
-                    </tr>
-                  </thead>
+                    <HeaderActions>
+                      {shouldAllowEdit && (
+                        <ButtonOutlineBlue
+                          disabled={allInputsDisabled}
+                          onClick={() => handleClickSaveGroup({ group: groupName })}
+                        >
+                          Simpan
+                        </ButtonOutlineBlue>
+                      )}
+                    </HeaderActions>
+                  </GroupHeader>
 
-                  <tbody>
-                    {eventBudRests[groupName]?.map((detail) => {
-                      const budRest = form?.[groupName][detail.categoryDetailId] || {};
-                      return (
-                        <tr key={detail.categoryDetailId}>
-                          <TDCateg>{detail.age}</TDCateg>
-                          <TDCateg>{detail.team}</TDCateg>
-                          <TDCateg>{detail.distance}</TDCateg>
-                          <TDCateg>{detail.totalParticipants}</TDCateg>
+                  {shouldShowGroupErrorMessages(groupName) && (
+                    <ErrorMessagesBar>
+                      {formErrors[groupName].messages.map((message, index) => (
+                        <ValidationMessagePill key={index}>
+                          <span>
+                            <IconAlertCircle size="20" />
+                          </span>
+                          <span>{message}</span>
+                        </ValidationMessagePill>
+                      ))}
+                    </ErrorMessagesBar>
+                  )}
 
-                          <TDInput>
-                            <FieldInputTextSmall
-                              placeholder="No. bantalan"
-                              disabled={!shouldAllowEdit || !budRest.isEditAllowed}
-                              value={shouldAllowEdit ? budRest.start : "—"}
-                              onChange={(value) => {
-                                dispatchForm({
-                                  group: groupName,
-                                  categoryDetailId: detail.categoryDetailId,
-                                  payload: { start: Number(value) },
-                                });
-                              }}
-                              errors={
-                                formErrors?.[groupName]?.[
-                                  `${groupName}-${detail.categoryDetailId}-start`
-                                ]
-                              }
-                            />
-                          </TDInput>
+                  <table className="table table-responsive">
+                    <thead>
+                      <tr>
+                        <THCateg>Kelas</THCateg>
+                        <THCateg>Jenis Regu</THCateg>
+                        <THCateg>Jarak</THCateg>
+                        <THCateg>Peserta</THCateg>
+                        <THCateg>Mulai</THCateg>
+                        <THCateg>Akhir</THCateg>
+                        <THCateg>Target Face</THCateg>
+                      </tr>
+                    </thead>
 
-                          <TDInput>
-                            <FieldInputTextSmall
-                              placeholder="No. bantalan"
-                              disabled={!shouldAllowEdit || !budRest.isEditAllowed}
-                              value={shouldAllowEdit ? budRest.end : "—"}
-                              onChange={(value) => {
-                                dispatchForm({
-                                  group: groupName,
-                                  categoryDetailId: detail.categoryDetailId,
-                                  payload: { end: Number(value) },
-                                });
-                              }}
-                              errors={
-                                formErrors?.[groupName]?.[
-                                  `${groupName}-${detail.categoryDetailId}-end`
-                                ]
-                              }
-                            />
-                          </TDInput>
+                    <tbody>
+                      {eventBudRests[groupName]?.map((detail) => {
+                        const budRest = form?.[groupName][detail.categoryDetailId] || {};
+                        return (
+                          <tr key={detail.categoryDetailId}>
+                            <TDCateg>{detail.age}</TDCateg>
+                            <TDCateg>{detail.team}</TDCateg>
+                            <TDCateg>{detail.distance}</TDCateg>
+                            <TDCateg>{detail.totalParticipants}</TDCateg>
 
-                          <TDInput>
-                            <FieldSelectBudRest
-                              disabled={!shouldAllowEdit || !budRest.isEditAllowed}
-                              value={budRest.targetFace}
-                              onChange={(option) => {
-                                dispatchForm({
-                                  group: groupName,
-                                  categoryDetailId: detail.categoryDetailId,
-                                  payload: { targetFace: option },
-                                });
-                              }}
-                            />
-                          </TDInput>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </CategoryGroup>
-            ))}
+                            <TDInput>
+                              <FieldInputTextSmall
+                                placeholder="No. bantalan"
+                                disabled={!shouldAllowEdit || !budRest.isEditAllowed}
+                                value={
+                                  shouldAllowEdit && budRest.totalParticipants > 0
+                                    ? budRest.start
+                                    : "—"
+                                }
+                                onChange={(value) => {
+                                  dispatchForm({
+                                    group: groupName,
+                                    categoryDetailId: detail.categoryDetailId,
+                                    payload: { start: Number(value) },
+                                  });
+                                }}
+                                errors={
+                                  formErrors?.[groupName]?.[
+                                    `${groupName}-${detail.categoryDetailId}-start`
+                                  ]
+                                }
+                              />
+                            </TDInput>
+
+                            <TDInput>
+                              <FieldInputTextSmall
+                                placeholder="No. bantalan"
+                                disabled={!shouldAllowEdit || !budRest.isEditAllowed}
+                                value={
+                                  shouldAllowEdit && budRest.totalParticipants > 0
+                                    ? budRest.end
+                                    : "—"
+                                }
+                                onChange={(value) => {
+                                  dispatchForm({
+                                    group: groupName,
+                                    categoryDetailId: detail.categoryDetailId,
+                                    payload: { end: Number(value) },
+                                  });
+                                }}
+                                errors={
+                                  formErrors?.[groupName]?.[
+                                    `${groupName}-${detail.categoryDetailId}-end`
+                                  ]
+                                }
+                              />
+                            </TDInput>
+
+                            <TDInput>
+                              <FieldSelectBudRest
+                                disabled={!shouldAllowEdit || !budRest.isEditAllowed}
+                                value={budRest.targetFace}
+                                onChange={(option) => {
+                                  dispatchForm({
+                                    group: groupName,
+                                    categoryDetailId: detail.categoryDetailId,
+                                    payload: { targetFace: option },
+                                  });
+                                }}
+                              />
+                            </TDInput>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </CategoryGroup>
+              );
+            })}
         </CategoryGroupsList>
       </FolderPanel>
 

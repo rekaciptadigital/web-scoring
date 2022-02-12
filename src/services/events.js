@@ -75,5 +75,8 @@ export default {
     },
     setPublished(data, qs = null) {
         return API.post("/web/v1/archery/events/update-status", data, qs, true);
+    },
+    getEventLaporan(qs = null) {
+        return API.get("/web/v1/archery/events/participant/excel/download", qs)
     }
 }

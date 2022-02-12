@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const QualificationScheduleHeader = styled.div`
+const FolderHeader = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 1rem;
@@ -30,12 +30,12 @@ const ScheduleGroupFormBox = styled.div`
   }
 `;
 
-const SchedulingFormActions = styled.div`
+const FolderHeaderActions = styled.div`
   position: relative;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 0.5rem;
 `;
 
-export { QualificationScheduleHeader, ScheduleGroupFormBox, SchedulingFormActions };
+export { FolderHeader, ScheduleGroupFormBox, FolderHeaderActions };

@@ -6,6 +6,7 @@ import { EventsService } from "services";
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
 import CardMenu from "../components/CardMenu";
+import CardMenuWithButton from "../components/CardMenuWithButton"
 
 import IconCopy from "components/ma/icons/mono/copy";
 
@@ -98,7 +99,7 @@ function PageEventDetailHome() {
                 href={eventMenus[1].computeLink(event_id)}
                 badge={renderManageEventMenuBadge()}
               />
-              <CardMenu
+              <CardMenuWithButton
                 menu={eventMenus[2]}
                 href={`/dashboard/member/${event_id}`}
                 disabled={!isQualificationSchedulesSet}

@@ -7,7 +7,7 @@ import { Container } from "reactstrap";
 import { WizardView, WizardViewContent } from "components/ma";
 import { StepsList, StepItem } from "./components";
 import { BreadcrumbDashboard } from "../components/breadcrumb";
-import { StepManageQualification } from "./views";
+import { StepManageQualification, StepScoringQualification, StepManageElimination } from "./views";
 
 import IconTarget from "components/ma/icons/mono/target";
 import IconScoreboard from "components/ma/icons/mono/scoreboard";
@@ -25,7 +25,8 @@ const stepsList = [
 
 const PageEventDetailSchedulingScoring = () => {
   const { event_id } = useParams();
-  const { currentStep, goToStep } = useWizardView(stepsList);
+  // TODO: balikin default
+  const { currentStep, goToStep } = useWizardView(stepsList, 2);
 
   const eventId = parseInt(event_id);
 
@@ -50,15 +51,15 @@ const PageEventDetailSchedulingScoring = () => {
                   Atur Kualifikasi
                 </StepItem>
 
-                <StepItem step="2" disabled icon={<IconScoreboard size="20" />}>
+                <StepItem step="2" icon={<IconScoreboard size="20" />}>
                   Skor Kualifikasi
                 </StepItem>
 
-                <StepItem step="3" disabled icon={<IconBranch size="20" />}>
+                <StepItem step="3" icon={<IconBranch size="20" />}>
                   Atur Eliminasi
                 </StepItem>
 
-                <StepItem step="4" disabled icon={<IconDiagram size="20" />}>
+                <StepItem step="4" icon={<IconDiagram size="20" />}>
                   Skor Eliminasi
                 </StepItem>
               </StepsList>
@@ -68,6 +69,14 @@ const PageEventDetailSchedulingScoring = () => {
               <WizardView currentStep={currentStep}>
                 <WizardViewContent>
                   <StepManageQualification eventId={eventId} />
+                </WizardViewContent>
+
+                <WizardViewContent>
+                  <StepScoringQualification />
+                </WizardViewContent>
+
+                <WizardViewContent>
+                  <StepManageElimination />
                 </WizardViewContent>
               </WizardView>
             </StickyItemSibling>

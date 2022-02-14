@@ -69,7 +69,7 @@ function EditorContent({ onClose, id }) {
 
       <FormHeader>
         <div>
-          <FieldInputBudrestNo>Bantalan</FieldInputBudrestNo>
+          <FieldInputBudrestNo isAutoFocus>Bantalan</FieldInputBudrestNo>
         </div>
 
         {isEditMode ? (

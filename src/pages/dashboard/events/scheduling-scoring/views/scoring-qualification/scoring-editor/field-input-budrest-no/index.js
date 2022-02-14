@@ -15,8 +15,18 @@ function FieldInputBudrestNo({
   disabled,
   errors,
   warnings,
+  isAutoFocus,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
+
+  const inputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!isAutoFocus) {
+      return;
+    }
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <FieldInputTextWrapper>
@@ -31,6 +41,7 @@ function FieldInputBudrestNo({
           "error-invalid": errors?.length,
           "warning-validation": warnings?.length,
         })}
+        ref={inputRef}
         id={fieldID}
         name={name}
         value={value}

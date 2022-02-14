@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { ButtonOutlineBlue } from "components/ma";
-import { FolderPanel, FieldInputDateSmall } from "../../components";
+import { FolderPanel } from "../../components";
 import { ScoringEditor } from "./scoring-editor";
 import { FieldSelectCategory } from "./field-select-category";
 
@@ -19,8 +19,23 @@ function TabContentScoringFemale() {
   return (
     <FolderPanel>
       <TopToolbar>
-        <FieldInputDateSmall>Tanggal Kualifikasi</FieldInputDateSmall>
-        <FieldSelectCategory placeholder="Kategori">Kategori</FieldSelectCategory>
+        <div>
+          <FieldSelectCategory
+            placeholder="Kategori"
+            value={{ value: 1, label: "Default ke - Kategori - Urutan Pertama" }}
+          >
+            Kategori
+          </FieldSelectCategory>
+        </div>
+
+        <SpacedButtonsGroup>
+          <ButtonDownload>
+            <span>
+              <IconDownload size="16" />
+            </span>
+            <span>Scoresheet</span>
+          </ButtonDownload>
+        </SpacedButtonsGroup>
       </TopToolbar>
 
       <table className="table table-responsive">
@@ -48,10 +63,7 @@ function TabContentScoringFemale() {
               <td>&ndash;</td>
               <td>&ndash;</td>
               <TDTableButtons>
-                <ScoringEditor data={member} />
-                <TableRowButton title="Unduh Scoresheet">
-                  <IconDownload size="18" />
-                </TableRowButton>
+                <ScoringEditor id={index + 1} data={member} />
               </TDTableButtons>
             </tr>
           ))}
@@ -63,9 +75,32 @@ function TabContentScoringFemale() {
 
 const TopToolbar = styled.div`
   margin-bottom: 1rem;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
   gap: 1rem;
+
+  > *:first-child {
+    flex: 1 1 0%;
+
+    > * {
+      max-width: 18.75rem;
+    }
+  }
+`;
+
+const ButtonDownload = styled(ButtonOutlineBlue)`
+  > span:first-of-type {
+    margin-right: 0.5rem;
+  }
+`;
+
+const SpacedButtonsGroup = styled.div`
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: flex-start;
 `;
 
 const THMember = styled.th`
@@ -73,26 +108,7 @@ const THMember = styled.th`
 `;
 
 const TDTableButtons = styled.td`
-  width: 5.875rem;
-`;
-
-const TableRowButton = styled(ButtonOutlineBlue)`
-  &,
-  &:focus {
-    padding: 0.25rem 0.45rem;
-    border-color: transparent;
-  }
-
-  &:hover {
-    border-color: transparent;
-    background-color: transparent;
-    box-shadow: none;
-    color: var(--ma-blue);
-  }
-
-  &:focus {
-    box-shadow: 0 0 0 1px rgb(38, 132, 255);
-  }
+  width: 1.875rem;
 `;
 
 export { TabContentScoringFemale };

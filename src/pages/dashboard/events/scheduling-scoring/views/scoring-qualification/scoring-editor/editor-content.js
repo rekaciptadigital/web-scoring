@@ -36,6 +36,8 @@ function sumScoresList(list) {
 function EditorContent({ onClose, id }) {
   const [isEditMode, setEditMode] = React.useState(false);
   const [scores, setScores] = React.useState(scoreTemplate);
+  const [sessionActive, setSessionActive] = React.useState(1);
+  const sessions = [1, 2, 3];
 
   const [shouldFocusOnWarning] = React.useState(false);
 
@@ -82,7 +84,7 @@ function EditorContent({ onClose, id }) {
 
             <ButtonBlue
               onClick={() => {
-                alert("simpan!");
+                alert(`simpan! Hit API -> ${JSON.stringify(scores)}`);
                 setEditMode(false);
               }}
             >
@@ -109,6 +111,18 @@ function EditorContent({ onClose, id }) {
           <IconDistance size="16" /> {"50m"}
         </div>
       </YeahCategory>
+
+      <SessionsTabList>
+        {sessions.map((session, index) => (
+          <Button
+            key={index}
+            className={classnames({ "tab-active": sessionActive === index + 1 })}
+            onClick={() => setSessionActive(index + 1)}
+          >
+            Sesi {index + 1}
+          </Button>
+        ))}
+      </SessionsTabList>
 
       <ScoresTable
         className={classnames("table", "table-responsive", {
@@ -248,6 +262,31 @@ const YeahCategory = styled.div`
     color: var(--ma-blue);
     text-align: center;
     font-weight: 600;
+  }
+`;
+
+const SessionsTabList = styled.div`
+  margin: 1rem 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.5rem;
+
+  > *,
+  > *:hover,
+  > *:active,
+  > *:focus {
+    border-radius: 0;
+    border: solid 1px transparent;
+    background-color: transparent;
+
+    &.tab-active {
+      box-shadow: 0 -2px 0 0 var(--ma-blue);
+    }
+  }
+
+  > *:hover {
+    box-shadow: 0 -2px 0 0 var(--ma-blue);
   }
 `;
 

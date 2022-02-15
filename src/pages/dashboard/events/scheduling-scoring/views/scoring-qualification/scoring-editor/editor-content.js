@@ -269,7 +269,7 @@ function EditorContent({ onClose, id: scheduleId }) {
         <div>
           <DisplayScoreTotal>
             <div>Total:</div>
-            <div>{40}</div>
+            <div>{sumEntireTotal(currentGrid)}</div>
           </DisplayScoreTotal>
         </div>
       </EditorFooter>
@@ -449,6 +449,17 @@ function sumScoresList(list) {
     return total + value;
   };
   return list.reduce(sumReducer, 0);
+}
+
+function sumEntireTotal(gridData) {
+  if (!gridData) {
+    return 0;
+  }
+  const total = Object.keys(gridData).reduce((total, id) => {
+    return total + sumScoresList(gridData[id]);
+  }, 0);
+
+  return total;
 }
 
 const FakeService = {};

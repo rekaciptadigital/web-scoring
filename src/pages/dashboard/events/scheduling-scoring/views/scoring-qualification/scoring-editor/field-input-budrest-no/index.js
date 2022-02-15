@@ -12,7 +12,6 @@ function FieldInputBudrestNo({
   placeholder,
   value = "",
   onChange,
-  disabled,
   errors,
   warnings,
   isAutoFocus,
@@ -20,6 +19,8 @@ function FieldInputBudrestNo({
   const fieldID = name ? `field-input-${name}` : undefined;
 
   const inputRef = React.useRef(null);
+  const [isDirty, setDirty] = React.useState(false);
+  const [shouldDisable, setShouldDisable] = React.useState(false);
 
   React.useEffect(() => {
     if (!isAutoFocus) {
@@ -27,6 +28,13 @@ function FieldInputBudrestNo({
     }
     inputRef.current?.focus();
   }, []);
+
+  React.useEffect(() => {
+    if (!value || isDirty) {
+      return;
+    }
+    setShouldDisable(true);
+  }, [value, isDirty]);
 
   return (
     <FieldInputTextWrapper>
@@ -45,9 +53,12 @@ function FieldInputBudrestNo({
         id={fieldID}
         name={name}
         value={value}
-        onChange={(ev) => onChange?.(ev.target.value)}
+        onChange={(ev) => {
+          !isDirty && setDirty(true);
+          onChange?.(ev.target.value);
+        }}
         placeholder={placeholder}
-        disabled={disabled}
+        disabled={shouldDisable}
       />
     </FieldInputTextWrapper>
   );

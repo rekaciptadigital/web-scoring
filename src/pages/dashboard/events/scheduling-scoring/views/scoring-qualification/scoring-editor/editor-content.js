@@ -1,6 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useWizardView } from "utils/hooks/wizard-view";
+import { useScoringDetail } from "./hooks/scoring-detail";
+import { useScoreGrid } from "./hooks/score-grid";
 
+import { LoadingScreen } from "components";
 import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import { SelectScore } from "./select-score";
 import { FieldInputBudrestNo } from "./field-input-budrest-no";
@@ -11,55 +15,102 @@ import IconCross from "components/ma/icons/mono/cross";
 
 import classnames from "classnames";
 
-const scoreTemplate = [
-  ["m", "m", "m", "m", "m", "m"],
-  ["m", "m", "m", "m", "m", "m"],
-  ["m", "m", "m", "m", "m", "m"],
-  ["m", "m", "m", "m", "m", "m"],
-  ["m", "m", "m", "m", "m", "m"],
-  ["m", "m", "m", "m", "m", "m"],
-];
+/**
+ * Butuh data:
+ * 1. KEPERLUAN DISPLAY:
+ *    - nomor peserta
+ *    - nama peserta
+ *    - kategori:
+ *      - competition category: contoh, "Barebow"
+ *      - age category: contoh, "Umum" | "U-15" | ...
+ *      - distance category: contoh, "50m"
+ *
+ * 2. KEPERLUAN FORM INPUT SKOR:
+ *    - nomor bantalan/target:
+ *      - init: ""
+ *      - refetch setelah submit: contoh, "1B"
+ *    - detail skor, dalam bentuk grid, dikelompokkan per sesi
+ *      - init: masing-masing, "" | "m"
+ *      - refetch setelah submit: masing-masing, data terakhir yang disubmit
+ */
 
-function sumScoresList(list) {
-  const sumReducer = (total, value) => {
-    if (!value || (typeof value === "string" && value.toLowerCase() === "m")) {
-      return total;
-    }
-    if (typeof value === "string" && value.toLowerCase() === "x") {
-      return total + 10;
-    }
-    return total + value;
-  };
-  return list.reduce(sumReducer, 0);
-}
-
-function EditorContent({ onClose, id }) {
+function EditorContent({ onClose, id: scheduleId }) {
   const [isEditMode, setEditMode] = React.useState(false);
-  const [scores, setScores] = React.useState(scoreTemplate);
-  const [sessionActive, setSessionActive] = React.useState(1);
-  const sessions = [1, 2, 3];
 
-  const [shouldFocusOnWarning] = React.useState(false);
+  const {
+    data: scoringDetail,
+    dispatch: dispatchScoring,
+    refetch: refetchScoringDetail,
+  } = useScoringDetail({
+    code: undefined,
+    type: undefined,
+    scheduleId,
+  });
 
-  const handleSelectScoreChange = (rambahanIndex, shotIndex, value) =>
-    setScores((scores) => {
-      const nextScores = scores.map((rambahan, index) => {
-        if (rambahanIndex !== index) {
-          return rambahan;
-        }
-        return rambahan.map((shot, index) => {
-          return shotIndex === index ? value : shot;
-        });
-      });
-      return nextScores;
-    });
+  const { sessions } = scoringDetail || {};
+  const sessionSteps = React.useMemo(() => {
+    return makeSessionStepsFromData(sessions);
+  }, [sessions]);
+
+  const { currentStep: currentSession, goToStep: goToSession } = useWizardView(sessionSteps);
+
+  const currentGridData = React.useMemo(() => {
+    return sessions?.[currentSession].scores;
+  }, [sessions, currentSession]);
+
+  const {
+    data: currentGrid,
+    status: submitStatus,
+    setScore,
+    resetGrid,
+    dispatchSubmit,
+  } = useScoreGrid(currentGridData);
+
+  const isSubmitLoading = submitStatus === "loading";
+
+  const handleCancelSessionGrid = () => {
+    resetGrid();
+    setEditMode(false);
+  };
+
+  const handleSubmitSessionGrid = async () => {
+    dispatchSubmit({ status: "loading", errors: null });
+
+    const payload = {
+      schedule_id: scoringDetail.scheduleId,
+      target_no: scoringDetail.targetNo,
+      type: scoringDetail.type,
+      save_permanent: 0,
+      sessions: {
+        ...scoringDetail.sessions,
+        [currentSession]: {
+          ...scoringDetail.sessions[currentSession],
+          scores: currentGrid,
+        },
+      },
+    };
+    // TODO: ganti ke service beneran
+    console.log("simpan! Hit API ->", payload);
+    alert(`simpan! Hit API -> ${JSON.stringify(payload)}`);
+    const result = await FakeService.setScore(payload);
+
+    if (result.success) {
+      dispatchSubmit({ status: "success" });
+      refetchScoringDetail();
+      setEditMode(false);
+    } else {
+      dispatchSubmit({ status: "error", errors: result.errors || result.message });
+      // TODO: alert handle error submit dari API
+    }
+  };
 
   return (
     <div>
       <EditorHeader>
         <div>
-          <h4>Scoresheet (ID: {id})</h4>
+          <h4>Scoresheet</h4>
         </div>
+
         <div className="float-end">
           <ButtonClose disabled={isEditMode} onClick={() => !isEditMode && onClose()}>
             <IconCross size="16" /> Tutup
@@ -67,36 +118,38 @@ function EditorContent({ onClose, id }) {
         </div>
       </EditorHeader>
 
-      <FormHeader>
-        <div>
-          <FieldInputBudrestNo>Bantalan</FieldInputBudrestNo>
-        </div>
-
-        {isEditMode ? (
-          <SpacedButtonsGroup>
-            <Button
-              onClick={() => {
-                setEditMode(false);
+      {scoringDetail && (
+        <FormHeader>
+          <div>
+            <FieldInputBudrestNo
+              isAutoFocus
+              value={scoringDetail?.targetNo || ""}
+              onChange={(value) => {
+                dispatchScoring({
+                  type: "CHANGE_TARGET_NO",
+                  payload: value,
+                });
               }}
             >
-              Batal
-            </Button>
+              Bantalan
+            </FieldInputBudrestNo>
+          </div>
 
-            <ButtonBlue
-              onClick={() => {
-                alert(`simpan! Hit API -> ${JSON.stringify(scores)}`);
-                setEditMode(false);
-              }}
-            >
-              Simpan
-            </ButtonBlue>
-          </SpacedButtonsGroup>
-        ) : (
-          <SpacedButtonsGroup>
-            <ButtonBlue onClick={() => setEditMode(true)}>Ubah Skor</ButtonBlue>
-          </SpacedButtonsGroup>
-        )}
-      </FormHeader>
+          {isEditMode ? (
+            <SpacedButtonsGroup>
+              <Button onClick={handleCancelSessionGrid}>Batal</Button>
+
+              <ButtonBlue onClick={handleSubmitSessionGrid}>Simpan</ButtonBlue>
+            </SpacedButtonsGroup>
+          ) : (
+            <SpacedButtonsGroup>
+              <ButtonBlue disabled={!scoringDetail.targetNo} onClick={() => setEditMode(true)}>
+                Ubah Skor
+              </ButtonBlue>
+            </SpacedButtonsGroup>
+          )}
+        </FormHeader>
+      )}
 
       <YeahCategory>
         <div>{"X-XX - Placeholder Nomor Peserta"}</div>
@@ -112,101 +165,116 @@ function EditorContent({ onClose, id }) {
         </div>
       </YeahCategory>
 
-      <SessionsTabList>
-        {sessions.map((session, index) => (
-          <Button
-            key={index}
-            className={classnames({ "tab-active": sessionActive === index + 1 })}
-            onClick={() => setSessionActive(index + 1)}
-          >
-            Sesi {index + 1}
-          </Button>
-        ))}
-      </SessionsTabList>
+      {scoringDetail ? (
+        <React.Fragment>
+          <SessionsTabList>
+            {sessionSteps.map((session) => (
+              <ButtonSession
+                key={session.step}
+                className={classnames({
+                  "tab-active": scoringDetail.targetNo && currentSession === session.step,
+                })}
+                disabled={isEditMode || !scoringDetail.targetNo}
+                onClick={() => goToSession(session.step)}
+              >
+                {session.label}
+              </ButtonSession>
+            ))}
+          </SessionsTabList>
 
-      <ScoresTable
-        className={classnames("table", "table-responsive", {
-          "table-focused": shouldFocusOnWarning,
-        })}
-      >
-        <thead>
-          <tr>
-            <th>End</th>
-            <th>Shot</th>
-            <th>X</th>
-            <th>X+10</th>
-            <th>Sum</th>
-          </tr>
-        </thead>
+          {currentGrid ? (
+            <ScoresTable key={currentSession} className="table table-responsive">
+              <thead>
+                <tr>
+                  <th>End</th>
+                  <th>Shot</th>
+                  <th>X</th>
+                  <th>X+10</th>
+                  <th>Sum</th>
+                </tr>
+              </thead>
 
-        <tbody>
-          {scores.map((rambahan, rambahanIndex) => {
-            const isCurrentRambahanActive = isEditMode;
+              <tbody>
+                {Object.keys(currentGrid).map((rambahanId, rambahanIndex) => {
+                  const rambahan = currentGrid[rambahanId];
+                  const isCurrentRambahanActive = isEditMode;
 
-            return (
-              <tr key={rambahanIndex}>
-                <td>
-                  <span>{rambahanIndex + 1}</span>
-                </td>
+                  return (
+                    <tr key={rambahanIndex}>
+                      <td>
+                        <span>{rambahanIndex + 1}</span>
+                      </td>
 
-                <td>
-                  {isCurrentRambahanActive ? (
-                    <RambahanUhuy>
-                      {rambahan.map((shot, shotIndex) => (
-                        <SelectScore
-                          key={shotIndex}
-                          score={shot}
-                          onChange={(value) => {
-                            handleSelectScoreChange(rambahanIndex, shotIndex, value);
-                          }}
-                        />
-                      ))}
-                    </RambahanUhuy>
-                  ) : (
-                    <RambahanUhuy>
-                      {rambahan.map((score, index) => (
-                        <DisplayScoreItem key={index}>
-                          {score === "m" ? "-" : score}
-                        </DisplayScoreItem>
-                      ))}
-                    </RambahanUhuy>
-                  )}
-                </td>
+                      <td>
+                        {isCurrentRambahanActive ? (
+                          <RambahanUhuy>
+                            {rambahan.map((shot, shotIndex) => (
+                              <SelectScore
+                                key={shotIndex}
+                                score={shot}
+                                onChange={(value) => {
+                                  setScore({ rambahan: rambahanIndex + 1, shot: shotIndex, value });
+                                }}
+                              />
+                            ))}
+                          </RambahanUhuy>
+                        ) : (
+                          <RambahanUhuy>
+                            {rambahan.map((score, index) => (
+                              <DisplayScoreItem key={index}>
+                                {score === "m" ? "-" : score}
+                              </DisplayScoreItem>
+                            ))}
+                          </RambahanUhuy>
+                        )}
+                      </td>
 
-                <td>
-                  {rambahan.reduce((total, value) => {
-                    if (typeof value === "string" && value.toLowerCase() === "x") {
-                      return total + 1;
-                    }
-                    return total;
-                  }, 0)}
-                </td>
+                      <td>
+                        {rambahan.reduce((total, value) => {
+                          if (typeof value === "string" && value.toLowerCase() === "x") {
+                            return total + 1;
+                          }
+                          return total;
+                        }, 0)}
+                      </td>
 
-                <td>
-                  {rambahan.reduce((total, value) => {
-                    if (typeof value === "string" && value.toLowerCase() === "x") {
-                      return total + 1;
-                    }
-                    return total;
-                  }, 0)}
-                </td>
+                      <td>
+                        {rambahan.reduce((total, value) => {
+                          if (
+                            (typeof value === "string" && value.toLowerCase() === "x") ||
+                            value === 10
+                          ) {
+                            return total + 1;
+                          }
+                          return total;
+                        }, 0)}
+                      </td>
 
-                <td>{sumScoresList(rambahan)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </ScoresTable>
+                      <td>{sumScoresList(rambahan)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </ScoresTable>
+          ) : (
+            <div>Ada kesalahan dalam memproses data input skor. Silakan coba lagi.</div>
+          )}
+        </React.Fragment>
+      ) : (
+        <div>Sedang memuat data skor...</div>
+      )}
 
       <EditorFooter>
         <div></div>
         <div>
           <DisplayScoreTotal>
             <div>Total:</div>
-            <div>{40}</div>
+            <div>{sumEntireTotal(currentGrid)}</div>
           </DisplayScoreTotal>
         </div>
       </EditorFooter>
+
+      <LoadingScreen loading={isSubmitLoading} />
     </div>
   );
 }
@@ -271,11 +339,13 @@ const SessionsTabList = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
   gap: 0.5rem;
+`;
 
-  > *,
-  > *:hover,
-  > *:active,
-  > *:focus {
+const ButtonSession = styled(Button)`
+  &,
+  &:hover,
+  &:active,
+  &:focus {
     border-radius: 0;
     border: solid 1px transparent;
     background-color: transparent;
@@ -285,8 +355,20 @@ const SessionsTabList = styled.div`
     }
   }
 
-  > *:hover {
+  &:hover {
     box-shadow: 0 -2px 0 0 var(--ma-blue);
+  }
+
+  &:disabled {
+    box-shadow: none;
+    border-color: transparent;
+    background-color: transparent;
+    color: var(--ma-gray-400);
+
+    &.tab-active {
+      box-shadow: 0 -2px 0 0 var(--ma-blue);
+      color: var(--ma-blue);
+    }
   }
 `;
 
@@ -344,5 +426,49 @@ const SpacedButtonsGroup = styled.div`
   justify-content: space-between;
   align-items: flex-start;
 `;
+
+// util
+function makeSessionStepsFromData(data) {
+  if (!data) {
+    return [];
+  }
+  return Object.keys(data).map((groupId, index) => ({
+    step: parseInt(groupId),
+    label: `Sesi ${index + 1}`,
+  }));
+}
+
+function sumScoresList(list) {
+  const sumReducer = (total, value) => {
+    if (!value || (typeof value === "string" && value.toLowerCase() === "m")) {
+      return total;
+    }
+    if (typeof value === "string" && value.toLowerCase() === "x") {
+      return total + 10;
+    }
+    return total + value;
+  };
+  return list.reduce(sumReducer, 0);
+}
+
+function sumEntireTotal(gridData) {
+  if (!gridData) {
+    return 0;
+  }
+  const total = Object.keys(gridData).reduce((total, id) => {
+    return total + sumScoresList(gridData[id]);
+  }, 0);
+
+  return total;
+}
+
+const FakeService = {};
+FakeService.setScore = function (payload, params) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ success: true, data: null, message: "Success", debug: { payload, params } });
+    }, 800);
+  });
+};
 
 export { EditorContent };

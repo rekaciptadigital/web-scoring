@@ -35,13 +35,22 @@ function useFetcher(fetcherFunction, configs) {
   }, [attempts]);
 
   const refetch = () => dispatch({ type: "REFETCH" });
+  const reset = (preferedDefaultData) => dispatch({ type: "RESET", payload: preferedDefaultData });
 
-  return { ...state, state, dispatch, refetch };
+  return { ...state, state, dispatch, refetch, reset };
 }
 
 function fetchingReducer(state, action) {
   if (action.type === "REFETCH") {
     return { ...state, attempts: state.attempts + 1 };
+  }
+  if (action.type === "RESET") {
+    return {
+      status: "idle",
+      data: typeof action.payload !== "undefined" ? action.payload : null,
+      errors: null,
+      attempts: 1,
+    };
   }
   return { ...state, ...action };
 }

@@ -48,11 +48,19 @@ function StepScoringQualification() {
     data: scorings,
     state: scoringsState,
     refetch: refetchScorings,
+    reset: resetScorings,
   } = useParticipantScorings(selectedCategory[currentTeamCategory]?.value);
 
   const isLoadingScorings = scoringsState.status === "loading";
   const isInitScorings = !scorings && isLoadingScorings;
   const isErrorScorings = scoringsState.status === "error";
+
+  React.useEffect(() => {
+    if (selectedCategory[currentTeamCategory]) {
+      return;
+    }
+    resetScorings([]);
+  }, [selectedCategory[currentTeamCategory]]);
 
   return (
     <div>

@@ -48,23 +48,41 @@ function StepScoringQualification() {
     data: scorings,
     state: scoringsState,
     refetch: refetchScorings,
+    reset: resetScorings,
   } = useParticipantScorings(selectedCategory[currentTeamCategory]?.value);
 
   const isLoadingScorings = scoringsState.status === "loading";
   const isInitScorings = !scorings && isLoadingScorings;
   const isErrorScorings = scoringsState.status === "error";
 
+  React.useEffect(() => {
+    if (selectedCategory[currentTeamCategory]) {
+      return;
+    }
+    resetScorings([]);
+  }, [selectedCategory[currentTeamCategory]]);
+
   return (
     <div>
       <TabsContext.Provider value={{ currentTab, switchToTab }}>
         <FolderTabs>
-          <TabItem tab="1" icon={<IconUser size="16" />}>
-            Individu Putra
-          </TabItem>
-
-          <TabItem tab="2" icon={<IconUser size="16" />}>
-            Individu Putri
-          </TabItem>
+          {teamCategories?.map((team) => {
+            if (team === "individu male") {
+              return (
+                <TabItem tab="1" icon={<IconUser size="16" />}>
+                  Individu Putra
+                </TabItem>
+              );
+            }
+            if (team === "individu female") {
+              return (
+                <TabItem tab="2" icon={<IconUser size="16" />}>
+                  Individu Putri
+                </TabItem>
+              );
+            }
+            return;
+          })}
         </FolderTabs>
 
         <FolderPanel>
@@ -130,7 +148,9 @@ function StepScoringQualification() {
                   return (
                     <tr key={index}>
                       <td>
-                        {scoring.participantNumber || <React.Fragment>&ndash;</React.Fragment>}
+                        {scoring.member.participantNumber || (
+                          <React.Fragment>&ndash;</React.Fragment>
+                        )}
                       </td>
                       <td>{computeTargetNumber()}</td>
                       <td>{scoring.member.name}</td>

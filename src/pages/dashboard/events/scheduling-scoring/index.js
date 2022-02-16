@@ -25,8 +25,7 @@ const stepsList = [
 
 const PageEventDetailSchedulingScoring = () => {
   const { event_id } = useParams();
-  // TODO: balikin default
-  const { currentStep, goToStep } = useWizardView(stepsList, 2);
+  const { currentStep, goToStep } = useWizardView(stepsList);
 
   const eventId = parseInt(event_id);
 

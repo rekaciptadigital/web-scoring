@@ -66,13 +66,23 @@ function StepScoringQualification() {
     <div>
       <TabsContext.Provider value={{ currentTab, switchToTab }}>
         <FolderTabs>
-          <TabItem tab="1" icon={<IconUser size="16" />}>
-            Individu Putra
-          </TabItem>
-
-          <TabItem tab="2" icon={<IconUser size="16" />}>
-            Individu Putri
-          </TabItem>
+          {teamCategories?.map((team) => {
+            if (team === "individu male") {
+              return (
+                <TabItem tab="1" icon={<IconUser size="16" />}>
+                  Individu Putra
+                </TabItem>
+              );
+            }
+            if (team === "individu female") {
+              return (
+                <TabItem tab="2" icon={<IconUser size="16" />}>
+                  Individu Putri
+                </TabItem>
+              );
+            }
+            return;
+          })}
         </FolderTabs>
 
         <FolderPanel>

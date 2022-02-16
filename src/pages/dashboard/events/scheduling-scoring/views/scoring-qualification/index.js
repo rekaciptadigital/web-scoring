@@ -148,7 +148,9 @@ function StepScoringQualification() {
                   return (
                     <tr key={index}>
                       <td>
-                        {scoring.participantNumber || <React.Fragment>&ndash;</React.Fragment>}
+                        {scoring.member.participantNumber || (
+                          <React.Fragment>&ndash;</React.Fragment>
+                        )}
                       </td>
                       <td>{computeTargetNumber()}</td>
                       <td>{scoring.member.name}</td>

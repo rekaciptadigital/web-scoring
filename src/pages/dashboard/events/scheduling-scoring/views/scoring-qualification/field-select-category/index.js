@@ -30,6 +30,7 @@ function FieldSelectCategory({
         value={value}
         onChange={onChange}
         isDisabled={disabled}
+        noOptionsMessage={() => "Tidak ada kategori di kelompok ini"}
       />
     </FieldSelectWrapper>
   );

@@ -1,7 +1,8 @@
 import API from "../utils/api";
 
 export default {
-  findParticipantScoreDetail(qs) {
+  findParticipantScoreDetail({ code }) {
+    const qs = { code };
     return API.get("/web/v1/archery/scorer/participant/detail", qs);
   },
   saveParticipantScore(data = null) {

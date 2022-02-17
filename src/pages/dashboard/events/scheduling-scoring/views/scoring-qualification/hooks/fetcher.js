@@ -1,7 +1,7 @@
 import * as React from "react";
 
-function useFetcher(fetcherFunction, configs) {
-  const [state, dispatch] = React.useReducer(fetchingReducer, {
+function useFetcher(fetcherFunction, { shouldFetch, reducer = fetchingReducer, transform } = {}) {
+  const [state, dispatch] = React.useReducer(reducer, {
     status: "idle",
     data: null,
     errors: null,
@@ -12,10 +12,10 @@ function useFetcher(fetcherFunction, configs) {
 
   React.useEffect(() => {
     const shouldPreventFetch = () => {
-      if (!configs || typeof configs.shouldFetch === "undefined") {
+      if (typeof shouldFetch === "undefined") {
         return false;
       }
-      return !configs.shouldFetch;
+      return !shouldFetch;
     };
 
     if (shouldPreventFetch()) {
@@ -26,7 +26,9 @@ function useFetcher(fetcherFunction, configs) {
       dispatch({ status: "loading", errors: null });
       const result = await fetcherFunction();
       if (result.success) {
-        dispatch({ status: "success", data: result.data });
+        const makeData = (data) => (typeof transform === "function" ? transform(data) : data);
+        const data = makeData(result.data);
+        dispatch({ status: "success", data: data });
       } else {
         dispatch({ status: "error", errors: result.errors || result.message });
       }
@@ -55,4 +57,4 @@ function fetchingReducer(state, action) {
   return { ...state, ...action };
 }
 
-export { useFetcher };
+export { useFetcher, fetchingReducer };

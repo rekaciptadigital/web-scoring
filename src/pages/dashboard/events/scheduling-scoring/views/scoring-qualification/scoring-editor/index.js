@@ -7,7 +7,7 @@ import { EditorContent } from "./editor-content";
 
 import IconEdit from "components/ma/icons/mono/edit";
 
-function ScoringEditor({ id, data }) {
+function ScoringEditor(forwardedProps) {
   const [shouldOpen, setOpen] = React.useState(false);
   const toggleControl = () => setOpen((open) => !open);
   const openControl = () => setOpen(true);
@@ -21,7 +21,7 @@ function ScoringEditor({ id, data }) {
 
       {shouldOpen && (
         <EditorControl {...{ toggleControl, openControl, closeControl }}>
-          <EditorContent id={id} data={data} onClose={closeControl} />
+          <EditorContent onClose={closeControl} {...forwardedProps} />
         </EditorControl>
       )}
     </React.Fragment>

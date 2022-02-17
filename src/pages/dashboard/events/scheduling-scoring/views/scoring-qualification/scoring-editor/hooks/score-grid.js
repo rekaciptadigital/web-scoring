@@ -3,12 +3,12 @@ import * as React from "react";
 const initialState = {
   status: "idle",
   data: {
-    1: ["m", "m", "m", "m", "m", "m"],
-    2: ["m", "m", "m", "m", "m", "m"],
-    3: ["m", "m", "m", "m", "m", "m"],
-    4: ["m", "m", "m", "m", "m", "m"],
-    5: ["m", "m", "m", "m", "m", "m"],
-    6: ["m", "m", "m", "m", "m", "m"],
+    1: ["", "", "", "", "", ""],
+    2: ["", "", "", "", "", ""],
+    3: ["", "", "", "", "", ""],
+    4: ["", "", "", "", "", ""],
+    5: ["", "", "", "", "", ""],
+    6: ["", "", "", "", "", ""],
   },
   errors: null,
 };
@@ -32,15 +32,11 @@ function useScoreGrid(gridData) {
 
 function gridReducer(state, action) {
   if (action.type === "INIT") {
-    const nextGridData = {};
-    for (const id in action.payload) {
-      nextGridData[id] = action.payload[id].map((score) => score);
-    }
-    return { ...state, data: nextGridData };
+    return { ...state, data: transformGridData(action.payload) };
   }
 
   if (action.type === "RESET") {
-    return { ...initialState, data: action.initialGrid };
+    return { ...initialState, data: transformGridData(action.initialGrid) };
   }
 
   if (action.type === "SUBMIT") {
@@ -57,6 +53,17 @@ function gridReducer(state, action) {
       ),
     },
   };
+}
+
+// util
+function transformGridData(data) {
+  const transformedGrid = {};
+  for (const id in data) {
+    transformedGrid[id] = data[id].map((score) => {
+      return isNaN(score) || !score ? score : Number(score);
+    });
+  }
+  return transformedGrid;
 }
 
 export { useScoreGrid };

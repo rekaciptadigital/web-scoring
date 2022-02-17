@@ -62,6 +62,8 @@ function StepScoringQualification() {
     resetScorings([]);
   }, [selectedCategory[currentTeamCategory]]);
 
+  const handleSuccessSave = () => refetchScorings();
+
   return (
     <div>
       <TabsContext.Provider value={{ currentTab, switchToTab }}>
@@ -69,14 +71,14 @@ function StepScoringQualification() {
           {teamCategories?.map((team) => {
             if (team === "individu male") {
               return (
-                <TabItem tab="1" icon={<IconUser size="16" />}>
+                <TabItem key="1" tab="1" icon={<IconUser size="16" />}>
                   Individu Putra
                 </TabItem>
               );
             }
             if (team === "individu female") {
               return (
-                <TabItem tab="2" icon={<IconUser size="16" />}>
+                <TabItem key="2" tab="2" icon={<IconUser size="16" />}>
                   Individu Putri
                 </TabItem>
               );
@@ -139,12 +141,16 @@ function StepScoringQualification() {
 
               <tbody>
                 {scorings.map((scoring, index) => {
+                  const code = ["1", scoring.member.id, "1"].join("-");
+
                   const computeTargetNumber = () => {
-                    if (!scoring.member.budRestNumber || !scoring.member.targetFace) {
-                      return <React.Fragment>&ndash;</React.Fragment>;
-                    }
-                    return `${scoring.member.budRestNumber}${scoring.member.targetFace}`;
+                    return (
+                      scoring.member.budRestNumber &&
+                      scoring.member.targetFace &&
+                      `${scoring.member.budRestNumber}${scoring.member.targetFace}`
+                    );
                   };
+
                   return (
                     <tr key={index}>
                       <td>
@@ -152,7 +158,7 @@ function StepScoringQualification() {
                           <React.Fragment>&ndash;</React.Fragment>
                         )}
                       </td>
-                      <td>{computeTargetNumber()}</td>
+                      <td>{computeTargetNumber() || <React.Fragment>&ndash;</React.Fragment>}</td>
                       <td>{scoring.member.name}</td>
                       <td>{scoring.member.clubName}</td>
                       <td>{scoring.total}</td>
@@ -160,7 +166,12 @@ function StepScoringQualification() {
                       <td>{scoring.totalXPlusTen}</td>
 
                       <TDTableButtons>
-                        <ScoringEditor id={scoring.schedule_id} data={scoring} />
+                        <ScoringEditor
+                          rowItem={scoring}
+                          code={code}
+                          targetNumber={computeTargetNumber()}
+                          onSuccess={handleSuccessSave}
+                        />
                       </TDTableButtons>
                     </tr>
                   );

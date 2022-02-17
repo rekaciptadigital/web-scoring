@@ -3,9 +3,10 @@ import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { useScoringDetail } from "./hooks/scoring-detail";
 import { useScoreGrid } from "./hooks/score-grid";
+import { ScoringService } from "services";
 
 import { LoadingScreen } from "components";
-import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
+import { Button, ButtonBlue, ButtonOutlineBlue, SpinnerDotBlock } from "components/ma";
 import { SelectScore } from "./select-score";
 import { FieldInputBudrestNo } from "./field-input-budrest-no";
 
@@ -14,49 +15,28 @@ import IconDistance from "components/ma/icons/mono/arrow-left-right";
 import IconCross from "components/ma/icons/mono/cross";
 
 import classnames from "classnames";
+import { makeSessionStepsFromData, sumScoresList, sumEntireTotal } from "./utils";
 
-/**
- * Butuh data:
- * 1. KEPERLUAN DISPLAY:
- *    - nomor peserta
- *    - nama peserta
- *    - kategori:
- *      - competition category: contoh, "Barebow"
- *      - age category: contoh, "Umum" | "U-15" | ...
- *      - distance category: contoh, "50m"
- *
- * 2. KEPERLUAN FORM INPUT SKOR:
- *    - nomor bantalan/target:
- *      - init: ""
- *      - refetch setelah submit: contoh, "1B"
- *    - detail skor, dalam bentuk grid, dikelompokkan per sesi
- *      - init: masing-masing, "" | "m"
- *      - refetch setelah submit: masing-masing, data terakhir yang disubmit
- */
-
-function EditorContent({ onClose, id: scheduleId }) {
+function EditorContent({ rowItem, code, targetNumber, onClose, onSuccess }) {
+  const [currentCode, setCurrentCode] = React.useState(code);
+  const [targetNo, setTargetNo] = React.useState(targetNumber);
   const [isEditMode, setEditMode] = React.useState(false);
 
   const {
     data: scoringDetail,
-    dispatch: dispatchScoring,
+    status: scoringDetailStatus,
     refetch: refetchScoringDetail,
-  } = useScoringDetail({
-    code: undefined,
-    type: undefined,
-    scheduleId,
-  });
+  } = useScoringDetail({ code: currentCode });
 
-  const { sessions } = scoringDetail || {};
-  const sessionSteps = React.useMemo(() => {
-    return makeSessionStepsFromData(sessions);
-  }, [sessions]);
-
+  const sessionSteps = makeSessionStepsFromData(rowItem.sessions);
   const { currentStep: currentSession, goToStep: goToSession } = useWizardView(sessionSteps);
 
-  const currentGridData = React.useMemo(() => {
-    return sessions?.[currentSession].scores;
-  }, [sessions, currentSession]);
+  const handleSwitchSession = (sessionNumber) => {
+    const { member } = rowItem;
+    goToSession(sessionNumber);
+    setCurrentCode(`1-${member.id}-${sessionNumber}`);
+    refetchScoringDetail();
+  };
 
   const {
     data: currentGrid,
@@ -64,9 +44,7 @@ function EditorContent({ onClose, id: scheduleId }) {
     setScore,
     resetGrid,
     dispatchSubmit,
-  } = useScoreGrid(currentGridData);
-
-  const isSubmitLoading = submitStatus === "loading";
+  } = useScoreGrid(scoringDetail?.score);
 
   const handleCancelSessionGrid = () => {
     resetGrid();
@@ -77,31 +55,30 @@ function EditorContent({ onClose, id: scheduleId }) {
     dispatchSubmit({ status: "loading", errors: null });
 
     const payload = {
-      schedule_id: scoringDetail.scheduleId,
-      target_no: scoringDetail.targetNo,
-      type: scoringDetail.type,
-      save_permanent: 0,
-      sessions: {
-        ...scoringDetail.sessions,
-        [currentSession]: {
-          ...scoringDetail.sessions[currentSession],
-          scores: currentGrid,
-        },
-      },
+      save_permanent: 1,
+      code: currentCode,
+      target_no: targetNo,
+      shoot_scores: currentGrid,
     };
-    // TODO: ganti ke service beneran
-    console.log("simpan! Hit API ->", payload);
-    alert(`simpan! Hit API -> ${JSON.stringify(payload)}`);
-    const result = await FakeService.setScore(payload);
+    const result = await ScoringService.saveParticipantScore(payload);
 
     if (result.success) {
       dispatchSubmit({ status: "success" });
       refetchScoringDetail();
       setEditMode(false);
+      onSuccess?.();
     } else {
       dispatchSubmit({ status: "error", errors: result.errors || result.message });
       // TODO: alert handle error submit dari API
     }
+  };
+
+  const isLoadingScoringDetail = scoringDetailStatus === "loading";
+  const isLoadingSubmit = submitStatus === "loading";
+
+  const computeCategoryLabel = () => {
+    const { competitionCategoryDetail, ageCategoryDetail } = scoringDetail.category;
+    return `${competitionCategoryDetail.label} ${ageCategoryDetail.label}`;
   };
 
   return (
@@ -118,164 +95,172 @@ function EditorContent({ onClose, id: scheduleId }) {
         </div>
       </EditorHeader>
 
-      {scoringDetail && (
-        <FormHeader>
-          <div>
-            <FieldInputBudrestNo
-              isAutoFocus
-              value={scoringDetail?.targetNo || ""}
-              onChange={(value) => {
-                dispatchScoring({
-                  type: "CHANGE_TARGET_NO",
-                  payload: value,
-                });
-              }}
-            >
-              Bantalan
-            </FieldInputBudrestNo>
-          </div>
-
-          {isEditMode ? (
-            <SpacedButtonsGroup>
-              <Button onClick={handleCancelSessionGrid}>Batal</Button>
-
-              <ButtonBlue onClick={handleSubmitSessionGrid}>Simpan</ButtonBlue>
-            </SpacedButtonsGroup>
-          ) : (
-            <SpacedButtonsGroup>
-              <ButtonBlue disabled={!scoringDetail.targetNo} onClick={() => setEditMode(true)}>
-                Ubah Skor
-              </ButtonBlue>
-            </SpacedButtonsGroup>
-          )}
-        </FormHeader>
-      )}
-
-      <YeahCategory>
-        <div>{"X-XX - Placeholder Nomor Peserta"}</div>
-
-        <div>{"Nama Pesertanya"}</div>
-
-        <div>
-          <IconBow size="16" /> {"Barebow"} {"Umum"}
-        </div>
-
-        <div>
-          <IconDistance size="16" /> {"50m"}
-        </div>
-      </YeahCategory>
-
-      {scoringDetail ? (
+      {!scoringDetail && isLoadingScoringDetail ? (
+        <SpinnerDotBlock />
+      ) : scoringDetail ? (
         <React.Fragment>
+          <FormHeader>
+            <div>
+              <FieldInputBudrestNo
+                isAutoFocus
+                value={targetNo || ""}
+                onChange={(value) => setTargetNo(value)}
+              >
+                Bantalan
+              </FieldInputBudrestNo>
+            </div>
+
+            {isEditMode ? (
+              <SpacedButtonsGroup>
+                <Button onClick={handleCancelSessionGrid}>Batal</Button>
+
+                <ButtonBlue onClick={handleSubmitSessionGrid}>Simpan</ButtonBlue>
+              </SpacedButtonsGroup>
+            ) : (
+              <SpacedButtonsGroup>
+                <ButtonBlue onClick={() => setEditMode(true)}>Ubah Skor</ButtonBlue>
+              </SpacedButtonsGroup>
+            )}
+          </FormHeader>
+
+          <YeahCategory>
+            <div>{rowItem.member.participantNumber}</div>
+            <div>{rowItem.member.name}</div>
+            <div>
+              <IconBow size="16" /> {computeCategoryLabel()}
+            </div>
+            <div>
+              <IconDistance size="16" /> {scoringDetail.category.distanceDetail.label}
+            </div>
+          </YeahCategory>
+
           <SessionsTabList>
             {sessionSteps.map((session) => (
               <ButtonSession
                 key={session.step}
-                className={classnames({
-                  "tab-active": scoringDetail.targetNo && currentSession === session.step,
-                })}
-                disabled={isEditMode || !scoringDetail.targetNo}
-                onClick={() => goToSession(session.step)}
+                className={classnames({ "tab-active": currentSession === session.step })}
+                disabled={isEditMode}
+                onClick={() => handleSwitchSession(session.step)}
               >
                 {session.label}
               </ButtonSession>
             ))}
           </SessionsTabList>
 
-          {currentGrid ? (
-            <ScoresTable key={currentSession} className="table table-responsive">
-              <thead>
-                <tr>
-                  <th>End</th>
-                  <th>Shot</th>
-                  <th>X</th>
-                  <th>X+10</th>
-                  <th>Sum</th>
-                </tr>
-              </thead>
+          <SectionTableContainer>
+            <TableLoadingIndicator isLoading={isLoadingScoringDetail} />
+            {currentGrid ? (
+              <ScoresTable key={currentSession} className="table table-responsive">
+                <thead>
+                  <tr>
+                    <th>End</th>
+                    <th>Shot</th>
+                    <th>X</th>
+                    <th>X+10</th>
+                    <th>Sum</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {Object.keys(currentGrid).map((rambahanId, rambahanIndex) => {
-                  const rambahan = currentGrid[rambahanId];
-                  const isCurrentRambahanActive = isEditMode;
+                <tbody>
+                  {Object.keys(currentGrid).map((rambahanIdKey) => {
+                    const rambahan = currentGrid[rambahanIdKey];
+                    const rambahanId = parseInt(rambahanIdKey);
+                    return (
+                      <tr key={rambahanIdKey}>
+                        <td>
+                          <span>{rambahanIdKey}</span>
+                        </td>
 
-                  return (
-                    <tr key={rambahanIndex}>
-                      <td>
-                        <span>{rambahanIndex + 1}</span>
-                      </td>
+                        <td>
+                          {isEditMode ? (
+                            <RambahanUhuy>
+                              {rambahan.map((shot, shotIndex) => (
+                                <SelectScore
+                                  key={shotIndex}
+                                  score={shot}
+                                  onChange={(value) => {
+                                    setScore({
+                                      rambahan: rambahanId,
+                                      shot: shotIndex,
+                                      value,
+                                    });
+                                  }}
+                                />
+                              ))}
+                            </RambahanUhuy>
+                          ) : (
+                            <RambahanUhuy>
+                              {rambahan.map((score, index) => (
+                                <DisplayScoreItem key={index}>
+                                  {!score ? "-" : score}
+                                </DisplayScoreItem>
+                              ))}
+                            </RambahanUhuy>
+                          )}
+                        </td>
 
-                      <td>
-                        {isCurrentRambahanActive ? (
-                          <RambahanUhuy>
-                            {rambahan.map((shot, shotIndex) => (
-                              <SelectScore
-                                key={shotIndex}
-                                score={shot}
-                                onChange={(value) => {
-                                  setScore({ rambahan: rambahanIndex + 1, shot: shotIndex, value });
-                                }}
-                              />
-                            ))}
-                          </RambahanUhuy>
-                        ) : (
-                          <RambahanUhuy>
-                            {rambahan.map((score, index) => (
-                              <DisplayScoreItem key={index}>
-                                {score === "m" ? "-" : score}
-                              </DisplayScoreItem>
-                            ))}
-                          </RambahanUhuy>
-                        )}
-                      </td>
+                        <td>
+                          {rambahan.reduce((total, value) => {
+                            if (typeof value === "string" && value.toLowerCase() === "x") {
+                              return total + 1;
+                            }
+                            return total;
+                          }, 0)}
+                        </td>
 
-                      <td>
-                        {rambahan.reduce((total, value) => {
-                          if (typeof value === "string" && value.toLowerCase() === "x") {
-                            return total + 1;
-                          }
-                          return total;
-                        }, 0)}
-                      </td>
+                        <td>
+                          {rambahan.reduce((total, value) => {
+                            if (
+                              (typeof value === "string" && value.toLowerCase() === "x") ||
+                              value === 10
+                            ) {
+                              return total + 1;
+                            }
+                            return total;
+                          }, 0)}
+                        </td>
 
-                      <td>
-                        {rambahan.reduce((total, value) => {
-                          if (
-                            (typeof value === "string" && value.toLowerCase() === "x") ||
-                            value === 10
-                          ) {
-                            return total + 1;
-                          }
-                          return total;
-                        }, 0)}
-                      </td>
+                        <td>{sumScoresList(rambahan)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </ScoresTable>
+            ) : (
+              <div>Ada kesalahan dalam memproses data input skor. Silakan coba lagi.</div>
+            )}
+          </SectionTableContainer>
 
-                      <td>{sumScoresList(rambahan)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </ScoresTable>
-          ) : (
-            <div>Ada kesalahan dalam memproses data input skor. Silakan coba lagi.</div>
-          )}
+          <EditorFooter>
+            <div></div>
+            <div>
+              <DisplayScoreTotal>
+                <div>Total:</div>
+                <div>{sumEntireTotal(currentGrid)}</div>
+              </DisplayScoreTotal>
+            </div>
+          </EditorFooter>
         </React.Fragment>
       ) : (
-        <div>Sedang memuat data skor...</div>
+        <div>
+          Ada error dalam mengambil data scoring. Silakan coba kembali beberapa saat lagi, atau
+          hubungi technical support.
+        </div>
       )}
 
-      <EditorFooter>
-        <div></div>
-        <div>
-          <DisplayScoreTotal>
-            <div>Total:</div>
-            <div>{sumEntireTotal(currentGrid)}</div>
-          </DisplayScoreTotal>
-        </div>
-      </EditorFooter>
-
-      <LoadingScreen loading={isSubmitLoading} />
+      <LoadingScreen loading={isLoadingSubmit} />
     </div>
+  );
+}
+
+function TableLoadingIndicator({ isLoading }) {
+  if (!isLoading) {
+    return null;
+  }
+  return (
+    <LoaderContainer>
+      <SpinnerDotBlock />
+    </LoaderContainer>
   );
 }
 
@@ -372,6 +357,18 @@ const ButtonSession = styled(Button)`
   }
 `;
 
+const SectionTableContainer = styled.div`
+  position: relative;
+`;
+
+const LoaderContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+`;
+
 const ScoresTable = styled.table`
   tbody > tr {
     cursor: default;
@@ -426,49 +423,5 @@ const SpacedButtonsGroup = styled.div`
   justify-content: space-between;
   align-items: flex-start;
 `;
-
-// util
-function makeSessionStepsFromData(data) {
-  if (!data) {
-    return [];
-  }
-  return Object.keys(data).map((groupId, index) => ({
-    step: parseInt(groupId),
-    label: `Sesi ${index + 1}`,
-  }));
-}
-
-function sumScoresList(list) {
-  const sumReducer = (total, value) => {
-    if (!value || (typeof value === "string" && value.toLowerCase() === "m")) {
-      return total;
-    }
-    if (typeof value === "string" && value.toLowerCase() === "x") {
-      return total + 10;
-    }
-    return total + value;
-  };
-  return list.reduce(sumReducer, 0);
-}
-
-function sumEntireTotal(gridData) {
-  if (!gridData) {
-    return 0;
-  }
-  const total = Object.keys(gridData).reduce((total, id) => {
-    return total + sumScoresList(gridData[id]);
-  }, 0);
-
-  return total;
-}
-
-const FakeService = {};
-FakeService.setScore = function (payload, params) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ success: true, data: null, message: "Success", debug: { payload, params } });
-    }, 800);
-  });
-};
 
 export { EditorContent };

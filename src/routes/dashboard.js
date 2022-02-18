@@ -31,7 +31,7 @@ const dashboardRoutes = [
     component: PageEventDetailSchedulingScoring,
   },
   {
-    path: "/dashboard/event/:event_id/scheduling-scoring/elimination-setting",
+    path: "/dashboard/event/:event_id/scheduling-scoring/elimination",
     component: PageConfigEliminationDetail,
   },
   { path: "/dashboard/member/:event_id", component: ListMember },

@@ -1,19 +1,20 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
-import Switch from "react-switch";
-import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
+import { ButtonOutlineBlue } from "components/ma";
 import { BreadcrumbDashboard } from "../../../components/breadcrumb";
-import { FieldInputDateSmall, FieldInputTextSmall, FieldSelectBudRest } from "../../components/";
+import { FieldSelectParticipantCounts } from "./field-select-participant-counts";
 
 import { StyledPageWrapper } from "./styles";
 
 function PageConfigEliminationDetail() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
+  const location = useLocation();
+  const { category } = location.state;
 
   return (
     <React.Fragment>
@@ -23,7 +24,9 @@ function PageConfigEliminationDetail() {
 
       <StyledPageWrapper>
         <Container fluid>
-          <BreadcrumbDashboard to={`/dashboard/event/${eventId}/scheduling-scoring`}>
+          <BreadcrumbDashboard
+            to={location.state.from || `/dashboard/event/${eventId}/scheduling-scoring`}
+          >
             Kembali
           </BreadcrumbDashboard>
 
@@ -31,7 +34,7 @@ function PageConfigEliminationDetail() {
             <div>
               <StackedFieldDisplay>
                 <div>Kategori</div>
-                <h5>Traditional Bow</h5>
+                <h5>{category.competitionCategoryId}</h5>
               </StackedFieldDisplay>
             </div>
 
@@ -40,25 +43,24 @@ function PageConfigEliminationDetail() {
                 <SpacedBoxesLined>
                   <StackedFieldDisplay>
                     <div>Jenis Regu</div>
-                    <h5>Individu</h5>
+                    <h5>{category.teamCategoryDetail.label}</h5>
                   </StackedFieldDisplay>
 
                   <StackedFieldDisplay>
                     <div>Kelas</div>
-                    <h5>Umum</h5>
+                    <h5>{category.ageCategoryId}</h5>
                   </StackedFieldDisplay>
 
                   <StackedFieldDisplay>
                     <div>Jarak</div>
-                    <h5>50m</h5>
+                    <h5>{category.distanceId}m</h5>
                   </StackedFieldDisplay>
                 </SpacedBoxesLined>
 
                 <SpacedBoxesLined>
-                  <FieldInputDateSmall>Tanggal</FieldInputDateSmall>
-                  <FieldSelectBudRest placeholder="Pilih jumlah babak" value={null}>
-                    Jumlah Babak
-                  </FieldSelectBudRest>
+                  <FieldSelectParticipantCounts placeholder="Pilih jumlah peserta" value={null}>
+                    Jumlah Peserta Eliminasi
+                  </FieldSelectParticipantCounts>
                 </SpacedBoxesLined>
 
                 <SpacedButtonsGroupRight>
@@ -70,40 +72,6 @@ function PageConfigEliminationDetail() {
             <PanelCard>
               <SplitPanelContent>
                 <MatchBracketContainer>Match bracket</MatchBracketContainer>
-
-                <div>
-                  <BracketConfigPanel>
-                    <SpacedBoxesStacked>
-                      <div>
-                        <h6>Bantalan</h6>
-
-                        <SpacedBoxesLined>
-                          <FieldInputTextSmall>Mulai</FieldInputTextSmall>
-                          <FieldInputTextSmall>Akhir</FieldInputTextSmall>
-                          <FieldSelectBudRest placeholder="Target face">
-                            Target Face
-                          </FieldSelectBudRest>
-                        </SpacedBoxesLined>
-                      </div>
-
-                      <div>
-                        <h6>Sesi</h6>
-
-                        <SpacedBoxesStacked>
-                          <FieldToggleVariant>Jam beda tiap sesi</FieldToggleVariant>
-
-                          <FieldInputDateSmall placeholder="Atur jam" value={null}>
-                            Sesi
-                          </FieldInputDateSmall>
-                        </SpacedBoxesStacked>
-                      </div>
-                    </SpacedBoxesStacked>
-
-                    <div>
-                      <ButtonBlueBlock>Simpan</ButtonBlueBlock>
-                    </div>
-                  </BracketConfigPanel>
-                </div>
               </SplitPanelContent>
             </PanelCard>
           </ContentSection>
@@ -131,6 +99,7 @@ const StackedFieldDisplay = styled.div`
 
   > *:last-child {
     font-weight: 600;
+    text-transform: capitalize;
   }
 `;
 
@@ -146,17 +115,6 @@ const TopConfigBar = styled.div`
 
 const SpacedBoxesLined = styled.div`
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-
-  > * {
-    flex: 1 0 0%;
-  }
-`;
-
-const SpacedBoxesStacked = styled.div`
-  display: flex;
-  flex-direction: column;
   gap: 1rem;
   flex-wrap: wrap;
 
@@ -189,50 +147,6 @@ const SplitPanelContent = styled.div`
 const MatchBracketContainer = styled.div`
   overflow: auto;
   height: 400px;
-`;
-
-const BracketConfigPanel = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1rem;
-
-  > * > * > *:first-child {
-    font-weight: 600;
-  }
-`;
-
-const StyledFieldToggleVariant = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  text-align: right;
-`;
-
-function FieldToggleVariant({ children }) {
-  return (
-    <StyledFieldToggleVariant>
-      <span>{children}</span>
-      <Switch
-        checked={false}
-        onChange={() => {}}
-        offColor="#eeeeee"
-        onColor="#B4C6E2"
-        onHandleColor="#0d47a1"
-        height={16}
-        width={36}
-        handleDiameter={20}
-        uncheckedIcon={false}
-        checkedIcon={false}
-        boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-      />
-    </StyledFieldToggleVariant>
-  );
-}
-
-const ButtonBlueBlock = styled(ButtonBlue)`
-  width: 100%;
 `;
 
 export default PageConfigEliminationDetail;

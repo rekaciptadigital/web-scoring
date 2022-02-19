@@ -159,7 +159,7 @@ function PageConfigEliminationDetail() {
             <BracketPanelCard>
               <SplitPanelContent>
                 <MatchBracketContainer>
-                  {matchTemplate && !matchTemplate.updated && (
+                  {matchTemplate && !matchTemplate.updated ? (
                     <OverflowingBracketContent>
                       <Bracket
                         rounds={matchTemplate.rounds || []}
@@ -174,6 +174,10 @@ function PageConfigEliminationDetail() {
                         )}
                       />
                     </OverflowingBracketContent>
+                  ) : (
+                    <SettingsNotApplied>
+                      <h4>Terapkan pengaturan eliminasi di atas untuk membuat bagan</h4>
+                    </SettingsNotApplied>
                   )}
                 </MatchBracketContainer>
               </SplitPanelContent>
@@ -285,6 +289,19 @@ const FloatingControl = styled.div`
   justify-content: center;
   align-items: center;
   transform: translateY(85%);
+`;
+
+const SettingsNotApplied = styled.div`
+  height: 400px;
+  padding: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  > * {
+    color: var(--ma-gray-400);
+  }
 `;
 
 const ContentSection = styled.div`

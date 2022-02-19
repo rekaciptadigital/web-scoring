@@ -2,20 +2,13 @@ import * as React from "react";
 import styled from "styled-components";
 import Select from "react-select";
 
-const amountOptions = [
-  { value: 16, label: 16 },
-  { value: 8, label: 8 },
-];
-
-const getOptionFromValue = (value) => amountOptions.find((option) => option.value === value);
-
-function FieldSelectParticipantCounts({
+function FieldSelectOption({
   children,
   label,
   name,
   placeholder,
   required,
-  options = amountOptions,
+  options,
   value,
   onChange,
   errors,
@@ -34,7 +27,7 @@ function FieldSelectParticipantCounts({
         name={name}
         placeholder={placeholder}
         options={options}
-        value={value || getOptionFromValue(16)}
+        value={value}
         onChange={onChange}
         isDisabled={disabled}
       />
@@ -96,4 +89,4 @@ const computeCustomStylesWithValidation = (errors) => {
   return customSelectStyles;
 };
 
-export { FieldSelectParticipantCounts };
+export { FieldSelectOption };

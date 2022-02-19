@@ -13,9 +13,10 @@ import {
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
 import { LoadingScreen } from "components";
-import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
+import { ButtonOutlineBlue } from "components/ma";
 import { BreadcrumbDashboard } from "../../../components/breadcrumb";
 import { FieldSelectOption } from "./field-select-option";
+import { ScoringEditor } from "./scoring-editor";
 
 import IconCheck from "components/ma/icons/fill/check";
 
@@ -167,8 +168,9 @@ function PageConfigEliminationDetail() {
                           <SeedBagan
                             bracketProps={bracketProps}
                             configs={{
-                              isSettingsApplied: !matchTemplate.updated,
+                              isSettingApplied: !matchTemplate.updated,
                               totalRounds: matchTemplate.rounds.length - 1,
+                              eliminationId: matchTemplate.eliminationId,
                             }}
                           />
                         )}
@@ -196,7 +198,7 @@ function SeedBagan({ bracketProps, configs }) {
 
   const shouldEnableScoring = () => {
     const noWinnersYet = seed.teams.every((team) => team.win === 0);
-    return configs.isSettingsApplied && noWinnersYet;
+    return configs.isSettingApplied && noWinnersYet;
   };
 
   return (
@@ -212,7 +214,7 @@ function SeedBagan({ bracketProps, configs }) {
 
           {shouldEnableScoring() && (
             <FloatingControl>
-              <ButtonScoring>scoring</ButtonScoring>
+              <ScoringEditor bracketProps={bracketProps} configs={configs} />
             </FloatingControl>
           )}
         </ItemContainer>
@@ -220,15 +222,6 @@ function SeedBagan({ bracketProps, configs }) {
     </Seed>
   );
 }
-
-const ButtonScoring = styled(ButtonBlue)`
-  &,
-  &:focus,
-  &:active {
-    padding: 2px 8px;
-    font-size: 0.875em;
-  }
-`;
 
 const Seed = styled(RBSeed)`
   padding-top: 2rem;

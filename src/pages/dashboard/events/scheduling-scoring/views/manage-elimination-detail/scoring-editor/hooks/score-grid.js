@@ -35,7 +35,6 @@ function useScoreGrid(scoresData) {
   const dispatchSubmit = (action) => dispatch({ type: "SUBMIT", payload: action });
 
   React.useEffect(() => {
-    console.log(scoresData);
     if (!scoresData) {
       return;
     }

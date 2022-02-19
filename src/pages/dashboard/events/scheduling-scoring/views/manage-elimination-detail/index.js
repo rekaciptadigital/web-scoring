@@ -74,6 +74,8 @@ function PageConfigEliminationDetail() {
     }
   };
 
+  const handleSuccessSave = () => refetchMatchTemplate();
+
   const isLoadingApply = formStatus.status === "loading";
 
   return (
@@ -172,6 +174,7 @@ function PageConfigEliminationDetail() {
                               totalRounds: matchTemplate.rounds.length - 1,
                               eliminationId: matchTemplate.eliminationId,
                             }}
+                            onSuccess={handleSuccessSave}
                           />
                         )}
                       />
@@ -193,7 +196,7 @@ function PageConfigEliminationDetail() {
   );
 }
 
-function SeedBagan({ bracketProps, configs }) {
+function SeedBagan({ bracketProps, configs, onSuccess }) {
   const { seed, breakpoint } = bracketProps;
 
   const shouldEnableScoring = () => {
@@ -214,7 +217,7 @@ function SeedBagan({ bracketProps, configs }) {
 
           {shouldEnableScoring() && (
             <FloatingControl>
-              <ScoringEditor bracketProps={bracketProps} configs={configs} />
+              <ScoringEditor bracketProps={bracketProps} configs={configs} onSuccess={onSuccess} />
             </FloatingControl>
           )}
         </ItemContainer>

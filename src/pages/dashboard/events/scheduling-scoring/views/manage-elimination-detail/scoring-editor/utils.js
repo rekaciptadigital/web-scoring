@@ -11,4 +11,16 @@ function sumScoresList(list) {
   return list.reduce(sumReducer, 0);
 }
 
-export { sumScoresList };
+function makeScoringPayload({ data, state }) {
+  const members = state.map((member, index) => ({
+    member_id: member.participant.member.id,
+    scores: {
+      shot: data[index].shot.map((rambahan) => ({ score: rambahan })),
+      extraShot: data[index].extraShot,
+    },
+  }));
+  //coba tanpa type?
+  return { type: 2, members };
+}
+
+export { sumScoresList, makeScoringPayload };

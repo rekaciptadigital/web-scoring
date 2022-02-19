@@ -3,7 +3,9 @@ import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { useScoringDetail } from "./hooks/scoring-detail";
 import { useScoreGrid } from "./hooks/score-grid";
+import { ScoringService } from "services";
 
+import { LoadingScreen } from "components";
 import { ButtonBlue, ButtonOutlineBlue, SpinnerDotBlock } from "components/ma";
 import { FieldInputBudrestNo } from "./field-input-budrest-no";
 import { ScoreGridForm } from "./score-grid-form";
@@ -12,7 +14,9 @@ import IconBow from "components/ma/icons/mono/bow";
 import IconDistance from "components/ma/icons/mono/arrow-left-right";
 import IconCross from "components/ma/icons/mono/cross";
 
-function EditorContent({ bracketProps, configs, onClose }) {
+import { makeScoringPayload } from "./utils";
+
+function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
   const location = useLocation();
   const { roundIndex, seedIndex, seed } = bracketProps;
   const memberId = seed.teams.find((team) => Boolean(team.id))?.id;
@@ -24,13 +28,19 @@ function EditorContent({ bracketProps, configs, onClose }) {
     match: seedIndex + 1,
   };
 
-  const { data: scoringDetail, status: scoringDetailStatus } = useScoringDetail(scoring);
+  const {
+    data: scoringDetail,
+    status: scoringDetailStatus,
+    refetch: refetchScoring,
+  } = useScoringDetail(scoring);
 
   const {
     data: gridLeft,
     updateShot: updateShotLeft,
     updateExtraShot: updateExtraShotLeft,
     resetGrid: resetGridLeft,
+    dispatchSubmit,
+    status: statusSubmit,
   } = useScoreGrid(scoringDetail?.[0].scores);
   const {
     data: gridRight,
@@ -48,7 +58,27 @@ function EditorContent({ bracketProps, configs, onClose }) {
     setEditMode(false);
   };
 
+  const handleSubmitSessionGrid = async () => {
+    dispatchSubmit({ status: "loading", errors: null });
+    const payload = {
+      save_permanent: 0,
+      ...scoring,
+      ...makeScoringPayload({ data: [gridLeft, gridRight], state: scoringDetail }),
+    };
+
+    const result = await ScoringService.saveParticipantScore(payload);
+    if (result.success) {
+      dispatchSubmit({ status: "success" });
+      setEditMode(false);
+      refetchScoring();
+      onSuccess?.();
+    } else {
+      dispatchSubmit({ status: "error", errors: result.errors || result.message });
+    }
+  };
+
   const isLoadingScoringDetail = scoringDetailStatus === "loading";
+  const isLoadingSubmit = statusSubmit === "loading";
 
   const computeCategoryLabel = () => {
     const { competitionCategoryId, ageCategoryId } = location.state.category;
@@ -169,6 +199,8 @@ function EditorContent({ bracketProps, configs, onClose }) {
           hubungi technical support.
         </div>
       )}
+
+      <LoadingScreen loading={isLoadingSubmit} />
     </div>
   );
 }

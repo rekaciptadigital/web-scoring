@@ -2,6 +2,8 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { SelectScore } from "./select-score";
+import { SelectExtraShot } from "./select-extra-shot";
+
 import { sumScoresList } from "./utils";
 
 function ScoreGridForm({ isEditMode, gridData, updateShot, updateExtraShot }) {
@@ -68,11 +70,18 @@ function ScoreGridForm({ isEditMode, gridData, updateShot, updateExtraShot }) {
             {isEditMode ? (
               <RambahanUhuy>
                 {gridData.extraShot.map((shot, index) => (
-                  <SelectScore
+                  <SelectExtraShot
                     key={index}
                     score={shot.score}
+                    distanceFromX={shot.distanceFromX}
                     onChange={(value) => {
-                      updateExtraShot?.({ shot: index, value });
+                      updateExtraShot?.({ shot: index, value: { score: value } });
+                    }}
+                    onDistanceChange={(value) => {
+                      updateExtraShot?.({ shot: index, value: { distanceFromX: value } });
+                    }}
+                    onClearDistance={() => {
+                      updateExtraShot?.({ shot: index, value: { distanceFromX: "" } });
                     }}
                   />
                 ))}

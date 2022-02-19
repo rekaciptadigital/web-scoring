@@ -29,11 +29,13 @@ function EditorContent({ bracketProps, configs, onClose }) {
   const {
     data: gridLeft,
     updateShot: updateShotLeft,
+    updateExtraShot: updateExtraShotLeft,
     resetGrid: resetGridLeft,
   } = useScoreGrid(scoringDetail?.[0].scores);
   const {
     data: gridRight,
     updateShot: updateShotRight,
+    updateExtraShot: updateExtraShotRight,
     resetGrid: resetGridRight,
   } = useScoreGrid(scoringDetail?.[1].scores);
 
@@ -112,7 +114,7 @@ function EditorContent({ bracketProps, configs, onClose }) {
                   <ScoreGridForm
                     gridData={gridLeft}
                     updateShot={updateShotLeft}
-                    // updateExtraShot={updateExtr}
+                    updateExtraShot={updateExtraShotLeft}
                     isEditMode={isEditMode}
                   />
                 ) : (
@@ -124,7 +126,6 @@ function EditorContent({ bracketProps, configs, onClose }) {
                 <FormHeader>
                   <div>
                     <FieldInputBudrestNo
-                      isAutoFocus
                       value={targetNo || ""}
                       onChange={(value) => setTargetNo(value)}
                     >
@@ -137,6 +138,7 @@ function EditorContent({ bracketProps, configs, onClose }) {
                   <ScoreGridForm
                     gridData={gridRight}
                     updateShot={updateShotRight}
+                    updateExtraShot={updateExtraShotRight}
                     isEditMode={isEditMode}
                   />
                 ) : (

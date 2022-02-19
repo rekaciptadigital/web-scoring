@@ -70,6 +70,21 @@ function gridReducer(state, action) {
     };
   }
 
+  if (action.type === "CHANGE_EXTRA") {
+    return {
+      ...state,
+      data: {
+        ...state.data,
+        extraShot: state.data.extraShot.map((column, index) => {
+          if (index !== action.shot) {
+            return column;
+          }
+          return { ...column, ...action.value };
+        }),
+      },
+    };
+  }
+
   if (action.type === "RESET") {
     return { ...initialState, data: transformGridData(action.initialGrid) };
   }
@@ -91,9 +106,9 @@ function gridReducer(state, action) {
 }
 
 // util
-function transformGridData(data) {
-  const handleScoreType = (score) => (isNaN(score) || !score ? score : Number(score));
+const handleScoreType = (score) => (isNaN(score) || !score ? score : Number(score));
 
+function transformGridData(data) {
   const transformedShot = data.shot.map((rambahan) => {
     return rambahan.score.map((item) => handleScoreType(item));
   });

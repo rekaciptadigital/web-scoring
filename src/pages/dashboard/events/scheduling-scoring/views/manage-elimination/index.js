@@ -1,119 +1,87 @@
 import * as React from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import styled from "styled-components";
-import { useWizardView } from "utils/hooks/wizard-view";
+import { useCategoriesElimination } from "./hooks/event-categories-elimination";
 
 import { ButtonOutlineBlue } from "components/ma";
-import { FolderTabs, TabItem, TabsContext, FolderPanel } from "../../components";
-
-import IconIndividu from "components/ma/icons/mono/user";
-import IconTeam from "components/ma/icons/mono/users";
-
-const tabsList = [
-  { step: 1, label: "Individu" },
-  { step: 2, label: "Beregu" },
-];
+import { FolderPanel } from "../../components";
+import { FieldSelectCategory } from "./field-select-category";
 
 function StepManageElimination() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
-  const { currentStep: currentTab, goToStep: switchToTab } = useWizardView(tabsList);
+  const location = useLocation();
+
+  const { data: categories } = useCategoriesElimination(eventId);
+  const tabsList = makeTeamCategoriesFilters(categories);
+
+  const [currentFilter, setCurrentFilter] = React.useState(null);
+  const currentCategories = categories?.[currentFilter?.value];
+
+  React.useEffect(() => {
+    setCurrentFilter(tabsList[0]);
+  }, [categories]);
 
   return (
-    <div>
-      <TabsContext.Provider value={{ currentTab, switchToTab }}>
-        <FolderTabs>
-          <TabItem tab="1" icon={<IconIndividu size="16" />}>
-            Individu
-          </TabItem>
+    <FolderPanel>
+      <GroupHeader>
+        <HeaderTitle>
+          <h3>Eliminasi</h3>
+          <div>Atur skor tiap kategori</div>
+        </HeaderTitle>
 
-          <TabItem tab="2" icon={<IconTeam size="16" />}>
-            Beregu
-          </TabItem>
-        </FolderTabs>
-      </TabsContext.Provider>
+        <HeaderActions>
+          <FieldSelectCategory
+            options={tabsList}
+            value={currentFilter}
+            onChange={(option) => setCurrentFilter(option)}
+          >
+            Kategori Tim
+          </FieldSelectCategory>
+        </HeaderActions>
+      </GroupHeader>
 
-      <FolderPanel>
-        <CategoryGroupsList>
-          <CategoryGroup>
-            <GroupHeader>
-              <HeaderTitle>
-                <div>Kategori</div>
-                <h4>{"Traditional Bow"}</h4>
-              </HeaderTitle>
+      <table className="table table-responsive">
+        <thead>
+          <tr>
+            <THCateg>Kelas</THCateg>
+            <THCateg>Jenis Regu</THCateg>
+            <THCateg>Jarak</THCateg>
+            <THCateg>Peserta</THCateg>
+            <THCateg>&nbsp;</THCateg>
+          </tr>
+        </thead>
 
-              <HeaderActions></HeaderActions>
-            </GroupHeader>
-
-            <table className="table table-responsive">
-              <thead>
-                <tr>
-                  <THCateg>Kelas</THCateg>
-                  <THCateg>Jenis Regu</THCateg>
-                  <THCateg>Jarak</THCateg>
-                  <THCateg>Jumlah Babak</THCateg>
-                  <THCateg>Peserta</THCateg>
-                  <THCateg>Tanggal Eliminasi</THCateg>
-                  <THCateg>Status</THCateg>
-                  <THCateg>&nbsp;</THCateg>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <TDCateg>{"Umum"}</TDCateg>
-                  <TDCateg style={{ width: 135 }}>{"Individu Putra"}</TDCateg>
-                  <TDCateg>{"50m"}</TDCateg>
-                  <TDCateg>&ndash;</TDCateg>
-                  <TDCateg>{28}</TDCateg>
-                  <TDCateg>{"12/02/2022"}</TDCateg>
-                  <TDCateg>{"Belum Diatur"}</TDCateg>
-                  <TDCateg>
-                    <ButtonOutlineBlue
-                      as={Link}
-                      to={`/dashboard/event/${eventId}/scheduling-scoring/elimination-setting`}
-                    >
-                      Atur
-                    </ButtonOutlineBlue>
-                  </TDCateg>
-                </tr>
-                <tr>
-                  <TDCateg>{"Umum"}</TDCateg>
-                  <TDCateg>{"Beregu Campuran"}</TDCateg>
-                  <TDCateg>{"30m, 40m, 50m"}</TDCateg>
-                  <TDCateg>&ndash;</TDCateg>
-                  <TDCateg>{28}</TDCateg>
-                  <TDCateg>{"12/02/2022"}</TDCateg>
-                  <TDCateg>{"Belum Diatur"}</TDCateg>
-                  <TDCateg>
-                    <ButtonOutlineBlue
-                      as={Link}
-                      to={`/dashboard/event/${eventId}/scheduling-scoring/elimination-setting`}
-                    >
-                      Atur
-                    </ButtonOutlineBlue>
-                  </TDCateg>
-                </tr>
-              </tbody>
-            </table>
-          </CategoryGroup>
-        </CategoryGroupsList>
-      </FolderPanel>
-    </div>
+        {currentCategories && (
+          <tbody>
+            {currentCategories.map((category) => (
+              <tr key={category.id}>
+                <TDCateg>{category.ageCategoryId}</TDCateg>
+                <TDCateg style={{ width: 135 }}>{category.teamCategoryDetail.label}</TDCateg>
+                <TDCateg className="text-lowercase">{category.distanceId}m</TDCateg>
+                <TDCateg>{category.totalParticipant}</TDCateg>
+                <TDCategAction>
+                  <ButtonOutlineBlue
+                    as={Link}
+                    to={{
+                      pathname: `/dashboard/event/${eventId}/scheduling-scoring/elimination`,
+                      state: {
+                        from: `${location.pathname}${location.search}`,
+                        category: category,
+                      },
+                    }}
+                  >
+                    Atur
+                  </ButtonOutlineBlue>
+                </TDCategAction>
+              </tr>
+            ))}
+          </tbody>
+        )}
+      </table>
+    </FolderPanel>
   );
 }
-
-const CategoryGroupsList = styled.div`
-  > * + * {
-    margin-top: 1.25rem;
-  }
-`;
-
-const CategoryGroup = styled.div`
-  padding: 1.25rem;
-  border: solid 1px var(--ma-gray-100);
-  border-radius: 0.5rem;
-`;
 
 const GroupHeader = styled.div`
   margin-bottom: 1.25rem;
@@ -136,6 +104,10 @@ const HeaderActions = styled.div`
   justify-content: flex-end;
   align-items: center;
   gap: 0.5rem;
+
+  > * {
+    width: 20rem;
+  }
 `;
 
 const THCateg = styled.th`
@@ -145,5 +117,34 @@ const THCateg = styled.th`
 const TDCateg = styled.td`
   text-transform: capitalize;
 `;
+
+const TDCategAction = styled.td`
+  text-align: right;
+`;
+
+// utils
+function makeTeamCategoriesFilters(data) {
+  if (!data) {
+    return [];
+  }
+
+  const teamCategories = {
+    "individu male": { name: "Individu Putra", type: "individu" },
+    "individu female": { name: "Individu Putri", type: "individu" },
+    maleTeam: { name: "Beregu Putra", type: "team" },
+    femaleTeam: { name: "Beregu Putri", type: "team" },
+    mixTeam: { name: "Beregu Campuran", type: "team" },
+  };
+
+  const filterOptions = [];
+  for (const groupId in data) {
+    filterOptions.push({
+      value: groupId,
+      label: teamCategories[groupId].name,
+      type: teamCategories[groupId].type,
+    });
+  }
+  return filterOptions;
+}
 
 export { StepManageElimination };

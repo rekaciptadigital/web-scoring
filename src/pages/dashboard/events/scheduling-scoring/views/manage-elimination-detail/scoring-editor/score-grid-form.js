@@ -4,9 +4,9 @@ import styled from "styled-components";
 import { SelectScore } from "./select-score";
 import { SelectExtraShot } from "./select-extra-shot";
 
-import { sumScoresList } from "./utils";
+import { sumScoresList, sumScoresAllRambahan } from "./utils";
 
-function ScoreGridForm({ isEditMode, gridData, updateShot, updateExtraShot }) {
+function ScoreGridForm({ isEditMode, scoringType, gridData, updateShot, updateExtraShot }) {
   return (
     <ScoresTable className="table table-responsive">
       <thead>
@@ -14,7 +14,7 @@ function ScoreGridForm({ isEditMode, gridData, updateShot, updateExtraShot }) {
           <THCenter>End</THCenter>
           <th>Shot</th>
           <THCenter>Sum</THCenter>
-          <THCenter>Poin</THCenter>
+          {scoringType === parseInt(1) && <THCenter>Poin</THCenter>}
         </tr>
       </thead>
 
@@ -56,7 +56,9 @@ function ScoreGridForm({ isEditMode, gridData, updateShot, updateExtraShot }) {
                 {(isEditMode ? sumScoresList(rambahan) : gridData.stats?.[rambahanIndex].total) ||
                   "-"}
               </TDCenter>
-              <TDCenter>{gridData.stats?.[rambahanIndex].point || "-"}</TDCenter>
+              {scoringType === parseInt(1) && (
+                <TDCenter>{gridData.stats?.[rambahanIndex].point || "-"}</TDCenter>
+              )}
             </tr>
           );
         })}
@@ -101,8 +103,12 @@ function ScoreGridForm({ isEditMode, gridData, updateShot, updateExtraShot }) {
       <tfoot>
         <tr>
           <THRight colSpan="2">Total:</THRight>
-          <THTotal>200</THTotal>
-          <THTotal>0</THTotal>
+          <THTotal>
+            {isEditMode ? sumScoresAllRambahan(gridData.shot) : gridData.stats.total}
+          </THTotal>
+          {scoringType === parseInt(1) && (
+            <THTotal>{isEditMode ? "..." : gridData.stats.result}</THTotal>
+          )}
         </tr>
       </tfoot>
     </ScoresTable>

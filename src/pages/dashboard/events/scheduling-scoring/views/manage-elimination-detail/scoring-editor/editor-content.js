@@ -93,7 +93,12 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
     <div>
       <EditorHeader>
         <div>
-          <h4>Scoresheet</h4>
+          <h4>
+            Scoresheet
+            {scoringDetail?.[0]?.scores.eliminationtScoreType === 1
+              ? " - Sistem Poin"
+              : " - Sistem Akumulasi Skor"}
+          </h4>
         </div>
 
         <div className="float-end">
@@ -110,7 +115,7 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
           <HUDPlayerTop>
             <PlayerName>{scoringDetail[0].participant.name}</PlayerName>
             <PlayerScores>
-              {scoringDetail[0].scores.total}-{scoringDetail[1].scores.total}
+              {scoringDetail[0].scores.result || 0}-{scoringDetail[1].scores.result || 0}
             </PlayerScores>
             <PlayerName>{scoringDetail[1].participant.name}</PlayerName>
           </HUDPlayerTop>
@@ -146,6 +151,7 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
 
                 {gridLeft ? (
                   <ScoreGridForm
+                    scoringType={scoringDetail?.[0]?.scores.eliminationtScoreType}
                     gridData={gridLeft}
                     updateShot={updateShotLeft}
                     updateExtraShot={updateExtraShotLeft}
@@ -170,6 +176,7 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
 
                 {gridRight ? (
                   <ScoreGridForm
+                    scoringType={scoringDetail?.[1]?.scores.eliminationtScoreType}
                     gridData={gridRight}
                     updateShot={updateShotRight}
                     updateExtraShot={updateExtraShotRight}

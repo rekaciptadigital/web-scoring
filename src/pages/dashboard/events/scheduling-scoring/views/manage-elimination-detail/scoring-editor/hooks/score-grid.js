@@ -78,7 +78,8 @@ function gridReducer(state, action) {
           if (index !== action.shot) {
             return column;
           }
-          return { ...column, ...action.value };
+          const value = handleScoreTypesInObject(action.value);
+          return { ...column, ...value };
         }),
       },
     };
@@ -104,23 +105,39 @@ function gridReducer(state, action) {
   };
 }
 
-// util
-const handleScoreType = (score) => (isNaN(score) || !score ? score : Number(score));
+// utils
+const handleScoreType = (score) => {
+  const checkValue = isNaN(score) || !score ? score : Number(score);
+  if (typeof checkValue === "undefined") {
+    return "";
+  }
+  return checkValue;
+};
+
+const handleScoreTypesInObject = (valueObject) => {
+  const value = {};
+  for (const key in valueObject) {
+    value[key] = handleScoreType(valueObject[key]);
+  }
+  return value;
+};
 
 function transformGridData(data) {
   const transformedShot = data.shot.map((rambahan) => {
     return rambahan.score.map((item) => handleScoreType(item));
   });
 
-  const stats = {};
+  const stats = { total: data.total, result: data.result };
   data.shot.forEach((shot, index) => {
     stats[index] = { total: shot.total, point: shot.point };
   });
 
+  const checkExtraShotLength = (shots) => (shots.length > 3 ? shots.slice(2) : shots);
+
   return {
     shot: transformedShot,
     stats: stats,
-    extraShot: data.extraShot.slice(2).map((shot) => ({
+    extraShot: checkExtraShotLength(data.extraShot).map((shot) => ({
       score: handleScoreType(shot.score),
       distanceFromX: handleScoreType(shot.distanceFromX),
     })),

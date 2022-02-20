@@ -17,10 +17,22 @@ function makeScoringPayload({ data, state }) {
     scores: {
       shot: data[index].shot.map((rambahan) => ({ score: rambahan })),
       extraShot: data[index].extraShot,
+      win: member.scores.win,
     },
   }));
   //coba tanpa type?
   return { type: 2, members };
 }
 
-export { sumScoresList, makeScoringPayload };
+function sumScoresAllRambahan(shotData) {
+  if (!shotData) {
+    return 0;
+  }
+  const total = shotData.reduce((total, rambahanShots) => {
+    return total + sumScoresList(rambahanShots);
+  }, 0);
+
+  return total;
+}
+
+export { sumScoresList, sumScoresAllRambahan, makeScoringPayload };

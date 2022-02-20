@@ -6,7 +6,7 @@ import { useScoreGrid } from "./hooks/score-grid";
 import { ScoringService } from "services";
 
 import { LoadingScreen } from "components";
-import { ButtonBlue, ButtonOutlineBlue, SpinnerDotBlock } from "components/ma";
+import { ButtonBlue, ButtonOutlineBlue, SpinnerDotBlock, AlertSubmitError } from "components/ma";
 import { FieldInputBudrestNo } from "./field-input-budrest-no";
 import { ScoreGridForm } from "./score-grid-form";
 
@@ -14,6 +14,7 @@ import IconBow from "components/ma/icons/mono/bow";
 import IconDistance from "components/ma/icons/mono/arrow-left-right";
 import IconCross from "components/ma/icons/mono/cross";
 
+import { errorsUtil } from "utils";
 import { makeScoringPayload } from "./utils";
 
 function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
@@ -41,6 +42,7 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
     resetGrid: resetGridLeft,
     dispatchSubmit,
     status: statusSubmit,
+    errors: submitErrors,
   } = useScoreGrid(scoringDetail?.[0].scores);
   const {
     data: gridRight,
@@ -73,12 +75,14 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
       refetchScoring();
       onSuccess?.();
     } else {
-      dispatchSubmit({ status: "error", errors: result.errors || result.message });
+      const errors = errorsUtil.interpretServerErrors(result);
+      dispatchSubmit({ status: "error", errors: errors });
     }
   };
 
   const isLoadingScoringDetail = scoringDetailStatus === "loading";
   const isLoadingSubmit = statusSubmit === "loading";
+  const isErrorSubmit = statusSubmit === "error";
 
   const computeCategoryLabel = () => {
     const { competitionCategoryId, ageCategoryId } = location.state.category;
@@ -201,6 +205,7 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
       )}
 
       <LoadingScreen loading={isLoadingSubmit} />
+      <AlertSubmitError isError={isErrorSubmit} errors={submitErrors} onConfirm={() => {}} />
     </div>
   );
 }

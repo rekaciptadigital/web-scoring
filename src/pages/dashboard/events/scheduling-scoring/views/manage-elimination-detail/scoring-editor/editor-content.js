@@ -6,16 +6,23 @@ import { useScoreGrid } from "./hooks/score-grid";
 import { ScoringService } from "services";
 
 import { LoadingScreen } from "components";
-import { ButtonBlue, ButtonOutlineBlue, SpinnerDotBlock, AlertSubmitError } from "components/ma";
+import {
+  ButtonBlue,
+  ButtonOutlineBlue,
+  SpinnerDotBlock,
+  AlertSubmitError,
+  AlertConfirmAction,
+} from "components/ma";
 import { FieldInputBudrestNo } from "./field-input-budrest-no";
 import { ScoreGridForm } from "./score-grid-form";
 
 import IconBow from "components/ma/icons/mono/bow";
 import IconDistance from "components/ma/icons/mono/arrow-left-right";
 import IconCross from "components/ma/icons/mono/cross";
+import IconTrophyWin from "components/ma/icons/fill/trophy-win";
 
 import { errorsUtil } from "utils";
-import { makeScoringPayload } from "./utils";
+import { makeScoringPayload, hasWinner } from "./utils";
 
 function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
   const location = useLocation();
@@ -80,9 +87,35 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
     }
   };
 
+  const handleConfirmDetermineWinner = () => setAlertConfirmStatus("open");
+
+  const handleDetermineWinner = async () => {
+    dispatchSubmit({ status: "loading", errors: null });
+    const payload = {
+      save_permanent: 1,
+      ...scoring,
+      ...makeScoringPayload({ data: [gridLeft, gridRight], state: scoringDetail }),
+    };
+
+    const result = await ScoringService.saveParticipantScore(payload);
+    if (result.success) {
+      dispatchSubmit({ status: "success" });
+      setEditMode(false);
+      refetchScoring();
+    } else {
+      const errors = errorsUtil.interpretServerErrors(result);
+      dispatchSubmit({ status: "error", errors: errors });
+    }
+  };
+
+  const [alertConfirmStatus, setAlertConfirmStatus] = React.useState("close");
+
   const isLoadingScoringDetail = scoringDetailStatus === "loading";
   const isLoadingSubmit = statusSubmit === "loading";
   const isErrorSubmit = statusSubmit === "error";
+  const matchHasWinner = hasWinner(scoringDetail);
+  const isDetermineWinnerAllowed = scoringDetail?.some((member) => member.scores.result);
+  const shouldShowConfirm = alertConfirmStatus === "open";
 
   const computeCategoryLabel = () => {
     const { competitionCategoryId, ageCategoryId } = location.state.category;
@@ -91,36 +124,66 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
 
   return (
     <div>
-      <EditorHeader>
-        <div>
-          <h4>
-            Scoresheet
-            {scoringDetail?.[0]?.scores.eliminationtScoreType === 1
-              ? " - Sistem Poin"
-              : " - Sistem Akumulasi Skor"}
-          </h4>
-        </div>
+      {!matchHasWinner && (
+        <EditorHeader>
+          <div>
+            <h4>
+              Scoresheet
+              {scoringDetail?.[0]?.scores.eliminationtScoreType === 1
+                ? " - Sistem Poin"
+                : " - Sistem Akumulasi Skor"}
+            </h4>
+          </div>
 
-        <div className="float-end">
-          <ButtonClose disabled={isEditMode} onClick={() => !isEditMode && onClose()}>
-            <IconCross size="16" /> Tutup
-          </ButtonClose>
-        </div>
-      </EditorHeader>
+          <div className="float-end">
+            <ButtonClose disabled={isEditMode} onClick={() => !isEditMode && onClose()}>
+              <IconCross size="16" /> Tutup
+            </ButtonClose>
+          </div>
+        </EditorHeader>
+      )}
 
       {!scoringDetail && isLoadingScoringDetail ? (
         <SpinnerDotBlock />
       ) : scoringDetail ? (
         <React.Fragment>
-          <HUDPlayerTop>
-            <PlayerName>{scoringDetail[0].participant.name}</PlayerName>
-            <PlayerScores>
-              {scoringDetail[0].scores.result || 0}-{scoringDetail[1].scores.result || 0}
-            </PlayerScores>
-            <PlayerName>{scoringDetail[1].participant.name}</PlayerName>
-          </HUDPlayerTop>
+          {!matchHasWinner ? (
+            <HUDPlayerTop>
+              <PlayerName>{scoringDetail[0].participant.name}</PlayerName>
+              <PlayerScores>
+                {scoringDetail[0].scores.result || 0}-{scoringDetail[1].scores.result || 0}
+              </PlayerScores>
+              <PlayerName>{scoringDetail[1].participant.name}</PlayerName>
+            </HUDPlayerTop>
+          ) : (
+            <WinnerHUDContainer>
+              <HUDPlayerTop>
+                <PlayerName>{scoringDetail[0].participant.name}</PlayerName>
 
-          {location?.state?.category && (
+                <div className="hud-middle">
+                  {Boolean(scoringDetail[0].scores.win) && (
+                    <span className="indicator-winner left">
+                      <IconTrophyWin size="28" />
+                    </span>
+                  )}
+
+                  <PlayerScores>
+                    {scoringDetail[0].scores.result || 0}-{scoringDetail[1].scores.result || 0}
+                  </PlayerScores>
+
+                  {Boolean(scoringDetail[1].scores.win) && (
+                    <span className="indicator-winner right">
+                      <IconTrophyWin size="28" />
+                    </span>
+                  )}
+                </div>
+
+                <PlayerName>{scoringDetail[1].participant.name}</PlayerName>
+              </HUDPlayerTop>
+            </WinnerHUDContainer>
+          )}
+
+          {location?.state?.category && !matchHasWinner && (
             <YeahCategory>
               <div>{location.state.category.teamCategoryDetail.label}</div>
               <div>
@@ -132,77 +195,100 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
             </YeahCategory>
           )}
 
-          <SectionTableContainer>
-            <TableLoadingIndicator isLoading={isLoadingScoringDetail} />
+          {!matchHasWinner && (
+            <SectionTableContainer>
+              <TableLoadingIndicator isLoading={isLoadingScoringDetail} />
 
-            <SplitEditor>
-              <div>
-                <FormHeader>
-                  <div>
-                    <FieldInputBudrestNo
-                      isAutoFocus
-                      value={targetNo || ""}
-                      onChange={(value) => setTargetNo(value)}
-                    >
-                      Bantalan
-                    </FieldInputBudrestNo>
-                  </div>
-                </FormHeader>
+              <SplitEditor>
+                <div>
+                  <FormHeader>
+                    <div>
+                      <FieldInputBudrestNo
+                        isAutoFocus
+                        value={targetNo || ""}
+                        onChange={(value) => setTargetNo(value)}
+                      >
+                        Bantalan
+                      </FieldInputBudrestNo>
+                    </div>
+                  </FormHeader>
 
-                {gridLeft ? (
-                  <ScoreGridForm
-                    scoringType={scoringDetail?.[0]?.scores.eliminationtScoreType}
-                    gridData={gridLeft}
-                    updateShot={updateShotLeft}
-                    updateExtraShot={updateExtraShotLeft}
-                    isEditMode={isEditMode}
-                  />
-                ) : (
-                  <div>Ada kesalahan dalam memproses data input skor. Silakan coba lagi.</div>
-                )}
-              </div>
+                  {gridLeft ? (
+                    <ScoreGridForm
+                      scoringType={scoringDetail?.[0]?.scores.eliminationtScoreType}
+                      gridData={gridLeft}
+                      updateShot={updateShotLeft}
+                      updateExtraShot={updateExtraShotLeft}
+                      isEditMode={isEditMode}
+                    />
+                  ) : (
+                    <div>Ada kesalahan dalam memproses data input skor. Silakan coba lagi.</div>
+                  )}
+                </div>
 
-              <div>
-                <FormHeader>
-                  <div>
-                    <FieldInputBudrestNo
-                      value={targetNo || ""}
-                      onChange={(value) => setTargetNo(value)}
-                    >
-                      Bantalan
-                    </FieldInputBudrestNo>
-                  </div>
-                </FormHeader>
+                <div>
+                  <FormHeader>
+                    <div>
+                      <FieldInputBudrestNo
+                        value={targetNo || ""}
+                        onChange={(value) => setTargetNo(value)}
+                      >
+                        Bantalan
+                      </FieldInputBudrestNo>
+                    </div>
+                  </FormHeader>
 
-                {gridRight ? (
-                  <ScoreGridForm
-                    scoringType={scoringDetail?.[1]?.scores.eliminationtScoreType}
-                    gridData={gridRight}
-                    updateShot={updateShotRight}
-                    updateExtraShot={updateExtraShotRight}
-                    isEditMode={isEditMode}
-                  />
-                ) : (
-                  <div>Ada kesalahan dalam memproses data input skor. Silakan coba lagi.</div>
-                )}
-              </div>
-            </SplitEditor>
-          </SectionTableContainer>
+                  {gridRight ? (
+                    <ScoreGridForm
+                      scoringType={scoringDetail?.[1]?.scores.eliminationtScoreType}
+                      gridData={gridRight}
+                      updateShot={updateShotRight}
+                      updateExtraShot={updateExtraShotRight}
+                      isEditMode={isEditMode}
+                    />
+                  ) : (
+                    <div>Ada kesalahan dalam memproses data input skor. Silakan coba lagi.</div>
+                  )}
+                </div>
+              </SplitEditor>
+            </SectionTableContainer>
+          )}
 
-          <EditorFooter>
-            <div></div>
-            {isEditMode ? (
+          {!matchHasWinner ? (
+            <EditorFooter>
+              <div></div>
+              {isEditMode ? (
+                <SpacedButtonsGroup>
+                  <ButtonClose onClick={handleCancelSessionGrid}>Batal</ButtonClose>
+                  <ButtonBlue onClick={handleSubmitSessionGrid}>Simpan</ButtonBlue>
+                  <ButtonOutlineBlue
+                    disabled={!isDetermineWinnerAllowed}
+                    onClick={handleConfirmDetermineWinner}
+                  >
+                    Tentukan
+                  </ButtonOutlineBlue>
+                </SpacedButtonsGroup>
+              ) : (
+                <SpacedButtonsGroup>
+                  <ButtonBlue onClick={() => setEditMode(true)}>Ubah Skor</ButtonBlue>
+                </SpacedButtonsGroup>
+              )}
+            </EditorFooter>
+          ) : (
+            <EditorFooter>
+              <div></div>
               <SpacedButtonsGroup>
-                <ButtonClose onClick={handleCancelSessionGrid}>Batal</ButtonClose>
-                <ButtonBlue onClick={handleSubmitSessionGrid}>Simpan</ButtonBlue>
-                <ButtonOutlineBlue onClick={() => {}}>Tentukan</ButtonOutlineBlue>
+                <ButtonClose
+                  onClick={() => {
+                    onSuccess?.();
+                    onClose();
+                  }}
+                >
+                  <IconCross size="16" /> Tutup
+                </ButtonClose>
               </SpacedButtonsGroup>
-            ) : (
-              <SpacedButtonsGroup>
-                <ButtonBlue onClick={() => setEditMode(true)}>Ubah Skor</ButtonBlue>
-              </SpacedButtonsGroup>
-            )}
-          </EditorFooter>
+            </EditorFooter>
+          )}
         </React.Fragment>
       ) : (
         <div>
@@ -213,6 +299,15 @@ function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
 
       <LoadingScreen loading={isLoadingSubmit} />
       <AlertSubmitError isError={isErrorSubmit} errors={submitErrors} onConfirm={() => {}} />
+      <AlertConfirmAction
+        shouldConfirm={shouldShowConfirm}
+        onConfirm={handleDetermineWinner}
+        onClose={() => setAlertConfirmStatus("close")}
+        labelCancel="Periksa kembali"
+      >
+        Skor tidak dapat diubah lagi setelah ditentukan pemenang. Pastikan semua skor telah diisi
+        benar.
+      </AlertConfirmAction>
     </div>
   );
 }
@@ -277,6 +372,29 @@ const ButtonClose = styled(ButtonOutlineBlue)`
   }
 `;
 
+const WinnerHUDContainer = styled.div`
+  padding: 3rem 2rem;
+
+  .hud-middle {
+    position: relative;
+    flex: 1 24 100px;
+
+    .indicator-winner {
+      position: absolute;
+      z-index: 10;
+      top: 20%;
+
+      &.left {
+        left: -12.5%;
+      }
+
+      &.right {
+        right: -12.5%;
+      }
+    }
+  }
+`;
+
 const HUDPlayerTop = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -298,7 +416,6 @@ const PlayerName = styled.h4`
 `;
 
 const PlayerScores = styled.div`
-  flex: 1 24 100px;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -35,4 +35,12 @@ function sumScoresAllRambahan(shotData) {
   return total;
 }
 
-export { sumScoresList, sumScoresAllRambahan, makeScoringPayload };
+function hasWinner(scoringData) {
+  if (!scoringData) {
+    return false;
+  }
+  const hasAttributeWinToBeTrue = (member) => Boolean(member.scores.win);
+  return scoringData.some(hasAttributeWinToBeTrue);
+}
+
+export { sumScoresList, sumScoresAllRambahan, makeScoringPayload, hasWinner };

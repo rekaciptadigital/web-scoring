@@ -23,7 +23,7 @@ function ScoringEditor(props) {
 
 function EditorControl({ children, ...props }) {
   return (
-    <StyledModal isOpen size="xl" {...props}>
+    <StyledModal isOpen size="xl" centered {...props}>
       <ModalBody>{children}</ModalBody>
     </StyledModal>
   );

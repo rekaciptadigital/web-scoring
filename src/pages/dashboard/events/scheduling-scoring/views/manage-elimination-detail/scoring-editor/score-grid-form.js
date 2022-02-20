@@ -107,7 +107,7 @@ function ScoreGridForm({ isEditMode, scoringType, gridData, updateShot, updateEx
             {isEditMode ? sumScoresAllRambahan(gridData.shot) : gridData.stats.total}
           </THTotal>
           {scoringType === parseInt(1) && (
-            <THTotal>{isEditMode ? "..." : gridData.stats.result}</THTotal>
+            <THTotal>{isEditMode ? "..." : gridData.stats.result || "-"}</THTotal>
           )}
         </tr>
       </tfoot>

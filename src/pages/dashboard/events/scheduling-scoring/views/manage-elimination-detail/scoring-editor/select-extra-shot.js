@@ -32,13 +32,20 @@ function SelectExtraShot({ score, distanceFromX, onChange, onDistanceChange, onC
         name={stringUtil.createRandom()}
         styles={customSelectStyles}
         onChange={(option) => {
-          onChange?.(option.value);
-          setInputOpen(true);
+          onChange?.(option?.value);
+          if (option) {
+            setTimeout(() => {
+              setInputOpen(true);
+            }, 350);
+          } else {
+            onClearDistance?.();
+          }
         }}
         defaultValue={formatedValue}
         value={formatedValue}
         options={scoreOptions}
         blurInputOnSelect
+        isClearable
       />
       {Boolean(distanceFromX) && (
         <DisplayDistance>
@@ -82,6 +89,10 @@ function InputDistanceFromX({ onInputChange, onClose, onSave }) {
       />
       <ButtonConfirm
         onClick={() => {
+          if (!inputRef.current.value) {
+            inputRef.current.focus();
+            return;
+          }
           onSave?.();
           onClose?.();
         }}

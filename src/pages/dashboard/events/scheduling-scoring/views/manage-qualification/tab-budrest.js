@@ -19,7 +19,9 @@ import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 
 import { FolderHeader, FolderHeaderActions } from "./styles";
 
-import { parseISO, isAfter } from "date-fns";
+import { parseISO, isAfter, format } from "date-fns";
+import id from "date-fns/locale/id";
+import { errorsUtil } from "utils";
 
 function TabBudRest() {
   const { event_id } = useParams();
@@ -53,15 +55,21 @@ function TabBudRest() {
     const validationErrors = {};
     iterateGroupData(
       form[group],
-      ({ start, end, targetFace, totalParticipants }, categoryDetailId) => {
+      ({ start, end, targetFace, totalParticipants, isEditAllowed }, categoryDetailId) => {
+        // skip
+        if (!isEditAllowed) {
+          return;
+        }
+
         // 1. Validasi nomor bantalan yang sama
         // cek item sekarang dengan item-item lain di kelompok kategori
-        iterateGroupData(form[group], (budRestCheck, idCheck) => {
-          if (categoryDetailId === idCheck) {
+        iterateGroupData(form[group], (checkBudRest, checkId) => {
+          // skip cek dengan dirinya sendiri
+          if (categoryDetailId === checkId) {
             return;
           }
 
-          const isStartNumberSame = start === budRestCheck.start;
+          const isStartNumberSame = start === checkBudRest.start;
 
           if (isStartNumberSame) {
             if (!validationErrors[group]) {
@@ -118,7 +126,8 @@ function TabBudRest() {
       setSubmitSuccess();
       refetchEventBudRests();
     } else {
-      setSubmitError(result.message || result.errors);
+      const errors = errorsUtil.interpretServerErrors(result);
+      setSubmitError(errors);
     }
   };
 
@@ -219,6 +228,7 @@ function TabBudRest() {
                         <THCateg>Jenis Regu</THCateg>
                         <THCateg>Jarak</THCateg>
                         <THCateg>Peserta</THCateg>
+                        <THCateg>Tanggal Kualifikasi</THCateg>
                         <THCateg>Mulai</THCateg>
                         <THCateg>Akhir</THCateg>
                         <THCateg>Target Face</THCateg>
@@ -234,6 +244,11 @@ function TabBudRest() {
                             <TDCateg>{detail.team}</TDCateg>
                             <TDCateg>{detail.distance}</TDCateg>
                             <TDCateg>{detail.totalParticipants}</TDCateg>
+                            <TDCateg>
+                              {format(parseISO(detail.qualificationTimeStart), "dd MMMM yyyy", {
+                                locale: id,
+                              })}
+                            </TDCateg>
 
                             <TDInput>
                               <FieldInputTextSmall

@@ -1,11 +1,11 @@
 function interpretServerErrors(result) {
-  let errors = null;
-  if (!result.errors?.length || !result.errors) {
-    errors = result.message;
-  } else {
-    errors = result.errors;
+  if (!result.errors) {
+    return result.message;
   }
-  return errors;
+  if (Array.isArray(result.errors) && !result.errors.length) {
+    return result.message;
+  }
+  return result.errors;
 }
 
 export default { interpretServerErrors };

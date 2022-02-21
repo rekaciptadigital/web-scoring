@@ -165,7 +165,7 @@ function budRestsFormReducer(state, action) {
 
     for (const id in nextGroupData) {
       const previousData = nextGroupData[id];
-      if (!previousData.isEditAllowed) {
+      if (id !== "common" && !previousData.isEditAllowed) {
         continue;
       }
       nextGroupData[id] = { ...previousData, targetFace: action.payload };

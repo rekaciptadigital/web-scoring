@@ -2,4 +2,4 @@ function openUrlOnNewTab(url) {
   return window.open(url, "_blank");
 }
 
-export { openUrlOnNewTab };
+export default { openUrlOnNewTab };

@@ -7,6 +7,9 @@ import TableMember from "./components/TableMember";
 import { EventsService } from "services";
 import { useParams } from "react-router-dom";
 import Download from "components/icons/Download";
+import fileSaver from "file-saver";
+import { errorsUtil } from "utils";
+import { AlertSubmitError } from "components/ma";
 
 function ListMember() {
   const { event_id } = useParams();
@@ -16,6 +19,7 @@ function ListMember() {
   const [category, setCategory] = useState({});
   const [statusFilter, setStatusFilter] = useState(0);
   const [dataExcel, setDataExcel] = useState();
+  const [errorsIdCard, setErrorsIdCard] = useState(null);
 
   useEffect(async () => {
     try {
@@ -110,6 +114,18 @@ function ListMember() {
     }
   };
 
+  const handleDownloadIdCard = async () => {
+    setErrorsIdCard(null);
+    const queryString = { event_category_id: category.id, event_id: event_id };
+    const result = await EventsService.getEventMemberIdCardByCategory(queryString);
+    if (result.success) {
+      const { fileName, fileBase64 } = result.data;
+      fileSaver.saveAs(fileBase64, fileName || "id-cards-peserta.pdf");
+    } else {
+      setErrorsIdCard(errorsUtil.interpretServerErrors(result));
+    }
+  };
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -144,7 +160,8 @@ function ListMember() {
                     value={category.label != undefined ? category : null}
                   />
                 </Col>
-                <Col md={7} sm={12}>
+
+                <Col md={5} sm={12}>
                   <div className="d-block d-md-flex mt-md-0 mt-3">
                     <Button
                       onClick={() => getMember(category, 0)}
@@ -175,14 +192,23 @@ function ListMember() {
                     </Button>
                   </div>
                 </Col>
-                <Col md={2} sm={12}>
+
+                <Col md={4} sm={12}>
                   <div className="d-block d-md-flex mt-md-0 mt-3 justify-content-end">
                     <a
-                    href={dataExcel}
-                      className="btn"
+                      href={dataExcel}
+                      className="btn me-2"
                       style={{ backgroundColor: "#fff", border: "1px solid #0D47A1" }}
                     >
                       <Download /> <span style={{ color: "#0D47A1" }}>Unduh Laporan</span>
+                    </a>
+
+                    <a
+                      className="btn"
+                      style={{ backgroundColor: "#fff", border: "1px solid #0D47A1" }}
+                      onClick={handleDownloadIdCard}
+                    >
+                      <Download /> <span style={{ color: "#0D47A1" }}>Unduh ID Card</span>
                     </a>
                   </div>
                 </Col>
@@ -194,6 +220,7 @@ function ListMember() {
           </div>
           <TableMember members={members} />
         </Container>
+        <AlertSubmitError isError={Boolean(errorsIdCard)} errors={errorsIdCard} />
       </div>
     </React.Fragment>
   );

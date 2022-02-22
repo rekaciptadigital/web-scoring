@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { useCategoriesByGender } from "./hooks/event-categories-by-gender";
 import { useParticipantScorings } from "./hooks/participant-scorings";
+import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
 import { ButtonOutlineBlue } from "components/ma";
 import { FolderTabs, FolderPanel, TabItem, TabsContext } from "../../components";
@@ -64,6 +65,8 @@ function StepScoringQualification() {
 
   const handleSuccessSave = () => refetchScorings();
 
+  const { handleScoresheetDownload } = useScoresheetDownload();
+
   return (
     <div>
       <TabsContext.Provider value={{ currentTab, switchToTab }}>
@@ -113,7 +116,11 @@ function StepScoringQualification() {
             </div>
 
             <SpacedButtonsGroup>
-              <ButtonDownload onClick={() => refetchScorings()}>
+              <ButtonDownload
+                onClick={() => {
+                  handleScoresheetDownload(selectedCategory[currentTeamCategory]?.value);
+                }}
+              >
                 <span>
                   <IconDownload size="16" />
                 </span>

@@ -235,6 +235,8 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
     const noWinnersYet = seed.teams.every((team) => team.win === 0);
     return configs.isSettingApplied && noWinnersYet;
   };
+  const memberId = seed.teams.find((team) => Boolean(team.id))?.id;
+  const code = memberId ? `2-${memberId}-1` : "";
 
   const isBye = seed.teams.some((team) => team.status === "bye");
 
@@ -250,6 +252,7 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
         <ItemContainer>
           {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
+          {shouldEnableScoring() && <FloatingCodeDisplay>Kode: {code || "-"}</FloatingCodeDisplay>}
           {seed.teams.map((team, index) => (
             <SeedTeam
               key={index}
@@ -276,7 +279,7 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
 
 const FinalHeading = styled.h6`
   position: absolute;
-  top: -2em;
+  top: -3.6em;
   left: 0;
   right: 0;
   font-weight: 600;
@@ -343,6 +346,20 @@ const BoxScore = styled.span`
   .item-winner & {
     background-color: #000000;
   }
+`;
+
+const FloatingCodeDisplay = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-65%);
+  color: var(--ma-gray-500);
+  font-size: 0.875em;
 `;
 
 const FloatingControl = styled.div`

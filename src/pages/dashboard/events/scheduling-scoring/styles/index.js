@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const StyledPageWrapper = styled.div`
   margin: 2.5rem 0;
+  margin-bottom: 7.5rem;
 `;
 
 const StickyContainer = styled.div`

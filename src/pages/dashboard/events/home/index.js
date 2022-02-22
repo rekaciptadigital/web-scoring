@@ -100,6 +100,7 @@ function PageEventDetailHome() {
                 badge={renderManageEventMenuBadge()}
               />
               <CardMenuWithButton
+                eventDetail={eventDetail}
                 menu={eventMenus[2]}
                 href={`/dashboard/member/${event_id}`}
                 disabled={!isQualificationSchedulesSet}

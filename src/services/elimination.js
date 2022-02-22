@@ -11,7 +11,7 @@ export default {
         return API.post("/web/v1/event-elimination/schedule", qs)
     },
     setEventElimination(qs) {
-        return API.post("/web/v1/event-elimination/set", qs)
+        return API.post("/web/v1/event-elimination/set", qs, null, true)
     },
     removeEventEliminationSchedule(qs) {
         return API.delete("/web/v1/event-elimination/schedule", qs)

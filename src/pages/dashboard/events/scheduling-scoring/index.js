@@ -1,5 +1,6 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useHistory } from "react-router-dom";
+import queryString from "query-string";
 import { useWizardView } from "utils/hooks/wizard-view";
 
 import MetaTags from "react-meta-tags";
@@ -7,12 +8,11 @@ import { Container } from "reactstrap";
 import { WizardView, WizardViewContent } from "components/ma";
 import { StepsList, StepItem } from "./components";
 import { BreadcrumbDashboard } from "../components/breadcrumb";
-import { StepManageQualification } from "./views";
+import { StepManageQualification, StepScoringQualification, StepManageElimination } from "./views";
 
 import IconTarget from "components/ma/icons/mono/target";
 import IconScoreboard from "components/ma/icons/mono/scoreboard";
 import IconBranch from "components/ma/icons/mono/branch";
-import IconDiagram from "components/ma/icons/mono/diagram";
 
 import { StyledPageWrapper, StickyContainer, StickyItem, StickyItemSibling } from "./styles";
 
@@ -25,9 +25,14 @@ const stepsList = [
 
 const PageEventDetailSchedulingScoring = () => {
   const { event_id } = useParams();
-  const { currentStep, goToStep } = useWizardView(stepsList);
+  const history = useHistory();
+  const location = useLocation();
 
   const eventId = parseInt(event_id);
+  const { menu } = queryString.parse(location.search);
+  const paramMenu = menu ? parseInt(menu) : undefined;
+
+  const { currentStep, goToStep } = useWizardView(stepsList, paramMenu);
 
   return (
     <React.Fragment>
@@ -44,21 +49,20 @@ const PageEventDetailSchedulingScoring = () => {
               <StepsList
                 title="Jadwal &amp; Scoring"
                 currentStep={currentStep}
-                onChange={(step) => goToStep(step)}
+                onChange={(step) => {
+                  goToStep(step);
+                  history.replace(`${location.pathname}?menu=${step}`);
+                }}
               >
                 <StepItem step="1" icon={<IconTarget size="20" />}>
                   Atur Kualifikasi
                 </StepItem>
 
-                <StepItem step="2" disabled icon={<IconScoreboard size="20" />}>
+                <StepItem step="2" icon={<IconScoreboard size="20" />}>
                   Skor Kualifikasi
                 </StepItem>
 
-                <StepItem step="3" disabled icon={<IconBranch size="20" />}>
-                  Atur Eliminasi
-                </StepItem>
-
-                <StepItem step="4" disabled icon={<IconDiagram size="20" />}>
+                <StepItem step="3" icon={<IconBranch size="20" />}>
                   Skor Eliminasi
                 </StepItem>
               </StepsList>
@@ -68,6 +72,14 @@ const PageEventDetailSchedulingScoring = () => {
               <WizardView currentStep={currentStep}>
                 <WizardViewContent>
                   <StepManageQualification eventId={eventId} />
+                </WizardViewContent>
+
+                <WizardViewContent>
+                  <StepScoringQualification />
+                </WizardViewContent>
+
+                <WizardViewContent>
+                  <StepManageElimination />
                 </WizardViewContent>
               </WizardView>
             </StickyItemSibling>

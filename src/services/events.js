@@ -28,6 +28,10 @@ export default {
     getEventMemberScoring(qs) {
         return API.get("/api/v1/archery/scorer/participant", qs)
     },
+    getEventMemberIdCardByCategory({ event_id, event_category_id }) {
+        const qs = { event_id, event_category_id };
+        return API.get("/web/v1/archery/events/bulk-download-card", qs);
+    },
     getEventCompetitionCategories(qs = null) {
         return API.get("/web/v1/archery/competition-categories", qs);
     },

@@ -13,7 +13,7 @@ import {
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
 import { LoadingScreen } from "components";
-import { ButtonOutlineBlue } from "components/ma";
+import { ButtonOutlineBlue, SpinnerDotBlock, AlertSubmitError } from "components/ma";
 import { BreadcrumbDashboard } from "../../../components/breadcrumb";
 import { FieldSelectOption } from "./field-select-option";
 import { ScoringEditor } from "./scoring-editor";
@@ -42,16 +42,26 @@ function PageConfigEliminationDetail() {
   const location = useLocation();
   const { category } = location.state;
 
-  const [eliminationMemberCount, setEliminationMemberCount] = React.useState(null);
+  const [eliminationMemberCount, setEliminationMemberCount] = React.useState(amountOptions[0]);
   const [scoringType, setScoringType] = React.useState(null);
   const [formStatus, dispatchFormStatus] = React.useReducer(
     (state, action) => ({ ...state, ...action }),
     { status: "idle", errors: null }
   );
 
-  const { data: matchTemplate, refetch: refetchMatchTemplate } = useMatchTemplate({
+  const { data: matchTemplate, fetchMatchTemplate } = useMatchTemplate({
     event_category_id: category.id,
+    elimination_member_count: eliminationMemberCount.value,
   });
+
+  const refetchMatchTemplate = () => {
+    // TODO: const options = {}
+    fetchMatchTemplate();
+  };
+
+  React.useEffect(() => {
+    refetchMatchTemplate();
+  }, [eliminationMemberCount, scoringType]);
 
   const handleApplySettings = async () => {
     // TODO: alert confirm sebelum submit?
@@ -123,9 +133,7 @@ function PageConfigEliminationDetail() {
                   <FieldSelectOption
                     placeholder="Pilih jumlah peserta"
                     disabled={!matchTemplate?.updated}
-                    value={
-                      eliminationMemberCount || (!matchTemplate?.updated && defaultEmptyOption)
-                    }
+                    value={!matchTemplate?.updated ? defaultEmptyOption : eliminationMemberCount}
                     options={amountOptions}
                     onChange={(option) => setEliminationMemberCount(option)}
                   >
@@ -135,7 +143,7 @@ function PageConfigEliminationDetail() {
                   <FieldSelectOption
                     placeholder="Pilih jenis sistem scoring"
                     disabled={!matchTemplate?.updated}
-                    value={scoringType || (!matchTemplate?.updated && defaultEmptyOption)}
+                    value={matchTemplate?.updated && scoringType ? scoringType : defaultEmptyOption}
                     options={scoringTypeOptions}
                     onChange={(option) => setScoringType(option)}
                   >
@@ -162,26 +170,46 @@ function PageConfigEliminationDetail() {
             <BracketPanelCard>
               <SplitPanelContent>
                 <MatchBracketContainer>
-                  {matchTemplate && !matchTemplate.updated ? (
-                    <OverflowingBracketContent>
-                      <Bracket
-                        rounds={matchTemplate.rounds || []}
-                        renderSeedComponent={(bracketProps) => (
-                          <SeedBagan
-                            bracketProps={bracketProps}
-                            configs={{
-                              isSettingApplied: !matchTemplate.updated,
-                              totalRounds: matchTemplate.rounds.length - 1,
-                              eliminationId: matchTemplate.eliminationId,
-                            }}
-                            onSuccess={handleSuccessSave}
-                          />
-                        )}
-                      />
-                    </OverflowingBracketContent>
+                  {matchTemplate ? (
+                    !matchTemplate.updated ? (
+                      <OverflowingBracketContent>
+                        <Bracket
+                          rounds={matchTemplate.rounds || []}
+                          renderSeedComponent={(bracketProps) => (
+                            <SeedBagan
+                              bracketProps={bracketProps}
+                              configs={{
+                                isSettingApplied: !matchTemplate.updated,
+                                totalRounds: matchTemplate.rounds.length - 1,
+                                eliminationId: matchTemplate.eliminationId,
+                              }}
+                              onSuccess={handleSuccessSave}
+                            />
+                          )}
+                        />
+                      </OverflowingBracketContent>
+                    ) : (
+                      <OverflowingBracketContent>
+                        <TitlePreviewBracket>Pratinjau</TitlePreviewBracket>
+                        <Bracket
+                          rounds={matchTemplate.rounds || []}
+                          renderSeedComponent={(bracketProps) => (
+                            <SeedBagan
+                              bracketProps={bracketProps}
+                              configs={{
+                                isSettingApplied: false,
+                                totalRounds: matchTemplate.rounds.length - 1,
+                                eliminationId: matchTemplate.eliminationId,
+                              }}
+                              onSuccess={handleSuccessSave}
+                            />
+                          )}
+                        />
+                      </OverflowingBracketContent>
+                    )
                   ) : (
                     <SettingsNotApplied>
-                      <h4>Terapkan pengaturan eliminasi di atas untuk membuat bagan</h4>
+                      <SpinnerDotBlock />
                     </SettingsNotApplied>
                   )}
                 </MatchBracketContainer>
@@ -191,6 +219,7 @@ function PageConfigEliminationDetail() {
         </Container>
 
         <LoadingScreen loading={isLoadingApply} />
+        <AlertSubmitError isError={formStatus.status === "error"} errors={formStatus.errors} />
       </StyledPageWrapper>
     </React.Fragment>
   );
@@ -206,6 +235,8 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
     const noWinnersYet = seed.teams.every((team) => team.win === 0);
     return configs.isSettingApplied && noWinnersYet;
   };
+  const memberId = seed.teams.find((team) => Boolean(team.id))?.id;
+  const code = memberId ? `2-${memberId}-1` : "";
 
   const isBye = seed.teams.some((team) => team.status === "bye");
 
@@ -221,6 +252,7 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
         <ItemContainer>
           {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
+          {shouldEnableScoring() && <FloatingCodeDisplay>Kode: {code || "-"}</FloatingCodeDisplay>}
           {seed.teams.map((team, index) => (
             <SeedTeam
               key={index}
@@ -247,7 +279,7 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
 
 const FinalHeading = styled.h6`
   position: absolute;
-  top: -2em;
+  top: -3.6em;
   left: 0;
   right: 0;
   font-weight: 600;
@@ -314,6 +346,20 @@ const BoxScore = styled.span`
   .item-winner & {
     background-color: #000000;
   }
+`;
+
+const FloatingCodeDisplay = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-65%);
+  color: var(--ma-gray-500);
+  font-size: 0.875em;
 `;
 
 const FloatingControl = styled.div`
@@ -417,6 +463,10 @@ const OverflowingBracketContent = styled.div`
   padding: 1rem;
   margin: 2rem;
   background-color: #fbfbfb;
+`;
+
+const TitlePreviewBracket = styled.h5`
+  color: var(--ma-gray-400);
 `;
 
 export default PageConfigEliminationDetail;

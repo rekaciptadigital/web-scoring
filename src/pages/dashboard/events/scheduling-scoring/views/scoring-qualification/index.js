@@ -65,28 +65,23 @@ function StepScoringQualification() {
 
   const handleSuccessSave = () => refetchScorings();
 
-  const { handleScoresheetDownload } = useScoresheetDownload();
+  const { handleScoresheetDownload, status: downloadStatus } = useScoresheetDownload();
+  const isLoadingPreparingScoresheet = downloadStatus === "loading";
 
   return (
     <div>
       <TabsContext.Provider value={{ currentTab, switchToTab }}>
         <FolderTabs>
-          {teamCategories?.map((team) => {
-            if (team === "individu male") {
-              return (
-                <TabItem key="1" tab="1" icon={<IconUser size="16" />}>
-                  Individu Putra
-                </TabItem>
-              );
-            }
-            if (team === "individu female") {
-              return (
-                <TabItem key="2" tab="2" icon={<IconUser size="16" />}>
-                  Individu Putri
-                </TabItem>
-              );
-            }
-            return;
+          {teamCategories?.map((team, index) => {
+            return (
+              <TabItem key={index + 1} tab={index + 1} icon={<IconUser size="16" />}>
+                {team === "individu male"
+                  ? "Individu Putra"
+                  : team === "individu female"
+                  ? "Individu Putri"
+                  : ""}
+              </TabItem>
+            );
           })}
         </FolderTabs>
 
@@ -124,7 +119,7 @@ function StepScoringQualification() {
                 <span>
                   <IconDownload size="16" />
                 </span>
-                <span>Scoresheet</span>
+                <span>{isLoadingPreparingScoresheet ? "Menyiapkan data..." : "Scoresheet"}</span>
               </ButtonDownload>
             </SpacedButtonsGroup>
           </TopToolbar>

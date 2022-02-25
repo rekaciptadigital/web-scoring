@@ -19,10 +19,19 @@ function useCategoriesElimination(eventId) {
 }
 
 function makeGroupNames(data) {
-  if (!data) return [];
-  return Object.keys(data).sort((teamCategory) => {
-    return teamCategory === "individu male" ? -1 : 0;
-  });
+  if (!data) {
+    return [];
+  }
+
+  const filteredNames = [];
+  const labelOptions = ["individu male", "individu female", "maleTeam", "femaleTeam", "mixTeam"];
+  for (const label of labelOptions) {
+    if (!data[label]) {
+      continue;
+    }
+    filteredNames.push(label);
+  }
+  return filteredNames;
 }
 
 export { useCategoriesElimination };

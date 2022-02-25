@@ -2,11 +2,10 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useEventBudRests, useBudRestsForm } from "./hooks/bud-rests";
-import { useEventDetail } from "./hooks/event-detail";
 import { BudRestService } from "services";
 
 import { LoadingScreen } from "components";
-import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
+import { ButtonOutlineBlue } from "components/ma";
 import {
   FieldInputTextSmall,
   FieldSelectBudRest,
@@ -19,7 +18,7 @@ import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 
 import { FolderHeader, FolderHeaderActions } from "./styles";
 
-import { parseISO, isAfter, format } from "date-fns";
+import { parseISO, format } from "date-fns";
 import id from "date-fns/locale/id";
 import { errorsUtil } from "utils";
 
@@ -27,7 +26,6 @@ function TabBudRest() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
 
-  const { data: eventDetail } = useEventDetail(event_id);
   const {
     data: eventBudRests,
     groupNames,
@@ -43,9 +41,8 @@ function TabBudRest() {
     setSubmitError,
   } = useSubmitStatus();
 
-  const shouldAllowEdit = eventDetail?.publicInformation?.eventEndRegister
-    ? isAfter(new Date(), parseISO(eventDetail.publicInformation.eventEndRegister))
-    : false;
+  // sementara buka set bantalan di waktu kapanpun sebelum tanggal kualifikasi
+  const shouldAllowEdit = true;
 
   const shouldShowGroupErrorMessages = (groupName) =>
     formErrors?.[groupName] && Object.keys(formErrors[groupName])?.length;
@@ -140,9 +137,7 @@ function TabBudRest() {
             <div>Pengaturan bantalan pada kualifikasi pertandingan</div>
           </div>
 
-          <FolderHeaderActions>
-            {false && <ButtonBlue disabled={!shouldAllowEdit}>Simpan</ButtonBlue>}
-          </FolderHeaderActions>
+          <FolderHeaderActions></FolderHeaderActions>
         </FolderHeader>
 
         {shouldAllowEdit ? (

@@ -11,10 +11,19 @@ function useCategoriesByGender(eventId) {
 }
 
 function makeGroupNames(data) {
-  if (!data) return [];
-  return Object.keys(data).sort((teamCategory) => {
-    return teamCategory === "individu male" ? -1 : 0;
-  });
+  if (!data) {
+    return [];
+  }
+
+  const sortedNames = [];
+  const labelOptions = ["individu male", "individu female"];
+  for (const label of labelOptions) {
+    if (!data[label]) {
+      continue;
+    }
+    sortedNames.push(label);
+  }
+  return sortedNames;
 }
 
 export { useCategoriesByGender };

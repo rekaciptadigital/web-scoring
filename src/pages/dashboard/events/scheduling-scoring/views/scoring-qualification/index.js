@@ -65,7 +65,8 @@ function StepScoringQualification() {
 
   const handleSuccessSave = () => refetchScorings();
 
-  const { handleScoresheetDownload } = useScoresheetDownload();
+  const { handleScoresheetDownload, status: downloadStatus } = useScoresheetDownload();
+  const isLoadingPreparingScoresheet = downloadStatus === "loading";
 
   return (
     <div>
@@ -124,7 +125,7 @@ function StepScoringQualification() {
                 <span>
                   <IconDownload size="16" />
                 </span>
-                <span>Scoresheet</span>
+                <span>{isLoadingPreparingScoresheet ? "Menyiapkan data..." : "Scoresheet"}</span>
               </ButtonDownload>
             </SpacedButtonsGroup>
           </TopToolbar>

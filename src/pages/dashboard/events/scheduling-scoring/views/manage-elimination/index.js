@@ -12,8 +12,8 @@ function StepManageElimination() {
   const eventId = parseInt(event_id);
   const location = useLocation();
 
-  const { data: categories } = useCategoriesElimination(eventId);
-  const tabsList = makeTeamCategoriesFilters(categories);
+  const { data: categories, groupNames } = useCategoriesElimination(eventId);
+  const tabsList = makeTeamCategoriesFilters(groupNames);
 
   const [currentFilter, setCurrentFilter] = React.useState(null);
   const currentCategories = categories?.[currentFilter?.value];
@@ -123,12 +123,12 @@ const TDCategAction = styled.td`
 `;
 
 // utils
-function makeTeamCategoriesFilters(data) {
-  if (!data) {
+function makeTeamCategoriesFilters(groupNames) {
+  if (!groupNames) {
     return [];
   }
 
-  const teamCategories = {
+  const teamCategoryOptions = {
     "individu male": { name: "Individu Putra", type: "individu" },
     "individu female": { name: "Individu Putri", type: "individu" },
     maleTeam: { name: "Beregu Putra", type: "team" },
@@ -136,14 +136,12 @@ function makeTeamCategoriesFilters(data) {
     mixTeam: { name: "Beregu Campuran", type: "team" },
   };
 
-  const filterOptions = [];
-  for (const groupId in data) {
-    filterOptions.push({
-      value: groupId,
-      label: teamCategories[groupId].name,
-      type: teamCategories[groupId].type,
-    });
-  }
+  const filterOptions = groupNames.map((teamCategId) => ({
+    value: teamCategId,
+    label: teamCategoryOptions[teamCategId].name,
+    type: teamCategoryOptions[teamCategId].type,
+  }));
+
   return filterOptions;
 }
 

@@ -20,6 +20,7 @@ function ListMember() {
   const [statusFilter, setStatusFilter] = useState(0);
   const [dataExcel, setDataExcel] = useState();
   const [errorsIdCard, setErrorsIdCard] = useState(null);
+  const [waitIdCard, setWaitIdCard] = useState(false);
 
   useEffect(async () => {
     try {
@@ -116,6 +117,7 @@ function ListMember() {
 
   const handleDownloadIdCard = async () => {
     setErrorsIdCard(null);
+    setWaitIdCard(true);
     const queryString = { event_category_id: category.id, event_id: event_id };
     const result = await EventsService.getEventMemberIdCardByCategory(queryString);
     if (result.success) {
@@ -124,6 +126,7 @@ function ListMember() {
     } else {
       setErrorsIdCard(errorsUtil.interpretServerErrors(result));
     }
+    setWaitIdCard(false);
   };
 
   return (
@@ -203,13 +206,14 @@ function ListMember() {
                       <Download /> <span style={{ color: "#0D47A1" }}>Unduh Laporan</span>
                     </a>
 
-                    <a
+                    <Button
+                      disabled={waitIdCard}
                       className="btn"
-                      style={{ backgroundColor: "#fff", border: "1px solid #0D47A1" }}
                       onClick={handleDownloadIdCard}
+                      style={{ backgroundColor: "#fff", border: "1px solid #0D47A1" }}
                     >
-                      <Download /> <span style={{ color: "#0D47A1" }}>Unduh ID Card</span>
-                    </a>
+                      <Download /> <span style={{ color: "#0D47A1" }}>{waitIdCard ? "menyiapkan data..." : "Unduh ID Card"}</span>
+                    </Button>
                   </div>
                 </Col>
               </Row>

@@ -44,6 +44,7 @@ function StepManageElimination() {
       <table className="table table-responsive">
         <thead>
           <tr>
+            <THCateg>Kategori</THCateg>
             <THCateg>Kelas</THCateg>
             <THCateg>Jenis Regu</THCateg>
             <THCateg>Jarak</THCateg>
@@ -56,6 +57,7 @@ function StepManageElimination() {
           <tbody>
             {currentCategories.map((category) => (
               <tr key={category.id}>
+                <TDCateg>{category.competitionCategoryId}</TDCateg>
                 <TDCateg>{category.ageCategoryId}</TDCateg>
                 <TDCateg style={{ width: 135 }}>{category.teamCategoryDetail.label}</TDCateg>
                 <TDCateg className="text-lowercase">{category.distanceId}m</TDCateg>

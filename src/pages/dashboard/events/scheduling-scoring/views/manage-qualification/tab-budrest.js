@@ -110,12 +110,13 @@ function TabBudRest() {
       }
     );
 
-    dispatchForm({ type: "INVALID", errors: validationErrors });
+    // TODO: open validasi kalau sudah...
+    // dispatchForm({ type: "INVALID", errors: validationErrors });
+    // const isValid = !(validationErrors?.[group] && Object.keys(validationErrors?.[group])?.length);
+    // if (!isValid) {
+    //   return;
+    // }
 
-    const isValid = !(validationErrors?.[group] && Object.keys(validationErrors?.[group])?.length);
-    if (!isValid) {
-      return;
-    }
     setSubmitLoading();
     const payload = makeSaveGroupPayload(form[group]);
     const result = await BudRestService.setByEventId(payload, { event_id: eventId });
@@ -258,7 +259,7 @@ function TabBudRest() {
                                   dispatchForm({
                                     group: groupName,
                                     categoryDetailId: detail.categoryDetailId,
-                                    payload: { start: Number(value) },
+                                    payload: { start: value },
                                   });
                                 }}
                                 errors={

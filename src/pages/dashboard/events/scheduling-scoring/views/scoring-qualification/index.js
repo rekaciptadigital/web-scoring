@@ -142,7 +142,7 @@ function StepScoringQualification() {
               </thead>
 
               <tbody>
-                {scorings.map((scoring, index) => {
+                {scorings.map((scoring) => {
                   const code = ["1", scoring.member.id, "1"].join("-");
 
                   const computeTargetNumber = () => {
@@ -154,7 +154,7 @@ function StepScoringQualification() {
                   };
 
                   return (
-                    <tr key={index}>
+                    <tr key={scoring.member.id}>
                       <td>
                         {scoring.member.participantNumber || (
                           <React.Fragment>&ndash;</React.Fragment>

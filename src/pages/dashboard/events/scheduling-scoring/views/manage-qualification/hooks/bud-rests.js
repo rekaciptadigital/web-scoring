@@ -1,6 +1,7 @@
 import * as React from "react";
 import { BudRestService } from "services";
 
+// eslint-disable-next-line no-unused-vars
 import { parseISO, isBefore } from "date-fns";
 
 function makeBudRestsState(data) {
@@ -78,11 +79,14 @@ function shouldRecommendDefaults(data) {
 }
 
 function shouldAllowEditBudRest(qualificationTimeStart, today, totalParticipants) {
+  // eslint-disable-next-line no-unused-vars
   const qualificationStart =
     typeof qualificationTimeStart === "string"
       ? parseISO(qualificationTimeStart)
       : qualificationTimeStart;
-  return isBefore(today, qualificationStart) && totalParticipants > 0;
+  // TODO: perbaiki validasi tanggal lomba
+  // return true || (isBefore(today, qualificationStart) && totalParticipants > 0);
+  return totalParticipants > 0;
 }
 
 function makeFormState(budRestsData) {

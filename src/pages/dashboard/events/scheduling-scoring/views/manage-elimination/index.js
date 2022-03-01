@@ -1,6 +1,7 @@
 import * as React from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, useHistory, Link } from "react-router-dom";
 import styled from "styled-components";
+import queryString from "query-string";
 import { useCategoriesElimination } from "./hooks/event-categories-elimination";
 
 import { ButtonOutlineBlue } from "components/ma";
@@ -11,6 +12,8 @@ function StepManageElimination() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
   const location = useLocation();
+  const { menu, teamCategoryId } = queryString.parse(location.search);
+  const history = useHistory();
 
   const { data: categories, groupNames } = useCategoriesElimination(eventId);
   const tabsList = makeTeamCategoriesFilters(groupNames);
@@ -19,8 +22,23 @@ function StepManageElimination() {
   const currentCategories = categories?.[currentFilter?.value];
 
   React.useEffect(() => {
-    setCurrentFilter(tabsList[0]);
+    const selectedFilter = teamCategoryId
+      ? tabsList.find((filter) => filter.value === teamCategoryId)
+      : tabsList[0];
+    setCurrentFilter(selectedFilter);
   }, [categories]);
+
+  React.useEffect(() => {
+    if (!currentFilter) {
+      return;
+    }
+
+    const makeURLWithParams = (location, selectedTeamCategoryId) => {
+      return `${location.pathname}?menu=${menu}&teamCategoryId=${selectedTeamCategoryId}`;
+    };
+    const URLWithParams = makeURLWithParams(location, currentFilter.value);
+    history.replace(URLWithParams);
+  }, [currentFilter]);
 
   return (
     <FolderPanel>

@@ -24,13 +24,12 @@ import IconTrophyWin from "components/ma/icons/fill/trophy-win";
 import { errorsUtil } from "utils";
 import { makeScoringPayload, hasWinner } from "./utils";
 
-function EditorContent({ bracketProps, configs, onClose, onSuccess }) {
+function EditorContent({ code, bracketProps, configs, onClose, onSuccess }) {
   const location = useLocation();
-  const { roundIndex, seedIndex, seed } = bracketProps;
-  const memberId = seed.teams.find((team) => Boolean(team.id))?.id;
+  const { roundIndex, seedIndex } = bracketProps;
 
   const scoring = {
-    code: `2-${memberId}-1`,
+    code: code,
     elimination_id: configs.eliminationId,
     round: roundIndex + 1,
     match: seedIndex + 1,

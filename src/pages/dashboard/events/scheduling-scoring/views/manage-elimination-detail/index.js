@@ -252,7 +252,7 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
         <ItemContainer>
           {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
-          {shouldEnableScoring() && <FloatingCodeDisplay>Kode: {code || "-"}</FloatingCodeDisplay>}
+          {<FloatingCodeDisplay>Kode: {code || "-"}</FloatingCodeDisplay>}
           {seed.teams.map((team, index) => (
             <SeedTeam
               key={index}

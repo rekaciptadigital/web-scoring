@@ -1,6 +1,7 @@
 import * as React from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, useHistory, Link } from "react-router-dom";
 import styled from "styled-components";
+import queryString from "query-string";
 import { useCategoriesElimination } from "./hooks/event-categories-elimination";
 
 import { ButtonOutlineBlue } from "components/ma";
@@ -11,16 +12,33 @@ function StepManageElimination() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
   const location = useLocation();
+  const { menu, teamCategoryId } = queryString.parse(location.search);
+  const history = useHistory();
 
-  const { data: categories } = useCategoriesElimination(eventId);
-  const tabsList = makeTeamCategoriesFilters(categories);
+  const { data: categories, groupNames } = useCategoriesElimination(eventId);
+  const tabsList = makeTeamCategoriesFilters(groupNames);
 
   const [currentFilter, setCurrentFilter] = React.useState(null);
   const currentCategories = categories?.[currentFilter?.value];
 
   React.useEffect(() => {
-    setCurrentFilter(tabsList[0]);
+    const selectedFilter = teamCategoryId
+      ? tabsList.find((filter) => filter.value === teamCategoryId)
+      : tabsList[0];
+    setCurrentFilter(selectedFilter);
   }, [categories]);
+
+  React.useEffect(() => {
+    if (!currentFilter) {
+      return;
+    }
+
+    const makeURLWithParams = (location, selectedTeamCategoryId) => {
+      return `${location.pathname}?menu=${menu}&teamCategoryId=${selectedTeamCategoryId}`;
+    };
+    const URLWithParams = makeURLWithParams(location, currentFilter.value);
+    history.replace(URLWithParams);
+  }, [currentFilter]);
 
   return (
     <FolderPanel>
@@ -44,6 +62,7 @@ function StepManageElimination() {
       <table className="table table-responsive">
         <thead>
           <tr>
+            <THCateg>Kategori</THCateg>
             <THCateg>Kelas</THCateg>
             <THCateg>Jenis Regu</THCateg>
             <THCateg>Jarak</THCateg>
@@ -56,6 +75,7 @@ function StepManageElimination() {
           <tbody>
             {currentCategories.map((category) => (
               <tr key={category.id}>
+                <TDCateg>{category.competitionCategoryId}</TDCateg>
                 <TDCateg>{category.ageCategoryId}</TDCateg>
                 <TDCateg style={{ width: 135 }}>{category.teamCategoryDetail.label}</TDCateg>
                 <TDCateg className="text-lowercase">{category.distanceId}m</TDCateg>
@@ -123,12 +143,12 @@ const TDCategAction = styled.td`
 `;
 
 // utils
-function makeTeamCategoriesFilters(data) {
-  if (!data) {
+function makeTeamCategoriesFilters(groupNames) {
+  if (!groupNames) {
     return [];
   }
 
-  const teamCategories = {
+  const teamCategoryOptions = {
     "individu male": { name: "Individu Putra", type: "individu" },
     "individu female": { name: "Individu Putri", type: "individu" },
     maleTeam: { name: "Beregu Putra", type: "team" },
@@ -136,14 +156,12 @@ function makeTeamCategoriesFilters(data) {
     mixTeam: { name: "Beregu Campuran", type: "team" },
   };
 
-  const filterOptions = [];
-  for (const groupId in data) {
-    filterOptions.push({
-      value: groupId,
-      label: teamCategories[groupId].name,
-      type: teamCategories[groupId].type,
-    });
-  }
+  const filterOptions = groupNames.map((teamCategId) => ({
+    value: teamCategId,
+    label: teamCategoryOptions[teamCategId].name,
+    type: teamCategoryOptions[teamCategId].type,
+  }));
+
   return filterOptions;
 }
 

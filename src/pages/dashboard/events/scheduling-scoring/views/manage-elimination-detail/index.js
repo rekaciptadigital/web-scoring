@@ -226,7 +226,7 @@ function PageConfigEliminationDetail() {
 }
 
 function SeedBagan({ bracketProps, configs, onSuccess }) {
-  const { roundIndex, seed, breakpoint } = bracketProps;
+  const { roundIndex, seedIndex, seed, breakpoint } = bracketProps;
 
   const isFinalRound = roundIndex === configs.totalRounds - 1;
   const isThirdPlaceRound = roundIndex === configs.totalRounds;
@@ -235,9 +235,8 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
     const noWinnersYet = seed.teams.every((team) => team.win === 0);
     return configs.isSettingApplied && noWinnersYet;
   };
-  const memberId = seed.teams.find((team) => Boolean(team.id))?.id;
-  const code = memberId ? `2-${memberId}-1` : "";
 
+  const code = `2-${configs.eliminationId}-${seedIndex + 1}-${roundIndex + 1}`;
   const isBye = seed.teams.some((team) => team.status === "bye");
 
   return (
@@ -258,7 +257,7 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
               key={index}
               className={classnames({
                 "item-active": shouldEnableScoring(),
-                "item-winner": parseInt(team.win) === 1 && !isBye,
+                "item-winner": configs.isSettingApplied && parseInt(team.win) === 1 && !isBye,
               })}
             >
               <BoxName>{team.name || "-"}</BoxName>
@@ -268,7 +267,12 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
 
           {shouldEnableScoring() && (
             <FloatingControl>
-              <ScoringEditor bracketProps={bracketProps} configs={configs} onSuccess={onSuccess} />
+              <ScoringEditor
+                code={code}
+                bracketProps={bracketProps}
+                configs={configs}
+                onSuccess={onSuccess}
+              />
             </FloatingControl>
           )}
         </ItemContainer>

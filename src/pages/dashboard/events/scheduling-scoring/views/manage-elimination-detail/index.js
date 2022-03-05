@@ -228,8 +228,12 @@ function PageConfigEliminationDetail() {
 function SeedBagan({ bracketProps, configs, onSuccess }) {
   const { roundIndex, seedIndex, seed, breakpoint } = bracketProps;
 
-  const isFinalRound = roundIndex === configs.totalRounds - 1;
-  const isThirdPlaceRound = roundIndex === configs.totalRounds;
+  const isFinalRound =
+    (configs.totalRounds === 4 && roundIndex === 3) ||
+    (configs.totalRounds === 3 && roundIndex === 2);
+  const isThirdPlaceRound =
+    (configs.totalRounds === 4 && roundIndex === 4) ||
+    (configs.totalRounds === 3 && roundIndex === 3);
 
   const shouldEnableScoring = () => {
     const noWinnersYet = seed.teams.every((team) => team.win === 0);

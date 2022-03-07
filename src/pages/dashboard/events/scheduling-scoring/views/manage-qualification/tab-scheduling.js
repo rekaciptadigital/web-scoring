@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useParams } from "react-router-dom";
+import { useEventDetail } from "./hooks/event-detail";
 import { schedulingReducer, SCHEDULING_TYPE } from "./hooks/qualification-scheduling-data";
 import { EventsService } from "services";
 
@@ -15,10 +17,17 @@ import {
 
 import classnames from "classnames";
 import { parseISO, format } from "date-fns";
+import { shouldDisableEditing } from "./utils";
 
 import { FolderHeader, FolderHeaderActions, ScheduleGroupFormBox } from "./styles";
 
-function TabScheduling({ eventId }) {
+function TabScheduling() {
+  const { event_id } = useParams();
+  const eventId = parseInt(event_id);
+  const { data: eventDetail } = useEventDetail(eventId);
+
+  const editIsDisabled = shouldDisableEditing(eventDetail?.publicInformation.eventEnd);
+
   const [categoryDetailsData, dispatchCategoryDetailsData] = React.useReducer(
     categoryDetailsReducer,
     {
@@ -194,9 +203,13 @@ function TabScheduling({ eventId }) {
           </div>
 
           <FolderHeaderActions>
-            <Button onClick={handleClickSaveSchedule}>Simpan</Button>
-            {editMode.flashMessage && (
-              <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
+            {!editIsDisabled && (
+              <React.Fragment>
+                <Button onClick={handleClickSaveSchedule}>Simpan</Button>
+                {editMode.flashMessage && (
+                  <BottomFlashMessage>{editMode.flashMessage}</BottomFlashMessage>
+                )}
+              </React.Fragment>
             )}
           </FolderHeaderActions>
         </FolderHeader>
@@ -217,7 +230,7 @@ function TabScheduling({ eventId }) {
           categoryGroupNames.map((groupName, index) => {
             const scheduleGroup = schedulesData[groupName];
             const categoryDetailsByName = categoryDetails[groupName];
-            const shouldAllowEditMode = isEditMode && editMode.currentId === groupName;
+            const editModeIsAllowed = isEditMode && editMode.currentId === groupName;
 
             const handleCommonChange = (payload) => {
               const byHavingParticipants = (detail) => detail.totalParticipant > 0;
@@ -269,7 +282,7 @@ function TabScheduling({ eventId }) {
             return (
               <ScheduleGroupFormBox
                 key={index}
-                className={classnames({ "is-focused": shouldAllowEditMode })}
+                className={classnames({ "is-focused": editModeIsAllowed })}
               >
                 <div>
                   <div>
@@ -286,7 +299,7 @@ function TabScheduling({ eventId }) {
                         <div className="d-flex" style={{ flexBasis: "70%", gap: "0.5rem" }}>
                           <FieldInputDateSmall
                             label="Tanggal"
-                            disabled={shouldAllowEditMode}
+                            disabled={editIsDisabled || editModeIsAllowed}
                             value={scheduleGroup.common.date}
                             onChange={(value) => {
                               handleCommonChange({ date: value });
@@ -294,7 +307,7 @@ function TabScheduling({ eventId }) {
                           />
                           <FieldInputTimeSmall
                             label="Jam Mulai"
-                            disabled={shouldAllowEditMode}
+                            disabled={editIsDisabled || editModeIsAllowed}
                             value={scheduleGroup.common.timeStart}
                             onChange={(value) => {
                               handleCommonChange({ timeStart: value });
@@ -302,7 +315,7 @@ function TabScheduling({ eventId }) {
                           />
                           <FieldInputTimeSmall
                             label="Jam Selesai"
-                            disabled={shouldAllowEditMode}
+                            disabled={editIsDisabled || editModeIsAllowed}
                             value={scheduleGroup.common.timeEnd}
                             onChange={(value) => {
                               handleCommonChange({ timeEnd: value });
@@ -319,7 +332,7 @@ function TabScheduling({ eventId }) {
                           gap: "0.5rem",
                         }}
                       >
-                        {shouldAllowEditMode ? (
+                        {editModeIsAllowed ? (
                           <React.Fragment>
                             <Button
                               onClick={() => handleCancelEditSchedule(editMode.initialSchedules)}
@@ -331,7 +344,10 @@ function TabScheduling({ eventId }) {
                             </ButtonOutlineBlue>
                           </React.Fragment>
                         ) : (
-                          <ButtonOutlineBlue onClick={handleOpenEditSchedule}>
+                          <ButtonOutlineBlue
+                            onClick={handleOpenEditSchedule}
+                            disabled={editIsDisabled}
+                          >
                             Ubah Detail
                           </ButtonOutlineBlue>
                         )}
@@ -366,7 +382,7 @@ function TabScheduling({ eventId }) {
 
                           const totalParticipant = detail.totalParticipant || 0;
 
-                          const isInputAllowed = shouldAllowEditMode && totalParticipant <= 0;
+                          const isInputAllowed = editModeIsAllowed && totalParticipant <= 0;
 
                           const handleSingleScheduleChange = (payload) => {
                             dispatchScheduling({

@@ -52,7 +52,17 @@ const FieldInputTextWrapper = styled.div`
   }
 `;
 
-function FieldInputText({ children, label, required, name, placeholder, value, onChange, errors }) {
+function FieldInputText({
+  children,
+  label,
+  required,
+  name,
+  placeholder,
+  value,
+  onChange,
+  errors,
+  disabled,
+}) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
   const handleChange = (ev) => {
@@ -74,6 +84,7 @@ function FieldInputText({ children, label, required, name, placeholder, value, o
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
+        disabled={disabled}
       />
     </FieldInputTextWrapper>
   );

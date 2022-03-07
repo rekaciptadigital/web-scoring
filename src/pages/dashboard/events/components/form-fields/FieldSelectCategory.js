@@ -76,6 +76,7 @@ function FieldSelectCategory({
   value = { label: "Barebow", value: "Barebow" },
   onChange,
   errors,
+  disabled,
 }) {
   return (
     <FieldSelectWrapper>
@@ -87,6 +88,7 @@ function FieldSelectCategory({
         isOptionDisabled={isOptionDisabled}
         value={value}
         onChange={onChange}
+        isDisabled={disabled}
       />
     </FieldSelectWrapper>
   );

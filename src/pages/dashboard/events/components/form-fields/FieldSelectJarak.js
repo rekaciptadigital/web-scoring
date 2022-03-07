@@ -76,6 +76,7 @@ function FieldSelectJarak({
   value = "",
   onChange,
   errors,
+  disabled,
 }) {
   const { options: optionsJarak } = useArcheryCategories(EventsService.getEventDistanceCategories);
   return (
@@ -91,6 +92,7 @@ function FieldSelectJarak({
         options={optionsJarak}
         value={value}
         onChange={onChange}
+        isDisabled={disabled}
       />
     </FieldSelectWrapper>
   );

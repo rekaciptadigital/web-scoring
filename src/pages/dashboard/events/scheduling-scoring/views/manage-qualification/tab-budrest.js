@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useEventDetail } from "./hooks/event-detail";
 import { useEventBudRests, useBudRestsForm } from "./hooks/bud-rests";
 import { BudRestService } from "services";
 
@@ -21,11 +22,12 @@ import { FolderHeader, FolderHeaderActions } from "./styles";
 import { parseISO, format } from "date-fns";
 import id from "date-fns/locale/id";
 import { errorsUtil } from "utils";
+import { shouldDisableEditing } from "./utils";
 
 function TabBudRest() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
-
+  const { data: eventDetail } = useEventDetail(eventId);
   const {
     data: eventBudRests,
     groupNames,
@@ -42,7 +44,7 @@ function TabBudRest() {
   } = useSubmitStatus();
 
   // sementara buka set bantalan di waktu kapanpun sebelum tanggal kualifikasi
-  const shouldAllowEdit = true;
+  const shouldAllowEdit = !shouldDisableEditing(eventDetail?.publicInformation.eventEnd);
 
   const shouldShowGroupErrorMessages = (groupName) =>
     formErrors?.[groupName] && Object.keys(formErrors[groupName])?.length;

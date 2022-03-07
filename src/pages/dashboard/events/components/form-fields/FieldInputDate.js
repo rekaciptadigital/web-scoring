@@ -17,6 +17,7 @@ function FieldInputDate({
   value,
   onChange,
   errors,
+  disabled,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -38,6 +39,7 @@ function FieldInputDate({
         placeholderText={placeholder}
         locale={id}
         dateFormat="dd/MM/yyyy"
+        disabled={disabled}
       />
       <FieldErrorMessage errors={errors} />
     </FieldInputDateWrapper>

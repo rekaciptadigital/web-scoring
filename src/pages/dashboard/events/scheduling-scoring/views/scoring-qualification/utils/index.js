@@ -1,3 +1,5 @@
+import { isPast } from "date-fns";
+
 function makeOptionsFromData(data) {
   if (!data) {
     return [];
@@ -22,4 +24,11 @@ function handleUrlFromResponse(url) {
   return downloadUrl;
 }
 
-export { makeOptionsFromData, handleUrlFromResponse };
+function shouldDisableEditing(eventDateEnd) {
+  if (!eventDateEnd) {
+    return true;
+  }
+  return isPast(eventDateEnd);
+}
+
+export { makeOptionsFromData, handleUrlFromResponse, shouldDisableEditing };

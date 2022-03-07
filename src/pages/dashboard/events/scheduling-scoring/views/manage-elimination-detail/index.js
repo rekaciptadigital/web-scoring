@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useParams, useLocation } from "react-router-dom";
 import styled from "styled-components";
+import { useEventDetail } from "./hooks/event-detail";
 import { useMatchTemplate } from "./hooks/match-template";
 import { EliminationService } from "services";
 
@@ -23,6 +24,7 @@ import IconCheck from "components/ma/icons/fill/check";
 import { StyledPageWrapper } from "./styles";
 
 import classnames from "classnames";
+import { shouldDisableEditing } from "./utils";
 
 const amountOptions = [
   { value: 16, label: 16 },
@@ -42,6 +44,7 @@ function PageConfigEliminationDetail() {
   const location = useLocation();
   const { category } = location.state;
 
+  const { data: eventDetail } = useEventDetail(eventId);
   const [eliminationMemberCount, setEliminationMemberCount] = React.useState(amountOptions[0]);
   const [scoringType, setScoringType] = React.useState(null);
   const [formStatus, dispatchFormStatus] = React.useReducer(
@@ -87,6 +90,7 @@ function PageConfigEliminationDetail() {
   const handleSuccessSave = () => refetchMatchTemplate();
 
   const isLoadingApply = formStatus.status === "loading";
+  const editIsDisabled = shouldDisableEditing(eventDetail?.publicInformation.eventEnd);
 
   return (
     <React.Fragment>
@@ -158,7 +162,7 @@ function PageConfigEliminationDetail() {
                     </div>
                   )}
                   <ButtonOutlineBlue
-                    disabled={!matchTemplate?.updated}
+                    disabled={editIsDisabled || !matchTemplate?.updated}
                     onClick={handleApplySettings}
                   >
                     Terapkan
@@ -179,6 +183,7 @@ function PageConfigEliminationDetail() {
                             <SeedBagan
                               bracketProps={bracketProps}
                               configs={{
+                                editIsAllowed: !editIsDisabled,
                                 isSettingApplied: !matchTemplate.updated,
                                 totalRounds: matchTemplate.rounds.length - 1,
                                 eliminationId: matchTemplate.eliminationId,
@@ -197,6 +202,7 @@ function PageConfigEliminationDetail() {
                             <SeedBagan
                               bracketProps={bracketProps}
                               configs={{
+                                editIsAllowed: !editIsDisabled,
                                 isSettingApplied: false,
                                 totalRounds: matchTemplate.rounds.length - 1,
                                 eliminationId: matchTemplate.eliminationId,
@@ -237,7 +243,7 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
 
   const shouldEnableScoring = () => {
     const noWinnersYet = seed.teams.every((team) => team.win === 0);
-    return configs.isSettingApplied && noWinnersYet;
+    return configs.editIsAllowed && configs.isSettingApplied && noWinnersYet;
   };
 
   const code = `2-${configs.eliminationId}-${seedIndex + 1}-${roundIndex + 1}`;

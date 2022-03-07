@@ -81,6 +81,7 @@ function FieldSelectJenisRegu({
   value = "",
   onChange,
   errors,
+  disabled,
 }) {
   const { options: optionsJenisRegu } = useArcheryCategories(EventsService.getEventTeamCategories);
   return (
@@ -96,6 +97,7 @@ function FieldSelectJenisRegu({
         options={optionsJenisRegu}
         value={value}
         onChange={onChange}
+        isDisabled={disabled}
       />
     </FieldSelectWrapper>
   );

@@ -62,6 +62,7 @@ function FieldInputTextSmall({
   value = "",
   onChange,
   errors,
+  disabled,
 }) {
   const fieldID = `field-${name}`;
   return (
@@ -77,6 +78,7 @@ function FieldInputTextSmall({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        disabled={disabled}
       />
     </FieldInputTextWrapper>
   );

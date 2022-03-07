@@ -15,7 +15,7 @@ function ScoringEditor(forwardedProps) {
 
   return (
     <React.Fragment>
-      <EditorButton onClick={openControl}>
+      <EditorButton onClick={openControl} disabled={forwardedProps.disabled}>
         <IconEdit size="18" />
       </EditorButton>
 
@@ -38,7 +38,8 @@ function EditorControl({ children, openControl, closeControl }) {
 
 const EditorButton = styled(ButtonOutlineBlue)`
   &,
-  &:focus {
+  &:focus,
+  &:active {
     padding: 0.25rem 0.45rem;
     border-color: transparent;
   }
@@ -52,6 +53,15 @@ const EditorButton = styled(ButtonOutlineBlue)`
 
   &:focus {
     box-shadow: 0 0 0 1px rgb(38, 132, 255);
+  }
+
+  &:disabled {
+    border-color: transparent;
+    background-color: transparent;
+
+    &:hover {
+      color: var(--ma-gray-200);
+    }
   }
 `;
 

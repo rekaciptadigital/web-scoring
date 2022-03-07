@@ -1,29 +1,31 @@
 import * as React from "react";
+import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EventsService } from "services";
+import { parseISO } from "date-fns";
 
 function useEventDetail(eventId) {
-  const [eventDetail, dispatch] = React.useReducer((state, action) => ({ ...state, ...action }), {
-    status: "idle",
-    data: null,
-    errors: null,
-    attempts: 1,
-  });
+  const eventDetail = useFetcher();
 
   React.useEffect(() => {
-    const fetchEventDetail = async () => {
-      dispatch({ status: "loading", errors: null });
-      const result = await EventsService.getEventDetailById({ id: eventId });
-      if (result.success) {
-        dispatch({ status: "success", data: result.data });
-      } else {
-        dispatch({ status: "error", errors: result.message || result.errors });
-      }
-    };
+    if (!eventId) {
+      return;
+    }
 
-    fetchEventDetail();
+    eventDetail.runAsync(
+      () => {
+        return EventsService.getEventDetailById({ id: eventId });
+      },
+      { transform }
+    );
   }, []);
 
-  return { ...eventDetail, state: eventDetail, dispatch };
+  return eventDetail;
+}
+
+function transform(data) {
+  const eventEnd = data.publicInformation.eventEnd;
+  data.publicInformation.eventEnd = parseISO(eventEnd);
+  return data;
 }
 
 export { useEventDetail };

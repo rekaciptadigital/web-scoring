@@ -10,6 +10,7 @@ import CategoryItem from "./CategoryItem";
 
 export function StepKategori({
   eventId,
+  editIsAllowed,
   savingStatus,
   eventData,
   updateEventData,
@@ -84,6 +85,7 @@ export function StepKategori({
             <CategoryItem
               key={category.key}
               eventId={eventId}
+              editIsAllowed={editIsAllowed}
               category={category}
               categoryOptions={optionsCompetitionCategory}
               eventData={eventData}
@@ -98,7 +100,10 @@ export function StepKategori({
 
         <div className="bottom-section-add-category">
           <ButtonAddCategory
-            disabled={eventData.eventCategories.length >= optionsCompetitionCategory.length}
+            disabled={
+              !editIsAllowed ||
+              eventData.eventCategories.length >= optionsCompetitionCategory.length
+            }
             corner="8"
             onClick={handleClickAddCategory}
           >

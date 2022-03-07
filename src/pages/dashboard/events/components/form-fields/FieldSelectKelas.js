@@ -76,6 +76,7 @@ function FieldSelectKelas({
   value = "",
   onChange,
   errors,
+  disabled,
 }) {
   const { options: optionsKelas } = useArcheryCategories(EventsService.getEventAgeCategories);
   return (
@@ -91,6 +92,7 @@ function FieldSelectKelas({
         options={optionsKelas}
         value={value}
         onChange={onChange}
+        isDisabled={disabled}
       />
     </FieldSelectWrapper>
   );

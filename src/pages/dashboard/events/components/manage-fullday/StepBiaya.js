@@ -10,6 +10,7 @@ import { FieldInputPrice } from "../form-fields";
 const { TEAM_CATEGORIES } = eventCategories;
 
 export function StepBiaya({
+  editIsAllowed,
   savingStatus,
   eventData,
   updateEventData,
@@ -54,7 +55,7 @@ export function StepBiaya({
             name="type-normal"
             value={eventData?.registrationFee || ""}
             onChange={handleRegistrationFeeChange}
-            disabled={!eventData.isFlatRegistrationFee}
+            disabled={!editIsAllowed || !eventData.isFlatRegistrationFee}
           >
             Biaya Registrasi
           </FieldInputPrice>
@@ -79,48 +80,48 @@ export function StepBiaya({
               uncheckedIcon={false}
               checkedIcon={false}
               boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+              disabled={!editIsAllowed}
             />
           </div>
         </Col>
       </Row>
 
       <Row className="mt-3">
-        {
-          eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE] ?
+        {eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE] ? (
           <Col md={3}>
             <FieldInputPrice
               name="normal-individual"
-              disabled={eventData.isFlatRegistrationFee}
+              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
               value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE)}
-              onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE, value)}
+              onChange={(value) =>
+                handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE, value)
+              }
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE}`]}
             >
-              Individual Putra 
+              Individual Putra
             </FieldInputPrice>
           </Col>
-         : null
-        }
-        {
-          eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE] ?
+        ) : null}
+        {eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE] ? (
           <Col md={3}>
             <FieldInputPrice
               name="normal-individual"
-              disabled={eventData.isFlatRegistrationFee}
+              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
               value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE)}
-              onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE, value)}
+              onChange={(value) =>
+                handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE, value)
+              }
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE}`]}
             >
               Individual Putri
             </FieldInputPrice>
           </Col>
-          : null
-        }
-        {
-          eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_MALE] ?
+        ) : null}
+        {eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_MALE] ? (
           <Col md={3}>
             <FieldInputPrice
               name="normal-male-team"
-              disabled={eventData.isFlatRegistrationFee}
+              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
               value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MALE)}
               onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MALE, value)}
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_MALE}`]}
@@ -128,29 +129,25 @@ export function StepBiaya({
               Beregu Putra
             </FieldInputPrice>
           </Col>
-          : null
-        }
-        {
-          eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_FEMALE] ?
+        ) : null}
+        {eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_FEMALE] ? (
           <Col md={3}>
             <FieldInputPrice
               name="normal-female-team"
-              disabled={eventData.isFlatRegistrationFee}
+              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
               value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_FEMALE)}
               onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_FEMALE, value)}
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_FEMALE}`]}
             >
               Beregu Putri
             </FieldInputPrice>
-          </Col> 
-          : null
-        }
-        {
-          eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_MIXED] ?
+          </Col>
+        ) : null}
+        {eventData.registrationFeesID[TEAM_CATEGORIES.TEAM_MIXED] ? (
           <Col md={3}>
             <FieldInputPrice
               name="normal-mixed-team"
-              disabled={eventData.isFlatRegistrationFee}
+              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
               value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MIXED)}
               onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MIXED, value)}
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_MIXED}`]}
@@ -158,8 +155,7 @@ export function StepBiaya({
               Beregu Campuran
             </FieldInputPrice>
           </Col>
-          : null
-        }
+        ) : null}
       </Row>
 
       <LoadingScreen loading={isLoading} />

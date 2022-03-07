@@ -29,7 +29,7 @@ const FieldSelectRadioWrapper = styled.div`
   }
 `;
 
-function FieldSelectRadio({ name, options, value, onChange, errors }) {
+function FieldSelectRadio({ name, options, value, onChange, errors, disabled }) {
   const handleSelectRadio = (ev) => {
     const {
       target: { value },
@@ -53,6 +53,7 @@ function FieldSelectRadio({ name, options, value, onChange, errors }) {
               value={option.value}
               checked={value?.value === option.value}
               onChange={handleSelectRadio}
+              disabled={disabled}
             />
             {option.label || option.value}
           </label>

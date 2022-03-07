@@ -2,6 +2,7 @@ import * as React from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
+import { useEventDetail } from "./hooks/event-detail";
 import { useCategoriesByGender } from "./hooks/event-categories-by-gender";
 import { useParticipantScorings } from "./hooks/participant-scorings";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
@@ -14,7 +15,7 @@ import { ScoringEditor } from "./scoring-editor";
 import IconUser from "components/ma/icons/mono/user";
 import IconDownload from "components/ma/icons/mono/download";
 
-import { makeOptionsFromData } from "./utils";
+import { makeOptionsFromData, shouldDisableEditing } from "./utils";
 
 const tabsList = [
   { step: 1, label: "Individu Putra" },
@@ -24,7 +25,7 @@ const tabsList = [
 function StepScoringQualification() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
-
+  const { data: eventDetail } = useEventDetail(eventId);
   const { data: categories, groupNames: teamCategories } = useCategoriesByGender(eventId);
   const { currentStep: currentTab, goToStep: switchToTab } = useWizardView(tabsList);
 
@@ -67,6 +68,7 @@ function StepScoringQualification() {
 
   const { handleScoresheetDownload, status: downloadStatus } = useScoresheetDownload();
   const isLoadingPreparingScoresheet = downloadStatus === "loading";
+  const editIsDisabled = shouldDisableEditing(eventDetail?.publicInformation.eventEnd);
 
   return (
     <div>
@@ -173,6 +175,7 @@ function StepScoringQualification() {
                           code={code}
                           targetNumber={computeTargetNumber()}
                           onSuccess={handleSuccessSave}
+                          disabled={editIsDisabled}
                         />
                       </TDTableButtons>
                     </tr>

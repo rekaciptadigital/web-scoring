@@ -339,6 +339,7 @@ export default function CertificateNew() {
                   {editorData ? (
                     <React.Fragment>
                       <EditorCanvasHTML
+                        key={currentCertificateType}
                         data={editorData}
                         onChange={(data) => handleEditorChange(data)}
                         currentObject={currentObject}

@@ -61,8 +61,9 @@ function renderTemplateString(editorData) {
 
 const renderCssBackgroundImage = (backgroundImage) => {
   if (backgroundImage) {
+    // TODO: pakai URL dari upload gambar internal
     return `
-        background-image: url(${backgroundImage});
+        background-image: url(https://i.postimg.cc/0kMc6vR6/meqzn64ab9h-3-8-2022.png); /* WTF hardcoded wkwk */
         background-image-resize: 6; /* properti custom mpdf, mirip background-size: cover */`;
   }
   return "";

@@ -57,11 +57,7 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText(LABEL_MEMBER_NAME)}
-    ${
-      editorData.typeCertificate === certificateTypes.WINNER
-        ? "Juara " + renderFieldText(LABEL_RANK)
-        : ""
-    }
+    ${editorData.typeCertificate === certificateTypes.WINNER ? renderFieldText(LABEL_RANK) : ""}
     ${renderFieldText(LABEL_CATEGORY_NAME)}
     ${renderQrCode()}
   </body>
@@ -95,7 +91,7 @@ function renderCssField(name, data = {}) {
 }
 
 function renderFieldText(name) {
-  const placeholderString = `{%${name}%}`;
+  const placeholderString = name === LABEL_RANK ? `Juara {%${name}%}` : `{%${name}%}`;
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 

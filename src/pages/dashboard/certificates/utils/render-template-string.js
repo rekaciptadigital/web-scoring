@@ -13,10 +13,10 @@ function renderTemplateString(editorData) {
     <style>
       @page {
         margin: 0px;
-        ${renderCssBackgroundImage(editorData.backgroundImage)}
       }
 
       body {
+        ${renderCssBackgroundImage(editorData.backgroundImage)}
         position: relative;
         margin: 0px;
         padding: 0px;

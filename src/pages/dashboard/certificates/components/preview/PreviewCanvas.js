@@ -10,8 +10,13 @@ const { LABEL_RANK } = certificateFields;
 export default function PreviewCanvas({ data }) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
+  const [offsetWidth, setOffsetWidth] = React.useState(null);
 
   const getBackgroundImage = () => backgroundUrl || backgroundPreviewUrl || backgroundImage;
+
+  React.useEffect(() => {
+    containerDiv.current && setOffsetWidth(containerDiv.current.offsetWidth);
+  }, []);
 
   return (
     <PreviewCanvasContainer ref={containerDiv} ratio={908 / 1280}>
@@ -19,7 +24,7 @@ export default function PreviewCanvas({ data }) {
         width={1280}
         height={908}
         backgroundImage={getBackgroundImage()}
-        scale={containerDiv.current?.offsetWidth / 1280}
+        scale={offsetWidth ? offsetWidth / 1280 : 1}
       >
         {fields?.length ? (
           fields.map((field) => {
@@ -40,6 +45,16 @@ export default function PreviewCanvas({ data }) {
   );
 }
 
+function PreviewImage({ children, width, height, backgroundImage, scale }) {
+  const variableStyles = {
+    "--cert-pre-width": width ? width + "px" : undefined,
+    "--cert-pre-height": height ? height + "px" : undefined,
+    "--cert-pre-background-image": backgroundImage ? `url(${backgroundImage})` : undefined,
+    "--cert-pre-scale": scale,
+  };
+  return <PreviewImageWrapper style={variableStyles}>{children}</PreviewImageWrapper>;
+}
+
 const PreviewCanvasContainer = styled.div`
   position: relative;
   height: 0;
@@ -47,16 +62,16 @@ const PreviewCanvasContainer = styled.div`
   overflow: hidden;
 `;
 
-const PreviewImage = styled.div`
+const PreviewImageWrapper = styled.div`
   position: relative;
-  width: ${({ width }) => width}px;
-  height: ${({ height }) => height}px;
+  width: var(--cert-pre-width, 100%);
+  height: var(--cert-pre-height, 100%);
   background-color: white;
-  background-image: url(${({ backgroundImage }) => backgroundImage});
+  background-image: var(--cert-pre-background-image, none);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  transform: scale(${({ scale }) => scale});
+  transform: scale(var(--cert-pre-scale, 1));
   transform-origin: top left;
 `;
 

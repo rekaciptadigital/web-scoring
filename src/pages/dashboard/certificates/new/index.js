@@ -292,7 +292,7 @@ export default function CertificateNew() {
                       onClick={() => handleClickSave()}
                       disabled={isSaving || isLoading}
                     >
-                      Save
+                      Simpan
                     </Button>
                   </div>
 
@@ -304,7 +304,7 @@ export default function CertificateNew() {
                       onClick={() => handleOpenPreview()}
                       disabled={isSaving || isLoading}
                     >
-                      Preview
+                      Pratinjau
                     </Button>
 
                     <Modal

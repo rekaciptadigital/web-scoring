@@ -14,11 +14,12 @@ import {
 import { DEJAVU_SANS } from "../utils/font-family-list";
 import { certificateFields } from "constants/index";
 
+import MetaTags from "react-meta-tags";
 import { Container, Col, Row, Card, Button, Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
 import Select from "react-select";
+import { BreadcrumbDashboard } from "pages/dashboard/events/components/breadcrumb";
 
-import { Breadcrumbs } from "components";
 import EditorBgImagePicker from "../components/EditorBgImagePicker";
 import EditorCanvasHTML from "../components/EditorCanvasHTML";
 import FontBoldToggle from "../components/FontBoldToggle";
@@ -59,6 +60,7 @@ const defaultEditorData = {
 };
 
 export default function CertificateNew() {
+  const pageRef = React.useRef(null);
   const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
   const [status, setStatus] = React.useState("idle");
   const [editorData, setEditorData] = React.useState(null);
@@ -79,22 +81,30 @@ export default function CertificateNew() {
   };
 
   const event_id = new URLSearchParams(useLocation().search).get("event_id");
+  const eventId = parseInt(event_id);
 
   React.useEffect(() => {
     setStatus("loading");
 
     const getCertificateData = async () => {
       const queryString = { event_id, type_certificate: currentCertificateType };
-      const { data: certificate } = await CertificateService.getForEditor(queryString);
+      const result = await CertificateService.getForEditor(queryString);
 
-      if (certificate) {
+      // Batalkan update state ketika komponen udah di-unmount.
+      // Menghindari memory leak ketika belum selesai loading tapi user pindah halamanan.
+      // Data sertifikat makan memory besar.
+      if (!pageRef.current) {
+        return;
+      }
+
+      if (result.success) {
         // Data editor dari data sertifikat yang sudah ada di server
-        const parsedEditorData = certificate.editorData ? JSON.parse(certificate.editorData) : "";
+        const parsedEditorData = result.data.editorData ? JSON.parse(result.data.editorData) : "";
         setEditorData({
           ...defaultEditorData,
           typeCertificate: currentCertificateType,
-          certificateId: certificate.id,
-          backgroundUrl: certificate.backgroundUrl,
+          certificateId: result.data.id,
+          backgroundUrl: result.data.backgroundUrl,
           backgroundImage: parsedEditorData.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
           fields: parsedEditorData.fields || defaultEditorData.fields,
         });
@@ -243,9 +253,13 @@ export default function CertificateNew() {
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
 
   return (
-    <div className="page-content">
+    <StyledPageWrapper ref={pageRef}>
+      <MetaTags>
+        <title>Editor Sertifikat | MyArchery.id</title>
+      </MetaTags>
+
       <Container fluid>
-        <Breadcrumbs title="Dashboards" breadcrumbItems={[{ title: "Dashboard" }]} />
+        <BreadcrumbDashboard to={`/dashboard/event/${eventId}/home`}>Dashboard</BreadcrumbDashboard>
 
         {/* Konten */}
         <Row>
@@ -406,9 +420,13 @@ export default function CertificateNew() {
           </Col>
         </Row>
       </Container>
-    </div>
+    </StyledPageWrapper>
   );
 }
+
+const StyledPageWrapper = styled.div`
+  margin: 4rem 0;
+`;
 
 const EditorActionButtons = styled.div`
   position: relative;

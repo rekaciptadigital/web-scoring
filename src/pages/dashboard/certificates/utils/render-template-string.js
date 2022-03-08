@@ -32,11 +32,16 @@ function renderTemplateString(editorData) {
 
       .qr-code-container {
         position: absolute;
-        right: 20px;
-        bottom: 20px;
-        padding: 2.5mm;
+        left: 0;
+        right: 0;
+        bottom: 120px;
+      }
+
+      .qr-code-centering {
+        margin: 0 auto;
         width: 25mm;
         height: 25mm;
+        padding: 2mm;
         background-color: white;
       }
 
@@ -52,7 +57,11 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText(LABEL_MEMBER_NAME)}
-    ${editorData.typeCertificate === certificateTypes.WINNER ? renderFieldText(LABEL_RANK) : ""}
+    ${
+      editorData.typeCertificate === certificateTypes.WINNER
+        ? "Juara " + renderFieldText(LABEL_RANK)
+        : ""
+    }
     ${renderFieldText(LABEL_CATEGORY_NAME)}
     ${renderQrCode()}
   </body>
@@ -93,15 +102,18 @@ function renderFieldText(name) {
 function renderQrCode() {
   const urlPlaceholder = "{%certificate_verify_url%}";
   return `
+
     <div class="qr-code-container">
-      <barcode
-        class="qr-code-img"
-        code="${urlPlaceholder}"
-        type="QR"
-        error="M"
-        class="barcode"
-        size="1"
-        disableborder="1" />
+      <div class="qr-code-centering">
+        <barcode
+          class="qr-code-img"
+          code="${urlPlaceholder}"
+          type="QR"
+          error="M"
+          class="barcode"
+          size="1"
+          disableborder="1" />
+      </div>
     </div>`;
 }
 

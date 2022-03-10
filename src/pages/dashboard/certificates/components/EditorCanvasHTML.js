@@ -38,7 +38,10 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
 
         {fields?.length ? (
           fields.map((field) => {
-            if (field.name === LABEL_RANK && data.typeCertificate !== 2) {
+            if (
+              field.name === LABEL_RANK &&
+              (data.typeCertificate === 1 || data.typeCertificate === 3)
+            ) {
               return;
             }
             return (

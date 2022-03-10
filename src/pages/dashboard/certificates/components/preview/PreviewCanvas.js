@@ -28,7 +28,10 @@ export default function PreviewCanvas({ data }) {
       >
         {fields?.length ? (
           fields.map((field) => {
-            if (field.name === LABEL_RANK && data.typeCertificate !== 2) {
+            if (
+              field.name === LABEL_RANK &&
+              (data.typeCertificate === 1 || data.typeCertificate === 3)
+            ) {
               return;
             }
             return <PreviewFieldText key={field.name} name={field.name} data={field} />;

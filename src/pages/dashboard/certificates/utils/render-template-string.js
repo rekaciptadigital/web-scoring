@@ -16,7 +16,7 @@ function renderTemplateString(editorData) {
       }
 
       body {
-        ${renderCssBackgroundImage(editorData.backgroundImage)}
+        ${renderCssBackgroundImage(editorData.backgroundImage, editorData.typeCertificate)}
         position: relative;
         margin: 0px;
         padding: 0px;
@@ -57,18 +57,26 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText(LABEL_MEMBER_NAME)}
-    ${editorData.typeCertificate === certificateTypes.WINNER ? renderFieldText(LABEL_RANK) : ""}
+    ${isTypeWinner(editorData.typeCertificate) ? renderFieldText(LABEL_RANK) : ""}
     ${renderFieldText(LABEL_CATEGORY_NAME)}
     ${renderQrCode()}
   </body>
 </html>`;
 }
 
-const renderCssBackgroundImage = (backgroundImage) => {
+function isTypeWinner(type) {
+  return (
+    type === certificateTypes.WINNER_ELIMINATION ||
+    type === certificateTypes.WINNER_QUALIFICATION ||
+    type === certificateTypes.WINNER_TEAM
+  );
+}
+
+const renderCssBackgroundImage = (backgroundImage, type) => {
   if (backgroundImage) {
-    // TODO: pakai URL dari upload gambar internal
+    const imgUrl = getImgUrl(backgroundImage, { debug: true, type });
     return `
-        background-image: url(https://i.postimg.cc/0kMc6vR6/meqzn64ab9h-3-8-2022.png); /* WTF hardcoded wkwk */
+        background-image: url(${imgUrl});
         background-image-resize: 6; /* properti custom mpdf, mirip background-size: cover */`;
   }
   return "";
@@ -98,7 +106,6 @@ function renderFieldText(name) {
 function renderQrCode() {
   const urlPlaceholder = "{%certificate_verify_url%}";
   return `
-
     <div class="qr-code-container">
       <div class="qr-code-centering">
         <barcode
@@ -111,6 +118,28 @@ function renderQrCode() {
           disableborder="1" />
       </div>
     </div>`;
+}
+
+/**
+ *
+ * @param {string} backgroundImage URL gambar asli yang diupload user
+ * @param {object} debugConfig { debug: true | false, type: 1 | 2 | 3 | 4 | 5 }
+ * @returns {string} URL gambar backgound sertifikat
+ */
+function getImgUrl(backgroundImage, { debug = false, type } = {}) {
+  if (!debug) {
+    return backgroundImage;
+  }
+  const imgPeserta = "https://i.postimg.cc/0kMc6vR6/meqzn64ab9h-3-8-2022.png";
+  const imgJuara = "https://i.postimg.cc/yBzkZqr0/sertifikat-dki-series-juara.jpg";
+  const fixedImages = {
+    1: imgPeserta,
+    3: imgPeserta,
+    2: imgJuara,
+    4: imgJuara,
+    5: imgJuara,
+  };
+  return fixedImages[type];
 }
 
 export { renderTemplateString };

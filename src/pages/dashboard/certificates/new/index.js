@@ -60,7 +60,8 @@ const defaultEditorData = {
 };
 
 export default function CertificateNew() {
-  const pageRef = React.useRef(null);
+  const isMounted = React.useRef(null);
+  const abortControllerRef = React.useRef(null);
   const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
   const [status, setStatus] = React.useState("idle");
   const [editorData, setEditorData] = React.useState(null);
@@ -84,16 +85,28 @@ export default function CertificateNew() {
   const eventId = parseInt(event_id);
 
   React.useEffect(() => {
+    isMounted.current = true;
+    abortControllerRef.current = new AbortController();
+    return () => {
+      isMounted.current = false;
+      abortControllerRef.current.abort();
+    };
+  }, []);
+
+  React.useEffect(() => {
     setStatus("loading");
 
     const getCertificateData = async () => {
       const queryString = { event_id, type_certificate: currentCertificateType };
-      const result = await CertificateService.getForEditor(queryString);
+      const result = await CertificateService.getForEditor(
+        queryString,
+        abortControllerRef.current.signal
+      );
 
       // Batalkan update state ketika komponen udah di-unmount.
       // Menghindari memory leak ketika belum selesai loading tapi user pindah halamanan.
       // Data sertifikat makan memory besar.
-      if (!pageRef.current) {
+      if (!isMounted.current) {
         return;
       }
 
@@ -253,7 +266,7 @@ export default function CertificateNew() {
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
 
   return (
-    <StyledPageWrapper ref={pageRef}>
+    <StyledPageWrapper>
       <MetaTags>
         <title>Editor Sertifikat | MyArchery.id</title>
       </MetaTags>

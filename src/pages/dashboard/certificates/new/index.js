@@ -15,9 +15,11 @@ import { DEJAVU_SANS } from "../utils/font-family-list";
 import { certificateFields } from "constants/index";
 
 import MetaTags from "react-meta-tags";
-import { Container, Col, Row, Card, Button, Modal, ModalBody } from "reactstrap";
+import { Container, Col, Row, Card, Button as BSButton, Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
 import Select from "react-select";
+import SweetAlert from "react-bootstrap-sweetalert";
+import { Button, ButtonBlue } from "components/ma";
 import { BreadcrumbDashboard } from "pages/dashboard/events/components/breadcrumb";
 
 import EditorBgImagePicker from "../components/EditorBgImagePicker";
@@ -66,11 +68,18 @@ export default function CertificateNew() {
   const [status, setStatus] = React.useState("idle");
   const [editorData, setEditorData] = React.useState(null);
   const [currentObject, setCurrentObject] = React.useState(null);
+  const [isEditorDirty, setEditorAsDirty] = React.useState(false);
+
+  const targetCertificateType = React.useRef(1);
+  const [needSavingConfirmation, setNeedSavingConfirmation] = React.useState(false);
 
   const [isModePreview, setModePreview] = React.useState(false);
 
   const isSaving = status === "saving";
   const isLoading = status === "loading";
+
+  const setEditorClean = () => setEditorAsDirty(false);
+  const setEditorDirty = () => setEditorAsDirty(true);
 
   const image = {
     preview:
@@ -129,6 +138,8 @@ export default function CertificateNew() {
         });
       }
       setStatus("done");
+      setEditorClean();
+      setCurrentObject(null);
     };
 
     getCertificateData();
@@ -153,33 +164,22 @@ export default function CertificateNew() {
     });
   }, [currentObject]);
 
-  /**
-   * 1. Simpan data editor untuk sertifikat yang sedang aktif
-   * 2. Ganti ke current certificate
-   */
   const handleTipeSertifikatChange = async (ev) => {
     if (parseInt(ev.value) === parseInt(editorData.typeCertificate)) {
       return;
     }
 
-    setStatus("saving");
-    const queryString = { event_id, type_certificate: currentCertificateType };
-    const data = await prepareSaveData(editorData, queryString);
-
-    const result = await CertificateService.save(data);
-    if (result.success || result.data) {
-      const editorDataCreated = JSON.parse(result.data.editorData);
-      setEditorData((editorData) => ({
-        ...editorData,
-        ...editorDataCreated,
-        certificateId: result.data.id,
-      }));
+    if (!isEditorDirty) {
+      setCurrentCertificateType(ev.value);
+    } else {
+      setNeedSavingConfirmation(true);
+      targetCertificateType.current = ev.value;
     }
-    setCurrentCertificateType(ev.value);
-    setStatus("done");
-    setCurrentObject(null);
   };
 
+  /**
+   * Ke-trigger ketika seleksi objek teks & juga ketika geser posisinya.
+   */
   const handleEditorChange = (data) => {
     setCurrentObject((currentData) => ({
       ...currentData,
@@ -229,6 +229,7 @@ export default function CertificateNew() {
         backgroundFileRaw: imageData,
       };
     });
+    setEditorDirty();
   };
 
   const handleHapusBg = () => {
@@ -241,6 +242,7 @@ export default function CertificateNew() {
         backgroundImage: null,
       };
     });
+    setEditorDirty();
   };
 
   const handleClickSave = async () => {
@@ -256,6 +258,7 @@ export default function CertificateNew() {
         ...editorDataSaved,
         certificateId: result.data.id,
       }));
+      setEditorClean();
     }
 
     setStatus("done");
@@ -299,18 +302,18 @@ export default function CertificateNew() {
                   </div>
 
                   <div>
-                    <Button
+                    <BSButton
                       tag="a"
                       color="primary"
                       onClick={() => handleClickSave()}
-                      disabled={isSaving || isLoading}
+                      disabled={isSaving || isLoading || !isEditorDirty}
                     >
                       Simpan
-                    </Button>
+                    </BSButton>
                   </div>
 
                   <div>
-                    <Button
+                    <BSButton
                       tag="a"
                       color="secondary"
                       outline
@@ -318,7 +321,7 @@ export default function CertificateNew() {
                       disabled={isSaving || isLoading}
                     >
                       Pratinjau
-                    </Button>
+                    </BSButton>
 
                     <Modal
                       isOpen={isModePreview}
@@ -332,9 +335,9 @@ export default function CertificateNew() {
                       <ModalBody>
                         <PreviewCanvas data={editorData} />
                         <div className="mt-4 mb-2 text-center">
-                          <Button color="primary" onClick={() => handleClosePreview()}>
+                          <BSButton color="primary" onClick={() => handleClosePreview()}>
                             Tutup
-                          </Button>
+                          </BSButton>
                         </div>
                       </ModalBody>
                     </Modal>
@@ -357,6 +360,7 @@ export default function CertificateNew() {
                         onChange={(data) => handleEditorChange(data)}
                         currentObject={currentObject}
                         onSelect={(target) => setCurrentObject(target)}
+                        setEditorDirty={setEditorDirty}
                       />
                       {(isSaving || isLoading) && <ProcessingBlocker />}
                     </React.Fragment>
@@ -434,6 +438,33 @@ export default function CertificateNew() {
           </Col>
         </Row>
       </Container>
+
+      <AlertPromptSave
+        shouldConfirm={needSavingConfirmation}
+        onConfirm={() => {
+          setNeedSavingConfirmation(false);
+
+          const submitSave = async () => {
+            setStatus("saving");
+            const queryString = { event_id, type_certificate: currentCertificateType };
+            const data = await prepareSaveData(editorData, queryString);
+
+            const result = await CertificateService.save(data);
+            if (result.data) {
+              setCurrentCertificateType(targetCertificateType.current);
+            }
+          };
+          submitSave();
+        }}
+        onClose={() => {
+          setNeedSavingConfirmation(false);
+          setCurrentCertificateType(targetCertificateType.current);
+        }}
+        labelCancel="Lanjut tanpa simpan"
+        labelConfirm="Simpan"
+      >
+        Sertifikat belum disimpan. Apakah ingin disimpan?
+      </AlertPromptSave>
     </StyledPageWrapper>
   );
 }
@@ -508,5 +539,60 @@ function ProcessingBlocker() {
         opacity: 0.5,
       }}
     />
+  );
+}
+
+function AlertPromptSave({
+  children,
+  shouldConfirm,
+  onConfirm,
+  onClose,
+  labelCancel = "Batal",
+  labelConfirm = "Konfirmasi",
+}) {
+  const [isAlertOpen, setAlertOpen] = React.useState(false);
+
+  const handleConfirm = async () => {
+    await onConfirm?.();
+    setAlertOpen(false);
+  };
+
+  const handleCancel = () => {
+    setAlertOpen(false);
+    onClose?.();
+  };
+
+  React.useEffect(() => {
+    if (!shouldConfirm) {
+      return;
+    }
+    setAlertOpen(true);
+  }, [shouldConfirm]);
+
+  return (
+    <React.Fragment>
+      <SweetAlert
+        show={isAlertOpen}
+        title=""
+        custom
+        btnSize="md"
+        style={{ padding: "30px 40px", width: "520px" }}
+        onConfirm={handleConfirm}
+        customButtons={
+          <span className="d-flex justify-content-center" style={{ gap: "0.5rem" }}>
+            <Button style={{ minWidth: 120 }} onClick={handleCancel}>
+              {labelCancel}
+            </Button>
+            <ButtonBlue style={{ minWidth: 120 }} onClick={handleConfirm}>
+              {labelConfirm}
+            </ButtonBlue>
+          </span>
+        }
+      >
+        <div>
+          <p>{children}</p>
+        </div>
+      </SweetAlert>
+    </React.Fragment>
   );
 }

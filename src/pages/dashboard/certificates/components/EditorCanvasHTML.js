@@ -7,7 +7,13 @@ import QrCodeField from "./QrCodeField";
 
 const { LABEL_RANK } = certificateFields;
 
-export default function EditorCanvasHTML({ data, currentObject, onChange, onSelect }) {
+export default function EditorCanvasHTML({
+  data,
+  currentObject,
+  onChange,
+  onSelect,
+  setEditorDirty,
+}) {
   const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
 
@@ -52,6 +58,7 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
                 selected={isSelected(field.name)}
                 onChange={(data) => onChange(data)}
                 onSelected={() => handleSelectField(field.name)}
+                setEditorDirty={setEditorDirty}
               />
             );
           })

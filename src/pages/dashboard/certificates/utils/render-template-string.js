@@ -16,7 +16,8 @@ function renderTemplateString(editorData) {
       }
 
       body {
-        ${renderCssBackgroundImage(editorData.backgroundImage, editorData.typeCertificate)}
+        ${renderCssBackgroundImage(editorData)}
+        background-image-resize: 6; /* properti custom mpdf, mirip background-size: cover */
         position: relative;
         margin: 0px;
         padding: 0px;
@@ -72,14 +73,13 @@ function isTypeWinner(type) {
   );
 }
 
-const renderCssBackgroundImage = (backgroundImage, type) => {
-  if (backgroundImage) {
-    const imgUrl = getImgUrl(backgroundImage, { debug: true, type });
-    return `
-        background-image: url(${imgUrl});
-        background-image-resize: 6; /* properti custom mpdf, mirip background-size: cover */`;
+const renderCssBackgroundImage = (editorData) => {
+  if (!editorData.backgroundImage && !editorData.backgroundUrl) {
+    return "";
   }
-  return "";
+  return `
+      background-image: url({%background%});
+  `;
 };
 
 function renderCssField(name, data = {}) {
@@ -118,28 +118,6 @@ function renderQrCode() {
           disableborder="1" />
       </div>
     </div>`;
-}
-
-/**
- *
- * @param {string} backgroundImage URL gambar asli yang diupload user
- * @param {object} debugConfig { debug: true | false, type: 1 | 2 | 3 | 4 | 5 }
- * @returns {string} URL gambar backgound sertifikat
- */
-function getImgUrl(backgroundImage, { debug = false, type } = {}) {
-  if (!debug) {
-    return backgroundImage;
-  }
-  const imgPeserta = "https://i.postimg.cc/0kMc6vR6/meqzn64ab9h-3-8-2022.png";
-  const imgJuara = "https://i.postimg.cc/yBzkZqr0/sertifikat-dki-series-juara.jpg";
-  const fixedImages = {
-    1: imgPeserta,
-    3: imgPeserta,
-    2: imgJuara,
-    4: imgJuara,
-    5: imgJuara,
-  };
-  return fixedImages[type];
 }
 
 export { renderTemplateString };

@@ -8,9 +8,8 @@ import {
   optionsTypeCertificate,
   getCurrentTypeCertificate,
   getSelectedFontFamily,
-  renderTemplateString,
-  convertBase64,
 } from "../utils";
+import { prepareSaveData } from "./utils";
 import { DEJAVU_SANS } from "../utils/font-family-list";
 import { certificateFields } from "constants/index";
 
@@ -18,9 +17,9 @@ import MetaTags from "react-meta-tags";
 import { Container, Col, Row, Card, Button as BSButton, Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
 import Select from "react-select";
-import SweetAlert from "react-bootstrap-sweetalert";
-import { Button, ButtonBlue } from "components/ma";
 import { BreadcrumbDashboard } from "pages/dashboard/events/components/breadcrumb";
+import { ProcessingBlocker } from "./processing-blocker";
+import { AlertPromptSave } from "./alert-prompt-save";
 
 import EditorBgImagePicker from "../components/EditorBgImagePicker";
 import EditorCanvasHTML from "../components/EditorCanvasHTML";
@@ -30,37 +29,7 @@ import PreviewCanvas from "../components/preview/PreviewCanvas";
 
 const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
 
-const defaultEditorData = {
-  paperSize: "A4", // || [1280, 908] || letter
-  backgroundUrl: undefined,
-  backgroundPreviewUrl: undefined,
-  backgroundFileRaw: undefined,
-  fields: [
-    {
-      name: LABEL_MEMBER_NAME,
-      x: 640,
-      y: 280,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 60,
-    },
-    {
-      name: LABEL_RANK,
-      x: 640,
-      y: 370,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
-      name: LABEL_CATEGORY_NAME,
-      x: 640,
-      y: 430,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-  ],
-};
-
-export default function CertificateNew() {
+function CertificateNew() {
   const isMounted = React.useRef(null);
   const abortControllerRef = React.useRef(null);
   const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
@@ -123,12 +92,6 @@ export default function CertificateNew() {
           certificateId: result.data.id,
           backgroundUrl: result.data.backgroundUrl,
           fields: parsedEditorData.fields || defaultEditorData.fields,
-        });
-      } else {
-        // Dari yang belum ada, dikenali dari gak ada `certificateId`-nya
-        setEditorData({
-          ...defaultEditorData,
-          typeCertificate: currentCertificateType,
         });
       }
       setStatus("done");
@@ -492,99 +455,34 @@ const EditorActionButtons = styled.div`
   }
 `;
 
-async function prepareSaveData(editorData, qs) {
-  const dataCopy = { ...editorData };
+const defaultEditorData = {
+  paperSize: "A4", // || [1280, 908] || letter
+  backgroundUrl: undefined,
+  backgroundPreviewUrl: undefined,
+  backgroundFileRaw: undefined,
+  fields: [
+    {
+      name: LABEL_MEMBER_NAME,
+      x: 640,
+      y: 280,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 60,
+    },
+    {
+      name: LABEL_RANK,
+      x: 640,
+      y: 370,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+    {
+      name: LABEL_CATEGORY_NAME,
+      x: 640,
+      y: 430,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+  ],
+};
 
-  let imageBase64ForUpload = undefined;
-  if (dataCopy.backgroundFileRaw) {
-    imageBase64ForUpload = await convertBase64(dataCopy.backgroundFileRaw);
-  }
-
-  const certificateHtmlTemplate = renderTemplateString(dataCopy);
-  const templateInBase64 = btoa(certificateHtmlTemplate);
-
-  const payload = {
-    event_id: parseInt(qs.event_id),
-    type_certificate: dataCopy.typeCertificate,
-    html_template: templateInBase64,
-    background_img: imageBase64ForUpload,
-    editor_data: JSON.stringify({
-      ...dataCopy,
-      backgroundFileRaw: undefined,
-      backgroundPreviewUrl: undefined,
-    }),
-  };
-
-  return payload;
-}
-
-function ProcessingBlocker() {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#ffffff",
-        opacity: 0.5,
-      }}
-    />
-  );
-}
-
-function AlertPromptSave({
-  children,
-  shouldConfirm,
-  onConfirm,
-  onClose,
-  labelCancel = "Batal",
-  labelConfirm = "Konfirmasi",
-}) {
-  const [isAlertOpen, setAlertOpen] = React.useState(false);
-
-  const handleConfirm = async () => {
-    await onConfirm?.();
-    setAlertOpen(false);
-  };
-
-  const handleCancel = () => {
-    setAlertOpen(false);
-    onClose?.();
-  };
-
-  React.useEffect(() => {
-    if (!shouldConfirm) {
-      return;
-    }
-    setAlertOpen(true);
-  }, [shouldConfirm]);
-
-  return (
-    <React.Fragment>
-      <SweetAlert
-        show={isAlertOpen}
-        title=""
-        custom
-        btnSize="md"
-        style={{ padding: "30px 40px", width: "520px" }}
-        onConfirm={handleConfirm}
-        customButtons={
-          <span className="d-flex justify-content-center" style={{ gap: "0.5rem" }}>
-            <Button style={{ minWidth: 120 }} onClick={handleCancel}>
-              {labelCancel}
-            </Button>
-            <ButtonBlue style={{ minWidth: 120 }} onClick={handleConfirm}>
-              {labelConfirm}
-            </ButtonBlue>
-          </span>
-        }
-      >
-        <div>
-          <p>{children}</p>
-        </div>
-      </SweetAlert>
-    </React.Fragment>
-  );
-}
+export default CertificateNew;

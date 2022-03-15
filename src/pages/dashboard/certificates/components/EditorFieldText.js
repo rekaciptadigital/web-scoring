@@ -16,7 +16,14 @@ function PlaceholderString({ children }) {
   return <React.Fragment>&laquo;{children}&raquo;</React.Fragment>;
 }
 
-export default function EditorFieldText({ name, data = {}, onSelected, onChange, selected }) {
+export default function EditorFieldText({
+  name,
+  data = {},
+  onSelected,
+  onChange,
+  selected,
+  setEditorDirty,
+}) {
   const { y, fontFamily, fontSize, color, fontWeight } = data;
 
   const divRef = React.useRef(null);
@@ -33,6 +40,10 @@ export default function EditorFieldText({ name, data = {}, onSelected, onChange,
     // agar jarak left & transform x bisa dikalkulasi ulang dengan benar
     setCurrentOffsetWidth(divRef.current?.offsetWidth);
   }, [fontSize, fontFamily, fontWeight]);
+
+  React.useEffect(() => {
+    setEditorDirty?.();
+  }, [y, fontSize, fontFamily, fontWeight, color]);
 
   const highlightOnMouseOver = () => {
     setActiveStrokeColor(boundingStroke.highlighted.color);

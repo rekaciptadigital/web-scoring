@@ -8,17 +8,18 @@ import {
   optionsTypeCertificate,
   getCurrentTypeCertificate,
   getSelectedFontFamily,
-  renderTemplateString,
-  convertBase64,
 } from "../utils";
+import { prepareSaveData } from "./utils";
 import { DEJAVU_SANS } from "../utils/font-family-list";
 import { certificateFields } from "constants/index";
 
 import MetaTags from "react-meta-tags";
-import { Container, Col, Row, Card, Button, Modal, ModalBody } from "reactstrap";
+import { Container, Col, Row, Card, Button as BSButton, Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
 import Select from "react-select";
 import { BreadcrumbDashboard } from "pages/dashboard/events/components/breadcrumb";
+import { ProcessingBlocker } from "./processing-blocker";
+import { AlertPromptSave } from "./alert-prompt-save";
 
 import EditorBgImagePicker from "../components/EditorBgImagePicker";
 import EditorCanvasHTML from "../components/EditorCanvasHTML";
@@ -28,61 +29,12 @@ import PreviewCanvas from "../components/preview/PreviewCanvas";
 
 const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
 
-const defaultEditorData = {
-  paperSize: "A4", // || [1280, 908] || letter
-  backgroundUrl: undefined,
-  backgroundPreviewUrl: undefined,
-  backgroundFileRaw: undefined,
-  backgroundImage: undefined, // base64, yang nanti diupload
-  fields: [
-    {
-      name: LABEL_MEMBER_NAME,
-      x: 640,
-      y: 280,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 60,
-    },
-    {
-      name: LABEL_RANK,
-      x: 640,
-      y: 370,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
-      name: LABEL_CATEGORY_NAME,
-      x: 640,
-      y: 430,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-  ],
-};
-
-export default function CertificateNew() {
-  const isMounted = React.useRef(null);
-  const abortControllerRef = React.useRef(null);
-  const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
-  const [status, setStatus] = React.useState("idle");
-  const [editorData, setEditorData] = React.useState(null);
-  const [currentObject, setCurrentObject] = React.useState(null);
-
-  const [isModePreview, setModePreview] = React.useState(false);
-
-  const isSaving = status === "saving";
-  const isLoading = status === "loading";
-
-  const image = {
-    preview:
-      editorData?.backgroundUrl ||
-      editorData?.backgroundPreviewUrl ||
-      editorData?.backgroundImage ||
-      null,
-    raw: editorData?.backgroundFileRaw || null,
-  };
-
+function CertificateNew() {
   const event_id = new URLSearchParams(useLocation().search).get("event_id");
   const eventId = parseInt(event_id);
+
+  const isMounted = React.useRef(null);
+  const abortControllerRef = React.useRef(null);
 
   React.useEffect(() => {
     isMounted.current = true;
@@ -92,6 +44,30 @@ export default function CertificateNew() {
       abortControllerRef.current.abort();
     };
   }, []);
+
+  const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
+
+  const [status, setStatus] = React.useState("idle");
+  const [editorData, setEditorData] = React.useState(null);
+
+  const [currentObject, setCurrentObject] = React.useState(null);
+  const [isEditorDirty, setEditorAsDirty] = React.useState(false);
+
+  const targetCertificateType = React.useRef(1);
+  const [needSavingConfirmation, setNeedSavingConfirmation] = React.useState(false);
+
+  const [isModePreview, setModePreview] = React.useState(false);
+
+  const isSaving = status === "saving";
+  const isLoading = status === "loading";
+
+  const setEditorClean = () => setEditorAsDirty(false);
+  const setEditorDirty = () => setEditorAsDirty(true);
+
+  const image = {
+    preview: editorData?.backgroundPreviewUrl || editorData?.backgroundUrl || null,
+    raw: editorData?.backgroundFileRaw || null,
+  };
 
   React.useEffect(() => {
     setStatus("loading");
@@ -118,17 +94,12 @@ export default function CertificateNew() {
           typeCertificate: currentCertificateType,
           certificateId: result.data.id,
           backgroundUrl: result.data.backgroundUrl,
-          backgroundImage: parsedEditorData.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
           fields: parsedEditorData.fields || defaultEditorData.fields,
-        });
-      } else {
-        // Dari yang belum ada, dikenali dari gak ada `certificateId`-nya
-        setEditorData({
-          ...defaultEditorData,
-          typeCertificate: currentCertificateType,
         });
       }
       setStatus("done");
+      setEditorClean();
+      setCurrentObject(null);
     };
 
     getCertificateData();
@@ -153,33 +124,22 @@ export default function CertificateNew() {
     });
   }, [currentObject]);
 
-  /**
-   * 1. Simpan data editor untuk sertifikat yang sedang aktif
-   * 2. Ganti ke current certificate
-   */
   const handleTipeSertifikatChange = async (ev) => {
     if (parseInt(ev.value) === parseInt(editorData.typeCertificate)) {
       return;
     }
 
-    setStatus("saving");
-    const queryString = { event_id, type_certificate: currentCertificateType };
-    const data = await prepareSaveData(editorData, queryString);
-
-    const result = await CertificateService.save(data);
-    if (result.success || result.data) {
-      const editorDataCreated = JSON.parse(result.data.editorData);
-      setEditorData((editorData) => ({
-        ...editorData,
-        ...editorDataCreated,
-        certificateId: result.data.id,
-      }));
+    if (!isEditorDirty) {
+      setCurrentCertificateType(ev.value);
+    } else {
+      setNeedSavingConfirmation(true);
+      targetCertificateType.current = ev.value;
     }
-    setCurrentCertificateType(ev.value);
-    setStatus("done");
-    setCurrentObject(null);
   };
 
+  /**
+   * Ke-trigger ketika seleksi objek teks & juga ketika geser posisinya.
+   */
   const handleEditorChange = (data) => {
     setCurrentObject((currentData) => ({
       ...currentData,
@@ -229,6 +189,7 @@ export default function CertificateNew() {
         backgroundFileRaw: imageData,
       };
     });
+    setEditorDirty();
   };
 
   const handleHapusBg = () => {
@@ -238,9 +199,9 @@ export default function CertificateNew() {
         backgroundPreviewUrl: undefined,
         backgroundFileRaw: undefined,
         backgroundUrl: null,
-        backgroundImage: null,
       };
     });
+    setEditorDirty();
   };
 
   const handleClickSave = async () => {
@@ -256,6 +217,7 @@ export default function CertificateNew() {
         ...editorDataSaved,
         certificateId: result.data.id,
       }));
+      setEditorClean();
     }
 
     setStatus("done");
@@ -299,18 +261,18 @@ export default function CertificateNew() {
                   </div>
 
                   <div>
-                    <Button
+                    <BSButton
                       tag="a"
                       color="primary"
                       onClick={() => handleClickSave()}
                       disabled={isSaving || isLoading}
                     >
                       Simpan
-                    </Button>
+                    </BSButton>
                   </div>
 
                   <div>
-                    <Button
+                    <BSButton
                       tag="a"
                       color="secondary"
                       outline
@@ -318,7 +280,7 @@ export default function CertificateNew() {
                       disabled={isSaving || isLoading}
                     >
                       Pratinjau
-                    </Button>
+                    </BSButton>
 
                     <Modal
                       isOpen={isModePreview}
@@ -332,9 +294,9 @@ export default function CertificateNew() {
                       <ModalBody>
                         <PreviewCanvas data={editorData} />
                         <div className="mt-4 mb-2 text-center">
-                          <Button color="primary" onClick={() => handleClosePreview()}>
+                          <BSButton color="primary" onClick={() => handleClosePreview()}>
                             Tutup
-                          </Button>
+                          </BSButton>
                         </div>
                       </ModalBody>
                     </Modal>
@@ -357,6 +319,7 @@ export default function CertificateNew() {
                         onChange={(data) => handleEditorChange(data)}
                         currentObject={currentObject}
                         onSelect={(target) => setCurrentObject(target)}
+                        setEditorDirty={setEditorDirty}
                       />
                       {(isSaving || isLoading) && <ProcessingBlocker />}
                     </React.Fragment>
@@ -434,6 +397,33 @@ export default function CertificateNew() {
           </Col>
         </Row>
       </Container>
+
+      <AlertPromptSave
+        shouldConfirm={needSavingConfirmation}
+        onConfirm={() => {
+          setNeedSavingConfirmation(false);
+
+          const submitSave = async () => {
+            setStatus("saving");
+            const queryString = { event_id, type_certificate: currentCertificateType };
+            const data = await prepareSaveData(editorData, queryString);
+
+            const result = await CertificateService.save(data);
+            if (result.data) {
+              setCurrentCertificateType(targetCertificateType.current);
+            }
+          };
+          submitSave();
+        }}
+        onClose={() => {
+          setNeedSavingConfirmation(false);
+          setCurrentCertificateType(targetCertificateType.current);
+        }}
+        labelCancel="Lanjut tanpa simpan"
+        labelConfirm="Simpan"
+      >
+        Sertifikat belum disimpan. Apakah ingin disimpan?
+      </AlertPromptSave>
     </StyledPageWrapper>
   );
 }
@@ -468,45 +458,34 @@ const EditorActionButtons = styled.div`
   }
 `;
 
-async function prepareSaveData(editorData, qs) {
-  const dataCopy = { ...editorData };
+const defaultEditorData = {
+  paperSize: "A4", // || [1280, 908] || letter
+  backgroundUrl: undefined,
+  backgroundPreviewUrl: undefined,
+  backgroundFileRaw: undefined,
+  fields: [
+    {
+      name: LABEL_MEMBER_NAME,
+      x: 640,
+      y: 280,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 60,
+    },
+    {
+      name: LABEL_RANK,
+      x: 640,
+      y: 370,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+    {
+      name: LABEL_CATEGORY_NAME,
+      x: 640,
+      y: 430,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+  ],
+};
 
-  if (dataCopy.backgroundFileRaw) {
-    dataCopy.backgroundImage = await convertBase64(dataCopy.backgroundFileRaw);
-  } else {
-    dataCopy.backgroundImage = dataCopy.backgroundImage || null;
-  }
-
-  const certificateHtmlTemplate = renderTemplateString(dataCopy);
-  const templateInBase64 = btoa(certificateHtmlTemplate);
-
-  const payload = {
-    event_id: parseInt(qs.event_id),
-    type_certificate: dataCopy.typeCertificate,
-    html_template: templateInBase64,
-    background_url: dataCopy.backgroundUrl || null,
-    editor_data: JSON.stringify({
-      ...dataCopy,
-      backgroundFileRaw: undefined,
-      backgroundPreviewUrl: undefined,
-    }),
-  };
-
-  return payload;
-}
-
-function ProcessingBlocker() {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#ffffff",
-        opacity: 0.5,
-      }}
-    />
-  );
-}
+export default CertificateNew;

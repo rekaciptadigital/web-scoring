@@ -7,11 +7,17 @@ import QrCodeField from "./QrCodeField";
 
 const { LABEL_RANK } = certificateFields;
 
-export default function EditorCanvasHTML({ data, currentObject, onChange, onSelect }) {
-  const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
+export default function EditorCanvasHTML({
+  data,
+  currentObject,
+  onChange,
+  onSelect,
+  setEditorDirty,
+}) {
+  const { backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
 
-  const getBackgroundImage = () => backgroundUrl || backgroundPreviewUrl || backgroundImage;
+  const getBackgroundImage = () => backgroundPreviewUrl || backgroundUrl || "";
 
   const isSelected = (name) => {
     return currentObject?.name === name;
@@ -31,14 +37,17 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
       <EditorBackground
         width={1280}
         height={908}
-        backgroundImage={getBackgroundImage()}
         scale={containerDiv.current?.offsetWidth / 1280}
+        style={{ "--editor-bg-image": `url(${getBackgroundImage()})` }}
       >
         <DeselectClickArea onClick={() => handleDeselectField()} />
 
         {fields?.length ? (
           fields.map((field) => {
-            if (field.name === LABEL_RANK && data.typeCertificate !== 2) {
+            if (
+              field.name === LABEL_RANK &&
+              (data.typeCertificate === 1 || data.typeCertificate === 3)
+            ) {
               return;
             }
             return (
@@ -49,6 +58,7 @@ export default function EditorCanvasHTML({ data, currentObject, onChange, onSele
                 selected={isSelected(field.name)}
                 onChange={(data) => onChange(data)}
                 onSelected={() => handleSelectField(field.name)}
+                setEditorDirty={setEditorDirty}
               />
             );
           })
@@ -74,7 +84,7 @@ const EditorBackground = styled.div`
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
   background-color: white;
-  background-image: url(${({ backgroundImage }) => backgroundImage});
+  background-image: var(--editor-bg-image);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

@@ -1,13 +1,17 @@
 const optionsTypeCertificate = [
   { label: "Peserta", value: 1 },
-  { label: "Juara", value: 2 },
-  { label: "Eliminasi", value: 3 },
+  { label: "Peserta Eliminasi", value: 3 },
+  { label: "Juara Kualifikasi", value: 4 },
+  { label: "Juara Eliminasi", value: 2 },
+  { label: "Juara Beregu", value: 5 },
 ];
 
 const label = {
   1: "Peserta",
-  2: "Juara",
-  3: "Eliminasi",
+  2: "Juara Eliminasi",
+  3: "Peserta Eliminasi",
+  4: "Juara Kualifikasi",
+  5: "Juara Beregu",
 };
 
 function getCurrentTypeCertificate(typeCertificate) {

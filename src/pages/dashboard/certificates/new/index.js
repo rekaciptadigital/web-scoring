@@ -87,16 +87,32 @@ function CertificateNew() {
       }
 
       if (result.success) {
-        // Data editor dari data sertifikat yang sudah ada di server
-        const parsedEditorData = result.data.editorData ? JSON.parse(result.data.editorData) : "";
+        // Kalau belum ada data template tapi dapatnya objek kosongan
+        // Dikenali dari gak ada `certificateId`-nya
+        if (!result.data.id) {
+          setEditorData({
+            ...defaultEditorData,
+            typeCertificate: currentCertificateType,
+          });
+        } else {
+          // Data editor dari data sertifikat yang sudah ada di server
+          const parsedEditorData = result.data.editorData ? JSON.parse(result.data.editorData) : "";
+          setEditorData({
+            ...defaultEditorData,
+            typeCertificate: currentCertificateType,
+            certificateId: result.data.id,
+            backgroundUrl: result.data.backgroundUrl,
+            fields: parsedEditorData.fields || defaultEditorData.fields,
+          });
+        }
+      } else {
+        // Kalau belum ada data template tapi dilempar error
         setEditorData({
           ...defaultEditorData,
           typeCertificate: currentCertificateType,
-          certificateId: result.data.id,
-          backgroundUrl: result.data.backgroundUrl,
-          fields: parsedEditorData.fields || defaultEditorData.fields,
         });
       }
+
       setStatus("done");
       setEditorClean();
       setCurrentObject(null);

@@ -30,11 +30,26 @@ import PreviewCanvas from "../components/preview/PreviewCanvas";
 const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
 
 function CertificateNew() {
+  const event_id = new URLSearchParams(useLocation().search).get("event_id");
+  const eventId = parseInt(event_id);
+
   const isMounted = React.useRef(null);
   const abortControllerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    isMounted.current = true;
+    abortControllerRef.current = new AbortController();
+    return () => {
+      isMounted.current = false;
+      abortControllerRef.current.abort();
+    };
+  }, []);
+
   const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
+
   const [status, setStatus] = React.useState("idle");
   const [editorData, setEditorData] = React.useState(null);
+
   const [currentObject, setCurrentObject] = React.useState(null);
   const [isEditorDirty, setEditorAsDirty] = React.useState(false);
 
@@ -53,18 +68,6 @@ function CertificateNew() {
     preview: editorData?.backgroundPreviewUrl || editorData?.backgroundUrl || null,
     raw: editorData?.backgroundFileRaw || null,
   };
-
-  const event_id = new URLSearchParams(useLocation().search).get("event_id");
-  const eventId = parseInt(event_id);
-
-  React.useEffect(() => {
-    isMounted.current = true;
-    abortControllerRef.current = new AbortController();
-    return () => {
-      isMounted.current = false;
-      abortControllerRef.current.abort();
-    };
-  }, []);
 
   React.useEffect(() => {
     setStatus("loading");

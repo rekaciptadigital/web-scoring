@@ -74,7 +74,7 @@ function isTypeWinner(type) {
 }
 
 const renderCssBackgroundImage = (editorData) => {
-  if (!editorData.backgroundImage && !editorData.backgroundUrl) {
+  if (!editorData.backgroundFileRaw && !editorData.backgroundUrl) {
     return "";
   }
   return `

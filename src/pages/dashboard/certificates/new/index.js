@@ -35,7 +35,6 @@ const defaultEditorData = {
   backgroundUrl: undefined,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
-  backgroundImage: undefined, // base64, yang nanti diupload
   fields: [
     {
       name: LABEL_MEMBER_NAME,
@@ -82,11 +81,7 @@ export default function CertificateNew() {
   const setEditorDirty = () => setEditorAsDirty(true);
 
   const image = {
-    preview:
-      editorData?.backgroundUrl ||
-      editorData?.backgroundPreviewUrl ||
-      editorData?.backgroundImage ||
-      null,
+    preview: editorData?.backgroundPreviewUrl || editorData?.backgroundUrl || null,
     raw: editorData?.backgroundFileRaw || null,
   };
 
@@ -127,7 +122,6 @@ export default function CertificateNew() {
           typeCertificate: currentCertificateType,
           certificateId: result.data.id,
           backgroundUrl: result.data.backgroundUrl,
-          backgroundImage: parsedEditorData.backgroundImage, // sudah base64, karena hasil dari save sebelumnya
           fields: parsedEditorData.fields || defaultEditorData.fields,
         });
       } else {
@@ -239,7 +233,6 @@ export default function CertificateNew() {
         backgroundPreviewUrl: undefined,
         backgroundFileRaw: undefined,
         backgroundUrl: null,
-        backgroundImage: null,
       };
     });
     setEditorDirty();
@@ -306,7 +299,7 @@ export default function CertificateNew() {
                       tag="a"
                       color="primary"
                       onClick={() => handleClickSave()}
-                      disabled={isSaving || isLoading || !isEditorDirty}
+                      disabled={isSaving || isLoading}
                     >
                       Simpan
                     </BSButton>
@@ -502,10 +495,9 @@ const EditorActionButtons = styled.div`
 async function prepareSaveData(editorData, qs) {
   const dataCopy = { ...editorData };
 
+  let imageBase64ForUpload = undefined;
   if (dataCopy.backgroundFileRaw) {
-    dataCopy.backgroundImage = await convertBase64(dataCopy.backgroundFileRaw);
-  } else {
-    dataCopy.backgroundImage = dataCopy.backgroundImage || null;
+    imageBase64ForUpload = await convertBase64(dataCopy.backgroundFileRaw);
   }
 
   const certificateHtmlTemplate = renderTemplateString(dataCopy);
@@ -515,7 +507,7 @@ async function prepareSaveData(editorData, qs) {
     event_id: parseInt(qs.event_id),
     type_certificate: dataCopy.typeCertificate,
     html_template: templateInBase64,
-    background_url: dataCopy.backgroundUrl || null,
+    background_img: imageBase64ForUpload,
     editor_data: JSON.stringify({
       ...dataCopy,
       backgroundFileRaw: undefined,

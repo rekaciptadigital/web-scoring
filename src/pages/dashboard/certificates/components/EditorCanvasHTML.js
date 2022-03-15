@@ -14,10 +14,10 @@ export default function EditorCanvasHTML({
   onSelect,
   setEditorDirty,
 }) {
-  const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
+  const { backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
 
-  const getBackgroundImage = () => backgroundUrl || backgroundPreviewUrl || backgroundImage;
+  const getBackgroundImage = () => backgroundPreviewUrl || backgroundUrl || "";
 
   const isSelected = (name) => {
     return currentObject?.name === name;
@@ -37,8 +37,8 @@ export default function EditorCanvasHTML({
       <EditorBackground
         width={1280}
         height={908}
-        backgroundImage={getBackgroundImage()}
         scale={containerDiv.current?.offsetWidth / 1280}
+        style={{ "--editor-bg-image": `url(${getBackgroundImage()})` }}
       >
         <DeselectClickArea onClick={() => handleDeselectField()} />
 
@@ -84,7 +84,7 @@ const EditorBackground = styled.div`
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
   background-color: white;
-  background-image: url(${({ backgroundImage }) => backgroundImage});
+  background-image: var(--editor-bg-image);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

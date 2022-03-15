@@ -6,6 +6,7 @@ import CategoryDetailList from "./CategoryDetailList";
 
 function CategoryItem({
   eventId,
+  editIsAllowed,
   category,
   categoryOptions,
   eventData,
@@ -41,12 +42,14 @@ function CategoryItem({
             value={category.competitionCategory}
             onChange={(value) => handleCategoryNameChange(category, value)}
             errors={validationErrors?.[`${category.key}-competitionCategory`]}
+            disabled={!editIsAllowed}
           />
         </div>
       </div>
       <h5 className="mt-3 mb-3 fw-normal">Detail Kategori</h5>
       <CategoryDetailList
         eventId={eventId}
+        editIsAllowed={editIsAllowed}
         details={category.categoryDetails}
         updateEventData={updateEventData}
         onSuccess={onSuccess}

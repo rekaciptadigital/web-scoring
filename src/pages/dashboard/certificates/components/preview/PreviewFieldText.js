@@ -6,7 +6,7 @@ const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields
 
 const previewTexts = {
   [LABEL_MEMBER_NAME]: "Morgan Lundin",
-  [LABEL_RANK]: "1",
+  [LABEL_RANK]: "Juara 1",
   [LABEL_CATEGORY_NAME]: "Individu - Umum - Barebow - 50m",
 };
 

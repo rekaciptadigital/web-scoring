@@ -28,6 +28,10 @@ export default {
     getEventMemberScoring(qs) {
         return API.get("/api/v1/archery/scorer/participant", qs)
     },
+    getEventMemberIdCardByCategory({ event_id, event_category_id }) {
+        const qs = { event_id, event_category_id };
+        return API.get("/web/v1/archery/events/bulk-download-card", qs);
+    },
     getEventCompetitionCategories(qs = null) {
         return API.get("/web/v1/archery/competition-categories", qs);
     },
@@ -45,6 +49,10 @@ export default {
     },
     getEventQualificationSchedules(qs = null) {
         return API.get("/web/v1/archery/qualification-time", qs);
+    },
+    getEventCategoryRegister({ event_id }){
+        const qs = { event_id }
+        return API.get("/web/v1/archery/events/register/list-categories", qs);
     },
     storeQualificationSchedules(data) {
         return API.post("/web/v1/archery/qualification-time", data, null, true);
@@ -75,5 +83,8 @@ export default {
     },
     setPublished(data, qs = null) {
         return API.post("/web/v1/archery/events/update-status", data, qs, true);
+    },
+    getEventLaporan(qs = null) {
+        return API.get("/web/v1/archery/events/participant/excel/download", qs)
     }
 }

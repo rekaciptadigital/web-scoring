@@ -9,6 +9,7 @@ import Dashboard from "../pages/dashboard";
 import PageEventDetailHome from "../pages/dashboard/events/home";
 import PageEventDetailManage from "../pages/dashboard/events/manage";
 import PageEventDetailSchedulingScoring from "pages/dashboard/events/scheduling-scoring";
+import PageConfigEliminationDetail from "pages/dashboard/events/scheduling-scoring/views/manage-elimination-detail";
 import ListCategory from "../pages/dashboard/category";
 import ListEvent from "../pages/dashboard/events";
 import EventsNew from "../pages/dashboard/events/new";
@@ -28,6 +29,10 @@ const dashboardRoutes = [
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",
     component: PageEventDetailSchedulingScoring,
+  },
+  {
+    path: "/dashboard/event/:event_id/scheduling-scoring/elimination",
+    component: PageConfigEliminationDetail,
   },
   { path: "/dashboard/member/:event_id", component: ListMember },
   { path: "/dashboard/category", component: ListCategory },

@@ -17,10 +17,12 @@ import {
   FieldInputTime,
 } from "../form-fields";
 
+import classnames from "classnames";
 import { setHours, setMinutes } from "date-fns";
 
 export function StepInfoUmum({
   eventId,
+  editIsAllowed,
   savingStatus,
   onSaveSuccess,
   eventData,
@@ -101,6 +103,7 @@ export function StepInfoUmum({
         image={eventData.bannerImage}
         onChange={handlePickBannerChange}
         onRemove={handleRemoveBannerImage}
+        disabled={!editIsAllowed}
       />
 
       <hr />
@@ -115,6 +118,7 @@ export function StepInfoUmum({
             value={eventData.eventName}
             onChange={(value) => handleFieldChange("eventName", value)}
             errors={validationErrors.eventName}
+            disabled={!editIsAllowed}
           >
             Nama Event
           </FieldInputText>
@@ -126,6 +130,7 @@ export function StepInfoUmum({
             placeholder="Masukkan deskripsi singkat"
             value={eventData.description}
             onChange={(value) => handleFieldChange("description", value)}
+            disabled={!editIsAllowed}
           >
             Deskripsi <span className="">&#40;Opsional&#41;</span>
           </FieldTextArea>
@@ -144,6 +149,7 @@ export function StepInfoUmum({
             value={eventData.location}
             onChange={(value) => handleFieldChange("location", value)}
             errors={validationErrors.location}
+            disabled={!editIsAllowed}
           >
             Lokasi
           </FieldInputText>
@@ -163,6 +169,7 @@ export function StepInfoUmum({
               }
               onChange={handleLocationTypeChange}
               errors={validationErrors.locationType}
+              disabled={!editIsAllowed}
             />
           </div>
         </Col>
@@ -175,6 +182,7 @@ export function StepInfoUmum({
             value={eventData?.city || null}
             onChange={handleCityChange}
             errors={validationErrors.city}
+            disabled={!editIsAllowed}
           >
             Kota
           </FieldSelectCity>
@@ -195,6 +203,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "REGISTRATION_START", payload: value });
                 }}
                 errors={validationErrors.registrationDateStart}
+                disabled={!editIsAllowed}
               >
                 Mulai Pendaftaran
               </FieldInputDate>
@@ -213,6 +222,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "REGISTRATION_START", payload: value });
                 }}
                 errors={validationErrors.registrationDateStart}
+                disabled={!editIsAllowed}
               >
                 Jam Buka
               </FieldInputTime>
@@ -234,6 +244,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "REGISTRATION_END", payload: value });
                 }}
                 errors={validationErrors.registrationDateEnd}
+                disabled={!editIsAllowed}
               >
                 Tutup Pendaftaran
               </FieldInputDate>
@@ -257,6 +268,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "REGISTRATION_END", payload: value });
                 }}
                 errors={validationErrors.registrationDateEnd}
+                disabled={!editIsAllowed}
               >
                 Jam Tutup
               </FieldInputTime>
@@ -280,6 +292,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "EVENT_START", payload: value });
                 }}
                 errors={validationErrors.eventDateStart}
+                disabled={!editIsAllowed}
               >
                 Mulai Lomba
               </FieldInputDate>
@@ -304,6 +317,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "EVENT_START", payload: value });
                 }}
                 errors={validationErrors.eventDateStart}
+                disabled={!editIsAllowed}
               >
                 Jam Mulai
               </FieldInputTime>
@@ -329,6 +343,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "EVENT_END", payload: value });
                 }}
                 errors={validationErrors.eventDateEnd}
+                disabled={!editIsAllowed}
               >
                 Akhir Lomba
               </FieldInputDate>
@@ -351,6 +366,7 @@ export function StepInfoUmum({
                   updateEventData({ type: "EVENT_END", payload: value });
                 }}
                 errors={validationErrors.eventDateEnd}
+                disabled={!editIsAllowed}
               >
                 Jam Akhir
               </FieldInputTime>
@@ -362,7 +378,12 @@ export function StepInfoUmum({
       <hr />
       <h3 className="mt-4 mb-3">Informasi Event</h3>
 
-      <ButtonOutlineBlue corner="8" style={{ width: "100%" }} onClick={handleModalAddInfoShow}>
+      <ButtonOutlineBlue
+        corner="8"
+        style={{ width: "100%" }}
+        onClick={handleModalAddInfoShow}
+        disabled={!editIsAllowed}
+      >
         + Tambah Informasi
       </ButtonOutlineBlue>
 
@@ -383,7 +404,12 @@ export function StepInfoUmum({
               </div>
 
               <div>
-                <a className="info-button-edit" onClick={() => handleModalEditInfoOpen(info.key)}>
+                <a
+                  className={classnames("info-button-edit", {
+                    "info-button-edit-disabled": !editIsAllowed,
+                  })}
+                  onClick={() => editIsAllowed && handleModalEditInfoOpen(info.key)}
+                >
                   &#10097;
                 </a>
               </div>
@@ -401,6 +427,7 @@ export function StepInfoUmum({
               <Button
                 style={{ color: "var(--ma-red)" }}
                 onClick={() => setKeyExtraInfoRemoved(info.key)}
+                disabled={!editIsAllowed}
               >
                 <i className="bx bx-trash font-size-18 align-middle" />
               </Button>
@@ -597,6 +624,10 @@ const ExtraInfoItem = styled.div`
         right: 0;
         bottom: 0;
         left: 0;
+      }
+
+      &.info-button-edit-disabled {
+        display: none;
       }
     }
   }

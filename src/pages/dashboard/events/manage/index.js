@@ -1,8 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams, useHistory } from "react-router-dom";
-import { format, parseISO } from "date-fns";
-import { stringUtil } from "utils";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventConfigs, eventCategories } from "constants/index";
 import { eventDataReducer } from "../hooks/create-event-data";
@@ -17,6 +15,9 @@ import { PreviewPortal } from "../components/manage-fullday/preview";
 import { BreadcrumbDashboard } from "../components/breadcrumb";
 
 import IconAlertTriangle from "components/ma/icons/mono/alert-triangle";
+
+import { format, isPast, parseISO } from "date-fns";
+import { stringUtil } from "utils";
 
 import illustrationAlertPublication from "assets/images/events/alert-publication.svg";
 import "pages/dashboard/events/style-overrides/main-content.scss";
@@ -105,6 +106,8 @@ const PageEventDetailManage = () => {
   const eventId = parseInt(event_id);
   const isLoading = savingEventStatus.status === "loading";
   const isErrorSubmiting = savingEventStatus.status === "error";
+
+  const editIsDisabled = shouldDisableEditing(eventData?.eventDateEnd);
 
   const incrementAttemptCounts = () => {
     setFetchingEventStatus((state) => ({
@@ -274,15 +277,26 @@ const PageEventDetailManage = () => {
                         className="d-flex justify-content-end"
                         style={{ position: "relative", gap: "0.5rem" }}
                       >
-                        <Button
-                          style={{ color: "var(--ma-blue)" }}
-                          onClick={() => handleClickSave(currentStep)}
-                        >
-                          Simpan
-                        </Button>
-                        {!isEventPublished && (
-                          <ButtonBlue onClick={handleClickPublish}>Publikasi</ButtonBlue>
+                        {!isEventPublished ? (
+                          <React.Fragment>
+                            <Button
+                              onClick={() => handleClickSave(currentStep)}
+                              disabled={editIsDisabled}
+                            >
+                              Simpan
+                            </Button>
+
+                            <ButtonBlue onClick={handleClickPublish}>Publikasi</ButtonBlue>
+                          </React.Fragment>
+                        ) : (
+                          <ButtonBlue
+                            onClick={() => handleClickSave(currentStep)}
+                            disabled={editIsDisabled}
+                          >
+                            Simpan
+                          </ButtonBlue>
                         )}
+
                         {shouldShowSavingWarning && (
                           <div
                             style={{
@@ -317,6 +331,7 @@ const PageEventDetailManage = () => {
                     <WizardViewContent>
                       <StepInfoUmum
                         eventId={eventId}
+                        editIsAllowed={!editIsDisabled}
                         savingStatus={savingEventStatus}
                         onSaveSuccess={() => incrementAttemptCounts()}
                         eventData={eventData}
@@ -330,6 +345,7 @@ const PageEventDetailManage = () => {
                     <WizardViewContent>
                       <StepKategori
                         eventId={eventId}
+                        editIsAllowed={!editIsDisabled}
                         savingStatus={savingEventStatus}
                         eventData={eventData}
                         updateEventData={updateEventData}
@@ -342,6 +358,7 @@ const PageEventDetailManage = () => {
 
                     <WizardViewContent>
                       <StepBiaya
+                        editIsAllowed={!editIsDisabled}
                         savingStatus={savingEventStatus}
                         eventData={eventData}
                         updateEventData={updateEventData}
@@ -552,6 +569,13 @@ function AlertSubmitError({ isError, errors, onConfirm }) {
       </SweetAlert>
     </React.Fragment>
   );
+}
+
+function shouldDisableEditing(eventDateEnd) {
+  if (!eventDateEnd) {
+    return true;
+  }
+  return isPast(eventDateEnd);
 }
 
 function makeEventDetailState(initialData) {

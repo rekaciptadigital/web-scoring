@@ -5,7 +5,7 @@ import { ButtonBlue } from "components/ma";
 
 import classnames from "classnames";
 
-export default function PosterImagePicker({ image, onChange, onRemove, errors }) {
+export default function PosterImagePicker({ image, onChange, onRemove, errors, disabled }) {
   const computeStyleBackgroundImage = () => {
     return !image?.preview && !image?.originalUrl
       ? {}
@@ -20,17 +20,19 @@ export default function PosterImagePicker({ image, onChange, onRemove, errors })
       <div className="image-overlay"></div>
       <div className="picker-body">
         <div className="mb-2">
-          <label htmlFor="image-picker-field">
-            <ButtonBlue as="span">{image ? "Ganti Banner" : "Pilih Banner"}</ButtonBlue>
-            <input
-              type="file"
-              accept="image/jpg,image/jpeg,image/png"
-              id="image-picker-field"
-              onChange={(ev) => onChange?.(ev)}
-            />
-          </label>
+          {!disabled && (
+            <label htmlFor="image-picker-field">
+              <ButtonBlue as="span">{image ? "Ganti Banner" : "Pilih Banner"}</ButtonBlue>
+              <input
+                type="file"
+                accept="image/jpg,image/jpeg,image/png"
+                id="image-picker-field"
+                onChange={(ev) => onChange?.(ev)}
+              />
+            </label>
+          )}
 
-          {image && (
+          {!disabled && image && (
             <Button
               color="link"
               className="text-white banner-button-remove"

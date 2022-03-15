@@ -59,7 +59,17 @@ const computeCustomStylesWithValidation = (errors) => {
 
 const FETCHING_LIMIT = 30;
 
-function FieldSelect({ children, label, name, placeholder, required, value, onChange, errors }) {
+function FieldSelect({
+  children,
+  label,
+  name,
+  placeholder,
+  required,
+  value,
+  onChange,
+  errors,
+  disabled,
+}) {
   const loadOptions = async (searchQuery, loadedOptions, { page }) => {
     const result = await GeneralService.getCities({
       limit: FETCHING_LIMIT,
@@ -89,6 +99,7 @@ function FieldSelect({ children, label, name, placeholder, required, value, onCh
         isSearchable
         debounceTimeout={200}
         additional={{ page: 1 }}
+        isDisabled={disabled}
       />
     </FieldSelectWrapper>
   );

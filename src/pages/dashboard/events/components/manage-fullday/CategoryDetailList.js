@@ -16,6 +16,7 @@ import Del from "components/icons/Del";
 
 function CategoryDetailList({
   eventId,
+  editIsAllowed,
   details,
   updateEventData,
   onSuccess,
@@ -85,6 +86,7 @@ function CategoryDetailList({
                   value={detail.ageCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "ageCategory", value)}
                   errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-ageCategory`]}
+                  disabled={!editIsAllowed}
                 >
                   Kelas
                 </FieldSelectKelas>
@@ -97,6 +99,7 @@ function CategoryDetailList({
                   value={detail.distance}
                   onChange={(valueArray) => handleDetailFieldChange(detail, "distance", valueArray)}
                   errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-distance`]}
+                  disabled={!editIsAllowed}
                 >
                   Jarak
                 </FieldSelectJarak>
@@ -109,6 +112,7 @@ function CategoryDetailList({
                   value={detail.teamCategory}
                   onChange={(value) => handleDetailFieldChange(detail, "teamCategory", value)}
                   errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-teamCategory`]}
+                  disabled={!editIsAllowed}
                 >
                   Jenis Regu
                 </FieldSelectJenisRegu>
@@ -123,6 +127,7 @@ function CategoryDetailList({
                     handleDetailFieldChange(detail, "quota", value);
                   }}
                   errors={validationErrors?.[`${detail.categoryKey}-${detail.key}-quota`]}
+                  disabled={!editIsAllowed}
                 >
                   Kuota
                 </FieldInputTextSmall>
@@ -130,10 +135,11 @@ function CategoryDetailList({
             </div>
 
             <div className="field-action">
-              <ButtonOutline onClick={() => handleAddDetail(detail)}>
+              <ButtonOutline onClick={() => handleAddDetail(detail)} disabled={!editIsAllowed}>
                 <Copy />
               </ButtonOutline>
-              <ButtonOutline onClick={() => handleRemoveDetail(detail)}>
+
+              <ButtonOutline onClick={() => handleRemoveDetail(detail)} disabled={!editIsAllowed}>
                 <Del />
               </ButtonOutline>
             </div>

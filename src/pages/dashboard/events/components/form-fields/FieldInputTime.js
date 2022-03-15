@@ -19,6 +19,7 @@ function FieldInputTime({
   onChange,
   interval,
   errors,
+  disabled,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -56,6 +57,7 @@ function FieldInputTime({
         timeCaption="Pukul"
         showTimeSelect
         showTimeSelectOnly
+        disabled={disabled}
       />
     </FieldInputTimeWrapper>
   );

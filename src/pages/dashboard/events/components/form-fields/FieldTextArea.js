@@ -47,7 +47,7 @@ const FieldTextAreaWrapper = styled.div`
   }
 `;
 
-function FieldTextArea({ children, label, name, placeholder, value = "", onChange }) {
+function FieldTextArea({ children, label, name, placeholder, value = "", onChange, disabled }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
   const handleTextChange = (ev) => {
@@ -69,6 +69,7 @@ function FieldTextArea({ children, label, name, placeholder, value = "", onChang
         placeholder={placeholder}
         value={value}
         onChange={handleTextChange}
+        disabled={disabled}
       />
     </FieldTextAreaWrapper>
   );

@@ -79,6 +79,14 @@ const initialEventData = {
     { key: 3, teamCategory: TEAM_CATEGORIES.TEAM_FEMALE, amount: "" },
     { key: 4, teamCategory: TEAM_CATEGORIES.TEAM_MIXED, amount: "" },
   ],
+  earlyBirdRegistrationFee: "",
+  earlyBirdRegistrationFees: [
+    { key: 1, teamCategory: TEAM_CATEGORIES.TEAM_INDIVIDUAL, amount: "" },
+    { key: 2, teamCategory: TEAM_CATEGORIES.TEAM_MALE, amount: "" },
+    { key: 3, teamCategory: TEAM_CATEGORIES.TEAM_FEMALE, amount: "" },
+    { key: 4, teamCategory: TEAM_CATEGORIES.TEAM_MIXED, amount: "" },
+  ],
+  dateEarlyBird: null,
 };
 
 const PageEventDetailManage = () => {
@@ -583,8 +591,16 @@ function makeEventDetailState(initialData) {
 
   const eventCategoriesState = makeCategoryDetailState(eventCategories);
   const feesState = makeRegistrationFeesState(eventCategories);
-  const { isFlatRegistrationFee, registrationFee, registrationFees, registrationFeesID } =
-    feesState;
+  const {
+    isFlatRegistrationFee,
+    registrationFee,
+    registrationFees,
+    earlyBirdRegistrationFee,
+    earlyBirdRegistrationFees,
+    registrationFeesID,
+    earlyRegistrationFeesID,
+    dateEarlyBird,
+  } = feesState;
 
   return {
     status: publicInformation.eventStatus,
@@ -611,10 +627,14 @@ function makeEventDetailState(initialData) {
       description: info.description,
     })),
     registrationFeesID: registrationFeesID,
+    earlyRegistrationFeesID: earlyRegistrationFeesID,
     eventCategories: eventCategoriesState,
     isFlatRegistrationFee,
     registrationFee,
     registrationFees,
+    earlyBirdRegistrationFee,
+    earlyBirdRegistrationFees,
+    dateEarlyBird,
   };
 }
 
@@ -660,6 +680,7 @@ function makeCategoryDetailState(categoryDetailData) {
           : null,
         quota: detail.quota,
         fee: Number(detail.fee),
+        early_bird: Number(detail.earlyBird),
       })),
     };
     eventCategories.push(competitionGroup);
@@ -670,9 +691,12 @@ function makeCategoryDetailState(categoryDetailData) {
 
 function makeRegistrationFeesState(eventCategories) {
   const registrationFees = [];
+  const earlyBirdRegistrationFees = [];
   const registrationFeesID = [];
+  const earlyRegistrationFeesID = [];
 
   let checkFee = -1;
+  let checkFeeEarly = -1;
   let isFlatRegistrationFee = true;
   for (const category of eventCategories) {
     if (isFlatRegistrationFee && checkFee >= 0 && checkFee != Number(category.fee))
@@ -682,17 +706,28 @@ function makeRegistrationFeesState(eventCategories) {
       teamCategory: category.teamCategoryId.id,
       amount: Number(category.fee),
     });
+
+    earlyBirdRegistrationFees.push({
+      teamCategory: category.teamCategoryId.id,
+      amount: Number(category.earlyBird),
+    });
     checkFee = Number(category.fee);
+    checkFeeEarly = Number(category?.earlyBird);
     registrationFeesID[category.teamCategoryId.id] = 1;
+    earlyRegistrationFeesID[category.teamCategoryId.id] = 1;
   }
 
   const registrationFee = isFlatRegistrationFee ? checkFee : "";
+  const earlyBirdRegistrationFee = isFlatRegistrationFee ? checkFeeEarly : "";
 
   return {
     isFlatRegistrationFee,
     registrationFee,
+    earlyBirdRegistrationFee,
     registrationFees: registrationFees,
+    earlyBirdRegistrationFees: earlyBirdRegistrationFees,
     registrationFeesID,
+    earlyRegistrationFeesID,
   };
 }
 
@@ -794,6 +829,8 @@ function makeFeesPayload(eventData) {
       data: teamCategories.map((teamCategory) => ({
         team_category_id: teamCategory,
         fee: eventData.registrationFee || 0,
+        end_date_early_bird: eventData?.dateEarlyBird || "",
+        early_bird: eventData?.earlyBirdRegistrationFee || 0,
       })),
     };
   }
@@ -804,14 +841,26 @@ function makeFeesPayload(eventData) {
       feesData.push({
         team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE,
         fee: fee.amount || 0,
+        end_date_early_bird: eventData?.dateEarlyBird || null,
       });
       feesData.push({
         team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE,
         fee: fee.amount || 0,
+        end_date_early_bird: eventData?.dateEarlyBird || null,
       });
     } else {
-      feesData.push({ team_category_id: fee.teamCategory, fee: fee.amount || 0 });
+      feesData.push({
+        team_category_id: fee.teamCategory,
+        fee: fee.amount || 0,
+        end_date_early_bird: eventData?.dateEarlyBird || "",
+      });
     }
+  }
+
+  let i = 0;
+  for (const early of eventData?.earlyBirdRegistrationFees) {
+    feesData[i].early_bird = early?.amount;
+    i += 1;
   }
 
   return {

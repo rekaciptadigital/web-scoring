@@ -54,6 +54,7 @@ const initialEventData = {
   locationType: "",
   city: "",
   extraInfos: [],
+  handbook: null,
   eventCategories: [
     {
       key: initialEventCategoryKey,
@@ -772,11 +773,13 @@ async function makeEventDetailsPayload(eventData) {
   const bannerImageBase64 = eventData.bannerImage?.raw
     ? await imageToBase64(eventData.bannerImage.raw)
     : undefined;
+  const handbookBase64 = eventData.handbook ? await imageToBase64(eventData.handbook) : null;
 
   return {
     id: eventData.event_id,
     eventType: "Full_day",
     eventCompetition: "Tournament",
+    handbook: handbookBase64,
     status: eventData.status, // kirim status apapun yang ada sekarang
     eventName: eventData.eventName,
     eventBanner: bannerImageBase64, // harus opsional
@@ -829,7 +832,7 @@ function makeFeesPayload(eventData) {
       data: teamCategories.map((teamCategory) => ({
         team_category_id: teamCategory,
         fee: eventData.registrationFee || 0,
-        end_date_early_bird: eventData?.dateEarlyBird || "",
+        end_date_early_bird: eventData?.dateEarlyBird || null,
         early_bird: eventData?.earlyBirdRegistrationFee || 0,
       })),
     };
@@ -852,7 +855,7 @@ function makeFeesPayload(eventData) {
       feesData.push({
         team_category_id: fee.teamCategory,
         fee: fee.amount || 0,
-        end_date_early_bird: eventData?.dateEarlyBird || "",
+        end_date_early_bird: eventData?.dateEarlyBird || null,
       });
     }
   }

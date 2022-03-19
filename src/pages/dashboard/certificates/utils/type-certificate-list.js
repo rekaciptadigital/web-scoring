@@ -4,7 +4,7 @@ const optionsTypeCertificate = [
   { label: "Kualifikasi", value: 4 },
   { label: "Juara Eliminasi", value: 2 },
   { label: "Juara Beregu", value: 5 },
-  { label: "Juara Beregu Campuran", value: 5 },
+  { label: "Juara Beregu Campuran", value: 6 },
 ];
 
 const label = {

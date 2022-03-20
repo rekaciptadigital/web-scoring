@@ -263,6 +263,29 @@ function eventDataReducer(state, action) {
     }
     // --- end Registration Fees
 
+    case "UPDATE_EARLYBIRD_REGISTRATION_FEES": {
+      const { value } = action;
+
+      const byTeamCategory = (early_bird) => early_bird.teamCategory === value.teamCategory;
+      const targetFeeItem = state.earlyBirdRegistrationFees.find(byTeamCategory);
+      if (!targetFeeItem) {
+        const newFeeItem = {
+          teamCategory: value.teamCategory,
+          amount: value.amount,
+        };
+        return { ...state, earlyBirdRegistrationFees: [...state.earlyBirdRegistrationFees, newFeeItem] };
+      }
+
+      const updatedRegistrationFees = state.earlyBirdRegistrationFees.map((early_bird) => {
+        if (early_bird.teamCategory !== value.teamCategory) {
+          return early_bird;
+        }
+        return { ...early_bird, amount: value.amount };
+      });
+
+      return { ...state, earlyBirdRegistrationFees: updatedRegistrationFees };
+  }
+
     case "TOGGLE_FIELD": {
       const { field } = action;
       return {

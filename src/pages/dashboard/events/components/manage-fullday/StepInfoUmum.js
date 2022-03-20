@@ -34,13 +34,14 @@ export function StepInfoUmum({
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
+  const [filePDF, setFilePDF] = React.useState(null);
   const [removingStatus, setRemovingStatus] = React.useState({ status: "idle", errors: null });
 
   const isLoading = savingStatus.status === "loading";
   const isRemovingInfo = removingStatus.status === "loading";
 
   const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
-  const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
+  // const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
 
   const handleModalEditInfoOpen = (key) => setKeyExtraInfoEdited(key);
   const handleModalEditInfoClose = () => setKeyExtraInfoEdited(null);
@@ -82,6 +83,11 @@ export function StepInfoUmum({
     updateEventData({ city: selectValue });
   };
 
+  const handleHandbookChange = (value) => {
+    !isFormDirty && setFormDirty(true);
+    updateEventData({ handbook: value });
+  };
+
   const handleRemoveInformation = async (targetInfo) => {
     setRemovingStatus((state) => ({ ...state, status: "loading", errors: null }));
     setKeyExtraInfoRemoved(null);
@@ -93,6 +99,10 @@ export function StepInfoUmum({
       setRemovingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
     }
   };
+
+  console.info(shouldShowAddExtraInfo);
+  // console.log(filePDF);
+  // console.log(eventData)
 
   return (
     <FormSheet>
@@ -387,12 +397,35 @@ export function StepInfoUmum({
         + Tambah Informasi
       </ButtonOutlineBlue>
 
-      <ModalExtraInfoEditor
-        eventId={eventId}
-        showEditor={shouldShowAddExtraInfo}
-        onSaveSuccess={onSaveSuccess}
-        onClose={handleModalAddInfoClose}
-      />
+      <div
+        className="mt-3"
+        style={{
+          display: "block",
+          position: "relative",
+          border: "1px solid #0F53BB",
+          borderRadius: "8px",
+        }}
+      >
+        <input
+        accept="application/pdf"
+          type="file"
+          id="file"
+          style={{ opacity: "0", position: "absolute", width: "100%", cursor: "pointer" }}
+          onChange={(e) => {
+            setFilePDF(e.target.files[0]);
+            handleHandbookChange(e.target.files[0]);
+          }}
+        />
+        <div
+          style={{
+            textAlign: "center",
+            color: "#0F53BB",
+          }}
+          className="pt-2"
+        >
+          <label htmlFor="file">{filePDF ? filePDF?.name : "Select file"}</label>
+        </div>
+      </div>
 
       <div>
         {eventData.extraInfos?.map((info) => (

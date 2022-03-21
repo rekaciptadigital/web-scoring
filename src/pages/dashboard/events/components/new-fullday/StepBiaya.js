@@ -4,7 +4,7 @@ import { eventCategories } from "constants/index";
 import Switch from "react-switch";
 import { Row, Col } from "reactstrap";
 import FormSheet from "../FormSheet";
-import { FieldInputPrice } from "../form-fields";
+import { FieldInputPrice, FieldInputDate } from "../form-fields";
 
 const { TEAM_CATEGORIES } = eventCategories;
 
@@ -13,8 +13,16 @@ export function StepBiaya({ eventData, updateEventData, validationErrors }) {
     updateEventData({ registrationFee: value });
   };
 
+  const handleRegistrationFeeEarlyChange = (value) => {
+    updateEventData({ earlyBirdRegistrationFee: value });
+  };
+
   const handleToggleFlatFeeChange = () => {
     updateEventData({ type: "TOGGLE_FIELD", field: "isFlatRegistrationFee" });
+  };
+
+  const handleRegisterEarlyBirdDate = (value) => {
+    updateEventData({ dateEarlyBird: value });
   };
 
   const handleVarietyFeesChange = (teamCategory, value) => {
@@ -27,9 +35,25 @@ export function StepBiaya({ eventData, updateEventData, validationErrors }) {
     });
   };
 
+  const handleVarietyFeesEarlyChange = (teamCategory, value) => {
+    updateEventData({
+      type: "UPDATE_EARLYBIRD_REGISTRATION_FEES",
+      value: {
+        teamCategory,
+        amount: value,
+      },
+    });
+  };
+
   const computeFeeAmountByTeamCategory = (teamCategory) => {
     const byTeamCategory = (fee) => fee.teamCategory === teamCategory;
     const feeData = eventData.registrationFees.find(byTeamCategory);
+    return feeData?.amount || "";
+  };
+
+  const computeFeeEarlyAmountByTeamCategory = (teamCategory) => {
+    const byTeamCategory = (early_bird) => early_bird.teamCategory === teamCategory;
+    const feeData = eventData.earlyBirdRegistrationFees.find(byTeamCategory);
     return feeData?.amount || "";
   };
 
@@ -48,8 +72,30 @@ export function StepBiaya({ eventData, updateEventData, validationErrors }) {
           </FieldInputPrice>
         </Col>
 
+        <Col md={3}>
+          <FieldInputDate
+            name="date-early"
+            value={eventData?.dateEarlyBird || ""}
+            onChange={(value) => handleRegisterEarlyBirdDate(value)}
+            small={true}
+          >
+            Tanggal Tutup Early Bird
+          </FieldInputDate>
+        </Col>
+
+        <Col md={3}>
+          <FieldInputPrice
+            name="type-normal-early"
+            value={eventData?.earlyBirdRegistrationFee || ""}
+            onChange={handleRegistrationFeeEarlyChange}
+            disabled={!eventData.isFlatRegistrationFee || !eventData?.dateEarlyBird}
+          >
+            Early Bird
+          </FieldInputPrice>
+        </Col>
+
         <Col
-          md={4}
+          md={3}
           className="d-flex align-items-center"
           style={{ gap: "1rem", fontSize: 12, paddingTop: 24 }}
         >
@@ -73,6 +119,7 @@ export function StepBiaya({ eventData, updateEventData, validationErrors }) {
       </Row>
 
       <Row className="mt-3">
+      <snap>Harga Normal</snap>
         <Col md={3}>
           <FieldInputPrice
             name="normal-individual"
@@ -115,6 +162,57 @@ export function StepBiaya({ eventData, updateEventData, validationErrors }) {
             disabled={eventData.isFlatRegistrationFee}
             value={computeFeeAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MIXED)}
             onChange={(value) => handleVarietyFeesChange(TEAM_CATEGORIES.TEAM_MIXED, value)}
+            errors={validationErrors?.[`registrationFee-${TEAM_CATEGORIES.TEAM_MIXED}`]}
+          >
+            Beregu Campuran
+          </FieldInputPrice>
+        </Col>
+      </Row>
+
+      <Row className="mt-3">
+        <snap>Harga Early Bird</snap>
+        <Col md={3}>
+          <FieldInputPrice
+            name="normal-individual"
+            disabled={eventData.isFlatRegistrationFee || !eventData.dateEarlyBird}
+            value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_INDIVIDUAL)}
+            onChange={(value) => handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL, value)}
+            errors={validationErrors?.[`registrationFee-${TEAM_CATEGORIES.TEAM_INDIVIDUAL}`]}
+          >
+            Individual
+          </FieldInputPrice>
+        </Col>
+
+        <Col md={3}>
+          <FieldInputPrice
+            name="normal-male-team"
+            disabled={eventData.isFlatRegistrationFee || !eventData.dateEarlyBird}
+            value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MALE)}
+            onChange={(value) => handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_MALE, value)}
+            errors={validationErrors?.[`registrationFee-${TEAM_CATEGORIES.TEAM_MALE}`]}
+          >
+            Beregu Putra
+          </FieldInputPrice>
+        </Col>
+
+        <Col md={3}>
+          <FieldInputPrice
+            name="normal-female-team"
+            disabled={eventData.isFlatRegistrationFee || !eventData.dateEarlyBird}
+            value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_FEMALE)}
+            onChange={(value) => handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_FEMALE, value)}
+            errors={validationErrors?.[`registrationFee-${TEAM_CATEGORIES.TEAM_FEMALE}`]}
+          >
+            Beregu Putri
+          </FieldInputPrice>
+        </Col>
+
+        <Col md={3}>
+          <FieldInputPrice
+            name="normal-mixed-team"
+            disabled={eventData.isFlatRegistrationFee || !eventData.dateEarlyBird}
+            value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MIXED)}
+            onChange={(value) => handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_MIXED, value)}
             errors={validationErrors?.[`registrationFee-${TEAM_CATEGORIES.TEAM_MIXED}`]}
           >
             Beregu Campuran

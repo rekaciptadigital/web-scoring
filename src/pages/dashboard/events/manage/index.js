@@ -818,7 +818,6 @@ function makeCategoryDetailsPayload(eventData) {
 }
 
 function makeFeesPayload(eventData) {
-  console.log(eventData?.dateEarlyBird)
   let newDateEarly = new Date(eventData?.dateEarlyBird)
   let early_date_bird = `${newDateEarly.getFullYear()}-${newDateEarly.getMonth()+1}-${newDateEarly.getDate()}`
   if (eventData.isFlatRegistrationFee || !eventData.registrationFees?.length) {

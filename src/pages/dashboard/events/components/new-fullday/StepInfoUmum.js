@@ -21,6 +21,7 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
+  const [filePDF, setFilePDF] = React.useState(null);
 
   const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
   const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
@@ -58,6 +59,10 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
 
   const handleCityChange = (selectValue) => {
     updateEventData({ city: selectValue });
+  };
+
+  const handleHandbookChange = (value) => {
+    updateEventData({ handbook: value });
   };
 
   const handleAddInformation = (value) => {
@@ -353,6 +358,38 @@ export function StepInfoUmum({ eventData, updateEventData, validationErrors }) {
       <ButtonOutlineBlue corner="8" style={{ width: "100%" }} onClick={handleModalAddInfoShow}>
         + Tambah Informasi
       </ButtonOutlineBlue>
+
+      <div
+        className="mt-3"
+        style={{
+          display: "block",
+          position: "relative",
+          border: "1px solid #0F53BB",
+          borderRadius: "8px",
+        }}
+      >
+        <input
+          accept="application/pdf"
+          type="file"
+          id="file"
+          style={{ opacity: "0", position: "absolute", width: "100%", cursor: "pointer" }}
+          onChange={(e) => {
+            setFilePDF(e.target.files[0]);
+            handleHandbookChange(e.target.files[0]);
+          }}
+        />
+        <div
+          style={{
+            textAlign: "center",
+            color: "#0F53BB",
+          }}
+          className="pt-2"
+        >
+          <label htmlFor="file">
+            {filePDF ? filePDF?.name : <span className="bx bx-upload"> Upload THB</span>}
+          </label>
+        </div>
+      </div>
 
       <ModalExtraInfoEditor
         showEditor={shouldShowAddExtraInfo}

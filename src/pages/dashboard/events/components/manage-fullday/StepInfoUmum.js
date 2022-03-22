@@ -407,7 +407,7 @@ export function StepInfoUmum({
         }}
       >
         <input
-        accept="application/pdf"
+          accept="application/pdf"
           type="file"
           id="file"
           style={{ opacity: "0", position: "absolute", width: "100%", cursor: "pointer" }}
@@ -423,7 +423,9 @@ export function StepInfoUmum({
           }}
           className="pt-2"
         >
-          <label htmlFor="file">{filePDF ? filePDF?.name : "Select file"}</label>
+          <label htmlFor="file">
+            {filePDF ? filePDF?.name : <span className="bx bx-upload"> Upload THB</span>}
+          </label>
         </div>
       </div>
 

@@ -56,6 +56,7 @@ const initialEventData = {
   locationType: "",
   city: "",
   extraInfos: [],
+  handbook: null,
   eventCategories: [
     {
       key: initialEventCategoryKey,
@@ -81,6 +82,14 @@ const initialEventData = {
     { key: 3, teamCategory: TEAM_CATEGORIES.TEAM_FEMALE, amount: "" },
     { key: 4, teamCategory: TEAM_CATEGORIES.TEAM_MIXED, amount: "" },
   ],
+  earlyBirdRegistrationFee: "",
+  earlyBirdRegistrationFees: [
+    { key: 1, teamCategory: TEAM_CATEGORIES.TEAM_INDIVIDUAL, amount: "" },
+    { key: 2, teamCategory: TEAM_CATEGORIES.TEAM_MALE, amount: "" },
+    { key: 3, teamCategory: TEAM_CATEGORIES.TEAM_FEMALE, amount: "" },
+    { key: 4, teamCategory: TEAM_CATEGORIES.TEAM_MIXED, amount: "" },
+  ],
+  dateEarlyBird: null,
 };
 
 const EventsNewFullday = () => {
@@ -389,6 +398,7 @@ async function makeEventPayload(eventData, options) {
   const bannerImageBase64 = eventData.bannerImage?.raw
     ? await imageToBase64(eventData.bannerImage.raw)
     : undefined;
+  const handbookBase64 = eventData.handbook ? await imageToBase64(eventData.handbook) : null;
 
   const generatedCategories = makeEventCategories(eventData.eventCategories);
   const categoriesWithFees = makeCategoryFees(eventData, generatedCategories);
@@ -399,6 +409,7 @@ async function makeEventPayload(eventData, options) {
     eventCompetition: eventData.eventCompetition,
     publicInformation: {
       eventName: eventData.eventName,
+      handbook: handbookBase64,
       eventBanner: bannerImageBase64,
       eventDescription: eventData.description,
       eventLocation: eventData.location,
@@ -439,8 +450,19 @@ function makeEventCategories(categoriesData) {
 }
 
 function makeCategoryFees(eventData, categoriesData) {
+  console.log(categoriesData);
+  console.log(eventData);
+  let newDateEarly = new Date(eventData?.dateEarlyBird);
+  let early_date_bird = `${newDateEarly.getFullYear()}-${
+    newDateEarly.getMonth() + 1
+  }-${newDateEarly.getDate()}`;
   if (eventData.isFlatRegistrationFee) {
-    return categoriesData.map((category) => ({ ...category, fee: eventData.registrationFee || 0 }));
+    return categoriesData.map((category) => ({
+      ...category,
+      fee: eventData.registrationFee || 0,
+      early_bird: eventData.earlyBirdRegistrationFee || 0,
+      end_date_early_bird: early_date_bird || null,
+    }));
   }
 
   const categoriesWithTeamFees = categoriesData.map((category) => {
@@ -453,7 +475,15 @@ function makeCategoryFees(eventData, categoriesData) {
     const feeItem = eventData.registrationFees.find(
       (fee) => fee.teamCategory === targetTeamCategory
     );
-    return { ...category, fee: feeItem?.amount || 0 };
+    const earlyItem = eventData.earlyBirdRegistrationFees.find(
+      (early_bird) => early_bird.teamCategory === targetTeamCategory
+    );
+    return {
+      ...category,
+      fee: feeItem?.amount || 0,
+      end_date_early_bird: early_date_bird || null,
+      early_bird: earlyItem?.amount,
+    };
   });
 
   return categoriesWithTeamFees;

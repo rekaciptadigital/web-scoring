@@ -31,6 +31,7 @@ export function StepBiaya({
   };
 
   const handleRegisterEarlyBirdDate = (value) => {
+    !isFormDirty && setFormDirty(true);
     updateEventData({ dateEarlyBird: value });
   };
 
@@ -73,7 +74,6 @@ export function StepBiaya({
     return feeData?.amount || "";
   };
 
-  console.log(eventData);
 
   return (
     <FormSheet>
@@ -90,25 +90,27 @@ export function StepBiaya({
         </Col>
 
         <Col md={3}>
-          <FieldInputPrice
-            name="type-normal-early"
-            value={eventData?.earlyBirdRegistrationFee || ""}
-            onChange={handleRegistrationFeeEarlyChange}
-            disabled={!editIsAllowed || !eventData.isFlatRegistrationFee}
-          >
-            Early Bird
-          </FieldInputPrice>
-        </Col>
-
-        <Col md={3}>
           <FieldInputDate
             name="date-early"
             value={eventData?.dateEarlyBird || ""}
-            onChange={handleRegisterEarlyBirdDate}
+            onChange={(value) => handleRegisterEarlyBirdDate(value)}
             small={true}
           >
             Tanggal Tutup Early Bird
           </FieldInputDate>
+        </Col>
+
+        <Col md={3}>
+          <FieldInputPrice
+            name="type-normal-early"
+            value={eventData?.earlyBirdRegistrationFee || ""}
+            onChange={handleRegistrationFeeEarlyChange}
+            disabled={
+              !editIsAllowed || !eventData.isFlatRegistrationFee || !eventData?.dateEarlyBird
+            }
+          >
+            Early Bird
+          </FieldInputPrice>
         </Col>
 
         <Col
@@ -215,7 +217,9 @@ export function StepBiaya({
           <Col md={3}>
             <FieldInputPrice
               name="normal-individual"
-              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
+              disabled={
+                !editIsAllowed || eventData.isFlatRegistrationFee || !eventData?.dateEarlyBird
+              }
               value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE)}
               onChange={(value) =>
                 handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE, value)
@@ -230,7 +234,9 @@ export function StepBiaya({
           <Col md={3}>
             <FieldInputPrice
               name="normal-individual"
-              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
+              disabled={
+                !editIsAllowed || eventData.isFlatRegistrationFee || !eventData?.dateEarlyBird
+              }
               value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE)}
               onChange={(value) =>
                 handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE, value)
@@ -245,7 +251,9 @@ export function StepBiaya({
           <Col md={3}>
             <FieldInputPrice
               name="normal-male-team"
-              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
+              disabled={
+                !editIsAllowed || eventData.isFlatRegistrationFee || !eventData?.dateEarlyBird
+              }
               value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MALE)}
               onChange={(value) => handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_MALE, value)}
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_MALE}`]}
@@ -258,7 +266,9 @@ export function StepBiaya({
           <Col md={3}>
             <FieldInputPrice
               name="normal-female-team"
-              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
+              disabled={
+                !editIsAllowed || eventData.isFlatRegistrationFee || !eventData?.dateEarlyBird
+              }
               value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_FEMALE)}
               onChange={(value) => handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_FEMALE, value)}
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_FEMALE}`]}
@@ -271,7 +281,9 @@ export function StepBiaya({
           <Col md={3}>
             <FieldInputPrice
               name="normal-mixed-team"
-              disabled={!editIsAllowed || eventData.isFlatRegistrationFee}
+              disabled={
+                !editIsAllowed || eventData.isFlatRegistrationFee || !eventData?.dateEarlyBird
+              }
               value={computeFeeEarlyAmountByTeamCategory(TEAM_CATEGORIES.TEAM_MIXED)}
               onChange={(value) => handleVarietyFeesEarlyChange(TEAM_CATEGORIES.TEAM_MIXED, value)}
               errors={validationErrors[`registrationFee-${TEAM_CATEGORIES.TEAM_MIXED}`]}

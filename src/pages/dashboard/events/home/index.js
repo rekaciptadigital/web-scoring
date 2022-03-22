@@ -103,10 +103,16 @@ function PageEventDetailHome() {
                 eventDetail={eventDetail}
                 menu={eventMenus[2]}
                 href={`/dashboard/member/${event_id}`}
-                disabled={!isQualificationSchedulesSet}
+                // disabled={!isQualificationSchedulesSet}
+              />
+              <CardMenuWithButton
+                eventDetail={eventDetail}
+                menu={eventMenus[3]}
+                // href={`/dashboard/member/${event_id}`}
+                // disabled={!isQualificationSchedulesSet}
               />
               <CardMenu
-                menu={eventMenus[3]}
+                menu={eventMenus[4]}
                 href={computeHrefScheduleMenu()}
                 disabled={!isEventPublished}
                 badge={
@@ -119,11 +125,6 @@ function PageEventDetailHome() {
                 }
               />
               <CardMenu
-                menu={eventMenus[4]}
-                href={eventMenus[4].computeLink(event_id)}
-                disabled={!isQualificationSchedulesSet}
-              />
-              <CardMenu
                 menu={eventMenus[5]}
                 href={eventMenus[5].computeLink(event_id)}
                 disabled={!isQualificationSchedulesSet}
@@ -131,6 +132,11 @@ function PageEventDetailHome() {
               <CardMenu
                 menu={eventMenus[6]}
                 href={eventMenus[6].computeLink(event_id)}
+                disabled={!isQualificationSchedulesSet}
+              />
+              <CardMenu
+                menu={eventMenus[7]}
+                href={eventMenus[7].computeLink(event_id)}
                 disabled={!isQualificationSchedulesSet}
               />
             </MenuGridWrapper>

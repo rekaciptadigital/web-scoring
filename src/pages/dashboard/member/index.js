@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MetaTags } from "react-meta-tags";
-import { Container, Button, Col, Row } from "reactstrap";
-import { SelectInput } from "components";
-import { Link } from "react-router-dom";
+import { Container, Button, Col, Row, Input } from "reactstrap";
+// import { SelectInput } from "components";
 import TableMember from "./components/TableMember";
 import { EventsService } from "services";
 import { useParams } from "react-router-dom";
@@ -10,10 +9,11 @@ import Download from "components/icons/Download";
 import fileSaver from "file-saver";
 import { errorsUtil } from "utils";
 import { AlertSubmitError } from "components/ma";
+import { BreadcrumbDashboard } from "../events/components/breadcrumb";
 
 function ListMember() {
   const { event_id } = useParams();
-  const [eventDetail, setEventDetail] = useState({});
+  const [, setEventDetail] = useState({});
   const [members, setMembers] = useState([]);
   const [dataMembers, setDataMembers] = useState([]);
   const [category, setCategory] = useState({});
@@ -131,71 +131,79 @@ function ListMember() {
 
   return (
     <React.Fragment>
-      <div className="page-content">
+      <div>
         <MetaTags>
           <title>Dashboard | List - Member</title>
         </MetaTags>
         <Container fluid>
-          <Link to={`/dashboard/event/${event_id}/home`}>
-            <Button color="outline-dark">{"<-"}</Button>
-          </Link>
-          <span style={{ marginLeft: "0.5rem" }}>Kembali ke List Event</span>
-          <div className="mb-4">
-            <h6>Category</h6>
-            <div>
-              <Row>
-                <Col md={3} sm={12}>
-                  {/* <div className="d-block d-md-flex justify-content-between"> */}
-                  <SelectInput
-                    name="jenis"
-                    onChange={(v) => {
-                      getMember(v.value, statusFilter);
-                    }}
-                    options={
-                      eventDetail?.eventCategories?.map((option) => {
-                        return {
-                          ...option,
-                          id: option.categoryDetailsId,
-                          label: `${option.teamCategoryId.label}-${option.ageCategoryId.label}-${option.competitionCategoryId.label}-${option.distanceId.label}  (${option.totalParticipant}/${option.quota})`,
-                        };
-                      }) || []
-                    }
-                    value={category.label != undefined ? category : null}
-                  />
-                </Col>
+          <BreadcrumbDashboard to={`/dashboard/event/${event_id}/home`}>
+            Peserta Individu
+          </BreadcrumbDashboard>
 
-                <Col md={5} sm={12}>
-                  <div className="d-block d-md-flex mt-md-0 mt-3">
-                    <Button
-                      onClick={() => getMember(category, 0)}
-                      color={statusFilter == 0 ? "dark" : "outline-dark"}
-                    >
-                      Semua ({dataMembers[category.id + "-" + statusFilter]?.count?.all})
-                    </Button>
-                    <Button
-                      onClick={() => getMember(category, 1)}
-                      color={statusFilter == 1 ? "dark" : "outline-dark"}
-                    >
-                      Telah Dibayar/ Terdaftar (
-                      {dataMembers[category.id + "-" + statusFilter]?.count?.success})
-                    </Button>
-                    <Button
-                      onClick={() => getMember(category, 4)}
-                      color={statusFilter == 4 ? "dark" : "outline-dark"}
-                    >
-                      Menunggu Pembayaran (
-                      {dataMembers[category.id + "-" + statusFilter]?.count?.pending})
-                    </Button>
-                    <Button
-                      onClick={() => getMember(category, 2)}
-                      color={statusFilter == 2 ? "dark" : "outline-dark"}
-                    >
-                      Pembayaran Kadarluarsa (
-                      {dataMembers[category.id + "-" + statusFilter]?.count?.expired})
-                    </Button>
+          <div>
+            <div className="mb-4">
+              <Row>
+                <Col
+                  md={2}
+                  sm={12}
+                  style={{ textAlign: "center", borderBottom: "2px solid #FFB420" }}
+                >
+                  <span
+                    onClick={() => getMember(category, 0)}
+                    color={statusFilter == 0 ? "dark" : "outline-dark"}
+                  >
+                    Semua
+                  </span>
+                </Col>
+                <Col md={2} sm={12} style={{ textAlign: "center" }}>
+                  <span
+                    onClick={() => getMember(category, 1)}
+                    color={statusFilter == 1 ? "dark" : "outline-dark"}
+                  >
+                    Recurve
+                  </span>
+                </Col>
+                <Col md={2} sm={12} style={{ textAlign: "center" }}>
+                  <span
+                    onClick={() => getMember(category, 4)}
+                    color={statusFilter == 4 ? "dark" : "outline-dark"}
+                  >
+                    Compound
+                  </span>
+                </Col>
+                <Col md={2} sm={12} style={{ textAlign: "center" }}>
+                  <span
+                    onClick={() => getMember(category, 2)}
+                    color={statusFilter == 2 ? "dark" : "outline-dark"}
+                  >
+                    Nasional
+                  </span>
+                </Col>
+                <Col md={2} sm={12} style={{ textAlign: "center" }}>
+                  <span
+                    onClick={() => getMember(category, 2)}
+                    color={statusFilter == 2 ? "dark" : "outline-dark"}
+                  >
+                    Barebow
+                  </span>
+                </Col>
+                <Col md={2} sm={12} style={{ textAlign: "center" }}>
+                  <span
+                    onClick={() => getMember(category, 2)}
+                    color={statusFilter == 2 ? "dark" : "outline-dark"}
+                  >
+                    Traditional Bow
+                  </span>
+                </Col>
+              </Row>
+            </div>
+            <div className="mb-4">
+              <Row>
+                <Col md={8}>
+                  <div style={{ width: "330px" }}>
+                    <Input />
                   </div>
                 </Col>
-
                 <Col md={4} sm={12}>
                   <div className="d-block d-md-flex mt-md-0 mt-3 justify-content-end">
                     <a
@@ -212,16 +220,57 @@ function ListMember() {
                       onClick={handleDownloadIdCard}
                       style={{ backgroundColor: "#fff", border: "1px solid #0D47A1" }}
                     >
-                      <Download /> <span style={{ color: "#0D47A1" }}>{waitIdCard ? "menyiapkan data..." : "Unduh ID Card"}</span>
+                      <Download />{" "}
+                      <span style={{ color: "#0D47A1" }}>
+                        {waitIdCard ? "menyiapkan data..." : "Unduh ID Card"}
+                      </span>
                     </Button>
                   </div>
                 </Col>
               </Row>
             </div>
+            <div className="mb-4">
+              <div className="d-flex align-items-center" style={{flexWrap: 'wrap', gap: '3.2rem'}}>
+                <div>
+                  <span>Kelas:</span>
+                </div>
+                <div>
+                  <span
+                    style={{
+                      border: "1px solid ##0D47A1",
+                      padding: "8px 12px",
+                      borderRadius: "5px",
+                      fontWeight: '600',
+                      color: '#0D47A1',
+                      backgroundColor: '#E7EDF6'
+                    }}
+                    >
+                    Semua
+                  </span>
+                </div>
+              </div>
+              <div className="d-flex align-items-center mt-3" style={{flexWrap: 'wrap', gap: '1rem'}}>
+                <div>
+                  <span>Jenis Regu:</span>
+                </div>
+                <div>
+                  <span
+                    style={{
+                      border: "1px solid ##0D47A1",
+                      padding: "8px 12px",
+                      borderRadius: "5px",
+                      fontWeight: '600',
+                      color: '#0D47A1',
+                      backgroundColor: '#E7EDF6'
+                    }}
+                    >
+                    Semua
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mb-4">
-            <hr />
-          </div>
+
           <TableMember members={members} />
         </Container>
         <AlertSubmitError isError={Boolean(errorsIdCard)} errors={errorsIdCard} />

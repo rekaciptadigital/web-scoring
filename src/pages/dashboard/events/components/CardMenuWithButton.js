@@ -3,27 +3,10 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Download from "components/icons/Download";
 import { Button } from "reactstrap";
-import {EventsService} from 'services'
-import { useParams } from "react-router-dom";
 
 
 function CardMenuWithButton({ eventDetail, menu, href, badge, disabled = false }) {
-  const [waitExcel, setWaitExcel] = React.useState("")
-  const { event_id } = useParams();
 
-  const getEventLaporan = async() => {
-    setWaitExcel(true);
-    const {data, message} = await EventsService.getEventLaporan({event_id: event_id ,status_id: 1})
-    if (message === 'Success'){
-      window.location = data;
-    }
-    setWaitExcel(false);
-    console.error(message)
-  }
-
-  React.useEffect(() => {
-    
-  }, [])
 
   if (disabled) {
     return (
@@ -68,21 +51,13 @@ function CardMenuWithButton({ eventDetail, menu, href, badge, disabled = false }
           <div className="menu-icon mb-3">
             <img className="menu-icon-img" src={menu.icon} />
           </div>
-          <div>
-          <Button
-              onClick={getEventLaporan}
-              className="btn"
-              disabled={waitExcel}
-              style={{ backgroundColor: "#fff", border: "1px solid #0D47A1" }}
-            >
-              <Download /> <span style={{ color: "#0D47A1" }}>{waitExcel ? "menyiapkan data..." :"Unduh Laporan"}</span>
-            </Button>
-          </div>
         </div>
 
         <h3>{menu.title}</h3>
         <p>{menu.description}</p>
-        <p style={{color:"green"}}>{eventDetail?.totalParticipant} Peserta telah terdaftar</p>
+        <div>
+          <span className="py-1 px-2" style={{backgroundColor: '#AEDDC2', borderRadius: '25px'}}>Peserta Individu: {eventDetail?.totalParticipant}</span>
+        </div>
       </div>
 
     <div className="position-relative">

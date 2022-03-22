@@ -818,6 +818,8 @@ function makeCategoryDetailsPayload(eventData) {
 }
 
 function makeFeesPayload(eventData) {
+  let newDateEarly = new Date(eventData?.dateEarlyBird)
+  let early_date_bird = `${newDateEarly.getFullYear()}-${newDateEarly.getMonth()+1}-${newDateEarly.getDate()}`
   if (eventData.isFlatRegistrationFee || !eventData.registrationFees?.length) {
     const teamCategories = [
       TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE,
@@ -832,7 +834,7 @@ function makeFeesPayload(eventData) {
       data: teamCategories.map((teamCategory) => ({
         team_category_id: teamCategory,
         fee: eventData.registrationFee || 0,
-        end_date_early_bird: eventData?.dateEarlyBird || null,
+        end_date_early_bird: early_date_bird || null,
         early_bird: eventData?.earlyBirdRegistrationFee || 0,
       })),
     };
@@ -844,18 +846,18 @@ function makeFeesPayload(eventData) {
       feesData.push({
         team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE,
         fee: fee.amount || 0,
-        end_date_early_bird: eventData?.dateEarlyBird || null,
+        end_date_early_bird: early_date_bird || null,
       });
       feesData.push({
         team_category_id: TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE,
         fee: fee.amount || 0,
-        end_date_early_bird: eventData?.dateEarlyBird || null,
+        end_date_early_bird: early_date_bird || null,
       });
     } else {
       feesData.push({
         team_category_id: fee.teamCategory,
         fee: fee.amount || 0,
-        end_date_early_bird: eventData?.dateEarlyBird || null,
+        end_date_early_bird: early_date_bird || null,
       });
     }
   }

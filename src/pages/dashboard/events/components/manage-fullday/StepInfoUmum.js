@@ -41,7 +41,7 @@ export function StepInfoUmum({
   const isRemovingInfo = removingStatus.status === "loading";
 
   const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
-  // const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
+  const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
 
   const handleModalEditInfoOpen = (key) => setKeyExtraInfoEdited(key);
   const handleModalEditInfoClose = () => setKeyExtraInfoEdited(null);
@@ -428,6 +428,13 @@ export function StepInfoUmum({
           </label>
         </div>
       </div>
+
+      <ModalExtraInfoEditor
+        eventId={eventId}
+        showEditor={shouldShowAddExtraInfo}
+        onSaveSuccess={onSaveSuccess}
+        onClose={handleModalAddInfoClose}
+      />
 
       <div>
         {eventData.extraInfos?.map((info) => (

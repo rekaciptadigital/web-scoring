@@ -20,7 +20,7 @@ update_production:
   script:
     - echo "Updating develop"
     - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master"
-    - php artisan migrate
+    - ssh -p22 root@$HOST_IP "php artisan migrate"
     - echo "Code Updated"
   only:
     - master

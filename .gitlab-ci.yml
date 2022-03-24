@@ -2,6 +2,8 @@ image: node:14
 before_script: 
   - apt-get update -qq
   - apt-get install -qq git
+  - rm -rf package-json.lock
+  - git config --global url."https://".insteadOf git://
   # Setup SSH deploy keys
   - 'which ssh-agent || ( apt-get install -qq openssh-client )'
   - eval $(ssh-agent -s)

@@ -15,24 +15,24 @@ stages:
   - update
   - deploy
 
-# update_production:
-#   stage: update
-#   script:
-#     - echo "Updating develop"
-#     - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master"
-#     - echo "Code Updated"
-#   only:
-#     - master
+update_production:
+  stage: update
+  script:
+    - echo "Updating develop"
+    - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master"
+    - echo "Code Updated"
+  only:
+    - master
 
-# deploy_production:
-#   stage: deploy
-#   script:
-#     - echo "Cleaning Up Modules"
+deploy_production:
+  stage: deploy
+  script:
+    - echo "Cleaning Up Modules"
 #     - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-admin-archery/node_modules && rm  /var/www/web-admin-archery/package-lock.json"
-#     - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery && sudo npm run build --prefix /var/www/web-admin-archery"
-#     - echo "Build Success, Apps running for Production"
-#   only:
-#     - master
+    - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery && sudo npm run build --prefix /var/www/web-admin-archery"
+    - echo "Build Success, Apps running for Production"
+  only:
+    - master
 
 update_staging:
   stage: update

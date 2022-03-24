@@ -29,7 +29,7 @@ deploy_production:
   script:
     - echo "Cleaning Up Modules"
     - ssh -p22 root@$HOST_IP "git config --global url."https://".insteadOf git://"
-    - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-admin-archery/node_modules && rm  /var/www/web-admin-archery/package-lock.json"
+    #- ssh -p22 root@$HOST_IP "rm -rf /var/www/web-admin-archery/node_modules && rm  /var/www/web-admin-archery/package-lock.json"
     - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery && sudo npm run build --prefix /var/www/web-admin-archery"
     - echo "Build Success, Apps running for Production"
   only:

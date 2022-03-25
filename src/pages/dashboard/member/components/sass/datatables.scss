@@ -126,16 +126,10 @@ div.dataTables_scrollHead table.table-bordered {
 div.table-responsive > div.dataTables_wrapper > div.row {
   margin: 0;
 }
-div.table-responsive
-  > div.dataTables_wrapper
-  > div.row
-  > div[class^="col-"]:first-child {
+div.table-responsive > div.dataTables_wrapper > div.row > div[class^="col-"]:first-child {
   padding-left: 0;
 }
-div.table-responsive
-  > div.dataTables_wrapper
-  > div.row
-  > div[class^="col-"]:last-child {
+div.table-responsive > div.dataTables_wrapper > div.row > div[class^="col-"]:last-child {
   padding-right: 0;
 }
 tbody tr {
@@ -165,4 +159,27 @@ tbody tr {
   border-top: 4px solid\9;
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
+}
+
+.btn-atur {
+  cursor: pointer;
+  color: #0d47a1;
+  border: #0d47a1 1px solid;
+  border-radius: 25px;
+  font-weight: 600;
+  &:hover {
+    background-color: #0d47a1;
+    color: #fff;
+    border: #0d47a1 1px solid;
+  }
+}
+
+.btn-atur-disable {
+  cursor: not-allowed;
+  color: #cccccc;
+  border: #395d92 1px solid;
+  border-radius: 25px;
+  font-weight: 600;
+  background-color: #395d92;
+ 
 }

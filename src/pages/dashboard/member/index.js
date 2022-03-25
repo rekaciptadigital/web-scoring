@@ -1,26 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { MetaTags } from "react-meta-tags";
 import { Container, Button, Col, Row, Input } from "reactstrap";
 // import { SelectInput } from "components";
 import TableMember from "./components/TableMember";
 import { EventsService } from "services";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Download from "components/icons/Download";
 import fileSaver from "file-saver";
 import { errorsUtil } from "utils";
 import { AlertSubmitError } from "components/ma";
 import { BreadcrumbDashboard } from "../events/components/breadcrumb";
+import { eventCategories } from "constants/index";
 
 function ListMember() {
   const { event_id } = useParams();
   const [, setEventDetail] = useState({});
   const [members, setMembers] = useState([]);
-  const [dataMembers, setDataMembers] = useState([]);
-  const [category, setCategory] = useState({});
-  const [statusFilter, setStatusFilter] = useState(0);
   const [dataExcel, setDataExcel] = useState();
   const [errorsIdCard, setErrorsIdCard] = useState(null);
   const [waitIdCard, setWaitIdCard] = useState(false);
+  const [filterCategory, setFilterCategory] = useState("");
+  const [eventCategoriesDetail, setEventCategoriesDetail] = useState({});
+  const [indexCategory, setIndexCategory] = useState(-1);
+  const [ageCategoryFilter, setAgeCategoryFilter] = useState("");
+  const [teamCategoryFilter, setTeamCategoryFilter] = useState("");
+  const [name, setName] = useState("");
+  const [teamFilter, setTeamFilter] = useState("");
+
+  const { TEAM_CATEGORIES } = eventCategories;
 
   useEffect(async () => {
     try {
@@ -28,14 +35,6 @@ function ListMember() {
       if (success) {
         if (data) {
           setEventDetail(data);
-          // getMember(data.flatCategories[0]);
-          let payload = {
-            ...data.eventCategories[0],
-            id: data.eventCategories[0].categoryDetailsId,
-            label: `${data.eventCategories[0].teamCategoryId.label}-${data.eventCategories[0].ageCategoryId.label}-${data.eventCategories[0].competitionCategoryId.label}-${data.eventCategories[0].distanceId.label} (${data.eventCategories[0].totalParticipant}/${data.eventCategories[0].quota})`,
-          };
-
-          getMember(payload);
         }
       } else {
         console.log(message, errors);
@@ -44,6 +43,14 @@ function ListMember() {
       console.log(error);
     }
   }, []);
+
+  const useQuery = () => {
+    const { search } = useLocation();
+
+    return useMemo(() => new URLSearchParams(search), [search]);
+  };
+
+  let query = useQuery();
 
   const getEventLaporan = async () => {
     try {
@@ -60,65 +67,67 @@ function ListMember() {
     }
   };
 
+  const getMember = async () => {
+    try {
+      const { message, errors, data } = await EventsService.getEventMemberNew({
+        event_id: event_id,
+        type: query.get("type"),
+        competition_category_id: filterCategory,
+        name: name,
+        age_category_id: ageCategoryFilter,
+        team_category_id: teamFilter,
+      });
+      if (message === "Success") {
+        setMembers(data);
+      }
+      console.info(errors);
+    } catch (errors) {
+      console.log(errors);
+    }
+  };
+
+  const getTeam = () => {
+    if (teamCategoryFilter === "Individu Putra") {
+      setTeamFilter(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE);
+    }
+    if (teamCategoryFilter === "Individu Putri") {
+      setTeamFilter(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE);
+    }
+    if (teamCategoryFilter === "Beregu Putra") {
+      setTeamFilter(TEAM_CATEGORIES.TEAM_MALE);
+    }
+    if (teamCategoryFilter === "Beregu Putri") {
+      setTeamFilter(TEAM_CATEGORIES.TEAM_FEMALE);
+    }
+    if (teamCategoryFilter === "Mix Team") {
+      setTeamFilter(TEAM_CATEGORIES.TEAM_MIXED);
+    }
+    if (teamCategoryFilter === "") {
+      setTeamFilter("");
+    }
+  };
+
+  const getEventCategoryDetails = async () => {
+    const { message, errors, data } = await EventsService.getEventCategoryDetails({
+      event_id: event_id,
+    });
+    if (message === "Success") {
+      setEventCategoriesDetail(data);
+    }
+    console.info(errors);
+  };
+
   useEffect(() => {
     getEventLaporan();
-  }, []);
-
-  const setMemberMap = (data, payload, status) => {
-    setCategory(payload);
-    setStatusFilter(status);
-    let m = [];
-    if (!dataMembers[payload.id + "-" + status]) {
-      dataMembers[payload.id + "-" + status] = data;
-      setDataMembers(dataMembers);
-    }
-    let no = 0;
-    data.list.map((d) => {
-      no = no + 1;
-      m.push({
-        id: d.member.id,
-        no: no,
-        name: d.member.name,
-        email: d.email,
-        telepon: d.phoneNumber,
-        club: d.club,
-        age: d.member.club,
-        gender: d.member.gender,
-        status: d.status,
-        statusLabel: d.statusLabel,
-      });
-    });
-    setMembers(m);
-  };
-  const getMember = async (payload, status = 0) => {
-    try {
-      if (dataMembers[payload.id + "-" + status]) {
-        return await setMemberMap(dataMembers[payload.id + "-" + status], payload, status);
-      }
-      const { data, errors, success, message } = await EventsService.getEventMember({
-        id: event_id,
-        competition_category_id: payload.competitionCategoryId.id,
-        team_category_id: payload.teamCategoryId.id,
-        age_category_id: payload.ageCategoryId.id,
-        category_id: payload.categoryDetailsId,
-        status: status,
-      });
-      if (success) {
-        if (data) {
-          setMemberMap(data, payload, status);
-        }
-      } else {
-        console.log(message, errors);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    getMember();
+    getEventCategoryDetails();
+    getTeam();
+  }, [event_id, filterCategory, name, ageCategoryFilter, teamCategoryFilter, teamFilter]);
 
   const handleDownloadIdCard = async () => {
     setErrorsIdCard(null);
     setWaitIdCard(true);
-    const queryString = { event_category_id: category.id, event_id: event_id };
+    const queryString = { event_id: event_id };
     const result = await EventsService.getEventMemberIdCardByCategory(queryString);
     if (result.success) {
       const { fileName, fileBase64 } = result.data;
@@ -128,6 +137,17 @@ function ListMember() {
     }
     setWaitIdCard(false);
   };
+
+  let dumpArray = [];
+  let arrayAge = [];
+  let arrayRegu = [];
+
+  // console.log(indexCategory);
+  // console.log(Object.values(eventCategoriesDetail)[indexCategory])
+  dumpArray = Object.values(eventCategoriesDetail)[indexCategory];
+  // console.log([...new Set(dumpArray?.map((d) => d.ageCategory))]);
+  arrayAge = [...new Set(dumpArray?.map((d) => d.ageCategory))];
+  arrayRegu = [...new Set(dumpArray?.map((d) => d.teamCategory))];
 
   return (
     <React.Fragment>
@@ -144,64 +164,64 @@ function ListMember() {
             <div className="mb-4">
               <Row>
                 <Col
+                  className="py-2"
                   md={2}
                   sm={12}
-                  style={{ textAlign: "center", borderBottom: "2px solid #FFB420" }}
+                  style={{
+                    textAlign: "center",
+                    borderBottom: `${filterCategory === "" ? "2px solid #FFB420" : "none"}`,
+                  }}
                 >
                   <span
-                    onClick={() => getMember(category, 0)}
-                    color={statusFilter == 0 ? "dark" : "outline-dark"}
+                    style={{ cursor: "pointer", color: "#0D47A1", fontWeight: "500" }}
+                    onClick={() => {
+                      setFilterCategory("");
+                      setIndexCategory(-1);
+                    }}
                   >
                     Semua
                   </span>
                 </Col>
-                <Col md={2} sm={12} style={{ textAlign: "center" }}>
-                  <span
-                    onClick={() => getMember(category, 1)}
-                    color={statusFilter == 1 ? "dark" : "outline-dark"}
-                  >
-                    Recurve
-                  </span>
-                </Col>
-                <Col md={2} sm={12} style={{ textAlign: "center" }}>
-                  <span
-                    onClick={() => getMember(category, 4)}
-                    color={statusFilter == 4 ? "dark" : "outline-dark"}
-                  >
-                    Compound
-                  </span>
-                </Col>
-                <Col md={2} sm={12} style={{ textAlign: "center" }}>
-                  <span
-                    onClick={() => getMember(category, 2)}
-                    color={statusFilter == 2 ? "dark" : "outline-dark"}
-                  >
-                    Nasional
-                  </span>
-                </Col>
-                <Col md={2} sm={12} style={{ textAlign: "center" }}>
-                  <span
-                    onClick={() => getMember(category, 2)}
-                    color={statusFilter == 2 ? "dark" : "outline-dark"}
-                  >
-                    Barebow
-                  </span>
-                </Col>
-                <Col md={2} sm={12} style={{ textAlign: "center" }}>
-                  <span
-                    onClick={() => getMember(category, 2)}
-                    color={statusFilter == 2 ? "dark" : "outline-dark"}
-                  >
-                    Traditional Bow
-                  </span>
-                </Col>
+                {Object.keys(eventCategoriesDetail).map((category, index) => {
+                  return (
+                    <Col
+                      key={index}
+                      className="py-2"
+                      md={2}
+                      sm={12}
+                      style={{
+                        textAlign: "center",
+                        borderBottom: `${
+                          filterCategory === category ? "2px solid #FFB420" : "none"
+                        }`,
+                      }}
+                    >
+                      <span
+                        style={{ cursor: "pointer", color: "#0D47A1", fontWeight: "500" }}
+                        onClick={() => {
+                          setFilterCategory(category);
+                          setIndexCategory(index);
+                        }}
+                      >
+                        {category}
+                      </span>
+                    </Col>
+                  );
+                })}
               </Row>
             </div>
             <div className="mb-4">
               <Row>
-                <Col md={8}>
+                <Col md={8} sm={12}>
                   <div style={{ width: "330px" }}>
-                    <Input />
+                    <Input
+                      placeholder="Cari archer"
+                      onKeyPress={(event) => {
+                        if (event.key === "Enter") {
+                          setName(event.target.value);
+                        }
+                      }}
+                    />
                   </div>
                 </Col>
                 <Col md={4} sm={12}>
@@ -230,42 +250,110 @@ function ListMember() {
               </Row>
             </div>
             <div className="mb-4">
-              <div className="d-flex align-items-center" style={{flexWrap: 'wrap', gap: '3.2rem'}}>
+              <div
+                className="d-flex align-items-center"
+                style={{ flexWrap: "wrap", gap: "3.2rem" }}
+              >
                 <div>
                   <span>Kelas:</span>
                 </div>
-                <div>
-                  <span
-                    style={{
-                      border: "1px solid ##0D47A1",
-                      padding: "8px 12px",
-                      borderRadius: "5px",
-                      fontWeight: '600',
-                      color: '#0D47A1',
-                      backgroundColor: '#E7EDF6'
-                    }}
+                <div
+                  className="d-flex align-items-center"
+                  style={{ flexWrap: "wrap", gap: "0.5rem" }}
+                >
+                  <div>
+                    <span
+                      onClick={() => setAgeCategoryFilter("")}
+                      style={{
+                        border: "1px solid #0D47A1",
+                        padding: "8px 12px",
+                        borderRadius: "5px",
+                        fontWeight: "600",
+                        color: "#0D47A1",
+                        backgroundColor: `${ageCategoryFilter === "" ? "#E7EDF6" : "#FFF"}`,
+                        cursor: "pointer",
+                      }}
                     >
-                    Semua
-                  </span>
+                      Semua
+                    </span>
+                  </div>
+                  {arrayAge.map((age, index) => {
+                    if (indexCategory > -1) {
+                      return (
+                        <div key={index}>
+                          <span
+                            onClick={() => setAgeCategoryFilter(age)}
+                            style={{
+                              border: "1px solid #0D47A1",
+                              padding: "8px 12px",
+                              borderRadius: "5px",
+                              fontWeight: "600",
+                              color: "#0D47A1",
+                              cursor: "pointer",
+                              backgroundColor: `${ageCategoryFilter === age ? "#E7EDF6" : "#FFF"}`,
+                            }}
+                          >
+                            {age}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
               </div>
-              <div className="d-flex align-items-center mt-3" style={{flexWrap: 'wrap', gap: '1rem'}}>
+              <div
+                className="d-flex align-items-center mt-4"
+                style={{ flexWrap: "wrap", gap: "1rem" }}
+              >
                 <div>
                   <span>Jenis Regu:</span>
                 </div>
-                <div>
-                  <span
-                    style={{
-                      border: "1px solid ##0D47A1",
-                      padding: "8px 12px",
-                      borderRadius: "5px",
-                      fontWeight: '600',
-                      color: '#0D47A1',
-                      backgroundColor: '#E7EDF6'
-                    }}
+                <div
+                  className="d-flex align-items-center"
+                  style={{ flexWrap: "wrap", gap: "0.5rem" }}
+                >
+                  <div>
+                    <span
+                      onClick={() => setTeamCategoryFilter("")}
+                      style={{
+                        border: "1px solid #0D47A1",
+                        padding: "8px 12px",
+                        borderRadius: "5px",
+                        fontWeight: "600",
+                        color: "#0D47A1",
+                        backgroundColor: `${teamCategoryFilter === "" ? "#E7EDF6" : "#FFF"}`,
+                        cursor: "pointer",
+                      }}
                     >
-                    Semua
-                  </span>
+                      Semua
+                    </span>
+                  </div>
+                  {arrayRegu.map((regu, index) => {
+                    if (indexCategory > -1) {
+                      return (
+                        <div key={index}>
+                          <span
+                            onClick={() => setTeamCategoryFilter(regu)}
+                            style={{
+                              border: "1px solid #0D47A1",
+                              padding: "8px 12px",
+                              borderRadius: "5px",
+                              fontWeight: "600",
+                              color: "#0D47A1",
+                              cursor: "pointer",
+                              backgroundColor: `${
+                                teamCategoryFilter === regu ? "#E7EDF6" : "#FFF"
+                              }`,
+                            }}
+                          >
+                            {regu}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
               </div>
             </div>

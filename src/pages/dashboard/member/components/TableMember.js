@@ -1,22 +1,23 @@
-import React, { Component } from "react"
-import { Row, Col, Card, CardBody } from "reactstrap"
-import { EventsService } from "services";
-import ModalParticipantMemberProfile  from "../../../../components/Common/ModalParticipanMemberProfile";
+import React, { Component } from "react";
+import { Row, Col, Card, CardBody } from "reactstrap";
+// import { EventsService } from "services";
+import ModalParticipantMemberProfile from "../../../../components/Common/ModalParticipanMemberProfile";
 // datatable related plugins
-import BootstrapTable from 'react-bootstrap-table-next';
-import paginationFactory, {
-  PaginationProvider
-} from 'react-bootstrap-table2-paginator';
+import BootstrapTable from "react-bootstrap-table-next";
+import paginationFactory, { PaginationProvider } from "react-bootstrap-table2-paginator";
+import SweetAlert from "react-bootstrap-sweetalert";
+import { Button, ButtonBlue } from "components/ma";
+import { EventsService } from "services";
+import logoUpdate from "../../../../assets/images/myachery/update-category.png";
 
-import ToolkitProvider from 'react-bootstrap-table2-toolkit';
+import ToolkitProvider from "react-bootstrap-table2-toolkit";
 
 //Import Breadcrumb
-import './sass/datatables.scss'
-
+import "./sass/datatables.scss";
 
 class TableMember extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       page: 1,
       sizePerPage: 10,
@@ -25,100 +26,197 @@ class TableMember extends Component {
       member_id_for_pop_up: 0,
       users: [],
       user: [],
-    }
-
+      isOpenAlert: false,
+      isUpdateCategory: false,
+      dataCategories: [],
+      catagoryID: 0,
+      IdParticipant: 0,
+    };
   }
 
   render() {
-    const getMemberProfile = async(id) =>{
-      let u = [];
-      u = await this.state.users;
-      if(u[id]) {
-        this.setState({modal: true, user: this.state.users[id]});
-        return;
-      }
+    // const getMemberProfile = async (id) => {
+    //   let u = [];
+    //   u = await this.state.users;
+    //   if (u[id]) {
+    //     this.setState({ modal: true, user: this.state.users[id] });
+    //     return;
+    //   }
 
-      const { data, errors, success, message } = await EventsService.getEventMemberProfile(
-        {"member_id":id}
-      );
-    if (success) {
+    //   const { data, errors, success, message } = await EventsService.getEventMemberProfile({
+    //     member_id: id,
+    //   });
+    //   if (success) {
+    //     if (data) {
+    //       u[id] = data;
+    //       this.setState({ modal: true, user: data, users: u });
+    //     }
+    //   } else {
+    //     console.log(message, errors);
+    //   }
+    // };
+
+    const onConfirm = async (participantId) => {
+      const { message, errors, data } = await EventsService.getAccessCategories({
+        participant_id: participantId,
+      });
+      if (message === "Success") {
+        this.setState({ dataCategories: data });
         if (data) {
-          u[id] = data;
-          this.setState({modal: true, user: data, users:u})
+          this.setState({ isOpenAlert: true });
         }
-    } else {
-        console.log(message, errors);
-    }
-    }
+      }
+      console.info(errors);
+    };
 
-    const toggle = () =>{
-      this.setState({modal: !this.state.modal})
-    } 
-    
-    const columns = [{
-      dataField: 'id',
-      text: 'No',
-      sort: true,
-      formatter: (cell, row) => {
-        return (
-          row.no
-        )
+    const onUpdateCategory = async () => {
+      console.log(this.state.IdParticipant);
+      console.log(this.state.catagoryID);
+      const { message, errors } = await EventsService.updateCategory(null, {
+        participant_id: this.state.IdParticipant,
+        category_id: this.state.catagoryID,
+      });
+      if (message === "Success") {
+        console.log("Update success");
+        this.setState({ isUpdateCategory: true });
       }
-    }, {
-      dataField: 'name',
-      text: 'Name',
-      sort: true,
-      formatter: (cell, row) => {
-        return(
-          <>
-            <span onClick={() => {
-              getMemberProfile(row.id);
-            }
-            }><p style={{color:"blue"}}>{row.name}</p></span>
-          </>
-        )
-      }
-    }, {
-      dataField: 'email',
-      text: 'Email',
-      sort: true
-    }, {
-      dataField: 'telepon',
-      text: 'Telepon',
-      sort: true
-    }, {
-      dataField: 'club',
-      text: 'Club',
-      sort: true
-    }, {
-      dataField: 'age',
-      text: 'Usia',
-    }, {
-      dataField: 'gender',
-      text: 'Gender',
-    }, {
-      dataField: 'status',
-      text: 'Status',
-      formatter: (cell, row) => {
-        return (
-          <div>
-            <span className={`${row.status == 1 ? "bg-success" : row.status == 2 ? "bg-danger" : row.status == 4 ? "bg-info" : "bg-warning"} text-white rounded-3 px-2`}>{row.statusLabel ? row.statusLabel : "Pending"}</span>
-          </div>
-        )
-      }
-    }
-];
+      console.info(errors);
+    };
 
-    const defaultSorted = [{
-      dataField: 'id',
-      order: 'asc'
-    }];
+    const onBackToList = () => {
+      this.setState({ isUpdateCategory: false });
+      window.location.reload();
+    };
+
+    const onCancel = () => {
+      this.setState({ isOpenAlert: false });
+    };
+
+    const toggle = () => {
+      this.setState({ modal: !this.state.modal });
+    };
+
+    const columns = [
+      {
+        dataField: "name",
+        text: "Nama Peserta",
+        sort: true,
+        style: { width: "40px", overflow: "hidden" },
+        headerStyle: { width: "40px", overflow: "hidden" },
+      },
+      {
+        dataField: "clubName",
+        text: "Nama Klub",
+        sort: true,
+        formatter: (cell, row) => {
+          if (!row.clubName) {
+            return (
+              <>
+                <span>Tidak ada club</span>
+              </>
+            );
+          }
+          return (
+            <>
+              <span>{row.clubName}</span>
+            </>
+          );
+        },
+      },
+      {
+        dataField: "competitionCategory",
+        text: "Kategori Lomba",
+        sort: true,
+      },
+      {
+        dataField: "email",
+        text: "Email",
+        sort: true,
+      },
+      {
+        dataField: "phoneNumber",
+        text: "Telepon",
+      },
+      {
+        dataField: "statusPayment",
+        text: "Status Pembayaran",
+        formatter: (cell, row) => {
+          if (row.statusPayment === "Belum Lunas")
+            return (
+              <>
+                <span
+                  className="py-1 px-2"
+                  style={{ color: "#FFB420", backgroundColor: "#FFE8BA", borderRadius: "25px" }}
+                >
+                  {row.statusPayment}
+                </span>
+              </>
+            );
+          if (row.statusPayment === "Lunas")
+            return (
+              <>
+                <span
+                  className="py-1 px-2"
+                  style={{ color: "#05944F", backgroundColor: "#DAF0E3", borderRadius: "25px" }}
+                >
+                  {row.statusPayment}
+                </span>
+              </>
+            );
+          if (row.statusPayment === "Expired")
+            return (
+              <>
+                <span
+                  className="py-1 px-2"
+                  style={{ color: "#FFFFFF", backgroundColor: "#AFAFAF", borderRadius: "25px" }}
+                >
+                  {row.statusPayment}
+                </span>
+              </>
+            );
+        },
+      },
+      {
+        dataField: "",
+        text: "...",
+        formatter: (cell, row) => {
+          if (row.statusPayment === "Lunas") {
+            return (
+              <>
+                <span
+                  onClick={() => {
+                    onConfirm(row.participantId);
+                    this.setState({ IdParticipant: row.participantId });
+                  }}
+                  className="py-2 px-2 btn-atur"
+                >
+                  Atur Kategori
+                </span>
+              </>
+            );
+          } else {
+            return (
+              <>
+                <span className="py-2 px-2 btn-atur-disable">Atur Kategori</span>
+              </>
+            );
+          }
+        },
+      },
+    ];
+
+    const defaultSorted = [
+      {
+        dataField: "id",
+        order: "asc",
+      },
+    ];
 
     const pageOptions = {
       sizePerPage: 500,
-      totalSize: this.props.members.length, // replace later with size(customers),
+      totalSize: this.props.members?.length, // replace later with size(customers),
       custom: true,
-    }
+    };
 
     // Custom Pagination Toggle
     // const sizePerPageList = [
@@ -129,18 +227,21 @@ class TableMember extends Component {
     //   { text: '25', value: 25 },
     //   { text: 'All', value: (this.state.productData).length }];
 
-  
     // Select All Button operation
-    const selectRow = {
-      mode: 'checkbox'
-    }
+    // const selectRow = {
+    //   mode: 'checkbox'
+    // }
 
     // const { SearchBar } = Search;
 
     return (
       <React.Fragment>
         <div>
-          <ModalParticipantMemberProfile isOpen={this.state.modal} toggle={toggle} participant={this.state.user} />
+          <ModalParticipantMemberProfile
+            isOpen={this.state.modal}
+            toggle={toggle}
+            participant={this.state.user}
+          />
           <div>
             <Row>
               <Col className="col-12">
@@ -148,20 +249,19 @@ class TableMember extends Component {
                   <CardBody>
                     <PaginationProvider
                       pagination={paginationFactory(pageOptions)}
-                      keyField='id'
+                      keyField="id"
                       columns={columns}
                       data={this.props.members}
                     >
-                      {({paginationTableProps }) => (
+                      {({ paginationTableProps }) => (
                         <ToolkitProvider
-                          keyField='id'
+                          keyField="id"
                           columns={columns}
                           data={this.props.members}
                           search
                         >
-                          {toolkitProps => (
+                          {(toolkitProps) => (
                             <React.Fragment>
-
                               <Row className="mb-2">
                                 <Col md="4">
                                   <div className="search-box me-2 mb-2 d-inline-block">
@@ -184,33 +284,112 @@ class TableMember extends Component {
                                       bordered={false}
                                       striped={false}
                                       defaultSorted={defaultSorted}
-                                      selectRow={selectRow}
-                                      classes={
-                                        "table align-middle table-nowrap"
-                                      }
+                                      noDataIndication="Table is Empty"
+                                      // selectRow={selectRow}
+                                      classes={"table align-middle table-nowrap"}
                                       headerWrapperClasses={"thead-light"}
                                       {...toolkitProps.baseProps}
                                       {...paginationTableProps}
                                     />
-
                                   </div>
                                 </Col>
                               </Row>
                             </React.Fragment>
-                          )
-                          }
+                          )}
                         </ToolkitProvider>
-                      )
-                      }</PaginationProvider>
+                      )}
+                    </PaginationProvider>
                   </CardBody>
                 </Card>
               </Col>
             </Row>
           </div>
         </div>
+        <SweetAlert
+          show={this.state.isOpenAlert}
+          title=""
+          custom
+          style={{ width: 1100, borderRadius: "1.25rem" }}
+          customButtons={
+            <span className="d-flex justify-content-end" style={{ gap: "0.5rem", width: "100%" }}>
+              <Button onClick={onCancel} style={{ color: "var(--ma-blue)" }}>
+                Batal
+              </Button>
+              <ButtonBlue onClick={onUpdateCategory}>Ubah</ButtonBlue>
+            </span>
+          }
+        >
+          <div style={{ textAlign: "start" }}>
+            <span>Kategori Lomba</span>
+            <br />
+            <span>Silakan pilih salah satu kategori lomba</span>
+          </div>
+          <div style={{ height: "500px", overflowY: "auto", overflowX: "hidden" }}>
+            <Row>
+              {this.state.dataCategories.map((catagory) => {
+                return (
+                  <Col key={catagory.id} md={4}>
+                    <div
+                      onClick={() => this.setState({ catagoryID: catagory.id })}
+                      className="py-4 ps-2 mt-3"
+                      style={{
+                        border: "1px solid #E2E2E2",
+                        borderRadius: "5px",
+                        textAlign: "start",
+                        cursor: "pointer",
+                        backgroundColor: `${
+                          catagory.id === this.state.catagoryID ? "#E7EDF6" : "#FFF"
+                        }`,
+                      }}
+                    >
+                      <span style={{ fontSize: "18px", fontWeight: "600" }}>
+                        {catagory.labelCategory}
+                      </span>
+                      <div className="mt-3">
+                        <span
+                          className="px-2 py-1"
+                          style={{ backgroundColor: "#AEDDC2", borderRadius: "25px" }}
+                        >
+                          Sisa kuota 0 dari {catagory.quota}
+                        </span>
+                      </div>
+                    </div>
+                  </Col>
+                );
+              })}
+            </Row>
+          </div>
+        </SweetAlert>
+        <SweetAlert
+          show={this.state.isUpdateCategory}
+          title=""
+          custom
+          style={{ width: 740, borderRadius: "1.25rem" }}
+          customButtons={
+            <span
+              className="d-flex justify-content-center"
+              style={{ gap: "0.5rem", width: "100%" }}
+            >
+              <ButtonBlue onClick={onBackToList}>Lanjut ke Data Peserta</ButtonBlue>
+            </span>
+          }
+        >
+          <div>
+            <div>
+              <img src={logoUpdate} />
+            </div>
+            <div>
+              <span style={{ fontWeight: "600", fontSize: "18px" }}>
+                Atur Kategori Peserta Berhasil
+              </span>
+              <br />
+              <span>Data kategori peserta telah diubah</span>
+            </div>
+          </div>
+        </SweetAlert>
       </React.Fragment>
-    )
+    );
   }
 }
 
-export default TableMember
+export default TableMember;

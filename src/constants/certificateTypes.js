@@ -3,6 +3,7 @@ const WINNER_ELIMINATION = 2;
 const ELIMINATION = 3;
 const WINNER_QUALIFICATION = 4;
 const WINNER_TEAM = 5;
+const WINNER_TEAM_MIXED = 6;
 
 export default {
   PARTICIPANT,
@@ -10,4 +11,5 @@ export default {
   ELIMINATION,
   WINNER_QUALIFICATION,
   WINNER_TEAM,
+  WINNER_TEAM_MIXED,
 };

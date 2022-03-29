@@ -97,10 +97,10 @@ function useStepScreenNavigation() {
 
   const getSequenceNumberById = (targetId) => {
     if (!targetId || !stepsData) {
-      return -1;
+      return 1;
     }
     const targetStep = stepsData.find((step) => targetId === step.stepId);
-    return targetStep?.sequence || -1;
+    return targetStep?.sequence || 1;
   };
 
   return {

@@ -8,22 +8,9 @@ import { useStepContent } from "./hooks/step-content";
 import { ButtonOutlineBlue } from "components/ma";
 
 function StepDisplay({ children }) {
-  const { currentStepId, registerStepContent } = useStepScreen();
+  const { currentStepId } = useStepScreen();
   const childrenList = React.Children.toArray(children);
   const currentChildById = childrenList.find((child) => child.props.id === currentStepId);
-
-  React.useEffect(() => {
-    if (!children) {
-      return;
-    }
-
-    const stepsData = childrenList
-      .filter((child) => child.type.name === "StepContent")
-      .map((child, index) => ({ sequence: index + 1, stepId: child.props.id }));
-
-    registerStepContent(stepsData);
-  }, []);
-
   return currentChildById || childrenList[0] || null;
 }
 

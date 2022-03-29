@@ -35,23 +35,35 @@ const StepListItemWrapper = styled.li`
     padding: 10px 30px 10px 40px;
     border: none;
     background-color: #0d47a1;
-    color: #ffffff !important;
+    color: #ffffff;
+
+    transition: all 0.3s;
 
     &:hover {
       color: #ffffff;
       background-color: rgba(212, 226, 252, 0.08);
     }
+
+    &:disabled {
+      color: var(--ma-gray-400);
+    }
+
+    &:disabled:hover {
+      color: var(--ma-gray-400);
+      background-color: #0d47a1;
+    }
   }
 
   &.active-step .step-item {
     background-color: rgba(212, 226, 252, 0.25);
+    padding-left: 50px;
   }
 `;
 
-function StepListItem({ children, className, onClick }) {
+function StepListItem({ children, className, onClick, disabled }) {
   return (
     <StepListItemWrapper className={className}>
-      <button className="step-item" onClick={onClick}>
+      <button className="step-item" onClick={onClick} disabled={disabled}>
         {children}
       </button>
     </StepListItemWrapper>
@@ -68,29 +80,41 @@ const StepNumberBullet = styled.span`
   border-radius: 1em;
   background-color: #ffffff;
   color: #0d47a1;
+
+  &.step-disabled {
+    background-color: var(--ma-gray-400);
+  }
 `;
 
-function StepList({ children, steps, currentStep, onChange }) {
+function StepList({ children, steps, currentStep, lastActiveStep, onChange }) {
   return (
     <StepListWrapper>
       {children && <StepListHeading>{children}</StepListHeading>}
 
       {steps && steps.length && (
         <ol className="steps-list">
-          {steps?.map((stepItem) => (
-            <StepListItem
-              key={stepItem.step}
-              className={classnames({ "active-step": currentStep === stepItem.step })}
-              onClick={() => {
-                if (onChange) {
-                  const ev = { target: { value: stepItem.step } };
-                  onChange(ev);
-                }
-              }}
-            >
-              <StepNumberBullet>{stepItem.step}</StepNumberBullet> {stepItem.label}
-            </StepListItem>
-          ))}
+          {steps?.map((stepItem) => {
+            const shouldDisableStep = lastActiveStep && stepItem.step > lastActiveStep;
+
+            return (
+              <StepListItem
+                key={stepItem.step}
+                className={classnames({ "active-step": currentStep === stepItem.step })}
+                onClick={() => {
+                  if (onChange) {
+                    const ev = { target: { value: stepItem.step } };
+                    onChange(ev);
+                  }
+                }}
+                disabled={shouldDisableStep}
+              >
+                <StepNumberBullet className={classnames({ "step-disabled": shouldDisableStep })}>
+                  {stepItem.step}
+                </StepNumberBullet>{" "}
+                {stepItem.label}
+              </StepListItem>
+            );
+          })}
         </ol>
       )}
     </StepListWrapper>

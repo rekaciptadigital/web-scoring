@@ -13,29 +13,29 @@ function useFetcher() {
   const { status } = state;
 
   const runAsync = async (serviceFetcher, { onSuccess, onError, transform } = {}) => {
-    if (!serviceFetcher) {
+    if (typeof serviceFetcher !== "function") {
       return;
     }
 
     dispatch({ status: "loading", errors: null });
-
     const result = await serviceFetcher();
+
+    // TODO: abort controller & cancel state update on unmount
+
     if (result.success) {
-      dispatch({
-        status: "success",
-        data: typeof transform === "function" ? transform(result.data) : result.data,
-      });
-      onSuccess?.();
+      const data = typeof transform === "function" ? transform(result.data) : result.data;
+      dispatch({ status: "success", data: data });
+      onSuccess?.(data);
     } else {
       const fetchingErrors = errorsUtil.interpretServerErrors(result);
       dispatch({ status: "error", errors: fetchingErrors });
-      onError?.();
+      onError?.(fetchingErrors);
     }
   };
 
   const isLoading = status === "loading";
   const isSuccess = status === "success";
-  const isError = status === "errors";
+  const isError = status === "error";
 
   return { ...state, state, runAsync, isLoading, isSuccess, isError };
 }

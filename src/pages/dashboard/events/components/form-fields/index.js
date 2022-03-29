@@ -2,6 +2,7 @@ export { default as FieldInputText } from "./FieldInputText";
 export { default as FieldInputTextSmall } from "./FieldInputTextSmall";
 export { default as FieldTextArea } from "./FieldTextArea";
 export { default as FieldSelect } from "./FieldSelect";
+export { default as FieldSelectSmall } from "./FieldSelectSmall";
 export { default as FieldSelectCity } from "./FieldSelectCity";
 export { default as FieldSelectCategory } from "./FieldSelectCategory";
 export { default as FieldSelectKelas } from "./FieldSelectKelas";

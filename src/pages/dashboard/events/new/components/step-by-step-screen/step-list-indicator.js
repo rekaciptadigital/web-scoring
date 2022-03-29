@@ -1,8 +1,25 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useStepScreen } from "./hooks/step-screen";
 
 function StepListIndicator({ children, title }) {
+  const { registerStepContent } = useStepScreen();
+
   const childrenItemsList = React.Children.toArray(children);
+
+  React.useEffect(() => {
+    if (!children) {
+      return;
+    }
+
+    const stepsData = childrenItemsList.map((child, index) => ({
+      sequence: index + 1,
+      stepId: child.props.id,
+    }));
+
+    registerStepContent(stepsData);
+  }, []);
+
   return (
     <StyledListIndicator>
       {title && <Title>{title}</Title>}

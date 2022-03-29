@@ -87,6 +87,15 @@ export default {
   getEventLaporan(qs = null) {
     return API.get("/web/v1/archery/events/participant/excel/download", qs);
   },
+  getEventMemberNew(qs = null) {
+    return API.get("/web/v2/members", qs);
+  },
+  getAccessCategories(qs = null) {
+    return API.get("/web/v2/members/access-categories", qs);
+  },
+  updateCategory(data = null, qs = null) {
+    return API.put("/web/v1/participant/update-category", data, qs);
+  },
 
   /**
    * v2

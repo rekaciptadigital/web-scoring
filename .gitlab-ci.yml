@@ -2,6 +2,8 @@ image: node:14
 before_script: 
   - apt-get update -qq
   - apt-get install -qq git
+  - rm -rf package-json.lock
+  - git config --global url."https://".insteadOf git://
   # Setup SSH deploy keys
   - 'which ssh-agent || ( apt-get install -qq openssh-client )'
   - eval $(ssh-agent -s)
@@ -13,70 +15,70 @@ stages:
   - update
   - deploy
 
-# update_production:
-#   stage: update
-#   script:
-#     - echo "Updating develop"
-#     - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master"
-#     - echo "Code Updated"
-#   only:
-#     - master
+update_production:
+  stage: update
+  script:
+    - echo "Updating develop"
+    - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master && php artisan migrate"
+    - echo "Code Updated"
+  only:
+    - master
 
-# deploy_production:
-#   stage: deploy
-#   script:
-#     - echo "Cleaning Up Modules"
+deploy_production:
+  stage: deploy
+  script:
+    - echo "Cleaning Up Modules"
 #     - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-admin-archery/node_modules && rm  /var/www/web-admin-archery/package-lock.json"
-#     - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery && sudo npm run build --prefix /var/www/web-admin-archery"
-#     - echo "Build Success, Apps running for Production"
-#   only:
-#     - master
+    - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery && sudo npm run build --prefix /var/www/web-admin-archery"
+    - echo "Build Success, Apps running for Production"
+  only:
+    - master
 
-# update_staging:
-#   stage: update
-#   script:
-#     - echo "Updating develop"
-#     - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git checkout develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git fetch origin develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git pull origin develop"
-#     - echo "Code Updated"
-#   only:
-#     - develop
+update_staging:
+  stage: update
+  script:
+    - echo "Updating develop"
+    - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git checkout develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git fetch origin develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git pull origin develop"
+    - echo "Code Updated"
+  only:
+    - develop
 
-# deploy_staging:
-#   stage: deploy
-#   script:
+deploy_staging:
+  stage: deploy
+  script:
 #     # - echo "Cleaning Up Modules"
 #     # - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-archery-stg/node_modules && rm  /var/www/web-archery-stg/package-lock.json"
-#     - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery-stg && sudo npm run build --prefix /var/www/web-admin-archery-stg"
-#     - echo "Build Success, Apps running for Staging"
-#   only:
-#     - develop
+    - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery-stg && sudo npm run build --prefix /var/www/web-admin-archery-stg"
+    - echo "Build Success, Apps running for Staging"
+  only:
+    - develop
 
 
 
 ####New Deployment######
 # image: tetraweb/php
 
-stage_build:
-  stage: update
-  only: 
-    - develop
-  script:
-    - npm install
-    - npm run build
-  artifacts:
-    paths:
-      - build/
+#stage_build:
+  #stage: update
+  #only: 
+    #- develop
+  #script:
+    #- npm install
+    #- npm run build
+  #artifacts:
+    #paths:
+    #  - build/
 
-stage_deploy:
-  stage: deploy
-  only:
-    - develop
-  script:
+#stage_deploy:
+  #stage: deploy
+  #only:
+    #- develop
+  #script:
     # - ssh -p22 root@103.31.38.37 "mkdir /opt/archery-web/_tmp"
     # - scp -P22 -r build/* root@103.31.38.37:/opt/archery-web/_tmp
     # - ssh -p22 root@103.31.38.37 "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
     # - ssh -p22 root@103.31.38.37 "rm -rf /opt/archery-web/_old"
-    - ssh -p22 root@103.31.38.37 "mkdir /var/www/web-admin-archery-stg/_temp"
-    - scp -P22 -r build/* root@103.31.38.37:/var/www/web-admin-archery-stg/_temp
-    - ssh -p22 root@103.31.38.37 "mv /var/www/web-admin-archery-stg/build /var/www/web-admin-archery-stg/build_old && mv /var/www/web-admin-archery-stg/_temp //var/www/web-admin-archery-stg/build"
-    - ssh -p22 root@103.31.38.37 "rm -rf /var/www/web-admin-archery-stg/build_old"
+    #- ssh -p22 root@103.31.38.37 "mkdir /var/www/web-admin-archery-stg/_temp"
+    #- scp -P22 -r build/* root@103.31.38.37:/var/www/web-admin-archery-stg/_temp
+    #- ssh -p22 root@103.31.38.37 "mv /var/www/web-admin-archery-stg/build /var/www/web-admin-archery-stg/build_old && mv /var/www/web-admin-archery-stg/_temp //var/www/web-admin-archery-stg/build"
+    #- ssh -p22 root@103.31.38.37 "rm -rf /var/www/web-admin-archery-stg/build_old"

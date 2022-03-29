@@ -4,7 +4,7 @@ const EVENT_TYPES = {
 };
 
 const MATCH_TYPES = {
-  TOURNAMENT: "tournament",
+  TOURNAMENT: "Tournament",
   GAMES: "games",
 };
 

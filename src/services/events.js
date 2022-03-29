@@ -96,4 +96,20 @@ export default {
   updateCategory(data = null, qs = null) {
     return API.put("/web/v1/participant/update-category", data, qs);
   },
+
+  /**
+   * v2
+   */
+  storeEventDetailV2(data) {
+    return API.post("/web/v2/events", data, null, true);
+  },
+  updateEventDetailV2(data = null, qs = null) {
+    return API.put("/web/v2/events", data, qs, true);
+  },
+  storeCategoryDetailV2(data) {
+    return API.post("/web/v2/category/", data, null, true);
+  },
+  deleteCategoryDetailV2(data) {
+    return API.deleteWithJSON("/web/v2/category/", data);
+  },
 };

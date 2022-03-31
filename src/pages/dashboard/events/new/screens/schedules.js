@@ -115,7 +115,7 @@ function DayScheduleEditor({
 
 function EditorDisplay({ sessionsByDate, schedulesProvider }) {
   const { data: schedules, isLoading: isLoadingSchedule } = schedulesProvider;
-  const isUpdatingEditorData = schedules?.length && isLoadingSchedule;
+  const isUpdatingEditorData = Boolean(schedules?.length) && isLoadingSchedule;
 
   return (
     <CategoryList>

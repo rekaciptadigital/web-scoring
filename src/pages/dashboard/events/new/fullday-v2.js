@@ -39,8 +39,7 @@ import { computeLastUnlockedStep } from "./utils/last-unlocked-step";
 import IconPlus from "components/ma/icons/mono/plus";
 
 function PageCreateEventFullday() {
-  const { qs, setParamEventId } = useRouteQueryParams();
-  const eventId = qs.event_id ? parseInt(qs.event_id) : null;
+  const { eventId, setParamEventId, isManageEvent } = useRouteQueryParams();
 
   const {
     data: eventDetail,
@@ -86,7 +85,7 @@ function PageCreateEventFullday() {
     <ContentLayoutWrapper
       pageTitle="Buat Event Baru"
       breadcrumbText="Kembali"
-      breadcrumbLink="/dashboard"
+      breadcrumbLink={isManageEvent ? `/dashboard/event/${eventId}/home` : "/dashboard"}
     >
       <ProcessingToast />
       <LoadingScreen loading={isLoadingSubmit} />
@@ -127,10 +126,10 @@ function PageCreateEventFullday() {
                       const isCreateMode = !eventDetail?.id || !eventId;
                       if (isCreateMode) {
                         setParamEventId(data.id);
+                        next();
                       } else {
                         fetchEventDetail();
                       }
-                      next();
                     },
                   });
                 }}
@@ -166,7 +165,6 @@ function PageCreateEventFullday() {
                     onSuccess() {
                       toast.success("Berhasil menyimpan biaya registrasi");
                       fetchEventDetail();
-                      next();
                     },
                   });
                 }}
@@ -211,9 +209,11 @@ function PageCreateEventFullday() {
                   submitCategories(formCategories.data, formFees, {
                     eventId,
                     onSuccess() {
-                      toast.success("Berhasil menyimpan kategori");
                       fetchEventDetail();
-                      next();
+                      toast.success("Berhasil menyimpan kategori");
+                      if (formCategories.isEmpty) {
+                        next();
+                      }
                     },
                   });
                 }}
@@ -241,6 +241,7 @@ function PageCreateEventFullday() {
             <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
+                  toast.success("Selesai mengisi data event!");
                   next();
                 }}
               >

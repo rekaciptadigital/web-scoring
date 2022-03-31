@@ -4,6 +4,9 @@ import { EventsService } from "services";
 
 function useEventDetail(eventId) {
   const eventDetail = useFetcher();
+  const { data, isLoading } = eventDetail;
+
+  const isPreparing = !data && isLoading;
 
   const fetchEventDetail = () => {
     const getFunction = () => EventsService.getEventDetailById({ id: eventId });
@@ -17,7 +20,7 @@ function useEventDetail(eventId) {
     fetchEventDetail();
   }, [eventId]);
 
-  return { ...eventDetail, fetchEventDetail };
+  return { ...eventDetail, isPreparing, fetchEventDetail };
 }
 
 export { useEventDetail };

@@ -42,7 +42,11 @@ function PageCreateEventFullday() {
   const { qs, setParamEventId } = useRouteQueryParams();
   const eventId = qs.event_id ? parseInt(qs.event_id) : null;
 
-  const { data: eventDetail, fetchEventDetail } = useEventDetail(eventId);
+  const {
+    data: eventDetail,
+    isPreparing: isPreparingEvent,
+    fetchEventDetail,
+  } = useEventDetail(eventId);
   const { data: categories } = useCategoriesQualification(eventDetail);
   const schedulesProvider = useQualificationSchedules(eventDetail);
   const { data: schedules } = schedulesProvider;
@@ -102,7 +106,11 @@ function PageCreateEventFullday() {
             </StepHeader>
 
             <StepBody>
-              <ScreenPublicInfos eventDetail={eventDetail} form={formPublicInfos} />
+              <ScreenPublicInfos
+                eventDetail={eventDetail}
+                form={formPublicInfos}
+                isPreparing={isPreparingEvent}
+              />
             </StepBody>
 
             <StepFooterActions>

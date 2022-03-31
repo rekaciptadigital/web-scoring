@@ -2,7 +2,7 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EventsService } from "services";
 
-import { getHours, getMinutes } from "date-fns";
+import { getHours, getMinutes, addHours } from "date-fns";
 import stringUtil from "utils/stringUtil";
 import { formatServerDate } from "../utils/datetime";
 
@@ -26,6 +26,9 @@ function useScheduleEditorForm(initialValues, eventId) {
   };
 
   const createEmptySchedule = () => dispatch({ type: "CREATE_EMPTY_SCHEDULE" });
+  const createSchedule = (categoryDetail) => {
+    dispatch({ type: "CREATE_SCHEDULE_WITH_DEFAULT", payload: categoryDetail });
+  };
 
   const removeScheduleItem = (key) => dispatch({ type: "REMOVE_SCHEDULE_ITEM", key: key });
 
@@ -42,6 +45,7 @@ function useScheduleEditorForm(initialValues, eventId) {
     createEmptySchedule,
     removeScheduleItem,
     submitSchedules,
+    createSchedule,
   };
 }
 
@@ -77,6 +81,27 @@ function editorReducer(state, action) {
             idQualificationTime: undefined,
             eventStartDatetime: null,
             eventEndDatetime: null,
+          },
+        ],
+      },
+    };
+  } else if (action.type === "CREATE_SCHEDULE_WITH_DEFAULT") {
+    const lastIndex = state.data.sessions.length - 1;
+    const lastTimeStart = state.data.sessions[lastIndex].eventStartDatetime;
+    const lastTimeEnd = addHours(lastTimeStart, 1);
+
+    return {
+      ...state,
+      data: {
+        ...state.data,
+        sessions: [
+          ...state.data.sessions,
+          {
+            key: stringUtil.createRandom(),
+            categoryDetail: action.payload,
+            idQualificationTime: undefined,
+            eventStartDatetime: lastTimeStart,
+            eventEndDatetime: lastTimeEnd,
           },
         ],
       },

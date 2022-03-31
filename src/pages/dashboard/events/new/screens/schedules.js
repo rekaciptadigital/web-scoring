@@ -170,7 +170,7 @@ function EditorForm({
   const {
     data: editorFormData,
     updateField,
-    createEmptySchedule,
+    createSchedule,
     removeScheduleItem,
     submitSchedules,
     isLoading: isLoadingSubmit,
@@ -226,6 +226,7 @@ function EditorForm({
                     <FieldSelectSmall
                       label="Kategori"
                       placeholder="Pilih kategori"
+                      emptyMessage="Kategori kosong"
                       disabled={isDisabled}
                       options={filteredOptionsCategories}
                       value={session.categoryDetail}
@@ -261,7 +262,7 @@ function EditorForm({
                   <Button
                     flexible
                     disabled={isButtonAddDisabled}
-                    onClick={() => createEmptySchedule()}
+                    onClick={() => createSchedule(filteredOptionsCategories[0])}
                   >
                     <IconPlus size="13" />
                   </Button>

@@ -9,6 +9,7 @@ function FieldSelectSmall({
   name,
   required,
   placeholder,
+  emptyMessage = "Pilihan kosong",
   options,
   value = null,
   onChange,
@@ -25,6 +26,7 @@ function FieldSelectSmall({
         styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder || label}
+        noOptionsMessage={() => emptyMessage}
         options={options}
         value={value}
         onChange={onChange}

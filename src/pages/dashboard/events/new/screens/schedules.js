@@ -166,7 +166,7 @@ function EditorForm({
   onCloseEdit,
   schedulesProvider,
 }) {
-  const { fetchSchedules } = schedulesProvider;
+  const { data: schedulesData, fetchSchedules } = schedulesProvider;
   const {
     data: editorFormData,
     updateField,
@@ -178,7 +178,17 @@ function EditorForm({
     errors: errorsSubmit,
   } = useScheduleEditorForm(sessionsByDate, eventDetail?.id);
 
+  const filteredOptionsCategories = filterUnselected(optionsCategories, {
+    initialSessions: sessionsByDate.sessions,
+    editorSessions: editorFormData.sessions,
+    serverSessions: schedulesData,
+  });
   const showOnlySessions = editorFormData?.sessions.filter((session) => !session.shouldDelete);
+  const notEmptyRows = showOnlySessions.filter((session) => {
+    return !session.shouldDelete && session.categoryDetail?.value;
+  });
+  const maxRowCountsAllowed = filteredOptionsCategories.length + notEmptyRows.length;
+  const isButtonAddDisabled = isDisabled || showOnlySessions.length >= maxRowCountsAllowed;
 
   const handleClickSave = () => {
     submitSchedules({
@@ -217,7 +227,7 @@ function EditorForm({
                       label="Kategori"
                       placeholder="Pilih kategori"
                       disabled={isDisabled}
-                      options={optionsCategories}
+                      options={filteredOptionsCategories}
                       value={session.categoryDetail}
                       onChange={(value) => {
                         updateField(session.key, "categoryDetail", value);
@@ -248,7 +258,11 @@ function EditorForm({
                 </SessionDetailInput>
 
                 <HorizontalSpacedButtonGroups>
-                  <Button flexible disabled={isDisabled} onClick={() => createEmptySchedule()}>
+                  <Button
+                    flexible
+                    disabled={isButtonAddDisabled}
+                    onClick={() => createEmptySchedule()}
+                  >
                     <IconPlus size="13" />
                   </Button>
 
@@ -402,5 +416,43 @@ const UpdatingStateBlocker = styled.div`
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.75);
 `;
+
+/* ========================================== */
+
+function filterUnselected(categoryOptions, { initialSessions, editorSessions, serverSessions }) {
+  const idsFromServer = serverSessions.map((session) => session.categoryDetailId);
+  const idsInitialEditor = initialSessions
+    .map((session) => session.categoryDetail?.value)
+    .filter((id) => Boolean(id));
+
+  const slicedIds = idsFromServer.filter((serverId) => {
+    for (const initialFormId of idsInitialEditor) {
+      if (serverId === initialFormId) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const idsFromEditor = editorSessions.reduce((sessions, session) => {
+    if (!session.categoryDetail?.value || session.shouldDelete) {
+      return sessions;
+    }
+    return [...sessions, session.categoryDetail.value];
+  }, []);
+
+  const selectedCategoryDetailIds = [...slicedIds, ...idsFromEditor];
+
+  const resultOptions = categoryOptions.filter((option) => {
+    for (const id of selectedCategoryDetailIds) {
+      if (id === option.value) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  return resultOptions;
+}
 
 export { ScreenSchedules };

@@ -12,6 +12,9 @@ import { FieldSelectSmall, FieldInputTextSmall } from "../../components/form-fie
 import { LoadingScreen } from "../components/loading-screen-portal";
 import { toast } from "../components/processing-toast";
 
+import IconPlus from "components/ma/icons/mono/plus";
+import IconTrash from "components/ma/icons/mono/trash";
+
 function ScreenCategories({ eventDetail, fetchEventDetail, form, formFees }) {
   const { data, setMaxLengthFromOptions } = form;
 
@@ -174,11 +177,11 @@ function CategoriesByCompetition({
             selectCompetitionCategory(category.key, value);
           }}
         >
-          Kategori (id: {<span>{category.competitionCategoryId?.label}</span>})
+          Kategori
         </FieldSelectSmall>
       </CompetitionCategorySelector>
 
-      <VerticalSpacedBox>
+      <VerticalSpacedBoxLoose>
         {category.categoryDetails.map((detail) => (
           <CategoryBlock key={detail.key}>
             <ClassGroup>
@@ -192,7 +195,7 @@ function CategoriesByCompetition({
                       selectCategoryDetailItem("ageCategoryId", category.key, detail.key, value);
                     }}
                   >
-                    Kelas <span>(id: {detail.ageCategoryId?.value})</span>
+                    Kelas
                   </FieldSelectSmall>
 
                   <FieldSelectSmall
@@ -203,7 +206,7 @@ function CategoriesByCompetition({
                       selectCategoryDetailItem("distanceId", category.key, detail.key, value);
                     }}
                   >
-                    Jarak <span>(id: {detail.distanceId?.value})</span>
+                    Jarak
                   </FieldSelectSmall>
                 </PairedFields>
 
@@ -229,7 +232,7 @@ function CategoriesByCompetition({
                               );
                             }}
                           >
-                            {quota.teamCategoryLabel} (id: {quota.categoryDetailsId})
+                            {quota.teamCategoryLabel}
                           </FieldInputTextSmall>
                         </div>
                       );
@@ -240,8 +243,11 @@ function CategoriesByCompetition({
             </ClassGroup>
 
             <div>
-              <Button onClick={() => createEmptyCategoryDetail(category.key)}>+</Button>
+              <Button flexible onClick={() => createEmptyCategoryDetail(category.key)}>
+                <IconPlus size="13" />
+              </Button>
               <Button
+                flexible
                 disabled={category.categoryDetails.length <= 1}
                 onClick={() => {
                   if (!detail.isAlive) {
@@ -257,7 +263,7 @@ function CategoriesByCompetition({
                   }
                 }}
               >
-                x
+                <IconTrash size="13" />
               </Button>
             </div>
           </CategoryBlock>
@@ -281,13 +287,19 @@ function CategoriesByCompetition({
               }
             }}
           >
-            Hapus kategori
+            <IconTrash size="13" /> <span>Hapus kategori</span>
           </ButtonOutlineBlue>
         </div>
-      </VerticalSpacedBox>
+      </VerticalSpacedBoxLoose>
     </CardSheet>
   );
 }
+
+const VerticalSpacedBoxLoose = styled.div`
+  > * + * {
+    margin-top: 1.75rem;
+  }
+`;
 
 /* ============================================= */
 // util

@@ -24,7 +24,7 @@ function FieldSelectSmall({
       <Select
         styles={computeCustomStylesWithValidation(errors)}
         name={name}
-        placeholder={placeholder}
+        placeholder={placeholder || label}
         options={options}
         value={value}
         onChange={onChange}
@@ -50,9 +50,11 @@ const FieldSelectWrapper = styled.div`
 `;
 
 const customSelectStyles = {
-  control: (provided) => ({
+  control: (provided, state) => ({
     ...provided,
     minHeight: undefined,
+    backgroundColor: state.isDisabled ? "#eff2f7" : "#ffffff",
+    borderColor: state.isDisabled ? "rgb(206, 212, 218)" : "#ced4da",
   }),
   valueContainer: (provided) => ({
     ...provided,

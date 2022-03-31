@@ -1,12 +1,12 @@
 function computeLastUnlockedStep(sortedFormStatusList) {
-  let stepNumber = 0;
+  let stepSequenceNumber = 0;
   for (const isEmpty of sortedFormStatusList) {
-    stepNumber = stepNumber + 1;
+    stepSequenceNumber = stepSequenceNumber + 1;
     if (isEmpty) {
       break;
     }
   }
-  return stepNumber;
+  return stepSequenceNumber;
 }
 
 export { computeLastUnlockedStep };

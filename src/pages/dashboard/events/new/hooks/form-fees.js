@@ -301,19 +301,6 @@ function syncToEarlyBirdToggle(data, syncToggledActive) {
   });
 }
 
-/**
- * Hanya perlu menyinkronkan dengan toggle flat fee ketika
- * early bird-nya aktif saja;
- * Selalu non-aktif kalau early bird-nya juga non-aktif.
- */
-// eslint-disable-next-line no-unused-vars
-function syncToFlatFeeToggle(data) {
-  if (data.isEarlyBird) {
-    return data.isFlatFee;
-  }
-  return false;
-}
-
 function syncEarlyBirdToNormalFees(data, feeType, team, toggledActive) {
   if (!(feeType === "normal" && data.isEarlyBird)) {
     return data.earlyBirdByTeam;

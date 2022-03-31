@@ -112,4 +112,15 @@ export default {
   deleteCategoryDetailV2(data) {
     return API.deleteWithJSON("/web/v2/category/", data);
   },
+  storeQualificationTimeV2(data) {
+    // create/update
+    return API.post("/web/v2/qualification-time", data, null, true);
+  },
+
+  /**
+   * General
+   */
+  getCategoryDetailV2(qs = null) {
+    return API.get("/general/v2/category-details", qs);
+  },
 };

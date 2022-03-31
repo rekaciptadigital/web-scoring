@@ -2,6 +2,8 @@ import * as React from "react";
 import styled from "styled-components";
 import { useRouteQueryParams } from "./hooks/route-params";
 import { useEventDetail } from "./hooks/event-detail";
+import { useCategoriesQualification } from "./hooks/qualification-categories";
+import { useQualificationSchedules } from "./hooks/qualification-schedules";
 import { useFormPublicInfos } from "./hooks/form-public-infos";
 import { useFormFees } from "./hooks/form-fees";
 import { useFormCategories } from "./hooks/form-categories";
@@ -28,27 +30,35 @@ import { LoadingScreen } from "./components/loading-screen-portal";
 import { ScreenPublicInfos } from "./screens/public-infos";
 import { ScreenFees } from "./screens/fees";
 import { ScreenCategories } from "./screens/categories";
+import { ScreenSchedules } from "./screens/schedules";
+import { ScreenFinish } from "./screens/finish";
 
 import { stepId } from "./constants/step-ids";
 import { computeLastUnlockedStep } from "./utils/last-unlocked-step";
+
+import IconPlus from "components/ma/icons/mono/plus";
 
 function PageCreateEventFullday() {
   const { qs, setParamEventId } = useRouteQueryParams();
   const eventId = qs.event_id ? parseInt(qs.event_id) : null;
 
   const { data: eventDetail, fetchEventDetail } = useEventDetail(eventId);
+  const { data: categories } = useCategoriesQualification(eventDetail);
+  const schedulesProvider = useQualificationSchedules(eventDetail);
+  const { data: schedules } = schedulesProvider;
 
   // Forms
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
-  const formSchedules = useFormSchedules(eventDetail);
+  const formSchedules = useFormSchedules(schedules, eventDetail);
 
   const lastUnlockedStep = computeLastUnlockedStep([
     formPublicInfos.isEmpty,
     formFees.isEmpty,
     formCategories.isEmpty,
     formSchedules.isEmpty,
+    !formSchedules.isEmpty,
   ]);
 
   // Submit functions
@@ -168,7 +178,7 @@ function PageCreateEventFullday() {
                     disabled={formCategories.data?.length >= formCategories.maxLength}
                     onClick={() => formCategories.createEmptyCategory()}
                   >
-                    Tambah Kategori
+                    <IconPlus size="13" /> Tambah Kategori
                   </ButtonOutlineBlue>
                 </div>
               </SpacedHeaderBar>
@@ -208,26 +218,29 @@ function PageCreateEventFullday() {
             </StepHeader>
 
             <StepBody>
-              <h1>TBD: Form Jadwal Pertandingan</h1>
+              <ScreenSchedules
+                eventDetail={eventDetail}
+                categories={categories}
+                formSchedules={formSchedules}
+                schedulesProvider={schedulesProvider}
+              />
             </StepBody>
 
-            <StepFooterActions />
+            <StepFooterActions>
+              <ButtonSave
+                onSubmit={({ next }) => {
+                  toast.success("Selesaikan dulu formnya!");
+                  next();
+                }}
+              >
+                Simpan
+              </ButtonSave>
+            </StepFooterActions>
           </StepContent>
 
           <StepContent id={stepId.SELESAI}>
             <StepBody>
-              <div>[TBD: gambar ilustrasi]</div>
-
-              <h2>Pengaturan Pertandingan berhasil disimpan</h2>
-              <p>
-                Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage Event.
-                Buat lebih banyak event di Dashboard EO.
-              </p>
-
-              <div>
-                <button>Pratinjau</button>
-                <button>Publikasi</button>
-              </div>
+              <ScreenFinish eventDetail={eventDetail} />
             </StepBody>
           </StepContent>
         </StepDisplay>

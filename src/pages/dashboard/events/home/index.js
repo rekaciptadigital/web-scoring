@@ -9,6 +9,8 @@ import CardMenu from "../components/CardMenu";
 import CardMenuWithButton from "../components/CardMenuWithButton";
 
 import IconCopy from "components/ma/icons/mono/copy";
+import IconInfo from "components/ma/icons/mono/info";
+import IconCheck from "components/ma/icons/fill/check";
 
 import { eventMenus } from "./utils/menus";
 
@@ -20,22 +22,23 @@ function PageEventDetailHome() {
   const isEventPublished = Boolean(eventDetail?.publicInformation.eventStatus);
 
   const renderManageEventMenuBadge = () => {
-    if (!isEventPublished && !isQualificationSchedulesSet) {
+    if (!isEventPublished) {
       return (
         <InfoGrayBadge>
-          <span className="icon-info">&#8505;</span>
+          <span className="icon-info">
+            <IconInfo size="20" />
+          </span>
           <span>Draft</span>
         </InfoGrayBadge>
       );
     }
-    if (!isQualificationSchedulesSet) {
-      return (
-        <PublishedBadge>
-          <span className="icon-check">&#10003;</span>
-          <span>Terpublikasi</span>
-        </PublishedBadge>
-      );
-    }
+
+    return (
+      <PublishedBadge>
+        <IconCheck size="20" />
+        <span>Terpublikasi</span>
+      </PublishedBadge>
+    );
   };
 
   const computeHrefScheduleMenu = () => {
@@ -103,18 +106,16 @@ function PageEventDetailHome() {
                 eventDetail={eventDetail}
                 menu={eventMenus[2]}
                 href={`/dashboard/member/${event_id}?type=individual`}
-                // disabled={!isQualificationSchedulesSet}
               />
               <CardMenuWithButton
                 eventDetail={eventDetail}
                 menu={eventMenus[3]}
-                // href={`/dashboard/member/${event_id}`}
                 href={`/dashboard/member/${event_id}?type=team`}
               />
               <CardMenu
                 menu={eventMenus[4]}
                 href={computeHrefScheduleMenu()}
-                disabled={!isEventPublished}
+                disabled={!isQualificationSchedulesSet}
                 badge={
                   !isQualificationSchedulesSet && (
                     <InfoGrayBadge>
@@ -124,21 +125,7 @@ function PageEventDetailHome() {
                   )
                 }
               />
-              {/* <CardMenu
-                menu={eventMenus[5]}
-                href={eventMenus[5].computeLink(event_id)}
-                disabled={!isQualificationSchedulesSet}
-              /> */}
-              <CardMenu
-                menu={eventMenus[6]}
-                href={eventMenus[6].computeLink(event_id)}
-                disabled={!isQualificationSchedulesSet}
-              />
-              {/* <CardMenu
-                menu={eventMenus[7]}
-                href={eventMenus[7].computeLink(event_id)}
-                disabled={!isQualificationSchedulesSet}
-              /> */}
+              <CardMenu menu={eventMenus[6]} href={eventMenus[6].computeLink(event_id)} />
             </MenuGridWrapper>
           </React.Fragment>
         ) : (
@@ -195,16 +182,7 @@ const InfoGrayBadge = styled.div`
   font-size: 12px;
 
   .icon-info {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 50%;
-    background-color: #ffffff;
     color: var(--ma-gray-400);
-    font-size: 15px;
-    font-style: italic;
   }
 `;
 
@@ -214,18 +192,6 @@ const PublishedBadge = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 12px;
-
-  .icon-check {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 50%;
-    background-color: #3aa76d;
-    color: #ffffff;
-    font-size: 15px;
-  }
 `;
 
 function LandingPageLinkPlaceholder({ url = "" }) {

@@ -8,7 +8,7 @@ import { parseServerDatetime, formatServerDate } from "../utils/datetime";
 function makeDefaultForm(eventDetail) {
   let eventStartDate = null;
   let eventEndDate = null;
-  let numberOfDays = 2;
+  let numberOfDays = 1;
 
   if (eventDetail) {
     eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
@@ -45,7 +45,7 @@ function makeDefaultForm(eventDetail) {
 function makeStateSchedules(eventDetail, schedules) {
   let eventStartDate = null;
   let eventEndDate = null;
-  let numberOfDays = 2;
+  let numberOfDays = 1;
 
   if (eventDetail) {
     eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
@@ -68,6 +68,14 @@ function makeStateSchedules(eventDetail, schedules) {
   const mappedServerDataToForm = schedules.reduce((data, schedule) => {
     const dateTarget = parseServerDatetime(schedule.eventStartDatetime);
     const dateAsString = formatServerDate(dateTarget);
+
+    // Tanpa ini, eksplode. Tapi sebenernya gak perlu karena harusnya
+    // jadwal yang sudah terbuat itu sudah masuk ke range tanggal mulai &
+    // selesai event. Antisipasi jadwal yang lolos validasi di luar range
+    // tanggal lomba event. Contoh kasus data jadwal di Series 1.
+    if (!data[dateAsString]) data[dateAsString] = {};
+    if (!data[dateAsString].sessions) data[dateAsString].sessions = [];
+
     return {
       ...data,
       [dateAsString]: {

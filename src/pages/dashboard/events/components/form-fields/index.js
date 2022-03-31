@@ -13,3 +13,5 @@ export { default as FieldSelectRadio } from "./FieldSelectRadio";
 export { default as FieldInputPrice } from "./FieldInputPrice";
 export { default as FieldInputDate } from "./FieldInputDate";
 export { default as FieldInputTime } from "./FieldInputTime";
+export { default as FieldInputDateSmall } from "./field-input-date-small";
+export { default as FieldInputTimeSmall } from "./field-input-time-small";

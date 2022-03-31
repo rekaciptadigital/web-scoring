@@ -16,7 +16,7 @@ import {
 
 import { setHours, setMinutes, getMinutes, getHours } from "date-fns";
 
-function ScreenPublicInfos({ form }) {
+function ScreenPublicInfos({ form, isPreparing }) {
   const {
     data,
     updateField,
@@ -34,6 +34,10 @@ function ScreenPublicInfos({ form }) {
     const imagePreviewUrl = URL.createObjectURL(imageRawData);
     updateField("poster", { preview: imagePreviewUrl, raw: imageRawData });
   };
+
+  if (isPreparing) {
+    return <CardSheet>Sedang menyiapkan data...</CardSheet>;
+  }
 
   return (
     <div>

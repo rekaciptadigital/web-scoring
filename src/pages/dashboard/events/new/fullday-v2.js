@@ -2,6 +2,8 @@ import * as React from "react";
 import styled from "styled-components";
 import { useRouteQueryParams } from "./hooks/route-params";
 import { useEventDetail } from "./hooks/event-detail";
+import { useCategoriesQualification } from "./hooks/qualification-categories";
+import { useQualificationSchedules } from "./hooks/qualification-schedules";
 import { useFormPublicInfos } from "./hooks/form-public-infos";
 import { useFormFees } from "./hooks/form-fees";
 import { useFormCategories } from "./hooks/form-categories";
@@ -28,27 +30,38 @@ import { LoadingScreen } from "./components/loading-screen-portal";
 import { ScreenPublicInfos } from "./screens/public-infos";
 import { ScreenFees } from "./screens/fees";
 import { ScreenCategories } from "./screens/categories";
+import { ScreenSchedules } from "./screens/schedules";
+import { ScreenFinish } from "./screens/finish";
 
 import { stepId } from "./constants/step-ids";
 import { computeLastUnlockedStep } from "./utils/last-unlocked-step";
 
-function PageCreateEventFullday() {
-  const { qs, setParamEventId } = useRouteQueryParams();
-  const eventId = qs.event_id ? parseInt(qs.event_id) : null;
+import IconPlus from "components/ma/icons/mono/plus";
 
-  const { data: eventDetail, fetchEventDetail } = useEventDetail(eventId);
+function PageCreateEventFullday() {
+  const { eventId, setParamEventId, isManageEvent } = useRouteQueryParams();
+
+  const {
+    data: eventDetail,
+    isPreparing: isPreparingEvent,
+    fetchEventDetail,
+  } = useEventDetail(eventId);
+  const { data: categories } = useCategoriesQualification(eventDetail);
+  const schedulesProvider = useQualificationSchedules(eventDetail);
+  const { data: schedules } = schedulesProvider;
 
   // Forms
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
-  const formSchedules = useFormSchedules(eventDetail);
+  const formSchedules = useFormSchedules(schedules, eventDetail);
 
   const lastUnlockedStep = computeLastUnlockedStep([
     formPublicInfos.isEmpty,
     formFees.isEmpty,
     formCategories.isEmpty,
     formSchedules.isEmpty,
+    !formSchedules.isEmpty,
   ]);
 
   // Submit functions
@@ -69,7 +82,11 @@ function PageCreateEventFullday() {
   const isLoadingSubmit = isSubmitingPublicInfos || isSubmitingCategories;
 
   return (
-    <ContentLayoutWrapper pageTitle="Buat Event Baru">
+    <ContentLayoutWrapper
+      pageTitle="Buat Event Baru"
+      breadcrumbText="Kembali"
+      breadcrumbLink={isManageEvent ? `/dashboard/event/${eventId}/home` : "/dashboard"}
+    >
       <ProcessingToast />
       <LoadingScreen loading={isLoadingSubmit} />
       <AlertSubmitError isError={isErrorPublicInfos} errors={publicInfosErrors} />
@@ -92,7 +109,11 @@ function PageCreateEventFullday() {
             </StepHeader>
 
             <StepBody>
-              <ScreenPublicInfos eventDetail={eventDetail} form={formPublicInfos} />
+              <ScreenPublicInfos
+                eventDetail={eventDetail}
+                form={formPublicInfos}
+                isPreparing={isPreparingEvent}
+              />
             </StepBody>
 
             <StepFooterActions>
@@ -105,10 +126,10 @@ function PageCreateEventFullday() {
                       const isCreateMode = !eventDetail?.id || !eventId;
                       if (isCreateMode) {
                         setParamEventId(data.id);
+                        next();
                       } else {
                         fetchEventDetail();
                       }
-                      next();
                     },
                   });
                 }}
@@ -144,7 +165,6 @@ function PageCreateEventFullday() {
                     onSuccess() {
                       toast.success("Berhasil menyimpan biaya registrasi");
                       fetchEventDetail();
-                      next();
                     },
                   });
                 }}
@@ -168,7 +188,7 @@ function PageCreateEventFullday() {
                     disabled={formCategories.data?.length >= formCategories.maxLength}
                     onClick={() => formCategories.createEmptyCategory()}
                   >
-                    Tambah Kategori
+                    <IconPlus size="13" /> Tambah Kategori
                   </ButtonOutlineBlue>
                 </div>
               </SpacedHeaderBar>
@@ -189,9 +209,11 @@ function PageCreateEventFullday() {
                   submitCategories(formCategories.data, formFees, {
                     eventId,
                     onSuccess() {
-                      toast.success("Berhasil menyimpan kategori");
                       fetchEventDetail();
-                      next();
+                      toast.success("Berhasil menyimpan kategori");
+                      if (formCategories.isEmpty) {
+                        next();
+                      }
                     },
                   });
                 }}
@@ -208,26 +230,30 @@ function PageCreateEventFullday() {
             </StepHeader>
 
             <StepBody>
-              <h1>TBD: Form Jadwal Pertandingan</h1>
+              <ScreenSchedules
+                eventDetail={eventDetail}
+                categories={categories}
+                formSchedules={formSchedules}
+                schedulesProvider={schedulesProvider}
+              />
             </StepBody>
 
-            <StepFooterActions />
+            <StepFooterActions>
+              <ButtonSave
+                disabled={formSchedules.isEmpty}
+                onSubmit={({ next }) => {
+                  toast.success("Selesai mengisi data event!");
+                  next();
+                }}
+              >
+                Selesai
+              </ButtonSave>
+            </StepFooterActions>
           </StepContent>
 
           <StepContent id={stepId.SELESAI}>
             <StepBody>
-              <div>[TBD: gambar ilustrasi]</div>
-
-              <h2>Pengaturan Pertandingan berhasil disimpan</h2>
-              <p>
-                Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage Event.
-                Buat lebih banyak event di Dashboard EO.
-              </p>
-
-              <div>
-                <button>Pratinjau</button>
-                <button>Publikasi</button>
-              </div>
+              <ScreenFinish eventDetail={eventDetail} />
             </StepBody>
           </StepContent>
         </StepDisplay>

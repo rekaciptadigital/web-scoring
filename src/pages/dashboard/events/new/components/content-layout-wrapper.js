@@ -3,8 +3,16 @@ import styled from "styled-components";
 
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
+import { BreadcrumbDashboard } from "../../components/breadcrumb";
 
-function ContentLayoutWrapper({ children, pageTitle, before, after }) {
+function ContentLayoutWrapper({
+  children,
+  pageTitle,
+  before,
+  after,
+  breadcrumbText,
+  breadcrumbLink,
+}) {
   return (
     <React.Fragment>
       <MetaTags>
@@ -14,7 +22,13 @@ function ContentLayoutWrapper({ children, pageTitle, before, after }) {
       {before}
 
       <StyledPageWrapper>
-        <Container fluid>{children}</Container>
+        <Container fluid>
+          <BreadcrumbDashboard to={breadcrumbLink || "#"}>
+            {breadcrumbText || ""}
+          </BreadcrumbDashboard>
+
+          {children}
+        </Container>
       </StyledPageWrapper>
 
       {after}

@@ -83,7 +83,11 @@ function PageCreateEventFullday() {
   const isLoadingSubmit = isSubmitingPublicInfos || isSubmitingCategories;
 
   return (
-    <ContentLayoutWrapper pageTitle="Buat Event Baru">
+    <ContentLayoutWrapper
+      pageTitle="Buat Event Baru"
+      breadcrumbText="Kembali"
+      breadcrumbLink="/dashboard"
+    >
       <ProcessingToast />
       <LoadingScreen loading={isLoadingSubmit} />
       <AlertSubmitError isError={isErrorPublicInfos} errors={publicInfosErrors} />
@@ -237,11 +241,10 @@ function PageCreateEventFullday() {
             <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
-                  toast.success("Selesaikan dulu formnya!");
                   next();
                 }}
               >
-                Simpan
+                Selesai
               </ButtonSave>
             </StepFooterActions>
           </StepContent>

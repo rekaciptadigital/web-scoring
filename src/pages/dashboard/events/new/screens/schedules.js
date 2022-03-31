@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useScheduleEditorForm } from "../hooks/form-submit-editor-schedule";
 import { toast } from "../components/processing-toast";
 
+import SweetAlert from "react-bootstrap-sweetalert";
 import {
   Button,
   ButtonBlue,
@@ -19,6 +20,7 @@ import { LoadingScreen } from "../components/loading-screen-portal";
 
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
+import illustrationAlert from "assets/images/events/alert-publication.svg";
 
 import classnames from "classnames";
 
@@ -211,8 +213,27 @@ function EditorForm({
         </CommonSessionInput>
 
         <HorizontalSpacedButtonGroups>
-          <ButtonOutlineBlue onClick={() => onCloseEdit?.()}>Batal</ButtonOutlineBlue>
-          <ButtonBlue onClick={handleClickSave}>Simpan</ButtonBlue>
+          <ButtonWithConfirmPrompt
+            customButton={ButtonOutlineBlue}
+            reverseButtons
+            buttonConfirmLabel="Lanjutkan"
+            onConfirm={() => onCloseEdit?.()}
+            buttonCancelLabel="Kembali isi data"
+            messageDescription="Anda akan membatalkan data yang diubah. Lanjutkan?"
+          >
+            Batal
+          </ButtonWithConfirmPrompt>
+
+          <ButtonWithConfirmPrompt
+            customButton={ButtonBlue}
+            buttonConfirmLabel="Sudah Yakin"
+            onConfirm={handleClickSave}
+            buttonCancelLabel="Cek lagi"
+            messagePrompt="Sudah yakin dengan pengaturan jadwal pertandingan?"
+            messageDescription="Anda masih dapat mengubah jadwal sebelum pertandingan dimulai"
+          >
+            Simpan
+          </ButtonWithConfirmPrompt>
         </HorizontalSpacedButtonGroups>
       </SpacedHeader>
 
@@ -267,13 +288,17 @@ function EditorForm({
                     <IconPlus size="13" />
                   </Button>
 
-                  <Button
+                  <ButtonWithConfirmPrompt
                     flexible
                     disabled={isDisabled || showOnlySessions.length <= 1}
-                    onClick={() => removeScheduleItem(session.key)}
+                    buttonConfirmLabel="Hapus"
+                    onConfirm={() => removeScheduleItem(session.key)}
+                    buttonCancelLabel=""
+                    messagePrompt="Jadwal hanya akan dihapus setelah disimpan"
+                    messageDescription="Anda dapat mengembalikan data dengan membatalkan ubah data bila berubah pikiran"
                   >
                     <IconTrash size="13" />
-                  </Button>
+                  </ButtonWithConfirmPrompt>
                 </HorizontalSpacedButtonGroups>
               </CategoryDetailItem>
             ))
@@ -416,6 +441,92 @@ const UpdatingStateBlocker = styled.div`
   align-items: center;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.75);
+`;
+
+/* ==================================== */
+
+function ButtonWithConfirmPrompt({
+  children,
+  disabled,
+  reverseButtons,
+  buttonConfirmLabel,
+  onConfirm,
+  buttonCancelLabel,
+  onCancel,
+  customButton,
+  flexible,
+  messagePrompt,
+  messageDescription,
+}) {
+  const [showAlert, setShowAlert] = React.useState(false);
+
+  const closeAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCancel = () => {
+    setShowAlert(false);
+    onCancel?.();
+  };
+
+  const handleConfirm = () => {
+    onConfirm?.();
+    closeAlert();
+  };
+
+  const CustomButtomComp = customButton || Button;
+
+  const buttonTriggerProps = {
+    onClick: () => setShowAlert(true),
+    disabled: disabled,
+    flexible: flexible,
+  };
+
+  return (
+    <React.Fragment>
+      <CustomButtomComp {...buttonTriggerProps}>{children}</CustomButtomComp>
+      <SweetAlert
+        show={showAlert}
+        title=""
+        custom
+        btnSize="md"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        style={{ width: 800, padding: "35px 88px", borderRadius: "1.25rem" }}
+        customButtons={
+          <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
+            {reverseButtons ? (
+              <React.Fragment>
+                <Button onClick={handleConfirm}>{buttonConfirmLabel || "Konfirmasi"}</Button>
+                <ButtonBlue onClick={handleCancel}>{buttonCancelLabel || "Batal"}</ButtonBlue>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Button onClick={handleCancel}>{buttonCancelLabel || "Batal"}</Button>
+                <ButtonBlue onClick={handleConfirm}>
+                  {buttonConfirmLabel || "Konfirmasi"}
+                </ButtonBlue>
+              </React.Fragment>
+            )}
+          </span>
+        }
+      >
+        <IllustationAlertPrompt />
+        {messagePrompt && <h4>{messagePrompt}</h4>}
+        {messageDescription && <p className="text-muted">{messageDescription}</p>}
+      </SweetAlert>
+    </React.Fragment>
+  );
+}
+
+const IllustationAlertPrompt = styled.div`
+  margin-bottom: 2rem;
+  width: 100%;
+  min-height: 188px;
+  background-image: url(${illustrationAlert});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 `;
 
 /* ========================================== */

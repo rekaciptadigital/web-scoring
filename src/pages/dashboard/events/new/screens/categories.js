@@ -7,13 +7,15 @@ import {
 } from "../hooks/archery-categories";
 import { useSubmitCategories } from "../hooks/submit-categories";
 
-import { Button, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
+import SweetAlert from "react-bootstrap-sweetalert";
+import { Button, ButtonBlue, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
 import { FieldSelectSmall, FieldInputTextSmall } from "../../components/form-fields";
 import { LoadingScreen } from "../components/loading-screen-portal";
 import { toast } from "../components/processing-toast";
 
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
+import illustrationAlertPublication from "assets/images/events/alert-publication.svg";
 
 function ScreenCategories({ eventDetail, fetchEventDetail, form, formFees }) {
   const { data, setMaxLengthFromOptions } = form;
@@ -246,17 +248,20 @@ function CategoriesByCompetition({
               <Button flexible onClick={() => createEmptyCategoryDetail(category.key)}>
                 <IconPlus size="13" />
               </Button>
-              <Button
+
+              <ButtonWithConfirmPrompt
                 flexible
                 disabled={category.categoryDetails.length <= 1}
-                onClick={() => {
+                messagePrompt="Ingin hapus kategori?"
+                buttonConfirmLabel="Hapus"
+                onConfirm={() => {
                   if (!detail.isAlive) {
                     removeCategoryDetailByKey(category.key, detail.key);
                   } else {
                     deleteByCategoryClass(detail, {
                       eventId: eventDetail?.id,
                       onSuccess() {
-                        toast.success("Informasi umum event berhasil disimpan");
+                        toast.success("Berhasil menghapus kategori");
                         fetchEventDetail();
                       },
                     });
@@ -264,16 +269,16 @@ function CategoriesByCompetition({
                 }}
               >
                 <IconTrash size="13" />
-              </Button>
+              </ButtonWithConfirmPrompt>
             </div>
           </CategoryBlock>
         ))}
 
         <div>
-          <ButtonOutlineBlue
-            corner="8"
+          <ButtonWithConfirmPrompt
+            customButton={ButtonOutlineBlue}
             disabled={data?.length <= 1}
-            onClick={() => {
+            onConfirm={() => {
               if (!eventDetail?.eventCategories?.length || !category.isAlive) {
                 removeCategoryByKey(category.key);
               } else {
@@ -286,9 +291,10 @@ function CategoriesByCompetition({
                 });
               }
             }}
+            messagePrompt="Ingin hapus kategori?"
           >
             <IconTrash size="13" /> <span>Hapus kategori</span>
-          </ButtonOutlineBlue>
+          </ButtonWithConfirmPrompt>
         </div>
       </VerticalSpacedBoxLoose>
     </CardSheet>
@@ -299,6 +305,80 @@ const VerticalSpacedBoxLoose = styled.div`
   > * + * {
     margin-top: 1.75rem;
   }
+`;
+
+/* ==================================== */
+
+function ButtonWithConfirmPrompt({
+  children,
+  disabled,
+  buttonConfirmLabel,
+  onConfirm,
+  buttonCancelLabel,
+  onCancel,
+  customButton,
+  flexible,
+  messagePrompt,
+  messageDescription,
+}) {
+  const [showAlert, setShowAlert] = React.useState(false);
+
+  const closeAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCancel = () => {
+    setShowAlert(false);
+    onCancel?.();
+  };
+
+  const handleConfirm = () => {
+    onConfirm?.();
+    closeAlert();
+  };
+
+  const CustomButtomComp = customButton || Button;
+
+  const buttonTriggerProps = {
+    onClick: () => setShowAlert(true),
+    disabled: disabled,
+    flexible: flexible,
+  };
+
+  return (
+    <React.Fragment>
+      <CustomButtomComp {...buttonTriggerProps}>{children}</CustomButtomComp>
+      <SweetAlert
+        show={showAlert}
+        title=""
+        custom
+        btnSize="md"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        style={{ width: 800, padding: "35px 88px", borderRadius: "1.25rem" }}
+        customButtons={
+          <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
+            <Button onClick={handleCancel}>{buttonCancelLabel || "Batal"}</Button>
+            <ButtonBlue onClick={handleConfirm}>{buttonConfirmLabel || "Konfirmasi"}</ButtonBlue>
+          </span>
+        }
+      >
+        <IllustationAlertPrompt />
+        {messagePrompt && <h4>{messagePrompt}</h4>}
+        {messageDescription && <p className="text-muted">{messageDescription}</p>}
+      </SweetAlert>
+    </React.Fragment>
+  );
+}
+
+const IllustationAlertPrompt = styled.div`
+  margin-bottom: 2rem;
+  width: 100%;
+  min-height: 188px;
+  background-image: url(${illustrationAlertPublication});
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 `;
 
 /* ============================================= */

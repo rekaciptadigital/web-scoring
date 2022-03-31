@@ -1,32 +1,65 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useSubmitPublish } from "../hooks/submit-publish";
+import { toast } from "../components/processing-toast";
 
-import { ButtonBlue } from "components/ma";
+import { ButtonBlue, AlertSubmitError } from "components/ma";
+import { LoadingScreen } from "../components/loading-screen-portal";
 
+import IconCheck from "components/ma/icons/fill/check";
 import imageIllustration from "assets/images/events/create-event-event-ready.png";
 
 function ScreenFinish({ eventDetail }) {
-  return (
-    <CardSheet>
-      <Illustration />
-      <CenteredContent>
-        <VerticalSpacedBox>
-          <div>
-            <h2>Pengaturan Pertandingan berhasil disimpan</h2>
-            <p>
-              Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage Event. Buat
-              lebih banyak event di Dashboard EO.
-            </p>
-          </div>
+  const {
+    sendPublish,
+    isLoading: isLoadingPublish,
+    isError: isErrorPublish,
+    errors: errorsPublish,
+  } = useSubmitPublish(eventDetail);
 
-          <HorizontalSpacedButtonGroups>
-            <ButtonBlue onClick={() => alert(`Hit API status publikasi... ID: ${eventDetail?.id}`)}>
-              Publikasi
-            </ButtonBlue>
-          </HorizontalSpacedButtonGroups>
-        </VerticalSpacedBox>
-      </CenteredContent>
-    </CardSheet>
+  const isPublished = Boolean(eventDetail?.publicInformation.eventStatus);
+
+  return (
+    <React.Fragment>
+      <LoadingScreen loading={isLoadingPublish} />
+      <AlertSubmitError isError={isErrorPublish} errors={errorsPublish} />
+
+      <CardSheet>
+        <Illustration />
+        <CenteredContent>
+          <VerticalSpacedBox>
+            <div>
+              <h2>Pengaturan Pertandingan berhasil disimpan</h2>
+              <p>
+                Atur pertandingan, jadwal kualifikasi &amp; semua tentang event di Manage Event.
+                Buat lebih banyak event di Dashboard EO.
+              </p>
+            </div>
+
+            <HorizontalSpacedButtonGroups>
+              {isPublished ? (
+                <React.Fragment>
+                  <IconCheck />
+                  <ButtonBlue disabled>Terpublikasi</ButtonBlue>
+                </React.Fragment>
+              ) : (
+                <ButtonBlue
+                  onClick={() => {
+                    sendPublish({
+                      onSuccess() {
+                        toast.success("Terpublikasi!");
+                      },
+                    });
+                  }}
+                >
+                  Publikasi
+                </ButtonBlue>
+              )}
+            </HorizontalSpacedButtonGroups>
+          </VerticalSpacedBox>
+        </CenteredContent>
+      </CardSheet>
+    </React.Fragment>
   );
 }
 

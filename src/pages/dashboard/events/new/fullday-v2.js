@@ -240,6 +240,7 @@ function PageCreateEventFullday() {
 
             <StepFooterActions>
               <ButtonSave
+                disabled={formSchedules.isEmpty}
                 onSubmit={({ next }) => {
                   toast.success("Selesai mengisi data event!");
                   next();

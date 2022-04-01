@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import Switch from "react-switch";
-import { FieldInputPrice, FieldInputDate } from "../../components/form-fields";
+import { FieldInputPrice, FieldInputDate, Checkbox } from "../../components/form-fields";
 
 function ScreenFees({ form }) {
   const {
@@ -89,8 +89,7 @@ function FreeEventTeamFees({ form }) {
         <TeamFeeInputsGrid>
           {data?.feesByTeam.map((feeItem) => (
             <div key={feeItem.team}>
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={feeItem.isActive}
                 onChange={() => activateTeamFee("normal", feeItem.team)}
               />
@@ -112,8 +111,7 @@ function FreeEventTeamFees({ form }) {
         <TeamFeeInputsGrid>
           {data?.earlyBirdByTeam.map((feeItem) => (
             <div key={feeItem.team}>
-              <input
-                type="checkbox"
+              <Checkbox
                 disabled
                 checked={feeItem.isActive}
                 onChange={() => activateTeamFee("earlyBird", feeItem.team)}
@@ -143,8 +141,7 @@ function PaidEventTeamFees({ form }) {
         <TeamFeeInputsGrid>
           {data?.feesByTeam.map((feeItem) => (
             <div key={feeItem.team}>
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={feeItem.isActive}
                 onChange={() => activateTeamFee("normal", feeItem.team)}
               />
@@ -166,8 +163,7 @@ function PaidEventTeamFees({ form }) {
         <TeamFeeInputsGrid>
           {data?.earlyBirdByTeam.map((feeItem, index) => (
             <div key={feeItem.team}>
-              <input
-                type="checkbox"
+              <Checkbox
                 disabled={!(data?.isEarlyBird && data?.feesByTeam[index].isActive)}
                 checked={feeItem.isActive}
                 onChange={() => activateTeamFee("earlyBird", feeItem.team)}

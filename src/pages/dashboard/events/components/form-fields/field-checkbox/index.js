@@ -20,6 +20,20 @@ const StyledCheckbox = styled(RCCheckbox)`
     border-color: var(--ma-blue);
     background-color: var(--ma-blue);
   }
+
+  &.rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner {
+    background-color: #f3f3f3;
+  }
+  &.rc-checkbox-disabled.rc-checkbox-checked:hover .rc-checkbox-inner {
+    border-color: #d9d9d9;
+  }
+  &.rc-checkbox-disabled .rc-checkbox-inner {
+    border-color: #d9d9d9;
+    background-color: #f3f3f3;
+  }
+  &.rc-checkbox-disabled:hover .rc-checkbox-inner {
+    border-color: #d9d9d9;
+  }
 `;
 
 export default Checkbox;

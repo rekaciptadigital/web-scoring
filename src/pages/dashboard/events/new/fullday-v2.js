@@ -253,7 +253,7 @@ function PageCreateEventFullday() {
 
           <StepContent id={stepId.SELESAI}>
             <StepBody>
-              <ScreenFinish eventDetail={eventDetail} />
+              <ScreenFinish eventDetail={eventDetail} fetchEventDetail={fetchEventDetail} />
             </StepBody>
           </StepContent>
         </StepDisplay>

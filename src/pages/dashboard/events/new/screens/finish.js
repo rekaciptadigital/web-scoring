@@ -9,7 +9,7 @@ import { LoadingScreen } from "../components/loading-screen-portal";
 import IconCheck from "components/ma/icons/fill/check";
 import imageIllustration from "assets/images/events/create-event-event-ready.png";
 
-function ScreenFinish({ eventDetail }) {
+function ScreenFinish({ eventDetail, fetchEventDetail }) {
   const {
     sendPublish,
     isLoading: isLoadingPublish,
@@ -47,6 +47,7 @@ function ScreenFinish({ eventDetail }) {
                   onClick={() => {
                     sendPublish({
                       onSuccess() {
+                        fetchEventDetail();
                         toast.success("Terpublikasi!");
                       },
                     });

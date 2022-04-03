@@ -7,9 +7,10 @@ const ButtonWrapper = styled.button`
   &:focus,
   &:active {
     display: inline-block;
+    min-width: var(--button-width, 6.5rem);
     padding: 0.47rem 0.75rem;
     border: solid 1px var(--button-outline-color, var(--ma-gray-100));
-    border-radius: var(--button-corner, 0.25rem);
+    border-radius: var(--button-corner, 0.5rem);
     box-shadow: none;
     background-color: var(--button-bg-color, var(--ma-gray-100));
 
@@ -35,9 +36,13 @@ const ButtonWrapper = styled.button`
 
   &:disabled {
     cursor: default;
-    background-color: var(--ma-gray-400);
-    border: solid 1px var(--ma-gray-400);
-    color: var(--ma-gray-200);
+    background-color: var(--ma-gray-200);
+    border: solid 1px var(--ma-gray-200);
+    color: var(--ma-gray-400);
+
+    &:hover {
+      box-shadow: none;
+    }
   }
 `;
 
@@ -71,7 +76,7 @@ const variantStyles = {
   },
 };
 
-function ButtonBase({ corner, color, style, ...props }) {
+function ButtonBase({ corner, color, style, flexible = false, ...props }) {
   const withPx = (number) => {
     return number ? `${number}px` : undefined;
   };
@@ -84,6 +89,10 @@ function ButtonBase({ corner, color, style, ...props }) {
       ...style,
     },
   };
+
+  if (flexible) {
+    propsNew.style = { ...propsNew.style, "--button-width": 0 };
+  }
 
   return <ButtonWrapper {...propsNew} />;
 }

@@ -47,7 +47,16 @@ const FieldTextAreaWrapper = styled.div`
   }
 `;
 
-function FieldTextArea({ children, label, name, placeholder, value = "", onChange, disabled }) {
+function FieldTextArea({
+  children,
+  label,
+  name,
+  placeholder,
+  rows = 3,
+  value = "",
+  onChange,
+  disabled,
+}) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
   const handleTextChange = (ev) => {
@@ -64,7 +73,7 @@ function FieldTextArea({ children, label, name, placeholder, value = "", onChang
       <textarea
         className="field-textarea"
         id={fieldID}
-        rows="3"
+        rows={rows}
         name={name}
         placeholder={placeholder}
         value={value}

@@ -1,4 +1,4 @@
-import { panah, users, target, userPlus, fileText, branch } from "./icon-svgs";
+import { panah, users, target, userPlus, fileText, branch, user } from "./icon-svgs";
 
 const eventMenus = {
   1: {
@@ -11,35 +11,42 @@ const eventMenus = {
   },
   2: {
     id: 2,
-    icon: users,
-    title: "Peserta",
-    description: "Melihat data peserta, pengaturan bantalan, jadwal peserta, dan lainnya",
+    icon: user,
+    title: "Peserta Individu",
+    description: "Melihat data peserta, mengubah kategori, status pembayaran, dan lainnya",
     computeLink: (eventId) => `/dashboard/member/${eventId}`,
   },
   3: {
     id: 3,
+    icon: users,
+    title: "Peserta Beregu",
+    description: "Melihat data peserta, mengubah kategori, status pembayaran, dan lainnya",
+    computeLink: () => `#`,
+  },
+  4: {
+    id: 4,
     icon: target,
     title: "Jadwal & Skor",
     description:
       "Mengatur jadwal pertandingan, pengaturan score, dan hasil score babak kualifikasi dan eliminasi",
     computeLink: () => "",
   },
-  4: {
-    id: 4,
+  5: {
+    id: 5,
     icon: userPlus,
     title: "Panitia",
     description: "Profil panitia, wasit/scorer",
     computeLink: () => "",
   },
-  5: {
-    id: 5,
+  6: {
+    id: 6,
     icon: fileText,
     title: "Dokumen",
     description: "Master e-sertifikat",
     computeLink: (eventId) => `/dashboard/certificate/new?event_id=${eventId}`,
   },
-  6: {
-    id: 6,
+  7: {
+    id: 7,
     icon: branch,
     title: "Registrasi Series",
     description: "Daftarkan event Anda menjadi bagian dari series",

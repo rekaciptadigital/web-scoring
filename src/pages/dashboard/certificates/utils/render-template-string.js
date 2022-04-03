@@ -4,6 +4,7 @@ const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields
 
 function renderTemplateString(editorData) {
   const documentTitle = editorData.title || "My Archery Certificate";
+  const isWinnerType = checkTypeIsWinner(editorData.typeCertificate);
 
   return `<!DOCTYPE html>
 <html>
@@ -58,18 +59,19 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText(LABEL_MEMBER_NAME)}
-    ${isTypeWinner(editorData.typeCertificate) ? renderFieldText(LABEL_RANK) : ""}
+    ${isWinnerType ? renderFieldText(LABEL_RANK) : ""}
     ${renderFieldText(LABEL_CATEGORY_NAME)}
     ${renderQrCode()}
   </body>
 </html>`;
 }
 
-function isTypeWinner(type) {
+function checkTypeIsWinner(type) {
   return (
     type === certificateTypes.WINNER_ELIMINATION ||
     type === certificateTypes.WINNER_QUALIFICATION ||
-    type === certificateTypes.WINNER_TEAM
+    type === certificateTypes.WINNER_TEAM ||
+    type === certificateTypes.WINNER_TEAM_MIXED
   );
 }
 

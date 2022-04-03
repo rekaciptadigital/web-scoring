@@ -61,18 +61,18 @@ deploy_staging:
 #stage_build:
   #stage: update
   #only: 
-    #- develop
+  #  - develop
   #script:
-    #- npm install
-    #- npm run build
+  #  - npm install
+  #  - npm run build
   #artifacts:
-    #paths:
-    #  - build/
+  #  paths:
+  #    - build/
 
 #stage_deploy:
   #stage: deploy
   #only:
-    #- develop
+  #  - develop
   #script:
     # - ssh -p22 root@103.31.38.37 "mkdir /opt/archery-web/_tmp"
     # - scp -P22 -r build/* root@103.31.38.37:/opt/archery-web/_tmp

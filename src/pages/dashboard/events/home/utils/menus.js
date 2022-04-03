@@ -1,4 +1,4 @@
-import { panah, users, target, userPlus, fileText, branch, user } from "./icon-svgs";
+import { panah, target, userPlus, fileText, branch, user, group } from "./icon-svgs";
 
 const eventMenus = {
   1: {
@@ -18,7 +18,7 @@ const eventMenus = {
   },
   3: {
     id: 3,
-    icon: users,
+    icon: group,
     title: "Peserta Beregu",
     description: "Melihat data peserta, mengubah kategori, status pembayaran, dan lainnya",
     computeLink: () => `#`,

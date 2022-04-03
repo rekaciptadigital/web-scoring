@@ -8,9 +8,10 @@ import { useParams, useLocation } from "react-router-dom";
 import Download from "components/icons/Download";
 import fileSaver from "file-saver";
 import { errorsUtil } from "utils";
-import { AlertSubmitError } from "components/ma";
+import { AlertSubmitError, ButtonBlue } from "components/ma";
 import { BreadcrumbDashboard } from "../events/components/breadcrumb";
 import { eventCategories } from "constants/index";
+import upLogo from "assets/images/myachery/mini x5F arrow x5F shack 10.png";
 
 function ListMember() {
   const { event_id } = useParams();
@@ -26,6 +27,7 @@ function ListMember() {
   const [teamCategoryFilter, setTeamCategoryFilter] = useState("");
   const [name, setName] = useState("");
   const [teamFilter, setTeamFilter] = useState("");
+  const [page, setPage] = useState(1);
 
   const { TEAM_CATEGORIES } = eventCategories;
 
@@ -51,6 +53,7 @@ function ListMember() {
   };
 
   let query = useQuery();
+  console.log(query.get("type"));
 
   const getEventLaporan = async () => {
     try {
@@ -70,8 +73,9 @@ function ListMember() {
   const getMember = async () => {
     try {
       const { message, errors, data } = await EventsService.getEventMemberNew({
+        limit: 10,
+        page: page,
         event_id: event_id,
-        type: query.get("type"),
         competition_category_id: filterCategory,
         name: name,
         age_category_id: ageCategoryFilter,
@@ -86,21 +90,45 @@ function ListMember() {
     }
   };
 
+  const getMemberTeam = async () => {
+    try {
+      const { message, errors, data } = await EventsService.getEventMemberTeam({
+        limit: 10,
+        page: page,
+        event_id: event_id,
+        competition_category_id: filterCategory,
+        name: name,
+        age_category_id: ageCategoryFilter,
+        team_category_id: teamFilter,
+      });
+      if (message === "Success") {
+        setMembers(data);
+      }
+      console.log(errors);
+    } catch (errors) {
+      console.info(errors);
+    }
+  };
+
   const getTeam = () => {
-    if (teamCategoryFilter === "Individu Putra") {
-      setTeamFilter(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE);
+    if (query.get("type") === "individual") {
+      if (teamCategoryFilter === "Individu Putra") {
+        setTeamFilter(TEAM_CATEGORIES.TEAM_INDIVIDUAL_MALE);
+      }
+      if (teamCategoryFilter === "Individu Putri") {
+        setTeamFilter(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE);
+      }
     }
-    if (teamCategoryFilter === "Individu Putri") {
-      setTeamFilter(TEAM_CATEGORIES.TEAM_INDIVIDUAL_FEMALE);
-    }
-    if (teamCategoryFilter === "Beregu Putra") {
-      setTeamFilter(TEAM_CATEGORIES.TEAM_MALE);
-    }
-    if (teamCategoryFilter === "Beregu Putri") {
-      setTeamFilter(TEAM_CATEGORIES.TEAM_FEMALE);
-    }
-    if (teamCategoryFilter === "Mix Team") {
-      setTeamFilter(TEAM_CATEGORIES.TEAM_MIXED);
+    if (query.get("type") === "team") {
+      if (teamCategoryFilter === "Beregu Putra") {
+        setTeamFilter(TEAM_CATEGORIES.TEAM_MALE);
+      }
+      if (teamCategoryFilter === "Beregu Putri") {
+        setTeamFilter(TEAM_CATEGORIES.TEAM_FEMALE);
+      }
+      if (teamCategoryFilter === "Mix Team") {
+        setTeamFilter(TEAM_CATEGORIES.TEAM_MIXED);
+      }
     }
     if (teamCategoryFilter === "") {
       setTeamFilter("");
@@ -119,10 +147,15 @@ function ListMember() {
 
   useEffect(() => {
     getEventLaporan();
-    getMember();
     getEventCategoryDetails();
     getTeam();
-  }, [event_id, filterCategory, name, ageCategoryFilter, teamCategoryFilter, teamFilter]);
+    if (query.get("type") === "team") {
+      getMemberTeam();
+    }
+    if (query.get("type") === "individual") {
+      getMember();
+    }
+  }, [event_id, filterCategory, name, ageCategoryFilter, teamCategoryFilter, teamFilter, page]);
 
   const handleDownloadIdCard = async () => {
     setErrorsIdCard(null);
@@ -141,13 +174,15 @@ function ListMember() {
   let dumpArray = [];
   let arrayAge = [];
   let arrayRegu = [];
+  // let arrayDistance = [];
 
   // console.log(indexCategory);
-  // console.log(Object.values(eventCategoriesDetail)[indexCategory])
+  // console.log(Object.values(eventCategoriesDetail)[indexCategory]);
   dumpArray = Object.values(eventCategoriesDetail)[indexCategory];
   // console.log([...new Set(dumpArray?.map((d) => d.ageCategory))]);
   arrayAge = [...new Set(dumpArray?.map((d) => d.ageCategory))];
   arrayRegu = [...new Set(dumpArray?.map((d) => d.teamCategory))];
+  // arrayDistance = dumpArray?.map((d) => d.distancesCategory);
 
   return (
     <React.Fragment>
@@ -157,10 +192,34 @@ function ListMember() {
         </MetaTags>
         <Container fluid>
           <BreadcrumbDashboard to={`/dashboard/event/${event_id}/home`}>
-            Peserta Individu
+            {query.get("type") === "team" ? "Peserta Beregu" : "Peserta Individu"}
           </BreadcrumbDashboard>
 
           <div>
+            <span
+              onClick={() => {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+              }}
+              style={{
+                position: "fixed",
+                zIndex: "99",
+                left: "95%",
+                top: "90%",
+                cursor: "pointer",
+              }}
+            >
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  backgroundColor: "#09327245",
+                  borderRadius: "10px",
+                }}
+              >
+                <img style={{ padding: "16px 12px" }} width="100%" height="100%" src={upLogo} />
+              </div>
+            </span>
             <div className="mb-4">
               <Row>
                 <Col
@@ -216,11 +275,12 @@ function ListMember() {
                   <div style={{ width: "330px" }}>
                     <Input
                       placeholder="Cari archer"
-                      onKeyPress={(event) => {
-                        if (event.key === "Enter") {
-                          setName(event.target.value);
-                        }
-                      }}
+                      onChange={(event) => setName(event.target.value)}
+                      // onKeyPress={(event) => {
+                      //   if (event.key === "Enter") {
+                      //     setName(event.target.value);
+                      //   }
+                      // }}
                     />
                   </div>
                 </Col>
@@ -358,8 +418,15 @@ function ListMember() {
               </div>
             </div>
           </div>
-
-          <TableMember members={members} />
+          <TableMember members={members} team={query.get("type") === "team" ? true : false} />
+          <div className="float-end pb-4">
+            <ButtonBlue className="me-2" disabled={page == 1 ? true : false} onClick={() => setPage(page - 1)}>
+              {"<-"}
+            </ButtonBlue>
+            <ButtonBlue disabled={page < 1 ? true : false} onClick={() => setPage(page + 1)}>
+              {"->"}
+            </ButtonBlue>
+          </div>
         </Container>
         <AlertSubmitError isError={Boolean(errorsIdCard)} errors={errorsIdCard} />
       </div>

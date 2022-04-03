@@ -33,12 +33,14 @@ const objectToFormData = function (obj, form, namespace) {
 };
 
 export default {
-  get(endpoint, qs = null) {
+  get(endpoint, qs = null, abortSignal) {
     const token = store.getState()?.authentication?.user?.accessToken;
+
     let params = "";
     if (qs) {
       params = queryString.stringify(qs);
     }
+
     let config = {
       method: "GET",
       headers: {
@@ -46,6 +48,11 @@ export default {
         "Accept-Language": localStorage.getItem("I18N_LANGUAGE") || "en",
       },
     };
+
+    if (typeof abortSignal !== "undefined") {
+      config.signal = abortSignal;
+    }
+
     return fetch(`${endpoint}?${params}`, config);
   },
 
@@ -145,6 +152,24 @@ export default {
         Authorization: `Bearer ${token}`,
         "Accept-Language": localStorage.getItem("I18N_LANGUAGE") || "en",
       },
+    };
+    return fetch(`${endpoint}?${params}`, config);
+  },
+
+  deleteWithJSON(endpoint, data = null, qs = null) {
+    const token = store.getState()?.authentication?.user?.accessToken;
+    let params = "";
+    if (qs) {
+      params = queryString.stringify(qs);
+    }
+    let config = {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Accept-Language": localStorage.getItem("I18N_LANGUAGE") || "en",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     };
     return fetch(`${endpoint}?${params}`, config);
   }

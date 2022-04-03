@@ -8,11 +8,11 @@ import QrCodeField from "../QrCodeField";
 const { LABEL_RANK } = certificateFields;
 
 export default function PreviewCanvas({ data }) {
-  const { backgroundImage, backgroundUrl, backgroundPreviewUrl, fields } = data;
+  const { backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
   const [offsetWidth, setOffsetWidth] = React.useState(null);
 
-  const getBackgroundImage = () => backgroundUrl || backgroundPreviewUrl || backgroundImage;
+  const getBackgroundImage = () => backgroundPreviewUrl || backgroundUrl || "";
 
   React.useEffect(() => {
     containerDiv.current && setOffsetWidth(containerDiv.current.offsetWidth);
@@ -28,7 +28,10 @@ export default function PreviewCanvas({ data }) {
       >
         {fields?.length ? (
           fields.map((field) => {
-            if (field.name === LABEL_RANK && data.typeCertificate !== 2) {
+            if (
+              field.name === LABEL_RANK &&
+              (data.typeCertificate === 1 || data.typeCertificate === 3)
+            ) {
               return;
             }
             return <PreviewFieldText key={field.name} name={field.name} data={field} />;
@@ -49,7 +52,7 @@ function PreviewImage({ children, width, height, backgroundImage, scale }) {
   const variableStyles = {
     "--cert-pre-width": width ? width + "px" : undefined,
     "--cert-pre-height": height ? height + "px" : undefined,
-    "--cert-pre-background-image": backgroundImage ? `url(${backgroundImage})` : undefined,
+    "--cert-pre-background-image": backgroundImage ? `url(${backgroundImage})` : "",
     "--cert-pre-scale": scale,
   };
   return <PreviewImageWrapper style={variableStyles}>{children}</PreviewImageWrapper>;

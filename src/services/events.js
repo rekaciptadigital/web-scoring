@@ -98,5 +98,5 @@ export default {
   },
   getEventMemberTeam(qs = null) {
     return API.get("/web/v2/members/team", qs);
-  },
-};
+    },
+}

@@ -96,6 +96,9 @@ export default {
   updateCategory(data = null, qs = null) {
     return API.put("/web/v1/participant/update-category", data, qs);
   },
+  getEventMemberTeam(qs = null) {
+    return API.get("/web/v2/members/team", qs);
+  },
 
   /**
    * v2

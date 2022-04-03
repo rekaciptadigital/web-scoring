@@ -56,6 +56,12 @@ class TableMember extends Component {
     //   }
     // };
 
+    let temp = [];
+    for (let index = 0; index < this.props.members.length; index++) {
+      temp.push(this.props.members[index]);
+      temp[index] = { ...temp[index], no: index + 1 };
+    }
+
     const onConfirm = async (participantId) => {
       const { message, errors, data } = await EventsService.getAccessCategories({
         participant_id: participantId,
@@ -98,8 +104,12 @@ class TableMember extends Component {
 
     const columns = [
       {
+        dataField: "no",
+        text: "No",
+      },
+      {
         dataField: "name",
-        text: "Nama Peserta",
+        text: `${this.props.team ? "Nama Tim" : "Nama Peserta"}`,
         sort: true,
         style: { width: "40px", overflow: "hidden" },
         headerStyle: { width: "40px", overflow: "hidden" },
@@ -126,6 +136,11 @@ class TableMember extends Component {
       {
         dataField: "competitionCategory",
         text: "Kategori Lomba",
+        sort: true,
+      },
+      {
+        dataField: "ageCategory",
+        text: "Kelas",
         sort: true,
       },
       {
@@ -204,7 +219,6 @@ class TableMember extends Component {
         },
       },
     ];
-
     const defaultSorted = [
       {
         dataField: "id",
@@ -213,8 +227,8 @@ class TableMember extends Component {
     ];
 
     const pageOptions = {
-      sizePerPage: 500,
-      totalSize: this.props.members?.length, // replace later with size(customers),
+      sizePerPage: 10,
+      totalSize: temp.length, // replace later with size(customers),
       custom: true,
     };
 
@@ -251,15 +265,10 @@ class TableMember extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField="id"
                       columns={columns}
-                      data={this.props.members}
+                      data={temp}
                     >
                       {({ paginationTableProps }) => (
-                        <ToolkitProvider
-                          keyField="id"
-                          columns={columns}
-                          data={this.props.members}
-                          search
-                        >
+                        <ToolkitProvider keyField="id" columns={columns} data={temp} search>
                           {(toolkitProps) => (
                             <React.Fragment>
                               <Row className="mb-2">
@@ -285,6 +294,7 @@ class TableMember extends Component {
                                       striped={false}
                                       defaultSorted={defaultSorted}
                                       noDataIndication="Table is Empty"
+                                      pagination={paginationFactory(pageOptions)}
                                       // selectRow={selectRow}
                                       classes={"table align-middle table-nowrap"}
                                       headerWrapperClasses={"thead-light"}

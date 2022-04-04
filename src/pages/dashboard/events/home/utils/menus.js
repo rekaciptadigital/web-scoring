@@ -4,7 +4,7 @@ const eventMenus = {
   1: {
     id: 1,
     icon: panah,
-    title: "Pertandingan",
+    title: "Acara",
     description:
       "Mengatur jenis pertandingan, kategori, jadwal, kuota, biaya registrasi, dan lainnya",
     computeLink: (eventId) => `/dashboard/event/${eventId}/manage`,
@@ -26,9 +26,8 @@ const eventMenus = {
   4: {
     id: 4,
     icon: target,
-    title: "Jadwal & Skor",
-    description:
-      "Mengatur jadwal pertandingan, pengaturan score, dan hasil score babak kualifikasi dan eliminasi",
+    title: "Pertandingan",
+    description: "Pengaturan scoring, hasil score babak kualifikasi, dan eliminasi",
     computeLink: () => "",
   },
   5: {
@@ -51,6 +50,13 @@ const eventMenus = {
     title: "Registrasi Series",
     description: "Daftarkan event Anda menjadi bagian dari series",
     computeLink: () => "#",
+  },
+  8: {
+    id: 8,
+    icon: userPlus,
+    title: "Pengaturan Acara",
+    description: "Bantalan, Run Down, BIB, Dokumen (ID Card dan Sertifikat), FAQ",
+    computeLink: (eventId) => (eventId ? `/dashboard/event/${eventId}/faqs` : "#"),
   },
 };
 

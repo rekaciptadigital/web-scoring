@@ -18,7 +18,7 @@ function SubNavbar({ eventId }) {
               <span>
                 <IconHome size="16" />
               </span>
-              <span>Beranda</span>
+              <span>Dashboard</span>
             </NavLinkItem>
           </li>
 

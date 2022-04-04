@@ -30,8 +30,9 @@ const ButtonWrapper = styled.button`
   &:hover {
     background-color: var(--button-bg-color-hover, var(--ma-gray-50));
     border: solid 1px var(--button-outline-color, var(--ma-gray-100));
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 1px var(--button-shadow-color-hover, rgba(0, 0, 0, 0.15));
     color: var(--button-font-color-hover, var(--ma-blue));
+    text-decoration: var(--button-underline-hover, none);
   }
 
   &:disabled {
@@ -73,6 +74,14 @@ const variantStyles = {
     "--button-outline-color": "var(--ma-blue)",
     "--button-font-color": "var(--ma-blue)",
     "--button-font-color-hover": "#ffffff",
+  },
+  "ghost-blue": {
+    "--button-bg-color": "none",
+    "--button-bg-color-hover": "none",
+    "--button-outline-color": "none",
+    "--button-font-color": "var(--ma-blue)",
+    "--button-shadow-color-hover": "rgba(0, 0, 0, 0)",
+    "--button-underline-hover": "underline",
   },
 };
 
@@ -117,6 +126,10 @@ function ButtonOutlineBlue(props) {
   return <ButtonBase color="outline-blue" {...props} />;
 }
 
+function ButtonGhostBlue(props) {
+  return <ButtonBase color="ghost-blue" {...props} />;
+}
+
 function ButtonSmallBlue(props) {
   return <ButtonBase color="blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
 }
@@ -149,6 +162,7 @@ export {
   ButtonBlueOutline,
   ButtonOutline,
   ButtonOutlineBlue,
+  ButtonGhostBlue,
   ButtonSmallBlue,
   ButtonSmallOutlineBlue,
 };

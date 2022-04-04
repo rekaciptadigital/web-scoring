@@ -91,7 +91,7 @@ function PageEventDetailHome() {
               <div>
                 <LinkToDashboard to="/dashboard">
                   <i className="bx bx-left-arrow-alt fs-4" />
-                  <span>Ke Dashboard EO</span>
+                  <span>Ke Beranda</span>
                 </LinkToDashboard>
               </div>
             </DashboardHeading>
@@ -102,6 +102,7 @@ function PageEventDetailHome() {
                 href={eventMenus[1].computeLink(event_id)}
                 badge={renderManageEventMenuBadge()}
               />
+              <CardMenu menu={eventMenus[8]} href={eventMenus[8].computeLink(event_id)} />
               <CardMenuWithButton
                 eventDetail={eventDetail}
                 menu={eventMenus[2]}

@@ -9,9 +9,9 @@ function PageEventFaqs() {
   // ...
 
   return (
-    <div>
+    <React.Fragment>
       <SubNavbar eventId={event_id} />
-    </div>
+    </React.Fragment>
   );
 }
 

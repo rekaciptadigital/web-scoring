@@ -19,4 +19,13 @@ export default {
   getSettingsByEventId(queryString = null) {
     return API.get("/web/v2/bud-rest", queryString);
   },
+
+  /**
+   *
+   * @param {Object} queryString { event_id, date }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  postSettingsByDateEventId(data, queryString = null) {
+    return API.post("/web/v2/bud-rest", data, queryString, true);
+  },
 };

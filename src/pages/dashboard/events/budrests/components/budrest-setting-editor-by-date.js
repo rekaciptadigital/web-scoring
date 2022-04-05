@@ -2,10 +2,13 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams, useHistory, Link } from "react-router-dom";
 import { useFormBudrestSettings } from "../hooks/form-budrest-settings";
+import { useSubmitBudrestSettings } from "../hooks/submit-budrest-settings";
 
-import { ButtonOutlineBlue, ButtonGhostBlue } from "components/ma";
+import { ButtonBlue, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
+import { LoadingScreen } from "../../new/components/loading-screen-portal";
 import { FieldInputDateSmall, FieldInputTextSmall } from "../../components/form-fields";
 import { DisplayTextSmall } from "./display-text-small";
+import { ButtonConfirmPrompt } from "./button-confirm-prompt";
 
 import { formatServerDate } from "../../new/utils/datetime";
 
@@ -23,84 +26,123 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
 
   const dateString = formatServerDate(settingsByDate.date);
 
+  const {
+    submit,
+    isLoading: isSubmiting,
+    isError: isErrorSubmit,
+    errors: errorsSubmit,
+  } = useSubmitBudrestSettings(formSettings, eventId);
+
   return (
-    <DayGroup>
-      <VerticalSpacedBox>
-        <SpacedHeader>
-          <SpacedHeaderLeft>
-            <FieldInputDateSmall label="Bertanding Tanggal" disabled value={settingsByDate.date} />
-          </SpacedHeaderLeft>
+    <React.Fragment>
+      <LoadingScreen loading={isSubmiting} />
+      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
 
-          <HorizontalSpacedButtonGroups>
-            {Boolean(settingsByDate.isSettingApplied) && (
-              <ButtonGhostBlue as={Link} to={getDetailUrl(eventId, dateString)}>
-                Ubah Bantalan Peserta
-              </ButtonGhostBlue>
-            )}
+      <DayGroup>
+        <VerticalSpacedBox>
+          <SpacedHeader>
+            <SpacedHeaderLeft>
+              <FieldInputDateSmall
+                label="Bertanding Tanggal"
+                disabled
+                value={settingsByDate.date}
+              />
+            </SpacedHeaderLeft>
 
-            {settingsByDate.isSettingApplied ? (
-              <ButtonOutlineBlue disabled>Terapkan</ButtonOutlineBlue>
-            ) : (
-              <ButtonOutlineBlue
-                onClick={() => {
-                  const detailUrl = getDetailUrl(eventId, dateString);
-                  history.push(detailUrl);
-                }}
-              >
-                Terapkan
-              </ButtonOutlineBlue>
-            )}
-          </HorizontalSpacedButtonGroups>
-        </SpacedHeader>
+            <HorizontalSpacedButtonGroups>
+              {Boolean(settingsByDate.isSettingApplied) && (
+                <ButtonOutlineBlue as={Link} to={getDetailUrl(eventId, dateString)}>
+                  Ubah Bantalan Peserta
+                </ButtonOutlineBlue>
+              )}
 
-        <DetailList>
-          <VerticalSpacedBox>
-            {formSettings.map((setting) => (
-              <DetailItem key={setting.key}>
-                <DetailInput>
-                  <div title={setting.categoryDetailLabel}>
-                    <DisplayTextSmall label="Kategori" displayValue={setting.categoryDetailLabel} />
-                  </div>
+              {settingsByDate.isSettingApplied ? (
+                <ButtonBlue disabled>Terapkan</ButtonBlue>
+              ) : (
+                <ButtonConfirmPrompt
+                  customButton={ButtonBlue}
+                  onConfirm={() => {
+                    submit({
+                      onSuccess() {
+                        const detailUrl = getDetailUrl(eventId, dateString);
+                        history.push(detailUrl);
+                      },
+                    });
+                  }}
+                  messagePrompt="Sudah Yakin dengan Pengaturan Bantalan?"
+                  messageDescription={
+                    <React.Fragment>
+                      Anda akan melakukan generate bantalan ke peserta.
+                      <br />
+                      Bantalan masih dapat diubah sebelum pertandingan dimulai.
+                    </React.Fragment>
+                  }
+                  buttonCancelLabel="Cek Lagi"
+                  buttonConfirmLabel="Masukan Bantalan ke Peserta"
+                >
+                  Terapkan
+                </ButtonConfirmPrompt>
+              )}
+            </HorizontalSpacedButtonGroups>
+          </SpacedHeader>
 
-                  <BudrestInputGroup>
-                    <FieldInputTextSmall
-                      placeholder="0"
-                      disabled={settingsByDate.isSettingApplied}
-                      value={setting.start}
-                      onChange={(ev) => updateFieldStart(setting.key, ev.target.value)}
-                    >
-                      Awal Bantalan
-                    </FieldInputTextSmall>
+          <DetailList>
+            <VerticalSpacedBox>
+              {formSettings.map((setting) => (
+                <DetailItem key={setting.key}>
+                  <DetailInput>
+                    <div title={setting.categoryDetailLabel}>
+                      <DisplayTextSmall
+                        label="Kategori"
+                        displayValue={setting.categoryDetailLabel}
+                      />
+                    </div>
 
-                    <FieldInputTextSmall
-                      placeholder="0"
-                      disabled={settingsByDate.isSettingApplied}
-                      value={setting.end}
-                      onChange={(ev) => updateFieldEnd(setting.key, ev.target.value)}
-                    >
-                      Akhir Bantalan
-                    </FieldInputTextSmall>
+                    <BudrestInputGroup>
+                      <FieldInputTextSmall
+                        placeholder="0"
+                        disabled={settingsByDate.isSettingApplied}
+                        value={setting.start}
+                        onChange={(ev) => updateFieldStart(setting.key, ev.target.value)}
+                      >
+                        Awal Bantalan
+                      </FieldInputTextSmall>
 
-                    <FieldInputTextSmall
-                      placeholder="0"
-                      disabled={settingsByDate.isSettingApplied}
-                      value={setting.targetFace}
-                      onChange={(ev) => updateField(setting.key, "targetFace", ev.target.value)}
-                    >
-                      Target Face
-                    </FieldInputTextSmall>
+                      <FieldInputTextSmall
+                        placeholder="0"
+                        disabled={settingsByDate.isSettingApplied}
+                        value={setting.end}
+                        onChange={(ev) => updateFieldEnd(setting.key, ev.target.value)}
+                      >
+                        Akhir Bantalan
+                      </FieldInputTextSmall>
 
-                    <DisplayTextSmall noBorder displayValue={setting.totalParticipant}>
-                      Total Peserta
-                    </DisplayTextSmall>
-                  </BudrestInputGroup>
-                </DetailInput>
-              </DetailItem>
-            ))}
-          </VerticalSpacedBox>
-        </DetailList>
-      </VerticalSpacedBox>
-    </DayGroup>
+                      <FieldInputTextSmall
+                        placeholder="0"
+                        disabled={settingsByDate.isSettingApplied}
+                        value={setting.targetFace}
+                        onChange={(ev) => updateField(setting.key, "targetFace", ev.target.value)}
+                      >
+                        Target Face
+                      </FieldInputTextSmall>
+
+                      <DisplayTextSmall
+                        noBorder
+                        displayValue={
+                          setting.totalParticipant || <React.Fragment>&ndash;</React.Fragment>
+                        }
+                      >
+                        Total Peserta
+                      </DisplayTextSmall>
+                    </BudrestInputGroup>
+                  </DetailInput>
+                </DetailItem>
+              ))}
+            </VerticalSpacedBox>
+          </DetailList>
+        </VerticalSpacedBox>
+      </DayGroup>
+    </React.Fragment>
   );
 }
 

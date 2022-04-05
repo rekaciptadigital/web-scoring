@@ -9,4 +9,14 @@ export default {
     const qs = { event_id };
     return API.post("/web/v1/archery/bud-rest", data, qs, true);
   },
+
+  // v2
+  /**
+   *
+   * @param {Object} queryString { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getSettingsByEventId(queryString = null) {
+    return API.get("/web/v2/bud-rest", queryString);
+  },
 };

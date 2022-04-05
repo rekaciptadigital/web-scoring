@@ -1,14 +1,19 @@
 import * as React from "react";
 import styled from "styled-components";
 
-function DisplayTextSmall({ children, label, value = "25", noBorder = false }) {
+function DisplayTextSmall({
+  children,
+  label,
+  displayValue = <React.Fragment>&ndash;</React.Fragment>,
+  noBorder = false,
+}) {
   return (
     <DisplayTextWrapper>
       {(children || label) && <div className="field-label">{children || label}</div>}
       {noBorder ? (
-        <div className="field-no-border-value-text">{value}</div>
+        <div className="field-no-border-value-text">{displayValue}</div>
       ) : (
-        <div className="field-value-text">{value}</div>
+        <div className="field-value-text">{displayValue}</div>
       )}
     </DisplayTextWrapper>
   );
@@ -25,6 +30,10 @@ const DisplayTextWrapper = styled.div`
 
   .field-value-text,
   .field-no-border-value-text {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
     display: block;
     width: 100%;
     padding: 0.5rem 0.75rem;

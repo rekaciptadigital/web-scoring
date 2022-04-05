@@ -4,3 +4,4 @@ export { default as stringUtil } from "./stringUtil";
 export { default as errorsUtil } from "./errors";
 export { default as urlUtil } from "./url";
 export { default as filesUtil } from "./files";
+export { default as misc } from "./misc";

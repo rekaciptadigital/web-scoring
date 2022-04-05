@@ -29,7 +29,8 @@ const ButtonWrapper = styled.button`
 
   &:hover {
     background-color: var(--button-bg-color-hover, var(--ma-gray-50));
-    border: solid 1px var(--button-outline-color, var(--ma-gray-100));
+    border: solid 1px
+      var(var(--button-outline-color-hover, --button-outline-color), var(--ma-gray-100));
     box-shadow: 0 1px 1px var(--button-shadow-color-hover, rgba(0, 0, 0, 0.15));
     color: var(--button-font-color-hover, var(--ma-blue));
     text-decoration: var(--button-underline-hover, none) !important;
@@ -77,12 +78,13 @@ const variantStyles = {
   },
   "ghost-blue": {
     "--button-bg-color": "none",
-    "--button-bg-color-hover": "none",
+    "--button-bg-color-hover": "var(--ma-blue)",
     "--button-outline-color": "none",
+    "--button-outline-color-hover": "var(--ma-blue)",
     "--button-font-color": "var(--ma-blue)",
-    "--button-shadow-color-hover": "rgba(0, 0, 0, 0)",
-    "--button-underline-hover": "underline",
+    "--button-font-color-hover": "#ffffff",
   },
+  // TODO: button link (?)
 };
 
 function ButtonBase({ corner, color, style, flexible = false, ...props }) {

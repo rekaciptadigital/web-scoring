@@ -20,7 +20,7 @@ function PageEventBudRests() {
     <ContentLayoutWrapper pageTitle="Pengaturan Bantalan" navbar={<SubNavbar eventId={eventId} />}>
       <CardSheet>
         <VerticalSpacedBox>
-          {Boolean(budrestSettings) && (
+          {Boolean(budrestSettings?.length) && (
             <NoticeBarInfo>Pengaturan aktif apabila pendaftaran lomba telah ditutup</NoticeBarInfo>
           )}
 
@@ -28,14 +28,18 @@ function PageEventBudRests() {
             {isPreparingBudrestSettings ? (
               <div>Sedang menyiapkan data pengaturan bantalan...</div>
             ) : budrestSettings ? (
-              budrestSettings?.map((settingsByDate) => (
-                <BudrestSettingEditorByDate
-                  key={settingsByDate.key}
-                  settingsByDate={settingsByDate}
-                />
-              ))
+              budrestSettings.length ? (
+                budrestSettings.map((settingsByDate) => (
+                  <BudrestSettingEditorByDate
+                    key={settingsByDate.key}
+                    settingsByDate={settingsByDate}
+                  />
+                ))
+              ) : (
+                <div>Data kategori atau jadwal belum tersedia.</div>
+              )
             ) : (
-              <div>Tidak ada data</div>
+              <div>Tidak ada data.</div>
             )}
           </VerticalSpacedBoxLoose>
         </VerticalSpacedBox>

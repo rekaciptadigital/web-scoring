@@ -2,7 +2,7 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { BudRestService } from "services";
 
-import { parseISO } from "date-fns";
+import { parseISO, isBefore, isAfter } from "date-fns";
 import { stringUtil } from "utils";
 
 function useBudrestSettings(eventId) {
@@ -60,8 +60,20 @@ function transform(originalData) {
     });
   }
 
-  // Dibuat flat lagi jadi array
-  return Object.values(dataGroupByDate);
+  // 1. Dibuat flat lagi jadi array.
+  // 2. Diurutkan menurut tanggalnya, karena data dari server dan
+  // waktu proses nge-group di sini belum urut by tanggalnya
+  const flatSettingListOrderByDate = Object.values(dataGroupByDate).sort((dayA, dayB) => {
+    if (isBefore(dayA.date, dayB.date)) {
+      return -1;
+    }
+    if (isAfter(dayA.date, dayB.date)) {
+      return 1;
+    }
+    return 0;
+  });
+
+  return flatSettingListOrderByDate;
 }
 
 export { useBudrestSettings };

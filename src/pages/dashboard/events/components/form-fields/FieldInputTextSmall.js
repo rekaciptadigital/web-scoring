@@ -65,6 +65,7 @@ function FieldInputTextSmall({
   disabled,
 }) {
   const fieldID = `field-${name}`;
+  const handleChange = (ev) => onChange?.(ev);
   return (
     <FieldInputTextWrapper>
       <label className="field-label" htmlFor={fieldID}>
@@ -77,7 +78,7 @@ function FieldInputTextSmall({
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         disabled={disabled}
       />
     </FieldInputTextWrapper>

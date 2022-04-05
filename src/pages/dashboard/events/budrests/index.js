@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory, Link } from "react-router-dom";
 
 import { NoticeBarInfo, ButtonOutlineBlue, ButtonGhostBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
@@ -10,10 +10,11 @@ import { DisplayTextSmall } from "./components/display-text-small";
 
 function PageEventBudRests() {
   const { event_id } = useParams();
+  const history = useHistory();
   const eventId = parseInt(event_id);
 
   return (
-    <ContentLayoutWrapper pageTitle="Pengaturan bantalan" navbar={<SubNavbar eventId={eventId} />}>
+    <ContentLayoutWrapper pageTitle="Pengaturan Bantalan" navbar={<SubNavbar eventId={eventId} />}>
       <CardSheet>
         <VerticalSpacedBox>
           <NoticeBarInfo>Pengaturan aktif apabila pendaftaran lomba telah ditutup</NoticeBarInfo>
@@ -28,8 +29,20 @@ function PageEventBudRests() {
                     </SpacedHeaderLeft>
 
                     <HorizontalSpacedButtonGroups>
-                      {id === 2 && <ButtonGhostBlue>Ubah Bantalan Peserta</ButtonGhostBlue>}
-                      <ButtonOutlineBlue disabled={id === 2}>Terapkan</ButtonOutlineBlue>
+                      {id === 2 && (
+                        <ButtonGhostBlue as={Link} to={getDetailUrl(eventId)}>
+                          Ubah Bantalan Peserta
+                        </ButtonGhostBlue>
+                      )}
+                      <ButtonOutlineBlue
+                        disabled={id === 2}
+                        onClick={() => {
+                          const detailUrl = getDetailUrl(eventId);
+                          history.push(detailUrl);
+                        }}
+                      >
+                        Terapkan
+                      </ButtonOutlineBlue>
                     </HorizontalSpacedButtonGroups>
                   </SpacedHeader>
 
@@ -103,7 +116,7 @@ const DayGroup = styled.div`
 const SpacedHeader = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
 
   > *:nth-child(1) {
     flex-grow: 1;
@@ -176,5 +189,15 @@ const BudrestInputGroup = styled.div`
     flex: 1;
   }
 `;
+
+/* ===================================== */
+// utils
+
+function getDetailUrl(eventId) {
+  if (!eventId) {
+    return "#";
+  }
+  return `/dashboard/event/${eventId}/budrests/detail`;
+}
 
 export default PageEventBudRests;

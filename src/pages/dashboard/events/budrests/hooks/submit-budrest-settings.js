@@ -20,14 +20,18 @@ function useSubmitBudrestSettings(formData, eventId) {
 }
 
 function makePayloadBudrestSettings(formData) {
+  // Yang gak ada partisipan/pendaftarnya gak dimasukkan
+  // Di UI-nya disable
   return {
-    category_bud_rest: formData.map((setting) => ({
-      category_id: setting.categoryDetailId,
-      bud_rest_start: setting.start,
-      bud_rest_end: setting.end,
-      target_face: setting.targetFace,
-      type: setting.type,
-    })),
+    category_bud_rest: formData
+      .filter((setting) => setting.totalParticipant)
+      .map((setting) => ({
+        category_id: setting.categoryDetailId,
+        bud_rest_start: setting.start,
+        bud_rest_end: setting.end,
+        target_face: setting.targetFace,
+        type: setting.type,
+      })),
   };
 }
 

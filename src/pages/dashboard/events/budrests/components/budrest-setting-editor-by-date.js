@@ -56,33 +56,29 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
                 </ButtonOutlineBlue>
               )}
 
-              {settingsByDate.isSettingApplied ? (
-                <ButtonBlue disabled>Terapkan</ButtonBlue>
-              ) : (
-                <ButtonConfirmPrompt
-                  customButton={ButtonBlue}
-                  onConfirm={() => {
-                    submit({
-                      onSuccess() {
-                        const detailUrl = getDetailUrl(eventId, dateString);
-                        history.push(detailUrl);
-                      },
-                    });
-                  }}
-                  messagePrompt="Sudah Yakin dengan Pengaturan Bantalan?"
-                  messageDescription={
-                    <React.Fragment>
-                      Anda akan melakukan generate bantalan ke peserta.
-                      <br />
-                      Bantalan masih dapat diubah sebelum pertandingan dimulai.
-                    </React.Fragment>
-                  }
-                  buttonCancelLabel="Cek Lagi"
-                  buttonConfirmLabel="Masukan Bantalan ke Peserta"
-                >
-                  Terapkan
-                </ButtonConfirmPrompt>
-              )}
+              <ButtonConfirmPrompt
+                customButton={ButtonBlue}
+                onConfirm={() => {
+                  submit({
+                    onSuccess() {
+                      const detailUrl = getDetailUrl(eventId, dateString);
+                      history.push(detailUrl);
+                    },
+                  });
+                }}
+                messagePrompt="Sudah Yakin dengan Pengaturan Bantalan?"
+                messageDescription={
+                  <React.Fragment>
+                    Anda akan melakukan generate bantalan ke peserta.
+                    <br />
+                    Bantalan masih dapat diubah sebelum pertandingan dimulai.
+                  </React.Fragment>
+                }
+                buttonCancelLabel="Cek Lagi"
+                buttonConfirmLabel="Masukkan Bantalan ke Peserta"
+              >
+                Terapkan
+              </ButtonConfirmPrompt>
             </HorizontalSpacedButtonGroups>
           </SpacedHeader>
 
@@ -99,37 +95,62 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
                     </div>
 
                     <BudrestInputGroup>
-                      <FieldInputTextSmall
-                        placeholder="0"
-                        disabled={settingsByDate.isSettingApplied}
-                        value={setting.start}
-                        onChange={(ev) => updateFieldStart(setting.key, ev.target.value)}
-                      >
-                        Awal Bantalan
-                      </FieldInputTextSmall>
+                      {setting.totalParticipant ? (
+                        <React.Fragment>
+                          <FieldInputTextSmall
+                            placeholder="0"
+                            disabled={!setting.totalParticipant}
+                            value={setting.start}
+                            onChange={(ev) => updateFieldStart(setting.key, ev.target.value)}
+                          >
+                            Awal Bantalan
+                          </FieldInputTextSmall>
 
-                      <FieldInputTextSmall
-                        placeholder="0"
-                        disabled={settingsByDate.isSettingApplied}
-                        value={setting.end}
-                        onChange={(ev) => updateFieldEnd(setting.key, ev.target.value)}
-                      >
-                        Akhir Bantalan
-                      </FieldInputTextSmall>
+                          <FieldInputTextSmall
+                            placeholder="0"
+                            disabled={!setting.totalParticipant}
+                            value={setting.end}
+                            onChange={(ev) => updateFieldEnd(setting.key, ev.target.value)}
+                          >
+                            Akhir Bantalan
+                          </FieldInputTextSmall>
 
-                      <FieldInputTextSmall
-                        placeholder="0"
-                        disabled={settingsByDate.isSettingApplied}
-                        value={setting.targetFace}
-                        onChange={(ev) => updateField(setting.key, "targetFace", ev.target.value)}
-                      >
-                        Target Face
-                      </FieldInputTextSmall>
+                          <FieldInputTextSmall
+                            placeholder="0"
+                            disabled={!setting.totalParticipant}
+                            value={setting.targetFace}
+                            onChange={(ev) => {
+                              updateField(setting.key, "targetFace", ev.target.value);
+                            }}
+                          >
+                            Target Face
+                          </FieldInputTextSmall>
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment>
+                          <DisplayTextSmall
+                            label="Awal Bantalan"
+                            displayValue={<React.Fragment>&ndash;</React.Fragment>}
+                          />
+
+                          <DisplayTextSmall
+                            label="Akhir Bantalan"
+                            displayValue={<React.Fragment>&ndash;</React.Fragment>}
+                          />
+
+                          <DisplayTextSmall
+                            label="Target Face"
+                            displayValue={<React.Fragment>&ndash;</React.Fragment>}
+                          />
+                        </React.Fragment>
+                      )}
 
                       <DisplayTextSmall
                         noBorder
                         displayValue={
-                          setting.totalParticipant || <React.Fragment>&ndash;</React.Fragment>
+                          setting.totalParticipant || (
+                            <React.Fragment>Tidak ada peserta</React.Fragment>
+                          )
                         }
                       >
                         Total Peserta
@@ -232,6 +253,10 @@ const BudrestInputGroup = styled.div`
   > * {
     max-width: 6.375rem;
     flex: 1;
+
+    &:last-child {
+      max-width: max-content;
+    }
   }
 `;
 

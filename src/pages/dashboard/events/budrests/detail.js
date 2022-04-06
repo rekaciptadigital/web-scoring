@@ -1,14 +1,88 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useRouteQueryParams } from "./hooks/route-params";
+import { useMemberBudrests } from "./hooks/member-budrests";
+import { useSearchMemberBudrests } from "./hooks/search-member-budrest";
 
-import { ButtonBlue } from "components/ma";
+import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 
+import { datetime } from "utils";
+
 function PageEventBudRestDetail() {
-  const { event_id } = useParams();
-  const eventId = parseInt(event_id);
+  const { eventId, date: dateFromParam } = useRouteQueryParams();
+
+  const { data: memberBudrests, isLoading: isLoadingMemberBudrests } = useMemberBudrests(
+    eventId,
+    dateFromParam
+  );
+
+  const {
+    searchKeyword,
+    setSearchKeyword,
+    searchResults: searchResultsByName,
+  } = useSearchMemberBudrests(memberBudrests);
+
+  // Fallback ke data awal kalau belum ada search karena datanya
+  // masih `null` meskipun loading API sudah selesai, bisa crash.
+  const memberBudrestsData = searchResultsByName || memberBudrests;
+
+  if (!dateFromParam) {
+    return (
+      <ContentLayoutWrapper
+        pageTitle="Pengaturan Bantalan"
+        navbar={<SubNavbar eventId={eventId} />}
+      >
+        <CardSheet>
+          <VerticalSpacedBox>
+            <div>
+              Tanggal bertanding tidak valid. Silakan terapkan pengaturan bantalan lebih dulu.
+            </div>
+            <div>
+              <ButtonOutlineBlue as={Link} to={`/dashboard/event/${eventId}/budrests`}>
+                Ke pengaturan bantalan
+              </ButtonOutlineBlue>
+            </div>
+          </VerticalSpacedBox>
+        </CardSheet>
+      </ContentLayoutWrapper>
+    );
+  }
+
+  if (!memberBudrests && isLoadingMemberBudrests) {
+    return (
+      <ContentLayoutWrapper
+        pageTitle="Pengaturan Bantalan"
+        navbar={<SubNavbar eventId={eventId} />}
+      >
+        <CardSheet>Sedang menyiapkan data nomor bantalan...</CardSheet>
+      </ContentLayoutWrapper>
+    );
+  }
+
+  if (!memberBudrests) {
+    return (
+      <ContentLayoutWrapper
+        pageTitle="Pengaturan Bantalan"
+        navbar={<SubNavbar eventId={eventId} />}
+      >
+        <CardSheet>
+          <VerticalSpacedBox>
+            <div>Data tidak tersedia.</div>
+            <div>
+              <ButtonOutlineBlue as={Link} to={`/dashboard/event/${eventId}/budrests`}>
+                Ke pengaturan bantalan
+              </ButtonOutlineBlue>
+            </div>
+          </VerticalSpacedBox>
+        </CardSheet>
+      </ContentLayoutWrapper>
+    );
+  }
+
+  const dateLabel = datetime.formatFullDateLabel(memberBudrests.date);
 
   return (
     <ContentLayoutWrapper pageTitle="Pengaturan Bantalan" navbar={<SubNavbar eventId={eventId} />}>
@@ -17,7 +91,7 @@ function PageEventBudRestDetail() {
           <SpacedHeader>
             <div>
               <h5>Data Peserta</h5>
-              <h6 className="fw-bold">2 Juni 2022</h6>
+              <h6 className="fw-bold">{dateLabel}</h6>
             </div>
 
             <div>
@@ -27,49 +101,56 @@ function PageEventBudRestDetail() {
             </div>
           </SpacedHeader>
 
+          <input
+            type="text"
+            placeholder="Cari peserta"
+            value={searchKeyword}
+            onChange={(ev) => setSearchKeyword(ev.target.value)}
+          />
+
           <VerticalSpacedBoxLoose>
-            {[1, 2].map((id) => (
-              <div key={id}>
-                <CategoryLabelHead>Nasional - Umum - 30m - Individu Putra</CategoryLabelHead>
+            {memberBudrestsData.groups.length ? (
+              memberBudrestsData.groups.map((group) => (
+                <div key={group.id}>
+                  <CategoryLabelHead>
+                    {group.label} (id: {group.id})
+                  </CategoryLabelHead>
 
-                <table className="table table-responsive">
-                  <thead>
-                    <tr>
-                      <th colSpan="2">Bantalan</th>
-                      <th>Nama</th>
-                      <th>Klub</th>
-                    </tr>
-                  </thead>
+                  <table className="table table-responsive">
+                    <thead>
+                      <tr>
+                        <th colSpan="2">Bantalan</th>
+                        <th>Nama</th>
+                        <th>Klub</th>
+                      </tr>
+                    </thead>
 
-                  <tbody>
-                    {[1, 2].map((id) => (
-                      <React.Fragment key={id}>
-                        <tr>
-                          <ColSpanningRow rowSpan={3}>
-                            <span>{id}</span>
-                          </ColSpanningRow>
-                          <td>{id}A</td>
-                          <td>Great Lord Fuzon</td>
-                          <td>Highest Throne Archery</td>
-                        </tr>
+                    <tbody>
+                      {memberBudrestsData.budrestsByCategory[group.id].map((memberBudrest) => (
+                        <React.Fragment key={memberBudrest.budRestNumber}>
+                          <tr>
+                            {/* <ColSpanningRow rowSpan={3}> */}
+                            <ColSpanningRow>
+                              <span>{memberBudrest.budRestNumber}</span>
+                            </ColSpanningRow>
 
-                        <tr>
-                          <td>{id}B</td>
-                          <td>Lord Fuzon</td>
-                          <td>Higher Throne Archery</td>
-                        </tr>
-
-                        <tr>
-                          <td>{id}C</td>
-                          <td>Lord Fuzon, Jr.</td>
-                          <td>High Throne Archery</td>
-                        </tr>
-                      </React.Fragment>
-                    ))}
-                  </tbody>
-                </table>
+                            <td>{memberBudrest.budRestNumber}</td>
+                            <td>{memberBudrest.name}</td>
+                            <td>{memberBudrest.clubName}</td>
+                          </tr>
+                        </React.Fragment>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))
+            ) : (
+              <div>
+                Data tidak ditemukan.
+                <br />
+                TODO: styling
               </div>
-            ))}
+            )}
           </VerticalSpacedBoxLoose>
         </VerticalSpacedBox>
       </CardSheet>

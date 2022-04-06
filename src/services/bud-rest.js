@@ -28,4 +28,8 @@ export default {
   postSettingsByDateEventId(data, queryString = null) {
     return API.post("/web/v2/bud-rest", data, queryString, true);
   },
+
+  getMembersBudrestByDate(queryString = null) {
+    return API.get("/web/v2/schedule-full-day", queryString);
+  },
 };

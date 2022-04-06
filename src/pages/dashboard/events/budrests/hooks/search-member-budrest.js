@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { computeRowSpan } from "../utils";
+
 function useSearchMemberBudrests(initialMemberBudrests) {
   const [searchKeyword, setSearchKeyword] = React.useState("");
   const [searchResults, setResults] = React.useState(initialMemberBudrests);
@@ -22,19 +24,8 @@ function useSearchMemberBudrests(initialMemberBudrests) {
   };
 }
 
-function rowsAfterFilter(originalRows, searchKeyword) {
-  if (!searchKeyword) {
-    return originalRows;
-  }
-
-  const filteredList = originalRows.filter((memberBudrest) => {
-    const archerName = memberBudrest.name.toLowerCase();
-    const keyword = searchKeyword.trim().toLowerCase();
-    const foundIndex = archerName.indexOf(keyword);
-    return foundIndex >= 0;
-  });
-  return filteredList;
-}
+/* ========================= */
+// utils
 
 function filterMemberBudrestsData(originalMemberBudrests, searchKeyword) {
   if (!originalMemberBudrests || !searchKeyword) {
@@ -59,8 +50,22 @@ function filterMemberBudrestsData(originalMemberBudrests, searchKeyword) {
   return {
     ...originalMemberBudrests,
     groups: filteredGroups,
-    budrestsByCategory: filteredData,
+    budrestsByCategory: computeRowSpan(filteredData),
   };
+}
+
+function rowsAfterFilter(originalRows, searchKeyword) {
+  if (!searchKeyword) {
+    return originalRows;
+  }
+
+  const filteredList = originalRows.filter((memberBudrest) => {
+    const archerName = memberBudrest.name.toLowerCase();
+    const keyword = searchKeyword.trim().toLowerCase();
+    const foundIndex = archerName.indexOf(keyword);
+    return foundIndex >= 0;
+  });
+  return filteredList;
 }
 
 export { useSearchMemberBudrests };

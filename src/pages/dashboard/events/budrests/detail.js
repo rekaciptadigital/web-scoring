@@ -8,6 +8,7 @@ import { useSearchMemberBudrests } from "./hooks/search-member-budrest";
 import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
+import { ListMemberBudrestsByCategory } from "./components/list-member-budrest-by-category";
 
 import { datetime } from "utils";
 
@@ -111,38 +112,11 @@ function PageEventBudRestDetail() {
           <VerticalSpacedBoxLoose>
             {memberBudrestsData.groups.length ? (
               memberBudrestsData.groups.map((group) => (
-                <div key={group.id}>
-                  <CategoryLabelHead>
-                    {group.label} (id: {group.id})
-                  </CategoryLabelHead>
-
-                  <table className="table table-responsive">
-                    <thead>
-                      <tr>
-                        <th colSpan="2">Bantalan</th>
-                        <th>Nama</th>
-                        <th>Klub</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {memberBudrestsData.budrestsByCategory[group.id].map((memberBudrest) => (
-                        <React.Fragment key={memberBudrest.budRestNumber}>
-                          <tr>
-                            {/* <ColSpanningRow rowSpan={3}> */}
-                            <ColSpanningRow>
-                              <span>{memberBudrest.budRestNumber}</span>
-                            </ColSpanningRow>
-
-                            <td>{memberBudrest.budRestNumber}</td>
-                            <td>{memberBudrest.name}</td>
-                            <td>{memberBudrest.clubName}</td>
-                          </tr>
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <ListMemberBudrestsByCategory
+                  key={group.id}
+                  group={group}
+                  budrestList={memberBudrestsData.budrestsByCategory[group.id]}
+                />
               ))
             ) : (
               <div>
@@ -194,17 +168,6 @@ const SpacedHeader = styled.div`
   > *:nth-child(2) {
     flex-shrink: 0;
   }
-`;
-
-const CategoryLabelHead = styled.div`
-  padding: 1rem;
-  background-color: var(--ma-primary-blue-50);
-  font-weight: 600;
-`;
-
-const ColSpanningRow = styled.td`
-  text-align: center;
-  vertical-align: middle;
 `;
 
 export default PageEventBudRestDetail;

@@ -9,6 +9,7 @@ import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ListMemberBudrestsByCategory } from "./components/list-member-budrest-by-category";
+import { SearchBox } from "./components/search-box";
 
 import { datetime } from "utils";
 
@@ -102,8 +103,7 @@ function PageEventBudRestDetail() {
             </div>
           </SpacedHeader>
 
-          <input
-            type="text"
+          <SearchBox
             placeholder="Cari peserta"
             value={searchKeyword}
             onChange={(ev) => setSearchKeyword(ev.target.value)}

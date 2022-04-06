@@ -15,9 +15,7 @@ function ListMemberBudrestsByCategory({ group, budrestList }) {
 
   return (
     <div key={group.id}>
-      <CategoryLabelHead>
-        {group.label} (id: {group.id})
-      </CategoryLabelHead>
+      <CategoryLabelHead>{group.label}</CategoryLabelHead>
 
       <table className="table table-responsive">
         <thead>

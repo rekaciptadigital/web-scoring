@@ -20,7 +20,17 @@ function useFormBudrestSettings(initialSettingsData) {
     dispatch({ type: "UPDATE_FIELD_END", key: key, payload: value });
   };
 
-  return { ...state, updateField, updateFieldStart, updateFieldEnd };
+  const updateFieldTargetFace = (key, value) => {
+    dispatch({ type: "UPDATE_FIELD_TARGET_FACE", key: key, payload: value });
+  };
+
+  return {
+    ...state,
+    updateField,
+    updateFieldStart,
+    updateFieldEnd,
+    updateFieldTargetFace,
+  };
 }
 
 function formReducer(state, action) {
@@ -45,11 +55,16 @@ function formReducer(state, action) {
           if (setting.key !== action.key) {
             return setting;
           }
-          const value = misc.convertAsNumber(action.payload, setting.start);
-          const endNumber = computeEndNumber(value, setting.totalParticipant, setting.targetFace);
+          const inputValueStart = misc.convertAsNumber(action.payload, setting.start);
+          const endNumber = computeEndNumber(
+            inputValueStart,
+            misc.convertAsNumber(setting.totalParticipant),
+            misc.convertAsNumber(setting.targetFace),
+            setting.end
+          );
           return {
             ...setting,
-            start: value || "",
+            start: inputValueStart || "",
             // Rekomendasikan angka akhir bantalan sesuai angka awal yang diinput
             end: endNumber || "",
           };
@@ -66,6 +81,29 @@ function formReducer(state, action) {
           }
           const value = misc.convertAsNumber(action.payload, setting.end);
           return { ...setting, end: value || "" };
+        }),
+      };
+    }
+
+    case "UPDATE_FIELD_TARGET_FACE": {
+      return {
+        ...state,
+        data: state.data.map((setting) => {
+          if (setting.key !== action.key) {
+            return setting;
+          }
+          const inputValueTargetFace = misc.convertAsNumber(action.payload, setting.targetFace);
+          const endNumber = computeEndNumber(
+            setting.start,
+            misc.convertAsNumber(setting.totalParticipant),
+            inputValueTargetFace,
+            setting.end
+          );
+          return {
+            ...setting,
+            targetFace: inputValueTargetFace || "",
+            end: endNumber || "",
+          };
         }),
       };
     }
@@ -103,13 +141,16 @@ function makeInitialState(initialData) {
   }));
 }
 
-function computeEndNumber(input, totalParticipant, numbersOfTargetFace) {
-  if (!input) {
-    return input;
+function computeEndNumber(startNumber, totalParticipant, numbersOfTargetFace, fallback = 0) {
+  if (!totalParticipant || !numbersOfTargetFace) {
+    return fallback;
+  }
+  if (!startNumber) {
+    return startNumber;
   }
   const numbersOfRequiredBudrests = Math.ceil(totalParticipant / numbersOfTargetFace);
   const range = numbersOfRequiredBudrests - 1;
-  const resultEndNumber = input + range;
+  const resultEndNumber = startNumber + range;
   return resultEndNumber;
 }
 

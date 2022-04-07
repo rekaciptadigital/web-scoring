@@ -19,9 +19,9 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
 
   const {
     data: formSettings,
-    updateField,
     updateFieldStart,
     updateFieldEnd,
+    updateFieldTargetFace,
   } = useFormBudrestSettings(settingsByDate);
 
   const dateString = formatServerDate(settingsByDate.date);
@@ -120,7 +120,7 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
                             disabled={!setting.totalParticipant}
                             value={setting.targetFace}
                             onChange={(ev) => {
-                              updateField(setting.key, "targetFace", ev.target.value);
+                              updateFieldTargetFace(setting.key, ev.target.value);
                             }}
                           >
                             Target Face

@@ -8,6 +8,7 @@ function useFormBudrestSettings(initialSettingsData) {
   });
 
   const errors = validateValues(state.data);
+  const isSubmitAllowed = shouldSubmitAllowed(errors);
 
   const getValidationProps = (key, fieldName) => {
     return {
@@ -45,6 +46,7 @@ function useFormBudrestSettings(initialSettingsData) {
     updateFieldEnd,
     updateFieldTargetFace,
     errors,
+    isSubmitAllowed,
     getValidationProps,
     resetFormState,
   };
@@ -182,6 +184,10 @@ function validateValues(data) {
 
   const errors = {};
   for (const setting of data) {
+    // Yang gak ada peserta gak perlu divalidasi
+    if (!setting.totalParticipant) {
+      continue;
+    }
     errors[setting.key] = {
       start: !setting.start ? "Wajib" : false,
       end: !setting.end ? "Wajib" : false,
@@ -191,16 +197,41 @@ function validateValues(data) {
   return errors;
 }
 
+function shouldSubmitAllowed(errors) {
+  if (!errors) {
+    return true;
+  }
+
+  let errorsCount = 0;
+  const settingKeys = Object.keys(errors);
+  for (const key of settingKeys) {
+    const fieldNames = Object.keys(errors[key]);
+
+    for (const field of fieldNames) {
+      if (!errors[key][field]) {
+        continue;
+      }
+      errorsCount = errorsCount + 1;
+      break;
+    }
+
+    if (errorsCount) {
+      break;
+    }
+  }
+
+  return errorsCount === 0;
+}
+
 function computeEndNumber(startNumber, totalParticipant, numbersOfTargetFace, fallback = 0) {
-  if (!totalParticipant || !numbersOfTargetFace) {
+  if (!startNumber || !totalParticipant || !numbersOfTargetFace) {
     return fallback;
   }
-  if (!startNumber) {
-    return startNumber;
-  }
+
   const numbersOfRequiredBudrests = Math.ceil(totalParticipant / numbersOfTargetFace);
   const range = numbersOfRequiredBudrests - 1;
   const resultEndNumber = startNumber + range;
+
   return resultEndNumber;
 }
 

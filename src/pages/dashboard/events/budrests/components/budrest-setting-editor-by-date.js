@@ -23,6 +23,7 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
     updateFieldEnd,
     updateFieldTargetFace,
     getValidationProps,
+    isSubmitAllowed,
   } = useFormBudrestSettings(settingsByDate);
 
   const dateString = formatServerDate(settingsByDate.date);
@@ -59,6 +60,7 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
 
               <ButtonConfirmPrompt
                 customButton={ButtonBlue}
+                disabled={!isSubmitAllowed}
                 onConfirm={() => {
                   submit({
                     onSuccess() {

@@ -13,6 +13,8 @@ import { SearchBox } from "./components/search-box";
 
 import { datetime } from "utils";
 
+import IllustrationDataNotFound from "assets/images/events/tanda-seru.png";
+
 function PageEventBudRestDetail() {
   const { eventId, date: dateFromParam } = useRouteQueryParams();
 
@@ -119,11 +121,17 @@ function PageEventBudRestDetail() {
                 />
               ))
             ) : (
-              <div>
-                Data tidak ditemukan.
-                <br />
-                TODO: styling
-              </div>
+              <SearchResultEmpty>
+                <VerticalSpacedBox>
+                  <div>
+                    <img src={IllustrationDataNotFound} alt="Ilustrasi data tidak ditemukan" />
+                  </div>
+                  <div>
+                    <TextHeadingBlue as="h3">Data yang Anda Cari Tidak Tersedia</TextHeadingBlue>
+                    <p>Silakan masukkan kata kunci lain.</p>
+                  </div>
+                </VerticalSpacedBox>
+              </SearchResultEmpty>
             )}
           </VerticalSpacedBoxLoose>
         </VerticalSpacedBox>
@@ -168,6 +176,19 @@ const SpacedHeader = styled.div`
   > *:nth-child(2) {
     flex-shrink: 0;
   }
+`;
+
+const SearchResultEmpty = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+`;
+
+const TextHeadingBlue = styled.h3`
+  color: var(--ma-blue);
+  font-weight: 600;
 `;
 
 export default PageEventBudRestDetail;

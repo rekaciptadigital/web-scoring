@@ -1,5 +1,5 @@
 import * as React from "react";
-import { stringUtil } from "utils";
+import { stringUtil, misc } from "utils";
 
 function useFormBudrestSettings(initialSettingsData) {
   const [state, dispatch] = React.useReducer(formReducer, {
@@ -32,8 +32,7 @@ function formReducer(state, action) {
           if (setting.key !== action.key) {
             return setting;
           }
-          const payloadAsNumber = Number(action.payload);
-          const value = isNaN(payloadAsNumber) ? setting[action.field] : payloadAsNumber;
+          const value = misc.convertAsNumber(action.payload, setting[action.field]);
           return { ...setting, [action.field]: value || "" };
         }),
       };
@@ -46,14 +45,14 @@ function formReducer(state, action) {
           if (setting.key !== action.key) {
             return setting;
           }
-          const payloadAsNumber = Number(action.payload);
-          const value = isNaN(payloadAsNumber) ? setting.start : payloadAsNumber;
-          if (value > setting.end) {
-            // Supaya nilai `end` gak lebih kecil dari `start`
-            // kasih suggestion nilai `end` minimal sama dengan `start`
-            return { ...setting, start: value || "", end: value || "" };
-          }
-          return { ...setting, start: value || "" };
+          const value = misc.convertAsNumber(action.payload, setting.start);
+          const endNumber = computeEndNumber(value, setting.totalParticipant, setting.targetFace);
+          return {
+            ...setting,
+            start: value || "",
+            // Rekomendasikan angka akhir bantalan sesuai angka awal yang diinput
+            end: endNumber || "",
+          };
         }),
       };
     }
@@ -65,8 +64,7 @@ function formReducer(state, action) {
           if (setting.key !== action.key) {
             return setting;
           }
-          const payloadAsNumber = Number(action.payload);
-          const value = isNaN(payloadAsNumber) ? setting.start : payloadAsNumber;
+          const value = misc.convertAsNumber(action.payload, setting.end);
           return { ...setting, end: value || "" };
         }),
       };
@@ -103,6 +101,16 @@ function makeInitialState(initialData) {
     // kasih nilai default 4
     targetFace: setting.targetFace || 4,
   }));
+}
+
+function computeEndNumber(input, totalParticipant, numbersOfTargetFace) {
+  if (!input) {
+    return input;
+  }
+  const numbersOfRequiredBudrests = Math.ceil(totalParticipant / numbersOfTargetFace);
+  const range = numbersOfRequiredBudrests - 1;
+  const resultEndNumber = input + range;
+  return resultEndNumber;
 }
 
 export { useFormBudrestSettings };

@@ -8,6 +8,7 @@ import ScoringNew from "pages/dashboard/scoring/new";
 import Dashboard from "../pages/dashboard";
 import PageEventDetailHome from "../pages/dashboard/events/home";
 import PageEventBudRests from "../pages/dashboard/events/budrests";
+import PageEventBudRestDetail from "../pages/dashboard/events/budrests/detail";
 import PageEventFaqs from "../pages/dashboard/events/faqs";
 import PageEventDetailSchedulingScoring from "pages/dashboard/events/scheduling-scoring";
 import PageConfigEliminationDetail from "pages/dashboard/events/scheduling-scoring/views/manage-elimination-detail";
@@ -28,6 +29,7 @@ const dashboardRoutes = [
   { path: "/dashboard/event/:event_id/home", component: PageEventDetailHome },
   { path: "/dashboard/event/:event_id/manage", component: EventsNewFullday },
   { path: "/dashboard/event/:event_id/budrests", component: PageEventBudRests },
+  { path: "/dashboard/event/:event_id/budrests/detail", component: PageEventBudRestDetail },
   { path: "/dashboard/event/:event_id/faqs", component: PageEventFaqs },
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",

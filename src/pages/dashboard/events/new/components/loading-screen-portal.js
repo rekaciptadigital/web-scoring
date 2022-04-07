@@ -10,7 +10,7 @@ function LoadingScreen({ loading: isLoading, message }) {
     const portalTargetDOM = document.createElement("div");
     portalRef.current = portalTargetDOM;
 
-    portalTargetDOM.setAttribute("id", "loading-screen-spinner");
+    portalTargetDOM.setAttribute("class", "loading-screen-spinner");
     document.body.appendChild(portalTargetDOM);
 
     return function () {

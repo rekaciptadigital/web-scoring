@@ -23,7 +23,7 @@ function SubNavbar({ eventId }) {
           </li>
 
           <li>
-            <NavLinkItem as="span" to={`/dashboard/event/${eventId}/budrests`}>
+            <NavLinkItem to={`/dashboard/event/${eventId}/budrests`}>
               <span>
                 <IconBudRest size="16" />
               </span>
@@ -54,7 +54,7 @@ const StyledSubNavbar = styled.div`
     gap: 3rem;
 
     list-style: none;
-    padding: 1rem;
+    padding: 1rem 0;
   }
 `;
 

@@ -3,6 +3,10 @@ import { fetchingReducer } from "./fetcher";
 
 import { errorsUtil } from "utils";
 
+/**
+ *
+ * @returns {Object} { status, data, errors, state, runAsync, isLoading, isSuccess, isError }
+ */
 function useFetcher() {
   const [state, dispatch] = React.useReducer(fetchingReducer, {
     status: "idle",

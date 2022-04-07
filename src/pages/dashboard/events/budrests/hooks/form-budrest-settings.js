@@ -5,8 +5,22 @@ function useFormBudrestSettings(initialSettingsData) {
   const [state, dispatch] = React.useReducer(formReducer, {
     data: makeInitialState(initialSettingsData),
     status: "",
-    errors: {},
   });
+
+  const errors = validateValues(state.data);
+
+  const getValidationProps = (key, fieldName) => {
+    return {
+      // keliatan ruwet... ini cuma bikin pesan error sebagai array string
+      errors: errors?.[key]?.[fieldName] ? [errors[key][fieldName]] : undefined,
+      isTouched: state.touched?.[key]?.[fieldName],
+      onBlur: () => {
+        dispatch({ type: "FIELD_TOUCHED", key: key, field: fieldName });
+      },
+    };
+  };
+
+  const resetFormState = () => dispatch({ type: "FORM_RESET" });
 
   const updateField = (key, fieldName, value) => {
     dispatch({ type: "FIELD_UPDATE", key: key, field: fieldName, payload: value });
@@ -30,6 +44,9 @@ function useFormBudrestSettings(initialSettingsData) {
     updateFieldStart,
     updateFieldEnd,
     updateFieldTargetFace,
+    errors,
+    getValidationProps,
+    resetFormState,
   };
 }
 
@@ -46,6 +63,23 @@ function formReducer(state, action) {
           return { ...setting, [action.field]: value || "" };
         }),
       };
+    }
+
+    case "FIELD_TOUCHED": {
+      return {
+        ...state,
+        touched: {
+          ...(state.touched || {}),
+          [action.key]: {
+            ...(state.touched?.[action.key] || {}),
+            [action.field]: true,
+          },
+        },
+      };
+    }
+
+    case "FORM_RESET": {
+      return { data: state.data, status: state.status };
     }
 
     case "UPDATE_FIELD_START": {
@@ -139,6 +173,22 @@ function makeInitialState(initialData) {
     // kasih nilai default 4
     targetFace: setting.targetFace || 4,
   }));
+}
+
+function validateValues(data) {
+  if (!data) {
+    return null;
+  }
+
+  const errors = {};
+  for (const setting of data) {
+    errors[setting.key] = {
+      start: !setting.start ? "Wajib" : false,
+      end: !setting.end ? "Wajib" : false,
+      targetFace: !setting.targetFace ? "Wajib" : false,
+    };
+  }
+  return errors;
 }
 
 function computeEndNumber(startNumber, totalParticipant, numbersOfTargetFace, fallback = 0) {

@@ -8,7 +8,7 @@ function useFormBudrestSettings(initialSettingsData) {
   });
 
   const errors = validateValues(state.data);
-  const isSubmitAllowed = shouldSubmitAllowed(errors);
+  const isSubmitAllowed = hasAnyParticipants(state.data) && shouldSubmitAllowed(errors);
 
   const getValidationProps = (key, fieldName) => {
     return {
@@ -221,6 +221,13 @@ function shouldSubmitAllowed(errors) {
   }
 
   return errorsCount === 0;
+}
+
+function hasAnyParticipants(data) {
+  if (!data) {
+    return false;
+  }
+  return data.some((setting) => setting.totalParticipant > 0);
 }
 
 function computeEndNumber(startNumber, totalParticipant, numbersOfTargetFace, fallback = 0) {

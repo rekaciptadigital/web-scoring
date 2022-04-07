@@ -19,9 +19,11 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
 
   const {
     data: formSettings,
-    updateField,
     updateFieldStart,
     updateFieldEnd,
+    updateFieldTargetFace,
+    getValidationProps,
+    isSubmitAllowed,
   } = useFormBudrestSettings(settingsByDate);
 
   const dateString = formatServerDate(settingsByDate.date);
@@ -58,6 +60,7 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
 
               <ButtonConfirmPrompt
                 customButton={ButtonBlue}
+                disabled={!isSubmitAllowed}
                 onConfirm={() => {
                   submit({
                     onSuccess() {
@@ -98,30 +101,36 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
                       {setting.totalParticipant ? (
                         <React.Fragment>
                           <FieldInputTextSmall
+                            name={`${setting.key}-start`}
                             placeholder="0"
                             disabled={!setting.totalParticipant}
                             value={setting.start}
                             onChange={(ev) => updateFieldStart(setting.key, ev.target.value)}
+                            {...getValidationProps(setting.key, "start")}
                           >
                             Awal Bantalan
                           </FieldInputTextSmall>
 
                           <FieldInputTextSmall
+                            name={`${setting.key}-end`}
                             placeholder="0"
                             disabled={!setting.totalParticipant}
                             value={setting.end}
                             onChange={(ev) => updateFieldEnd(setting.key, ev.target.value)}
+                            {...getValidationProps(setting.key, "end")}
                           >
                             Akhir Bantalan
                           </FieldInputTextSmall>
 
                           <FieldInputTextSmall
+                            name={`${setting.key}-targetFace`}
                             placeholder="0"
                             disabled={!setting.totalParticipant}
                             value={setting.targetFace}
                             onChange={(ev) => {
-                              updateField(setting.key, "targetFace", ev.target.value);
+                              updateFieldTargetFace(setting.key, ev.target.value);
                             }}
+                            {...getValidationProps(setting.key, "targetFace")}
                           >
                             Target Face
                           </FieldInputTextSmall>
@@ -247,7 +256,7 @@ const DetailInput = styled.div`
 
 const BudrestInputGroup = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
 
   > * {

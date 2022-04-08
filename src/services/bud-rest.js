@@ -22,14 +22,28 @@ export default {
 
   /**
    *
-   * @param {Object} queryString { event_id, date }
+   * @param {Object} queryString { event_id }
    * @returns {Promise} { success, data, errors, message }
    */
-  postSettingsByDateEventId(data, queryString = null) {
+  postSettingsByEventId(data, queryString = null) {
     return API.post("/web/v2/bud-rest", data, queryString, true);
   },
 
+  /**
+   *
+   * @param {Object} queryString { event_id, date }
+   * @returns {Promise} { success, data, errors, message }
+   */
   getMembersBudrestByDate(queryString = null) {
     return API.get("/web/v2/schedule-full-day", queryString);
+  },
+
+  /**
+   *
+   * @param {Object} queryString { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getNumbersByEventId(queryString = null) {
+    return API.get("/web/v2/bud-rest/get-list-budrest", queryString);
   },
 };

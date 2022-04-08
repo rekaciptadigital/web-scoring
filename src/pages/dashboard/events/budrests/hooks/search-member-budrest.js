@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { computeRowSpan } from "../utils";
+import { computeRowSpanAndClub } from "../utils";
 
 function useSearchMemberBudrests(initialMemberBudrests) {
   const [searchKeyword, setSearchKeyword] = React.useState("");
@@ -50,7 +50,7 @@ function filterMemberBudrestsData(originalMemberBudrests, searchKeyword) {
   return {
     ...originalMemberBudrests,
     groups: filteredGroups,
-    budrestsByCategory: computeRowSpan(filteredData),
+    budrestsByCategory: computeRowSpanAndClub(filteredData),
   };
 }
 
@@ -61,9 +61,13 @@ function rowsAfterFilter(originalRows, searchKeyword) {
 
   const filteredList = originalRows.filter((memberBudrest) => {
     const archerName = memberBudrest.name.toLowerCase();
+    const clubName = memberBudrest.clubName.toLowerCase();
     const keyword = searchKeyword.trim().toLowerCase();
-    const foundIndex = archerName.indexOf(keyword);
-    return foundIndex >= 0;
+
+    const foundIndexOnArcher = archerName.indexOf(keyword);
+    const foundIndexOnClub = clubName.indexOf(keyword);
+
+    return foundIndexOnArcher >= 0 || foundIndexOnClub >= 0;
   });
   return filteredList;
 }

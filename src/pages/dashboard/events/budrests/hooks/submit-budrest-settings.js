@@ -7,7 +7,7 @@ function useSubmitBudrestSettings(formData, eventId) {
   const submit = ({ onSuccess: consumerSuccessHandler }) => {
     const postFunction = () => {
       const payload = makePayloadBudrestSettings(formData);
-      return BudRestService.postSettingsByDateEventId(payload, { event_id: eventId });
+      return BudRestService.postSettingsByEventId(payload, { event_id: eventId });
     };
     fetcher.runAsync(postFunction, {
       onSuccess: (data) => {

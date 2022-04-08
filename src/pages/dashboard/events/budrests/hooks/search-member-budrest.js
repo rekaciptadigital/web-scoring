@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { computeRowSpan } from "../utils";
+import { computeRowSpanAndClub } from "../utils";
 
 function useSearchMemberBudrests(initialMemberBudrests) {
   const [searchKeyword, setSearchKeyword] = React.useState("");
@@ -50,7 +50,7 @@ function filterMemberBudrestsData(originalMemberBudrests, searchKeyword) {
   return {
     ...originalMemberBudrests,
     groups: filteredGroups,
-    budrestsByCategory: computeRowSpan(filteredData),
+    budrestsByCategory: computeRowSpanAndClub(filteredData),
   };
 }
 

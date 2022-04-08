@@ -2,7 +2,7 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { BudRestService } from "services";
 
-import { computeRowSpan } from "../utils";
+import { computeRowSpanAndClub } from "../utils";
 
 function useMemberBudrests(eventId, date) {
   const fetcher = useFetcher();
@@ -35,7 +35,7 @@ function transform(originalData) {
     label: originalData.categoryBudrest[groupId][0].labelCategory,
   }));
 
-  const dataWithRowSpan = computeRowSpan(originalData.categoryBudrest);
+  const dataWithRowSpan = computeRowSpanAndClub(originalData.categoryBudrest);
 
   return {
     date: originalData.date,

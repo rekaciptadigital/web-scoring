@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import { useRouteQueryParams } from "./hooks/route-params";
 import { useMemberBudrests } from "./hooks/member-budrests";
 import { useSearchMemberBudrests } from "./hooks/search-member-budrest";
+import { useBudrestNumbers } from "./hooks/budrest-numbers";
 
 import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
+import { ProcessingToast } from "pages/dashboard/events/new/components/processing-toast";
 import { SubNavbar } from "../components/submenus-settings";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ListMemberBudrestsByCategory } from "./components/list-member-budrest-by-category";
@@ -22,6 +24,20 @@ function PageEventBudRestDetail() {
     eventId,
     dateFromParam
   );
+
+  const { data: budrestNumbers } = useBudrestNumbers(eventId, dateFromParam);
+
+  const optionsBudrestNumber = React.useMemo(() => {
+    if (!budrestNumbers) {
+      return [];
+    }
+
+    return budrestNumbers.map((numberItem) => ({
+      label: `${numberItem.label}${numberItem.isEmpty ? " (*)" : ""}`,
+      value: numberItem.label,
+      isEmpty: numberItem.isEmpty,
+    }));
+  }, [budrestNumbers]);
 
   const {
     searchKeyword,
@@ -90,6 +106,7 @@ function PageEventBudRestDetail() {
 
   return (
     <ContentLayoutWrapper pageTitle="Pengaturan Bantalan" navbar={<SubNavbar eventId={eventId} />}>
+      <ProcessingToast />
       <CardSheet>
         <VerticalSpacedBox>
           <SpacedHeader>
@@ -118,6 +135,7 @@ function PageEventBudRestDetail() {
                   key={group.id}
                   group={group}
                   budrestList={memberBudrestsData.budrestsByCategory[group.id]}
+                  budrestOptions={optionsBudrestNumber}
                 />
               ))
             ) : (

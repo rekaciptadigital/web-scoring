@@ -3,16 +3,11 @@ import styled from "styled-components";
 
 import { BudrestNumberChooser } from "./budrest-number-chooser";
 
+import IconAlertCircle from "components/ma/icons/mono/alert-circle";
+
 import { getNumberFromBudrest } from "../utils";
 
-function ListMemberBudrestsByCategory({ group, budrestList }) {
-  const options = React.useMemo(() => {
-    return budrestList.map((item) => ({
-      label: item.budRestNumber,
-      value: item.budRestNumber,
-    }));
-  }, []);
-
+function ListMemberBudrestsByCategory({ group, budrestList, budrestOptions }) {
   return (
     <div key={group.id}>
       <CategoryLabelHead>{group.label}</CategoryLabelHead>
@@ -38,12 +33,24 @@ function ListMemberBudrestsByCategory({ group, budrestList }) {
 
                 <td>
                   <BudrestNumberChooser
-                    options={options}
+                    options={budrestOptions}
                     selectedNumber={memberBudrest.budRestNumber}
                   />
                 </td>
                 <RowTextInTheMiddle>{memberBudrest.name}</RowTextInTheMiddle>
-                <RowTextInTheMiddle>{memberBudrest.clubName}</RowTextInTheMiddle>
+                <RowTextInTheMiddle>
+                  {memberBudrest.hasSameClub ? (
+                    <SpaceBetween>
+                      <HighlightedText>{memberBudrest.clubName}</HighlightedText>
+
+                      <WarningIconWrapper>
+                        <IconAlertCircle />
+                      </WarningIconWrapper>
+                    </SpaceBetween>
+                  ) : (
+                    <span>{memberBudrest.clubName}</span>
+                  )}
+                </RowTextInTheMiddle>
               </tr>
             </React.Fragment>
           ))}
@@ -66,6 +73,20 @@ const CenterCenterRow = styled.td`
 
 const RowTextInTheMiddle = styled.td`
   vertical-align: middle;
+`;
+
+const SpaceBetween = styled.span`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const HighlightedText = styled.span`
+  /* TODO: kasih warna "stabilo" (kuning) kalau nanti perlu */
+  background-color: none;
+`;
+
+const WarningIconWrapper = styled.span`
+  color: var(--ma-yellow);
 `;
 
 export { ListMemberBudrestsByCategory };

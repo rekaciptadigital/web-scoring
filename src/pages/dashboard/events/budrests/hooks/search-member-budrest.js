@@ -61,9 +61,13 @@ function rowsAfterFilter(originalRows, searchKeyword) {
 
   const filteredList = originalRows.filter((memberBudrest) => {
     const archerName = memberBudrest.name.toLowerCase();
+    const clubName = memberBudrest.clubName.toLowerCase();
     const keyword = searchKeyword.trim().toLowerCase();
-    const foundIndex = archerName.indexOf(keyword);
-    return foundIndex >= 0;
+
+    const foundIndexOnArcher = archerName.indexOf(keyword);
+    const foundIndexOnClub = clubName.indexOf(keyword);
+
+    return foundIndexOnArcher >= 0 || foundIndexOnClub >= 0;
   });
   return filteredList;
 }

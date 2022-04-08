@@ -109,6 +109,7 @@ function PageEventDetailHome() {
                 href={`/dashboard/member/${event_id}?type=individual`}
               />
               <CardMenuWithButton
+                team={true}
                 eventDetail={eventDetail}
                 menu={eventMenus[3]}
                 href={`/dashboard/member/${event_id}?type=team`}

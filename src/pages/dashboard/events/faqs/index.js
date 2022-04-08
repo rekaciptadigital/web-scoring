@@ -291,7 +291,7 @@ function ExtraInfoEditor({ infoData, onSave, onClose, onUpdate }) {
   };
 
   return (
-    <Modal isOpen size="lg">
+    <Modal centered isOpen size="lg">
       <ModalBody>
         <h4>Pertanyaan dan Jawaban</h4>
         <div className="mt-3 d-flex align-items-center flex-wrap gap-2">
@@ -342,7 +342,7 @@ function ExtraInfoEditor({ infoData, onSave, onClose, onUpdate }) {
             </ButtonBlue>
           ) : (
             <ButtonBlue onClick={handleClickUpdate} disabled={!shouldSubmitAllowed()}>
-              Update
+              Simpan
             </ButtonBlue>
           )}
         </div>

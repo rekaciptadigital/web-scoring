@@ -59,7 +59,7 @@ function ListMemberBudrestsByCategory({
                     <BudrestNumberChooser
                       options={budrestOptions}
                       selectedNumber={memberBudrest.budRestNumber}
-                      onChange={(opt) => {
+                      onSubmit={(opt) => {
                         const params = {
                           scheduleId: memberBudrest.scheduleFullDayId,
                           budrestNumber: opt.value,

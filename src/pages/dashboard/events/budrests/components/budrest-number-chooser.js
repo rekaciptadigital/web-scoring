@@ -1,17 +1,37 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 
-function UnmemoizedBudrestNumberChooser({ selectedNumber, options, onChange, ...props }) {
+function UnmemoizedBudrestNumberChooser({ selectedNumber, options, onSubmit, ...props }) {
+  // Buat nampilin sementara value yang diselect sebelum hit API & direfresh datanya
+  const [tempSelected, setTempSelected] = React.useState("");
+
+  const handleNumberChange = (opt) => {
+    setTempSelected(opt);
+    onSubmit?.(opt);
+  };
+
+  const handleCreateNumber = (inputValue) => {
+    const newOption = { label: inputValue, value: inputValue };
+    setTempSelected(newOption);
+    onSubmit?.(newOption);
+  };
+
   return (
     <StyledWrapper>
-      <Select
+      <CreatableSelect
         {...props}
         options={options}
-        value={{ label: selectedNumber, value: selectedNumber }}
+        value={
+          tempSelected
+            ? { label: tempSelected.label, value: tempSelected.value }
+            : { label: selectedNumber, value: selectedNumber }
+        }
         styles={customSelectStyles}
-        onChange={onChange}
+        onChange={handleNumberChange}
+        onCreateOption={handleCreateNumber}
+        formatCreateLabel={(inputValue) => `Buat: "${inputValue}"`}
       />
     </StyledWrapper>
   );

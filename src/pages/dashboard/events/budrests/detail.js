@@ -20,12 +20,17 @@ import IllustrationDataNotFound from "assets/images/events/tanda-seru.png";
 function PageEventBudRestDetail() {
   const { eventId, date: dateFromParam } = useRouteQueryParams();
 
-  const { data: memberBudrests, isLoading: isLoadingMemberBudrests } = useMemberBudrests(
-    eventId,
-    dateFromParam
-  );
+  const {
+    data: memberBudrests,
+    isLoading: isLoadingMemberBudrests,
+    fetchMemberBudrests,
+  } = useMemberBudrests(eventId, dateFromParam);
 
-  const { data: budrestNumbers } = useBudrestNumbers(eventId, dateFromParam);
+  const {
+    data: budrestNumbers,
+    fetchBudrestNumbers,
+    isLoading: isLoadingNumberList,
+  } = useBudrestNumbers(eventId, dateFromParam);
 
   const optionsBudrestNumber = React.useMemo(() => {
     if (!budrestNumbers) {
@@ -33,7 +38,7 @@ function PageEventBudRestDetail() {
     }
 
     return budrestNumbers.map((numberItem) => ({
-      label: `${numberItem.label}${numberItem.isEmpty ? " (*)" : ""}`,
+      label: numberItem.label,
       value: numberItem.label,
       isEmpty: numberItem.isEmpty,
     }));
@@ -136,6 +141,15 @@ function PageEventBudRestDetail() {
                   group={group}
                   budrestList={memberBudrestsData.budrestsByCategory[group.id]}
                   budrestOptions={optionsBudrestNumber}
+                  onChangeItem={() => {
+                    fetchBudrestNumbers();
+                    fetchMemberBudrests();
+                  }}
+                  isUpdatingData={
+                    memberBudrests &&
+                    budrestNumbers &&
+                    (isLoadingMemberBudrests || isLoadingNumberList)
+                  }
                 />
               ))
             ) : (

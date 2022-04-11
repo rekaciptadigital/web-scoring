@@ -2,6 +2,7 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { BudRestService } from "services";
 
+import { stringUtil } from "utils";
 import { computeRowSpanAndClub } from "../utils";
 
 function useMemberBudrests(eventId, date) {
@@ -36,6 +37,12 @@ function transform(originalData) {
   }));
 
   const dataWithRowSpan = computeRowSpanAndClub(originalData.categoryBudrest);
+
+  // assign key untuk render "list"
+  for (const id of categoryIds) {
+    const rowsData = dataWithRowSpan[id];
+    dataWithRowSpan[id] = rowsData.map((row) => ({ ...row, key: stringUtil.createRandom() }));
+  }
 
   return {
     date: originalData.date,

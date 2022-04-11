@@ -46,4 +46,13 @@ export default {
   getNumbersByEventId(queryString = null) {
     return API.get("/web/v2/bud-rest/get-list-budrest", queryString);
   },
+
+  /**
+   *
+   * @param {Object} queryString { event_id, schedule_id, bud_rest_number }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  putMemberNumbers(queryString = null) {
+    return API.put("/web/v2/schedule-full-day/change_bud_rest", null, queryString);
+  },
 };

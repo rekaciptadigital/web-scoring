@@ -38,7 +38,7 @@ function PageEventBudRestDetail() {
     }
 
     return budrestNumbers.map((numberItem) => ({
-      label: `${numberItem.label}${numberItem.isEmpty ? " (*)" : ""}`,
+      label: numberItem.label,
       value: numberItem.label,
       isEmpty: numberItem.isEmpty,
     }));

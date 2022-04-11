@@ -12,6 +12,10 @@ import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 
 import { getNumberFromBudrest } from "../utils";
 
+const TOOLTIP_WARNING_TEXT = `Terdapat peserta dari klub yang
+sama dalam satu bantalan. Silakan
+ubah bantalan salah satu peserta.`;
+
 function ListMemberBudrestsByCategory({
   group,
   budrestList,
@@ -47,49 +51,47 @@ function ListMemberBudrestsByCategory({
 
           <tbody>
             {budrestList.map((memberBudrest) => (
-              <React.Fragment key={memberBudrest.budRestNumber}>
-                <tr>
-                  {Boolean(memberBudrest.rowSpan) && (
-                    <CenterCenterRow rowSpan={memberBudrest.rowSpan}>
-                      <span>{getNumberFromBudrest(memberBudrest.budRestNumber)}</span>
-                    </CenterCenterRow>
+              <tr key={memberBudrest.key}>
+                {Boolean(memberBudrest.rowSpan) && (
+                  <CenterCenterRow rowSpan={memberBudrest.rowSpan}>
+                    <span>{getNumberFromBudrest(memberBudrest.budRestNumber) || "-"}</span>
+                  </CenterCenterRow>
+                )}
+
+                <td>
+                  <BudrestNumberChooser
+                    options={budrestOptions}
+                    selectedNumber={memberBudrest.budRestNumber}
+                    onSubmit={(opt) => {
+                      const params = {
+                        scheduleId: memberBudrest.scheduleFullDayId,
+                        budrestNumber: opt.value,
+                      };
+
+                      submit(params, {
+                        onSuccess() {
+                          onChangeItem?.();
+                          toast.success("Berhasil menyimpan nomor bantalan");
+                        },
+                      });
+                    }}
+                  />
+                </td>
+                <RowTextInTheMiddle>{memberBudrest.name}</RowTextInTheMiddle>
+                <RowTextInTheMiddle>
+                  {memberBudrest.hasSameClub ? (
+                    <SpaceBetween>
+                      <HighlightedText>{memberBudrest.clubName}</HighlightedText>
+
+                      <WarningIconWrapper title={TOOLTIP_WARNING_TEXT}>
+                        <IconAlertCircle />
+                      </WarningIconWrapper>
+                    </SpaceBetween>
+                  ) : (
+                    <span>{memberBudrest.clubName}</span>
                   )}
-
-                  <td>
-                    <BudrestNumberChooser
-                      options={budrestOptions}
-                      selectedNumber={memberBudrest.budRestNumber}
-                      onSubmit={(opt) => {
-                        const params = {
-                          scheduleId: memberBudrest.scheduleFullDayId,
-                          budrestNumber: opt.value,
-                        };
-
-                        submit(params, {
-                          onSuccess() {
-                            onChangeItem?.();
-                            toast.success("Berhasil menyimpan nomor bantalan");
-                          },
-                        });
-                      }}
-                    />
-                  </td>
-                  <RowTextInTheMiddle>{memberBudrest.name}</RowTextInTheMiddle>
-                  <RowTextInTheMiddle>
-                    {memberBudrest.hasSameClub ? (
-                      <SpaceBetween>
-                        <HighlightedText>{memberBudrest.clubName}</HighlightedText>
-
-                        <WarningIconWrapper>
-                          <IconAlertCircle />
-                        </WarningIconWrapper>
-                      </SpaceBetween>
-                    ) : (
-                      <span>{memberBudrest.clubName}</span>
-                    )}
-                  </RowTextInTheMiddle>
-                </tr>
-              </React.Fragment>
+                </RowTextInTheMiddle>
+              </tr>
             ))}
           </tbody>
         </table>

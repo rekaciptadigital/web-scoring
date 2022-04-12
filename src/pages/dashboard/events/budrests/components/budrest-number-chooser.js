@@ -10,27 +10,46 @@ import IconDot from "components/ma/icons/mono/dot";
 
 import illustrationAlert from "assets/images/events/alert-publication.svg";
 
-function BudrestNumberChooser({ selectedNumber, options, onSubmit, ...props }) {
+// Komponen berat & banyak dipakai di table, perlu di-memoize
+// supaya gak render ulang terus ketika onchange search, berat.
+// Kalau gak di-memo, ngetik di search jadi nge-lag.
+const MemoizedCreatableSelect = React.memo(CreatableSelect);
+
+function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
   // Buat nampilin sementara value yang diselect sebelum hit API & direfresh datanya
   const [tempSelected, setTempSelected] = React.useState(null);
   const [showAlert, setShowAlert] = React.useState(false);
 
-  const selectedOption = getSelectedFromValue(options, selectedNumber, tempSelected);
+  // Semua prop value & callback yang dioper ke React Select pelu di-memo juga
+  // supaya memo komponen di atas working
+  const selectedOption = React.useMemo(
+    () => getSelectedFromValue(options, selectedNumber, tempSelected),
+    [options, selectedNumber, tempSelected]
+  );
 
-  const handleNumberChange = (opt) => {
+  const handleNumberChange = React.useCallback((opt) => {
     setTempSelected(opt);
     if (!opt.isEmpty) {
       setShowAlert(true);
     } else {
       onSubmit?.(opt);
     }
-  };
+  }, []);
 
-  const handleCreateNumber = (inputValue) => {
+  const handleCreateNumber = React.useCallback((inputValue) => {
     const newOption = { label: inputValue, value: inputValue };
     setTempSelected(newOption);
     onSubmit?.(newOption);
-  };
+  }, []);
+
+  const formatCreateLabel = React.useCallback((inputValue) => `Buat: "${inputValue}"`, []);
+
+  const isOptionDisabled = React.useCallback(
+    (option) => option.value === selectedNumber,
+    [selectedNumber]
+  );
+
+  const customComponents = React.useMemo(() => ({ Option }), []);
 
   const handleCancel = () => {
     setShowAlert(false);
@@ -45,16 +64,16 @@ function BudrestNumberChooser({ selectedNumber, options, onSubmit, ...props }) {
   return (
     <React.Fragment>
       <StyledWrapper>
-        <CreatableSelect
-          {...props}
+        <MemoizedCreatableSelect
           options={options}
           placeholder="-"
           value={selectedOption}
           styles={customSelectStyles}
           onChange={handleNumberChange}
           onCreateOption={handleCreateNumber}
-          formatCreateLabel={(inputValue) => `Buat: "${inputValue}"`}
-          components={{ Option }}
+          formatCreateLabel={formatCreateLabel}
+          components={customComponents}
+          isOptionDisabled={isOptionDisabled}
         />
       </StyledWrapper>
       <PromptAlert

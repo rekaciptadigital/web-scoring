@@ -26,10 +26,6 @@ function useMemberBudrests(eventId, date) {
 }
 
 function transform(originalData) {
-  // Ini bisa dihilangkan kalau di backend juga udah ilang
-  if (typeof originalData.categoryBudrest.totalTargetFace !== "undefined") {
-    delete originalData.categoryBudrest.totalTargetFace;
-  }
   const categoryIds = Object.keys(originalData.categoryBudrest);
   const groupsData = categoryIds.map((groupId) => ({
     id: parseInt(groupId),

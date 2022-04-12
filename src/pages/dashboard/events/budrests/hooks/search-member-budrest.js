@@ -2,23 +2,30 @@ import * as React from "react";
 
 import { computeRowSpanAndClub } from "../utils";
 
-function useSearchMemberBudrests(initialMemberBudrests) {
+function useSearchMemberBudrests(memberBudrests) {
   const [searchKeyword, setSearchKeyword] = React.useState("");
-  const [searchResults, setResults] = React.useState(initialMemberBudrests);
+  const [searchResults, setResults] = React.useState(null);
 
   React.useEffect(() => {
+    if (!searchKeyword) {
+      setResults(memberBudrests);
+      return;
+    }
+
     // Perlu debounce kayak gini karena total item datanya bisa banyak
     // dan komponennya yang dirender berat-berat (kayak `react-select`, misalnya)
     const delayTimer = setTimeout(() => {
-      const filteredResult = filterMemberBudrestsData(initialMemberBudrests, searchKeyword);
+      const filteredResult = filterMemberBudrestsData(memberBudrests, searchKeyword);
       setResults(filteredResult);
     }, 500);
 
     return () => clearTimeout(delayTimer);
-  }, [initialMemberBudrests, searchKeyword]);
+  }, [memberBudrests, searchKeyword]);
 
   return {
-    searchResults,
+    // Fallback ke data awal kalau belum ada search karena ada delay debounce
+    // waktu update data, bisa crash.
+    searchResults: searchResults || memberBudrests,
     searchKeyword,
     setSearchKeyword,
   };

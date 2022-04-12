@@ -71,13 +71,12 @@ function findDuplicateClubNames(rows, startIndex, maxLoop) {
   const counterSameClub = {};
 
   for (let i = startIndex; i < maxLoop; i++) {
-    if (i <= 0) {
-      // index 0 berarti tidak punya nomor bantalan
-      // gak perlu ditandai klub yang sama dalam satu bantalan
+    const row = rows[i];
+    if (!row.budRestNumber) {
+      // Yang gak punya nomor bantalan gak perlu
+      // ditandai klub yang sama dalam satu bantalan
       continue;
     }
-
-    const row = rows[i];
     counterSameClub[row.clubName] = counterSameClub[row.clubName]
       ? counterSameClub[row.clubName] + 1
       : 1;

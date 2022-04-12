@@ -26,11 +26,11 @@ function computeRowSpanAndClub(initialBudrestsByCategory) {
     budrestGroupIndexes.forEach((rowIndex) => {
       const startIndex = parseInt(rowIndex);
       const rowsCount = parseInt(counterSameBudrest[rowIndex]);
-      const maxLoop = startIndex + rowsCount;
-      const duplicateClubNames = findDuplicateClubNames(rows, startIndex, maxLoop);
+      const endIndex = startIndex + rowsCount;
+      const duplicateClubNames = findDuplicateClubNames(rows, startIndex, endIndex);
 
       // Assign flag `hasSameClub` ke row yang klubnya sama dalam satu bantalan
-      for (let i = startIndex; i < maxLoop; i++) {
+      for (let i = startIndex; i < endIndex; i++) {
         const checkClubName = rows[i].clubName;
         const hasDuplicate = duplicateClubNames.indexOf(checkClubName) >= 0;
         if (!hasDuplicate) {
@@ -71,6 +71,12 @@ function findDuplicateClubNames(rows, startIndex, maxLoop) {
   const counterSameClub = {};
 
   for (let i = startIndex; i < maxLoop; i++) {
+    if (i <= 0) {
+      // index 0 berarti tidak punya nomor bantalan
+      // gak perlu ditandai klub yang sama dalam satu bantalan
+      continue;
+    }
+
     const row = rows[i];
     counterSameClub[row.clubName] = counterSameClub[row.clubName]
       ? counterSameClub[row.clubName] + 1

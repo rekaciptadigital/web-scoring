@@ -27,11 +27,18 @@ function PageEventBudRestDetail() {
   } = useMemberBudrests(eventId, dateFromParam);
 
   const {
+    searchKeyword,
+    setSearchKeyword,
+    searchResults: memberBudrestsFiltered,
+  } = useSearchMemberBudrests(memberBudrests);
+
+  const {
     data: budrestNumbers,
     fetchBudrestNumbers,
     isLoading: isLoadingNumberList,
   } = useBudrestNumbers(eventId, dateFromParam);
 
+  // Di-memo dulu sebelum dioper ke komponen Select yang di-memo juga
   const optionsBudrestNumber = React.useMemo(() => {
     if (!budrestNumbers) {
       return [];
@@ -43,16 +50,6 @@ function PageEventBudRestDetail() {
       isEmpty: numberItem.isEmpty,
     }));
   }, [budrestNumbers]);
-
-  const {
-    searchKeyword,
-    setSearchKeyword,
-    searchResults: searchResultsByName,
-  } = useSearchMemberBudrests(memberBudrests);
-
-  // Fallback ke data awal kalau belum ada search karena datanya
-  // masih `null` meskipun loading API sudah selesai, bisa crash.
-  const memberBudrestsData = searchResultsByName || memberBudrests;
 
   if (!dateFromParam) {
     return (
@@ -134,12 +131,12 @@ function PageEventBudRestDetail() {
           />
 
           <VerticalSpacedBoxLoose>
-            {memberBudrestsData.groups.length ? (
-              memberBudrestsData.groups.map((group) => (
+            {memberBudrestsFiltered.groups.length ? (
+              memberBudrestsFiltered.groups.map((group) => (
                 <ListMemberBudrestsByCategory
                   key={group.id}
                   group={group}
-                  budrestList={memberBudrestsData.budrestsByCategory[group.id]}
+                  budrestList={memberBudrestsFiltered.budrestsByCategory[group.id]}
                   budrestOptions={optionsBudrestNumber}
                   onChangeItem={() => {
                     fetchBudrestNumbers();

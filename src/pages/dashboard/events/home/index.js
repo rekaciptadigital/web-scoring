@@ -102,7 +102,7 @@ function PageEventDetailHome() {
                 href={eventMenus[1].computeLink(event_id)}
                 badge={renderManageEventMenuBadge()}
               />
-              <CardMenu menu={eventMenus[8]} href={eventMenus[8].computeLink(event_id)} />
+              <CardMenu menu={eventMenus[8]} href={`/dashboard/event/${event_id}/budrests`} />
               <CardMenuWithButton
                 eventDetail={eventDetail}
                 menu={eventMenus[2]}

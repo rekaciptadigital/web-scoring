@@ -97,7 +97,7 @@ stage_deploy_docker:
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml pull web-admin-myarchery-stg"
-    - ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml up -d web-myarchery-stg"
+    - ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml up -d web-admin-myarchery-stg"
 
 update_staging:
   image: node:14

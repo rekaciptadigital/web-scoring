@@ -18,5 +18,3 @@ RUN npm run build
 RUN rm -f config/.env
 
 CMD npm start # >> log/stdout.log 2>> log/stderr.log
-
-RUN rm -rf /myarchery-web-admin

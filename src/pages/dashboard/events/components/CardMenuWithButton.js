@@ -5,7 +5,7 @@ import Download from "components/icons/Download";
 import { Button } from "reactstrap";
 
 
-function CardMenuWithButton({ eventDetail, menu, href, badge, disabled = false }) {
+function CardMenuWithButton({ spanLabel, menu, href, badge, disabled = false }) {
 
 
   if (disabled) {
@@ -56,7 +56,7 @@ function CardMenuWithButton({ eventDetail, menu, href, badge, disabled = false }
         <h3>{menu.title}</h3>
         <p>{menu.description}</p>
         <div>
-          <span className="py-1 px-2" style={{backgroundColor: '#AEDDC2', borderRadius: '25px'}}>Peserta Individu: {eventDetail?.totalParticipant}</span>
+          <span className="py-1 px-2" style={{backgroundColor: '#AEDDC2', borderRadius: '25px'}}>{spanLabel}</span>
         </div>
       </div>
 

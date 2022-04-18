@@ -48,7 +48,14 @@ const FieldInputTextWrapper = styled.div`
     }
 
     &.error-invalid {
-      border-color: var(--ma-red);
+      border-color: var(--ma-border-negative);
+      box-shadow: 0 0 0 1px var(--ma-border-negative);
+      background-color: var(--ma-bg-negative);
+
+      &:focus {
+        border-color: #2684ff;
+        box-shadow: 0 0 0 1px #2684ff;
+      }
     }
   }
 `;
@@ -61,10 +68,13 @@ function FieldInputTextSmall({
   placeholder,
   value = "",
   onChange,
-  errors,
   disabled,
+  errors,
+  isTouched,
+  onBlur,
 }) {
   const fieldID = `field-${name}`;
+  const handleChange = (ev) => onChange?.(ev);
   return (
     <FieldInputTextWrapper>
       <label className="field-label" htmlFor={fieldID}>
@@ -73,15 +83,29 @@ function FieldInputTextSmall({
       </label>
       <input
         id={fieldID}
-        className={classnames("field-input-text", { "error-invalid": errors?.length })}
+        className={classnames("field-input-text", { "error-invalid": errors?.length && isTouched })}
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
+        onBlur={onBlur}
         disabled={disabled}
       />
+      <InlineErrorMessage errors={errors} isTouched={isTouched} />
     </FieldInputTextWrapper>
   );
 }
+
+function InlineErrorMessage({ errors, isTouched }) {
+  if (!errors?.length || !isTouched) {
+    return null;
+  }
+  return <MessageError>{errors[0]}</MessageError>;
+}
+
+const MessageError = styled.span`
+  color: var(--ma-text-negative);
+  font-size: 0.625rem;
+`;
 
 export default FieldInputTextSmall;

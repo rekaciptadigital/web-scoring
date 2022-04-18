@@ -174,6 +174,7 @@ function ListMember() {
   let dumpArray = [];
   let arrayAge = [];
   let arrayRegu = [];
+  let splitRegu = [];
   // let arrayDistance = [];
 
   // console.log(indexCategory);
@@ -183,6 +184,24 @@ function ListMember() {
   arrayAge = [...new Set(dumpArray?.map((d) => d.ageCategory))];
   arrayRegu = [...new Set(dumpArray?.map((d) => d.teamCategory))];
   // arrayDistance = dumpArray?.map((d) => d.distancesCategory);
+
+  for (let i = 0; i < arrayRegu.length; i++) {
+    if (query.get("type") === "team") {
+      if (
+        arrayRegu[i] === "Beregu Putra" ||
+        arrayRegu[i] === "Beregu Putri" ||
+        arrayRegu[i] === "Mix Team"
+      ) {
+        splitRegu.push(arrayRegu[i]);
+      }
+    }
+    if (query.get("type") === "individual") {
+      if (arrayRegu[i] === "Individu Putra" || arrayRegu[i] === "Individu Putri") {
+        splitRegu.push(arrayRegu[i]);
+      }
+    }
+  }
+  console.log(splitRegu);
 
   return (
     <React.Fragment>
@@ -389,7 +408,7 @@ function ListMember() {
                       Semua
                     </span>
                   </div>
-                  {arrayRegu.map((regu, index) => {
+                  {splitRegu.map((regu, index) => {
                     if (indexCategory > -1) {
                       return (
                         <div key={index}>
@@ -420,7 +439,11 @@ function ListMember() {
           </div>
           <TableMember members={members} team={query.get("type") === "team" ? true : false} />
           <div className="float-end pb-4">
-            <ButtonBlue className="me-2" disabled={page == 1 ? true : false} onClick={() => setPage(page - 1)}>
+            <ButtonBlue
+              className="me-2"
+              disabled={page == 1 ? true : false}
+              onClick={() => setPage(page - 1)}
+            >
               {"<-"}
             </ButtonBlue>
             <ButtonBlue disabled={page < 1 ? true : false} onClick={() => setPage(page + 1)}>

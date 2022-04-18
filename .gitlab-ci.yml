@@ -115,7 +115,7 @@ update_staging:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - echo ${CI_COMMIT_BRANCH}
-    - ./root/deployment_bf_docker/$CI_COMMIT_BRANCH-web-admin-update.sh
+    - ssh -p22 root@$HOST_IP "./root/deployment_bf_docker/$CI_COMMIT_BRANCH-web-admin-update.sh"
     #- echo "Updating develop"
     #- ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git checkout develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git fetch origin develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git pull origin develop"
     #- echo "Code Updated"

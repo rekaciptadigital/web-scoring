@@ -138,7 +138,7 @@ deploy_staging:
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-      - ssh -p22 root@$HOST_IP "./root/deployment_bf_docker/$CI_COMMIT_BRANCH-web-admin-deploy.sh"
+      - ssh -p22 root@$HOST_IP "/root/deployment_bf_docker/$CI_COMMIT_BRANCH-web-admin-deploy.sh"
 #     # - echo "Cleaning Up Modules"
 #     # - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-archery-stg/node_modules && rm  /var/www/web-archery-stg/package-lock.json"
     #- ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery-stg && sudo npm run build --prefix /var/www/web-admin-archery-stg"

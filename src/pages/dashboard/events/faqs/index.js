@@ -137,8 +137,8 @@ function PageEventFaqs() {
         <MetaTags>
           <title>Dashboard | List - FAQ</title>
         </MetaTags>
-        <Container fluid>
-          <WarpperFAQ>
+        <WarpperFAQ>
+          <Container fluid>
             <div className="box-header">
               <div className="box-text">
                 <span className="text-header">Frequently Ask Questions</span>
@@ -212,8 +212,8 @@ function PageEventFaqs() {
                 );
               })
             )}
-          </WarpperFAQ>
-        </Container>
+          </Container>
+        </WarpperFAQ>
       </div>
       {detail ? (
         <ModalExtraInfoEditor
@@ -352,6 +352,12 @@ function ExtraInfoEditor({ infoData, onSave, onClose, onUpdate }) {
 }
 
 const WarpperFAQ = styled.div`
+  @media (min-width: 768px) {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .box-header {
     display: flex;
     justify-content: space-between;

@@ -6,14 +6,17 @@ import styled from "styled-components";
 import logoEmpty from "assets/images/myachery/empty.png";
 import { Modal, ModalBody } from "reactstrap";
 import { FieldInputText, FieldTextArea } from "../components/form-fields";
-import { Button, ButtonBlue } from "components/ma";
-import { eye, eyeOff, trash, edit } from "../home/utils/icon-svgs";
+import { Button, ButtonBlue, ButtonGhostBlue } from "components/ma";
+import { eye, eyeOff } from "../home/utils/icon-svgs";
 import SweetAlert from "react-bootstrap-sweetalert";
 import logoBuatAkun from "assets/images/myachery/Illustration.png";
 import { FAQService } from "services";
-// ... imports
 
 import { SubNavbar } from "../components/submenus-settings";
+
+import IconPlus from "components/ma/icons/mono/plus";
+import IconEdit from "components/ma/icons/mono/edit";
+import IconTrash from "components/ma/icons/mono/trash";
 
 function PageEventFaqs() {
   const { event_id } = useParams();
@@ -26,8 +29,6 @@ function PageEventFaqs() {
   const handlerShowFaqModal = () => setShowFaqModal(true);
   const handlerCloseFaqModal = () => setShowFaqModal(false);
   const onCancel = () => setIsAlertOpen(false);
-  //   const hanlderOpenAlert = () => setIsAlertOpen(true)
-  // ...
 
   const getListFaq = async () => {
     const { message, data, errors } = await FAQService.getListFaq({ event_id, limit: 30 });
@@ -154,7 +155,7 @@ function PageEventFaqs() {
                     setDetail({});
                   }}
                 >
-                  + Tambah FAQ
+                  <IconPlus size="16" /> Tambah FAQ
                 </button>
               </div>
             </div>
@@ -182,29 +183,36 @@ function PageEventFaqs() {
             ) : (
               data?.map((d) => {
                 return (
-                  <div key={d.id} className="content-faq">
-                    <div className="box-content content-question">
-                      <h5 className="text-title">{d.question}</h5>
+                  <div
+                    key={d.id}
+                    className="content-faq d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <div className="box-content content-question">
+                        <h5 className="text-title">{d.question}</h5>
+                      </div>
+
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div className="box-content content-answer">
+                          <div className="text-content">{d.answer}</div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="box-content content-answer" style={{ width: "90%" }}>
-                        <div className="text-content">{d.answer}</div>
-                      </div>
-                      <div style={{ width: "10%" }} className="me-2 d-flex justify-content-end">
-                        <div onClick={() => getDetailFaq(d.id)} style={{ cursor: "pointer" }}>
-                          <img src={edit} />
-                        </div>
-                        <div
-                          className="ms-2"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => {
-                            setIdFaq(d.id);
-                            setIsAlertOpen(true);
-                          }}
-                        >
-                          <img src={trash} />
-                        </div>
-                      </div>
+
+                    <div className="d-flex justify-content-end">
+                      <ButtonGhostBlue flexible onClick={() => getDetailFaq(d.id)}>
+                        <IconEdit size="18" />
+                      </ButtonGhostBlue>
+
+                      <ButtonGhostBlue
+                        flexible
+                        onClick={() => {
+                          setIdFaq(d.id);
+                          setIsAlertOpen(true);
+                        }}
+                      >
+                        <IconTrash size="18" />
+                      </ButtonGhostBlue>
                     </div>
                   </div>
                 );
@@ -356,6 +364,9 @@ const WarpperFAQ = styled.div`
     margin-right: auto;
   }
 
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+
   .box-header {
     display: flex;
     justify-content: space-between;
@@ -397,11 +408,7 @@ const WarpperFAQ = styled.div`
     background-color: #fff;
     border-radius: 8px;
     padding: 24px;
-    margin-block: 2rem;
-
-    > * + * {
-      margin-top: 0.75rem;
-    }
+    margin-block: 0.75rem;
 
     .box-content {
       &.content-question {
@@ -418,6 +425,7 @@ const WarpperFAQ = styled.div`
       }
 
       &.content-answer {
+        margin-top: 0.75rem;
         display: flex;
         gap: 1.25rem;
 

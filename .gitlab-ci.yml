@@ -1,7 +1,6 @@
 image: docker:latest
 services:
   - docker:dind
-#image: node:14
  
 stages:
   - build
@@ -9,36 +8,13 @@ stages:
   - update
   - deploy
 
-#update_production:
-#  stage: update
-#  script:
-#    - echo "Updating develop"
-#    - ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git checkout master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git fetch origin master && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-archery/.git GIT_WORK_TREE=/var/www/web-archery git pull origin master && php artisan migrate"
-#    - echo "Code Updated"
-#  only:
-#    - master
-
-#deploy_production:
-#  stage: deploy
-#  script:
-#    - echo "Cleaning Up Modules"
-#     - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-admin-archery/node_modules && rm  /var/www/web-admin-archery/package-lock.json"
-#    - ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery && sudo npm run build --prefix /var/www/web-admin-archery"
-#    - echo "Build Success, Apps running for Production"
-#  only:
-#    - master
-
 stage_build:
-  #image: docker:latest
   stage: build
-  only: 
-    - develop
+
   script:
     - rm -rf yarn.lock
     - rm -rf package-lock.json 
-    - mv .env.example .env
-    #- git config --global url."https://".insteadOf git://
-    
+    - mv .env.example .env    
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     - >
@@ -61,8 +37,6 @@ Push latest:
   variables:
     GIT_STRATEGY: none
   stage: push
-  only:
-    - develop
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
@@ -84,8 +58,6 @@ Push tag:
 stage_deploy_docker:
   image: node:14
   stage: deploy
-  only:
-    - develop
   before_script:
   - apt-get update -qq
   - apt-get install -qq git
@@ -97,10 +69,8 @@ stage_deploy_docker:
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh -p22 root@103.31.38.37 "/root/deployment/$CI_COMMIT_BRANCH-docker-web-admin-deploy.sh"
-    #- ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml pull web-admin-myarchery-stg"
-    #- ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml up -d web-admin-myarchery-stg"
 
-update_s$CI_COMMIT_BRANCH:
+update:
   image: node:14
   stage: update
   before_script: 
@@ -115,16 +85,11 @@ update_s$CI_COMMIT_BRANCH:
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - echo ${CI_COMMIT_BRANCH}
-    - ssh -p22 root@$HOST_IP "ls -lah /root/deployment_bf_docker/."
+#    - echo ${CI_COMMIT_BRANCH}
+#    - ssh -p22 root@$HOST_IP "ls -lah /root/deployment_bf_docker/."
     - ssh -p22 root@$HOST_IP "/root/deployment_bf_docker/$CI_COMMIT_BRANCH-web-admin-update.sh"
-    #- echo "Updating develop"
-    #- ssh -p22 root@$HOST_IP "GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git checkout develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git fetch origin develop && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git reset --hard FETCH_HEAD && GIT_DIR=/var/www/web-admin-archery-stg/.git GIT_WORK_TREE=/var/www/web-admin-archery-stg git pull origin develop"
-    #- echo "Code Updated"
-  only:
-    - develop
 
-deploy_$CI_COMMIT_BRANCH:
+deploy:
   image: node:14
   stage: deploy
   before_script: 
@@ -140,39 +105,3 @@ deploy_$CI_COMMIT_BRANCH:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
       - ssh -p22 root@$HOST_IP "/root/deployment_bf_docker/$CI_COMMIT_BRANCH-web-admin-deploy.sh"
-#     # - echo "Cleaning Up Modules"
-#     # - ssh -p22 root@$HOST_IP "rm -rf /var/www/web-archery-stg/node_modules && rm  /var/www/web-archery-stg/package-lock.json"
-    #- ssh -p22 root@$HOST_IP "sudo npm install --prefix /var/www/web-admin-archery-stg && sudo npm run build --prefix /var/www/web-admin-archery-stg"
-    #- echo "Build Success, Apps running for Staging"
-  only:
-    - develop
-
-
-
-####New Deployment######
-# image: tetraweb/php
-
-#stage_build:
-  #stage: update
-  #only: 
-  #  - develop
-  #script:
-  #  - npm install
-  #  - npm run build
-  #artifacts:
-  #  paths:
-  #    - build/
-
-#stage_deploy:
-  #stage: deploy
-  #only:
-  #  - develop
-  #script:
-    # - ssh -p22 root@103.31.38.37 "mkdir /opt/archery-web/_tmp"
-    # - scp -P22 -r build/* root@103.31.38.37:/opt/archery-web/_tmp
-    # - ssh -p22 root@103.31.38.37 "mv /opt/archery-web/live /opt/archery-web/_old && mv /opt/archery-web/_tmp /opt/archery-web/live"
-    # - ssh -p22 root@103.31.38.37 "rm -rf /opt/archery-web/_old"
-    #- ssh -p22 root@103.31.38.37 "mkdir /var/www/web-admin-archery-stg/_temp"
-    #- scp -P22 -r build/* root@103.31.38.37:/var/www/web-admin-archery-stg/_temp
-    #- ssh -p22 root@103.31.38.37 "mv /var/www/web-admin-archery-stg/build /var/www/web-admin-archery-stg/build_old && mv /var/www/web-admin-archery-stg/_temp //var/www/web-admin-archery-stg/build"
-    #- ssh -p22 root@103.31.38.37 "rm -rf /var/www/web-admin-archery-stg/build_old"

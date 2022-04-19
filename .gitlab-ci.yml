@@ -96,10 +96,11 @@ stage_deploy_docker:
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml pull web-admin-myarchery-stg"
-    - ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml up -d web-admin-myarchery-stg"
+    - ssh -p22 root@103.31.38.37 "/root/deployment/$CI_COMMIT_BRANCH-docker-web-admin-deploy.sh"
+    #- ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml pull web-admin-myarchery-stg"
+    #- ssh -p22 root@103.31.38.37 "docker-compose -f /root/deployment/web-admin-myarchery-stg.yml up -d web-admin-myarchery-stg"
 
-update_staging:
+update_s$CI_COMMIT_BRANCH:
   image: node:14
   stage: update
   before_script: 
@@ -123,7 +124,7 @@ update_staging:
   only:
     - develop
 
-deploy_staging:
+deploy_$CI_COMMIT_BRANCH:
   image: node:14
   stage: deploy
   before_script: 

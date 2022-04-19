@@ -183,14 +183,12 @@ function PageEventFaqs() {
               data?.map((d) => {
                 return (
                   <div key={d.id} className="content-faq">
-                    <div className="box-content">
-                      <span className="text-title-p me-4">P</span>
-                      <span className="text-title">{d.question}</span>
+                    <div className="box-content content-question">
+                      <h5 className="text-title">{d.question}</h5>
                     </div>
                     <div className="d-flex justify-content-between align-items-center">
-                      <div className="box-content" style={{ width: "90%" }}>
-                        <span className="text-title-p me-4">J</span>
-                        <span>{d.answer}</span>
+                      <div className="box-content content-answer" style={{ width: "90%" }}>
+                        <div className="text-content">{d.answer}</div>
                       </div>
                       <div style={{ width: "10%" }} className="me-2 d-flex justify-content-end">
                         <div onClick={() => getDetailFaq(d.id)} style={{ cursor: "pointer" }}>
@@ -400,7 +398,38 @@ const WarpperFAQ = styled.div`
     border-radius: 8px;
     padding: 24px;
     margin-block: 2rem;
+
+    > * + * {
+      margin-top: 0.75rem;
+    }
+
     .box-content {
+      &.content-question {
+        display: flex;
+        gap: 1.25rem;
+
+        &::before {
+          content: "P";
+          color: var(--ma-blue);
+          line-height: 1.2;
+          font-size: 14px;
+          font-weight: 600;
+        }
+      }
+
+      &.content-answer {
+        display: flex;
+        gap: 1.25rem;
+
+        &::before {
+          content: "J";
+          color: var(--ma-blue);
+          line-height: 1.5;
+          font-size: 14px;
+          font-weight: 600;
+        }
+      }
+
       .text-title-p {
         font-size: 14px;
         font-weight: 600;
@@ -410,6 +439,9 @@ const WarpperFAQ = styled.div`
         color: #545454;
         font-size: 16px;
         font-weight: 600;
+      }
+      .text-content {
+        white-space: pre-wrap;
       }
     }
   }

@@ -28,6 +28,7 @@ function ListMember() {
   const [name, setName] = useState("");
   const [teamFilter, setTeamFilter] = useState("");
   const [page, setPage] = useState(1);
+  const [totalData, setTotalData] = useState(0);
 
   const { TEAM_CATEGORIES } = eventCategories;
 
@@ -82,7 +83,8 @@ function ListMember() {
         team_category_id: teamFilter,
       });
       if (message === "Success") {
-        setMembers(data);
+        setMembers(data?.data);
+        setTotalData(data?.total);
       }
       console.info(errors);
     } catch (errors) {
@@ -202,6 +204,11 @@ function ListMember() {
     }
   }
   console.log(splitRegu);
+
+
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
 
   return (
     <React.Fragment>
@@ -437,13 +444,9 @@ function ListMember() {
               </div>
             </div>
           </div>
-          <TableMember members={members} team={query.get("type") === "team" ? true : false} />
+          <TableMember members={members} team={query.get("type") === "team" ? true : false} page={page} handlePageChange={handlePageChange} totalData={totalData} />
           <div className="float-end pb-4">
-            <ButtonBlue
-              className="me-2"
-              disabled={page == 1 ? true : false}
-              onClick={() => setPage(page - 1)}
-            >
+            <ButtonBlue className="me-2" disabled={page == 1 ? true : false} onClick={() => setPage(page - 1)}>
               {"<-"}
             </ButtonBlue>
             <ButtonBlue disabled={page < 1 ? true : false} onClick={() => setPage(page + 1)}>

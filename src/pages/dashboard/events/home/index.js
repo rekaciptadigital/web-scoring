@@ -105,12 +105,15 @@ function PageEventDetailHome() {
               <CardMenu menu={eventMenus[8]} href={`/dashboard/event/${event_id}/budrests`} />
               <CardMenuWithButton
                 eventDetail={eventDetail}
+                spanLabel={"Peserta Individu : " + eventDetail?.totalParticipantIndividual}
                 menu={eventMenus[2]}
                 href={`/dashboard/member/${event_id}?type=individual`}
               />
               <CardMenuWithButton
+                team={true}
                 eventDetail={eventDetail}
                 menu={eventMenus[3]}
+                spanLabel={"Peserta Beregu : " + eventDetail?.totalParticipantTeam}
                 href={`/dashboard/member/${event_id}?type=team`}
               />
               <CardMenu

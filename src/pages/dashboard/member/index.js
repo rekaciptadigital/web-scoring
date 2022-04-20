@@ -28,6 +28,7 @@ function ListMember() {
   const [name, setName] = useState("");
   const [teamFilter, setTeamFilter] = useState("");
   const [page, setPage] = useState(1);
+  const [totalData, setTotalData] = useState(0);
 
   const { TEAM_CATEGORIES } = eventCategories;
 
@@ -83,6 +84,7 @@ function ListMember() {
       });
       if (message === "Success") {
         setMembers(data?.data);
+        setTotalData(data?.total);
       }
       console.info(errors);
     } catch (errors) {
@@ -422,7 +424,7 @@ function ListMember() {
               </div>
             </div>
           </div>
-          <TableMember members={members} team={query.get("type") === "team" ? true : false} page={page} handlePageChange={handlePageChange} />
+          <TableMember members={members} team={query.get("type") === "team" ? true : false} page={page} handlePageChange={handlePageChange} totalData={totalData} />
           <div className="float-end pb-4">
             <ButtonBlue className="me-2" disabled={page == 1 ? true : false} onClick={() => setPage(page - 1)}>
               {"<-"}

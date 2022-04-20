@@ -19,7 +19,7 @@ class TableMember extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      page: 1,
+      page: this.props.page,
       sizePerPage: 10,
       productData: this.props.members,
       modal: false,
@@ -31,6 +31,8 @@ class TableMember extends Component {
       dataCategories: [],
       catagoryID: 0,
       IdParticipant: 0,
+      handlePageChange: this.props.handlePageChange,
+      totalData: this.props.totalData,
     };
   }
 
@@ -104,7 +106,7 @@ class TableMember extends Component {
 
     const columns = [
       {
-        dataField: "no",
+        dataField: "No",
         text: "No",
       },
       {
@@ -228,8 +230,9 @@ class TableMember extends Component {
 
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: temp.length, // replace later with size(customers),
+      totalSize: this.state.totalData, // replace later with size(customers),
       custom: true,
+      page: this.state.page,
     };
 
     // Custom Pagination Toggle
@@ -304,6 +307,16 @@ class TableMember extends Component {
                                   </div>
                                 </Col>
                               </Row>
+
+                              {/* <Row>
+                                <Col xl="12">
+                                  <PaginationListStandalone 
+                                    {...paginationProps}
+                                    onPageChange={(e) => {
+                                      handlePageChange(e);
+                                    }} />
+                                </Col>
+                              </Row> */}
                             </React.Fragment>
                           )}
                         </ToolkitProvider>

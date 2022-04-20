@@ -82,7 +82,7 @@ function ListMember() {
         team_category_id: teamFilter,
       });
       if (message === "Success") {
-        setMembers(data);
+        setMembers(data?.data);
       }
       console.info(errors);
     } catch (errors) {
@@ -183,6 +183,10 @@ function ListMember() {
   arrayAge = [...new Set(dumpArray?.map((d) => d.ageCategory))];
   arrayRegu = [...new Set(dumpArray?.map((d) => d.teamCategory))];
   // arrayDistance = dumpArray?.map((d) => d.distancesCategory);
+
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
 
   return (
     <React.Fragment>
@@ -418,7 +422,7 @@ function ListMember() {
               </div>
             </div>
           </div>
-          <TableMember members={members} team={query.get("type") === "team" ? true : false} />
+          <TableMember members={members} team={query.get("type") === "team" ? true : false} page={page} handlePageChange={handlePageChange} />
           <div className="float-end pb-4">
             <ButtonBlue className="me-2" disabled={page == 1 ? true : false} onClick={() => setPage(page - 1)}>
               {"<-"}

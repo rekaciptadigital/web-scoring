@@ -2,184 +2,219 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { ButtonOutlineBlue } from "components/ma";
-import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { SubNavbar } from "../components/submenus-matches";
+import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
+import { ScoringTable } from "./components/scoring-table";
 
 import IconDownload from "components/ma/icons/mono/download";
-import IconChevronLeft from "components/ma/icons/mono/chevron-left";
-import IconChevronRight from "components/ma/icons/mono/chevron-right";
-import IconX from "components/ma/icons/mono/x";
-
-import classnames from "classnames";
 
 function PageEventScoringQualification() {
-  const [indexActiveItem, setIndexActiveItem] = React.useState(null);
-  const isItemActive = (index) => indexActiveItem === index;
-  const showEditor = indexActiveItem !== null;
-
   return (
     <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
-      <ViewWrapper>
-        <div>
-          <ul>
-            <li>Recurve</li>
-            <li>Compound</li>
-            <li>Nasional</li>
-            <li>Barebow</li>
-            <li>Traditional Bow</li>
-          </ul>
-        </div>
+      <div>
+        <TabBar>
+          <TabButtonList>
+            <li>
+              <TabButton>Recurve</TabButton>
+            </li>
+            <li>
+              <TabButton className="tab-active">Compound</TabButton>
+            </li>
+            <li>
+              <TabButton>Nasional</TabButton>
+            </li>
+            <li>
+              <TabButton>Barebow</TabButton>
+            </li>
+            <li>
+              <TabButton>Traditional Bow</TabButton>
+            </li>
+          </TabButtonList>
+        </TabBar>
 
-        <div>
-          <div>
-            <div>Kelas:</div>
-            <div>Jenis Regu:</div>
-          </div>
+        <ViewWrapper>
+          <ToolbarTop>
+            <FilterBars>
+              <CategoryFilter>
+                <FilterLabel>Kelas:</FilterLabel>
+                <FilterList>
+                  <li>
+                    <FilterItemButton> Umum - 70m</FilterItemButton>
+                  </li>
+                  <li>
+                    <FilterItemButton className="filter-item-active"> U15 - 50m</FilterItemButton>
+                  </li>
+                </FilterList>
+              </CategoryFilter>
 
-          <div>
-            <input type="text" placeholder="Cari peserta" />
-            <ButtonOutlineBlue>
-              <IconDownload size="16" /> Unduh Dokumen
-            </ButtonOutlineBlue>
-          </div>
-        </div>
+              <CategoryFilter>
+                <FilterLabel>Jenis Regu:</FilterLabel>
+                <FilterList>
+                  <li>
+                    <FilterItemButton className="filter-item-active">
+                      Individu Putra
+                    </FilterItemButton>
+                  </li>
+                  <li>
+                    <FilterItemButton>Individu Putri</FilterItemButton>
+                  </li>
+                </FilterList>
+              </CategoryFilter>
+            </FilterBars>
 
-        <TableContainer>
-          <div style={{ outline: "solid 1px red" }}>
-            <table className="table table-responsive">
-              <thead>
-                <tr>
-                  <td>Bantalan</td>
-                  <td>Peringkat</td>
-                  <td>Nama Peserta</td>
-                  <td>Nama Klub</td>
-                  {!showEditor && <td>Sesi 1</td>}
-                  {!showEditor && <td>Sesi 2</td>}
-                  <td>Total</td>
-                  {!showEditor && <td>X</td>}
-                  {!showEditor && <td>X+10</td>}
-                  <td>ellipsis</td>
-                </tr>
-              </thead>
-
-              <tbody>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((id, index) => (
-                  <tr key={id} className={classnames({ "row-active": isItemActive(index) })}>
-                    <td>1A</td>
-                    <td>10</td>
-                    <td>John Doe</td>
-                    <td>Jakarta Jaya</td>
-                    {!showEditor && <td>82</td>}
-                    {!showEditor && <td>82</td>}
-                    <td>164</td>
-                    {!showEditor && <td>8</td>}
-                    {!showEditor && <td>10</td>}
-                    <td>
-                      {isItemActive(index) ? (
-                        <ButtonOutlineBlue flexible onClick={() => setIndexActiveItem(null)}>
-                          <IconChevronLeft />
-                        </ButtonOutlineBlue>
-                      ) : (
-                        <ButtonOutlineBlue flexible onClick={() => setIndexActiveItem(index)}>
-                          <IconChevronRight />
-                        </ButtonOutlineBlue>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {showEditor && (
-            <div style={{ outline: "solid 1px green" }} key={indexActiveItem}>
-              <h1>Active Row Identity: {indexActiveItem}</h1>
-
-              <div>
-                <ul>
-                  <li>50m</li>
-                  <li>40m</li>
-                  <li>30m </li>
-                </ul>
-
-                <div>
-                  <div>Akumulasi Skor: 360</div>
-                  <div>
-                    <ButtonOutlineBlue flexible onClick={() => setIndexActiveItem(null)}>
-                      <IconX size="16" />
-                    </ButtonOutlineBlue>
-                  </div>
-                </div>
-              </div>
-
-              <table className="table table-responsive">
-                <thead>
-                  <tr>
-                    <td>End</td>
-                    <td colSpan="6">Shot</td>
-                    <td>Total</td>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {[1, 2, 3, 4, 5, 6].map((id, indexRambahan) => (
-                    <tr key={id}>
-                      <td>{indexRambahan + 1}</td>
-
-                      {[1, 2, 3, 4, 5, 6].map((id, indexShot) => (
-                        <td key={id}>
-                          <select
-                            name={`shot-score-${indexRambahan}-${indexShot}`}
-                            id={`shot-score-${indexRambahan}-${indexShot}`}
-                            defaultValue={""}
-                            onChange={(ev) => alert(`Simpan nilai jadi ${ev.target.value}`)}
-                          >
-                            <option value="" disabled>
-                              &ndash;
-                            </option>
-                            {["m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => (
-                              <option key={value} value={value}>
-                                {isNaN(value) ? value.toUpperCase() : value}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                      ))}
-
-                      <td>60</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              <div>Total: 360</div>
+            <div>
+              <input type="text" placeholder="Cari peserta" />
+              <ButtonOutlineBlue>
+                <IconDownload size="16" /> Unduh Dokumen
+              </ButtonOutlineBlue>
             </div>
-          )}
-        </TableContainer>
-      </ViewWrapper>
+          </ToolbarTop>
+
+          <ScoringTable />
+        </ViewWrapper>
+      </div>
     </ContentLayoutWrapper>
   );
 }
 
 const ViewWrapper = styled.div`
+  padding: 1.875rem;
   background-color: #ffffff;
+
+  > * + * {
+    margin-top: 1.875rem;
+  }
 `;
 
-const TableContainer = styled.div`
-  outline: solid 1px yellow;
+const TabBar = styled.div`
+  margin-bottom: 0.25rem;
+`;
 
+const TabButtonList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
 
-  > *:first-child {
+  > * {
+    flex-grow: 1;
+  }
+`;
+
+const TabButton = styled.button`
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background-color: #ffffff;
+  color: var(--ma-blue);
+  font-weight: 500;
+
+  position: relative;
+
+  &::after {
+    content: " ";
+    display: block;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 5px;
+
+    transform: scaleX(0);
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    &::after {
+      background-color: var(--ma-yellow);
+      transform: scaleX(1);
+    }
+  }
+
+  &.tab-active {
+    &::after {
+      background-color: var(--ma-yellow);
+      transform: scaleX(1);
+    }
+  }
+`;
+
+const ToolbarTop = styled.div`
+  display: flex;
+  gap: 1.5rem;
+
+  > *:nth-child(1) {
     flex-grow: 1;
   }
 
-  > *:last-child {
+  > *:nth-child(2) {
     flex-shrink: 0;
+    margin-top: auto;
+  }
+`;
+
+const FilterBars = styled.div`
+  > * + * {
+    margin-top: 1.5rem;
+  }
+`;
+
+const CategoryFilter = styled.div`
+  display: flex;
+  align-items: center;
+
+  > *:nth-child(1) {
+    flex-shrink: 0;
+    min-width: 6.25rem;
   }
 
-  .row-active {
-    background-color: var(--ma-gray-100);
+  > *:nth-child(2) {
+    flex-grow: 1;
+  }
+`;
+
+const FilterLabel = styled.div`
+  color: var(--ma-txt-black);
+  font-size: 0.875rem;
+  font-weight: 600;
+`;
+
+const FilterList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const FilterItemButton = styled.button`
+  transition: all 0.15s;
+
+  &,
+  &:active,
+  &:focus,
+  &:focus-visible {
+    padding: 0.5rem 0.75rem;
+    border: solid 1px var(--ma-blue-400);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0 1px var(--ma-blue-400);
+    background-color: transparent;
+
+    color: var(--ma-blue-400);
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    &.filter-item-active {
+      background-color: var(--ma-primary-blue-50);
+      border-color: var(--ma-blue);
+      box-shadow: 0 0 0 1px var(--ma-blue);
+      color: var(--ma-blue);
+    }
+  }
+
+  &:hover {
+    background-color: var(--ma-primary-blue-50);
   }
 `;
 

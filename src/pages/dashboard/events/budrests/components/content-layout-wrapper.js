@@ -13,9 +13,9 @@ function ContentLayoutWrapper({ children, pageTitle, navbar }) {
 
       {navbar}
 
-      <StyledPageWrapper>
-        <Container fluid>{children}</Container>
-      </StyledPageWrapper>
+      <Container fluid>
+        <StyledPageWrapper>{children}</StyledPageWrapper>
+      </Container>
     </React.Fragment>
   );
 }

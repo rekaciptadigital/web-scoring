@@ -1,81 +1,127 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import { useCategoryDetails } from "./hooks/category-details";
+import { useCategoriesWithFilters } from "./hooks/category-filters";
 
-import { ButtonOutlineBlue } from "components/ma";
+import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
+import { SearchBox } from "./components/search-box";
 
 import IconDownload from "components/ma/icons/mono/download";
 
+import classnames from "classnames";
+
 function PageEventScoringQualification() {
+  const { event_id } = useParams();
+  const eventId = parseInt(event_id);
+
+  const { data: categoryDetails, isLoading: isLoadingCategoryDetails } =
+    useCategoryDetails(eventId);
+  const {
+    activeCategoryDetail,
+    optionsCompetitionCategory,
+    optionsAgeCategory,
+    optionsGenderCategory,
+    selectOptionCompetitionCategory,
+    selectOptionAgeCategory,
+    selectOptionGenderCategory,
+  } = useCategoriesWithFilters(categoryDetails);
+
+  const isPreparingInitialData = !categoryDetails && isLoadingCategoryDetails;
+
+  if (isPreparingInitialData) {
+    return (
+      <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
+        <SpinnerDotBlock />
+      </ContentLayoutWrapper>
+    );
+  }
+
   return (
     <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
-      <div>
-        <TabBar>
-          <TabButtonList>
-            <li>
-              <TabButton>Recurve</TabButton>
+      <TabBar>
+        <TabButtonList>
+          {optionsCompetitionCategory.map((option) => (
+            <li key={option.competitionCategory}>
+              <TabButton
+                className={classnames({ "tab-active": option.isActive })}
+                onClick={() => selectOptionCompetitionCategory(option.competitionCategory)}
+              >
+                {option.competitionCategory}
+              </TabButton>
             </li>
-            <li>
-              <TabButton className="tab-active">Compound</TabButton>
-            </li>
-            <li>
-              <TabButton>Nasional</TabButton>
-            </li>
-            <li>
-              <TabButton>Barebow</TabButton>
-            </li>
-            <li>
-              <TabButton>Traditional Bow</TabButton>
-            </li>
-          </TabButtonList>
-        </TabBar>
+          ))}
+        </TabButtonList>
+      </TabBar>
 
-        <ViewWrapper>
-          <ToolbarTop>
-            <FilterBars>
-              <CategoryFilter>
-                <FilterLabel>Kelas:</FilterLabel>
-                <FilterList>
-                  <li>
-                    <FilterItemButton> Umum - 70m</FilterItemButton>
-                  </li>
-                  <li>
-                    <FilterItemButton className="filter-item-active"> U15 - 50m</FilterItemButton>
-                  </li>
-                </FilterList>
-              </CategoryFilter>
+      <ViewWrapper>
+        <ToolbarTop>
+          <FilterBars>
+            <CategoryFilter>
+              <FilterLabel>Kelas:</FilterLabel>
+              <FilterList>
+                {optionsAgeCategory?.length > 0 ? (
+                  optionsAgeCategory.map((option) => (
+                    <li key={option.ageCategory}>
+                      <FilterItemButton
+                        className={classnames({ "filter-item-active": option.isActive })}
+                        onClick={() => selectOptionAgeCategory(option.ageCategory)}
+                      >
+                        {option.ageCategory}
+                      </FilterItemButton>
+                    </li>
+                  ))
+                ) : (
+                  <li>Tidak tersedia filter kelas</li>
+                )}
+              </FilterList>
+            </CategoryFilter>
 
-              <CategoryFilter>
-                <FilterLabel>Jenis Regu:</FilterLabel>
-                <FilterList>
-                  <li>
-                    <FilterItemButton className="filter-item-active">
-                      Individu Putra
-                    </FilterItemButton>
-                  </li>
-                  <li>
-                    <FilterItemButton>Individu Putri</FilterItemButton>
-                  </li>
-                </FilterList>
-              </CategoryFilter>
-            </FilterBars>
+            <CategoryFilter>
+              <FilterLabel>Jenis Regu:</FilterLabel>
+              <FilterList>
+                {optionsGenderCategory?.length > 0 ? (
+                  optionsGenderCategory.map((option) => (
+                    <li key={option.genderCategory}>
+                      <FilterItemButton
+                        className={classnames({ "filter-item-active": option.isActive })}
+                        onClick={() => selectOptionGenderCategory(option.genderCategory)}
+                      >
+                        {option.genderCategoryLabel}
+                      </FilterItemButton>
+                    </li>
+                  ))
+                ) : (
+                  <li>Tidak tersedia filter jenis regu</li>
+                )}
+              </FilterList>
+            </CategoryFilter>
+          </FilterBars>
 
-            <div>
-              <input type="text" placeholder="Cari peserta" />
-              <ButtonOutlineBlue>
-                <IconDownload size="16" /> Unduh Dokumen
-              </ButtonOutlineBlue>
-            </div>
-          </ToolbarTop>
+          <HorizontalSpaced>
+            <SearchBox placeholder="Cari peserta" />
+            <ButtonOutlineBlue>
+              <IconDownload size="16" /> Unduh Dokumen
+            </ButtonOutlineBlue>
+          </HorizontalSpaced>
+        </ToolbarTop>
 
-          <ScoringTable />
-        </ViewWrapper>
-      </div>
+        <ScoringTable
+          key={activeCategoryDetail?.categoryDetailId}
+          categoryDetailId={activeCategoryDetail?.categoryDetailId}
+        />
+      </ViewWrapper>
     </ContentLayoutWrapper>
   );
 }
+
+const HorizontalSpaced = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
 
 const ViewWrapper = styled.div`
   padding: 1.875rem;
@@ -88,6 +134,7 @@ const ViewWrapper = styled.div`
 
 const TabBar = styled.div`
   margin-bottom: 0.25rem;
+  background-color: #ffffff;
 `;
 
 const TabButtonList = styled.ul`
@@ -175,7 +222,6 @@ const CategoryFilter = styled.div`
 
 const FilterLabel = styled.div`
   color: var(--ma-txt-black);
-  font-size: 0.875rem;
   font-weight: 600;
 `;
 
@@ -185,6 +231,7 @@ const FilterList = styled.ul`
   margin: 0;
 
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 `;
 
@@ -198,11 +245,9 @@ const FilterItemButton = styled.button`
     padding: 0.5rem 0.75rem;
     border: solid 1px var(--ma-blue-400);
     border-radius: 0.5rem;
-    box-shadow: 0 0 0 1px var(--ma-blue-400);
     background-color: transparent;
 
     color: var(--ma-blue-400);
-    font-size: 0.875rem;
     font-weight: 600;
 
     &.filter-item-active {

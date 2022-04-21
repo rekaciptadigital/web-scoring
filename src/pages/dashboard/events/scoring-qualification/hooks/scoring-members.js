@@ -22,14 +22,14 @@ function useScoringMembers(categoryDetailId, searchQuery) {
     fetchScoringMembers();
   }, [categoryDetailId]);
 
-  const getSessionList = () => {
+  const getSessionNumbersList = () => {
     if (!fetcher.data?.length) {
       return null;
     }
     return Object.keys(fetcher.data[0].sessions);
   };
 
-  return { ...fetcher, getSessionList, fetchScoringMembers };
+  return { ...fetcher, getSessionNumbersList, fetchScoringMembers };
 }
 
 export { useScoringMembers };

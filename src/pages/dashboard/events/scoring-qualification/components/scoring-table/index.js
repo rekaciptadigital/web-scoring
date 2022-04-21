@@ -1,12 +1,12 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useScoringMembers } from "../hooks/scoring-members";
+import { useScoringMembers } from "../../hooks/scoring-members";
 
-import { ButtonGhostBlue, SpinnerDotBlock } from "components/ma";
+import { SpinnerDotBlock } from "components/ma";
+import { ScoreEditor } from "./score-editor";
 
 import IconChevronLeft from "components/ma/icons/mono/chevron-left";
 import IconChevronRight from "components/ma/icons/mono/chevron-right";
-import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
@@ -14,10 +14,10 @@ function ScoringTable({ categoryDetailId }) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
-    getSessionList,
+    getSessionNumbersList,
     fetchScoringMembers,
   } = useScoringMembers(categoryDetailId);
-  const sessionList = getSessionList();
+  const sessionNumbersList = getSessionNumbersList();
 
   const [idActiveItem, setIdActiveItem] = React.useState(null);
   const showEditor = idActiveItem !== null;
@@ -35,15 +35,18 @@ function ScoringTable({ categoryDetailId }) {
   return (
     <TableContainer>
       <div>
-        <table className="table table-responsive">
+        <MembersTable className="table table-responsive">
           <thead>
             <tr>
-              <td>Bantalan</td>
-              <td>Peringkat</td>
-              <td>Nama Peserta</td>
-              <td>Nama Klub</td>
-              <SessionStatsColumnHeadingGroup collapsed={showEditor} sessionList={sessionList} />
-              <td></td>
+              <th>Bantalan</th>
+              <th>Peringkat</th>
+              <th>Nama Peserta</th>
+              <th>Nama Klub</th>
+              <SessionStatsColumnHeadingGroup
+                collapsed={showEditor}
+                sessionList={sessionNumbersList}
+              />
+              <th></th>
             </tr>
           </thead>
 
@@ -81,87 +84,31 @@ function ScoringTable({ categoryDetailId }) {
                   totalXPlusTen={row.totalXPlusTen}
                 />
 
-                <td>
+                <CellExpander>
                   {isItemActive(row.member.id) ? (
-                    <ButtonGhostBlue flexible onClick={() => closeEditor()}>
+                    <ExpanderButton flexible onClick={() => closeEditor()}>
                       <IconChevronLeft size="16" />
-                    </ButtonGhostBlue>
+                    </ExpanderButton>
                   ) : (
-                    <ButtonGhostBlue flexible onClick={() => setIdActiveItem(row.member.id)}>
+                    <ExpanderButton flexible onClick={() => setIdActiveItem(row.member.id)}>
                       <IconChevronRight size="16" />
-                    </ButtonGhostBlue>
+                    </ExpanderButton>
                   )}
-                </td>
+                </CellExpander>
               </tr>
             ))}
           </tbody>
-        </table>
+        </MembersTable>
       </div>
 
       {showEditor && (
-        <div key={`${categoryDetailId}-${idActiveItem}`}>
-          <ScoreEditorContainer>
-            <div>
-              <SessionTabList>
-                <li>50m</li>
-                <li>40m</li>
-                <li>30m </li>
-              </SessionTabList>
-
-              <div>
-                <div>Akumulasi Skor: 360</div>
-                <div>
-                  <ButtonGhostBlue flexible onClick={() => closeEditor()}>
-                    <IconX size="16" />
-                  </ButtonGhostBlue>
-                </div>
-              </div>
-            </div>
-
-            <table className="table table-responsive">
-              <thead>
-                <tr>
-                  <td>End</td>
-                  <td colSpan="6">Shot</td>
-                  <td>Total</td>
-                </tr>
-              </thead>
-
-              <tbody>
-                {[1, 2, 3, 4, 5, 6].map((id, indexRambahan) => (
-                  <tr key={id}>
-                    <td>{indexRambahan + 1}</td>
-
-                    {[1, 2, 3, 4, 5, 6].map((id, indexShot) => (
-                      <td key={id}>
-                        <select
-                          name={`shot-score-${indexRambahan}-${indexShot}`}
-                          id={`shot-score-${indexRambahan}-${indexShot}`}
-                          defaultValue={""}
-                          onChange={(ev) => {
-                            fetchScoringMembers();
-                          }}
-                        >
-                          <option value="" disabled>
-                            &ndash;
-                          </option>
-                          {["m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => (
-                            <option key={value} value={value}>
-                              {isNaN(value) ? value.toUpperCase() : value}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    ))}
-
-                    <td>60</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div>Total: 360</div>
-          </ScoreEditorContainer>
+        <div>
+          <ScoreEditor
+            key={`${categoryDetailId}-${idActiveItem}`}
+            sessionNumbersList={sessionNumbersList}
+            onSaveSuccess={fetchScoringMembers}
+            onClose={() => closeEditor()}
+          />
         </div>
       )}
     </TableContainer>
@@ -170,15 +117,15 @@ function ScoringTable({ categoryDetailId }) {
 
 function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
   if (collapsed) {
-    return <td>Total</td>;
+    return <th>Total</th>;
   }
 
   if (!sessionList) {
     return (
       <React.Fragment>
-        <td>Total</td>
-        <td>X</td>
-        <td>X+10</td>
+        <th>Total</th>
+        <th>X</th>
+        <th>X+10</th>
       </React.Fragment>
     );
   }
@@ -186,11 +133,11 @@ function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
   return (
     <React.Fragment>
       {sessionList.map((sessionNumber) => (
-        <td key={sessionNumber}>Sesi {sessionNumber}</td>
+        <th key={sessionNumber}>Sesi {sessionNumber}</th>
       ))}
-      <td>Total</td>
-      <td>X</td>
-      <td>X+10</td>
+      <th>Total</th>
+      <th>X</th>
+      <th>X+10</th>
     </React.Fragment>
   );
 }
@@ -225,10 +172,10 @@ function SessionStatsCellsGroup({ collapsed, sessions, total, totalX, totalXPlus
 }
 
 function TargetFaceNumber({ targetFace, budRestNumber }) {
-  if (!targetFace || !budRestNumber) {
+  if (!budRestNumber || !targetFace) {
     return <GrayedOutText>&ndash;</GrayedOutText>;
   }
-  return <React.Fragment>{targetFace + budRestNumber}</React.Fragment>;
+  return <React.Fragment>{budRestNumber + targetFace}</React.Fragment>;
 }
 
 function ClubName({ children, clubName }) {
@@ -271,31 +218,44 @@ const TableContainer = styled.div`
     position: sticky;
     top: var(--ma-header-height);
     bottom: 0;
-    background-color: var(--ma-gray-100);
+    background-color: var(--ma-gray-50);
     transition: all 0.15s;
   }
 `;
 
-const ScoreEditorContainer = styled.div`
-  position: sticky;
-  top: var(--ma-header-height);
-  bottom: 0;
+const MembersTable = styled.table`
+  thead {
+    background-color: var(--ma-primary-blue-50);
 
-  padding: 1rem;
-  background-color: var(--ma-gray-100);
+    th {
+      color: var(--ma-txt-black);
+      font-weight: 600;
+    }
+  }
 
-  > * {
-    background-color: #ffffff;
+  tbody td {
+    vertical-align: middle;
   }
 `;
 
-const SessionTabList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
+const CellExpander = styled.td`
+  text-align: right;
+`;
 
-  display: flex;
-  gap: 0.5rem;
+const ExpanderButton = styled.button`
+  padding: 0.375rem 0.625rem;
+  border: none;
+  border-radius: 1px;
+  background-color: transparent;
+  color: var(--ma-blue);
+
+  &:hover {
+    box-shadow: 0 0 0 1px var(--ma-gray-100);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 1px #2684ff;
+  }
 `;
 
 export { ScoringTable };

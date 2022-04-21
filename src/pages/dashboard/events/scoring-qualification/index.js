@@ -102,8 +102,8 @@ function PageEventScoringQualification() {
           </FilterBars>
 
           <HorizontalSpaced>
-            <SearchBox placeholder="Cari peserta" />
-            <ButtonOutlineBlue>
+            <SearchBox placeholder="Cari peserta" disabled />
+            <ButtonOutlineBlue disabled>
               <IconDownload size="16" /> Unduh Dokumen
             </ButtonOutlineBlue>
           </HorizontalSpaced>

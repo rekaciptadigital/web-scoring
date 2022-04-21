@@ -40,8 +40,8 @@ function ScoringTable({ categoryDetailId }) {
             <tr>
               <th>Bantalan</th>
               <th>Peringkat</th>
-              <th>Nama Peserta</th>
-              <th>Nama Klub</th>
+              <th className="name">Nama Peserta</th>
+              <th className="name">Nama Klub</th>
               <SessionStatsColumnHeadingGroup
                 collapsed={showEditor}
                 sessionList={sessionNumbersList}
@@ -71,8 +71,8 @@ function ScoringTable({ categoryDetailId }) {
                     </GrayedOutText>
                   )}
                 </td>
-                <td>{row.member.name}</td>
-                <td>
+                <td className="name">{row.member.name}</td>
+                <td className="name">
                   <ClubName>{row.clubName}</ClubName>
                 </td>
 
@@ -117,15 +117,15 @@ function ScoringTable({ categoryDetailId }) {
 
 function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
   if (collapsed) {
-    return <th>Total</th>;
+    return <th className="stats">Total</th>;
   }
 
   if (!sessionList) {
     return (
       <React.Fragment>
-        <th>Total</th>
-        <th>X</th>
-        <th>X+10</th>
+        <th className="stats">Total</th>
+        <th className="stats">X</th>
+        <th className="stats">X+10</th>
       </React.Fragment>
     );
   }
@@ -133,26 +133,28 @@ function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
   return (
     <React.Fragment>
       {sessionList.map((sessionNumber) => (
-        <th key={sessionNumber}>Sesi {sessionNumber}</th>
+        <th key={sessionNumber} className="stats">
+          Sesi {sessionNumber}
+        </th>
       ))}
-      <th>Total</th>
-      <th>X</th>
-      <th>X+10</th>
+      <th className="stats">Total</th>
+      <th className="stats">X</th>
+      <th className="stats">X+10</th>
     </React.Fragment>
   );
 }
 
 function SessionStatsCellsGroup({ collapsed, sessions, total, totalX, totalXPlusTen }) {
   if (collapsed) {
-    return <td>{total}</td>;
+    return <td className="stats">{total}</td>;
   }
 
   if (!sessions) {
     return (
       <React.Fragment>
-        <td>{total}</td>
-        <td>{totalX}</td>
-        <td>{totalXPlusTen}</td>
+        <td className="stats">{total}</td>
+        <td className="stats">{totalX}</td>
+        <td className="stats">{totalXPlusTen}</td>
       </React.Fragment>
     );
   }
@@ -160,13 +162,13 @@ function SessionStatsCellsGroup({ collapsed, sessions, total, totalX, totalXPlus
   return (
     <React.Fragment>
       {Object.keys(sessions).map((sessionNumber) => (
-        <td key={sessionNumber}>
+        <td key={sessionNumber} className="stats">
           {sessions[sessionNumber]?.total || <GrayedOutText>&ndash;</GrayedOutText>}
         </td>
       ))}
-      <td>{total}</td>
-      <td>{totalX}</td>
-      <td>{totalXPlusTen}</td>
+      <td className="stats">{total}</td>
+      <td className="stats">{totalX}</td>
+      <td className="stats">{totalXPlusTen}</td>
     </React.Fragment>
   );
 }
@@ -224,17 +226,35 @@ const TableContainer = styled.div`
 `;
 
 const MembersTable = styled.table`
+  text-align: center;
+
   thead {
     background-color: var(--ma-primary-blue-50);
 
     th {
       color: var(--ma-txt-black);
       font-weight: 600;
+
+      &.name {
+        text-align: left;
+      }
+
+      &.stats {
+        text-align: right;
+      }
     }
   }
 
   tbody td {
     vertical-align: middle;
+
+    &.name {
+      text-align: left;
+    }
+
+    &.stats {
+      text-align: right;
+    }
   }
 `;
 
@@ -248,6 +268,8 @@ const ExpanderButton = styled.button`
   border-radius: 1px;
   background-color: transparent;
   color: var(--ma-blue);
+
+  transition: all 0.15s;
 
   &:hover {
     box-shadow: 0 0 0 1px var(--ma-gray-100);

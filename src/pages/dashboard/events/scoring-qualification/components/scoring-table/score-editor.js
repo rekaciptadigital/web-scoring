@@ -35,7 +35,7 @@ function ScoreEditor({ sessionNumbersList, onSaveSuccess, onClose }) {
 
       <SessionContainer key={activeSessionNumber}>
         {sessionNumbersList ? (
-          <EditorBody>
+          <SessionBody>
             <ScoresTable className="table table-responsive">
               <thead>
                 <tr>
@@ -109,14 +109,14 @@ function ScoreEditor({ sessionNumbersList, onSaveSuccess, onClose }) {
 
               <div>29</div>
             </ShotOffBar>
-          </EditorBody>
+          </SessionBody>
         ) : (
-          <EditorBody>
+          <SessionBody>
             <EmptySession>Data sesi skoring tidak tersedia</EmptySession>
-          </EditorBody>
+          </SessionBody>
         )}
 
-        <EditorFooter>
+        <SessionStatsFooter>
           <StatItem>
             <span>X+10:</span>
             <span>20</span>
@@ -131,7 +131,7 @@ function ScoreEditor({ sessionNumbersList, onSaveSuccess, onClose }) {
             <span>Total:</span>
             <TotalNumber>360</TotalNumber>
           </StatItem>
-        </EditorFooter>
+        </SessionStatsFooter>
       </SessionContainer>
     </ScoreEditorContainer>
   );
@@ -216,12 +216,12 @@ const StatsScoreAccumulation = styled.div`
   }
 `;
 
-const EditorBody = styled.div`
+const SessionBody = styled.div`
   border-radius: 0.5rem;
   background-color: #ffffff;
 `;
 
-const EditorFooter = styled.div`
+const SessionStatsFooter = styled.div`
   padding: 0.75rem;
   display: flex;
   justify-content: flex-end;
@@ -296,6 +296,8 @@ const EditorCloseButton = styled.button`
   border: none;
   background-color: transparent;
   color: var(--ma-blue);
+
+  transition: all 0.15s;
 
   &:hover {
     box-shadow: 0 0 0 1px var(--ma-gray-200);

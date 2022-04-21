@@ -1,14 +1,20 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useScoringDetail } from "../../hooks/scoring-details";
+import { useSubmitScore } from "../../hooks/submit-score";
 
 import { SpinnerDotBlock } from "components/ma";
 
 function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
   const code = _makeQualificationCode({ memberId, sessionNumber });
-  const { data: scoreDetail, isLoading } = useScoringDetail(code);
+  const {
+    data: scoreDetail,
+    isLoading: isLoadingScore,
+    fetchScoringDetail,
+  } = useScoringDetail(code);
+  const { submitScore, isLoading: isLoadingSubmit } = useSubmitScore(code, scoreDetail?.score);
 
-  const isInitiatingData = !scoreDetail && isLoading;
+  const isLoading = isLoadingScore || isLoadingSubmit;
 
   const getScores = (shotNumber) => {
     if (!scoreDetail) {
@@ -17,10 +23,15 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
     return scoreDetail.score[shotNumber];
   };
 
+  const handleSuccessSave = () => {
+    onSaveSuccess?.();
+    fetchScoringDetail();
+  };
+
   return (
     <SessionContainer>
       <SessionBody>
-        <LoadingBlocker isLoading={isInitiatingData} />
+        <LoadingBlocker isLoading={isLoading} />
         <ScoresTable className="table table-responsive">
           <thead>
             <tr>
@@ -31,18 +42,22 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
           </thead>
 
           <tbody>
-            {[1, 2, 3, 4, 5, 6].map((id, indexRambahan) => (
+            {[1, 2, 3, 4, 5, 6].map((id, rambahanIndex) => (
               <tr key={id}>
-                <td>{indexRambahan + 1}</td>
+                <td>{rambahanIndex + 1}</td>
 
-                {getScores(id).map((scoreItem, indexShot) => (
-                  <td key={indexShot}>
+                {getScores(id).map((scoreItem, shotIndex) => (
+                  <td key={shotIndex}>
                     <SelectScore
-                      name={`shot-score-${indexRambahan}-${indexShot}`}
+                      name={`shot-score-${rambahanIndex}-${shotIndex}`}
                       value={scoreItem}
                       onChange={(value) => {
-                        alert(`Simpan nilai jadi ${value}`);
-                        onSaveSuccess?.();
+                        submitScore({
+                          rambahan: id,
+                          shotIndex: shotIndex,
+                          value: value,
+                          onSuccess: handleSuccessSave,
+                        });
                       }}
                     />
                   </td>
@@ -65,7 +80,7 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
                   value={""}
                   onChange={(value) => {
                     alert(`Simpan nilai jadi ${value}`);
-                    onSaveSuccess?.();
+                    handleSuccessSave();
                   }}
                 />
               ))}
@@ -79,7 +94,7 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
       <SessionStatsFooter>
         <StatItem>
           <span>X+10:</span>
-          {isInitiatingData ? (
+          {isLoading ? (
             <SkeletonStatItem>{_countXPlusTen(scoreDetail?.score)}</SkeletonStatItem>
           ) : (
             <span>{_countXPlusTen(scoreDetail?.score)}</span>
@@ -88,7 +103,7 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
 
         <StatItem>
           <span>X:</span>
-          {isInitiatingData ? (
+          {isLoading ? (
             <SkeletonStatItem>{_countX(scoreDetail?.score)}</SkeletonStatItem>
           ) : (
             <span>{_countX(scoreDetail?.score)}</span>
@@ -97,7 +112,7 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
 
         <StatItem>
           <span>Total:</span>
-          {isInitiatingData ? (
+          {isLoading ? (
             <SkeletonStatItem className="total">{_sumTotal(scoreDetail?.score)}</SkeletonStatItem>
           ) : (
             <TotalNumber>{_sumTotal(scoreDetail?.score)}</TotalNumber>
@@ -121,15 +136,12 @@ function LoadingBlocker({ isLoading = true }) {
 
 function SelectScore({ name = "", value = "", onChange }) {
   const covertedValueType = _convertScoreValueType(value);
-  const [displayValue, setDisplayValue] = React.useState(null);
-
   return (
     <select
       id={name}
       name={name}
-      value={displayValue || covertedValueType}
+      value={covertedValueType}
       onChange={(ev) => {
-        setDisplayValue(ev.target.value);
         onChange?.(ev.target.value);
       }}
     >
@@ -160,7 +172,7 @@ const LoadingContainer = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.6);
 `;
 
 const SkeletonStatItem = styled.span`

@@ -19,10 +19,10 @@ function ScoringTable({ categoryDetailId }) {
   } = useScoringMembers(categoryDetailId);
   const sessionNumbersList = getSessionNumbersList();
 
-  const [idActiveItem, setIdActiveItem] = React.useState(null);
-  const showEditor = idActiveItem !== null;
-  const isItemActive = (index) => idActiveItem === index;
-  const closeEditor = () => setIdActiveItem(null);
+  const [activeRow, setActiveRow] = React.useState(null);
+  const showEditor = activeRow !== null;
+  const isItemActive = (memberId) => activeRow?.member?.id === memberId;
+  const closeEditor = () => setActiveRow(null);
 
   if (!scoringMembers && isLoadingScoringMembers) {
     return <SpinnerDotBlock />;
@@ -90,7 +90,7 @@ function ScoringTable({ categoryDetailId }) {
                       <IconChevronLeft size="16" />
                     </ExpanderButton>
                   ) : (
-                    <ExpanderButton flexible onClick={() => setIdActiveItem(row.member.id)}>
+                    <ExpanderButton flexible onClick={() => setActiveRow(row)}>
                       <IconChevronRight size="16" />
                     </ExpanderButton>
                   )}
@@ -104,8 +104,10 @@ function ScoringTable({ categoryDetailId }) {
       {showEditor && (
         <div>
           <ScoreEditor
-            key={`${categoryDetailId}-${idActiveItem}`}
+            key={`${categoryDetailId}-${activeRow.member.id}`}
+            memberId={activeRow.member.id}
             sessionNumbersList={sessionNumbersList}
+            scoreTotal={activeRow.total}
             onSaveSuccess={fetchScoringMembers}
             onClose={() => closeEditor()}
           />

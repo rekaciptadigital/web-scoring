@@ -4,6 +4,7 @@ import { useScoringDetail } from "../../hooks/scoring-details";
 import { useSubmitScore } from "../../hooks/submit-score";
 
 import { SpinnerDotBlock } from "components/ma";
+import { SelectScore } from "./select-score";
 
 function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
   const code = _makeQualificationCode({ memberId, sessionNumber });
@@ -70,9 +71,9 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
         </ScoresTable>
 
         <ShotOffBar>
-          <div>
+          <ShotOffGroup>
             <div>S-Off</div>
-            <div>
+            <ShotOffGroup>
               {[1, 2, 3].map((number) => (
                 <SelectScore
                   key={number}
@@ -84,10 +85,11 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
                   }}
                 />
               ))}
-            </div>
-          </div>
+            </ShotOffGroup>
+          </ShotOffGroup>
 
-          <div>29</div>
+          {/* TODO: nilai dari data */}
+          <div>{0}</div>
         </ShotOffBar>
       </SessionBody>
 
@@ -95,7 +97,7 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
         <StatItem>
           <span>X+10:</span>
           {isLoading ? (
-            <SkeletonStatItem>{_countXPlusTen(scoreDetail?.score)}</SkeletonStatItem>
+            <SkeletonStatItem>{_countXPlusTen(scoreDetail?.score) || "00"}</SkeletonStatItem>
           ) : (
             <span>{_countXPlusTen(scoreDetail?.score)}</span>
           )}
@@ -104,7 +106,7 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
         <StatItem>
           <span>X:</span>
           {isLoading ? (
-            <SkeletonStatItem>{_countX(scoreDetail?.score)}</SkeletonStatItem>
+            <SkeletonStatItem>{_countX(scoreDetail?.score) || "00"}</SkeletonStatItem>
           ) : (
             <span>{_countX(scoreDetail?.score)}</span>
           )}
@@ -113,7 +115,9 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
         <StatItem>
           <span>Total:</span>
           {isLoading ? (
-            <SkeletonStatItem className="total">{_sumTotal(scoreDetail?.score)}</SkeletonStatItem>
+            <SkeletonStatItem className="total">
+              {_sumTotal(scoreDetail?.score) || "00"}
+            </SkeletonStatItem>
           ) : (
             <TotalNumber>{_sumTotal(scoreDetail?.score)}</TotalNumber>
           )}
@@ -134,29 +138,6 @@ function LoadingBlocker({ isLoading = true }) {
   );
 }
 
-function SelectScore({ name = "", value = "", onChange }) {
-  const covertedValueType = _convertScoreValueType(value);
-  return (
-    <select
-      id={name}
-      name={name}
-      value={covertedValueType}
-      onChange={(ev) => {
-        onChange?.(ev.target.value);
-      }}
-    >
-      <option value="-" disabled>
-        &ndash;
-      </option>
-      {["m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => (
-        <option key={value} value={value}>
-          {isNaN(value) ? value.toUpperCase() : value}
-        </option>
-      ))}
-    </select>
-  );
-}
-
 /* ============================== */
 // styles
 
@@ -168,6 +149,7 @@ const SessionContainer = styled.div`
 
 const LoadingContainer = styled.div`
   position: absolute;
+  z-index: 100;
   top: 0;
   bottom: 0;
   left: 0;
@@ -190,17 +172,6 @@ const SessionBody = styled.div`
   min-width: 30rem;
   border-radius: 0.5rem;
   background-color: #ffffff;
-`;
-
-// eslint-disable-next-line no-unused-vars
-const EmptySession = styled.div`
-  min-width: 30rem;
-  min-height: 10rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--ma-gray-400);
-  font-weight: 600;
 `;
 
 const SessionStatsFooter = styled.div`
@@ -239,14 +210,15 @@ const ScoresTable = styled.table`
 
 const ShotOffBar = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
+  align-items: center;
   padding: 0.5rem;
+`;
 
-  > *:nth-child(1) {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-  }
+const ShotOffGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 
 /* ============================ */

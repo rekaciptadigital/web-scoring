@@ -113,8 +113,17 @@ class TableMember extends Component {
         dataField: "name",
         text: `${this.props.team ? "Nama Tim" : "Nama Peserta"}`,
         sort: true,
-        style: { width: "40px", overflow: "hidden" },
-        headerStyle: { width: "40px", overflow: "hidden" },
+        // style: { width: "40px", overflow: "hidden" },
+        // headerStyle: { width: "40px", overflow: "hidden" },
+        formatter: (cell, row) => {
+         return (
+            <>
+            <div style={{ minWidth: 200, paddingTop: 15 }}>
+              <p>{row.name}</p>
+            </div>
+            </>
+          );
+        },
       },
       {
         dataField: "clubName",
@@ -139,11 +148,39 @@ class TableMember extends Component {
         dataField: "competitionCategory",
         text: "Kategori Lomba",
         sort: true,
+        formatter: (cell, row) => {
+          if (!row.competitionCategory) {
+            return (
+              <>
+                <span>-</span>
+              </>
+            );
+          }
+          return (
+            <>
+              <span>{row.competitionCategory}</span>
+            </>
+          );
+        },
       },
       {
         dataField: "ageCategory",
         text: "Kelas",
         sort: true,
+        formatter: (cell, row) => {
+          if (!row.ageCategory) {
+            return (
+              <>
+                <span>-</span>
+              </>
+            );
+          }
+          return (
+            <>
+              <span >{row.ageCategory}</span>
+            </>
+          );
+        },
       },
       {
         dataField: "email",

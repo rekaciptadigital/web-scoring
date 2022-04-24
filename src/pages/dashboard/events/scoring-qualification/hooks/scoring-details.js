@@ -5,21 +5,19 @@ import { ScoringService } from "services";
 function useScoringDetail(code) {
   const fetcher = useFetcher();
 
-  const fetchScoringDetail = () => {
-    const getFunction = () => {
-      return ScoringService.findParticipantScoreDetail({ code });
-    };
-    fetcher.runAsync(getFunction);
-  };
-
   React.useEffect(() => {
     if (!code) {
       return;
     }
-    fetchScoringDetail();
+
+    const getFunction = () => {
+      return ScoringService.findParticipantScoreDetail({ code });
+    };
+
+    fetcher.runAsync(getFunction);
   }, [code]);
 
-  return { ...fetcher, fetchScoringDetail };
+  return { ...fetcher };
 }
 
 export { useScoringDetail };

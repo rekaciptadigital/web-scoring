@@ -1,22 +1,18 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import Select from "react-select";
+import ReactSelect from "react-select";
 
 const optionsScoreNumbers = ["m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => ({
   value,
   label: isNaN(value) ? value.toUpperCase() : value,
 }));
 
-function getOptionFromValue(value) {
-  return optionsScoreNumbers.find((option) => option.value === value);
-}
-
-const MemoSelect = React.memo(Select);
+const Select = React.memo(ReactSelect);
 
 function SelectScore({ name, value, onChange }) {
   const covertedValueType = _convertScoreValueType(value);
-  const selectedOption = getOptionFromValue(covertedValueType);
+  const selectedOption = _getOptionFromValue(covertedValueType);
 
   const handleChange = React.useCallback(
     (option) => {
@@ -32,7 +28,7 @@ function SelectScore({ name, value, onChange }) {
 
   return (
     <SelectContainer>
-      <MemoSelect
+      <Select
         name={name}
         placeholder="-"
         styles={customSelectStyles}
@@ -44,6 +40,9 @@ function SelectScore({ name, value, onChange }) {
     </SelectContainer>
   );
 }
+
+/* ================================== */
+// styles
 
 const customSelectStyles = {
   control: (provided) => ({
@@ -78,6 +77,9 @@ const SelectContainer = styled.div`
   max-width: 4rem;
 `;
 
+/* =============================== */
+// utils
+
 function _convertScoreValueType(inputValue) {
   if (!inputValue || inputValue === "-") {
     return "-";
@@ -86,6 +88,10 @@ function _convertScoreValueType(inputValue) {
     return inputValue;
   }
   return Number(inputValue);
+}
+
+function _getOptionFromValue(value) {
+  return optionsScoreNumbers.find((option) => option.value === value);
 }
 
 export { SelectScore };

@@ -1,5 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useScoringDetail } from "../../hooks/scoring-details";
+import { useSubmitScore } from "../../hooks/submit-score";
 
 import { EditorForm } from "./editor-form";
 
@@ -7,8 +9,76 @@ import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
-function ScoreEditor({ memberId, sessionNumbersList, scoreTotal, onSaveSuccess, onClose }) {
-  const [activeSessionNumber, setActiveSessionNumber] = React.useState(1);
+function ScoreEditor({
+  memberId,
+  sessionNumbersList,
+  scoreTotal,
+  isLoading: isLoadingFromProp,
+  onChange,
+  onSaveSuccess,
+  onClose,
+}) {
+  const [sessionNumber, setSessionNumber] = React.useState(1);
+
+  const code = _makeQualificationCode({ memberId, sessionNumber });
+  const { data: scoreDetail, isLoading: isLoadingScore } = useScoringDetail(code);
+
+  const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
+  const { submitScore, isLoading: isSubmiting } = useSubmitScore();
+
+  React.useEffect(() => {
+    if (!formValues || !onChange) {
+      return;
+    }
+
+    const componentValue = {
+      sessionNumber: sessionNumber,
+      sessionCode: code,
+      value: formValues,
+      isDirty: isFormDirty,
+    };
+
+    onChange(componentValue);
+  }, [isFormDirty, sessionNumber, code, formValues]);
+
+  const handleChangeSession = (targetSessionNumber) => {
+    if (!isFormDirty) {
+      resetForm();
+      setSessionNumber(targetSessionNumber);
+      return;
+    }
+
+    const payload = { code: code, shoot_scores: formValues };
+    submitScore(payload, {
+      onSuccess() {
+        resetForm();
+        setSessionNumber(targetSessionNumber);
+        onSaveSuccess?.();
+      },
+      onError() {
+        // TODO: prompt retry / switch without saving anyway
+      },
+    });
+  };
+
+  const handleCloseEditor = () => {
+    if (!isFormDirty) {
+      onClose?.();
+      return;
+    }
+
+    const payload = { code: code, shoot_scores: formValues };
+    submitScore(payload, {
+      onSuccess() {
+        onClose?.();
+        onSaveSuccess?.();
+      },
+      onError() {
+        // TODO: prompt retry / switch without saving anyway
+      },
+    });
+  };
+
   return (
     <ScoreEditorContainer>
       <EditorHeader>
@@ -16,8 +86,8 @@ function ScoreEditor({ memberId, sessionNumbersList, scoreTotal, onSaveSuccess, 
           <EditorHeaderContent>
             <SessionTabList
               sessions={sessionNumbersList}
-              currentSession={activeSessionNumber}
-              onChange={setActiveSessionNumber}
+              currentSession={sessionNumber}
+              onChange={handleChangeSession}
             />
             {!isNaN(scoreTotal) && (
               <StatsScoreAccumulation>
@@ -31,17 +101,17 @@ function ScoreEditor({ memberId, sessionNumbersList, scoreTotal, onSaveSuccess, 
         )}
 
         <div>
-          <EditorCloseButton flexible onClick={() => onClose?.()}>
+          <EditorCloseButton flexible onClick={handleCloseEditor}>
             <IconX size="16" />
           </EditorCloseButton>
         </div>
       </EditorHeader>
 
       <EditorForm
-        key={activeSessionNumber}
-        memberId={memberId}
-        sessionNumber={activeSessionNumber}
-        onSaveSuccess={onSaveSuccess}
+        key={sessionNumber}
+        isLoading={isLoadingFromProp || isLoadingScore || isSubmiting}
+        scoresData={formValues}
+        onChange={(scoresData) => setFormValues(scoresData)}
       />
     </ScoreEditorContainer>
   );
@@ -73,6 +143,9 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
     </SessionTabListContainer>
   );
 }
+
+/* ============================= */
+// styles
 
 const ScoreEditorContainer = styled.div`
   position: sticky;
@@ -193,5 +266,66 @@ const EmptySession = styled.div`
   color: var(--ma-gray-400);
   font-weight: 600;
 `;
+
+/* ========================= */
+// hook
+
+const defaultFormState = { data: null, isDirty: false };
+
+function useForm(scoreDetail) {
+  const [formState, dispatch] = React.useReducer((state, action) => {
+    switch (action.type) {
+      case "RESET": {
+        return defaultFormState;
+      }
+
+      case "INIT": {
+        return { ...defaultFormState, data: action.payload };
+      }
+
+      case "CHANGE": {
+        return {
+          ...state,
+          isDirty: true,
+          data: {
+            ...state.data,
+            ...action.payload,
+          },
+        };
+      }
+
+      case "FORCE_MARKED_DIRTY": {
+        return { ...state, isDirty: true };
+      }
+
+      default: {
+        return state;
+      }
+    }
+  }, defaultFormState);
+
+  React.useEffect(() => {
+    if (!scoreDetail?.score) {
+      return;
+    }
+    dispatch({ type: "INIT", payload: scoreDetail.score });
+  }, [scoreDetail]);
+
+  const setFormValues = (payload) => dispatch({ type: "CHANGE", payload: payload });
+  const resetForm = () => dispatch({ type: "RESET" });
+  const markFormAsDirty = () => dispatch({ type: "FORCE_MARKED_DIRTY" });
+
+  return { ...formState, setFormValues, markFormAsDirty, resetForm };
+}
+
+/* =============================== */
+// utils
+
+function _makeQualificationCode({ memberId, sessionNumber }) {
+  if (!memberId || !sessionNumber) {
+    return null;
+  }
+  return `1-${memberId}-${sessionNumber}`;
+}
 
 export { ScoreEditor };

@@ -1,32 +1,28 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useScoringDetail } from "../../hooks/scoring-details";
-import { useSubmitScore } from "../../hooks/submit-score";
 
 import { SpinnerDotBlock } from "components/ma";
 import { SelectScore } from "./select-score";
 
-function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
-  const code = _makeQualificationCode({ memberId, sessionNumber });
-  const {
-    data: scoreDetail,
-    isLoading: isLoadingScore,
-    fetchScoringDetail,
-  } = useScoringDetail(code);
-  const { submitScore, isLoading: isLoadingSubmit } = useSubmitScore(code, scoreDetail?.score);
+/**
+ * Controlled component
+ * ...gak manage state di dalam kecuali untuk kebutuhan internal
+ * (tapi gak di-ekspose langsung ke parent - lihat pemanggilan onChange?.(...))
+ */
+function EditorForm({ scoresData, isLoading, onChange }) {
+  const scoresFromProp = _makeScoresDataFromProp(scoresData);
 
-  const isLoading = isLoadingScore || isLoadingSubmit;
+  const [selectedScore, setSelectedScore] = React.useState(null);
 
-  const getScores = (shotNumber) => {
-    if (!scoreDetail) {
-      return ["", "", "", "", "", ""];
+  React.useEffect(() => {
+    if (!selectedScore) {
+      return;
     }
-    return scoreDetail.score[shotNumber];
-  };
+    onChange?.(_makeOutputValue(scoresFromProp, selectedScore));
+  }, [selectedScore]);
 
-  const handleSuccessSave = () => {
-    onSaveSuccess?.();
-    fetchScoringDetail();
+  const handleSelectScore = (selectData) => {
+    setSelectedScore(selectData);
   };
 
   return (
@@ -43,28 +39,27 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
           </thead>
 
           <tbody>
-            {[1, 2, 3, 4, 5, 6].map((id, rambahanIndex) => (
-              <tr key={id}>
-                <td>{rambahanIndex + 1}</td>
+            {[1, 2, 3, 4, 5, 6].map((rambahanNumber, rambahanIndex) => (
+              <tr key={rambahanNumber}>
+                <td>{rambahanNumber}</td>
 
-                {getScores(id).map((scoreItem, shotIndex) => (
+                {scoresFromProp[rambahanNumber].map((scoreItem, shotIndex) => (
                   <td key={shotIndex}>
                     <SelectScore
                       name={`shot-score-${rambahanIndex}-${shotIndex}`}
                       value={scoreItem}
                       onChange={(value) => {
-                        submitScore({
-                          rambahan: id,
-                          shotIndex: shotIndex,
-                          value: value,
-                          onSuccess: handleSuccessSave,
+                        handleSelectScore({
+                          rambahan: rambahanIndex,
+                          shot: shotIndex,
+                          score: value,
                         });
                       }}
                     />
                   </td>
                 ))}
 
-                <td>{_sumRambahanTotal(getScores(id))}</td>
+                <td>{_sumRambahanTotal(scoresFromProp[rambahanNumber])}</td>
               </tr>
             ))}
           </tbody>
@@ -77,12 +72,9 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
               {[1, 2, 3].map((number) => (
                 <SelectScore
                   key={number}
-                  name={`shot-off-score`}
-                  value={""}
-                  onChange={(value) => {
-                    alert(`Simpan nilai jadi ${value}`);
-                    handleSuccessSave();
-                  }}
+                  name={`shot-off-score-${number}`}
+                  value=""
+                  // onChange={handleSelectScore}
                 />
               ))}
             </ShotOffGroup>
@@ -94,34 +86,15 @@ function EditorForm({ memberId, sessionNumber, onSaveSuccess }) {
       </SessionBody>
 
       <SessionStatsFooter>
-        <StatItem>
-          <span>X+10:</span>
-          {isLoading ? (
-            <SkeletonStatItem>{_countXPlusTen(scoreDetail?.score) || "00"}</SkeletonStatItem>
-          ) : (
-            <span>{_countXPlusTen(scoreDetail?.score)}</span>
-          )}
-        </StatItem>
+        <StatCount label="X+10:" isLoading={isLoading}>
+          {_countXPlusTen(scoresFromProp)}
+        </StatCount>
 
-        <StatItem>
-          <span>X:</span>
-          {isLoading ? (
-            <SkeletonStatItem>{_countX(scoreDetail?.score) || "00"}</SkeletonStatItem>
-          ) : (
-            <span>{_countX(scoreDetail?.score)}</span>
-          )}
-        </StatItem>
+        <StatCount label="X:" isLoading={isLoading}>
+          {_countX(scoresFromProp)}
+        </StatCount>
 
-        <StatItem>
-          <span>Total:</span>
-          {isLoading ? (
-            <SkeletonStatItem className="total">
-              {_sumTotal(scoreDetail?.score) || "00"}
-            </SkeletonStatItem>
-          ) : (
-            <TotalNumber>{_sumTotal(scoreDetail?.score)}</TotalNumber>
-          )}
-        </StatItem>
+        <StatTotal isLoading={isLoading}>{_sumTotal(scoresFromProp)}</StatTotal>
       </SessionStatsFooter>
     </SessionContainer>
   );
@@ -135,6 +108,40 @@ function LoadingBlocker({ isLoading = true }) {
     <LoadingContainer>
       <SpinnerDotBlock />
     </LoadingContainer>
+  );
+}
+
+function StatCount({ children, amount, label = "X", isLoading }) {
+  if (isLoading) {
+    return (
+      <StatItem>
+        <span>{label}</span>
+        <SkeletonStatItem>{children || amount || "00"}</SkeletonStatItem>
+      </StatItem>
+    );
+  }
+  return (
+    <StatItem>
+      <span>{label}</span>
+      <span>{children || amount || 0}</span>
+    </StatItem>
+  );
+}
+
+function StatTotal({ children, amount, isLoading }) {
+  if (isLoading) {
+    return (
+      <StatItem>
+        <span>Total:</span>
+        <SkeletonStatItem className="total">{children || amount || "00"}</SkeletonStatItem>
+      </StatItem>
+    );
+  }
+  return (
+    <StatItem>
+      <span>Total:</span>
+      <TotalNumber>{children || amount}</TotalNumber>
+    </StatItem>
   );
 }
 
@@ -224,11 +231,29 @@ const ShotOffGroup = styled.div`
 /* ============================ */
 // utils
 
-function _makeQualificationCode({ memberId, sessionNumber }) {
-  if (!memberId || !sessionNumber) {
-    return null;
-  }
-  return `1-${memberId}-${sessionNumber}`;
+function _makeScoresDataFromProp(scoresData) {
+  return (
+    scoresData || {
+      1: ["", "", "", "", "", ""],
+      2: ["", "", "", "", "", ""],
+      3: ["", "", "", "", "", ""],
+      4: ["", "", "", "", "", ""],
+      5: ["", "", "", "", "", ""],
+      6: ["", "", "", "", "", ""],
+    }
+  );
+}
+
+function _makeOutputValue(previousData, selectData) {
+  const rambahanNumber = selectData.rambahan + 1;
+  const updatedRambahanScores = previousData[rambahanNumber].map((existingScore, index) => {
+    if (index !== selectData.shot) {
+      return existingScore;
+    }
+    return selectData.score;
+  });
+
+  return { ...previousData, [rambahanNumber]: updatedRambahanScores };
 }
 
 function _convertScoreValueType(inputValue) {

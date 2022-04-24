@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
+import { useSubmitScore } from "../../hooks/submit-score";
 
 import { SpinnerDotBlock } from "components/ma";
 import { ScoreEditor } from "./score-editor";
@@ -17,12 +18,69 @@ function ScoringTable({ categoryDetailId }) {
     getSessionNumbersList,
     fetchScoringMembers,
   } = useScoringMembers(categoryDetailId);
-  const sessionNumbersList = getSessionNumbersList();
 
-  const [activeRow, setActiveRow] = React.useState(null);
+  const [editor, dispatchEditor] = React.useReducer(editorReducer, defaultEditorState);
+  const { editorValue, selectedMemberId } = editor;
+
+  // di-memo jaga-jaga kalau row-nya banyak & rerendernya juga banyak
+  const activeRow = React.useMemo(() => {
+    if (!scoringMembers || !selectedMemberId) {
+      return null;
+    }
+    return scoringMembers.find((row) => row.member.id === selectedMemberId);
+  }, [scoringMembers, selectedMemberId]);
+
+  const sessionNumbersList = getSessionNumbersList();
   const showEditor = activeRow !== null;
   const isItemActive = (memberId) => activeRow?.member?.id === memberId;
-  const closeEditor = () => setActiveRow(null);
+
+  const { submitScore, isLoading: isSaving } = useSubmitScore();
+
+  const handleChangeEditor = (editorValue) => {
+    dispatchEditor({ type: "UPDATE_EDITOR_VALUE", payload: editorValue });
+  };
+
+  const handleSelectRow = (rowData) => {
+    if (editorValue?.isDirty) {
+      const payload = {
+        code: editorValue.sessionCode,
+        shoot_scores: editorValue.value,
+      };
+
+      submitScore(payload, {
+        onSuccess() {
+          dispatchEditor({ type: "SELECT_ROW", payload: rowData.member.id });
+          fetchScoringMembers();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    } else {
+      dispatchEditor({ type: "SELECT_ROW", payload: rowData.member.id });
+    }
+  };
+
+  const handleCollapseEditor = () => {
+    if (editorValue?.isDirty) {
+      const payload = {
+        code: editorValue.sessionCode,
+        shoot_scores: editorValue.value,
+      };
+
+      submitScore(payload, {
+        onSuccess() {
+          dispatchEditor({ type: "CLOSED" });
+          fetchScoringMembers();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    } else {
+      dispatchEditor({ type: "CLOSED" });
+    }
+  };
 
   if (!scoringMembers && isLoadingScoringMembers) {
     return <SpinnerDotBlock />;
@@ -86,11 +144,11 @@ function ScoringTable({ categoryDetailId }) {
 
                 <CellExpander>
                   {isItemActive(row.member.id) ? (
-                    <ExpanderButton flexible onClick={() => closeEditor()}>
+                    <ExpanderButton flexible onClick={handleCollapseEditor}>
                       <IconChevronLeft size="16" />
                     </ExpanderButton>
                   ) : (
-                    <ExpanderButton flexible onClick={() => setActiveRow(row)}>
+                    <ExpanderButton flexible onClick={() => handleSelectRow(row)}>
                       <IconChevronRight size="16" />
                     </ExpanderButton>
                   )}
@@ -108,8 +166,10 @@ function ScoringTable({ categoryDetailId }) {
             memberId={activeRow.member.id}
             sessionNumbersList={sessionNumbersList}
             scoreTotal={activeRow.total}
+            isLoading={isSaving}
+            onChange={handleChangeEditor}
             onSaveSuccess={fetchScoringMembers}
-            onClose={() => closeEditor()}
+            onClose={() => dispatchEditor({ type: "CLOSED" })}
           />
         </div>
       )}
@@ -281,5 +341,33 @@ const ExpanderButton = styled.button`
     box-shadow: 0 0 0 1px #2684ff;
   }
 `;
+
+/* =========================== */
+
+const defaultEditorState = { selectedMemberId: null, editorValue: null };
+
+function editorReducer(state, action) {
+  switch (action.type) {
+    case "CLOSED": {
+      return defaultEditorState;
+    }
+
+    case "SELECT_ROW": {
+      return { ...defaultEditorState, selectedMemberId: action.payload };
+    }
+
+    case "UPDATE_SELECTED_ROW": {
+      return { ...state, selectedMemberId: action.payload };
+    }
+
+    case "UPDATE_EDITOR_VALUE": {
+      return { ...state, editorValue: action.payload };
+    }
+
+    default: {
+      return state;
+    }
+  }
+}
 
 export { ScoringTable };

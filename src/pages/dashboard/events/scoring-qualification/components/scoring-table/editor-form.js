@@ -13,6 +13,19 @@ function EditorForm({ scoresData, isLoading, onChange }) {
   const scoresFromProp = _makeScoresDataFromProp(scoresData);
 
   const [selectedScore, setSelectedScore] = React.useState(null);
+  const [nextFocusedSeletor, setNextFocusedSeletor] = React.useState({
+    rambahanIndex: 0,
+    shotIndex: 0,
+  });
+
+  const shouldFocusSelector = (rambahanIndex, shotIndex) => {
+    return (
+      scoresData &&
+      !isLoading &&
+      rambahanIndex === nextFocusedSeletor.rambahanIndex &&
+      shotIndex === nextFocusedSeletor.shotIndex
+    );
+  };
 
   React.useEffect(() => {
     if (!selectedScore) {
@@ -23,6 +36,20 @@ function EditorForm({ scoresData, isLoading, onChange }) {
 
   const handleSelectScore = (selectData) => {
     setSelectedScore(selectData);
+
+    if (selectData.rambahan >= 5 && selectData.shot >= 5) {
+      return;
+    } else if (selectData.shot >= 5) {
+      setNextFocusedSeletor({
+        rambahanIndex: selectData.rambahan + 1,
+        shotIndex: 0,
+      });
+    } else {
+      setNextFocusedSeletor({
+        rambahanIndex: selectData.rambahan,
+        shotIndex: selectData.shot + 1,
+      });
+    }
   };
 
   return (
@@ -55,6 +82,8 @@ function EditorForm({ scoresData, isLoading, onChange }) {
                           score: value,
                         });
                       }}
+                      isFocus={shouldFocusSelector(rambahanIndex, shotIndex)}
+                      onFocus={() => setNextFocusedSeletor({ rambahanIndex, shotIndex })}
                     />
                   </td>
                 ))}

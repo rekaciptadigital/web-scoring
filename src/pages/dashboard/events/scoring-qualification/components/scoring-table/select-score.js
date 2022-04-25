@@ -10,9 +10,17 @@ const optionsScoreNumbers = ["m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value
 
 const Select = React.memo(ReactSelect);
 
-function SelectScore({ name, value, onChange }) {
+function SelectScore({ name, value, onChange, isFocus, onFocus }) {
   const covertedValueType = _convertScoreValueType(value);
   const selectedOption = _getOptionFromValue(covertedValueType);
+  const refSelect = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!isFocus) {
+      return;
+    }
+    refSelect.current?.focus();
+  }, [isFocus]);
 
   const handleChange = React.useCallback(
     (option) => {
@@ -26,6 +34,8 @@ function SelectScore({ name, value, onChange }) {
 
   const handleNoOption = React.useCallback(() => "-", []);
 
+  const handleFocus = React.useCallback(onFocus, []);
+
   return (
     <SelectContainer>
       <Select
@@ -33,9 +43,11 @@ function SelectScore({ name, value, onChange }) {
         placeholder="-"
         styles={customSelectStyles}
         onChange={handleChange}
+        onFocus={handleFocus}
         value={selectedOption}
         options={optionsScoreNumbers}
         noOptionsMessage={handleNoOption}
+        ref={refSelect}
       />
     </SelectContainer>
   );

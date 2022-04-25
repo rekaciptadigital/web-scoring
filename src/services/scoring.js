@@ -11,4 +11,15 @@ export default {
     const qs = { event_category_id };
     return API.get("/web/v1/archery-score-sheet/download", qs);
   },
+
+  // V2
+
+  /**
+   * @param {Object} queryString { event_category_id, name }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getQualificationScoringMembersV2({ event_category_id, name = "" }) {
+    const queryString = { event_category_id, name: name || undefined };
+    return API.get("/web/v2/scorer-qualification", queryString);
+  },
 };

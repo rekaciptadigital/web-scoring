@@ -6,7 +6,6 @@ import { Container } from "reactstrap";
 
 import IconHome from "components/ma/icons/mono/home";
 import IconBudRest from "components/ma/icons/mono/bud-rest";
-import IconHelpCircle from "components/ma/icons/mono/help-circle";
 import IconFile from "components/ma/icons/mono/file";
 
 function SubNavbar() {

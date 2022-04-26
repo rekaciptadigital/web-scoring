@@ -13,17 +13,17 @@ function EditorForm({ scoresData, isLoading, onChange }) {
   const scoresFromProp = _makeScoresDataFromProp(scoresData);
 
   const [selectedScore, setSelectedScore] = React.useState(null);
-  const [nextFocusedSeletor, setNextFocusedSeletor] = React.useState({
+  const [nextFocusedSelector, setNextFocusedSelector] = React.useState({
     rambahanIndex: 0,
     shotIndex: 0,
   });
 
   const shouldFocusSelector = (rambahanIndex, shotIndex) => {
     return (
-      scoresData &&
+      Boolean(scoresData) &&
       !isLoading &&
-      rambahanIndex === nextFocusedSeletor.rambahanIndex &&
-      shotIndex === nextFocusedSeletor.shotIndex
+      rambahanIndex === nextFocusedSelector.rambahanIndex &&
+      shotIndex === nextFocusedSelector.shotIndex
     );
   };
 
@@ -40,12 +40,12 @@ function EditorForm({ scoresData, isLoading, onChange }) {
     if (selectData.rambahan >= 5 && selectData.shot >= 5) {
       return;
     } else if (selectData.shot >= 5) {
-      setNextFocusedSeletor({
+      setNextFocusedSelector({
         rambahanIndex: selectData.rambahan + 1,
         shotIndex: 0,
       });
     } else {
-      setNextFocusedSeletor({
+      setNextFocusedSelector({
         rambahanIndex: selectData.rambahan,
         shotIndex: selectData.shot + 1,
       });
@@ -68,10 +68,10 @@ function EditorForm({ scoresData, isLoading, onChange }) {
           <tbody>
             {[1, 2, 3, 4, 5, 6].map((rambahanNumber, rambahanIndex) => (
               <tr key={rambahanNumber}>
-                <td>{rambahanNumber}</td>
+                <RambahanCell>{rambahanNumber}</RambahanCell>
 
                 {scoresFromProp[rambahanNumber].map((scoreItem, shotIndex) => (
-                  <td key={shotIndex}>
+                  <RambahanCell key={shotIndex}>
                     <SelectScore
                       name={`shot-score-${rambahanIndex}-${shotIndex}`}
                       value={scoreItem}
@@ -83,35 +83,16 @@ function EditorForm({ scoresData, isLoading, onChange }) {
                         });
                       }}
                       isFocus={shouldFocusSelector(rambahanIndex, shotIndex)}
-                      onFocus={() => setNextFocusedSeletor({ rambahanIndex, shotIndex })}
+                      onFocus={() => setNextFocusedSelector({ rambahanIndex, shotIndex })}
                     />
-                  </td>
+                  </RambahanCell>
                 ))}
 
-                <td>{_sumRambahanTotal(scoresFromProp[rambahanNumber])}</td>
+                <RambahanCell>{_sumRambahanTotal(scoresFromProp[rambahanNumber])}</RambahanCell>
               </tr>
             ))}
           </tbody>
         </ScoresTable>
-
-        <ShotOffBar>
-          <ShotOffGroup>
-            <div>S-Off</div>
-            <ShotOffGroup>
-              {[1, 2, 3].map((number) => (
-                <SelectScore
-                  key={number}
-                  name={`shot-off-score-${number}`}
-                  value=""
-                  // onChange={handleSelectScore}
-                />
-              ))}
-            </ShotOffGroup>
-          </ShotOffGroup>
-
-          {/* TODO: nilai dari data */}
-          <div>{0}</div>
-        </ShotOffBar>
       </SessionBody>
 
       <SessionStatsFooter>
@@ -169,7 +150,7 @@ function StatTotal({ children, amount, isLoading }) {
   return (
     <StatItem>
       <span>Total:</span>
-      <TotalNumber>{children || amount}</TotalNumber>
+      <TotalNumber>{children || amount || 0}</TotalNumber>
     </StatItem>
   );
 }
@@ -237,24 +218,14 @@ const ScoresTable = styled.table`
     color: var(--ma-txt-black);
     font-weight: 600;
   }
+`;
 
-  td {
+const RambahanCell = styled.td`
+  ${ScoresTable} & {
+    padding: 0.5rem 0.25rem;
     text-align: center;
     vertical-align: middle;
   }
-`;
-
-const ShotOffBar = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  padding: 0.5rem;
-`;
-
-const ShotOffGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 `;
 
 /* ============================ */

@@ -4,6 +4,7 @@ import { useScoringDetail } from "../../hooks/scoring-details";
 import { useSubmitScore } from "../../hooks/submit-score";
 
 import { EditorForm } from "./editor-form";
+import { EditorFormShootOff } from "./editor-form-shootoff";
 
 import IconX from "components/ma/icons/mono/x";
 
@@ -26,6 +27,15 @@ function ScoreEditor({
   const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
   const { submitScore, isLoading: isSubmiting } = useSubmitScore();
 
+  const {
+    data: formShootOffValue,
+    isDirty: isFormShootOffDirty,
+    setShotOffValue,
+    resetFormShootOff,
+  } = useFormShootOff(scoreDetail);
+
+  const isLoadingForm = isLoadingFromProp || isLoadingScore || isSubmiting;
+
   React.useEffect(() => {
     if (!formValues || !onChange) {
       return;
@@ -42,8 +52,13 @@ function ScoreEditor({
   }, [isFormDirty, sessionNumber, code, formValues]);
 
   const handleChangeSession = (targetSessionNumber) => {
-    if (!isFormDirty) {
-      resetForm();
+    if (targetSessionNumber === sessionNumber) {
+      return;
+    }
+
+    if (!isFormDirty || !isFormShootOffDirty) {
+      formValues && resetForm();
+      formShootOffValue && resetFormShootOff();
       setSessionNumber(targetSessionNumber);
       return;
     }
@@ -107,12 +122,21 @@ function ScoreEditor({
         </div>
       </EditorHeader>
 
-      <EditorForm
-        key={sessionNumber}
-        isLoading={isLoadingFromProp || isLoadingScore || isSubmiting}
-        scoresData={formValues}
-        onChange={(scoresData) => setFormValues(scoresData)}
-      />
+      {sessionNumber === 11 ? (
+        <EditorFormShootOff
+          key={sessionNumber}
+          isLoading={isLoadingForm}
+          shootOffData={formShootOffValue}
+          onChange={(shootOffData) => setShotOffValue(shootOffData)}
+        />
+      ) : (
+        <EditorForm
+          key={sessionNumber}
+          isLoading={isLoadingForm}
+          scoresData={formValues}
+          onChange={(scoresData) => setFormValues(scoresData)}
+        />
+      )}
     </ScoreEditorContainer>
   );
 }
@@ -126,20 +150,39 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
     );
   }
 
+  const hasShootOff = sessions.indexOf(11) >= 0;
+
   return (
     <SessionTabListContainer>
-      {sessions.map((sessionNumber) => (
-        <li key={sessionNumber}>
-          <SessionTabButton
-            className={classnames({
-              "session-tab-active": parseInt(sessionNumber) === parseInt(currentSession),
-            })}
-            onClick={() => onChange?.(parseInt(sessionNumber))}
-          >
-            Sesi {sessionNumber}
-          </SessionTabButton>
-        </li>
-      ))}
+      {sessions.map((sessionNumber) => {
+        const isTabActive = parseInt(sessionNumber) === parseInt(currentSession);
+        return (
+          <li key={sessionNumber}>
+            <SessionTabButton
+              disabled={isTabActive}
+              className={classnames({ "session-tab-active": isTabActive })}
+              onClick={() => onChange?.(parseInt(sessionNumber))}
+            >
+              Sesi {sessionNumber}
+            </SessionTabButton>
+          </li>
+        );
+      })}
+
+      {/* Tab spesial shoot off */}
+      <li>
+        <SessionTabButton
+          title={!hasShootOff ? "Shoot Off tidak diberlakukan" : undefined}
+          disabled={parseInt(currentSession) === 11 || !hasShootOff}
+          className={classnames({
+            "session-tab-active": parseInt(currentSession) === 11,
+            "shootoff-tab-disabled": !hasShootOff,
+          })}
+          onClick={() => onChange?.(11)}
+        >
+          S-Off
+        </SessionTabButton>
+      </li>
     </SessionTabListContainer>
   );
 }
@@ -151,6 +194,7 @@ const ScoreEditorContainer = styled.div`
   position: sticky;
   top: var(--ma-header-height);
   bottom: 0;
+  min-width: 31rem;
   padding: 0.5rem;
   background-color: var(--ma-gray-50);
 
@@ -216,6 +260,14 @@ const SessionTabButton = styled.button`
 
   position: relative;
 
+  &.shootoff-tab-disabled {
+    color: var(--ma-gray-200);
+
+    &:disabled {
+      color: var(--ma-gray-200);
+    }
+  }
+
   &::before {
     content: " ";
     position: absolute;
@@ -256,17 +308,6 @@ const EditorCloseButton = styled.button`
   }
 `;
 
-// eslint-disable-next-line no-unused-vars
-const EmptySession = styled.div`
-  min-width: 30rem;
-  min-height: 10rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--ma-gray-400);
-  font-weight: 600;
-`;
-
 /* ========================= */
 // hook
 
@@ -284,14 +325,7 @@ function useForm(scoreDetail) {
       }
 
       case "CHANGE": {
-        return {
-          ...state,
-          isDirty: true,
-          data: {
-            ...state.data,
-            ...action.payload,
-          },
-        };
+        return { isDirty: true, data: action.payload };
       }
 
       case "FORCE_MARKED_DIRTY": {
@@ -305,7 +339,8 @@ function useForm(scoreDetail) {
   }, defaultFormState);
 
   React.useEffect(() => {
-    if (!scoreDetail?.score) {
+    const isRegularSession = parseInt(scoreDetail?.session) !== 11;
+    if (!scoreDetail?.score || !isRegularSession) {
       return;
     }
     dispatch({ type: "INIT", payload: scoreDetail.score });
@@ -316,6 +351,43 @@ function useForm(scoreDetail) {
   const markFormAsDirty = () => dispatch({ type: "FORCE_MARKED_DIRTY" });
 
   return { ...formState, setFormValues, markFormAsDirty, resetForm };
+}
+
+function useFormShootOff(scoreDetail) {
+  const [formState, dispatch] = React.useReducer((state, action) => {
+    switch (action.type) {
+      case "RESET": {
+        return defaultFormState;
+      }
+
+      case "INIT": {
+        return { ...defaultFormState, data: action.payload };
+      }
+
+      case "CHANGE": {
+        return { isDirty: true, data: action.payload };
+      }
+
+      default: {
+        return state;
+      }
+    }
+  }, defaultFormState);
+
+  React.useEffect(() => {
+    const isShootOffSession = parseInt(scoreDetail?.session) === 11;
+    if (!scoreDetail?.score || !isShootOffSession) {
+      return;
+    }
+    dispatch({ type: "INIT", payload: scoreDetail.score });
+  }, [scoreDetail]);
+
+  const setShotOffValue = (payload) => {
+    dispatch({ type: "CHANGE", payload: payload });
+  };
+  const resetFormShootOff = () => dispatch({ type: "RESET" });
+
+  return { ...formState, setShotOffValue, resetFormShootOff };
 }
 
 /* =============================== */

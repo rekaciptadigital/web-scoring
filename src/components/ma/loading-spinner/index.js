@@ -19,3 +19,4 @@ const StyledSpinnerContainer = styled.div`
 `;
 
 export { SpinnerDotBlock };
+export * from "./loading-screen-portal";

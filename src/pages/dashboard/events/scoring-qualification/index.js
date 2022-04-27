@@ -9,6 +9,8 @@ import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
 import { SearchBox } from "./components/search-box";
+import { ProcessingToast } from "./components/processing-toast";
+import { EliminationConfigBar } from "./components/elimination-config-bar";
 
 import IconDownload from "components/ma/icons/mono/download";
 
@@ -30,6 +32,14 @@ function PageEventScoringQualification() {
     selectOptionGenderCategory,
   } = useCategoriesWithFilters(categoryDetails);
 
+  const [isEliminationUnlocked, setEliminationUnlocked] = React.useState(false);
+  const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(undefined);
+
+  const resetOnChangeCategory = () => {
+    setEliminationUnlocked(false);
+    setEliminationParticipantsCount(undefined);
+  };
+
   const isPreparingInitialData = !categoryDetails && isLoadingCategoryDetails;
 
   if (isPreparingInitialData) {
@@ -42,13 +52,18 @@ function PageEventScoringQualification() {
 
   return (
     <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
+      <ProcessingToast />
+
       <TabBar>
         <TabButtonList>
           {optionsCompetitionCategory.map((option) => (
             <li key={option.competitionCategory}>
               <TabButton
                 className={classnames({ "tab-active": option.isActive })}
-                onClick={() => selectOptionCompetitionCategory(option.competitionCategory)}
+                onClick={() => {
+                  resetOnChangeCategory();
+                  selectOptionCompetitionCategory(option.competitionCategory);
+                }}
               >
                 {option.competitionCategory}
               </TabButton>
@@ -68,7 +83,10 @@ function PageEventScoringQualification() {
                     <li key={option.ageCategory}>
                       <FilterItemButton
                         className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => selectOptionAgeCategory(option.ageCategory)}
+                        onClick={() => {
+                          resetOnChangeCategory();
+                          selectOptionAgeCategory(option.ageCategory);
+                        }}
                       >
                         {option.ageCategory}
                       </FilterItemButton>
@@ -88,7 +106,10 @@ function PageEventScoringQualification() {
                     <li key={option.genderCategory}>
                       <FilterItemButton
                         className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => selectOptionGenderCategory(option.genderCategory)}
+                        onClick={() => {
+                          resetOnChangeCategory();
+                          selectOptionGenderCategory(option.genderCategory);
+                        }}
                       >
                         {option.genderCategoryLabel}
                       </FilterItemButton>
@@ -101,27 +122,33 @@ function PageEventScoringQualification() {
             </CategoryFilter>
           </FilterBars>
 
-          <HorizontalSpaced>
-            <SearchBox placeholder="Cari peserta" disabled />
-            <ButtonOutlineBlue disabled>
-              <IconDownload size="16" /> Unduh Dokumen
-            </ButtonOutlineBlue>
-          </HorizontalSpaced>
+          <ToolbarRight>
+            <EliminationConfigBar
+              key={activeCategoryDetail?.categoryDetailId}
+              isShow={isEliminationUnlocked}
+              onChangeParticipantsCount={setEliminationParticipantsCount}
+            />
+
+            <ButtonsOnRight>
+              <SearchBox placeholder="Cari peserta" disabled />
+              <ButtonOutlineBlue disabled>
+                <IconDownload size="16" /> Unduh Dokumen
+              </ButtonOutlineBlue>
+            </ButtonsOnRight>
+          </ToolbarRight>
         </ToolbarTop>
 
         <ScoringTable
           key={activeCategoryDetail?.categoryDetailId}
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
+          onChangeProgressStatus={(progress) => setEliminationUnlocked(progress.isComplete)}
+          onChangeParticipantPresence={() => setEliminationParticipantsCount(undefined)}
+          eliminationParticipantsCount={eliminationParticipantsCount}
         />
       </ViewWrapper>
     </ContentLayoutWrapper>
   );
 }
-
-const HorizontalSpaced = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
 
 const ViewWrapper = styled.div`
   padding: 1.875rem;
@@ -203,6 +230,25 @@ const ToolbarTop = styled.div`
 const FilterBars = styled.div`
   > * + * {
     margin-top: 1.5rem;
+  }
+`;
+
+const ToolbarRight = styled.div`
+  > * + * {
+    margin-top: 0.75rem;
+  }
+`;
+
+const ButtonsOnRight = styled.div`
+  display: flex;
+  gap: 0.5rem;
+
+  > *:first-of-type {
+    flex-grow: 1;
+  }
+
+  > *:nth-of-type(2) {
+    flex-shrink: 0;
   }
 `;
 

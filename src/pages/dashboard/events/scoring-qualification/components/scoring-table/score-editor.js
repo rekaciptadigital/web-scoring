@@ -21,7 +21,7 @@ function ScoreEditor({
 }) {
   const [sessionNumber, setSessionNumber] = React.useState(1);
 
-  const code = _makeQualificationCode({ memberId, sessionNumber });
+  const code = _makeQualificationCode(memberId, sessionNumber);
   const { data: scoreDetail, isLoading: isLoadingScore } = useScoringDetail(code);
 
   const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
@@ -41,14 +41,14 @@ function ScoreEditor({
       return;
     }
 
-    const componentValue = {
+    const editorValue = {
       sessionNumber: sessionNumber,
       sessionCode: code,
       value: formValues,
       isDirty: isFormDirty,
     };
 
-    onChange(componentValue);
+    onChange?.(editorValue);
   }, [isFormDirty, sessionNumber, code, formValues]);
 
   const handleChangeSession = (targetSessionNumber) => {
@@ -56,24 +56,45 @@ function ScoreEditor({
       return;
     }
 
-    if (!isFormDirty || !isFormShootOffDirty) {
-      formValues && resetForm();
-      formShootOffValue && resetFormShootOff();
-      setSessionNumber(targetSessionNumber);
-      return;
-    }
+    if (sessionNumber === 11) {
+      // shoot off
+      if (!isFormShootOffDirty) {
+        resetFormShootOff();
+        setSessionNumber(targetSessionNumber);
+        return;
+      }
 
-    const payload = { code: code, shoot_scores: formValues };
-    submitScore(payload, {
-      onSuccess() {
+      const payload = { code: code, shoot_scores: formShootOffValue };
+      submitScore(payload, {
+        onSuccess() {
+          resetFormShootOff();
+          setSessionNumber(targetSessionNumber);
+          onSaveSuccess?.();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    } else {
+      // sesi biasa
+      if (!isFormDirty) {
         resetForm();
         setSessionNumber(targetSessionNumber);
-        onSaveSuccess?.();
-      },
-      onError() {
-        // TODO: prompt retry / switch without saving anyway
-      },
-    });
+        return;
+      }
+
+      const payload = { code: code, shoot_scores: formValues };
+      submitScore(payload, {
+        onSuccess() {
+          resetForm();
+          setSessionNumber(targetSessionNumber);
+          onSaveSuccess?.();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    }
   };
 
   const handleCloseEditor = () => {
@@ -393,7 +414,7 @@ function useFormShootOff(scoreDetail) {
 /* =============================== */
 // utils
 
-function _makeQualificationCode({ memberId, sessionNumber }) {
+function _makeQualificationCode(memberId, sessionNumber) {
   if (!memberId || !sessionNumber) {
     return null;
   }

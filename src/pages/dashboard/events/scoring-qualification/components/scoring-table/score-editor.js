@@ -13,6 +13,7 @@ import classnames from "classnames";
 function ScoreEditor({
   memberId,
   sessionNumbersList,
+  hasShootOff = false,
   scoreTotal,
   isLoading: isLoadingFromProp,
   onChange,
@@ -122,6 +123,7 @@ function ScoreEditor({
           <EditorHeaderContent>
             <SessionTabList
               sessions={sessionNumbersList}
+              hasShootOff={hasShootOff}
               currentSession={sessionNumber}
               onChange={handleChangeSession}
             />
@@ -144,12 +146,16 @@ function ScoreEditor({
       </EditorHeader>
 
       {sessionNumber === 11 ? (
-        <EditorFormShootOff
-          key={sessionNumber}
-          isLoading={isLoadingForm}
-          shootOffData={formShootOffValue}
-          onChange={(shootOffData) => setShotOffValue(shootOffData)}
-        />
+        hasShootOff ? (
+          <EditorFormShootOff
+            key={sessionNumber}
+            isLoading={isLoadingForm}
+            shootOffData={formShootOffValue}
+            onChange={(shootOffData) => setShotOffValue(shootOffData)}
+          />
+        ) : (
+          <EmptySheetBox>Shoot off tidak diberlakukan</EmptySheetBox>
+        )
       ) : (
         <EditorForm
           key={sessionNumber}
@@ -162,7 +168,21 @@ function ScoreEditor({
   );
 }
 
-function SessionTabList({ sessions, currentSession = 1, onChange }) {
+function SessionTabList({ sessions, hasShootOff, currentSession = 1, onChange }) {
+  const _checkIsTabActive = (sessionNumber) => {
+    return parseInt(sessionNumber) === parseInt(currentSession);
+  };
+  const isShootOffActive = parseInt(currentSession) === 11;
+
+  // Balik ke tab sesi 1 kalau state peserta berubah
+  // jadi gak punya shoot off
+  React.useEffect(() => {
+    if (hasShootOff || !isShootOffActive) {
+      return;
+    }
+    onChange?.(1);
+  }, [hasShootOff]);
+
   if (!sessions) {
     return (
       <SessionTabListContainer>
@@ -171,32 +191,27 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
     );
   }
 
-  const hasShootOff = sessions.indexOf(11) >= 0;
-
   return (
     <SessionTabListContainer>
-      {sessions.map((sessionNumber) => {
-        const isTabActive = parseInt(sessionNumber) === parseInt(currentSession);
-        return (
-          <li key={sessionNumber}>
-            <SessionTabButton
-              disabled={isTabActive}
-              className={classnames({ "session-tab-active": isTabActive })}
-              onClick={() => onChange?.(parseInt(sessionNumber))}
-            >
-              Sesi {sessionNumber}
-            </SessionTabButton>
-          </li>
-        );
-      })}
+      {sessions.map((sessionNumber) => (
+        <li key={sessionNumber}>
+          <SessionTabButton
+            disabled={_checkIsTabActive(sessionNumber)}
+            className={classnames({ "session-tab-active": _checkIsTabActive(sessionNumber) })}
+            onClick={() => onChange?.(parseInt(sessionNumber))}
+          >
+            Sesi {sessionNumber}
+          </SessionTabButton>
+        </li>
+      ))}
 
       {/* Tab spesial shoot off */}
       <li>
         <SessionTabButton
           title={!hasShootOff ? "Shoot Off tidak diberlakukan" : undefined}
-          disabled={parseInt(currentSession) === 11 || !hasShootOff}
+          disabled={isShootOffActive || !hasShootOff}
           className={classnames({
-            "session-tab-active": parseInt(currentSession) === 11,
+            "session-tab-active": isShootOffActive,
             "shootoff-tab-disabled": !hasShootOff,
           })}
           onClick={() => onChange?.(11)}
@@ -327,6 +342,17 @@ const EditorCloseButton = styled.button`
   &:hover {
     box-shadow: 0 0 0 1px var(--ma-gray-200);
   }
+`;
+
+const EmptySheetBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: var(--ma-gray-200);
+  font-weight: 600;
 `;
 
 /* ========================= */

@@ -27,7 +27,7 @@ function useScoringMembers(categoryDetailId, searchQuery, eliminationParticipant
     if (!fetcher.data?.length) {
       return null;
     }
-    return Object.keys(fetcher.data[0].sessions);
+    return Object.keys(fetcher.data[0].sessions).map((key) => parseInt(key));
   };
 
   return { ...fetcher, getSessionNumbersList, fetchScoringMembers };

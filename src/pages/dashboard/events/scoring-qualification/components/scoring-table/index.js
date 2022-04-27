@@ -258,6 +258,7 @@ function ScoringTable({
               memberId={activeRow.member.id}
               sessionNumbersList={sessionNumbersList}
               scoreTotal={activeRow.total}
+              hasShootOff={parseInt(activeRow.haveShootOff) === 1}
               isLoading={isSaving}
               onChange={handleChangeEditor}
               onSaveSuccess={fetchScoringMembers}

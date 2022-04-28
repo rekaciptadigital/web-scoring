@@ -3,13 +3,14 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
+import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
 import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
 import { SearchBox } from "./components/search-box";
-import { ProcessingToast } from "./components/processing-toast";
+import { ProcessingToast, toast } from "./components/processing-toast";
 import { EliminationConfigBar } from "./components/elimination-config-bar";
 
 import IconDownload from "components/ma/icons/mono/download";
@@ -37,6 +38,10 @@ function PageEventScoringQualification() {
 
   const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(
     DEFAULT_PARTICIPANTS_COUNT
+  );
+
+  const { handleDownloadScoresheet } = useScoresheetDownload(
+    activeCategoryDetail?.categoryDetailId
   );
 
   const resetOnChangeCategory = () => {
@@ -138,9 +143,24 @@ function PageEventScoringQualification() {
                 value={inputSearchQuery}
                 onChange={(ev) => setInputSearchQuery(ev.target.value)}
               />
-              <ButtonOutlineBlue disabled>
-                <IconDownload size="16" /> Unduh Dokumen
-              </ButtonOutlineBlue>
+
+              <div>
+                <ButtonOutlineBlue
+                  onClick={() => {
+                    toast.loading("Sedang menyiapkan dokumen scoresheet...");
+                    handleDownloadScoresheet({
+                      onSuccess() {
+                        toast.dismiss();
+                      },
+                    });
+                  }}
+                >
+                  <span>
+                    <IconDownload size="16" />
+                  </span>{" "}
+                  <span>Unduh Dokumen</span>
+                </ButtonOutlineBlue>
+              </div>
             </ButtonsOnRight>
           </ToolbarRight>
         </ToolbarTop>

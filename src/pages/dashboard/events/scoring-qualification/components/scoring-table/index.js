@@ -21,19 +21,18 @@ function ScoringTable({
   categoryDetailId,
   eliminationParticipantsCount,
   onChangeParticipantPresence,
+  searchName,
 }) {
   const { event_id } = useParams();
   const eventId = event_id;
 
-  // TODO: do something with it
-  const searchQuery = undefined;
-
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
+    isSearchMode,
     getSessionNumbersList,
     fetchScoringMembers,
-  } = useScoringMembers(categoryDetailId, searchQuery, eliminationParticipantsCount);
+  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount);
   const { submitParticipantPresence, isLoading: isLoadingCheckPresence } = useParticipantPresence();
   const {
     isEditorOpen,
@@ -43,7 +42,7 @@ function ScoringTable({
     selectRow,
     closeEditor,
     updateEditorValue,
-  } = useScoreEditor(scoringMembers);
+  } = useScoreEditor(scoringMembers, isSearchMode);
   const { submitScore, isLoading: isSaving } = useSubmitScore();
 
   const sessionNumbersList = getSessionNumbersList();
@@ -138,6 +137,7 @@ function ScoringTable({
 
       <TableContainer>
         <div>
+          <LoadingBlocker isLoading={isLoadingScoringMembers} />
           <MembersTable className="table table-responsive">
             <thead>
               <tr>
@@ -350,6 +350,17 @@ function CheckboxWithPrompt({ checked, onChange, title, disabled }) {
   );
 }
 
+function LoadingBlocker({ isLoading = true }) {
+  if (!isLoading) {
+    return null;
+  }
+  return (
+    <LoadingContainer>
+      <SpinnerDotBlock />
+    </LoadingContainer>
+  );
+}
+
 /* =============================== */
 // styles
 
@@ -369,6 +380,7 @@ const EmptyMembers = styled.div`
 `;
 
 const TableContainer = styled.div`
+  position: relative;
   display: flex;
 
   > *:first-child {
@@ -479,6 +491,16 @@ const CheckboxWrapper = styled.span`
   .rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner:after {
     border-color: #ffffff;
   }
+`;
+
+const LoadingContainer = styled.div`
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.6);
 `;
 
 export { ScoringTable };

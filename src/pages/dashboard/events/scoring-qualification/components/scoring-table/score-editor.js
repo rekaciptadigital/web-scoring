@@ -100,7 +100,6 @@ function ScoreEditorControl({
       value: formShootOffValue?.map?.((shot) => ({
         score: shot.score,
         distance_from_x: shot.distance,
-        status: "",
       })),
       isDirty: isFormShootOffDirty,
     };

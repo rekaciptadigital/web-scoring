@@ -31,6 +31,7 @@ function PageEventScoringQualification() {
     selectOptionAgeCategory,
     selectOptionGenderCategory,
   } = useCategoriesWithFilters(categoryDetails);
+  const [inputSearchQuery, setInputSearchQuery] = React.useState("");
 
   const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(undefined);
 
@@ -128,7 +129,11 @@ function PageEventScoringQualification() {
             />
 
             <ButtonsOnRight>
-              <SearchBox placeholder="Cari peserta" disabled />
+              <SearchBox
+                placeholder="Cari peserta"
+                value={inputSearchQuery}
+                onChange={(ev) => setInputSearchQuery(ev.target.value)}
+              />
               <ButtonOutlineBlue disabled>
                 <IconDownload size="16" /> Unduh Dokumen
               </ButtonOutlineBlue>
@@ -139,6 +144,7 @@ function PageEventScoringQualification() {
         <ScoringTable
           key={activeCategoryDetail?.categoryDetailId}
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
+          searchName={inputSearchQuery}
           onChangeParticipantPresence={() => setEliminationParticipantsCount(undefined)}
           eliminationParticipantsCount={eliminationParticipantsCount}
         />

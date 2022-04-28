@@ -2,14 +2,17 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { ScoringService } from "services";
 
-function useScoringMembers(categoryDetailId, searchQuery, eliminationParticipantsCount) {
+const DEBOUNCE_TIMER_MS = 650;
+
+function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationParticipantsCount) {
   const fetcher = useFetcher();
+  const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
 
   const fetchScoringMembers = () => {
     const getFunction = () => {
       return ScoringService.getQualificationScoringMembersV2({
         event_category_id: categoryDetailId,
-        name: searchQuery?.name,
+        name: debouncedSearchQuery || undefined,
         elimination_template: eliminationParticipantsCount,
       });
     };
@@ -21,7 +24,16 @@ function useScoringMembers(categoryDetailId, searchQuery, eliminationParticipant
       return;
     }
     fetchScoringMembers();
-  }, [categoryDetailId, eliminationParticipantsCount]);
+  }, [categoryDetailId, eliminationParticipantsCount, debouncedSearchQuery]);
+
+  React.useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setDebouncedInputSearchQuery(inputSearchQuery);
+    }, DEBOUNCE_TIMER_MS);
+    return () => clearTimeout(debounceTimer);
+  }, [inputSearchQuery]);
+
+  const isSearchMode = Boolean(debouncedSearchQuery);
 
   const getSessionNumbersList = () => {
     if (!fetcher.data?.length) {
@@ -30,7 +42,12 @@ function useScoringMembers(categoryDetailId, searchQuery, eliminationParticipant
     return Object.keys(fetcher.data[0].sessions).map((key) => parseInt(key));
   };
 
-  return { ...fetcher, getSessionNumbersList, fetchScoringMembers };
+  return {
+    ...fetcher,
+    isSearchMode,
+    getSessionNumbersList,
+    fetchScoringMembers,
+  };
 }
 
 function transform(initialScoringMembers) {

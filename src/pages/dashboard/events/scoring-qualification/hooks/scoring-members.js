@@ -39,7 +39,9 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
     if (!fetcher.data?.length) {
       return null;
     }
-    return Object.keys(fetcher.data[0].sessions).map((key) => parseInt(key));
+    return Object.keys(fetcher.data[0].sessions)
+      .map((key) => parseInt(key))
+      .filter((sessionNumber) => sessionNumber !== 11);
   };
 
   return {

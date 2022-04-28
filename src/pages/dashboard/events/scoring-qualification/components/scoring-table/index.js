@@ -182,6 +182,7 @@ function ScoringTable({
                   <SessionStatsCellsGroup
                     collapsed={isEditorOpen}
                     sessions={row.sessions}
+                    sessionNumbersList={sessionNumbersList}
                     total={row.total}
                     totalX={row.totalX}
                     totalXPlusTen={row.totalXPlusTen}
@@ -273,7 +274,14 @@ function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
   );
 }
 
-function SessionStatsCellsGroup({ collapsed, sessions, total, totalX, totalXPlusTen }) {
+function SessionStatsCellsGroup({
+  collapsed,
+  sessions,
+  sessionNumbersList,
+  total,
+  totalX,
+  totalXPlusTen,
+}) {
   if (collapsed) {
     return <td className="stats">{total}</td>;
   }
@@ -290,7 +298,7 @@ function SessionStatsCellsGroup({ collapsed, sessions, total, totalX, totalXPlus
 
   return (
     <React.Fragment>
-      {Object.keys(sessions).map((sessionNumber) => (
+      {sessionNumbersList.map((sessionNumber) => (
         <td key={sessionNumber} className="stats">
           {<span>{sessions[sessionNumber]?.total}</span> || <GrayedOutText>&ndash;</GrayedOutText>}
         </td>

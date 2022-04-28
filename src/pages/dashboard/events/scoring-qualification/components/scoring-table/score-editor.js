@@ -10,7 +10,44 @@ import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
+/**
+ * Kontainer untuk render kondisional open/closed
+ * Komponen yang kerja beneran di bawah: `<ScoreEditorControl />`
+ */
 function ScoreEditor({
+  isOpen = false,
+  memberId,
+  sessionNumbersList,
+  hasShootOff = false,
+  scoreTotal,
+  isLoading,
+  onChange,
+  onSaveSuccess,
+  onClose,
+}) {
+  if (!isOpen) {
+    return null;
+  }
+
+  const controlProps = {
+    memberId,
+    sessionNumbersList,
+    hasShootOff,
+    scoreTotal,
+    isLoading,
+    onChange,
+    onSaveSuccess,
+    onClose,
+  };
+
+  return (
+    <div>
+      <ScoreEditorControl {...controlProps} />
+    </div>
+  );
+}
+
+function ScoreEditorControl({
   memberId,
   sessionNumbersList,
   hasShootOff = false,
@@ -24,19 +61,18 @@ function ScoreEditor({
 
   const code = _makeQualificationCode(memberId, sessionNumber);
   const { data: scoreDetail, isLoading: isLoadingScore } = useScoringDetail(code);
-
   const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
-  const { submitScore, isLoading: isSubmiting } = useSubmitScore();
-
   const {
     data: formShootOffValue,
     isDirty: isFormShootOffDirty,
     setShotOffValue,
     resetFormShootOff,
   } = useFormShootOff(scoreDetail);
+  const { submitScore, isLoading: isSubmiting } = useSubmitScore();
 
   const isLoadingForm = isLoadingFromProp || isLoadingScore || isSubmiting;
 
+  // On change dari form skoring biasa
   React.useEffect(() => {
     if (!formValues || !onChange) {
       return;
@@ -51,6 +87,26 @@ function ScoreEditor({
 
     onChange?.(editorValue);
   }, [isFormDirty, sessionNumber, code, formValues]);
+
+  // On change dari form skoring shoot off
+  React.useEffect(() => {
+    if (!formShootOffValue || !onChange) {
+      return;
+    }
+
+    const editorValueShootOff = {
+      sessionNumber: sessionNumber,
+      sessionCode: code,
+      value: formShootOffValue?.map?.((shot) => ({
+        score: shot.score,
+        distance_from_x: shot.distance,
+        status: "",
+      })),
+      isDirty: isFormShootOffDirty,
+    };
+
+    onChange?.(editorValueShootOff);
+  }, [isFormShootOffDirty, sessionNumber, code, formShootOffValue]);
 
   const handleChangeSession = (targetSessionNumber) => {
     if (targetSessionNumber === sessionNumber) {

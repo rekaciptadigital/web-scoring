@@ -5,11 +5,18 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { ButtonBlue } from "components/ma";
 
-function EliminationConfigBar({ isShow, onChangeParticipantsCount }) {
-  if (!isShow) {
-    return null;
-  }
+const optionsParticipantsCount = [
+  { value: 8, label: 8 },
+  { value: 16, label: 16 },
+  { value: 32, label: 32 },
+];
 
+function _getSelectedFromValue(valueParticipantsCount) {
+  valueParticipantsCount = valueParticipantsCount || 16;
+  return optionsParticipantsCount.find((option) => option.value === valueParticipantsCount);
+}
+
+function EliminationConfigBar({ participantsCount, onChangeParticipantsCount }) {
   const handleChangeParticipantsCount = (option) => {
     onChangeParticipantsCount?.(option.value);
   };
@@ -20,11 +27,8 @@ function EliminationConfigBar({ isShow, onChangeParticipantsCount }) {
         <label htmlFor="elimination-members-count">Jumlah Peserta Eliminasi</label>
         <Select
           placeholder="Jumlah peserta"
-          options={[
-            { value: 8, label: 8 },
-            { value: 16, label: 16 },
-            { value: 32, label: 32 },
-          ]}
+          value={_getSelectedFromValue(participantsCount)}
+          options={optionsParticipantsCount}
           onChange={handleChangeParticipantsCount}
         />
       </div>

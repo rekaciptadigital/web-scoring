@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useScoringMembers } from "../../hooks/scoring-members";
+import { useScoreEditor } from "../../hooks/score-editor";
 import { useParticipantPresence } from "../../hooks/participant-presence";
 import { useSubmitScore } from "../../hooks/submit-score";
 import { toast } from "../processing-toast";
@@ -18,7 +19,6 @@ import classnames from "classnames";
 
 function ScoringTable({
   categoryDetailId,
-  onChangeProgressStatus,
   eliminationParticipantsCount,
   onChangeParticipantPresence,
 }) {
@@ -30,98 +30,74 @@ function ScoringTable({
 
   const {
     data: scoringMembers,
-    isInit: isInitScoringMembers,
     isLoading: isLoadingScoringMembers,
     getSessionNumbersList,
     fetchScoringMembers,
   } = useScoringMembers(categoryDetailId, searchQuery, eliminationParticipantsCount);
   const { submitParticipantPresence, isLoading: isLoadingCheckPresence } = useParticipantPresence();
-  const [editor, dispatchEditor] = React.useReducer(editorReducer, defaultEditorState);
-
-  const { editorValue, selectedMemberId } = editor;
-
-  // di-memo jaga-jaga kalau row-nya banyak & rerendernya juga banyak
-  const activeRow = React.useMemo(() => {
-    if (!scoringMembers || !selectedMemberId) {
-      return null;
-    }
-    return scoringMembers.find((row) => row.member.id === selectedMemberId);
-  }, [scoringMembers, selectedMemberId]);
-
-  const sessionNumbersList = getSessionNumbersList();
-  const showEditor = activeRow !== null;
-  const isItemActive = (memberId) => activeRow?.member?.id === memberId;
-
+  const {
+    isEditorOpen,
+    activeRow,
+    editorValue,
+    checkIsRowActive,
+    selectRow,
+    closeEditor,
+    updateEditorValue,
+  } = useScoreEditor(scoringMembers);
   const { submitScore, isLoading: isSaving } = useSubmitScore();
 
-  const isStatusComplete = React.useMemo(() => {
-    if (!scoringMembers) {
-      return false;
-    }
-    const onlyIncludedMembers = scoringMembers.filter((row) => row.member.isPresent);
-    if (!onlyIncludedMembers.length) {
-      return false;
-    }
-    return !onlyIncludedMembers.some((row) => !row.total);
-  }, [scoringMembers]);
+  const sessionNumbersList = getSessionNumbersList();
 
-  const isStatusGoing = !isStatusComplete;
+  const _getParamEliminationTemplate = (count) => {
+    if (editorValue.sessionNumber !== 11) {
+      return;
+    }
+    return count;
+  };
 
-  React.useEffect(() => {
-    if (isInitScoringMembers || !scoringMembers) {
+  const handleClickSelectRow = (rowData) => {
+    if (!editorValue?.isDirty) {
+      selectRow(rowData.member.id);
       return;
     }
 
-    onChangeProgressStatus?.({
-      isComplete: isStatusComplete,
-      isGoing: isStatusGoing,
+    const payload = {
+      code: editorValue.sessionCode,
+      shoot_scores: editorValue.value,
+      elimination_template: _getParamEliminationTemplate(eliminationParticipantsCount),
+    };
+
+    submitScore(payload, {
+      onSuccess() {
+        selectRow(rowData.member.id);
+        fetchScoringMembers();
+      },
+      onError() {
+        // TODO: prompt retry / switch without saving anyway
+      },
     });
-  }, [scoringMembers]);
-
-  const handleChangeEditor = (editorValue) => {
-    dispatchEditor({ type: "UPDATE_EDITOR_VALUE", payload: editorValue });
-  };
-
-  const handleSelectRow = (rowData) => {
-    if (editorValue?.isDirty) {
-      const payload = {
-        code: editorValue.sessionCode,
-        shoot_scores: editorValue.value,
-      };
-
-      submitScore(payload, {
-        onSuccess() {
-          dispatchEditor({ type: "SELECT_ROW", payload: rowData.member.id });
-          fetchScoringMembers();
-        },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
-      });
-    } else {
-      dispatchEditor({ type: "SELECT_ROW", payload: rowData.member.id });
-    }
   };
 
   const handleCollapseEditor = () => {
-    if (editorValue?.isDirty) {
-      const payload = {
-        code: editorValue.sessionCode,
-        shoot_scores: editorValue.value,
-      };
-
-      submitScore(payload, {
-        onSuccess() {
-          dispatchEditor({ type: "CLOSED" });
-          fetchScoringMembers();
-        },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
-      });
-    } else {
-      dispatchEditor({ type: "CLOSED" });
+    if (!editorValue?.isDirty) {
+      closeEditor();
+      return;
     }
+
+    const payload = {
+      code: editorValue.sessionCode,
+      shoot_scores: editorValue.value,
+    };
+
+    submitScore(payload, {
+      onSuccess() {
+        closeEditor();
+        fetchScoringMembers();
+      },
+      onError() {
+        // TODO: prompt retry / switch without saving anyway
+      },
+    });
   };
 
   const checkPresenceByRow = (row) => {
@@ -140,9 +116,9 @@ function ScoringTable({
 
         // let's just take it for granted, for a moment
         // hard to explain
-        onChangeParticipantPresence?.();
+        onChangeParticipantPresence?.(); // <- ini akan otomatis trigger refetch scoring member, yang bawah `false`
         if (!eliminationParticipantsCount) {
-          fetchScoringMembers();
+          fetchScoringMembers(); // <- akan trigger refetch scoring member kalau jumlah peserta gak berubah
         }
       },
     });
@@ -170,7 +146,7 @@ function ScoringTable({
                 <th className="name">Nama Peserta</th>
                 <th className="name">Nama Klub</th>
                 <SessionStatsColumnHeadingGroup
-                  collapsed={showEditor}
+                  collapsed={isEditorOpen}
                   sessionList={sessionNumbersList}
                 />
                 <th></th>
@@ -181,7 +157,7 @@ function ScoringTable({
               {scoringMembers?.map((row) => (
                 <tr
                   key={row.member.id}
-                  className={classnames({ "row-active": isItemActive(row.member.id) })}
+                  className={classnames({ "row-active": checkIsRowActive(row.member.id) })}
                 >
                   <td>
                     <TargetFaceNumber
@@ -204,7 +180,7 @@ function ScoringTable({
                   </td>
 
                   <SessionStatsCellsGroup
-                    collapsed={showEditor}
+                    collapsed={isEditorOpen}
                     sessions={row.sessions}
                     total={row.total}
                     totalX={row.totalX}
@@ -220,7 +196,7 @@ function ScoringTable({
                       )}
 
                       <CheckboxWithPrompt
-                        disabled={showEditor}
+                        disabled={isEditorOpen}
                         checked={row.member.isPresent}
                         onChange={() => checkPresenceByRow(row)}
                         title={
@@ -230,14 +206,14 @@ function ScoringTable({
                         }
                       />
 
-                      {isItemActive(row.member.id) ? (
+                      {checkIsRowActive(row.member.id) ? (
                         <ExpanderButton flexible onClick={handleCollapseEditor}>
                           <IconChevronLeft size="16" />
                         </ExpanderButton>
                       ) : (
                         <ExpanderButton
                           flexible
-                          onClick={() => handleSelectRow(row)}
+                          onClick={() => handleClickSelectRow(row)}
                           disabled={!row.member.isPresent}
                         >
                           <IconChevronRight size="16" />
@@ -251,21 +227,18 @@ function ScoringTable({
           </MembersTable>
         </div>
 
-        {showEditor && (
-          <div>
-            <ScoreEditor
-              key={`${categoryDetailId}-${activeRow.member.id}`}
-              memberId={activeRow.member.id}
-              sessionNumbersList={sessionNumbersList}
-              scoreTotal={activeRow.total}
-              hasShootOff={parseInt(activeRow.haveShootOff) === 1}
-              isLoading={isSaving}
-              onChange={handleChangeEditor}
-              onSaveSuccess={fetchScoringMembers}
-              onClose={() => dispatchEditor({ type: "CLOSED" })}
-            />
-          </div>
-        )}
+        <ScoreEditor
+          key={`${categoryDetailId}-${activeRow?.member.id}`}
+          isOpen={isEditorOpen}
+          memberId={activeRow?.member.id}
+          sessionNumbersList={sessionNumbersList}
+          scoreTotal={activeRow?.total}
+          hasShootOff={parseInt(activeRow?.haveShootOff) === 1}
+          isLoading={isSaving}
+          onChange={updateEditorValue}
+          onSaveSuccess={fetchScoringMembers}
+          onClose={() => closeEditor()}
+        />
       </TableContainer>
     </React.Fragment>
   );
@@ -507,33 +480,5 @@ const CheckboxWrapper = styled.span`
     border-color: #ffffff;
   }
 `;
-
-/* =========================== */
-
-const defaultEditorState = { selectedMemberId: null, editorValue: null };
-
-function editorReducer(state, action) {
-  switch (action.type) {
-    case "CLOSED": {
-      return defaultEditorState;
-    }
-
-    case "SELECT_ROW": {
-      return { ...defaultEditorState, selectedMemberId: action.payload };
-    }
-
-    case "UPDATE_SELECTED_ROW": {
-      return { ...state, selectedMemberId: action.payload };
-    }
-
-    case "UPDATE_EDITOR_VALUE": {
-      return { ...state, editorValue: action.payload };
-    }
-
-    default: {
-      return state;
-    }
-  }
-}
 
 export { ScoringTable };

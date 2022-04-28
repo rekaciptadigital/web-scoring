@@ -32,11 +32,9 @@ function PageEventScoringQualification() {
     selectOptionGenderCategory,
   } = useCategoriesWithFilters(categoryDetails);
 
-  const [isEliminationUnlocked, setEliminationUnlocked] = React.useState(false);
   const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(undefined);
 
   const resetOnChangeCategory = () => {
-    setEliminationUnlocked(false);
     setEliminationParticipantsCount(undefined);
   };
 
@@ -125,7 +123,7 @@ function PageEventScoringQualification() {
           <ToolbarRight>
             <EliminationConfigBar
               key={activeCategoryDetail?.categoryDetailId}
-              isShow={isEliminationUnlocked}
+              participantsCount={eliminationParticipantsCount}
               onChangeParticipantsCount={setEliminationParticipantsCount}
             />
 
@@ -141,7 +139,6 @@ function PageEventScoringQualification() {
         <ScoringTable
           key={activeCategoryDetail?.categoryDetailId}
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
-          onChangeProgressStatus={(progress) => setEliminationUnlocked(progress.isComplete)}
           onChangeParticipantPresence={() => setEliminationParticipantsCount(undefined)}
           eliminationParticipantsCount={eliminationParticipantsCount}
         />

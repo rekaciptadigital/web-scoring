@@ -116,7 +116,7 @@ function ScoringTable({
         // let's just take it for granted, for a moment
         // hard to explain
         onChangeParticipantPresence?.(); // <- ini akan otomatis trigger refetch scoring member, yang bawah `false`
-        if (!eliminationParticipantsCount) {
+        if (!eliminationParticipantsCount || eliminationParticipantsCount === 16) {
           fetchScoringMembers(); // <- akan trigger refetch scoring member kalau jumlah peserta gak berubah
         }
       },

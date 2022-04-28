@@ -12,7 +12,9 @@ const optionsParticipantsCount = [
 ];
 
 function _getSelectedFromValue(valueParticipantsCount) {
-  valueParticipantsCount = valueParticipantsCount || 16;
+  if (!valueParticipantsCount) {
+    return null;
+  }
   return optionsParticipantsCount.find((option) => option.value === valueParticipantsCount);
 }
 

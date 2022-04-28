@@ -16,6 +16,8 @@ import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
 
+const DEFAULT_PARTICIPANTS_COUNT = 16;
+
 function PageEventScoringQualification() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
@@ -33,10 +35,12 @@ function PageEventScoringQualification() {
   } = useCategoriesWithFilters(categoryDetails);
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
 
-  const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(undefined);
+  const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(
+    DEFAULT_PARTICIPANTS_COUNT
+  );
 
   const resetOnChangeCategory = () => {
-    setEliminationParticipantsCount(undefined);
+    setEliminationParticipantsCount(DEFAULT_PARTICIPANTS_COUNT);
   };
 
   const isPreparingInitialData = !categoryDetails && isLoadingCategoryDetails;
@@ -145,7 +149,7 @@ function PageEventScoringQualification() {
           key={activeCategoryDetail?.categoryDetailId}
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
           searchName={inputSearchQuery}
-          onChangeParticipantPresence={() => setEliminationParticipantsCount(undefined)}
+          onChangeParticipantPresence={resetOnChangeCategory}
           eliminationParticipantsCount={eliminationParticipantsCount}
         />
       </ViewWrapper>

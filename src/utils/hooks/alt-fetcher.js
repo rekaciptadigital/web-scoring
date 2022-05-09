@@ -37,11 +37,12 @@ function useFetcher() {
     }
   };
 
+  const isInit = status === "idle";
   const isLoading = status === "loading";
   const isSuccess = status === "success";
   const isError = status === "error";
 
-  return { ...state, state, runAsync, isLoading, isSuccess, isError };
+  return { ...state, state, runAsync, isInit, isLoading, isSuccess, isError };
 }
 
 export { useFetcher };

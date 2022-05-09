@@ -15,7 +15,6 @@ function SearchBox(props) {
 }
 
 const SearchBoxWrapper = styled.div`
-  max-width: 20rem;
   position: relative;
 `;
 

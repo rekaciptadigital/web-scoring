@@ -4,14 +4,53 @@ import { useScoringDetail } from "../../hooks/scoring-details";
 import { useSubmitScore } from "../../hooks/submit-score";
 
 import { EditorForm } from "./editor-form";
+import { EditorFormShootOff } from "./editor-form-shootoff";
 
 import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
+/**
+ * Kontainer untuk render kondisional open/closed
+ * Komponen yang kerja beneran di bawah: `<ScoreEditorControl />`
+ */
 function ScoreEditor({
+  isOpen = false,
   memberId,
   sessionNumbersList,
+  hasShootOff = false,
+  scoreTotal,
+  isLoading,
+  onChange,
+  onSaveSuccess,
+  onClose,
+}) {
+  if (!isOpen) {
+    return null;
+  }
+
+  const controlProps = {
+    memberId,
+    sessionNumbersList,
+    hasShootOff,
+    scoreTotal,
+    isLoading,
+    onChange,
+    onSaveSuccess,
+    onClose,
+  };
+
+  return (
+    <div>
+      <ScoreEditorControl {...controlProps} />
+    </div>
+  );
+}
+
+function ScoreEditorControl({
+  memberId,
+  sessionNumbersList,
+  hasShootOff = false,
   scoreTotal,
   isLoading: isLoadingFromProp,
   onChange,
@@ -20,45 +59,98 @@ function ScoreEditor({
 }) {
   const [sessionNumber, setSessionNumber] = React.useState(1);
 
-  const code = _makeQualificationCode({ memberId, sessionNumber });
+  const code = _makeQualificationCode(memberId, sessionNumber);
   const { data: scoreDetail, isLoading: isLoadingScore } = useScoringDetail(code);
-
   const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
+  const {
+    data: formShootOffValue,
+    isDirty: isFormShootOffDirty,
+    setShotOffValue,
+    resetFormShootOff,
+  } = useFormShootOff(scoreDetail);
   const { submitScore, isLoading: isSubmiting } = useSubmitScore();
 
+  const isLoadingForm = isLoadingFromProp || isLoadingScore || isSubmiting;
+
+  // On change dari form skoring biasa
   React.useEffect(() => {
     if (!formValues || !onChange) {
       return;
     }
 
-    const componentValue = {
+    const editorValue = {
       sessionNumber: sessionNumber,
       sessionCode: code,
       value: formValues,
       isDirty: isFormDirty,
     };
 
-    onChange(componentValue);
+    onChange?.(editorValue);
   }, [isFormDirty, sessionNumber, code, formValues]);
 
-  const handleChangeSession = (targetSessionNumber) => {
-    if (!isFormDirty) {
-      resetForm();
-      setSessionNumber(targetSessionNumber);
+  // On change dari form skoring shoot off
+  React.useEffect(() => {
+    if (!formShootOffValue || !onChange) {
       return;
     }
 
-    const payload = { code: code, shoot_scores: formValues };
-    submitScore(payload, {
-      onSuccess() {
+    const editorValueShootOff = {
+      sessionNumber: sessionNumber,
+      sessionCode: code,
+      value: formShootOffValue?.map?.((shot) => ({
+        score: shot.score,
+        distance_from_x: shot.distance,
+      })),
+      isDirty: isFormShootOffDirty,
+    };
+
+    onChange?.(editorValueShootOff);
+  }, [isFormShootOffDirty, sessionNumber, code, formShootOffValue]);
+
+  const handleChangeSession = (targetSessionNumber) => {
+    if (targetSessionNumber === sessionNumber) {
+      return;
+    }
+
+    if (sessionNumber === 11) {
+      // shoot off
+      if (!isFormShootOffDirty) {
+        resetFormShootOff();
+        setSessionNumber(targetSessionNumber);
+        return;
+      }
+
+      const payload = { code: code, shoot_scores: formShootOffValue };
+      submitScore(payload, {
+        onSuccess() {
+          resetFormShootOff();
+          setSessionNumber(targetSessionNumber);
+          onSaveSuccess?.();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    } else {
+      // sesi biasa
+      if (!isFormDirty) {
         resetForm();
         setSessionNumber(targetSessionNumber);
-        onSaveSuccess?.();
-      },
-      onError() {
-        // TODO: prompt retry / switch without saving anyway
-      },
-    });
+        return;
+      }
+
+      const payload = { code: code, shoot_scores: formValues };
+      submitScore(payload, {
+        onSuccess() {
+          resetForm();
+          setSessionNumber(targetSessionNumber);
+          onSaveSuccess?.();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    }
   };
 
   const handleCloseEditor = () => {
@@ -86,6 +178,7 @@ function ScoreEditor({
           <EditorHeaderContent>
             <SessionTabList
               sessions={sessionNumbersList}
+              hasShootOff={hasShootOff}
               currentSession={sessionNumber}
               onChange={handleChangeSession}
             />
@@ -107,17 +200,44 @@ function ScoreEditor({
         </div>
       </EditorHeader>
 
-      <EditorForm
-        key={sessionNumber}
-        isLoading={isLoadingFromProp || isLoadingScore || isSubmiting}
-        scoresData={formValues}
-        onChange={(scoresData) => setFormValues(scoresData)}
-      />
+      {sessionNumber === 11 ? (
+        hasShootOff ? (
+          <EditorFormShootOff
+            key={sessionNumber}
+            isLoading={isLoadingForm}
+            shootOffData={formShootOffValue}
+            onChange={(shootOffData) => setShotOffValue(shootOffData)}
+          />
+        ) : (
+          <EmptySheetBox>Shoot off tidak diberlakukan</EmptySheetBox>
+        )
+      ) : (
+        <EditorForm
+          key={sessionNumber}
+          isLoading={isLoadingForm}
+          scoresData={formValues}
+          onChange={(scoresData) => setFormValues(scoresData)}
+        />
+      )}
     </ScoreEditorContainer>
   );
 }
 
-function SessionTabList({ sessions, currentSession = 1, onChange }) {
+function SessionTabList({ sessions, hasShootOff, currentSession = 1, onChange }) {
+  const _checkIsTabActive = (sessionNumber) => {
+    return parseInt(sessionNumber) === parseInt(currentSession);
+  };
+  const isShootOffActive = parseInt(currentSession) === 11;
+
+  // Balik ke tab sesi 1 kalau state peserta berubah
+  // jadi gak punya shoot off
+  React.useEffect(() => {
+    if (hasShootOff || !isShootOffActive) {
+      return;
+    }
+    onChange?.(1);
+  }, [hasShootOff]);
+
   if (!sessions) {
     return (
       <SessionTabListContainer>
@@ -131,15 +251,29 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
       {sessions.map((sessionNumber) => (
         <li key={sessionNumber}>
           <SessionTabButton
-            className={classnames({
-              "session-tab-active": parseInt(sessionNumber) === parseInt(currentSession),
-            })}
+            disabled={_checkIsTabActive(sessionNumber)}
+            className={classnames({ "session-tab-active": _checkIsTabActive(sessionNumber) })}
             onClick={() => onChange?.(parseInt(sessionNumber))}
           >
             Sesi {sessionNumber}
           </SessionTabButton>
         </li>
       ))}
+
+      {/* Tab spesial shoot off */}
+      <li>
+        <SessionTabButton
+          title={!hasShootOff ? "Shoot Off tidak diberlakukan" : undefined}
+          disabled={isShootOffActive || !hasShootOff}
+          className={classnames({
+            "session-tab-active": isShootOffActive,
+            "shootoff-tab-disabled": !hasShootOff,
+          })}
+          onClick={() => onChange?.(11)}
+        >
+          S-Off
+        </SessionTabButton>
+      </li>
     </SessionTabListContainer>
   );
 }
@@ -151,6 +285,7 @@ const ScoreEditorContainer = styled.div`
   position: sticky;
   top: var(--ma-header-height);
   bottom: 0;
+  min-width: 31rem;
   padding: 0.5rem;
   background-color: var(--ma-gray-50);
 
@@ -216,6 +351,14 @@ const SessionTabButton = styled.button`
 
   position: relative;
 
+  &.shootoff-tab-disabled {
+    color: var(--ma-gray-200);
+
+    &:disabled {
+      color: var(--ma-gray-200);
+    }
+  }
+
   &::before {
     content: " ";
     position: absolute;
@@ -256,14 +399,14 @@ const EditorCloseButton = styled.button`
   }
 `;
 
-// eslint-disable-next-line no-unused-vars
-const EmptySession = styled.div`
-  min-width: 30rem;
-  min-height: 10rem;
+const EmptySheetBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--ma-gray-400);
+  padding: 1.5rem 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: var(--ma-gray-200);
   font-weight: 600;
 `;
 
@@ -284,14 +427,7 @@ function useForm(scoreDetail) {
       }
 
       case "CHANGE": {
-        return {
-          ...state,
-          isDirty: true,
-          data: {
-            ...state.data,
-            ...action.payload,
-          },
-        };
+        return { isDirty: true, data: action.payload };
       }
 
       case "FORCE_MARKED_DIRTY": {
@@ -305,7 +441,8 @@ function useForm(scoreDetail) {
   }, defaultFormState);
 
   React.useEffect(() => {
-    if (!scoreDetail?.score) {
+    const isRegularSession = parseInt(scoreDetail?.session) !== 11;
+    if (!scoreDetail?.score || !isRegularSession) {
       return;
     }
     dispatch({ type: "INIT", payload: scoreDetail.score });
@@ -318,10 +455,47 @@ function useForm(scoreDetail) {
   return { ...formState, setFormValues, markFormAsDirty, resetForm };
 }
 
+function useFormShootOff(scoreDetail) {
+  const [formState, dispatch] = React.useReducer((state, action) => {
+    switch (action.type) {
+      case "RESET": {
+        return defaultFormState;
+      }
+
+      case "INIT": {
+        return { ...defaultFormState, data: action.payload };
+      }
+
+      case "CHANGE": {
+        return { isDirty: true, data: action.payload };
+      }
+
+      default: {
+        return state;
+      }
+    }
+  }, defaultFormState);
+
+  React.useEffect(() => {
+    const isShootOffSession = parseInt(scoreDetail?.session) === 11;
+    if (!scoreDetail?.score || !isShootOffSession) {
+      return;
+    }
+    dispatch({ type: "INIT", payload: scoreDetail.score });
+  }, [scoreDetail]);
+
+  const setShotOffValue = (payload) => {
+    dispatch({ type: "CHANGE", payload: payload });
+  };
+  const resetFormShootOff = () => dispatch({ type: "RESET" });
+
+  return { ...formState, setShotOffValue, resetFormShootOff };
+}
+
 /* =============================== */
 // utils
 
-function _makeQualificationCode({ memberId, sessionNumber }) {
+function _makeQualificationCode(memberId, sessionNumber) {
   if (!memberId || !sessionNumber) {
     return null;
   }

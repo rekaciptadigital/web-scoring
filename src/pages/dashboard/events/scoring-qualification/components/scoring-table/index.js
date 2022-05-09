@@ -1,85 +1,126 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
 import { useScoringMembers } from "../../hooks/scoring-members";
+import { useScoreEditor } from "../../hooks/score-editor";
+import { useParticipantPresence } from "../../hooks/participant-presence";
 import { useSubmitScore } from "../../hooks/submit-score";
+import { toast } from "../processing-toast";
 
-import { SpinnerDotBlock } from "components/ma";
+import { LoadingScreen, SpinnerDotBlock, AlertConfirmAction } from "components/ma";
+import { Checkbox } from "../../../components/form-fields";
 import { ScoreEditor } from "./score-editor";
 
 import IconChevronLeft from "components/ma/icons/mono/chevron-left";
 import IconChevronRight from "components/ma/icons/mono/chevron-right";
+import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 
 import classnames from "classnames";
 
-function ScoringTable({ categoryDetailId }) {
+function ScoringTable({
+  categoryDetailId,
+  eliminationParticipantsCount,
+  onChangeParticipantPresence,
+  searchName,
+}) {
+  const { event_id } = useParams();
+  const eventId = event_id;
+
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
+    isSearchMode,
     getSessionNumbersList,
     fetchScoringMembers,
-  } = useScoringMembers(categoryDetailId);
-
-  const [editor, dispatchEditor] = React.useReducer(editorReducer, defaultEditorState);
-  const { editorValue, selectedMemberId } = editor;
-
-  // di-memo jaga-jaga kalau row-nya banyak & rerendernya juga banyak
-  const activeRow = React.useMemo(() => {
-    if (!scoringMembers || !selectedMemberId) {
-      return null;
-    }
-    return scoringMembers.find((row) => row.member.id === selectedMemberId);
-  }, [scoringMembers, selectedMemberId]);
-
-  const sessionNumbersList = getSessionNumbersList();
-  const showEditor = activeRow !== null;
-  const isItemActive = (memberId) => activeRow?.member?.id === memberId;
-
+  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount);
+  const { submitParticipantPresence, isLoading: isLoadingCheckPresence } = useParticipantPresence();
+  const {
+    isEditorOpen,
+    activeRow,
+    editorValue,
+    checkIsRowActive,
+    selectRow,
+    closeEditor,
+    updateEditorValue,
+  } = useScoreEditor(scoringMembers, isSearchMode);
   const { submitScore, isLoading: isSaving } = useSubmitScore();
 
-  const handleChangeEditor = (editorValue) => {
-    dispatchEditor({ type: "UPDATE_EDITOR_VALUE", payload: editorValue });
+  const sessionNumbersList = getSessionNumbersList();
+
+  const _getParamEliminationTemplate = (count) => {
+    if (editorValue.sessionNumber !== 11) {
+      return;
+    }
+    return count;
   };
 
-  const handleSelectRow = (rowData) => {
-    if (editorValue?.isDirty) {
-      const payload = {
-        code: editorValue.sessionCode,
-        shoot_scores: editorValue.value,
-      };
-
-      submitScore(payload, {
-        onSuccess() {
-          dispatchEditor({ type: "SELECT_ROW", payload: rowData.member.id });
-          fetchScoringMembers();
-        },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
-      });
-    } else {
-      dispatchEditor({ type: "SELECT_ROW", payload: rowData.member.id });
+  const handleClickSelectRow = (rowData) => {
+    if (!editorValue?.isDirty) {
+      selectRow(rowData.member.id);
+      return;
     }
+
+    const payload = {
+      code: editorValue.sessionCode,
+      shoot_scores: editorValue.value,
+      elimination_template: _getParamEliminationTemplate(eliminationParticipantsCount),
+    };
+
+    submitScore(payload, {
+      onSuccess() {
+        selectRow(rowData.member.id);
+        fetchScoringMembers();
+      },
+      onError() {
+        // TODO: prompt retry / switch without saving anyway
+      },
+    });
   };
 
   const handleCollapseEditor = () => {
-    if (editorValue?.isDirty) {
-      const payload = {
-        code: editorValue.sessionCode,
-        shoot_scores: editorValue.value,
-      };
-
-      submitScore(payload, {
-        onSuccess() {
-          dispatchEditor({ type: "CLOSED" });
-          fetchScoringMembers();
-        },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
-      });
-    } else {
-      dispatchEditor({ type: "CLOSED" });
+    if (!editorValue?.isDirty) {
+      closeEditor();
+      return;
     }
+
+    const payload = {
+      code: editorValue.sessionCode,
+      shoot_scores: editorValue.value,
+    };
+
+    submitScore(payload, {
+      onSuccess() {
+        closeEditor();
+        fetchScoringMembers();
+      },
+      onError() {
+        // TODO: prompt retry / switch without saving anyway
+      },
+    });
+  };
+
+  const checkPresenceByRow = (row) => {
+    const params = {
+      eventId,
+      participantId: row.member.participantId,
+      isPresent: row.member.isPresent ? 0 : 1,
+    };
+
+    submitParticipantPresence(params, {
+      onSuccess() {
+        const message = row.member.isPresent
+          ? "Peserta tidak diikutkan dalam eliminasi"
+          : "Peserta diikutkan dalam eliminasi";
+        toast.success(message);
+
+        // let's just take it for granted, for a moment
+        // hard to explain
+        onChangeParticipantPresence?.(); // <- ini akan otomatis trigger refetch scoring member, yang bawah `false`
+        if (!eliminationParticipantsCount || eliminationParticipantsCount === 16) {
+          fetchScoringMembers(); // <- akan trigger refetch scoring member kalau jumlah peserta gak berubah
+        }
+      },
+    });
   };
 
   if (!scoringMembers && isLoadingScoringMembers) {
@@ -91,89 +132,116 @@ function ScoringTable({ categoryDetailId }) {
   }
 
   return (
-    <TableContainer>
-      <div>
-        <MembersTable className="table table-responsive">
-          <thead>
-            <tr>
-              <th>Bantalan</th>
-              <th>Peringkat</th>
-              <th className="name">Nama Peserta</th>
-              <th className="name">Nama Klub</th>
-              <SessionStatsColumnHeadingGroup
-                collapsed={showEditor}
-                sessionList={sessionNumbersList}
-              />
-              <th></th>
-            </tr>
-          </thead>
+    <React.Fragment>
+      <LoadingScreen loading={isLoadingCheckPresence} />
 
-          <tbody>
-            {scoringMembers?.map((row) => (
-              <tr
-                key={row.member.id}
-                className={classnames({ "row-active": isItemActive(row.member.id) })}
-              >
-                <td>
-                  <TargetFaceNumber
-                    budRestNumber={row.member.budRestNumber}
-                    targetFace={row.member.targetFace}
-                  />
-                </td>
-                <td>
-                  {row.rank || (
-                    <GrayedOutText style={{ fontSize: "0.75em" }}>
-                      belum
-                      <br />
-                      ada data
-                    </GrayedOutText>
-                  )}
-                </td>
-                <td className="name">{row.member.name}</td>
-                <td className="name">
-                  <ClubName>{row.clubName}</ClubName>
-                </td>
-
-                <SessionStatsCellsGroup
-                  collapsed={showEditor}
-                  sessions={row.sessions}
-                  total={row.total}
-                  totalX={row.totalX}
-                  totalXPlusTen={row.totalXPlusTen}
-                />
-
-                <CellExpander>
-                  {isItemActive(row.member.id) ? (
-                    <ExpanderButton flexible onClick={handleCollapseEditor}>
-                      <IconChevronLeft size="16" />
-                    </ExpanderButton>
-                  ) : (
-                    <ExpanderButton flexible onClick={() => handleSelectRow(row)}>
-                      <IconChevronRight size="16" />
-                    </ExpanderButton>
-                  )}
-                </CellExpander>
-              </tr>
-            ))}
-          </tbody>
-        </MembersTable>
-      </div>
-
-      {showEditor && (
+      <TableContainer>
         <div>
-          <ScoreEditor
-            key={`${categoryDetailId}-${activeRow.member.id}`}
-            memberId={activeRow.member.id}
-            sessionNumbersList={sessionNumbersList}
-            scoreTotal={activeRow.total}
-            isLoading={isSaving}
-            onChange={handleChangeEditor}
-            onSaveSuccess={fetchScoringMembers}
-            onClose={() => dispatchEditor({ type: "CLOSED" })}
-          />
+          <LoadingBlocker isLoading={isLoadingScoringMembers} />
+          <MembersTable className="table table-responsive">
+            <thead>
+              <tr>
+                <th>Bantalan</th>
+                <th>Peringkat</th>
+                <th className="name">Nama Peserta</th>
+                <th className="name">Nama Klub</th>
+                <SessionStatsColumnHeadingGroup
+                  collapsed={isEditorOpen}
+                  sessionList={sessionNumbersList}
+                />
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {scoringMembers?.map((row) => (
+                <tr
+                  key={row.member.id}
+                  className={classnames({ "row-active": checkIsRowActive(row.member.id) })}
+                >
+                  <td>
+                    <TargetFaceNumber
+                      budRestNumber={row.member.budRestNumber}
+                      targetFace={row.member.targetFace}
+                    />
+                  </td>
+                  <td>
+                    {row.rank || (
+                      <GrayedOutText style={{ fontSize: "0.75em" }}>
+                        belum
+                        <br />
+                        ada data
+                      </GrayedOutText>
+                    )}
+                  </td>
+                  <td className="name">{row.member.name}</td>
+                  <td className="name">
+                    <ClubName>{row.clubName}</ClubName>
+                  </td>
+
+                  <SessionStatsCellsGroup
+                    collapsed={isEditorOpen}
+                    sessions={row.sessions}
+                    sessionNumbersList={sessionNumbersList}
+                    total={row.total}
+                    totalX={row.totalX}
+                    totalXPlusTen={row.totalXPlusTen}
+                  />
+
+                  <td>
+                    <CellExpander>
+                      {parseInt(row.haveShootOff) === 1 && (
+                        <WarningIconWrapper title="Peringkat terbawah memiliki skor yang sama">
+                          <IconAlertCircle />
+                        </WarningIconWrapper>
+                      )}
+
+                      <CheckboxWithPrompt
+                        disabled={isEditorOpen}
+                        checked={row.member.isPresent}
+                        onChange={() => checkPresenceByRow(row)}
+                        title={
+                          row.member.isPresent
+                            ? "Hapus centang untuk tidak mengikutkan dalam eliminasi"
+                            : "Centang untuk mengikutkan dalam eliminasi"
+                        }
+                      />
+
+                      {checkIsRowActive(row.member.id) ? (
+                        <ExpanderButton flexible onClick={handleCollapseEditor}>
+                          <IconChevronLeft size="16" />
+                        </ExpanderButton>
+                      ) : (
+                        <ExpanderButton
+                          flexible
+                          onClick={() => handleClickSelectRow(row)}
+                          disabled={!row.member.isPresent}
+                        >
+                          <IconChevronRight size="16" />
+                        </ExpanderButton>
+                      )}
+                    </CellExpander>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </MembersTable>
         </div>
-      )}
-    </TableContainer>
+
+        <ScoreEditor
+          key={`${categoryDetailId}-${activeRow?.member.id}`}
+          isOpen={isEditorOpen}
+          memberId={activeRow?.member.id}
+          sessionNumbersList={sessionNumbersList}
+          scoreTotal={activeRow?.total}
+          hasShootOff={parseInt(activeRow?.haveShootOff) === 1}
+          isLoading={isSaving}
+          onChange={updateEditorValue}
+          onSaveSuccess={fetchScoringMembers}
+          onClose={() => closeEditor()}
+        />
+      </TableContainer>
+    </React.Fragment>
   );
 }
 
@@ -206,7 +274,14 @@ function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
   );
 }
 
-function SessionStatsCellsGroup({ collapsed, sessions, total, totalX, totalXPlusTen }) {
+function SessionStatsCellsGroup({
+  collapsed,
+  sessions,
+  sessionNumbersList,
+  total,
+  totalX,
+  totalXPlusTen,
+}) {
   if (collapsed) {
     return <td className="stats">{total}</td>;
   }
@@ -223,9 +298,9 @@ function SessionStatsCellsGroup({ collapsed, sessions, total, totalX, totalXPlus
 
   return (
     <React.Fragment>
-      {Object.keys(sessions).map((sessionNumber) => (
+      {sessionNumbersList.map((sessionNumber) => (
         <td key={sessionNumber} className="stats">
-          {sessions[sessionNumber]?.total || <GrayedOutText>&ndash;</GrayedOutText>}
+          {<span>{sessions[sessionNumber]?.total}</span> || <GrayedOutText>&ndash;</GrayedOutText>}
         </td>
       ))}
       <td className="stats">{total}</td>
@@ -249,6 +324,51 @@ function ClubName({ children, clubName }) {
   return children || clubName;
 }
 
+function CheckboxWithPrompt({ checked, onChange, title, disabled }) {
+  const [showPrompt, setShowPrompt] = React.useState(false);
+  return (
+    <CheckboxWrapper title={title}>
+      <Checkbox
+        disabled={disabled}
+        checked={checked}
+        onChange={() => {
+          if (checked) {
+            setShowPrompt(true);
+          } else {
+            onChange?.();
+          }
+        }}
+      />
+
+      <AlertConfirmAction
+        shouldConfirm={showPrompt}
+        labelConfirm="Yakin"
+        onConfirm={() => {
+          setShowPrompt(false);
+          onChange?.();
+        }}
+        labelCancel="Batal"
+        onClose={() => setShowPrompt(false)}
+      >
+        Peserta akan tidak dihitung dalam pemeringkatan eliminasi.
+        <br />
+        Yakin?
+      </AlertConfirmAction>
+    </CheckboxWrapper>
+  );
+}
+
+function LoadingBlocker({ isLoading = true }) {
+  if (!isLoading) {
+    return null;
+  }
+  return (
+    <LoadingContainer>
+      <SpinnerDotBlock />
+    </LoadingContainer>
+  );
+}
+
 /* =============================== */
 // styles
 
@@ -268,6 +388,7 @@ const EmptyMembers = styled.div`
 `;
 
 const TableContainer = styled.div`
+  position: relative;
   display: flex;
 
   > *:first-child {
@@ -318,9 +439,21 @@ const MembersTable = styled.table`
       text-align: right;
     }
   }
+
+  th,
+  td {
+    cursor: auto;
+  }
 `;
 
-const CellExpander = styled.td`
+const CellExpander = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+
+  white-space: nowrap;
   text-align: right;
 `;
 
@@ -340,34 +473,42 @@ const ExpanderButton = styled.button`
   &:focus {
     box-shadow: 0 0 0 1px #2684ff;
   }
+
+  &:disabled {
+    color: var(--ma-gray-200);
+    box-shadow: none;
+  }
 `;
 
-/* =========================== */
+const WarningIconWrapper = styled.span`
+  color: var(--ma-yellow);
+`;
 
-const defaultEditorState = { selectedMemberId: null, editorValue: null };
-
-function editorReducer(state, action) {
-  switch (action.type) {
-    case "CLOSED": {
-      return defaultEditorState;
-    }
-
-    case "SELECT_ROW": {
-      return { ...defaultEditorState, selectedMemberId: action.payload };
-    }
-
-    case "UPDATE_SELECTED_ROW": {
-      return { ...state, selectedMemberId: action.payload };
-    }
-
-    case "UPDATE_EDITOR_VALUE": {
-      return { ...state, editorValue: action.payload };
-    }
-
-    default: {
-      return state;
-    }
+const CheckboxWrapper = styled.span`
+  .rc-checkbox-disabled,
+  .rc-checkbox-disabled .rc-checkbox-input {
+    cursor: default;
   }
-}
+
+  .rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner,
+  .rc-checkbox-disabled.rc-checkbox-checked:hover .rc-checkbox-inner {
+    background-color: var(--ma-blue);
+    border-color: var(--ma-blue);
+  }
+
+  .rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner:after {
+    border-color: #ffffff;
+  }
+`;
+
+const LoadingContainer = styled.div`
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+`;
 
 export { ScoringTable };

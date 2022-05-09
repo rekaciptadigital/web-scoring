@@ -3,16 +3,21 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
+import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
 import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
 import { SearchBox } from "./components/search-box";
+import { ProcessingToast, toast } from "./components/processing-toast";
+import { EliminationConfigBar } from "./components/elimination-config-bar";
 
 import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
+
+const DEFAULT_PARTICIPANTS_COUNT = 16;
 
 function PageEventScoringQualification() {
   const { event_id } = useParams();
@@ -29,6 +34,19 @@ function PageEventScoringQualification() {
     selectOptionAgeCategory,
     selectOptionGenderCategory,
   } = useCategoriesWithFilters(categoryDetails);
+  const [inputSearchQuery, setInputSearchQuery] = React.useState("");
+
+  const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(
+    DEFAULT_PARTICIPANTS_COUNT
+  );
+
+  const { handleDownloadScoresheet } = useScoresheetDownload(
+    activeCategoryDetail?.categoryDetailId
+  );
+
+  const resetOnChangeCategory = () => {
+    setEliminationParticipantsCount(DEFAULT_PARTICIPANTS_COUNT);
+  };
 
   const isPreparingInitialData = !categoryDetails && isLoadingCategoryDetails;
 
@@ -42,13 +60,18 @@ function PageEventScoringQualification() {
 
   return (
     <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
+      <ProcessingToast />
+
       <TabBar>
         <TabButtonList>
           {optionsCompetitionCategory.map((option) => (
             <li key={option.competitionCategory}>
               <TabButton
                 className={classnames({ "tab-active": option.isActive })}
-                onClick={() => selectOptionCompetitionCategory(option.competitionCategory)}
+                onClick={() => {
+                  resetOnChangeCategory();
+                  selectOptionCompetitionCategory(option.competitionCategory);
+                }}
               >
                 {option.competitionCategory}
               </TabButton>
@@ -68,7 +91,10 @@ function PageEventScoringQualification() {
                     <li key={option.ageCategory}>
                       <FilterItemButton
                         className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => selectOptionAgeCategory(option.ageCategory)}
+                        onClick={() => {
+                          resetOnChangeCategory();
+                          selectOptionAgeCategory(option.ageCategory);
+                        }}
                       >
                         {option.ageCategory}
                       </FilterItemButton>
@@ -88,7 +114,10 @@ function PageEventScoringQualification() {
                     <li key={option.genderCategory}>
                       <FilterItemButton
                         className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => selectOptionGenderCategory(option.genderCategory)}
+                        onClick={() => {
+                          resetOnChangeCategory();
+                          selectOptionGenderCategory(option.genderCategory);
+                        }}
                       >
                         {option.genderCategoryLabel}
                       </FilterItemButton>
@@ -101,27 +130,52 @@ function PageEventScoringQualification() {
             </CategoryFilter>
           </FilterBars>
 
-          <HorizontalSpaced>
-            <SearchBox placeholder="Cari peserta" disabled />
-            <ButtonOutlineBlue disabled>
-              <IconDownload size="16" /> Unduh Dokumen
-            </ButtonOutlineBlue>
-          </HorizontalSpaced>
+          <ToolbarRight>
+            <EliminationConfigBar
+              key={activeCategoryDetail?.categoryDetailId}
+              participantsCount={eliminationParticipantsCount}
+              onChangeParticipantsCount={setEliminationParticipantsCount}
+            />
+
+            <ButtonsOnRight>
+              <SearchBox
+                placeholder="Cari peserta"
+                value={inputSearchQuery}
+                onChange={(ev) => setInputSearchQuery(ev.target.value)}
+              />
+
+              <div>
+                <ButtonOutlineBlue
+                  onClick={() => {
+                    toast.loading("Sedang menyiapkan dokumen scoresheet...");
+                    handleDownloadScoresheet({
+                      onSuccess() {
+                        toast.dismiss();
+                      },
+                    });
+                  }}
+                >
+                  <span>
+                    <IconDownload size="16" />
+                  </span>{" "}
+                  <span>Unduh Dokumen</span>
+                </ButtonOutlineBlue>
+              </div>
+            </ButtonsOnRight>
+          </ToolbarRight>
         </ToolbarTop>
 
         <ScoringTable
           key={activeCategoryDetail?.categoryDetailId}
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
+          searchName={inputSearchQuery}
+          onChangeParticipantPresence={resetOnChangeCategory}
+          eliminationParticipantsCount={eliminationParticipantsCount}
         />
       </ViewWrapper>
     </ContentLayoutWrapper>
   );
 }
-
-const HorizontalSpaced = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
 
 const ViewWrapper = styled.div`
   padding: 1.875rem;
@@ -203,6 +257,25 @@ const ToolbarTop = styled.div`
 const FilterBars = styled.div`
   > * + * {
     margin-top: 1.5rem;
+  }
+`;
+
+const ToolbarRight = styled.div`
+  > * + * {
+    margin-top: 0.75rem;
+  }
+`;
+
+const ButtonsOnRight = styled.div`
+  display: flex;
+  gap: 0.5rem;
+
+  > *:first-of-type {
+    flex-grow: 1;
+  }
+
+  > *:nth-of-type(2) {
+    flex-shrink: 0;
   }
 `;
 

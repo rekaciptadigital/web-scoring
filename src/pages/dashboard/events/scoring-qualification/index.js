@@ -21,10 +21,10 @@ import { ScoringTable } from "./components/scoring-table";
 import { SearchBox } from "./components/search-box";
 import { ProcessingToast, toast } from "./components/processing-toast";
 import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
+import { ButtonShowBracket } from "./components/button-show-bracket";
 
 import IconCheck from "components/ma/icons/fill/check";
 import IconDownload from "components/ma/icons/mono/download";
-import IconBranch from "components/ma/icons/mono/branch";
 
 import classnames from "classnames";
 
@@ -228,9 +228,10 @@ function PageEventScoringQualification() {
               </PushBottom>
 
               <PushBottom>
-                <ButtonOutlineBlue flexible title="Lihat Bagan">
-                  <IconBranch size="20" />
-                </ButtonOutlineBlue>
+                <ButtonShowBracket
+                  categoryDetailId={activeCategoryDetail?.categoryDetailId}
+                  eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
+                />
               </PushBottom>
             </HorizontalSpaced>
 

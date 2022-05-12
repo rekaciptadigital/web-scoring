@@ -3,28 +3,55 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
+import { useSubmitEliminationCount } from "./hooks/submit-elimination-count";
+import { useSubmitEliminationConfig } from "./hooks/submit-elimination-config";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
-import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
+import Select from "react-select";
+import {
+  SpinnerDotBlock,
+  ButtonBlue,
+  ButtonOutlineBlue,
+  LoadingScreen,
+  AlertSubmitError,
+} from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
 import { SearchBox } from "./components/search-box";
 import { ProcessingToast, toast } from "./components/processing-toast";
-import { EliminationConfigBar } from "./components/elimination-config-bar";
+import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
 
+import IconCheck from "components/ma/icons/fill/check";
 import IconDownload from "components/ma/icons/mono/download";
+import IconBranch from "components/ma/icons/mono/branch";
 
 import classnames from "classnames";
 
-const DEFAULT_PARTICIPANTS_COUNT = 16;
+const optionsParticipantsCount = [
+  { value: 8, label: 8 },
+  { value: 16, label: 16 },
+  { value: 32, label: 32 },
+];
+
+function _getSelectedFromValue(countValue) {
+  if (!countValue) {
+    return null;
+  }
+  return optionsParticipantsCount.find((option) => option.value === countValue);
+}
 
 function PageEventScoringQualification() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
 
-  const { data: categoryDetails, isLoading: isLoadingCategoryDetails } =
-    useCategoryDetails(eventId);
+  const {
+    data: categoryDetails,
+    errors: errorsCategoryDetail,
+    isSettled: isSettledCategories,
+    fetchCategoryDetails,
+  } = useCategoryDetails(eventId);
+
   const {
     activeCategoryDetail,
     optionsCompetitionCategory,
@@ -34,23 +61,51 @@ function PageEventScoringQualification() {
     selectOptionAgeCategory,
     selectOptionGenderCategory,
   } = useCategoriesWithFilters(categoryDetails);
-  const [inputSearchQuery, setInputSearchQuery] = React.useState("");
 
-  const [eliminationParticipantsCount, setEliminationParticipantsCount] = React.useState(
-    DEFAULT_PARTICIPANTS_COUNT
-  );
+  const [inputSearchQuery, setInputSearchQuery] = React.useState("");
+  const [localCountNumber, setLocalCountNumber] = React.useState(null);
+
+  const {
+    submit: updateEliminationMemberCount,
+    isLoading: isLoadingSubmitCount,
+    isError: isErrorSubmitCount,
+    errors: errorsSubmitCount,
+  } = useSubmitEliminationCount(activeCategoryDetail?.categoryDetailId);
+
+  const {
+    submit: setElimination,
+    isLoading: isLoadingSubmitElimination,
+    isError: isErrorSubmitElimination,
+    errors: errorsSubmitElimination,
+  } = useSubmitEliminationConfig(activeCategoryDetail?.categoryDetailId);
 
   const { handleDownloadScoresheet } = useScoresheetDownload(
     activeCategoryDetail?.categoryDetailId
   );
 
   const resetOnChangeCategory = () => {
-    setEliminationParticipantsCount(DEFAULT_PARTICIPANTS_COUNT);
+    setLocalCountNumber(null);
+    setInputSearchQuery("");
   };
 
-  const isPreparingInitialData = !categoryDetails && isLoadingCategoryDetails;
+  const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
-  if (isPreparingInitialData) {
+  if (errorFetchingInitialCategories) {
+    return (
+      <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
+        <ViewWrapper>
+          <p>
+            Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
+            teknis lebih lanjut:
+          </p>
+
+          <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
+        </ViewWrapper>
+      </ContentLayoutWrapper>
+    );
+  }
+
+  if (!isSettledCategories) {
     return (
       <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
         <SpinnerDotBlock />
@@ -61,6 +116,10 @@ function PageEventScoringQualification() {
   return (
     <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
       <ProcessingToast />
+      <LoadingScreen loading={isLoadingSubmitCount || isLoadingSubmitElimination} />
+
+      <AlertSubmitError isError={isErrorSubmitCount} errors={errorsSubmitCount} />
+      <AlertSubmitError isError={isErrorSubmitElimination} errors={errorsSubmitElimination} />
 
       <TabBar>
         <TabButtonList>
@@ -131,37 +190,85 @@ function PageEventScoringQualification() {
           </FilterBars>
 
           <ToolbarRight>
-            <EliminationConfigBar
-              key={activeCategoryDetail?.categoryDetailId}
-              participantsCount={eliminationParticipantsCount}
-              onChangeParticipantsCount={setEliminationParticipantsCount}
-            />
-
-            <ButtonsOnRight>
-              <SearchBox
-                placeholder="Cari peserta"
-                value={inputSearchQuery}
-                onChange={(ev) => setInputSearchQuery(ev.target.value)}
-              />
-
-              <div>
-                <ButtonOutlineBlue
-                  onClick={() => {
-                    toast.loading("Sedang menyiapkan dokumen scoresheet...");
-                    handleDownloadScoresheet({
+            <HorizontalSpaced>
+              <SelectEliminationCounts>
+                <label htmlFor="elimination-members-count">Peserta Eliminasi</label>
+                <Select
+                  placeholder="Pilih jumlah"
+                  options={optionsParticipantsCount}
+                  value={_getSelectedFromValue(
+                    localCountNumber || activeCategoryDetail?.defaultEliminationCount
+                  )}
+                  onChange={(option) => {
+                    setLocalCountNumber(option.value);
+                    updateEliminationMemberCount(option.value, {
                       onSuccess() {
-                        toast.dismiss();
+                        fetchCategoryDetails();
+                      },
+                      onError() {
+                        setLocalCountNumber(activeCategoryDetail?.defaultEliminationCount);
                       },
                     });
                   }}
-                >
-                  <span>
-                    <IconDownload size="16" />
-                  </span>{" "}
-                  <span>Unduh Dokumen</span>
+                />
+
+                {Boolean(activeCategoryDetail?.defaultEliminationCount) && (
+                  <AppliedIconWrapper>
+                    <IconCheck size="20" />
+                  </AppliedIconWrapper>
+                )}
+              </SelectEliminationCounts>
+
+              <PushBottom>
+                <SearchBox
+                  placeholder="Cari peserta"
+                  value={inputSearchQuery}
+                  onChange={(ev) => setInputSearchQuery(ev.target.value)}
+                />
+              </PushBottom>
+
+              <PushBottom>
+                <ButtonOutlineBlue flexible title="Lihat Bagan">
+                  <IconBranch size="20" />
                 </ButtonOutlineBlue>
-              </div>
-            </ButtonsOnRight>
+              </PushBottom>
+            </HorizontalSpaced>
+
+            <HorizontalSpaced>
+              <ButtonOutlineBlue
+                onClick={() => {
+                  toast.loading("Sedang menyiapkan dokumen scoresheet...");
+                  handleDownloadScoresheet({
+                    onSuccess() {
+                      toast.dismiss();
+                    },
+                  });
+                }}
+              >
+                <span>
+                  <IconDownload size="16" />
+                </span>{" "}
+                <span>Unduh Dokumen</span>
+              </ButtonOutlineBlue>
+
+              <ButtonConfirmPrompt
+                customButton={ButtonBlue}
+                messagePrompt="Anda akan menentukan pemeringkatan eliminasi"
+                messageDescription={
+                  <React.Fragment>
+                    Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan. Data yang telah
+                    ditentukan dapat diubah jika terjadi perubahan.
+                  </React.Fragment>
+                }
+                buttonCancelLabel="Batalkan"
+                buttonConfirmLabel="Iya, Tentukan Eliminasi"
+                onConfirm={() => {
+                  setElimination(localCountNumber, { onSuccess() {} });
+                }}
+              >
+                Tentukan Eliminasi
+              </ButtonConfirmPrompt>
+            </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
 
@@ -170,12 +277,15 @@ function PageEventScoringQualification() {
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
           searchName={inputSearchQuery}
           onChangeParticipantPresence={resetOnChangeCategory}
-          eliminationParticipantsCount={eliminationParticipantsCount}
+          eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
         />
       </ViewWrapper>
     </ContentLayoutWrapper>
   );
 }
+
+/* =============================== */
+// styles
 
 const ViewWrapper = styled.div`
   padding: 1.875rem;
@@ -266,17 +376,27 @@ const ToolbarRight = styled.div`
   }
 `;
 
-const ButtonsOnRight = styled.div`
+const SelectEliminationCounts = styled.div`
+  position: relative;
+`;
+
+const AppliedIconWrapper = styled.div`
+  position: absolute;
+  bottom: 0.5rem;
+  left: -2rem;
+`;
+
+const HorizontalSpaced = styled.div`
   display: flex;
   gap: 0.5rem;
 
-  > *:first-of-type {
+  > * {
     flex-grow: 1;
   }
+`;
 
-  > *:nth-of-type(2) {
-    flex-shrink: 0;
-  }
+const PushBottom = styled.div`
+  align-self: flex-end;
 `;
 
 const CategoryFilter = styled.div`

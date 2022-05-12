@@ -22,6 +22,7 @@ import Bagan from "pages/dashboard/results/bagan";
 import EditResult from "pages/dashboard/results/edit";
 import ListSchedule from "../pages/dashboard/schedule";
 import Eliminasi from "../pages/dashboard/eliminasi";
+import PageEventOfficial from "pages/dashboard/events/officials";
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -31,6 +32,7 @@ const dashboardRoutes = [
   { path: "/dashboard/event/:event_id/budrests", component: PageEventBudRests },
   { path: "/dashboard/event/:event_id/budrests/detail", component: PageEventBudRestDetail },
   { path: "/dashboard/event/:event_id/faqs", component: PageEventFaqs },
+  { path: "/dashboard/event/:event_id/official", component: PageEventOfficial },
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",
     component: PageEventDetailSchedulingScoring,

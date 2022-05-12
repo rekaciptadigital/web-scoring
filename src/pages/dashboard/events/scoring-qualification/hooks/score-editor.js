@@ -5,7 +5,7 @@ const defaultEditorState = {
   editorValue: null,
 };
 
-function useScoreEditor(scoringMembers, isSearchMode) {
+function useScoreEditor(scoringMembers, searchQuery) {
   const [state, dispatch] = React.useReducer(editorReducer, defaultEditorState);
   const { selectedMemberId } = state;
 
@@ -24,7 +24,7 @@ function useScoreEditor(scoringMembers, isSearchMode) {
       return;
     }
     closeEditor();
-  }, [isSearchMode]);
+  }, [searchQuery]);
 
   const checkIsRowActive = (memberId) => activeRow?.member?.id === memberId;
 

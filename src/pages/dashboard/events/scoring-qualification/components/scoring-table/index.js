@@ -28,12 +28,16 @@ function ScoringTable({
 
   const {
     data: scoringMembers,
+    searchQuery,
     isLoading: isLoadingScoringMembers,
-    isSearchMode,
+    isError: isErrorScoringMembers,
     getSessionNumbersList,
     fetchScoringMembers,
   } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount);
+  const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
+
   const { submitParticipantPresence, isLoading: isLoadingCheckPresence } = useParticipantPresence();
+
   const {
     isEditorOpen,
     activeRow,
@@ -42,7 +46,8 @@ function ScoringTable({
     selectRow,
     closeEditor,
     updateEditorValue,
-  } = useScoreEditor(scoringMembers, isSearchMode);
+  } = useScoreEditor(scoringMembers, searchQuery);
+
   const { submitScore, isLoading: isSaving } = useSubmitScore();
 
   const sessionNumbersList = getSessionNumbersList();
@@ -111,19 +116,15 @@ function ScoringTable({
         const message = row.member.isPresent
           ? "Peserta tidak diikutkan dalam eliminasi"
           : "Peserta diikutkan dalam eliminasi";
-        toast.success(message);
 
-        // let's just take it for granted, for a moment
-        // hard to explain
-        onChangeParticipantPresence?.(); // <- ini akan otomatis trigger refetch scoring member, yang bawah `false`
-        if (!eliminationParticipantsCount || eliminationParticipantsCount === 16) {
-          fetchScoringMembers(); // <- akan trigger refetch scoring member kalau jumlah peserta gak berubah
-        }
+        toast.success(message);
+        onChangeParticipantPresence?.();
+        fetchScoringMembers();
       },
     });
   };
 
-  if (!scoringMembers && isLoadingScoringMembers) {
+  if (!isSettledScoringMembers) {
     return <SpinnerDotBlock />;
   }
 

@@ -33,7 +33,7 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
     return () => clearTimeout(debounceTimer);
   }, [inputSearchQuery]);
 
-  const isSearchMode = Boolean(debouncedSearchQuery);
+  const searchQuery = debouncedSearchQuery;
 
   const getSessionNumbersList = () => {
     if (!fetcher.data?.length) {
@@ -46,7 +46,7 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
 
   return {
     ...fetcher,
-    isSearchMode,
+    searchQuery,
     getSessionNumbersList,
     fetchScoringMembers,
   };

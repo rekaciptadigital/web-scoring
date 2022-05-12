@@ -37,12 +37,14 @@ function useFetcher() {
     }
   };
 
+  const reset = () => dispatch({ type: "RESET" });
+
   const isInit = status === "idle";
   const isLoading = status === "loading";
   const isSuccess = status === "success";
   const isError = status === "error";
 
-  return { ...state, state, runAsync, isInit, isLoading, isSuccess, isError };
+  return { ...state, state, runAsync, reset, isInit, isLoading, isSuccess, isError };
 }
 
 export { useFetcher };

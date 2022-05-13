@@ -23,6 +23,7 @@ import EditResult from "pages/dashboard/results/edit";
 import ListSchedule from "../pages/dashboard/schedule";
 import Eliminasi from "../pages/dashboard/eliminasi";
 import PageEventOfficial from "pages/dashboard/events/officials";
+import PageEventIdCard from "pages/dashboard/events/id-card";
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -32,6 +33,7 @@ const dashboardRoutes = [
   { path: "/dashboard/event/:event_id/budrests", component: PageEventBudRests },
   { path: "/dashboard/event/:event_id/budrests/detail", component: PageEventBudRestDetail },
   { path: "/dashboard/event/:event_id/faqs", component: PageEventFaqs },
+  { path: "/dashboard/event/:event_id/id-card", component: PageEventIdCard },
   { path: "/dashboard/event/:event_id/official", component: PageEventOfficial },
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",

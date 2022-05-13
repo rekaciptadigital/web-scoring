@@ -257,8 +257,8 @@ function PageEventScoringQualification() {
                 messagePrompt="Anda akan menentukan pemeringkatan eliminasi"
                 messageDescription={
                   <React.Fragment>
-                    Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan. Data yang telah
-                    ditentukan dapat diubah jika terjadi perubahan.
+                    Jumlah peserta dan data yang telah ditentukan tidak dapat diubah kembali.
+                    Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.
                   </React.Fragment>
                 }
                 buttonCancelLabel="Batalkan"

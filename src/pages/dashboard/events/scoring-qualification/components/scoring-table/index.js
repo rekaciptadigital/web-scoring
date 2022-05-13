@@ -51,6 +51,7 @@ function ScoringTable({
   const { submitScore, isLoading: isSaving } = useSubmitScore();
 
   const sessionNumbersList = getSessionNumbersList();
+  const shouldActiveRowRenderShootoff = [1, 2].indexOf(parseInt(activeRow?.haveShootOff)) >= 0;
 
   const _getParamEliminationTemplate = (count) => {
     if (editorValue.sessionNumber !== 11) {
@@ -238,7 +239,7 @@ function ScoringTable({
           memberId={activeRow?.member.id}
           sessionNumbersList={sessionNumbersList}
           scoreTotal={activeRow?.total}
-          hasShootOff={parseInt(activeRow?.haveShootOff) === 1}
+          hasShootOff={shouldActiveRowRenderShootoff}
           isLoading={isSaving}
           onChange={updateEditorValue}
           onSaveSuccess={fetchScoringMembers}

@@ -64,18 +64,20 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
               </TopBar>
 
               <div>
-                <Bracket
-                  rounds={bracketData.rounds || []}
-                  renderSeedComponent={(bracketProps) => (
-                    <SeedBagan
-                      bracketProps={bracketProps}
-                      configs={{
-                        totalRounds: bracketData.rounds.length - 1,
-                        eliminationId: bracketData.eliminationId,
-                      }}
-                    />
-                  )}
-                />
+                <Scrollable>
+                  <Bracket
+                    rounds={bracketData.rounds || []}
+                    renderSeedComponent={(bracketProps) => (
+                      <SeedBagan
+                        bracketProps={bracketProps}
+                        configs={{
+                          totalRounds: bracketData.rounds.length - 1,
+                          eliminationId: bracketData.eliminationId,
+                        }}
+                      />
+                    )}
+                  />
+                </Scrollable>
               </div>
             </BodyWrapper>
           </ModalBody>
@@ -131,6 +133,10 @@ const TopBar = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+`;
+
+const Scrollable = styled.div`
+  overflow-x: auto;
 `;
 
 const EditorCloseButton = styled.button`

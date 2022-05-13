@@ -61,7 +61,7 @@ function EditorFormShootOff({ shootOffData, isLoading, onChange }) {
                     handleSelectScore({
                       shotIndex: index,
                       score: value.score,
-                      distance: value.distance,
+                      distanceFromX: value.distance,
                     });
                   }}
                   isFocus={shouldFocusSelector(index)}
@@ -169,11 +169,11 @@ const ShootOffGroup = styled.div`
 function _makeScoresDataFromProp(scoresData) {
   if (!scoresData?.length) {
     return [
-      { score: "", distance: "" },
-      { score: "", distance: "" },
-      { score: "", distance: "" },
-      { score: "", distance: "" },
-      { score: "", distance: "" },
+      { score: "", distanceFromX: "" },
+      { score: "", distanceFromX: "" },
+      { score: "", distanceFromX: "" },
+      { score: "", distanceFromX: "" },
+      { score: "", distanceFromX: "" },
     ];
   }
   return scoresData;
@@ -184,7 +184,7 @@ function _makeOutputValue(previousData, selectData) {
     if (index !== selectData.shotIndex) {
       return existingScore;
     }
-    return { score: selectData.score, distance: selectData.distance };
+    return { score: selectData.score, distanceFromX: selectData.distanceFromX };
   });
 
   return updatedRambahanScores;

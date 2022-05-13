@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useScoringDetail } from "../../hooks/scoring-details";
 import { useSubmitScore } from "../../hooks/submit-score";
 
+import { AlertSubmitError } from "components/ma";
 import { EditorForm } from "./editor-form";
 import { EditorFormShootOff } from "./editor-form-shootoff";
 
@@ -68,7 +69,7 @@ function ScoreEditorControl({
     setShotOffValue,
     resetFormShootOff,
   } = useFormShootOff(scoreDetail);
-  const { submitScore, isLoading: isSubmiting } = useSubmitScore();
+  const { submitScore, isLoading: isSubmiting, isError, errors: errorsShotoff } = useSubmitScore();
 
   const isLoadingForm = isLoadingFromProp || isLoadingScore || isSubmiting;
 
@@ -114,6 +115,7 @@ function ScoreEditorControl({
 
     if (sessionNumber === 11) {
       // shoot off
+
       if (!isFormShootOffDirty) {
         resetFormShootOff();
         setSessionNumber(targetSessionNumber);
@@ -133,6 +135,7 @@ function ScoreEditorControl({
       });
     } else {
       // sesi biasa
+
       if (!isFormDirty) {
         resetForm();
         setSessionNumber(targetSessionNumber);
@@ -154,25 +157,47 @@ function ScoreEditorControl({
   };
 
   const handleCloseEditor = () => {
-    if (!isFormDirty) {
-      onClose?.();
-      return;
-    }
-
-    const payload = { code: code, shoot_scores: formValues };
-    submitScore(payload, {
-      onSuccess() {
+    if (sessionNumber === 11) {
+      // shoot off
+      if (!isFormShootOffDirty) {
         onClose?.();
-        onSaveSuccess?.();
-      },
-      onError() {
-        // TODO: prompt retry / switch without saving anyway
-      },
-    });
+        return;
+      }
+
+      const payload = { code: code, shoot_scores: formShootOffValue };
+      submitScore(payload, {
+        onSuccess() {
+          onClose?.();
+          onSaveSuccess?.();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    } else {
+      // sesi biasa
+
+      if (!isFormDirty) {
+        onClose?.();
+        return;
+      }
+
+      const payload = { code: code, shoot_scores: formValues };
+      submitScore(payload, {
+        onSuccess() {
+          onClose?.();
+          onSaveSuccess?.();
+        },
+        onError() {
+          // TODO: prompt retry / switch without saving anyway
+        },
+      });
+    }
   };
 
   return (
     <ScoreEditorContainer>
+      <AlertSubmitError isError={isError} errors={errorsShotoff} />
       <EditorHeader>
         {sessionNumbersList ? (
           <EditorHeaderContent>

@@ -8,19 +8,25 @@ function useCategoriesWithFilters(eventCategories) {
     categoryDetails: null,
   });
 
-  React.useEffect(() => {
-    if (!eventCategories) {
-      return;
-    }
-    dispatch({ type: "INIT", payload: _makeFilteringState(eventCategories) });
-  }, [eventCategories]);
-
   const {
     competitionCategory: activeCompetitionCategory,
     ageCategories,
     genderCategories,
     categoryDetails,
   } = filterState;
+
+  React.useEffect(() => {
+    if (!eventCategories) {
+      return;
+    }
+    dispatch({
+      type: "INIT",
+      payload: _makeFilteringState({
+        data: eventCategories,
+        previousCompetitionCategory: activeCompetitionCategory,
+      }),
+    });
+  }, [eventCategories]);
 
   const activeAgeCategory = ageCategories[activeCompetitionCategory];
   const activeGenderCategory = genderCategories[activeCompetitionCategory];
@@ -115,7 +121,7 @@ function _filtersReducer(state, action) {
 /* ================================ */
 // utils
 
-function _makeFilteringState(categoryDetails) {
+function _makeFilteringState({ data: categoryDetails, previousCompetitionCategory = null }) {
   if (!categoryDetails?.length) {
     return;
   }
@@ -146,7 +152,7 @@ function _makeFilteringState(categoryDetails) {
   );
 
   return {
-    competitionCategory: competitionCategoryKeys[0],
+    competitionCategory: previousCompetitionCategory || competitionCategoryKeys[0],
     ageCategories: defaultAgeCategories,
     genderCategories: defaultGenderCategories,
     categoryDetails: groupedCategories,

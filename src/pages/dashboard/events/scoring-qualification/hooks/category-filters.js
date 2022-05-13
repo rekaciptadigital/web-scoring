@@ -3,8 +3,8 @@ import * as React from "react";
 function useCategoriesWithFilters(eventCategories) {
   const [filterState, dispatch] = React.useReducer(_filtersReducer, {
     competitionCategory: null,
-    ageCategories: {},
-    genderCategories: {},
+    ageCategories: null,
+    genderCategories: null,
     categoryDetails: null,
   });
 
@@ -15,24 +15,18 @@ function useCategoriesWithFilters(eventCategories) {
     categoryDetails,
   } = filterState;
 
+  const activeAgeCategory = ageCategories?.[activeCompetitionCategory];
+  const activeGenderCategory = genderCategories?.[activeCompetitionCategory];
+  const activeCategoryDetail =
+    categoryDetails?.[activeCompetitionCategory]?.[activeAgeCategory]?.[activeGenderCategory] ||
+    null;
+
   React.useEffect(() => {
     if (!eventCategories) {
       return;
     }
-    dispatch({
-      type: "INIT",
-      payload: _makeFilteringState({
-        data: eventCategories,
-        previousCompetitionCategory: activeCompetitionCategory,
-      }),
-    });
+    dispatch({ type: "INIT", payload: eventCategories });
   }, [eventCategories]);
-
-  const activeAgeCategory = ageCategories[activeCompetitionCategory];
-  const activeGenderCategory = genderCategories[activeCompetitionCategory];
-  const activeCategoryDetail =
-    categoryDetails?.[activeCompetitionCategory]?.[activeAgeCategory]?.[activeGenderCategory] ||
-    null;
 
   const optionsCompetitionCategory = React.useMemo(() => {
     return _makeOptionsCompetitionCategory(categoryDetails, activeCompetitionCategory);
@@ -83,7 +77,15 @@ function _filtersReducer(state, action) {
       if (!action.payload) {
         return state;
       }
-      return { ...action.payload };
+
+      const updatedState = _makeFilteringState({
+        data: action.payload,
+        previousCompetitionCategory: state.competitionCategory,
+        previousAgeCategories: state.ageCategories,
+        previousGenderCategories: state.genderCategories,
+      });
+
+      return updatedState;
     }
 
     case "UPDATE_COMPETITION_CATEGORY": {
@@ -121,7 +123,12 @@ function _filtersReducer(state, action) {
 /* ================================ */
 // utils
 
-function _makeFilteringState({ data: categoryDetails, previousCompetitionCategory = null }) {
+function _makeFilteringState({
+  data: categoryDetails,
+  previousCompetitionCategory = null,
+  previousAgeCategories = null,
+  previousGenderCategories = null,
+}) {
   if (!categoryDetails?.length) {
     return;
   }
@@ -130,26 +137,24 @@ function _makeFilteringState({ data: categoryDetails, previousCompetitionCategor
   const groupedCategories = _runCategoriesGrouping(categoryDetailsSortedByID);
   const competitionCategoryKeys = Object.keys(groupedCategories);
 
-  const defaultAgeCategories = competitionCategoryKeys.reduce(
-    (ageCategories, competitionCategory) => {
+  const defaultAgeCategories =
+    previousAgeCategories ||
+    competitionCategoryKeys.reduce((ageCategories, competitionCategory) => {
       const defaultAge = Object.keys(groupedCategories[competitionCategory])[0];
       ageCategories[competitionCategory] = defaultAge;
       return ageCategories;
-    },
-    {}
-  );
+    }, {});
 
-  const defaultGenderCategories = competitionCategoryKeys.reduce(
-    (genderCategoriesInGroups, competitionCategory) => {
+  const defaultGenderCategories =
+    previousGenderCategories ||
+    competitionCategoryKeys.reduce((genderCategoriesInGroups, competitionCategory) => {
       const ageCategories = Object.keys(groupedCategories[competitionCategory]);
       ageCategories.forEach((ageCategory) => {
         const defaultGender = Object.keys(groupedCategories[competitionCategory][ageCategory])[0];
         genderCategoriesInGroups[competitionCategory] = defaultGender;
       });
       return genderCategoriesInGroups;
-    },
-    {}
-  );
+    }, {});
 
   return {
     competitionCategory: previousCompetitionCategory || competitionCategoryKeys[0],

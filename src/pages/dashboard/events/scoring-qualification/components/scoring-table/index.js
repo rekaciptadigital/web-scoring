@@ -155,76 +155,79 @@ function ScoringTable({
             </thead>
 
             <tbody>
-              {scoringMembers?.map((row) => (
-                <tr
-                  key={row.member.id}
-                  className={classnames({ "row-active": checkIsRowActive(row.member.id) })}
-                >
-                  <td>
-                    <TargetFaceNumber
-                      budRestNumber={row.member.budRestNumber}
-                      targetFace={row.member.targetFace}
-                    />
-                  </td>
-                  <td>
-                    {row.rank || (
-                      <GrayedOutText style={{ fontSize: "0.75em" }}>
-                        belum
-                        <br />
-                        ada data
-                      </GrayedOutText>
-                    )}
-                  </td>
-                  <td className="name">{row.member.name}</td>
-                  <td className="name">
-                    <ClubName>{row.clubName}</ClubName>
-                  </td>
-
-                  <SessionStatsCellsGroup
-                    collapsed={isEditorOpen}
-                    sessions={row.sessions}
-                    sessionNumbersList={sessionNumbersList}
-                    total={row.total}
-                    totalX={row.totalX}
-                    totalXPlusTen={row.totalXPlusTen}
-                  />
-
-                  <td>
-                    <CellExpander>
-                      {parseInt(row.haveShootOff) === 1 && (
-                        <WarningIconWrapper title="Peringkat terbawah memiliki skor yang sama">
-                          <IconAlertCircle />
-                        </WarningIconWrapper>
-                      )}
-
-                      <CheckboxWithPrompt
-                        disabled={isEditorOpen}
-                        checked={row.member.isPresent}
-                        onChange={() => checkPresenceByRow(row)}
-                        title={
-                          row.member.isPresent
-                            ? "Hapus centang untuk tidak mengikutkan dalam eliminasi"
-                            : "Centang untuk mengikutkan dalam eliminasi"
-                        }
+              {scoringMembers?.map((row) => {
+                const shouldRenderShootoffWarning = [1, 2].indexOf(parseInt(row.haveShootOff)) >= 0;
+                return (
+                  <tr
+                    key={row.member.id}
+                    className={classnames({ "row-active": checkIsRowActive(row.member.id) })}
+                  >
+                    <td>
+                      <TargetFaceNumber
+                        budRestNumber={row.member.budRestNumber}
+                        targetFace={row.member.targetFace}
                       />
-
-                      {checkIsRowActive(row.member.id) ? (
-                        <ExpanderButton flexible onClick={handleCollapseEditor}>
-                          <IconChevronLeft size="16" />
-                        </ExpanderButton>
-                      ) : (
-                        <ExpanderButton
-                          flexible
-                          onClick={() => handleClickSelectRow(row)}
-                          disabled={!row.member.isPresent}
-                        >
-                          <IconChevronRight size="16" />
-                        </ExpanderButton>
+                    </td>
+                    <td>
+                      {row.rank || (
+                        <GrayedOutText style={{ fontSize: "0.75em" }}>
+                          belum
+                          <br />
+                          ada data
+                        </GrayedOutText>
                       )}
-                    </CellExpander>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="name">{row.member.name}</td>
+                    <td className="name">
+                      <ClubName>{row.clubName}</ClubName>
+                    </td>
+
+                    <SessionStatsCellsGroup
+                      collapsed={isEditorOpen}
+                      sessions={row.sessions}
+                      sessionNumbersList={sessionNumbersList}
+                      total={row.total}
+                      totalX={row.totalX}
+                      totalXPlusTen={row.totalXPlusTen}
+                    />
+
+                    <td>
+                      <CellExpander>
+                        {shouldRenderShootoffWarning && (
+                          <WarningIconWrapper title="Peringkat terbawah memiliki skor yang sama">
+                            <IconAlertCircle />
+                          </WarningIconWrapper>
+                        )}
+
+                        <CheckboxWithPrompt
+                          disabled={isEditorOpen}
+                          checked={row.member.isPresent}
+                          onChange={() => checkPresenceByRow(row)}
+                          title={
+                            row.member.isPresent
+                              ? "Hapus centang untuk tidak mengikutkan dalam eliminasi"
+                              : "Centang untuk mengikutkan dalam eliminasi"
+                          }
+                        />
+
+                        {checkIsRowActive(row.member.id) ? (
+                          <ExpanderButton flexible onClick={handleCollapseEditor}>
+                            <IconChevronLeft size="16" />
+                          </ExpanderButton>
+                        ) : (
+                          <ExpanderButton
+                            flexible
+                            onClick={() => handleClickSelectRow(row)}
+                            disabled={!row.member.isPresent}
+                          >
+                            <IconChevronRight size="16" />
+                          </ExpanderButton>
+                        )}
+                      </CellExpander>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </MembersTable>
         </div>

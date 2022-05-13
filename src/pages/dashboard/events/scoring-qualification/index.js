@@ -21,6 +21,7 @@ import { ScoringTable } from "./components/scoring-table";
 import { SearchBox } from "./components/search-box";
 import { ProcessingToast, toast } from "./components/processing-toast";
 import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
+import { ButtonConfirmWarning } from "./components/button-confirm-warning";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 
 import IconCheck from "components/ma/icons/fill/check";
@@ -252,23 +253,33 @@ function PageEventScoringQualification() {
                 <span>Unduh Dokumen</span>
               </ButtonOutlineBlue>
 
-              <ButtonConfirmPrompt
-                customButton={ButtonBlue}
-                messagePrompt="Anda akan menentukan pemeringkatan eliminasi"
-                messageDescription={
-                  <React.Fragment>
-                    Jumlah peserta dan data yang telah ditentukan tidak dapat diubah kembali.
-                    Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.
-                  </React.Fragment>
-                }
-                buttonCancelLabel="Batalkan"
-                buttonConfirmLabel="Iya, Tentukan Eliminasi"
-                onConfirm={() => {
-                  setElimination(localCountNumber, { onSuccess() {} });
-                }}
-              >
-                Tentukan Eliminasi
-              </ButtonConfirmPrompt>
+              {activeCategoryDetail?.eliminationLock ? (
+                <ButtonConfirmWarning
+                  customButton={ButtonBlue}
+                  messagePrompt="Pemeringkatan eliminasi sudah ditentukan"
+                  buttonConfirmLabel="Tutup"
+                >
+                  Tentukan Eliminasi
+                </ButtonConfirmWarning>
+              ) : (
+                <ButtonConfirmPrompt
+                  customButton={ButtonBlue}
+                  messagePrompt="Anda akan menentukan pemeringkatan eliminasi"
+                  messageDescription={
+                    <React.Fragment>
+                      Jumlah peserta dan data yang telah ditentukan tidak dapat diubah kembali.
+                      Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.
+                    </React.Fragment>
+                  }
+                  buttonCancelLabel="Batalkan"
+                  buttonConfirmLabel="Iya, Tentukan Eliminasi"
+                  onConfirm={() => {
+                    setElimination(localCountNumber, { onSuccess() {} });
+                  }}
+                >
+                  Tentukan Eliminasi
+                </ButtonConfirmPrompt>
+              )}
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>

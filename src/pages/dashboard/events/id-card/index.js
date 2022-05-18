@@ -1,13 +1,13 @@
 import * as React from "react";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { CertificateService } from "services";
+import { IdCardService } from "services";
 import {
   optionsFontSize,
   optionsFontFamily,
   getSelectedFontFamily,
 } from './utils/index';
-import { prepareSaveData } from "../../certificates/new/utils";
+import { prepareSaveData } from "./utils";
 import { DEJAVU_SANS } from "../../certificates/utils/font-family-list";
 import { idCardFields } from "constants/index";
 
@@ -25,11 +25,11 @@ import ColorPickerContainer from "./components/ColorPickerContainer";
 import PreviewCanvas from "./components/preview/PreviewCanvas";
 import { SubNavbar } from "../components/submenus-settings";
 
-const { LABEL_PLAYER_NAME, LABEL_BIRTHDATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
+const { LABEL_PLAYER_NAME, LABEL_BIRTHDATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT, LABEL_PHOTO_PROFILE } = idCardFields;
 
 function PageEventIdCard() {
-  const event_id = new URLSearchParams(useLocation().search).get("event_id");
-  
+  const { event_id } = useParams();
+
   const isMounted = React.useRef(null);
   const abortControllerRef = React.useRef(null);
 
@@ -70,8 +70,8 @@ function PageEventIdCard() {
     setStatus("loading");
 
     const getCertificateData = async () => {
-      const queryString = { event_id, type_certificate: currentCertificateType };
-      const result = await CertificateService.getForEditor(
+      const queryString = { event_id: event_id };
+      const result = await IdCardService.getForEditor(
         queryString,
         abortControllerRef.current.signal
       );
@@ -85,7 +85,6 @@ function PageEventIdCard() {
 
       if (result.success) {
         // Kalau belum ada data template tapi dapatnya objek kosongan
-        // Dikenali dari gak ada `certificateId`-nya
         if (!result.data.id) {
           setEditorData({
             ...defaultEditorData,
@@ -96,9 +95,8 @@ function PageEventIdCard() {
           const parsedEditorData = result.data.editorData ? JSON.parse(result.data.editorData) : "";
           setEditorData({
             ...defaultEditorData,
-            typeCertificate: currentCertificateType,
-            certificateId: result.data.id,
-            backgroundUrl: result.data.backgroundUrl,
+            event_id: event_id,
+            backgroundUrl: result.data.background,
             fields: parsedEditorData.fields || defaultEditorData.fields,
           });
         }
@@ -222,13 +220,13 @@ function PageEventIdCard() {
     const queryString = { event_id, type_certificate: currentCertificateType };
     const data = await prepareSaveData(editorData, queryString);
 
-    const result = await CertificateService.save(data);
+    const result = await IdCardService.save(data);
     if (result.data) {
       const editorDataSaved = JSON.parse(result.data.editorData);
       setEditorData((editorData) => ({
         ...editorData,
         ...editorDataSaved,
-        certificateId: result.data.id,
+        event_id: event_id,
       }));
     //   setEditorClean();
     }
@@ -306,8 +304,8 @@ function PageEventIdCard() {
                     </Modal>
                   </div>
 
-                  {isSaving && <div className="indicator-message">Saving certificate...</div>}
-                  {isLoading && <div className="indicator-message">Loading certificate...</div>}
+                  {isSaving && <div className="indicator-message">Saving ID Card...</div>}
+                  {isLoading && <div className="indicator-message">Loading ID Card...</div>}
                 </EditorActionButtons>
               </Col>
             </Row>
@@ -427,7 +425,7 @@ function PageEventIdCard() {
             const queryString = { event_id, type_certificate: currentCertificateType };
             const data = await prepareSaveData(editorData, queryString);
 
-            const result = await CertificateService.save(data);
+            const result = await IdCardService.save(data);
             if (result.data) {
               setCurrentCertificateType(targetCertificateType.current);
             }
@@ -487,27 +485,27 @@ const ButtonEditor = styled.div`
 
 const defaultEditorData = {
   paperSize: "A4", // || [1280, 908] || letter
-  backgroundUrl: undefined,
+  backgroundUrl: null,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
   fields: [
     {
       name: LABEL_PLAYER_NAME,
-      x: 850,
+      x: 150,
       y: 50,
       fontFamily: DEJAVU_SANS,
       fontSize: 45,
     },
     {
       name: LABEL_BIRTHDATE,
-      x: 700,
+      x: 850,
       y: 100,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
       name: LABEL_CATEGORY,
-      x: 640,
+      x: 850,
       y: 150,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
@@ -523,6 +521,13 @@ const defaultEditorData = {
       name: LABEL_STATUS_EVENT,
       x: 640,
       y: 250,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+    {
+      name: LABEL_PHOTO_PROFILE,
+      x: 40,
+      y: 50,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },

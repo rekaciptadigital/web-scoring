@@ -1,4 +1,4 @@
-import { renderTemplateString, convertBase64 } from "../utils";
+import { renderTemplateString, convertBase64 } from "./utils/index";
 
 async function prepareSaveData(editorData, qs) {
   const dataCopy = { ...editorData };
@@ -13,9 +13,8 @@ async function prepareSaveData(editorData, qs) {
 
   const payload = {
     event_id: parseInt(qs.event_id),
-    type_certificate: dataCopy.typeCertificate,
     html_template: templateInBase64,
-    background_img: imageBase64ForUpload,
+    background_url: imageBase64ForUpload,
     editor_data: JSON.stringify({
       ...dataCopy,
       backgroundFileRaw: undefined,

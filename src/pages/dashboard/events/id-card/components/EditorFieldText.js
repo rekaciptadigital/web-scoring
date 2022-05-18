@@ -24,7 +24,7 @@ export default function EditorFieldText({
   selected,
   setEditorDirty,
 }) {
-  const { y, fontFamily, fontSize, color, fontWeight } = data;
+  const { y, fontFamily, fontSize, color, fontWeight, x } = data;
 
   const divRef = React.useRef(null);
   const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
@@ -33,7 +33,7 @@ export default function EditorFieldText({
     boundingStroke.idle.dashArray
   );
 
-  const translatePosition = { x: 0, y };
+  const translatePosition = { x, y };
 
   React.useEffect(() => {
     // Perubahan data yang memengaruhi width DOM perlu diupdate di sini,
@@ -43,7 +43,7 @@ export default function EditorFieldText({
 
   React.useEffect(() => {
     setEditorDirty?.();
-  }, [y, fontSize, fontFamily, fontWeight, color]);
+  }, [y, fontSize, fontFamily, fontWeight, color, x]);
 
   const highlightOnMouseOver = () => {
     setActiveStrokeColor(boundingStroke.highlighted.color);
@@ -60,7 +60,7 @@ export default function EditorFieldText({
   };
 
   const handleDragStop = (translation) => {
-    onChange?.({ y: translation.y });
+    onChange?.({ y: translation.y, x: translation.x });
   };
 
   return (
@@ -76,7 +76,7 @@ export default function EditorFieldText({
         style={{
           position: "absolute",
           top: 0,
-          left: 1280 / 2 - currentOffsetWidth / 2 || 0,
+          left: 500 / 2 - currentOffsetWidth / 2 || 0,
           fontSize: fontSize || 60,
           color: color || undefined,
           fontFamily: fontFamily || undefined,

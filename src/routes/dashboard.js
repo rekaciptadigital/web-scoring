@@ -33,7 +33,7 @@ const dashboardRoutes = [
   { path: "/dashboard/event/:event_id/budrests", component: PageEventBudRests },
   { path: "/dashboard/event/:event_id/budrests/detail", component: PageEventBudRestDetail },
   { path: "/dashboard/event/:event_id/faqs", component: PageEventFaqs },
-  { path: "/dashboard/event/:event_id/id-card", component: PageEventIdCard },
+  { path: "/dashboard/event/id-card/:event_id", component: PageEventIdCard },
   { path: "/dashboard/event/:event_id/official", component: PageEventOfficial },
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",

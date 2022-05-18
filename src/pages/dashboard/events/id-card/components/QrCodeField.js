@@ -16,8 +16,8 @@ export default function QrCodeField({ preview }) {
 const QrCodeContainer = styled.div`
   position: absolute;
   left: 0;
-  right: 0;
-  bottom: 120px;
+  right: 70%;
+  bottom: 100px;
 
   .qr-code-centering {
     margin: 0 auto;

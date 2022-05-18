@@ -32,6 +32,8 @@ const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields
 function CertificateNew() {
   const event_id = new URLSearchParams(useLocation().search).get("event_id");
   const eventId = parseInt(event_id);
+  console.log(event_id, 'eventId');
+
 
   const isMounted = React.useRef(null);
   const abortControllerRef = React.useRef(null);

@@ -96,7 +96,7 @@ function renderCssField(name, data = {}) {
 }
 
 function renderFieldText(name) {
-  const placeholderString = name === LABEL_RANK ? `Juara {%${name}%}` : `{%${name}%}`;
+  const placeholderString = name === LABEL_PLAYER_NAME ? `Juara {%${name}%}` : `{%${name}%}`;
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 

@@ -52,7 +52,7 @@ function SubNavbar({ eventId }) {
           </li>
 
           <li>
-            <NavLinkItem to={`/dashboard/event/${eventId}/id-card`}>
+            <NavLinkItem to={`/dashboard/event/id-card/${eventId}`}>
               <span>
                 <IconCard size="16" />
               </span>

@@ -10,11 +10,10 @@ const previewTexts = {
   [LABEL_CATEGORY]: "Individu - Umum - Barebow - 50m",
   [LABEL_CLUB_MEMBER]: "Robin Hood",
   [LABEL_STATUS_EVENT]: "Official",
-  
 };
 
 export default function PreviewFieldText({ name, data = {} }) {
-  const { y, fontFamily, fontSize, color, fontWeight } = data;
+  const { y, fontFamily, fontSize, color, fontWeight, x } = data;
   const divRef = React.useRef(null);
   const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
   const placeholderString = previewTexts[name];
@@ -30,6 +29,7 @@ export default function PreviewFieldText({ name, data = {} }) {
       fontSize={fontSize}
       color={color}
       y={y}
+      x={x}
       fontFamily={fontFamily}
       fontWeight={fontWeight}
     >

@@ -3,11 +3,10 @@ import styled from "styled-components";
 
 import PreviewFieldText from "./PreviewFieldText";
 import QrCodeField from "../QrCodeField";
+import ImageField from "../imageField";
 
 
 export default function PreviewCanvas({ data }) {
-
-  console.log(data, 'prev can');
   const { backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
   const [offsetWidth, setOffsetWidth] = React.useState(null);
@@ -34,6 +33,7 @@ export default function PreviewCanvas({ data }) {
           <div>Ada error pada data editor</div>
         )}
 
+        <ImageField dataEditor={data?.photoProfileField} preview />
         <QrCodeField dataEditor={data?.qrFields} preview />
       </PreviewImage>
 

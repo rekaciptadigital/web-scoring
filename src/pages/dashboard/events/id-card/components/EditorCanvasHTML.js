@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import EditorFieldText from "./EditorFieldText";
+import ImageField from "./imageField";
 import QrCodeField from "./QrCodeField";
 
 export default function EditorCanvasHTML({
@@ -27,6 +28,10 @@ export default function EditorCanvasHTML({
 
   const handleSelectQrField = () => {
     onSelect({ ...data.qrFields });
+  };
+  
+  const handleSelectPhotoField = () => {
+    onSelect({ ...data.photoProfileField });
   };
 
   const handleDeselectField = () => {
@@ -60,6 +65,16 @@ export default function EditorCanvasHTML({
         ) : (
           <div>Ada error pada data editor</div>
         )}
+
+        <ImageField 
+          key={data.photoProfileField.name}
+          name={data.photoProfileField.name}
+          data={data.photoProfileField}
+          onSelected={() => handleSelectPhotoField(data.photoProfileField.name)}
+          selected={isSelected(data.photoProfileField.name)}
+          onChange={(data) => onChange(data)}
+          setEditorDirty={setEditorDirty}
+          />
 
         <QrCodeField 
           key={data.qrFields.name}

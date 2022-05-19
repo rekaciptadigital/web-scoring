@@ -98,6 +98,7 @@ function PageEventIdCard() {
             backgroundUrl: result.data.background,
             fields: parsedEditorData.fields || defaultEditorData.fields,
             qrFields: parsedEditorData.qrFields || defaultEditorData.qrFields,
+            photoProfileField: parsedEditorData.photoProfileField || defaultEditorData.photoProfileField,
           });
         }
       } else {
@@ -131,6 +132,7 @@ function PageEventIdCard() {
         ...editorData,
         fields: fieldsUpdated,
         qrFields: currentObject.name == editorData.qrFields.name ? currentObject : editorData.qrFields,
+        photoProfileField: currentObject.name == editorData.photoProfileField.name ? currentObject : editorData.photoProfileField,
       };
     });
   }, [currentObject]);
@@ -488,6 +490,11 @@ const defaultEditorData = {
   backgroundUrl: null,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
+  photoProfileField: {
+    name: 'photoProfile',
+    x: 30,
+    y: 250,
+  },
   qrFields: {
     name: 'qrCode',
     x: 0,

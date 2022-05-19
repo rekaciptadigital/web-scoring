@@ -6,6 +6,8 @@ import QrCodeField from "../QrCodeField";
 
 
 export default function PreviewCanvas({ data }) {
+
+  console.log(data, 'prev can');
   const { backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
   const [offsetWidth, setOffsetWidth] = React.useState(null);
@@ -32,7 +34,7 @@ export default function PreviewCanvas({ data }) {
           <div>Ada error pada data editor</div>
         )}
 
-        <QrCodeField preview />
+        <QrCodeField dataEditor={data?.qrFields} preview />
       </PreviewImage>
 
       <PreviewBlocker />

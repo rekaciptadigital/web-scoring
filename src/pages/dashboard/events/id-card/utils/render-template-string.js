@@ -1,6 +1,6 @@
 import { idCardFields } from "constants/index";
 
-const { LABEL_PLAYER_NAME, LABEL_BIRTHDATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
+const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
 
 
 function renderTemplateString(editorData) {
@@ -52,7 +52,7 @@ function renderTemplateString(editorData) {
       }
 
       ${renderCssField(LABEL_PLAYER_NAME, editorData.fields[0])}
-      ${renderCssField(LABEL_BIRTHDATE, editorData.fields[1])}
+      ${renderCssField(LABEL_LOCATION_AND_DATE, editorData.fields[1])}
       ${renderCssField(LABEL_CATEGORY, editorData.fields[2])}
       ${renderCssField(LABEL_CLUB_MEMBER, editorData.fields[2])}
       ${renderCssField(LABEL_STATUS_EVENT, editorData.fields[2])}
@@ -61,7 +61,7 @@ function renderTemplateString(editorData) {
 
   <body>
     ${renderFieldText(LABEL_PLAYER_NAME)}
-    ${renderFieldText(LABEL_BIRTHDATE)}
+    ${renderFieldText(LABEL_LOCATION_AND_DATE)}
     ${renderFieldText(LABEL_CATEGORY)}
     ${renderFieldText(LABEL_CLUB_MEMBER)}
     ${renderFieldText(LABEL_STATUS_EVENT)}

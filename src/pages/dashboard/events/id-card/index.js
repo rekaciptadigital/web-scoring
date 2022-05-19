@@ -25,7 +25,7 @@ import ColorPickerContainer from "./components/ColorPickerContainer";
 import PreviewCanvas from "./components/preview/PreviewCanvas";
 import { SubNavbar } from "../components/submenus-settings";
 
-const { LABEL_PLAYER_NAME, LABEL_BIRTHDATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT, LABEL_PHOTO_PROFILE } = idCardFields;
+const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT, LABEL_PHOTO_PROFILE } = idCardFields;
 
 function PageEventIdCard() {
   const { event_id } = useParams();
@@ -88,7 +88,6 @@ function PageEventIdCard() {
         if (!result.data.id) {
           setEditorData({
             ...defaultEditorData,
-            typeCertificate: currentCertificateType,
           });
         } else {
           // Data editor dari data sertifikat yang sudah ada di server
@@ -104,7 +103,6 @@ function PageEventIdCard() {
         // Kalau belum ada data template tapi dilempar error
         setEditorData({
           ...defaultEditorData,
-          typeCertificate: currentCertificateType,
         });
       }
 
@@ -131,6 +129,7 @@ function PageEventIdCard() {
       return {
         ...editorData,
         fields: fieldsUpdated,
+        qrFields: currentObject.name == editorData.qrFields.name ? currentObject : editorData.qrFields,
       };
     });
   }, [currentObject]);
@@ -152,10 +151,11 @@ function PageEventIdCard() {
    * Ke-trigger ketika seleksi objek teks & juga ketika geser posisinya.
    */
   const handleEditorChange = (data) => {
-    setCurrentObject((currentData) => ({
+    setCurrentObject((currentData) => {
+      return ({
       ...currentData,
       ...data,
-    }));
+    })});
   };
 
   const handleFontSizeChange = (ev) => {
@@ -237,7 +237,7 @@ function PageEventIdCard() {
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
-
+  console.log(currentObject?.name);
   return (
     <React.Fragment>
         <SubNavbar eventId={event_id} />
@@ -352,8 +352,7 @@ function PageEventIdCard() {
 
                 <Row>
                 {currentObject?.name && (
-                    
-                    
+                  
                     <div className="mt-3">
                     <div>
                       <label>Font family:</label>
@@ -488,6 +487,11 @@ const defaultEditorData = {
   backgroundUrl: null,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
+  qrFields: {
+    name: 'qrCode',
+    x: 0,
+    y: 650,
+  },
   fields: [
     {
       name: LABEL_PLAYER_NAME,
@@ -497,7 +501,7 @@ const defaultEditorData = {
       fontSize: 45,
     },
     {
-      name: LABEL_BIRTHDATE,
+      name: LABEL_LOCATION_AND_DATE,
       x: 850,
       y: 100,
       fontFamily: DEJAVU_SANS,

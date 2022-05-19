@@ -97,6 +97,7 @@ function PageEventIdCard() {
             event_id: event_id,
             backgroundUrl: result.data.background,
             fields: parsedEditorData.fields || defaultEditorData.fields,
+            qrFields: parsedEditorData.qrFields || defaultEditorData.qrFields,
           });
         }
       } else {

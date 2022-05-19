@@ -87,8 +87,8 @@ export default function QrCodeField({
         onMouseLeave={() => idleOnMouseLeave()}
       >
         <PlaceholderString>
-          <QrCodeContainer>
-            <div className="qr-code-image" x={dataEditor?.x} y={dataEditor?.y} />
+          <QrCodeContainer x={dataEditor?.x} y={dataEditor?.y} >
+            <div className="qr-code-image"  />
           </QrCodeContainer>
         </PlaceholderString>
 
@@ -113,14 +113,15 @@ export default function QrCodeField({
 
 const QrCodeContainer = styled.div`
 
+  transform: translate(${({ x }) => x}px, ${({ y }) => y}px);
+  
   .qr-code-centering {
     margin: 0 auto;
     width: 50mm;
     height: 50mm;
     background-color: white;
-    transform: translate(${({ x }) => x}px, ${({ y }) => y}px);
   }
-
+  
   .qr-code-image {
     width: 50mm;
     height: 50mm;

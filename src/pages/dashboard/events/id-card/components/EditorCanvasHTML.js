@@ -25,6 +25,10 @@ export default function EditorCanvasHTML({
     onSelect({ ...fieldData });
   };
 
+  const handleSelectQrField = () => {
+    onSelect({ ...data.qrFields });
+  };
+
   const handleDeselectField = () => {
     onSelect(null);
   };
@@ -57,7 +61,15 @@ export default function EditorCanvasHTML({
           <div>Ada error pada data editor</div>
         )}
 
-        <QrCodeField />
+        <QrCodeField 
+          key={data.qrFields.name}
+          name={data.qrFields.name}
+          data={data.qrFields}
+          onSelected={() => handleSelectQrField(data.qrFields.name)}
+          selected={isSelected(data.qrFields.name)}
+          onChange={(data) => onChange(data)}
+          setEditorDirty={setEditorDirty}
+          />
       </EditorBackground>
     </EditorCanvasContainer>
   );

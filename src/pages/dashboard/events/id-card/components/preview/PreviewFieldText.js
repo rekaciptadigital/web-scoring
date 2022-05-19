@@ -2,11 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 import { idCardFields } from "constants/index";
 
-const { LABEL_PLAYER_NAME, LABEL_BIRTHDATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
+const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
 
 const previewTexts = {
   [LABEL_PLAYER_NAME]: "Morgan Lundin",
-  [LABEL_BIRTHDATE]: "Jakarta, 17 Agustus 1945",
+  [LABEL_LOCATION_AND_DATE]: "Jakarta, 17 Agustus 1945",
   [LABEL_CATEGORY]: "Individu - Umum - Barebow - 50m",
   [LABEL_CLUB_MEMBER]: "Robin Hood",
   [LABEL_STATUS_EVENT]: "Official",
@@ -44,7 +44,7 @@ const FieldTextContainer = styled.div`
   left: ${({ left }) => left}px;
   font-size: ${({ fontSize }) => fontSize || 60}px;
   ${({ color }) => (color ? `color: ${color};` : "")}
-  transform: translate(0px, ${({ y }) => y}px);
+  transform: translate(${({ x }) => x}px, ${({ y }) => y}px);
   ${({ fontFamily }) => (fontFamily ? `font-family: ${fontFamily};` : "")}
   font-weight: ${({ fontWeight }) => fontWeight || "normal"};
 `;

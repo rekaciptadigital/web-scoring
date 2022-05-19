@@ -76,7 +76,7 @@ export default function EditorFieldText({
         style={{
           position: "absolute",
           top: 0,
-          left: 500 / 2 - currentOffsetWidth / 2 || 0,
+          left: 1280 / 2 - currentOffsetWidth / 2 || 0,
           fontSize: fontSize || 60,
           color: color || undefined,
           fontFamily: fontFamily || undefined,

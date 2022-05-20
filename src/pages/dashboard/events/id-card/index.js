@@ -352,7 +352,7 @@ function PageEventIdCard() {
                 </div>
                 </Row>
 
-
+              {currentObject?.name == 'player_name' || currentObject?.name == 'category' || currentObject?.name == 'birthdate' || currentObject?.name == 'location_and_date' || currentObject?.name == 'club_member' || currentObject?.name == 'status_event' ? (
                 <Row>
                 {currentObject?.name && (
                   
@@ -409,8 +409,8 @@ function PageEventIdCard() {
                     </EditorSection>
                   </div>
                 )}
-                
                 </Row>
+              ) : null}
               </Col>
             </Row>
           </Col>

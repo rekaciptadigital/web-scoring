@@ -32,30 +32,25 @@ function renderTemplateString(editorData) {
         text-align: center;
       }
 
-      .qr-code-container {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 120px;
-      }
-
       .qr-code-centering {
         margin: 0 auto;
-        width: 25mm;
-        height: 25mm;
-        padding: 2mm;
-        background-color: white;
+        width: 35mm;
+        height: 35mm;
       }
-
+     
       .qr-code-img {
         margin: 0;
+        width: 50mm;
+        height: 50mm;
       }
 
       ${renderCssField(LABEL_PLAYER_NAME, editorData.fields[0])}
       ${renderCssField(LABEL_LOCATION_AND_DATE, editorData.fields[1])}
       ${renderCssField(LABEL_CATEGORY, editorData.fields[2])}
-      ${renderCssField(LABEL_CLUB_MEMBER, editorData.fields[2])}
-      ${renderCssField(LABEL_STATUS_EVENT, editorData.fields[2])}
+      ${renderCssField(LABEL_CLUB_MEMBER, editorData.fields[3])}
+      ${renderCssField(LABEL_STATUS_EVENT, editorData.fields[4])}
+      ${renderCssQrField(LABEL_STATUS_EVENT, editorData.qrFields)} 
+      ${renderCssAvatarField(LABEL_STATUS_EVENT, editorData.photoProfileField)}      
     </style>
   </head>
 
@@ -66,6 +61,7 @@ function renderTemplateString(editorData) {
     ${renderFieldText(LABEL_CLUB_MEMBER)}
     ${renderFieldText(LABEL_STATUS_EVENT)}
     ${renderQrCode()}
+    ${renderAvatar()}
   </body>
 </html>`;
 }
@@ -80,7 +76,8 @@ const renderCssBackgroundImage = (editorData) => {
 };
 
 function renderCssField(name, data = {}) {
-  const { y, fontFamily, fontWeight, fontSize, color } = data;
+
+  const { y, fontFamily, fontWeight, fontSize, color, x } = data;
 
   const computeColor = () => (color ? `color: ${color};` : "");
   const computeFontWeight = () => fontWeight || "normal";
@@ -88,6 +85,7 @@ function renderCssField(name, data = {}) {
   return `
       #field-${name} {
         top: ${y}px;
+        left: ${x}px;
         ${computeColor()}
         font-family: ${fontFamily};
         font-size: ${fontSize}px;
@@ -100,10 +98,35 @@ function renderFieldText(name) {
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 
+function renderCssQrField(name, data = {}) {
+  console.log(data, 'data');  
+  const { y, x } = data;
+
+  return `
+    #qr-code-container {
+      position: absolute;
+      top: ${y}px;
+      left: ${x}px;   
+      padding-left: 300px;  
+    }`
+}
+
+function renderCssAvatarField(name, data = {}) {
+  const { y, x } = data;
+
+  return `
+    #qr-avatar-container {
+      position: absolute;
+      top: ${y}px;
+      left: ${x}px;   
+      padding-left: 300px;  
+    }`
+}
+
 function renderQrCode() {
   const urlPlaceholder = "{%certificate_verify_url%}";
   return `
-    <div class="qr-code-container">
+    <div id="qr-code-container">
       <div class="qr-code-centering">
         <barcode
           class="qr-code-img"
@@ -113,6 +136,19 @@ function renderQrCode() {
           class="barcode"
           size="1"
           disableborder="1" />
+      </div>
+    </div>`;
+}
+
+function renderAvatar() {
+  const urlPlaceholder = "{%avatar%}";
+  return `
+    <div class="qr-avatar-container">
+      <div class="qr-code-centering">
+        <image
+          class="qr-code-img"
+          src="${urlPlaceholder}"
+          class="barcode" />
       </div>
     </div>`;
 }

@@ -6,7 +6,9 @@ import { NavLink } from "react-router-dom";
 
 import IconHome from "components/ma/icons/mono/home";
 import IconBudRest from "components/ma/icons/mono/bud-rest";
+import IconUser from "components/ma/icons/mono/user";
 import IconHelpCircle from "components/ma/icons/mono/help-circle";
+import IconCard from "components/ma/icons/mono/card";
 
 function SubNavbar({ eventId }) {
   return (
@@ -32,11 +34,29 @@ function SubNavbar({ eventId }) {
           </li>
 
           <li>
+            <NavLinkItem to={`/dashboard/event/${eventId}/official`}>
+              <span>
+                <IconUser size="16" />
+              </span>
+              <span>Official</span>
+            </NavLinkItem>
+          </li>
+
+          <li>
             <NavLinkItem to={`/dashboard/event/${eventId}/faqs`}>
               <span>
                 <IconHelpCircle size="16" />
               </span>
               <span>FAQ</span>
+            </NavLinkItem>
+          </li>
+
+          <li>
+            <NavLinkItem to={`/dashboard/event/id-card/${eventId}`}>
+              <span>
+                <IconCard size="16" />
+              </span>
+              <span>ID Card</span>
             </NavLinkItem>
           </li>
         </ul>

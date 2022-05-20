@@ -19,7 +19,7 @@ class TableMember extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      page: 1,
+      page: this.props.page,
       sizePerPage: 10,
       productData: this.props.members,
       modal: false,
@@ -31,6 +31,8 @@ class TableMember extends Component {
       dataCategories: [],
       catagoryID: 0,
       IdParticipant: 0,
+      handlePageChange: this.props.handlePageChange,
+      totalData: this.props.totalData,
     };
   }
 
@@ -104,15 +106,24 @@ class TableMember extends Component {
 
     const columns = [
       {
-        dataField: "no",
+        dataField: "No",
         text: "No",
       },
       {
         dataField: "name",
         text: `${this.props.team ? "Nama Tim" : "Nama Peserta"}`,
         sort: true,
-        style: { width: "40px", overflow: "hidden" },
-        headerStyle: { width: "40px", overflow: "hidden" },
+        // style: { width: "40px", overflow: "hidden" },
+        // headerStyle: { width: "40px", overflow: "hidden" },
+        formatter: (cell, row) => {
+         return (
+            <>
+            <div style={{ minWidth: 200, paddingTop: 15 }}>
+              <p>{row.name}</p>
+            </div>
+            </>
+          );
+        },
       },
       {
         dataField: "clubName",
@@ -137,11 +148,39 @@ class TableMember extends Component {
         dataField: "competitionCategory",
         text: "Kategori Lomba",
         sort: true,
+        formatter: (cell, row) => {
+          if (!row.competitionCategory) {
+            return (
+              <>
+                <span>-</span>
+              </>
+            );
+          }
+          return (
+            <>
+              <span>{row.competitionCategory}</span>
+            </>
+          );
+        },
       },
       {
         dataField: "ageCategory",
         text: "Kelas",
         sort: true,
+        formatter: (cell, row) => {
+          if (!row.ageCategory) {
+            return (
+              <>
+                <span>-</span>
+              </>
+            );
+          }
+          return (
+            <>
+              <span >{row.ageCategory}</span>
+            </>
+          );
+        },
       },
       {
         dataField: "email",
@@ -228,8 +267,9 @@ class TableMember extends Component {
 
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: temp.length, // replace later with size(customers),
+      totalSize: this.state.totalData, // replace later with size(customers),
       custom: true,
+      page: this.state.page,
     };
 
     // Custom Pagination Toggle
@@ -304,6 +344,16 @@ class TableMember extends Component {
                                   </div>
                                 </Col>
                               </Row>
+
+                              {/* <Row>
+                                <Col xl="12">
+                                  <PaginationListStandalone 
+                                    {...paginationProps}
+                                    onPageChange={(e) => {
+                                      handlePageChange(e);
+                                    }} />
+                                </Col>
+                              </Row> */}
                             </React.Fragment>
                           )}
                         </ToolkitProvider>

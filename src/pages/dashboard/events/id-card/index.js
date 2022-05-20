@@ -1,39 +1,34 @@
 import * as React from "react";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { CertificateService } from "services";
+import { IdCardService } from "services";
 import {
   optionsFontSize,
   optionsFontFamily,
-  optionsTypeCertificate,
-  getCurrentTypeCertificate,
   getSelectedFontFamily,
-} from "../utils";
+} from './utils/index';
 import { prepareSaveData } from "./utils";
-import { DEJAVU_SANS } from "../utils/font-family-list";
-import { certificateFields } from "constants/index";
+import { DEJAVU_SANS } from "../../certificates/utils/font-family-list";
+import { idCardFields } from "constants/index";
 
 import MetaTags from "react-meta-tags";
 import { Container, Col, Row, Card, Button as BSButton, Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
 import Select from "react-select";
-import { BreadcrumbDashboard } from "pages/dashboard/events/components/breadcrumb";
-import { ProcessingBlocker } from "./processing-blocker";
-import { AlertPromptSave } from "./alert-prompt-save";
+import { ProcessingBlocker } from "../../certificates/new/processing-blocker";
+import { AlertPromptSave } from "../../certificates/new/alert-prompt-save";
 
-import EditorBgImagePicker from "../components/EditorBgImagePicker";
-import EditorCanvasHTML from "../components/EditorCanvasHTML";
-import FontBoldToggle from "../components/FontBoldToggle";
-import ColorPickerContainer from "../components/ColorPickerContainer";
-import PreviewCanvas from "../components/preview/PreviewCanvas";
+import EditorBgImagePicker from "./components/EditorBgImagePicker";
+import EditorCanvasHTML from "./components/EditorCanvasHTML";
+import FontBoldToggle from "./components/FontBoldToggle";
+import ColorPickerContainer from "./components/ColorPickerContainer";
+import PreviewCanvas from "./components/preview/PreviewCanvas";
+import { SubNavbar } from "../components/submenus-settings";
 
-const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
+const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT, LABEL_PHOTO_PROFILE } = idCardFields;
 
-function CertificateNew() {
-  const event_id = new URLSearchParams(useLocation().search).get("event_id");
-  const eventId = parseInt(event_id);
-  console.log(event_id, 'eventId');
-
+function PageEventIdCard() {
+  const { event_id } = useParams();
 
   const isMounted = React.useRef(null);
   const abortControllerRef = React.useRef(null);
@@ -53,7 +48,7 @@ function CertificateNew() {
   const [editorData, setEditorData] = React.useState(null);
 
   const [currentObject, setCurrentObject] = React.useState(null);
-  const [isEditorDirty, setEditorAsDirty] = React.useState(false);
+//   const [isEditorDirty, setEditorAsDirty] = React.useState(false);
 
   const targetCertificateType = React.useRef(1);
   const [needSavingConfirmation, setNeedSavingConfirmation] = React.useState(false);
@@ -63,8 +58,8 @@ function CertificateNew() {
   const isSaving = status === "saving";
   const isLoading = status === "loading";
 
-  const setEditorClean = () => setEditorAsDirty(false);
-  const setEditorDirty = () => setEditorAsDirty(true);
+//   const setEditorClean = () => setEditorAsDirty(false);
+//   const setEditorDirty = () => setEditorAsDirty(true);
 
   const image = {
     preview: editorData?.backgroundPreviewUrl || editorData?.backgroundUrl || null,
@@ -75,8 +70,8 @@ function CertificateNew() {
     setStatus("loading");
 
     const getCertificateData = async () => {
-      const queryString = { event_id, type_certificate: currentCertificateType };
-      const result = await CertificateService.getForEditor(
+      const queryString = { event_id: event_id };
+      const result = await IdCardService.getForEditor(
         queryString,
         abortControllerRef.current.signal
       );
@@ -90,33 +85,31 @@ function CertificateNew() {
 
       if (result.success) {
         // Kalau belum ada data template tapi dapatnya objek kosongan
-        // Dikenali dari gak ada `certificateId`-nya
         if (!result.data.id) {
           setEditorData({
             ...defaultEditorData,
-            typeCertificate: currentCertificateType,
           });
         } else {
           // Data editor dari data sertifikat yang sudah ada di server
           const parsedEditorData = result.data.editorData ? JSON.parse(result.data.editorData) : "";
           setEditorData({
             ...defaultEditorData,
-            typeCertificate: currentCertificateType,
-            certificateId: result.data.id,
-            backgroundUrl: result.data.backgroundUrl,
+            event_id: event_id,
+            backgroundUrl: result.data.background,
             fields: parsedEditorData.fields || defaultEditorData.fields,
+            qrFields: parsedEditorData.qrFields || defaultEditorData.qrFields,
+            photoProfileField: parsedEditorData.photoProfileField || defaultEditorData.photoProfileField,
           });
         }
       } else {
         // Kalau belum ada data template tapi dilempar error
         setEditorData({
           ...defaultEditorData,
-          typeCertificate: currentCertificateType,
         });
       }
 
       setStatus("done");
-      setEditorClean();
+    //   setEditorClean();
       setCurrentObject(null);
     };
 
@@ -138,31 +131,34 @@ function CertificateNew() {
       return {
         ...editorData,
         fields: fieldsUpdated,
+        qrFields: currentObject.name == editorData.qrFields.name ? currentObject : editorData.qrFields,
+        photoProfileField: currentObject.name == editorData.photoProfileField.name ? currentObject : editorData.photoProfileField,
       };
     });
   }, [currentObject]);
 
-  const handleTipeSertifikatChange = async (ev) => {
-    if (parseInt(ev.value) === parseInt(editorData.typeCertificate)) {
-      return;
-    }
+//   const handleTipeSertifikatChange = async (ev) => {
+//     if (parseInt(ev.value) === parseInt(editorData.typeCertificate)) {
+//       return;
+//     }
 
-    if (!isEditorDirty) {
-      setCurrentCertificateType(ev.value);
-    } else {
-      setNeedSavingConfirmation(true);
-      targetCertificateType.current = ev.value;
-    }
-  };
+//     if (!isEditorDirty) {
+//       setCurrentCertificateType(ev.value);
+//     } else {
+//       setNeedSavingConfirmation(true);
+//       targetCertificateType.current = ev.value;
+//     }
+//   };
 
   /**
    * Ke-trigger ketika seleksi objek teks & juga ketika geser posisinya.
    */
   const handleEditorChange = (data) => {
-    setCurrentObject((currentData) => ({
+    setCurrentObject((currentData) => {
+      return ({
       ...currentData,
       ...data,
-    }));
+    })});
   };
 
   const handleFontSizeChange = (ev) => {
@@ -207,7 +203,7 @@ function CertificateNew() {
         backgroundFileRaw: imageData,
       };
     });
-    setEditorDirty();
+    // setEditorDirty();
   };
 
   const handleHapusBg = () => {
@@ -219,7 +215,7 @@ function CertificateNew() {
         backgroundUrl: null,
       };
     });
-    setEditorDirty();
+    // setEditorDirty();
   };
 
   const handleClickSave = async () => {
@@ -227,15 +223,15 @@ function CertificateNew() {
     const queryString = { event_id, type_certificate: currentCertificateType };
     const data = await prepareSaveData(editorData, queryString);
 
-    const result = await CertificateService.save(data);
+    const result = await IdCardService.save(data);
     if (result.data) {
       const editorDataSaved = JSON.parse(result.data.editorData);
       setEditorData((editorData) => ({
         ...editorData,
         ...editorDataSaved,
-        certificateId: result.data.id,
+        event_id: event_id,
       }));
-      setEditorClean();
+    //   setEditorClean();
     }
 
     setStatus("done");
@@ -244,39 +240,30 @@ function CertificateNew() {
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
-
+  
   return (
-    <StyledPageWrapper>
-      <MetaTags>
-        <title>Editor Sertifikat | MyArchery.id</title>
-      </MetaTags>
+    <React.Fragment>
+        <SubNavbar eventId={event_id} />
+        
+        <MetaTags>
+                <title>Dashboard | Id Card</title>
+        </MetaTags>
 
       <Container fluid>
-        <BreadcrumbDashboard to={`/dashboard/event/${eventId}/home`}>Dashboard</BreadcrumbDashboard>
-
+       
         {/* Konten */}
         <Row>
           <Col lg="12">
             <Row>
               <Col lg="8">
-                <h1>Sertifikat Event</h1>
+                <h1>ID Card</h1>
                 <p>
-                  Klik untuk mengubah jenis dan ukuran teks. Geser untuk mengatur komposisi
-                  sertifikat.
+                Geser keterangan yang ada di dalam ID Card sesuai yang Anda inginkan
                 </p>
               </Col>
 
               <Col lg="4">
                 <EditorActionButtons>
-                  <div>
-                    <Select
-                      options={optionsTypeCertificate}
-                      placeholder="Tipe Sertifikat"
-                      value={getCurrentTypeCertificate(currentCertificateType)}
-                      onChange={(ev) => handleTipeSertifikatChange(ev)}
-                      isDisabled={isSaving || isLoading}
-                    />
-                  </div>
 
                   <div>
                     <BSButton
@@ -320,14 +307,14 @@ function CertificateNew() {
                     </Modal>
                   </div>
 
-                  {isSaving && <div className="indicator-message">Saving certificate...</div>}
-                  {isLoading && <div className="indicator-message">Loading certificate...</div>}
+                  {isSaving && <div className="indicator-message">Saving ID Card...</div>}
+                  {isLoading && <div className="indicator-message">Loading ID Card...</div>}
                 </EditorActionButtons>
               </Col>
             </Row>
 
             <Row>
-              <Col lg="8">
+              <Col lg="6">
                 <Card>
                   {editorData ? (
                     <React.Fragment>
@@ -337,7 +324,7 @@ function CertificateNew() {
                         onChange={(data) => handleEditorChange(data)}
                         currentObject={currentObject}
                         onSelect={(target) => setCurrentObject(target)}
-                        setEditorDirty={setEditorDirty}
+                        // setEditorDirty={setEditorDirty}
                       />
                       {(isSaving || isLoading) && <ProcessingBlocker />}
                     </React.Fragment>
@@ -352,18 +339,24 @@ function CertificateNew() {
                 </Card>
               </Col>
 
-              <Col lg="4">
-                <div className="ratio ratio-16x9">
+              <Col lg="6">
+                <Row>
+
+                <div className="ratio ratio-21x9">
                   <EditorBgImagePicker
                     image={image}
                     onSelectImage={(imageData) => handleSelectBg(imageData)}
                     onRemoveImage={() => handleHapusBg()}
-                  />
+                    />
                   {(isSaving || isLoading) && <ProcessingBlocker />}
                 </div>
+                </Row>
 
+              {currentObject?.name == 'player_name' || currentObject?.name == 'category' || currentObject?.name == 'birthdate' || currentObject?.name == 'location_and_date' || currentObject?.name == 'club_member' || currentObject?.name == 'status_event' ? (
+                <Row>
                 {currentObject?.name && (
-                  <div className="mt-5">
+                  
+                    <div className="mt-3">
                     <div>
                       <label>Font family:</label>
                       <Select
@@ -371,45 +364,53 @@ function CertificateNew() {
                         placeholder="Font Family"
                         value={getSelectedFontFamily(optionsFontFamily, currentObject)}
                         onChange={(ev) => handleFontFamilyChange(ev)}
-                      />
+                        />
                     </div>
 
+                    <EditorSection>
+                    <Col lg="2">
                     <div className="mt-2">
                       <label>Font size:</label>
                       <Select
                         options={optionsFontSize}
                         placeholder="font size"
                         value={{
-                          value: currentObject?.fontSize,
-                          label: currentObject?.fontSize,
+                            value: currentObject?.fontSize,
+                            label: currentObject?.fontSize,
                         }}
                         onChange={(ev) => handleFontSizeChange(ev)}
-                      />
+                        />
                     </div>
+                    </Col>
 
-                    <div className="mt-2">
-                      <label>Font color:</label>
+                    <Col lg="1">
+                    <ButtonEditor>
                       <div>
                         <ColorPickerContainer color={currentObject?.color}>
                           <CompactPicker
                             color={currentObject?.color}
                             onChange={(color) => handleFontColorChange(color)}
-                          />
+                            />
                         </ColorPickerContainer>
                       </div>
-                    </div>
+                    </ButtonEditor>
+                    </Col>
 
-                    <div className="mt-2">
-                      <label>Bold?</label>
+                        <Col lg="1">
+                    <ButtonEditor>
                       <div>
                         <FontBoldToggle
                           bold={currentObject?.fontWeight}
                           onChange={() => handleFontBoldChange()}
-                        />
+                          />
                       </div>
-                    </div>
+                    </ButtonEditor>
+                    </Col>
+                    </EditorSection>
                   </div>
                 )}
+                </Row>
+              ) : null}
               </Col>
             </Row>
           </Col>
@@ -426,7 +427,7 @@ function CertificateNew() {
             const queryString = { event_id, type_certificate: currentCertificateType };
             const data = await prepareSaveData(editorData, queryString);
 
-            const result = await CertificateService.save(data);
+            const result = await IdCardService.save(data);
             if (result.data) {
               setCurrentCertificateType(targetCertificateType.current);
             }
@@ -440,15 +441,11 @@ function CertificateNew() {
         labelCancel="Lanjut tanpa simpan"
         labelConfirm="Simpan"
       >
-        Sertifikat belum disimpan. Apakah ingin disimpan?
+        ID Card belum disimpan. Apakah ingin disimpan?
       </AlertPromptSave>
-    </StyledPageWrapper>
+    </React.Fragment>
   );
 }
-
-const StyledPageWrapper = styled.div`
-  margin: 4rem 0;
-`;
 
 const EditorActionButtons = styled.div`
   position: relative;
@@ -476,34 +473,77 @@ const EditorActionButtons = styled.div`
   }
 `;
 
+const EditorSection = styled.div`
+  display: flex;
+`;
+
+const ButtonEditor = styled.div`
+    margin-top: 2.5rem !important;
+    margin-left: 1rem;
+`;
+
+
+
+
 const defaultEditorData = {
   paperSize: "A4", // || [1280, 908] || letter
-  backgroundUrl: undefined,
+  backgroundUrl: null,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
+  photoProfileField: {
+    name: 'photoProfile',
+    x: 30,
+    y: 250,
+  },
+  qrFields: {
+    name: 'qrCode',
+    x: 0,
+    y: 650,
+  },
   fields: [
     {
-      name: LABEL_MEMBER_NAME,
-      x: 640,
-      y: 280,
+      name: LABEL_PLAYER_NAME,
+      x: 150,
+      y: 50,
       fontFamily: DEJAVU_SANS,
-      fontSize: 60,
+      fontSize: 45,
     },
     {
-      name: LABEL_RANK,
-      x: 640,
-      y: 370,
+      name: LABEL_LOCATION_AND_DATE,
+      x: 850,
+      y: 100,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
-      name: LABEL_CATEGORY_NAME,
+      name: LABEL_CATEGORY,
+      x: 850,
+      y: 150,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+    {
+      name: LABEL_CLUB_MEMBER,
       x: 640,
-      y: 430,
+      y: 200,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+    {
+      name: LABEL_STATUS_EVENT,
+      x: 640,
+      y: 250,
+      fontFamily: DEJAVU_SANS,
+      fontSize: 36,
+    },
+    {
+      name: LABEL_PHOTO_PROFILE,
+      x: 40,
+      y: 50,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
   ],
 };
 
-export default CertificateNew;
+export default PageEventIdCard;

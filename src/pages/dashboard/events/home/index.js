@@ -13,6 +13,7 @@ import IconInfo from "components/ma/icons/mono/info";
 import IconCheck from "components/ma/icons/fill/check";
 
 import { eventMenus } from "./utils/menus";
+import { target } from "./utils/icon-svgs";
 
 function PageEventDetailHome() {
   const { event_id } = useParams();
@@ -45,7 +46,7 @@ function PageEventDetailHome() {
     if (!isQualificationSchedulesSet) {
       return `/dashboard/events/new/prepublish?eventId=${event_id}`;
     }
-    return `/dashboard/event/${event_id}/scheduling-scoring`;
+    return `/dashboard/event/${event_id}/scoring-qualification`;
   };
 
   React.useEffect(() => {
@@ -117,7 +118,11 @@ function PageEventDetailHome() {
                 href={`/dashboard/member/${event_id}?type=team`}
               />
               <CardMenu
-                menu={eventMenus[4]}
+                menu={{
+                  icon: target,
+                  title: "Pertandingan",
+                  description: "Input skor, hasil skor babak kualifikasi dan eliminasi",
+                }}
                 href={computeHrefScheduleMenu()}
                 disabled={!isQualificationSchedulesSet}
                 badge={

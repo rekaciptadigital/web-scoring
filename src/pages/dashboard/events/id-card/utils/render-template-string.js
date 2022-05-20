@@ -119,7 +119,7 @@ function renderCssAvatarField(name, data = {}) {
       position: absolute;
       top: ${y}px;
       left: ${x}px;   
-      padding-left: 300px;  
+      padding-left: 250px;  
     }`
 }
 
@@ -143,9 +143,9 @@ function renderQrCode() {
 function renderAvatar() {
   const urlPlaceholder = "{%avatar%}";
   return `
-    <div class="qr-avatar-container">
+    <div id="qr-avatar-container">
       <div class="qr-code-centering">
-        <image
+        <img
           class="qr-code-img"
           src="${urlPlaceholder}"
           class="barcode" />

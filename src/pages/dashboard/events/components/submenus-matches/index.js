@@ -34,8 +34,7 @@ function SubNavbar() {
           </li>
 
           <li>
-            {/* TODO: hapus as="span" kalau mau dipakai */}
-            <NavLinkItem as="span" to={`/dashboard/event/${eventId}/scoring-elimination`}>
+            <NavLinkItem to={`/dashboard/event/${eventId}/scoring-elimination`}>
               <span>
                 <IconBudRest size="16" />
               </span>

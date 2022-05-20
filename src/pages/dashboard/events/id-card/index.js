@@ -240,7 +240,7 @@ function PageEventIdCard() {
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
-  console.log(currentObject?.name);
+  
   return (
     <React.Fragment>
         <SubNavbar eventId={event_id} />

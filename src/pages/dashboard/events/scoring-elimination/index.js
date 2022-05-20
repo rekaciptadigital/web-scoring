@@ -4,10 +4,14 @@ import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
 
-import { SpinnerDotBlock } from "components/ma";
+import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
-import { ProcessingToast } from "./components/processing-toast";
+import { ProcessingToast, toast } from "./components/processing-toast";
+import { ButtonShowBracket } from "./components/button-show-bracket";
+import { ScoringTable } from "./components/scoring-table";
+
+import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
 
@@ -27,6 +31,7 @@ function PageEventScoringElimination() {
   } = useCategoryDetails(eventId);
 
   const {
+    activeCategoryDetail,
     optionsCompetitionCategory,
     optionsAgeCategory,
     optionsGenderCategory,
@@ -122,8 +127,27 @@ function PageEventScoringElimination() {
               </FilterList>
             </CategoryFilter>
           </FilterBars>
+
+          <ToolbarRight>
+            <HorizontalSpaced>
+              <ButtonShowBracket
+                categoryDetailId={activeCategoryDetail?.categoryDetailId}
+                eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
+              />
+
+              <ButtonOutlineBlue
+              >
+                <span>
+                  <IconDownload size="16" />
+                </span>{" "}
+                <span>Unduh Dokumen</span>
+              </ButtonOutlineBlue>
+            </HorizontalSpaced>
+          </ToolbarRight>
         </ToolbarTop>
       </ViewWrapper>
+
+      <ScoringTable />
     </ContentLayoutWrapper>
   );
 }
@@ -211,6 +235,21 @@ const ToolbarTop = styled.div`
 const FilterBars = styled.div`
   > * + * {
     margin-top: 1.5rem;
+  }
+`;
+
+const ToolbarRight = styled.div`
+  > * + * {
+    margin-top: 0.75rem;
+  }
+`;
+
+const HorizontalSpaced = styled.div`
+  display: flex;
+  gap: 0.5rem;
+
+  > * {
+    flex-grow: 1;
   }
 `;
 

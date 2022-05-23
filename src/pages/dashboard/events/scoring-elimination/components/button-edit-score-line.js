@@ -10,12 +10,12 @@ import {
 import IconEdit from "components/ma/icons/mono/edit";
 import IconX from "components/ma/icons/mono/x";
 
-function ButtonEditScoreLine() {
+function ButtonEditScoreLine({ disabled }) {
   const [isOpen, setOpen] = React.useState(false);
 
   return (
     <React.Fragment>
-      <ButtonOutlineBlue flexible onClick={() => setOpen(true)}>
+      <ButtonOutlineBlue flexible onClick={() => setOpen(true)} disabled={disabled}>
         <span>Edit</span>{" "}
         <span>
           <IconEdit size="16" />

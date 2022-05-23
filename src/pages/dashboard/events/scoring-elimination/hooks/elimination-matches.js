@@ -1,12 +1,17 @@
+import * as React from "react";
 import { useParams } from "react-router-dom";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EliminationService } from "services";
 
-function useEliminationBracketTemplate(categoryDetailId, countNumber) {
+function useEliminationMatches(categoryDetailId, countNumber) {
   const { event_id } = useParams();
   const fetcher = useFetcher();
 
-  const fetchEliminationTemplate = ({ onSuccess, onError } = {}) => {
+  React.useEffect(() => {
+    if (!categoryDetailId) {
+      return;
+    }
+
     const getFunction = () => {
       return EliminationService.getEventEliminationTemplate({
         event_id: event_id,
@@ -18,12 +23,11 @@ function useEliminationBracketTemplate(categoryDetailId, countNumber) {
     };
 
     fetcher.runAsync(getFunction, {
-      onSuccess: onSuccess,
-      onError: onError,
+      transform: (initialData) => initialData.rounds,
     });
-  };
+  }, []);
 
-  return { ...fetcher, fetchEliminationTemplate };
+  return fetcher;
 }
 
-export { useEliminationBracketTemplate };
+export { useEliminationMatches };

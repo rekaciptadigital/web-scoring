@@ -4,14 +4,12 @@ import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
 
-import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
+import { SpinnerDotBlock } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
-import { ProcessingToast, toast } from "./components/processing-toast";
+import { ProcessingToast } from "./components/processing-toast";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 import { ScoringTable } from "./components/scoring-table";
-
-import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
 
@@ -134,20 +132,16 @@ function PageEventScoringElimination() {
                 categoryDetailId={activeCategoryDetail?.categoryDetailId}
                 eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
               />
-
-              <ButtonOutlineBlue
-              >
-                <span>
-                  <IconDownload size="16" />
-                </span>{" "}
-                <span>Unduh Dokumen</span>
-              </ButtonOutlineBlue>
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
       </ViewWrapper>
 
-      <ScoringTable />
+      <ScoringTable
+        key={activeCategoryDetail?.categoryDetailId}
+        categoryDetailId={activeCategoryDetail?.categoryDetailId}
+        eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
+      />
     </ContentLayoutWrapper>
   );
 }

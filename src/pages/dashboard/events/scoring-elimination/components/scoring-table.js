@@ -1,31 +1,61 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useEliminationMatches } from "../hooks/elimination-matches";
 
-import { ButtonBlue } from "components/ma";
+import { SpinnerDotBlock, ButtonBlue } from "components/ma";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
+import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
+import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 
 import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracket.png";
 
 import classnames from "classnames";
 
-function ScoringTable() {
+function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
+  const { isError, data } = useEliminationMatches(categoryDetailId, eliminationMemberCounts);
+  const [selectedTab, setSelectedTab] = React.useState(0);
+
+  const isSettled = Boolean(data) || (!data && isError);
+
+  if (!isSettled) {
+    return (
+      <SectionTableContainer>
+        <SpinnerDotBlock />
+      </SectionTableContainer>
+    );
+  }
+
+  if (isSettled && !data) {
+    return (
+      <SectionTableContainer>
+        <EmptyBracketContainer>
+          <FloatingEmptyBracketContent>
+            <div>
+              <EmptyStateHeading>Bagan belum tersedia</EmptyStateHeading>
+              <EmptyStateDescription>
+                Maaf tidak ada klasemen dengan kategori yang Anda cari. Silakan cari dengan kategori
+                lain.
+              </EmptyStateDescription>
+            </div>
+          </FloatingEmptyBracketContent>
+        </EmptyBracketContainer>
+      </SectionTableContainer>
+    );
+  }
+
+  // Happy path
+  const tabLabels = getTabLabels(data);
+  const currentRows = data[selectedTab]?.seeds || [];
+
   return (
     <SectionTableContainer>
-      <EmptyBracketContainer>
-        <FloatingEmptyBracketContent>
-          <div>
-            <EmptyStateHeading>Bagan belum tersedia</EmptyStateHeading>
-            <EmptyStateDescription>
-              Maaf tidak ada klasemen dengan kategori yang Anda cari. Silakan cari dengan kategori
-              lain.
-            </EmptyStateDescription>
-          </div>
-        </FloatingEmptyBracketContent>
-      </EmptyBracketContainer>
-
-      <StagesTabs />
+      <StagesTabs
+        labels={tabLabels}
+        currentTab={selectedTab}
+        onChange={(index) => setSelectedTab(index)}
+      />
 
       <MembersTable className="table table-responsive">
         <thead>
@@ -40,85 +70,113 @@ function ScoringTable() {
           </tr>
         </thead>
 
-        <tbody>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((id) => (
-            <tr key={id}>
-              <td>
-                <InputBudrestNumber type="text" value={id + "A"} />
-              </td>
+        <tbody key={selectedTab}>
+          {currentRows.map((row, index) => {
+            const player1 = row.teams[0];
+            const player2 = row.teams[1];
+            return (
+              <tr key={index}>
+                <td>
+                  <InputBudrestNumber
+                    type="text"
+                    placeholder="-"
+                    value={
+                      player1.targetFace && player1.budRestNumber
+                        ? player1.targetFace + player1.budRestNumber
+                        : ""
+                    }
+                    disabled={!player1?.name || !player2?.name}
+                    readOnly
+                  />
+                </td>
 
-              <td>
-                <PlayerLabelContainerLeft>
-                  <PlayerNameData>
-                    <RankLabel>#{id}</RankLabel>
-                    <NameLabel>Arief Muhammad</NameLabel>
-                  </PlayerNameData>
-                </PlayerLabelContainerLeft>
-              </td>
+                <td>
+                  <PlayerLabelContainerLeft>
+                    <PlayerNameData>
+                      <RankLabel>#{player1?.potition || player1?.postition || "-"}</RankLabel>
+                      <NameLabel>{player1?.name || <NoArcherLabel />}</NameLabel>
+                    </PlayerNameData>
+                  </PlayerLabelContainerLeft>
+                </td>
 
-              <td>
-                <InlineScoreInput>
-                  <IndicatorIconWarning>
-                    <IconAlertCircle />
-                  </IndicatorIconWarning>
-                  <InputInlineScore type="text" value="197" />
-                </InlineScoreInput>
-              </td>
+                <td>
+                  <InlineScoreInput>
+                    {false && (
+                      <IndicatorIconWarning>
+                        <IconAlertCircle />
+                      </IndicatorIconWarning>
+                    )}
+                    <InputInlineScore
+                      type="text"
+                      placeholder="-"
+                      value={player1?.result || !player1?.name ? "-" : 0}
+                      disabled={!player1?.name}
+                      readOnly
+                    />
+                  </InlineScoreInput>
+                </td>
 
-              <td>
-                <Head2HeadScoreLabels>
-                  <ScoreLabelP1>229</ScoreLabelP1>
-                  <span>&ndash;</span>
-                  <ScoreLabelP2>312</ScoreLabelP2>
-                </Head2HeadScoreLabels>
-              </td>
+                <td>
+                  <Head2HeadScoreLabels>
+                    <ScoreLabelP1>{player1?.result || 0}</ScoreLabelP1>
+                    <span>&ndash;</span>
+                    <ScoreLabelP2>{player2?.result || 0}</ScoreLabelP2>
+                  </Head2HeadScoreLabels>
+                </td>
 
-              <td>
-                <InlineScoreInput>
-                  <InputInlineScore type="text" value="312" />
-                  <IndicatorIconValid>
-                    {/* TODO: ikon centang tapi circle */}
-                    <IconAlertCircle />
-                  </IndicatorIconValid>
-                </InlineScoreInput>
-              </td>
+                <td>
+                  <InlineScoreInput>
+                    <InputInlineScore
+                      type="text"
+                      placeholder="-"
+                      value={player2?.result || !player2?.name ? "-" : 0}
+                      disabled={!player2?.name}
+                      readOnly
+                    />
+                    {false && (
+                      <IndicatorIconValid>
+                        <IconCheckOkCircle />
+                      </IndicatorIconValid>
+                    )}
+                  </InlineScoreInput>
+                </td>
 
-              <td>
-                <PlayerLabelContainerRight>
-                  <PlayerNameData>
-                    <RankLabel>#{17 - id}</RankLabel>
-                    <NameLabel>Alshad Ahmad</NameLabel>
-                  </PlayerNameData>
-                </PlayerLabelContainerRight>
-              </td>
+                <td>
+                  <PlayerLabelContainerRight>
+                    <PlayerNameData>
+                      <RankLabel>#{player2?.potition || player2?.postition || "-"}</RankLabel>
+                      <NameLabel>{player2?.name || <NoArcherLabel />}</NameLabel>
+                    </PlayerNameData>
+                  </PlayerLabelContainerRight>
+                </td>
 
-              <td>
-                <HorizontalSpaced>
-                  <ButtonBlue flexible>Terapkan</ButtonBlue>
-                  <ButtonEditScoreLine />
-                </HorizontalSpaced>
-              </td>
-            </tr>
-          ))}
+                <td>
+                  <HorizontalSpaced>
+                    <ButtonBlue flexible disabled={!player1?.name || !player2?.name}>
+                      Tentukan
+                    </ButtonBlue>
+                    <ButtonEditScoreLine disabled={!player1?.name || !player2?.name} />
+                    <ButtonDownloadScoresheet disabled={!player1?.name || !player2?.name} />
+                  </HorizontalSpaced>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </MembersTable>
     </SectionTableContainer>
   );
 }
 
-function StagesTabs() {
-  // TODO: yang aktif dibaca dari "tahapan eliminasi" yang sedang berlangsung
-  // simulated
-  const [selectedTab, setSelectedTab] = React.useState(0);
-
+function StagesTabs({ labels, currentTab, onChange }) {
   return (
     <StagesBarContainer>
       <StageTabsList>
-        {["16 Besar", "8 Besar", "Semi-final", "Final"].map((label, index) => (
+        {labels.map((label, index) => (
           <li key={label}>
             <StageTabButton
-              className={classnames({ "session-tab-active": index === selectedTab })}
-              onClick={() => setSelectedTab(index)}
+              className={classnames({ "session-tab-active": index === currentTab })}
+              onClick={() => onChange(index)}
             >
               <span>{label}</span>
             </StageTabButton>
@@ -127,6 +185,10 @@ function StagesTabs() {
       </StageTabsList>
     </StagesBarContainer>
   );
+}
+
+function NoArcherLabel() {
+  return <NoArcherWrapper>Belum ada archer</NoArcherWrapper>;
 }
 
 /* ============================ */
@@ -176,7 +238,7 @@ const IndicatorIconValid = styled.span`
   right: -1.75rem;
   display: flex;
   align-items: center;
-  color: green;
+  color: var(--ma-alert-positive);
 `;
 
 const HorizontalSpaced = styled.div`
@@ -216,7 +278,6 @@ const EmptyStateDescription = styled.p`
 `;
 
 const StagesBarContainer = styled.div`
-  /* padding: 1rem 1.875rem; */
   padding: 1rem;
 `;
 
@@ -331,6 +392,11 @@ const NameLabel = styled.span`
   text-align: left;
 `;
 
+const NoArcherWrapper = styled.span`
+  color: var(--ma-gray-200);
+  font-weight: 400;
+`;
+
 const Head2HeadScoreLabels = styled.div`
   display: flex;
   justify-content: center;
@@ -349,5 +415,36 @@ const ScoreLabelP1 = styled.span`
 const ScoreLabelP2 = styled(ScoreLabelP1)`
   background-color: var(--ma-gray-200);
 `;
+
+/* =========================== */
+// utils
+
+const tabLabels = {
+  16: "32 Besar",
+  8: "16 Besar",
+  4: "8 Besar",
+  2: "Semi-Final",
+};
+
+function getTabLabels(bracketTemplate) {
+  if (!bracketTemplate) {
+    return [];
+  }
+
+  let finalHasTaken = false;
+  const labels = bracketTemplate.map((round) => {
+    const matchCount = round.seeds.length;
+    if (matchCount > 1) {
+      return tabLabels[matchCount];
+    }
+    if (!finalHasTaken) {
+      finalHasTaken = true;
+      return "Final";
+    }
+    return "3rd Place";
+  });
+
+  return labels;
+}
 
 export { ScoringTable };

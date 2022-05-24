@@ -65,7 +65,6 @@ export default function EditorFieldText({
 
   return (
     <Draggable
-      axis="y"
       scale={0.5}
       position={translatePosition}
       onStart={() => handleDrag()}

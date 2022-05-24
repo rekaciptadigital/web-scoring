@@ -70,7 +70,6 @@ export default function QrCodeField({
 
   return (
     <Draggable
-      axis="y"
       scale={0.5}
       position={translatePosition}
       onStart={() => handleDrag()}

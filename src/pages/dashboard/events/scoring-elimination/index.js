@@ -29,6 +29,7 @@ function PageEventScoringElimination() {
   } = useCategoryDetails(eventId);
 
   const {
+    activeCompetitionCategory,
     activeCategoryDetail,
     optionsCompetitionCategory,
     optionsAgeCategory,
@@ -87,7 +88,7 @@ function PageEventScoringElimination() {
           <FilterBars>
             <CategoryFilter>
               <FilterLabel>Kelas:</FilterLabel>
-              <FilterList>
+              <FilterList key={activeCompetitionCategory}>
                 {optionsAgeCategory?.length > 0 ? (
                   optionsAgeCategory.map((option) => (
                     <li key={option.ageCategory}>
@@ -107,7 +108,7 @@ function PageEventScoringElimination() {
 
             <CategoryFilter>
               <FilterLabel>Jenis Regu:</FilterLabel>
-              <FilterList>
+              <FilterList key={activeCompetitionCategory}>
                 {optionsGenderCategory?.length > 0 ? (
                   optionsGenderCategory.map((option) => (
                     <li key={option.genderCategory}>

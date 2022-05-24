@@ -27,7 +27,10 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
     );
   }
 
-  if (isSettled && !data) {
+  // Tabel dirender sebagai "state kosong" ketika:
+  // 1. belum menentukan jumlah peserta eliminasi di page skoring kualifikasi (belum ada ID eliminasi/`eliminationId`)
+  // 2. belum menentukan bagan eliminasi (terlempar error)
+  if ((isSettled && !data) || (isSettled && !data?.eliminationId)) {
     return (
       <SectionTableContainer>
         <EmptyBracketContainer>
@@ -46,8 +49,8 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
   }
 
   // Happy path
-  const tabLabels = getTabLabels(data);
-  const currentRows = data[selectedTab]?.seeds || [];
+  const tabLabels = getTabLabels(data.rounds);
+  const currentRows = data.rounds[selectedTab]?.seeds || [];
 
   return (
     <SectionTableContainer>
@@ -74,6 +77,18 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
           {currentRows.map((row, index) => {
             const player1 = row.teams[0];
             const player2 = row.teams[1];
+
+            const roundNumber = selectedTab + 1;
+            const matchNumber = index + 1;
+            const code = `2-${data.eliminationId}-${matchNumber}-${roundNumber}`;
+
+            const scoring = {
+              code: code,
+              elimination_id: data.eliminationId,
+              round: roundNumber,
+              match: matchNumber,
+            };
+
             return (
               <tr key={index}>
                 <td>
@@ -155,8 +170,10 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
                     <ButtonBlue flexible disabled={!player1?.name || !player2?.name}>
                       Tentukan
                     </ButtonBlue>
-                    <ButtonEditScoreLine disabled={!player1?.name || !player2?.name} />
-                    <ButtonDownloadScoresheet disabled={!player1?.name || !player2?.name} />
+                    <ButtonEditScoreLine
+                      disabled={!player1?.name || !player2?.name}
+                      scoring={scoring}
+                    />
                   </HorizontalSpaced>
                 </td>
               </tr>

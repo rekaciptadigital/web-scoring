@@ -48,7 +48,7 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
       {isOpen && (
         <Modal
           isOpen
-          size="xl"
+          size={bracketData.eliminationId ? "xl" : "md"}
           centered
           backdrop="static"
           autoFocus
@@ -64,26 +64,38 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
               </TopBar>
 
               <div>
-                <Scrollable>
-                  <Bracket
-                    rounds={bracketData.rounds || []}
-                    renderSeedComponent={(bracketProps) => (
-                      <SeedBagan
-                        bracketProps={bracketProps}
-                        configs={{
-                          totalRounds: bracketData.rounds.length - 1,
-                          eliminationId: bracketData.eliminationId,
-                        }}
-                      />
-                    )}
-                  />
-                </Scrollable>
+                {bracketData.eliminationId ? (
+                  <Scrollable>
+                    <Bracket
+                      rounds={bracketData.rounds || []}
+                      renderSeedComponent={(bracketProps) => (
+                        <SeedBagan
+                          bracketProps={bracketProps}
+                          configs={{
+                            totalRounds: bracketData.rounds.length - 1,
+                            eliminationId: bracketData.eliminationId,
+                          }}
+                        />
+                      )}
+                    />
+                  </Scrollable>
+                ) : (
+                  <NoBracketAvailable />
+                )}
               </div>
             </BodyWrapper>
           </ModalBody>
         </Modal>
       )}
     </React.Fragment>
+  );
+}
+
+function NoBracketAvailable() {
+  return (
+    <NoBracketWrapper>
+      <h4>Bagan belum tersedia</h4>
+    </NoBracketWrapper>
   );
 }
 
@@ -149,6 +161,18 @@ const TopBar = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+`;
+
+const NoBracketWrapper = styled.div`
+  min-height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > *:nth-child(1) {
+    margin-top: -2rem;
+    color: var(--ma-gray-400);
+  }
 `;
 
 const Scrollable = styled.div`

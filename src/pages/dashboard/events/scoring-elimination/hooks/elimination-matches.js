@@ -22,9 +22,7 @@ function useEliminationMatches(categoryDetailId, countNumber) {
       });
     };
 
-    fetcher.runAsync(getFunction, {
-      transform: (initialData) => initialData.rounds,
-    });
+    fetcher.runAsync(getFunction);
   }, []);
 
   return fetcher;

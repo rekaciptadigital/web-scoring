@@ -6,6 +6,10 @@ import {
   optionsFontSize,
   optionsFontFamily,
   getSelectedFontFamily,
+  optionsPaperSize,
+  getSelectedPaperSize,
+  optionsOrientation,
+  getSelectedOrientation,
 } from './utils/index';
 import { prepareSaveData } from "./utils";
 import { DEJAVU_SANS } from "../../certificates/utils/font-family-list";
@@ -49,6 +53,7 @@ function PageEventIdCard() {
 
   const [currentObject, setCurrentObject] = React.useState(null);
 //   const [isEditorDirty, setEditorAsDirty] = React.useState(false);
+
 
   const targetCertificateType = React.useRef(1);
   const [needSavingConfirmation, setNeedSavingConfirmation] = React.useState(false);
@@ -97,6 +102,8 @@ function PageEventIdCard() {
             event_id: event_id,
             backgroundUrl: result.data.background,
             fields: parsedEditorData.fields || defaultEditorData.fields,
+            paperSize: parsedEditorData.paperSize || defaultEditorData.paperSize,
+            // orientation: parsedEditorData.orientation || defaultEditorData.orientation,
             qrFields: parsedEditorData.qrFields || defaultEditorData.qrFields,
             photoProfileField: parsedEditorData.photoProfileField || defaultEditorData.photoProfileField,
           });
@@ -177,6 +184,22 @@ function PageEventIdCard() {
     }));
   };
 
+  const handlePaperSizeChange = (ev) => {
+    const { value } = ev;
+    setEditorData((data) => ({
+      ...data,
+      paperSize: value,
+    }));
+  };
+
+  const handleOrientationChange = (ev) => {
+    const { value } = ev;
+    setEditorData((data) => ({
+      ...data,
+      orientation: value,
+    }));
+  };
+
   const handleFontColorChange = (color) => {
     setCurrentObject((currentData) => ({
       ...currentData,
@@ -217,12 +240,12 @@ function PageEventIdCard() {
     });
     // setEditorDirty();
   };
-
+  
   const handleClickSave = async () => {
     setStatus("saving");
     const queryString = { event_id, type_certificate: currentCertificateType };
     const data = await prepareSaveData(editorData, queryString);
-
+    
     const result = await IdCardService.save(data);
     if (result.data) {
       const editorDataSaved = JSON.parse(result.data.editorData);
@@ -231,15 +254,17 @@ function PageEventIdCard() {
         ...editorDataSaved,
         event_id: event_id,
       }));
-    //   setEditorClean();
+      //   setEditorClean();
     }
-
+    
     setStatus("done");
   };
-
+  
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
+  
+  console.log(editorData, 'log');
   
   return (
     <React.Fragment>
@@ -352,6 +377,34 @@ function PageEventIdCard() {
                 </div>
                 </Row>
 
+                <Row>
+                  <div className="mt-3">
+                    <div>
+                      <label>Paper Size:</label>
+                      <Select
+                        options={optionsPaperSize}
+                        placeholder="Paper Size"
+                        value={getSelectedPaperSize(optionsPaperSize, editorData)}
+                        onChange={(ev) => handlePaperSizeChange(ev)}
+                        />
+                    </div>
+                    </div>
+                </Row>
+
+                <Row>
+                  <div className="mt-3">
+                    <div>
+                      <label>Orientation:</label>
+                      <Select
+                        options={optionsOrientation}
+                        placeholder="Pilih Orientasi Kertas"
+                        value={getSelectedOrientation(optionsOrientation, editorData)}
+                        onChange={(ev) => handleOrientationChange(ev)}
+                        />
+                    </div>
+                    </div>
+                </Row>
+
               {currentObject?.name == 'player_name' || currentObject?.name == 'category' || currentObject?.name == 'birthdate' || currentObject?.name == 'location_and_date' || currentObject?.name == 'club_member' || currentObject?.name == 'status_event' ? (
                 <Row>
                 {currentObject?.name && (
@@ -410,7 +463,7 @@ function PageEventIdCard() {
                   </div>
                 )}
                 </Row>
-              ) : null}
+              ) :null}
               </Col>
             </Row>
           </Col>
@@ -483,10 +536,9 @@ const ButtonEditor = styled.div`
 `;
 
 
-
-
 const defaultEditorData = {
-  paperSize: "A4", // || [1280, 908] || letter
+  paperSize: 'A4',
+  orientation: 'Potrait',
   backgroundUrl: null,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,

@@ -2,11 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
 
-import { SpinnerDotBlock, ButtonBlue } from "components/ma";
+import { SpinnerDotBlock } from "components/ma";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
 import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
-import { ButtonConfirmPrompt } from "./button-confirm-prompt";
+import { ButtonSetWinner } from "./button-set-winner";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
@@ -20,8 +20,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
     categoryDetailId,
     eliminationMemberCounts
   );
-  const [selectedTab, setSelectedTab] = React.useState(0);
 
+  const [selectedTab, setSelectedTab] = React.useState(0);
   const isSettled = Boolean(data) || (!data && isError);
 
   if (!isSettled) {
@@ -94,89 +94,106 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               match: matchNumber,
             };
 
+            const noData = !player1?.name || !player2?.name;
+            const hasWinner = row.teams.some((team) => team.win === 1);
+
             return (
               <tr key={index}>
                 <td>
-                  <InputBudrestNumber
-                    type="text"
-                    placeholder="-"
-                    value={
-                      player1.targetFace && player1.budRestNumber
+                  {noData || hasWinner ? (
+                    <BudrestNumberLabel>
+                      {player1.targetFace && player1.budRestNumber
                         ? player1.targetFace + player1.budRestNumber
-                        : ""
-                    }
-                    disabled={!player1?.name || !player2?.name}
-                    readOnly
-                  />
+                        : "-"}
+                    </BudrestNumberLabel>
+                  ) : (
+                    <InputBudrestNumber
+                      type="text"
+                      placeholder="-"
+                      value={
+                        player1.targetFace && player1.budRestNumber
+                          ? player1.targetFace + player1.budRestNumber
+                          : ""
+                      }
+                      disabled={!player1?.name || !player2?.name}
+                      readOnly
+                    />
+                  )}
                 </td>
 
                 <td>
                   <PlayerLabelContainerLeft>
                     <PlayerNameData>
-                      <RankLabel>#{player1?.potition || player1?.postition || "-"}</RankLabel>
+                      {(player1?.potition || player1?.postition) && (
+                        <RankLabel>#{player1?.potition || player1?.postition || "-"}</RankLabel>
+                      )}
                       <NameLabel>{player1?.name || <NoArcherLabel />}</NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerLeft>
                 </td>
 
                 <td>
-                  <InlineScoreInput>
-                    {false && (
-                      <IndicatorIconWarning>
-                        <IconAlertCircle />
-                      </IndicatorIconWarning>
-                    )}
-                    <TotalInputAsync
-                      playerDetail={player1}
-                      disabled={!player1?.name}
-                      scoring={scoring}
-                      onSuccess={fetchEliminationMatches}
-                    />
-                  </InlineScoreInput>
+                  {!noData && !hasWinner ? (
+                    <InlineScoreInput>
+                      <ValidationIndicator isValid={false} />
+                      <TotalInputAsync
+                        playerDetail={player1}
+                        disabled={hasWinner || !player1?.name}
+                        scoring={scoring}
+                        onSuccess={fetchEliminationMatches}
+                      />
+                    </InlineScoreInput>
+                  ) : (
+                    <NoArcherWrapper>-</NoArcherWrapper>
+                  )}
                 </td>
 
                 <td>
-                  <HeadToHeadScoreLabels>
-                    <ScoreTotalLabel
-                      className={classnames({
-                        "score-label-higher": player1?.adminTotal > player2?.adminTotal,
-                      })}
-                    >
-                      {player1?.adminTotal || 0}
-                    </ScoreTotalLabel>
+                  {!noData && (
+                    <HeadToHeadScoreLabels>
+                      <ScoreTotalLabel
+                        className={classnames({
+                          "score-label-higher": player1?.adminTotal > player2?.adminTotal,
+                        })}
+                      >
+                        {player1?.adminTotal || 0}
+                      </ScoreTotalLabel>
 
-                    <span>&ndash;</span>
+                      <span>&ndash;</span>
 
-                    <ScoreTotalLabel
-                      className={classnames({
-                        "score-label-higher": player2?.adminTotal > player1?.adminTotal,
-                      })}
-                    >
-                      {player2?.adminTotal || 0}
-                    </ScoreTotalLabel>
-                  </HeadToHeadScoreLabels>
+                      <ScoreTotalLabel
+                        className={classnames({
+                          "score-label-higher": player2?.adminTotal > player1?.adminTotal,
+                        })}
+                      >
+                        {player2?.adminTotal || 0}
+                      </ScoreTotalLabel>
+                    </HeadToHeadScoreLabels>
+                  )}
                 </td>
 
                 <td>
-                  <InlineScoreInput>
-                    <TotalInputAsync
-                      playerDetail={player2}
-                      disabled={!player2?.name}
-                      scoring={scoring}
-                      onSuccess={fetchEliminationMatches}
-                    />
-                    {false && (
-                      <IndicatorIconValid>
-                        <IconCheckOkCircle />
-                      </IndicatorIconValid>
-                    )}
-                  </InlineScoreInput>
+                  {!noData && !hasWinner ? (
+                    <InlineScoreInput>
+                      <TotalInputAsync
+                        playerDetail={player2}
+                        disabled={hasWinner || !player2?.name}
+                        scoring={scoring}
+                        onSuccess={fetchEliminationMatches}
+                      />
+                      <ValidationIndicator isValid={true} />
+                    </InlineScoreInput>
+                  ) : (
+                    <NoArcherWrapper>-</NoArcherWrapper>
+                  )}
                 </td>
 
                 <td>
                   <PlayerLabelContainerRight>
                     <PlayerNameData>
-                      <RankLabel>#{player2?.potition || player2?.postition || "-"}</RankLabel>
+                      {(player2?.potition || player2?.postition) && (
+                        <RankLabel>#{player2?.potition || player2?.postition || "-"}</RankLabel>
+                      )}
                       <NameLabel>{player2?.name || <NoArcherLabel />}</NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerRight>
@@ -184,28 +201,32 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
 
                 <td>
                   <HorizontalSpaced>
-                    <ButtonConfirmPrompt
-                      flexible
-                      customButton={ButtonBlue}
-                      title="Tentukan pemenang untuk match ini"
-                      disabled={!player1?.name || !player2?.name}
-                      messagePrompt="Anda akan menentukan pemenang"
-                      messageDescription="Skor tidak dapat diubah lagi setelah ditentukan pemenang. Pastikan skor telah diisi benar."
-                      buttonConfirmLabel="Tentukan pemenang"
-                      buttonCancelLabel="Periksa kembali"
-                    >
-                      Tentukan
-                    </ButtonConfirmPrompt>
+                    {!hasWinner && (
+                      <ButtonSetWinner
+                        title={
+                          hasWinner
+                            ? "Pemenang telah ditentukan"
+                            : "Tentukan pemenang untuk match ini"
+                        }
+                        disabled={noData}
+                        scoring={scoring}
+                        onSuccess={fetchEliminationMatches}
+                      >
+                        Tentukan
+                      </ButtonSetWinner>
+                    )}
 
-                    <ButtonEditScoreLine
-                      disabled={!player1?.name || !player2?.name}
-                      headerInfo={row}
-                      scoring={scoring}
-                      onSuccessSubmit={fetchEliminationMatches}
-                      categoryDetails={categoryDetails}
-                    />
+                    {!hasWinner && (
+                      <ButtonEditScoreLine
+                        disabled={noData}
+                        headerInfo={row}
+                        scoring={scoring}
+                        onSuccessSubmit={fetchEliminationMatches}
+                        categoryDetails={categoryDetails}
+                      />
+                    )}
 
-                    <ButtonDownloadScoresheet disabled={!player1?.name || !player2?.name} />
+                    <ButtonDownloadScoresheet disabled={noData} />
                   </HorizontalSpaced>
                 </td>
               </tr>
@@ -240,6 +261,21 @@ function NoArcherLabel() {
   return <NoArcherWrapper>Belum ada archer</NoArcherWrapper>;
 }
 
+function ValidationIndicator({ isValid }) {
+  if (!isValid) {
+    return (
+      <IndicatorIconWarning title="Hasil input dengan total poin belum sesuai, cek detail skoring">
+        <IconAlertCircle />
+      </IndicatorIconWarning>
+    );
+  }
+  return (
+    <IndicatorIconValid title="Total skor sesuai dengan detailnya">
+      <IconCheckOkCircle />
+    </IndicatorIconValid>
+  );
+}
+
 /* ============================ */
 // styles
 
@@ -251,6 +287,13 @@ const InputBudrestNumber = styled.input`
   padding: calc(0.625rem - 1px) calc(0.5rem - 1px);
   width: 3rem;
   border: solid 1px var(--ma-gray-400);
+  border-radius: 0.25rem;
+  font-weight: 600;
+  text-align: center;
+`;
+
+const BudrestNumberLabel = styled.div`
+  width: 3rem;
   border-radius: 0.25rem;
   font-weight: 600;
   text-align: center;

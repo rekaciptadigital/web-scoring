@@ -40,7 +40,12 @@ function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit, c
 
   return (
     <React.Fragment>
-      <ButtonOutlineBlue flexible onClick={open} disabled={disabled}>
+      <ButtonOutlineBlue
+        flexible
+        title={disabled ? undefined : "Edit detail skor"}
+        onClick={open}
+        disabled={disabled}
+      >
         <span>Edit</span>{" "}
         <span>
           <IconEdit size="16" />

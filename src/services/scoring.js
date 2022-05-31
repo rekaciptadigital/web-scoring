@@ -40,4 +40,13 @@ export default {
   saveScoreAdminTotal(data = null) {
     return API.post("/web/v2/scorer-elimination/set-admin-total", data, null, true);
   },
+
+  /**
+   *
+   * @param {Object} queryString  { elimination_id, round, match }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  saveScorePermanent(data = null) {
+    return API.post("/web/v2/scorer-elimination/set-save-permanent", data, null, true);
+  },
 };

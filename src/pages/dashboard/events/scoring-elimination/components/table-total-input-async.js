@@ -65,6 +65,7 @@ function TotalInputAsync({ playerDetail, disabled, scoring, onSuccess }) {
             return validatedNumberValue;
           });
         }}
+        onFocus={(ev) => ev.target.select()}
       />
       {isLoading && (
         <span>

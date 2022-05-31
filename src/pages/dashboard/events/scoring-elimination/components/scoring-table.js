@@ -15,7 +15,7 @@ import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracke
 
 import classnames from "classnames";
 
-function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
+function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
   const { isError, data, fetchEliminationMatches } = useEliminationMatches(
     categoryDetailId,
     eliminationMemberCounts
@@ -199,9 +199,10 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
 
                     <ButtonEditScoreLine
                       disabled={!player1?.name || !player2?.name}
-                      headerInfo={row.teams}
+                      headerInfo={row}
                       scoring={scoring}
                       onSuccessSubmit={fetchEliminationMatches}
+                      categoryDetails={categoryDetails}
                     />
 
                     <ButtonDownloadScoresheet disabled={!player1?.name || !player2?.name} />

@@ -25,7 +25,9 @@ import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 import IconBow from "components/ma/icons/mono/bow";
 import IconDistance from "components/ma/icons/mono/arrow-left-right";
 
-function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit }) {
+import classnames from "classnames";
+
+function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit, categoryDetails }) {
   const [isOpen, setOpen] = React.useState(false);
 
   const open = () => {
@@ -51,15 +53,14 @@ function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit })
           onClose={close}
           scoring={scoring}
           onSuccessSubmit={onSuccessSubmit}
+          categoryDetails={categoryDetails}
         />
       )}
     </React.Fragment>
   );
 }
 
-function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit }) {
-  const refetchCounter = React.useRef(1);
-
+function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit, categoryDetails }) {
   // "query"
   const {
     isError: isErrorScoringDetail,
@@ -69,8 +70,8 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit }) {
   } = useScoringDetail(scoring);
 
   const isSettled = Boolean(scoringDetails) || (!scoringDetails && isErrorScoringDetail);
-  const headerPlayer1 = headerInfo[0];
-  const headerPlayer2 = headerInfo[1];
+  const headerPlayer1 = headerInfo?.teams[0];
+  const headerPlayer2 = headerInfo?.teams[1];
   const player1 = scoringDetails?.[0];
   const player2 = scoringDetails?.[1];
 
@@ -104,7 +105,6 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit }) {
   });
 
   const onSuccess = () => {
-    refetchCounter.current = refetchCounter.current + 1;
     toast.success("Detail skor berhasil disimpan");
     fetchScoringDetail();
     onSuccessSubmit?.();
@@ -180,9 +180,25 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit }) {
                   </HeaderScoreInput>
 
                   <HeadToHeadScoreLabels>
-                    <ScoreCounter>{player1?.scores?.adminTotal || 0}</ScoreCounter>
+                    <ScoreCounter
+                      className={classnames({
+                        "score-counter-highlighted":
+                          player1?.scores?.adminTotal > player2?.scores?.adminTotal,
+                      })}
+                    >
+                      {player1?.scores?.adminTotal || 0}
+                    </ScoreCounter>
+
                     <span>&ndash;</span>
-                    <ScoreCounter>{player2?.scores?.adminTotal || 0}</ScoreCounter>
+
+                    <ScoreCounter
+                      className={classnames({
+                        "score-counter-highlighted":
+                          player2?.scores?.adminTotal > player1?.scores?.adminTotal,
+                      })}
+                    >
+                      {player2?.scores?.adminTotal || 0}
+                    </ScoreCounter>
                   </HeadToHeadScoreLabels>
 
                   <HeaderScoreInput>
@@ -226,12 +242,15 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit }) {
               </ScoresheetHeader>
 
               <CategoryLabel>
-                <div>{"Individu Putra"}</div>
+                <div>{categoryDetails?.teamCategoryLabel}</div>
                 <div>
-                  <IconBow size="16" /> {`${"Barebow"} ${"Umum"}`}
+                  <IconBow size="16" />{" "}
+                  {categoryDetails?.originalCategoryDetail.competitionCategoryId}{" "}
+                  {categoryDetails?.originalCategoryDetail.ageCategoryId}
                 </div>
                 <div>
-                  <IconDistance size="16" /> {"50m"}
+                  <IconDistance size="16" />{" "}
+                  {_getDistanceCategoryLabel(categoryDetails?.originalCategoryDetail.classCategory)}
                 </div>
               </CategoryLabel>
             </div>
@@ -446,6 +465,10 @@ const ScoreCounter = styled.span`
   background-color: var(--ma-gray-200);
   white-space: nowrap;
   text-align: center;
+
+  &.score-counter-highlighted {
+    background-color: var(--ma-secondary);
+  }
 `;
 
 const SplitEditor = styled.div`
@@ -505,6 +528,10 @@ function _makeMemberScoresPayload({ state, payload }) {
   }));
   //coba tanpa type?
   return { type: 2, members };
+}
+
+function _getDistanceCategoryLabel(classCategory) {
+  return classCategory.split(" - ")?.[1]?.trim() || "-";
 }
 
 export { ButtonEditScoreLine };

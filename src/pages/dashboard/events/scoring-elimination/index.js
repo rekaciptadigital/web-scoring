@@ -141,6 +141,7 @@ function PageEventScoringElimination() {
       <ScoringTable
         key={activeCategoryDetail?.categoryDetailId}
         categoryDetailId={activeCategoryDetail?.categoryDetailId}
+        categoryDetails={activeCategoryDetail}
         eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
       />
     </ContentLayoutWrapper>

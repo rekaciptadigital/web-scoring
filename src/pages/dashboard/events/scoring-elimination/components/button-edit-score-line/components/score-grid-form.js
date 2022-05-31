@@ -6,68 +6,125 @@ import { SelectScoreShootOff } from "./select-score-shoot-off";
 
 import { sumScoresList, sumScoresAllRambahan } from "../utils";
 
-function ScoreGridForm({
-  scoringType = 1,
-  gridData = {
-    shot: [
-      ["", "", ""],
-      ["", "", ""],
-      ["", "", ""],
-      ["", "", ""],
-      ["", "", ""],
-    ],
-    stats: { 0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {} },
-    extraShot: [
-      { score: "", distanceFromX: 0 },
-      { score: "", distanceFromX: 0 },
-      { score: "", distanceFromX: 0 },
-    ],
-  },
-}) {
+const defaultGrid = {
+  shot: [
+    ["", "", ""],
+    ["", "", ""],
+    ["", "", ""],
+    ["", "", ""],
+    ["", "", ""],
+  ],
+  stats: { 0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {} },
+  extraShot: [
+    { score: "", distanceFromX: 0 },
+    { score: "", distanceFromX: 0 },
+    { score: "", distanceFromX: 0 },
+  ],
+};
+
+function ScoreGridForm({ scoringType = 1, gridData = defaultGrid, onChange }) {
+  const handleChangeScores = ({ rambahan: rambahanIndex, shot: shotIndex, value }) => {
+    const updatedShot = gridData.shot.map((rambahan, index) => {
+      if (index !== rambahanIndex) {
+        return rambahan;
+      }
+
+      return rambahan.map((shot, index) => {
+        if (index !== shotIndex) {
+          return shot;
+        }
+        return value;
+      });
+    });
+
+    onChange?.({
+      ...gridData,
+      shot: updatedShot,
+    });
+  };
+
+  const handleChangeShootoff = ({ index: shootoffIndex, value }) => {
+    const updatedExtraShot = gridData.extraShot.map((shot, index) => {
+      if (index !== shootoffIndex) {
+        return shot;
+      }
+
+      return { score: value.score, distanceFromX: value.distance };
+    });
+
+    onChange?.({
+      ...gridData,
+      extraShot: updatedExtraShot,
+    });
+  };
+
   return (
     <ScoresTable className="table table-responsive">
       <thead>
         <tr>
-          {/* <THCenter>End</THCenter> */}
           <th>Shot</th>
-          <THCenter>Sum</THCenter>
-          {scoringType === parseInt(1) && <THCenter>Poin</THCenter>}
+          {parseInt(scoringType) === 1 && (
+            <React.Fragment>
+              <THCenter>Sum</THCenter>
+              <THCenter>Poin</THCenter>
+            </React.Fragment>
+          )}
+
+          {parseInt(scoringType) === 2 && (
+            <React.Fragment>
+              <THCenter></THCenter>
+              <THCenter>Sum</THCenter>
+            </React.Fragment>
+          )}
         </tr>
       </thead>
 
       <tbody>
-        {gridData.shot.map((rambahan, rambahanIndex) => {
+        {gridData?.shot?.map((rambahan, rambahanIndex) => {
           return (
             <tr key={rambahanIndex}>
-              {/* <TDCenter>
-                <span>{rambahanIndex + 1}</span>
-              </TDCenter> */}
-
-              <td>
+              <TDRambahan>
                 <RambahanUhuy>
                   {rambahan.map((shot, shotIndex) => (
                     <SelectScore
                       key={shotIndex}
                       name={`score-${rambahanIndex}-${shotIndex}`}
                       value={shot}
-                      // onChange={}
+                      onChange={(value) => {
+                        handleChangeScores({
+                          rambahan: rambahanIndex,
+                          shot: shotIndex,
+                          value,
+                        });
+                      }}
                     />
                   ))}
                 </RambahanUhuy>
-              </td>
+              </TDRambahan>
 
-              <TDCenter>{sumScoresList(rambahan) || "-"}</TDCenter>
-              {scoringType === parseInt(1) && (
-                <TDCenter>
-                  <ScoreCounter>{gridData.stats?.[rambahanIndex].point || "-"}</ScoreCounter>
-                </TDCenter>
+              {parseInt(scoringType) === 1 && (
+                <React.Fragment>
+                  <TDCenter>{sumScoresList(rambahan) || "-"}</TDCenter>
+                  <TDCenter>
+                    <ScoreCounter>{gridData.stats?.[rambahanIndex].point || "-"}</ScoreCounter>
+                  </TDCenter>
+                </React.Fragment>
+              )}
+
+              {parseInt(scoringType) === 2 && (
+                <React.Fragment>
+                  <TDCenter></TDCenter>
+                  <TDCenter>
+                    <ScoreCounter>{sumScoresList(rambahan) || "-"}</ScoreCounter>
+                  </TDCenter>
+                </React.Fragment>
               )}
             </tr>
           );
         })}
 
         <tr>
-          <td>
+          <TDRambahan>
             <RambahanUhuy>
               {gridData.extraShot.map((shot, index) => (
                 <SelectScoreShootOff
@@ -76,13 +133,12 @@ function ScoreGridForm({
                     score: shot.score,
                     distance: shot.distanceFromX,
                   }}
-                  // onChange
-                  // onSetDistance
+                  onChange={(value) => handleChangeShootoff({ index, value })}
                 />
               ))}
             </RambahanUhuy>
-          </td>
-          <td>&nbsp;</td>
+          </TDRambahan>
+          <td></td>
 
           <TDCenter>
             <span>S-Off</span>
@@ -92,12 +148,22 @@ function ScoreGridForm({
 
       <tfoot>
         <tr>
-          <THRight></THRight>
-          <THTotal>{sumScoresAllRambahan(gridData.shot)}</THTotal>
-          {scoringType === parseInt(1) && (
-            <THTotal>
-              <ScoreCounter>{"..."}</ScoreCounter>
-            </THTotal>
+          <th></th>
+
+          {parseInt(scoringType) === 1 && (
+            <React.Fragment>
+              <THTotal>{sumScoresAllRambahan(gridData?.shot)}</THTotal>
+              <THTotal>
+                <ScoreCounter>{"..."}</ScoreCounter>
+              </THTotal>
+            </React.Fragment>
+          )}
+
+          {parseInt(scoringType) === 2 && (
+            <React.Fragment>
+              <th></th>
+              <THTotal>{sumScoresAllRambahan(gridData?.shot)}</THTotal>
+            </React.Fragment>
           )}
         </tr>
       </tfoot>
@@ -116,6 +182,10 @@ const ScoresTable = styled.table`
   }
 `;
 
+const TDRambahan = styled.td`
+  vertical-align: middle;
+`;
+
 const RambahanUhuy = styled.div`
   display: flex;
   gap: 0.5rem;
@@ -127,11 +197,8 @@ const THCenter = styled.th`
 `;
 
 const TDCenter = styled.td`
+  vertical-align: middle;
   text-align: center;
-`;
-
-const THRight = styled.th`
-  text-align: right;
 `;
 
 const THTotal = styled.th`
@@ -140,7 +207,7 @@ const THTotal = styled.th`
 `;
 
 const ScoreCounter = styled.span`
-  display: block;
+  display: inline-block;
   padding: 0.625rem 0.5rem;
   min-width: 3rem;
   background-color: var(--ma-gray-200);

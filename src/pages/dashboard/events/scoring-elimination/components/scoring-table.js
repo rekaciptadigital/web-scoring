@@ -3,8 +3,10 @@ import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
 
 import { SpinnerDotBlock, ButtonBlue } from "components/ma";
+import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
 import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
+import { ButtonConfirmPrompt } from "./button-confirm-prompt";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
@@ -14,7 +16,10 @@ import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracke
 import classnames from "classnames";
 
 function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
-  const { isError, data } = useEliminationMatches(categoryDetailId, eliminationMemberCounts);
+  const { isError, data, fetchEliminationMatches } = useEliminationMatches(
+    categoryDetailId,
+    eliminationMemberCounts
+  );
   const [selectedTab, setSelectedTab] = React.useState(0);
 
   const isSettled = Boolean(data) || (!data && isError);
@@ -30,7 +35,7 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
   // Tabel dirender sebagai "state kosong" ketika:
   // 1. belum menentukan jumlah peserta eliminasi di page skoring kualifikasi (belum ada ID eliminasi/`eliminationId`)
   // 2. belum menentukan bagan eliminasi (terlempar error)
-  if ((isSettled && !data) || (isSettled && !data?.eliminationId)) {
+  if (!data?.eliminationId) {
     return (
       <SectionTableContainer>
         <EmptyBracketContainer>
@@ -121,32 +126,44 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
                         <IconAlertCircle />
                       </IndicatorIconWarning>
                     )}
-                    <InputInlineScore
-                      type="text"
-                      placeholder="-"
-                      value={player1?.result || !player1?.name ? "-" : 0}
+                    <TotalInputAsync
+                      playerDetail={player1}
                       disabled={!player1?.name}
-                      readOnly
+                      scoring={scoring}
+                      onSuccess={fetchEliminationMatches}
                     />
                   </InlineScoreInput>
                 </td>
 
                 <td>
-                  <Head2HeadScoreLabels>
-                    <ScoreLabelP1>{player1?.result || 0}</ScoreLabelP1>
+                  <HeadToHeadScoreLabels>
+                    <ScoreTotalLabel
+                      className={classnames({
+                        "score-label-higher": player1?.adminTotal > player2?.adminTotal,
+                      })}
+                    >
+                      {player1?.adminTotal || 0}
+                    </ScoreTotalLabel>
+
                     <span>&ndash;</span>
-                    <ScoreLabelP2>{player2?.result || 0}</ScoreLabelP2>
-                  </Head2HeadScoreLabels>
+
+                    <ScoreTotalLabel
+                      className={classnames({
+                        "score-label-higher": player2?.adminTotal > player1?.adminTotal,
+                      })}
+                    >
+                      {player2?.adminTotal || 0}
+                    </ScoreTotalLabel>
+                  </HeadToHeadScoreLabels>
                 </td>
 
                 <td>
                   <InlineScoreInput>
-                    <InputInlineScore
-                      type="text"
-                      placeholder="-"
-                      value={player2?.result || !player2?.name ? "-" : 0}
+                    <TotalInputAsync
+                      playerDetail={player2}
                       disabled={!player2?.name}
-                      readOnly
+                      scoring={scoring}
+                      onSuccess={fetchEliminationMatches}
                     />
                     {false && (
                       <IndicatorIconValid>
@@ -167,13 +184,27 @@ function ScoringTable({ categoryDetailId, eliminationMemberCounts }) {
 
                 <td>
                   <HorizontalSpaced>
-                    <ButtonBlue flexible disabled={!player1?.name || !player2?.name}>
+                    <ButtonConfirmPrompt
+                      flexible
+                      customButton={ButtonBlue}
+                      title="Tentukan pemenang untuk match ini"
+                      disabled={!player1?.name || !player2?.name}
+                      messagePrompt="Anda akan menentukan pemenang"
+                      messageDescription="Skor tidak dapat diubah lagi setelah ditentukan pemenang. Pastikan skor telah diisi benar."
+                      buttonConfirmLabel="Tentukan pemenang"
+                      buttonCancelLabel="Periksa kembali"
+                    >
                       Tentukan
-                    </ButtonBlue>
+                    </ButtonConfirmPrompt>
+
                     <ButtonEditScoreLine
                       disabled={!player1?.name || !player2?.name}
+                      headerInfo={row.teams}
                       scoring={scoring}
+                      onSuccessSubmit={fetchEliminationMatches}
                     />
+
+                    <ButtonDownloadScoresheet disabled={!player1?.name || !player2?.name} />
                   </HorizontalSpaced>
                 </td>
               </tr>
@@ -226,16 +257,6 @@ const InputBudrestNumber = styled.input`
 
 const InlineScoreInput = styled.div`
   position: relative;
-`;
-
-const InputInlineScore = styled.input`
-  padding: calc(0.625rem - 1px) calc(0.5rem - 1px);
-  width: 3rem;
-  border: solid 1px var(--ma-gray-200);
-  border-radius: 0.25rem;
-  color: var(--ma-gray-500);
-  font-size: 0.85em;
-  text-align: center;
 `;
 
 const IndicatorIconWarning = styled.span`
@@ -414,23 +435,23 @@ const NoArcherWrapper = styled.span`
   font-weight: 400;
 `;
 
-const Head2HeadScoreLabels = styled.div`
+const HeadToHeadScoreLabels = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
 `;
 
-const ScoreLabelP1 = styled.span`
+const ScoreTotalLabel = styled.span`
   display: block;
   padding: 0.625rem 0.5rem;
   min-width: 3rem;
-  background-color: var(--ma-secondary);
-  white-space: nowrap;
-`;
-
-const ScoreLabelP2 = styled(ScoreLabelP1)`
   background-color: var(--ma-gray-200);
+  white-space: nowrap;
+
+  &.score-label-higher {
+    background-color: var(--ma-secondary);
+  }
 `;
 
 /* =========================== */

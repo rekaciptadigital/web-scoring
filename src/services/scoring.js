@@ -31,4 +31,13 @@ export default {
   putParticipantPresence(queryString = null) {
     return API.put("/web/v2/participant/change-is-present", null, queryString);
   },
+
+  /**
+   *
+   * @param {Object} queryString  { elimination_id, round, match, member_id, admin_total }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  saveScoreAdminTotal(data = null) {
+    return API.post("/web/v2/scorer-elimination/set-admin-total", data, null, true);
+  },
 };

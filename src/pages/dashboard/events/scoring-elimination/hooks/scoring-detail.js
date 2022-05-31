@@ -7,13 +7,7 @@ function useScoringDetail({ code, elimination_id, match, round }) {
 
   const fetchScoringDetail = () => {
     const getFunction = () => {
-      return ScoringService.findParticipantScoreDetail({
-        code: code,
-        type: 2,
-        elimination_id: elimination_id,
-        match: match,
-        round: round,
-      });
+      return ScoringService.findParticipantScoreDetail({ code: code });
     };
     fetcher.runAsync(getFunction);
   };

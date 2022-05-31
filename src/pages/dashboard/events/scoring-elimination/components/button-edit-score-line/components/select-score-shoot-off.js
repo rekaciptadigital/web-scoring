@@ -1,54 +1,26 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import ReactSelect from "react-select";
+import Select from "react-select";
 
 import classnames from "classnames";
 import { misc } from "utils";
 
-const Select = React.memo(ReactSelect);
+const defaultSelectValue = { score: "", distance: 0 };
 
-const optionsScoreNumbers = ["", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => ({
-  value,
-  label: !value ? "-" : isNaN(value) ? value.toUpperCase() : value,
-}));
-
-const VALUES_WITHOUT_DISTANCE = ["", "-", "m"];
-
-const defaultSelectValue = { score: "", distance: "" };
-
-function SelectScoreShootOff({ name, value, onChange, onSetDistance }) {
-  value = value || defaultSelectValue;
-  const convertedValueType = _convertValueType(value.score);
-  const distanceValue = value.distance;
-  const selectedOption = _getOptionFromValue(convertedValueType);
-  const refSelect = React.useRef(null);
-
+function SelectScoreShootOff({ name, value, onChange }) {
+  const [localValue, setLocalValue] = React.useState(defaultSelectValue);
   const [isDistanceInputOpen, setDistanceInputOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!value) {
+      return;
+    }
+    setLocalValue(value);
+  }, [value]);
+
   const openDistanceInput = () => setDistanceInputOpen(true);
-
-  const handleChange = React.useCallback(
-    async (option) => {
-      const valueObject = {
-        score: option.value,
-        distance: "",
-      };
-
-      onChange?.(valueObject);
-
-      const isValueForDistance = _checkIsValueForDistance(option.value);
-      if (!isValueForDistance) {
-        return;
-      }
-
-      // buka input jarak setelah delay sebentar
-      await misc.sleep(300);
-      openDistanceInput();
-    },
-    [convertedValueType, distanceValue]
-  );
-
-  const handleNoOption = React.useCallback(() => "-", []);
+  const closeDistanceInput = () => setDistanceInputOpen(false);
 
   return (
     <SelectContainer>
@@ -56,31 +28,48 @@ function SelectScoreShootOff({ name, value, onChange, onSetDistance }) {
         name={name}
         placeholder="-"
         styles={customSelectStyles}
-        onChange={handleChange}
-        value={selectedOption}
         options={optionsScoreNumbers}
-        noOptionsMessage={handleNoOption}
-        ref={refSelect}
+        noOptionsMessage={() => "-"}
+        value={_getOptionFromValue(localValue.score)}
+        onChange={async (option) => {
+          setLocalValue({
+            score: option.value,
+            distance: 0,
+          });
+
+          const shouldOpenDistance = _checkIsValueForDistance(option.value);
+          if (!shouldOpenDistance) {
+            onChange?.({
+              score: option.value,
+              distance: 0,
+            });
+            return;
+          }
+
+          // buka input jarak setelah delay sebentar
+          await misc.sleep(300);
+          openDistanceInput();
+        }}
       />
 
-      <DistanceLabel scoreValue={convertedValueType} onOpen={openDistanceInput}>
-        {distanceValue}
+      <DistanceLabel scoreValue={_convertValueType(localValue.score)} onOpen={openDistanceInput}>
+        {localValue.distance}
       </DistanceLabel>
 
       <DistanceInput
         isOpen={isDistanceInputOpen}
-        onConfirm={(distanceValue) => {
-          const valueObject = {
-            score: convertedValueType,
-            distance: _convertValueType(distanceValue),
-          };
-
-          onChange?.(valueObject);
-          onSetDistance?.();
+        onClose={closeDistanceInput}
+        onIgnore={() => {
+          if (localValue.score === value.score) {
+            return;
+          }
+          onChange?.(localValue);
         }}
-        onClose={() => {
-          setDistanceInputOpen(false);
-          onSetDistance?.();
+        onConfirm={(distanceValue) => {
+          onChange?.({
+            score: localValue.score,
+            distance: _convertValueType(distanceValue),
+          });
         }}
       />
     </SelectContainer>
@@ -118,48 +107,59 @@ function DistanceLabel({ children, distanceValue, scoreValue, onOpen }) {
   );
 }
 
-function DistanceInput({ isOpen, onClose, onConfirm }) {
+function DistanceInput({ isOpen, onIgnore, onClose, onConfirm }) {
   if (!isOpen) {
     return null;
   }
-
-  const inputDistanceProps = { onConfirm, onClose };
-
   return (
     <React.Fragment>
-      <ClickOutsideBlocker onClick={onClose} />
-      <InputDistanceFromX {...inputDistanceProps} />
+      <ClickOutsideBlocker
+        onClick={() => {
+          onIgnore();
+          onClose();
+        }}
+      />
+      <InputDistanceFromX {...{ onConfirm, onIgnore, onClose }} />
     </React.Fragment>
   );
 }
 
-function InputDistanceFromX({ onConfirm, onClose }) {
+function InputDistanceFromX({ onConfirm, onIgnore, onClose }) {
   const inputRef = React.useRef(null);
 
   React.useEffect(() => {
     inputRef.current.focus();
   }, []);
 
-  const handleConfirm = (ev) => {
-    ev.preventDefault();
-    if (!inputRef.current.value) {
-      inputRef.current.focus();
-      return;
-    }
-    onConfirm?.(inputRef.current.value);
-    onClose?.();
-  };
-
   return (
     <InputDistanceContainer>
-      <form id="form-distance" onSubmit={handleConfirm}>
+      <form
+        id="form-distance"
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          if (!inputRef.current.value) {
+            inputRef.current.focus();
+            return;
+          }
+          onConfirm?.(inputRef.current.value);
+          onClose?.();
+        }}
+      >
         <input ref={inputRef} id="distanceFromX" placeholder="Jarak dari X (mm)" />
       </form>
 
       <ButtonConfirm form="form-distance" type="submit">
         Simpan
       </ButtonConfirm>
-      <ButtonGhost onClick={onClose}>Abaikan</ButtonGhost>
+
+      <ButtonGhost
+        onClick={() => {
+          onIgnore();
+          onClose();
+        }}
+      >
+        Abaikan
+      </ButtonGhost>
     </InputDistanceContainer>
   );
 }
@@ -291,9 +291,14 @@ const ButtonConfirm = styled(ButtonGhost)`
 /* =============================== */
 // utils
 
+const optionsScoreNumbers = ["", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => ({
+  value,
+  label: !value ? "-" : isNaN(value) ? value.toUpperCase() : value,
+}));
+
 function _convertValueType(inputValue) {
   if (!inputValue || inputValue === "-") {
-    return "-";
+    return "";
   }
   if (["m", "x"].indexOf(inputValue.toLowerCase?.()) >= 0) {
     return inputValue;
@@ -302,10 +307,17 @@ function _convertValueType(inputValue) {
 }
 
 function _getOptionFromValue(value) {
-  return optionsScoreNumbers.find((option) => option.value === value);
+  if (!value) {
+    return null;
+  }
+  const foundOption = optionsScoreNumbers.find(
+    (option) => option.value === _convertValueType(value)
+  );
+  return foundOption || null;
 }
 
 function _checkIsValueForDistance(value) {
+  const VALUES_WITHOUT_DISTANCE = ["", "-", "m"];
   return VALUES_WITHOUT_DISTANCE.indexOf(value) < 0;
 }
 

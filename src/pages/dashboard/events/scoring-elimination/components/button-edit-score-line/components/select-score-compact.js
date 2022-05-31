@@ -1,29 +1,23 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import ReactSelect from "react-select";
+import Select from "react-select";
 
-const optionsScoreNumbers = ["m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => ({
+const optionsScoreNumbers = ["", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => ({
   value,
-  label: isNaN(value) ? value.toUpperCase() : value,
+  label: !value ? "-" : isNaN(value) ? value.toUpperCase() : value,
 }));
-
-const Select = React.memo(ReactSelect);
 
 function SelectScore({ name, value, onChange }) {
   const covertedValueType = _convertScoreValueType(value);
   const selectedOption = _getOptionFromValue(covertedValueType);
-  const refSelect = React.useRef(null);
 
-  const handleChange = React.useCallback(
-    (option) => {
-      if (option.value === covertedValueType) {
-        return;
-      }
-      onChange?.(option.value);
-    },
-    [covertedValueType]
-  );
+  const handleChange = (option) => {
+    if (option.value === covertedValueType) {
+      return;
+    }
+    onChange?.(option.value);
+  };
 
   const handleNoOption = React.useCallback(() => "-", []);
 
@@ -37,7 +31,6 @@ function SelectScore({ name, value, onChange }) {
         value={selectedOption}
         options={optionsScoreNumbers}
         noOptionsMessage={handleNoOption}
-        ref={refSelect}
       />
     </SelectContainer>
   );

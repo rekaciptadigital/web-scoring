@@ -7,11 +7,7 @@ function useEliminationMatches(categoryDetailId, countNumber) {
   const { event_id } = useParams();
   const fetcher = useFetcher();
 
-  React.useEffect(() => {
-    if (!categoryDetailId) {
-      return;
-    }
-
+  const fetchEliminationMatches = () => {
     const getFunction = () => {
       return EliminationService.getEventEliminationTemplate({
         event_id: event_id,
@@ -23,9 +19,16 @@ function useEliminationMatches(categoryDetailId, countNumber) {
     };
 
     fetcher.runAsync(getFunction);
+  };
+
+  React.useEffect(() => {
+    if (!categoryDetailId) {
+      return;
+    }
+    fetchEliminationMatches();
   }, []);
 
-  return fetcher;
+  return { ...fetcher, fetchEliminationMatches };
 }
 
 export { useEliminationMatches };

@@ -1,4 +1,7 @@
 function sumScoresList(list) {
+  if (!list) {
+    return 0;
+  }
   const sumReducer = (total, value) => {
     if (!value || (typeof value === "string" && value.toLowerCase() === "m")) {
       return total;

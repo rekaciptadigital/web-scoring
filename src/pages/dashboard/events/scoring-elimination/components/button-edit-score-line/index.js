@@ -1,16 +1,21 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useScoringDetail } from "../../hooks/scoring-detail";
+import { useSubmitScores } from "../../hooks/submit-scores";
+import { useGridForm } from "../../hooks/grid-form.js";
+import { useAdminTotal } from "../../hooks/admin-total";
+import { useSubmitAdminTotal } from "../../hooks/submit-total";
 
-import { Modal, ModalBody } from "reactstrap";
-
+import { Modal as BSModal, ModalBody } from "reactstrap";
 import {
   Button,
   ButtonBlue,
   ButtonOutlineBlue,
   SpinnerDotBlock,
+  LoadingScreen,
   AlertSubmitError,
 } from "components/ma";
+import { toast } from "../processing-toast";
 import { ScoreGridForm } from "./components/score-grid-form";
 import { ScoreGridFormRight } from "./components/score-grid-form-right";
 
@@ -20,7 +25,7 @@ import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 import IconBow from "components/ma/icons/mono/bow";
 import IconDistance from "components/ma/icons/mono/arrow-left-right";
 
-function ButtonEditScoreLine({ disabled, scoring }) {
+function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit }) {
   const [isOpen, setOpen] = React.useState(false);
 
   const open = () => {
@@ -41,80 +46,181 @@ function ButtonEditScoreLine({ disabled, scoring }) {
       </ButtonOutlineBlue>
 
       {isOpen && (
-        <ModalEditor onClose={close} scoring={scoring} toggle={() => setOpen((open) => !open)} />
+        <ModalEditor
+          headerInfo={headerInfo}
+          onClose={close}
+          scoring={scoring}
+          onSuccessSubmit={onSuccessSubmit}
+        />
       )}
     </React.Fragment>
   );
 }
 
-function ModalEditor({ onClose, toggle, scoring }) {
-  const { isError, errors, data } = useScoringDetail(scoring);
+function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit }) {
+  const refetchCounter = React.useRef(1);
 
-  const commonModalProps = {
-    isOpen: true,
-    centered: true,
-    backdrop: "static",
+  // "query"
+  const {
+    isError: isErrorScoringDetail,
+    errors: errorsScoringDetail,
+    data: scoringDetails,
+    fetchScoringDetail,
+  } = useScoringDetail(scoring);
+
+  const isSettled = Boolean(scoringDetails) || (!scoringDetails && isErrorScoringDetail);
+  const headerPlayer1 = headerInfo[0];
+  const headerPlayer2 = headerInfo[1];
+  const player1 = scoringDetails?.[0];
+  const player2 = scoringDetails?.[1];
+
+  const { value: gridDataPlayer1, setValue: setGridDataPlayer1 } = useGridForm(player1?.scores);
+  const { value: gridDataPlayer2, setValue: setGridDataPlayer2 } = useGridForm(player2?.scores);
+
+  const {
+    isDirty: isDirtyTotalP1,
+    value: adminTotalP1,
+    setTotal: setTotalP1,
+  } = useAdminTotal(player1?.scores);
+
+  const {
+    isDirty: isDirtyTotalP2,
+    value: adminTotalP2,
+    setTotal: setTotalP2,
+  } = useAdminTotal(player2?.scores);
+
+  // mutate
+  const {
+    submitScoringDetail,
+    isLoading: isSubmiting,
+    isError: isErrorSubmit,
+    errors: errorsSubmit,
+  } = useSubmitScores();
+
+  const { submitAdminTotal, isLoading: isSubmitingTotal } = useSubmitAdminTotal({
+    eliminationId: scoring.elimination_id,
+    round: scoring.round,
+    match: scoring.match,
+  });
+
+  const onSuccess = () => {
+    refetchCounter.current = refetchCounter.current + 1;
+    toast.success("Detail skor berhasil disimpan");
+    fetchScoringDetail();
+    onSuccessSubmit?.();
   };
 
-  if (!data) {
+  if (!isSettled) {
     return (
       <React.Fragment>
-        <AlertSubmitError isError={isError} errors={errors} onConfirm={onClose} />
-        <Modal {...commonModalProps} size="md" toggle={toggle}>
-          <ModalBody>
-            <SpinnerDotBlock />
-          </ModalBody>
-        </Modal>
+        <AlertSubmitError
+          isError={isErrorScoringDetail}
+          errors={errorsScoringDetail}
+          onConfirm={onClose}
+        />
+        <LoadingScreen loading />
       </React.Fragment>
     );
   }
 
+  if (!scoringDetails && isErrorScoringDetail) {
+    return <AlertSubmitError isError errors={errorsScoringDetail} onConfirm={onClose} />;
+  }
+
   return (
     <React.Fragment>
-      <Modal {...commonModalProps} size="lg" autoFocus onClosed={onClose}>
+      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
+      <AlertSubmitError isError={isErrorScoringDetail} errors={errorsScoringDetail} />
+
+      <Modal isOpen centered backdrop="static" size="lg" autoFocus onClosed={onClose}>
         <ModalBody>
+          <LoadingBlocker isLoading={isSubmitingTotal || isSubmiting} />
           <BodyWrapper>
             <div>
               <h4>Scoresheet</h4>
 
               <ScoresheetHeader>
-                <InputBudrestNumber>1A</InputBudrestNumber>
+                <BudrestNumberLabel>{scoringDetails?.budrestNumber || "-"}</BudrestNumberLabel>
 
                 <PlayerLabelContainerLeft>
                   <PlayerNameData>
-                    <RankLabel>#1</RankLabel> <NameLabel>Nama</NameLabel>
+                    <RankLabel>
+                      #{headerPlayer1?.potition || headerPlayer1?.postition || "-"}
+                    </RankLabel>
+                    <NameLabel>
+                      {player1?.participant.member.name || headerPlayer1?.name || "-"}
+                    </NameLabel>
                   </PlayerNameData>
                 </PlayerLabelContainerLeft>
 
                 <HeadToHeadScores>
-                  <InlineScoreInput>
-                    {false && (
-                      <IndicatorIconWarning>
+                  <HeaderScoreInput>
+                    {player1?.scores.isDifferent ? (
+                      <IndicatorIconFloating className="indicator-left indicator-warning">
                         <IconAlertCircle />
-                      </IndicatorIconWarning>
+                      </IndicatorIconFloating>
+                    ) : (
+                      <IndicatorIconFloating className="indicator-left indicator-valid">
+                        <IconCheckOkCircle />
+                      </IndicatorIconFloating>
                     )}
-                    <InputInlineScore type="text" />
-                  </InlineScoreInput>
+
+                    <ScoreInput
+                      type="text"
+                      placeholder="-"
+                      value={adminTotalP1 || ""}
+                      onChange={(ev) => {
+                        setTotalP1((previousValue) => {
+                          const { value } = ev.target;
+                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
+                          return validatedNumberValue;
+                        });
+                      }}
+                    />
+                  </HeaderScoreInput>
 
                   <HeadToHeadScoreLabels>
-                    <ScoreCounter>skor</ScoreCounter>
+                    <ScoreCounter>{player1?.scores?.adminTotal || 0}</ScoreCounter>
                     <span>&ndash;</span>
-                    <ScoreCounter>skor</ScoreCounter>
+                    <ScoreCounter>{player2?.scores?.adminTotal || 0}</ScoreCounter>
                   </HeadToHeadScoreLabels>
 
-                  <InlineScoreInput>
-                    <InputInlineScore type="text" />
-                    {false && (
-                      <IndicatorIconValid>
+                  <HeaderScoreInput>
+                    <ScoreInput
+                      type="text"
+                      placeholder="-"
+                      value={adminTotalP2 || ""}
+                      onChange={(ev) => {
+                        setTotalP2((previousValue) => {
+                          const { value } = ev.target;
+                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
+                          return validatedNumberValue;
+                        });
+                      }}
+                    />
+
+                    {player2?.scores.isDifferent ? (
+                      <IndicatorIconFloating className="indicator-right indicator-warning">
+                        <IconAlertCircle />
+                      </IndicatorIconFloating>
+                    ) : (
+                      <IndicatorIconFloating className="indicator-right indicator-valid">
                         <IconCheckOkCircle />
-                      </IndicatorIconValid>
+                      </IndicatorIconFloating>
                     )}
-                  </InlineScoreInput>
+                  </HeaderScoreInput>
                 </HeadToHeadScores>
 
                 <PlayerLabelContainerRight>
                   <PlayerNameData>
-                    <RankLabel>#1</RankLabel> <NameLabel>Nama</NameLabel>
+                    <RankLabel>
+                      #{headerPlayer2?.potition || headerPlayer2?.postition || "-"}
+                    </RankLabel>
+                    <NameLabel>
+                      {player2?.participant.member.name ||
+                        headerPlayer2?.name ||
+                        "Nama archer tidak tersedia"}
+                    </NameLabel>
                   </PlayerNameData>
                 </PlayerLabelContainerRight>
               </ScoresheetHeader>
@@ -132,22 +238,89 @@ function ModalEditor({ onClose, toggle, scoring }) {
 
             <SplitEditor>
               <div>
-                <ScoreGridForm />
+                <ScoreGridForm
+                  scoringType={player1?.scores.eliminationtScoreType}
+                  gridData={gridDataPlayer1}
+                  onChange={(value) => setGridDataPlayer1(value)}
+                />
               </div>
 
               <div>
-                <ScoreGridFormRight />
+                <ScoreGridFormRight
+                  scoringType={player2?.scores.eliminationtScoreType}
+                  gridData={gridDataPlayer2}
+                  onChange={(value) => setGridDataPlayer2(value)}
+                />
               </div>
             </SplitEditor>
 
             <HorizontalSpaced>
               <Button onClick={onClose}>Batal</Button>
-              <ButtonBlue onClick={onClose}>Tentukan</ButtonBlue>
+              <ButtonBlue
+                onClick={() => {
+                  if (isDirtyTotalP1) {
+                    submitAdminTotal(
+                      {
+                        memberId: player1.participant.member.id,
+                        value: adminTotalP1,
+                      },
+                      {
+                        onSuccess: () => {
+                          toast.success("Total berhasil disimpan");
+                        },
+                        onError: () => {
+                          toast.error("Gagal menyimpan total");
+                        },
+                      }
+                    );
+                  }
+
+                  if (isDirtyTotalP2) {
+                    submitAdminTotal(
+                      {
+                        memberId: player2.participant.member.id,
+                        value: adminTotalP2,
+                      },
+                      {
+                        onSuccess: () => {
+                          toast.success("Total berhasil disimpan");
+                        },
+                        onError: () => {
+                          toast.error("Gagal menyimpan total");
+                        },
+                      }
+                    );
+                  }
+
+                  const payload = {
+                    save_permanent: 0,
+                    ...scoring,
+                    ..._makeMemberScoresPayload({
+                      state: scoringDetails,
+                      payload: [gridDataPlayer1, gridDataPlayer2],
+                    }),
+                  };
+                  submitScoringDetail(payload, { onSuccess });
+                }}
+              >
+                Simpan
+              </ButtonBlue>
             </HorizontalSpaced>
           </BodyWrapper>
         </ModalBody>
       </Modal>
     </React.Fragment>
+  );
+}
+
+function LoadingBlocker({ isLoading = false }) {
+  if (!isLoading) {
+    return null;
+  }
+  return (
+    <LoadingContainer>
+      <SpinnerDotBlock />
+    </LoadingContainer>
   );
 }
 
@@ -160,6 +333,11 @@ const BodyWrapper = styled.div`
   }
 `;
 
+const Modal = styled(BSModal)`
+  position: relative;
+  max-width: 56.25rem;
+`;
+
 const ScoresheetHeader = styled.div`
   display: flex;
   gap: 1.5rem;
@@ -170,8 +348,7 @@ const ScoresheetHeader = styled.div`
   border-radius: 0.5rem;
 `;
 
-const InputBudrestNumber = styled.div`
-  padding: 0.625rem 0.5rem;
+const BudrestNumberLabel = styled.div`
   width: 3rem;
   border-radius: 0.25rem;
   font-weight: 600;
@@ -180,15 +357,16 @@ const InputBudrestNumber = styled.div`
 
 const PlayerLabelContainerLeft = styled.div`
   flex-grow: 1;
-  margin-right: 3rem;
+  margin-right: 2rem;
 `;
 
 const PlayerLabelContainerRight = styled.div`
   flex-grow: 1;
-  margin-left: 3rem;
+  margin-left: 2rem;
 `;
 
 const PlayerNameData = styled.div`
+  min-width: 11rem;
   display: flex;
   gap: 0.5rem;
   align-items: center;
@@ -216,11 +394,11 @@ const HeadToHeadScores = styled.div`
   gap: 1.5rem;
 `;
 
-const InlineScoreInput = styled.div`
+const HeaderScoreInput = styled.div`
   position: relative;
 `;
 
-const InputInlineScore = styled.input`
+const ScoreInput = styled.input`
   padding: calc(0.625rem - 1px) calc(0.5rem - 1px);
   width: 3rem;
   border: solid 1px var(--ma-gray-200);
@@ -230,24 +408,28 @@ const InputInlineScore = styled.input`
   text-align: center;
 `;
 
-const IndicatorIconWarning = styled.span`
+const IndicatorIconFloating = styled.span`
   position: absolute;
   top: 0;
   bottom: 0;
-  left: -1.75rem;
   display: flex;
   align-items: center;
-  color: var(--ma-secondary);
-`;
 
-const IndicatorIconValid = styled.span`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: -1.75rem;
-  display: flex;
-  align-items: center;
-  color: var(--ma-alert-positive);
+  &.indicator-left {
+    left: -1.75rem;
+  }
+
+  &.indicator-right {
+    right: -1.75rem;
+  }
+
+  &.indicator-warning {
+    color: var(--ma-secondary);
+  }
+
+  &.indicator-valid {
+    color: var(--ma-alert-positive);
+  }
 `;
 
 const HeadToHeadScoreLabels = styled.div`
@@ -296,5 +478,33 @@ const CategoryLabel = styled.div`
     text-transform: capitalize;
   }
 `;
+
+const LoadingContainer = styled.div`
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+`;
+
+/* =========================== */
+// utils
+
+// Nge-update payload detail skor di rambahan & shoot-off
+function _makeMemberScoresPayload({ state, payload }) {
+  const members = state.map((member, index) => ({
+    member_id: member.participant.member.id,
+    scores: {
+      shot: payload[index].shot.map((rambahan) => ({ score: rambahan })),
+      extraShot: payload[index].extraShot,
+      win: member.scores.win,
+      adminTotal: member.scores.adminTotal,
+    },
+  }));
+  //coba tanpa type?
+  return { type: 2, members };
+}
 
 export { ButtonEditScoreLine };

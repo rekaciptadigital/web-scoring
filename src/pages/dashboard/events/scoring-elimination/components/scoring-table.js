@@ -43,7 +43,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
         <EmptyBracketContainer>
           <FloatingEmptyBracketContent>
             <div>
-              <EmptyStateHeading>Bagan belum tersedia</EmptyStateHeading>
+              <EmptyStateHeading>Data tidak tersedia</EmptyStateHeading>
               <EmptyStateDescription>
                 Maaf tidak ada klasemen dengan kategori yang Anda cari. Silakan cari dengan kategori
                 lain.

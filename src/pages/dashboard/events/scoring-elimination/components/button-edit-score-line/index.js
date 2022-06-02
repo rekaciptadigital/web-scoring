@@ -24,6 +24,7 @@ import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 import IconBow from "components/ma/icons/mono/bow";
 import IconDistance from "components/ma/icons/mono/arrow-left-right";
+import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
@@ -141,126 +142,129 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit, categoryDe
         <ModalBody>
           <LoadingBlocker isLoading={isSubmitingTotal || isSubmiting} />
           <BodyWrapper>
-            <div>
+            <ModalHeaderBar>
               <h4>Scoresheet</h4>
+              <EditorCloseButton flexible onClick={onClose}>
+                <IconX size="16" />
+              </EditorCloseButton>
+            </ModalHeaderBar>
 
-              <ScoresheetHeader>
-                <BudrestNumberLabel>{scoringDetails?.budrestNumber || "-"}</BudrestNumberLabel>
+            <ScoresheetHeader>
+              <BudrestNumberLabel>{scoringDetails?.budrestNumber || "-"}</BudrestNumberLabel>
 
-                <PlayerLabelContainerLeft>
-                  <PlayerNameData>
-                    <RankLabel>
-                      #{headerPlayer1?.potition || headerPlayer1?.postition || "-"}
-                    </RankLabel>
-                    <NameLabel>
-                      {player1?.participant.member.name || headerPlayer1?.name || "-"}
-                    </NameLabel>
-                  </PlayerNameData>
-                </PlayerLabelContainerLeft>
+              <PlayerLabelContainerLeft>
+                <PlayerNameData>
+                  <RankLabel>
+                    #{headerPlayer1?.potition || headerPlayer1?.postition || "-"}
+                  </RankLabel>
+                  <NameLabel>
+                    {player1?.participant.member.name || headerPlayer1?.name || "-"}
+                  </NameLabel>
+                </PlayerNameData>
+              </PlayerLabelContainerLeft>
 
-                <HeadToHeadScores>
-                  <HeaderScoreInput>
-                    {player1?.scores.isDifferent ? (
-                      <IndicatorIconFloating className="indicator-left indicator-warning">
-                        <IconAlertCircle />
-                      </IndicatorIconFloating>
-                    ) : (
-                      <IndicatorIconFloating className="indicator-left indicator-valid">
-                        <IconCheckOkCircle />
-                      </IndicatorIconFloating>
-                    )}
+              <HeadToHeadScores>
+                <HeaderScoreInput>
+                  {player1?.scores.isDifferent ? (
+                    <IndicatorIconFloating className="indicator-left indicator-warning">
+                      <IconAlertCircle />
+                    </IndicatorIconFloating>
+                  ) : (
+                    <IndicatorIconFloating className="indicator-left indicator-valid">
+                      <IconCheckOkCircle />
+                    </IndicatorIconFloating>
+                  )}
 
-                    <ScoreInput
-                      type="text"
-                      placeholder="-"
-                      value={adminTotalP1 || ""}
-                      onChange={(ev) => {
-                        setTotalP1((previousValue) => {
-                          const { value } = ev.target;
-                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-                          return validatedNumberValue;
-                        });
-                      }}
-                      onFocus={(ev) => ev.target.select()}
-                    />
-                  </HeaderScoreInput>
+                  <ScoreInput
+                    type="text"
+                    placeholder="-"
+                    value={adminTotalP1 || ""}
+                    onChange={(ev) => {
+                      setTotalP1((previousValue) => {
+                        const { value } = ev.target;
+                        const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
+                        return validatedNumberValue;
+                      });
+                    }}
+                    onFocus={(ev) => ev.target.select()}
+                  />
+                </HeaderScoreInput>
 
-                  <HeadToHeadScoreLabels>
-                    <ScoreCounter
-                      className={classnames({
-                        "score-counter-highlighted":
-                          player1?.scores?.adminTotal > player2?.scores?.adminTotal,
-                      })}
-                    >
-                      {player1?.scores?.adminTotal || 0}
-                    </ScoreCounter>
+                <HeadToHeadScoreLabels>
+                  <ScoreCounter
+                    className={classnames({
+                      "score-counter-highlighted":
+                        player1?.scores?.adminTotal > player2?.scores?.adminTotal,
+                    })}
+                  >
+                    {player1?.scores?.adminTotal || 0}
+                  </ScoreCounter>
 
-                    <span>&ndash;</span>
+                  <span>&ndash;</span>
 
-                    <ScoreCounter
-                      className={classnames({
-                        "score-counter-highlighted":
-                          player2?.scores?.adminTotal > player1?.scores?.adminTotal,
-                      })}
-                    >
-                      {player2?.scores?.adminTotal || 0}
-                    </ScoreCounter>
-                  </HeadToHeadScoreLabels>
+                  <ScoreCounter
+                    className={classnames({
+                      "score-counter-highlighted":
+                        player2?.scores?.adminTotal > player1?.scores?.adminTotal,
+                    })}
+                  >
+                    {player2?.scores?.adminTotal || 0}
+                  </ScoreCounter>
+                </HeadToHeadScoreLabels>
 
-                  <HeaderScoreInput>
-                    <ScoreInput
-                      type="text"
-                      placeholder="-"
-                      value={adminTotalP2 || ""}
-                      onChange={(ev) => {
-                        setTotalP2((previousValue) => {
-                          const { value } = ev.target;
-                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-                          return validatedNumberValue;
-                        });
-                      }}
-                      onFocus={(ev) => ev.target.select()}
-                    />
+                <HeaderScoreInput>
+                  <ScoreInput
+                    type="text"
+                    placeholder="-"
+                    value={adminTotalP2 || ""}
+                    onChange={(ev) => {
+                      setTotalP2((previousValue) => {
+                        const { value } = ev.target;
+                        const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
+                        return validatedNumberValue;
+                      });
+                    }}
+                    onFocus={(ev) => ev.target.select()}
+                  />
 
-                    {player2?.scores.isDifferent ? (
-                      <IndicatorIconFloating className="indicator-right indicator-warning">
-                        <IconAlertCircle />
-                      </IndicatorIconFloating>
-                    ) : (
-                      <IndicatorIconFloating className="indicator-right indicator-valid">
-                        <IconCheckOkCircle />
-                      </IndicatorIconFloating>
-                    )}
-                  </HeaderScoreInput>
-                </HeadToHeadScores>
+                  {player2?.scores.isDifferent ? (
+                    <IndicatorIconFloating className="indicator-right indicator-warning">
+                      <IconAlertCircle />
+                    </IndicatorIconFloating>
+                  ) : (
+                    <IndicatorIconFloating className="indicator-right indicator-valid">
+                      <IconCheckOkCircle />
+                    </IndicatorIconFloating>
+                  )}
+                </HeaderScoreInput>
+              </HeadToHeadScores>
 
-                <PlayerLabelContainerRight>
-                  <PlayerNameData>
-                    <RankLabel>
-                      #{headerPlayer2?.potition || headerPlayer2?.postition || "-"}
-                    </RankLabel>
-                    <NameLabel>
-                      {player2?.participant.member.name ||
-                        headerPlayer2?.name ||
-                        "Nama archer tidak tersedia"}
-                    </NameLabel>
-                  </PlayerNameData>
-                </PlayerLabelContainerRight>
-              </ScoresheetHeader>
+              <PlayerLabelContainerRight>
+                <PlayerNameData>
+                  <RankLabel>
+                    #{headerPlayer2?.potition || headerPlayer2?.postition || "-"}
+                  </RankLabel>
+                  <NameLabel>
+                    {player2?.participant.member.name ||
+                      headerPlayer2?.name ||
+                      "Nama archer tidak tersedia"}
+                  </NameLabel>
+                </PlayerNameData>
+              </PlayerLabelContainerRight>
+            </ScoresheetHeader>
 
-              <CategoryLabel>
-                <div>{categoryDetails?.teamCategoryLabel}</div>
-                <div>
-                  <IconBow size="16" />{" "}
-                  {categoryDetails?.originalCategoryDetail.competitionCategoryId}{" "}
-                  {categoryDetails?.originalCategoryDetail.ageCategoryId}
-                </div>
-                <div>
-                  <IconDistance size="16" />{" "}
-                  {_getDistanceCategoryLabel(categoryDetails?.originalCategoryDetail.classCategory)}
-                </div>
-              </CategoryLabel>
-            </div>
+            <CategoryLabel>
+              <div>{categoryDetails?.teamCategoryLabel}</div>
+              <div>
+                <IconBow size="16" />{" "}
+                {categoryDetails?.originalCategoryDetail.competitionCategoryId}{" "}
+                {categoryDetails?.originalCategoryDetail.ageCategoryId}
+              </div>
+              <div>
+                <IconDistance size="16" />{" "}
+                {_getDistanceCategoryLabel(categoryDetails?.originalCategoryDetail.classCategory)}
+              </div>
+            </CategoryLabel>
 
             <SplitEditor>
               <div>
@@ -362,6 +366,26 @@ const BodyWrapper = styled.div`
 const Modal = styled(BSModal)`
   position: relative;
   max-width: 56.25rem;
+`;
+
+const ModalHeaderBar = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const EditorCloseButton = styled.button`
+  padding: 0.375rem 0.625rem;
+  border: none;
+  background-color: transparent;
+  color: var(--ma-blue);
+
+  transition: all 0.15s;
+
+  &:hover {
+    box-shadow: 0 0 0 1px var(--ma-gray-200);
+  }
 `;
 
 const ScoresheetHeader = styled.div`

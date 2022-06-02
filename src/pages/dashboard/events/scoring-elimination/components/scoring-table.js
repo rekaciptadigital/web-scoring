@@ -3,9 +3,11 @@ import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
 
 import { SpinnerDotBlock } from "components/ma";
+import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
-import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
+// TODO: uncomment saat ready
+// import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 import { ButtonSetWinner } from "./button-set-winner";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
@@ -54,7 +56,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
   }
 
   // Happy path
-  const tabLabels = getTabLabels(data.rounds);
+  const tabLabels = _getTabLabels(data.rounds);
   const currentRows = data.rounds[selectedTab]?.seeds || [];
 
   return (
@@ -101,22 +103,13 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               <tr key={index}>
                 <td>
                   {noData || hasWinner ? (
-                    <BudrestNumberLabel>
-                      {player1.targetFace && player1.budRestNumber
-                        ? player1.targetFace + player1.budRestNumber
-                        : "-"}
-                    </BudrestNumberLabel>
+                    <BudrestNumberLabel>{_getBudrestNumber(row)}</BudrestNumberLabel>
                   ) : (
-                    <InputBudrestNumber
-                      type="text"
-                      placeholder="-"
-                      value={
-                        player1.targetFace && player1.budRestNumber
-                          ? player1.targetFace + player1.budRestNumber
-                          : ""
-                      }
-                      disabled={!player1?.name || !player2?.name}
-                      readOnly
+                    <BudrestInputAsync
+                      playerDetail={player1 || player2}
+                      disabled={hasWinner || noData}
+                      scoring={scoring}
+                      onSuccess={fetchEliminationMatches}
                     />
                   )}
                 </td>
@@ -135,7 +128,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   {!noData && !hasWinner ? (
                     <InlineScoreInput>
-                      <ValidationIndicator isValid={false} />
+                      <ValidationIndicator position="left" isValid={player1?.isDifferent !== 1} />
                       <TotalInputAsync
                         playerDetail={player1}
                         disabled={hasWinner || !player1?.name}
@@ -181,7 +174,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                         scoring={scoring}
                         onSuccess={fetchEliminationMatches}
                       />
-                      <ValidationIndicator isValid={true} />
+                      <ValidationIndicator position="right" isValid={player2?.isDifferent !== 1} />
                     </InlineScoreInput>
                   ) : (
                     <NoArcherWrapper>-</NoArcherWrapper>
@@ -226,7 +219,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       />
                     )}
 
-                    <ButtonDownloadScoresheet disabled={noData} />
+                    {/* TODO: uncomment saat ready */}
+                    {/* <ButtonDownloadScoresheet disabled={noData} /> */}
                   </HorizontalSpaced>
                 </td>
               </tr>
@@ -261,16 +255,26 @@ function NoArcherLabel() {
   return <NoArcherWrapper>Belum ada archer</NoArcherWrapper>;
 }
 
-function ValidationIndicator({ isValid }) {
+function ValidationIndicator({ position, isValid }) {
+  const getClassNameProp = () => ({
+    className: classnames({
+      "indicator-left": position === "left",
+      "indicator-right": position === "right",
+    }),
+  });
+
   if (!isValid) {
     return (
-      <IndicatorIconWarning title="Hasil input dengan total poin belum sesuai, cek detail skoring">
+      <IndicatorIconWarning
+        title="Hasil input dengan total poin belum sesuai, cek detail skoring"
+        {...getClassNameProp()}
+      >
         <IconAlertCircle />
       </IndicatorIconWarning>
     );
   }
   return (
-    <IndicatorIconValid title="Total skor sesuai dengan detailnya">
+    <IndicatorIconValid title="Total skor sesuai dengan detailnya" {...getClassNameProp()}>
       <IconCheckOkCircle />
     </IndicatorIconValid>
   );
@@ -281,15 +285,6 @@ function ValidationIndicator({ isValid }) {
 
 const SectionTableContainer = styled.section`
   background-color: #ffffff;
-`;
-
-const InputBudrestNumber = styled.input`
-  padding: calc(0.625rem - 1px) calc(0.5rem - 1px);
-  width: 3rem;
-  border: solid 1px var(--ma-gray-400);
-  border-radius: 0.25rem;
-  font-weight: 600;
-  text-align: center;
 `;
 
 const BudrestNumberLabel = styled.div`
@@ -307,20 +302,34 @@ const IndicatorIconWarning = styled.span`
   position: absolute;
   top: 0;
   bottom: 0;
-  left: -1.75rem;
   display: flex;
   align-items: center;
   color: var(--ma-secondary);
+
+  &.indicator-left {
+    left: -1.75rem;
+  }
+
+  &.indicator-right {
+    right: -1.75rem;
+  }
 `;
 
 const IndicatorIconValid = styled.span`
   position: absolute;
   top: 0;
   bottom: 0;
-  right: -1.75rem;
   display: flex;
   align-items: center;
   color: var(--ma-alert-positive);
+
+  &.indicator-left {
+    left: -1.75rem;
+  }
+
+  &.indicator-right {
+    right: -1.75rem;
+  }
 `;
 
 const HorizontalSpaced = styled.div`
@@ -508,7 +517,7 @@ const tabLabels = {
   2: "Semi-Final",
 };
 
-function getTabLabels(bracketTemplate) {
+function _getTabLabels(bracketTemplate) {
   if (!bracketTemplate) {
     return [];
   }
@@ -527,6 +536,25 @@ function getTabLabels(bracketTemplate) {
   });
 
   return labels;
+}
+
+function _getBudrestNumber(row) {
+  if (!row?.teams?.length) {
+    return "-";
+  }
+
+  const player1 = row.teams[0];
+  const player2 = row.teams[1];
+
+  if (player1?.budrestNumber) {
+    return player1.budrestNumber;
+  }
+
+  if (player2?.budrestNumber) {
+    return player2.budrestNumber;
+  }
+
+  return "-";
 }
 
 export { ScoringTable };

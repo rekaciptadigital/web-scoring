@@ -98,12 +98,13 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
 
             const noData = !player1?.name || !player2?.name;
             const hasWinner = row.teams.some((team) => team.win === 1);
+            const budrestNumber = _getBudrestNumber(row);
 
             return (
               <tr key={index}>
                 <td>
                   {noData || hasWinner ? (
-                    <BudrestNumberLabel>{_getBudrestNumber(row)}</BudrestNumberLabel>
+                    <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
                   ) : (
                     <BudrestInputAsync
                       playerDetail={player1 || player2}
@@ -213,6 +214,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       <ButtonEditScoreLine
                         disabled={noData}
                         headerInfo={row}
+                        budrestNumber={budrestNumber}
                         scoring={scoring}
                         onSuccessSubmit={fetchEliminationMatches}
                         categoryDetails={categoryDetails}

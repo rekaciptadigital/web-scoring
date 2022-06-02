@@ -28,7 +28,14 @@ import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
-function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit, categoryDetails }) {
+function ButtonEditScoreLine({
+  disabled,
+  scoring,
+  headerInfo,
+  budrestNumber,
+  onSuccessSubmit,
+  categoryDetails,
+}) {
   const [isOpen, setOpen] = React.useState(false);
 
   const open = () => {
@@ -56,6 +63,7 @@ function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit, c
       {isOpen && (
         <ModalEditor
           headerInfo={headerInfo}
+          budrestNumber={budrestNumber}
           onClose={close}
           scoring={scoring}
           onSuccessSubmit={onSuccessSubmit}
@@ -66,7 +74,14 @@ function ButtonEditScoreLine({ disabled, scoring, headerInfo, onSuccessSubmit, c
   );
 }
 
-function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit, categoryDetails }) {
+function ModalEditor({
+  headerInfo,
+  budrestNumber,
+  onClose,
+  scoring,
+  onSuccessSubmit,
+  categoryDetails,
+}) {
   // "query"
   const {
     isError: isErrorScoringDetail,
@@ -150,7 +165,7 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit, categoryDe
             </ModalHeaderBar>
 
             <ScoresheetHeader>
-              <BudrestNumberLabel>{scoringDetails?.budrestNumber || "-"}</BudrestNumberLabel>
+              <BudrestNumberLabel>{budrestNumber || "-"}</BudrestNumberLabel>
 
               <PlayerLabelContainerLeft>
                 <PlayerNameData>

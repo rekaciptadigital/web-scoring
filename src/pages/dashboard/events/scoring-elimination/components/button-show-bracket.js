@@ -102,6 +102,9 @@ function NoBracketAvailable() {
 function SeedBagan({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
 
+  const noData = !seed.teams[0]?.name || !seed.teams[0]?.name;
+  const isBye = seed.teams.some((team) => team.status === "bye");
+
   const isFinalRound =
     (configs.totalRounds === 4 && roundIndex === 3) ||
     (configs.totalRounds === 3 && roundIndex === 2);
@@ -122,14 +125,37 @@ function SeedBagan({ bracketProps, configs }) {
           {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
           {seed.teams.map((team, index) => (
-            <SeedTeam key={index}>
+            <SeedTeam
+              key={index}
+              className={classnames({
+                "item-active": !noData,
+                "item-winner": parseInt(team.win) === 1 && !isBye,
+              })}
+            >
               <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxScore team={team} />
             </SeedTeam>
           ))}
         </ItemContainer>
       </SeedItem>
     </Seed>
   );
+}
+
+function BoxScore({ team }) {
+  if (!team) {
+    return null;
+  }
+
+  if (team.adminTotal && typeof team.adminTotal === "number") {
+    return <BoxScoreWrapper>{team.adminTotal}</BoxScoreWrapper>;
+  }
+
+  if (team.totalScoring && typeof team.totalScoring === "number") {
+    return <BoxScoreWrapper>{team.totalScoring}</BoxScoreWrapper>;
+  }
+
+  return null;
 }
 
 /* ================================== */
@@ -238,6 +264,7 @@ const SeedTeam = styled(RBSeedTeam)`
 
 const ItemContainer = styled.div`
   position: relative;
+  max-width: 12.5rem;
 
   > ${SeedTeam} + ${SeedTeam} {
     border-top: none;
@@ -248,6 +275,19 @@ const BoxName = styled.span`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+`;
+
+const BoxScoreWrapper = styled.span`
+  display: inline-block;
+  padding: 2px 0.375rem;
+  border-radius: 0.25rem;
+  background-color: var(--ma-gray-400);
+  color: #ffffff;
+  font-weight: 600;
+
+  .item-winner & {
+    background-color: #000000;
+  }
 `;
 
 export { ButtonShowBracket };

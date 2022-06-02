@@ -125,6 +125,13 @@ const InputBudrestNumber = styled.input`
   border-radius: 0.25rem;
   font-weight: 600;
   text-align: center;
+
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:focus {
+    border-color: #2684ff;
+    box-shadow: 0 0 0 1px #2684ff;
+  }
 `;
 
 export { BudrestInputAsync };

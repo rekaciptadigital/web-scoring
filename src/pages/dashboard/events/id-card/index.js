@@ -28,8 +28,9 @@ import FontBoldToggle from "./components/FontBoldToggle";
 import ColorPickerContainer from "./components/ColorPickerContainer";
 import PreviewCanvas from "./components/preview/PreviewCanvas";
 import { SubNavbar } from "../components/submenus-settings";
+import DisplayObject from "./components/DisplayObject";
 
-const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT, LABEL_PHOTO_PROFILE } = idCardFields;
+const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
 
 function PageEventIdCard() {
   const { event_id } = useParams();
@@ -213,6 +214,20 @@ function PageEventIdCard() {
       fontWeight: currentData.fontWeight ? undefined : "bold",
     }));
   };
+  
+  const handleRemove = () => {
+    setCurrentObject((currentData) => ({
+      ...currentData,
+      display: currentData.display ? undefined : "none",
+    }))
+  };
+
+  const handleReset = () => {
+    setEditorData((data) => ({
+      ...data,
+      fields: defaultEditorData.fields,
+    }));
+  };
 
   const handleSelectBg = (imageData) => {
     if (!imageData) {
@@ -263,8 +278,8 @@ function PageEventIdCard() {
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
-  
-  console.log(editorData, 'log');
+
+  console.log(editorData, 'ratata');
   
   return (
     <React.Fragment>
@@ -312,6 +327,7 @@ function PageEventIdCard() {
                       Pratinjau
                     </BSButton>
 
+
                     <Modal
                       isOpen={isModePreview}
                       size="lg"
@@ -330,6 +346,16 @@ function PageEventIdCard() {
                         </div>
                       </ModalBody>
                     </Modal>
+                  </div>
+
+                  <div>
+                    <BSButton
+                      tag="a"
+                      color="warning"
+                      onClick={() => handleReset()}
+                      >
+                      Reset
+                    </BSButton>
                   </div>
 
                   {isSaving && <div className="indicator-message">Saving ID Card...</div>}
@@ -449,7 +475,7 @@ function PageEventIdCard() {
                     </ButtonEditor>
                     </Col>
 
-                        <Col lg="1">
+                    <Col lg="1">
                     <ButtonEditor>
                       <div>
                         <FontBoldToggle
@@ -458,6 +484,19 @@ function PageEventIdCard() {
                           />
                       </div>
                     </ButtonEditor>
+                    </Col>
+                    <Col lg="2">
+                      <div className="mt-2">
+                        <label className="ml-2">Visibilty:</label>
+                          <ButtonVisible>
+                            <div>
+                              <DisplayObject
+                                none={currentObject?.display}
+                                onChange={() => handleRemove()}
+                                />
+                            </div>
+                          </ButtonVisible>
+                      </div>
                     </Col>
                     </EditorSection>
                   </div>
@@ -535,6 +574,11 @@ const ButtonEditor = styled.div`
     margin-left: 1rem;
 `;
 
+const ButtonVisible = styled.div`
+    margin-top: 0.3rem !important;
+    margin-left: 1rem;
+`;
+
 
 const defaultEditorData = {
   paperSize: 'A4',
@@ -562,36 +606,29 @@ const defaultEditorData = {
     },
     {
       name: LABEL_LOCATION_AND_DATE,
-      x: 850,
+      x: 150,
       y: 100,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
       name: LABEL_CATEGORY,
-      x: 850,
+      x: 150,
       y: 150,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
       name: LABEL_CLUB_MEMBER,
-      x: 640,
+      x: 200,
       y: 200,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
       name: LABEL_STATUS_EVENT,
-      x: 640,
+      x: 200,
       y: 250,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
-      name: LABEL_PHOTO_PROFILE,
-      x: 40,
-      y: 50,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },

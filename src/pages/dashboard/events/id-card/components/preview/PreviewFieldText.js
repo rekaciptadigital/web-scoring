@@ -13,7 +13,7 @@ const previewTexts = {
 };
 
 export default function PreviewFieldText({ name, data = {} }) {
-  const { y, fontFamily, fontSize, color, fontWeight, x } = data;
+  const { y, fontFamily, fontSize, color, fontWeight, x, display } = data;
   const divRef = React.useRef(null);
   const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
   const placeholderString = previewTexts[name];
@@ -32,6 +32,7 @@ export default function PreviewFieldText({ name, data = {} }) {
       x={x}
       fontFamily={fontFamily}
       fontWeight={fontWeight}
+      display={display}
     >
       {placeholderString}
     </FieldTextContainer>
@@ -47,4 +48,5 @@ const FieldTextContainer = styled.div`
   transform: translate(${({ x }) => x}px, ${({ y }) => y}px);
   ${({ fontFamily }) => (fontFamily ? `font-family: ${fontFamily};` : "")}
   font-weight: ${({ fontWeight }) => fontWeight || "normal"};
+  display: ${({ display }) => display || "inline-block"}
 `;

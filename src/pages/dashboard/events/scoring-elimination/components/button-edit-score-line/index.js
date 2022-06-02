@@ -181,6 +181,7 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit, categoryDe
                           return validatedNumberValue;
                         });
                       }}
+                      onFocus={(ev) => ev.target.select()}
                     />
                   </HeaderScoreInput>
 
@@ -218,6 +219,7 @@ function ModalEditor({ headerInfo, onClose, scoring, onSuccessSubmit, categoryDe
                           return validatedNumberValue;
                         });
                       }}
+                      onFocus={(ev) => ev.target.select()}
                     />
 
                     {player2?.scores.isDifferent ? (
@@ -430,6 +432,13 @@ const ScoreInput = styled.input`
   color: var(--ma-gray-500);
   font-size: 0.85em;
   text-align: center;
+
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:focus {
+    border-color: #2684ff;
+    box-shadow: 0 0 0 1px #2684ff;
+  }
 `;
 
 const IndicatorIconFloating = styled.span`

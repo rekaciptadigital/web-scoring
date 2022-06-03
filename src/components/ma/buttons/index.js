@@ -102,7 +102,7 @@ function ButtonBase({ corner, color, style, flexible = false, ...props }) {
   };
 
   if (flexible) {
-    propsNew.style = { ...propsNew.style, "--button-width": 0 };
+    propsNew.style = { ...propsNew.style, "--button-width": 0, whiteSpace: "nowrap" };
   }
 
   return <ButtonWrapper {...propsNew} />;

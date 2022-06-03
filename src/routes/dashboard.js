@@ -11,6 +11,7 @@ import PageEventBudRests from "../pages/dashboard/events/budrests";
 import PageEventBudRestDetail from "../pages/dashboard/events/budrests/detail";
 import PageEventFaqs from "../pages/dashboard/events/faqs";
 import PageEventScoringQualification from "pages/dashboard/events/scoring-qualification";
+import PageEventScoringElimination from "pages/dashboard/events/scoring-elimination";
 import PageEventDetailSchedulingScoring from "pages/dashboard/events/scheduling-scoring";
 import PageConfigEliminationDetail from "pages/dashboard/events/scheduling-scoring/views/manage-elimination-detail";
 import ListCategory from "../pages/dashboard/category";
@@ -39,6 +40,10 @@ const dashboardRoutes = [
   {
     path: "/dashboard/event/:event_id/scoring-qualification",
     component: PageEventScoringQualification,
+  },
+  {
+    path: "/dashboard/event/:event_id/scoring-elimination",
+    component: PageEventScoringElimination,
   },
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",

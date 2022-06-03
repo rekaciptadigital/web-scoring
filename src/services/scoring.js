@@ -31,4 +31,31 @@ export default {
   putParticipantPresence(queryString = null) {
     return API.put("/web/v2/participant/change-is-present", null, queryString);
   },
+
+  /**
+   *
+   * @param {Object} queryString  { elimination_id, round, match, budrest_number }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  saveBudrestElimination(data = null) {
+    return API.post("/web/v2/event-elimination/set-budrest", data, null, true);
+  },
+
+  /**
+   *
+   * @param {Object} queryString  { elimination_id, round, match, member_id, admin_total }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  saveScoreAdminTotal(data = null) {
+    return API.post("/web/v2/scorer-elimination/set-admin-total", data, null, true);
+  },
+
+  /**
+   *
+   * @param {Object} queryString  { elimination_id, round, match }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  saveScorePermanent(data = null) {
+    return API.post("/web/v2/scorer-elimination/set-save-permanent", data, null, true);
+  },
 };

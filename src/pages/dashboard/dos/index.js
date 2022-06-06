@@ -30,8 +30,6 @@ const DashboardDos = () => {
       getDosData();
     }, [event_id]);
 
-    console.log(data, 'ratata');
-
     return (
     <StyledPageWrapper>
       <MetaTags>

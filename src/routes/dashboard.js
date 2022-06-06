@@ -26,6 +26,7 @@ import ListSchedule from "../pages/dashboard/schedule";
 import Eliminasi from "../pages/dashboard/eliminasi";
 import PageEventOfficial from "pages/dashboard/events/official";
 import PageEventIdCard from "pages/dashboard/events/id-card";
+import DashboardDos from "../pages/dashboard/dos";
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -71,6 +72,8 @@ const dashboardRoutes = [
   { path: "/dashboard/events/new", component: EventsNew },
   { path: "/dashboard/events/new/fullday", component: EventsNewFullday },
   { path: "/dashboard/events/new/marathon", component: EventsNewMarathon },
+
+  { path: "/dashboard/event/:event_id/dos", component: DashboardDos},
 ];
 
 export default dashboardRoutes;

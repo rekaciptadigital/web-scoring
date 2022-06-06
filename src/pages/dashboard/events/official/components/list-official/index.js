@@ -17,7 +17,7 @@ function OfficialTable( {searchName} ) {
          <MembersTable className="table table-responsive">
             <thead>
               <tr>
-                {/* <th>No.</th> */}
+                <th className="name">No.</th>
                 <th className="name">Nama Official</th>
                 <th className="name">Nama Klub</th>
                 <th className="name">Email</th>
@@ -30,6 +30,7 @@ function OfficialTable( {searchName} ) {
               {officialMembers?.member?.map((row) => {
                   return (
                       <tr key={row.userName}>
+                        <td className="name">{row.sortNumber}</td>  
                         <td className="name">{row.userName}</td>
                         <td className="name">
                             <ClubName>{row.clubName}</ClubName>

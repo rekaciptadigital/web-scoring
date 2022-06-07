@@ -280,7 +280,6 @@ function PageEventIdCard() {
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
   
-  console.log(editorData?.orientation, 'artata');
   return (
     <React.Fragment>
         <SubNavbar eventId={event_id} />

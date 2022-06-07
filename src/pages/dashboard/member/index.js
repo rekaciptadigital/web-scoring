@@ -163,7 +163,7 @@ function ListMember() {
     setErrorsIdCard(null);
     setWaitIdCard(true);
     const queryString = { event_id: event_id };
-    const result = await EventsService.getEventMemberIdCardByCategory(queryString);
+    const result = await EventsService.getDownloadIdCard(queryString);
     if (result.success) {
       const { fileName, fileBase64 } = result.data;
       fileSaver.saveAs(fileBase64, fileName || "id-cards-peserta.pdf");
@@ -210,6 +210,7 @@ function ListMember() {
     setPage(page);
   };
 
+  console.log(eventCategoriesDetail, 'ratata')
   return (
     <React.Fragment>
       <div>

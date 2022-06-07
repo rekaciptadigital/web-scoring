@@ -29,7 +29,7 @@ export default function ImageField({
   setEditorDirty,
   dataEditor,
 }) {
-  const { y, x } = data;
+  const { y, x, display } = data;
 
   const divRef = React.useRef(null);
   const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
@@ -44,11 +44,11 @@ export default function ImageField({
     // Perubahan data yang memengaruhi width DOM perlu diupdate di sini,
     // agar jarak left & transform x bisa dikalkulasi ulang dengan benar
     setCurrentOffsetWidth(divRef.current?.offsetWidth);
-  }, []);
+  }, [y, x, display]);
 
   React.useEffect(() => {
     setEditorDirty?.();
-  }, [y, x]);
+  }, [y, x, display]);
 
   const highlightOnMouseOver = () => {
     setActiveStrokeColor(boundingStroke.highlighted.color);
@@ -81,12 +81,13 @@ export default function ImageField({
           position: "absolute",
           top: 0,
           left: 1280 / 2 - currentOffsetWidth / 2 || 0,
+          display: display || "inline-block",
         }}
         onMouseOver={() => highlightOnMouseOver()}
         onMouseLeave={() => idleOnMouseLeave()}
       >
         <PlaceholderString>
-          <QrCodeContainer x={dataEditor?.x} y={dataEditor?.y} >
+          <QrCodeContainer x={dataEditor?.x} y={dataEditor?.y} display={dataEditor?.display} >
             <div className="qr-code-image"  />
           </QrCodeContainer>
         </PlaceholderString>
@@ -128,5 +129,6 @@ const QrCodeContainer = styled.div`
     ${(props) => (!props.preview ? "border: solid 1px #000000;" : "")}
     background-image: url(${photoPrev});
     background-size: cover;
+    display: ${({ display }) => display || "inline-block"}
   }
 `;

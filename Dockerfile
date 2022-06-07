@@ -11,7 +11,7 @@ RUN git config --global url."https://".insteadOf git://
 RUN apk add curl
 
 RUN npm uninstall node-sass --force
-RUN npm i sass
+RUN npm i sass --legacy-peer-deps
 RUN npm install --force #--legacy-peer-deps
 RUN npm run build
 

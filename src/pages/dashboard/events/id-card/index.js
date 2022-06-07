@@ -24,6 +24,7 @@ import { AlertPromptSave } from "../../certificates/new/alert-prompt-save";
 
 import EditorBgImagePicker from "./components/EditorBgImagePicker";
 import EditorCanvasHTML from "./components/EditorCanvasHTML";
+import EditorCanvasHTMLPotrait from "./components/EditorCanvasHTMLPotrait";
 import FontBoldToggle from "./components/FontBoldToggle";
 import ColorPickerContainer from "./components/ColorPickerContainer";
 import PreviewCanvas from "./components/preview/PreviewCanvas";
@@ -279,6 +280,7 @@ function PageEventIdCard() {
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
   
+  console.log(editorData?.orientation, 'artata');
   return (
     <React.Fragment>
         <SubNavbar eventId={event_id} />
@@ -366,17 +368,33 @@ function PageEventIdCard() {
               <Col lg="6">
                 <Card>
                   {editorData ? (
-                    <React.Fragment>
-                      <EditorCanvasHTML
-                        key={currentCertificateType}
-                        data={editorData}
-                        onChange={(data) => handleEditorChange(data)}
-                        currentObject={currentObject}
-                        onSelect={(target) => setCurrentObject(target)}
-                        // setEditorDirty={setEditorDirty}
-                      />
-                      {(isSaving || isLoading) && <ProcessingBlocker />}
-                    </React.Fragment>
+                    <>
+                    {editorData?.orientation == 'Landscape' ? (
+                      <React.Fragment>
+                        <EditorCanvasHTML
+                          key={currentCertificateType}
+                          data={editorData}
+                          onChange={(data) => handleEditorChange(data)}
+                          currentObject={currentObject}
+                          onSelect={(target) => setCurrentObject(target)}
+                          // setEditorDirty={setEditorDirty}
+                          />
+                        {(isSaving || isLoading) && <ProcessingBlocker />}
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <EditorCanvasHTMLPotrait
+                          key={currentCertificateType}
+                          data={editorData}
+                          onChange={(data) => handleEditorChange(data)}
+                          currentObject={currentObject}
+                          onSelect={(target) => setCurrentObject(target)}
+                          // setEditorDirty={setEditorDirty}
+                          />
+                        {(isSaving || isLoading) && <ProcessingBlocker />}
+                      </React.Fragment>
+                    )}
+                    </>
                   ) : (
                     <div
                       className="d-flex align-items-center justify-content-center"

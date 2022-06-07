@@ -18,6 +18,7 @@ import {
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
+import { ScoringTableTeam } from "./components/scoring-table-team";
 import { SearchBox } from "./components/search-box";
 import { ProcessingToast, toast } from "./components/processing-toast";
 import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
@@ -30,9 +31,9 @@ import IconDownload from "components/ma/icons/mono/download";
 import classnames from "classnames";
 
 const optionsParticipantsCount = [
-  { value: 8, label: 8 },
-  { value: 16, label: 16 },
-  { value: 32, label: 32 },
+  { value: 8, label: "8 Besar" },
+  { value: 16, label: "16 Besar" },
+  { value: 32, label: "32 Besar" },
 ];
 
 function _getSelectedFromValue(countValue) {
@@ -193,7 +194,7 @@ function PageEventScoringQualification() {
           <ToolbarRight>
             <HorizontalSpaced>
               <SelectEliminationCounts>
-                <label htmlFor="elimination-members-count">Peserta Eliminasi</label>
+                <label htmlFor="elimination-members-count">Babak Eliminasi</label>
                 <Select
                   placeholder="Pilih jumlah"
                   options={optionsParticipantsCount}
@@ -259,7 +260,7 @@ function PageEventScoringQualification() {
                   messagePrompt="Pemeringkatan eliminasi sudah ditentukan"
                   buttonConfirmLabel="Tutup"
                 >
-                  Tentukan Eliminasi
+                  {getLabelButtonSetBracket(activeCategoryDetail?.isTeam)}
                 </ButtonConfirmWarning>
               ) : (
                 <ButtonConfirmPrompt
@@ -277,20 +278,31 @@ function PageEventScoringQualification() {
                     setElimination(localCountNumber, { onSuccess() {} });
                   }}
                 >
-                  Tentukan Eliminasi
+                  {getLabelButtonSetBracket(activeCategoryDetail?.isTeam)}
                 </ButtonConfirmPrompt>
               )}
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
 
-        <ScoringTable
-          key={activeCategoryDetail?.categoryDetailId}
-          categoryDetailId={activeCategoryDetail?.categoryDetailId}
-          searchName={inputSearchQuery}
-          onChangeParticipantPresence={resetOnChangeCategory}
-          eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
-        />
+        {activeCategoryDetail &&
+          (activeCategoryDetail.isTeam ? (
+            <ScoringTableTeam
+              key={activeCategoryDetail?.categoryDetailId}
+              categoryDetailId={activeCategoryDetail?.categoryDetailId}
+              searchName={inputSearchQuery}
+              onChangeParticipantPresence={resetOnChangeCategory}
+              eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+            />
+          ) : (
+            <ScoringTable
+              key={activeCategoryDetail?.categoryDetailId}
+              categoryDetailId={activeCategoryDetail?.categoryDetailId}
+              searchName={inputSearchQuery}
+              onChangeParticipantPresence={resetOnChangeCategory}
+              eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+            />
+          ))}
       </ViewWrapper>
     </ContentLayoutWrapper>
   );
@@ -364,7 +376,7 @@ const TabButton = styled.button`
 
 const ToolbarTop = styled.div`
   display: flex;
-  gap: 1.5rem;
+  gap: 1.5rem 2.25rem;
 
   > *:nth-child(1) {
     flex-grow: 1;
@@ -390,12 +402,13 @@ const ToolbarRight = styled.div`
 
 const SelectEliminationCounts = styled.div`
   position: relative;
+  min-width: 7.5rem;
 `;
 
 const AppliedIconWrapper = styled.div`
   position: absolute;
   bottom: 0.5rem;
-  left: -2rem;
+  left: -1.5rem;
 `;
 
 const HorizontalSpaced = styled.div`
@@ -467,5 +480,15 @@ const FilterItemButton = styled.button`
     background-color: var(--ma-primary-blue-50);
   }
 `;
+
+/* =========================== */
+// utils
+
+const getLabelButtonSetBracket = (isTeam) => {
+  if (!isTeam) {
+    return "Tentukan Eliminasi";
+  }
+  return "Lanjut ke Eliminasi";
+};
 
 export default PageEventScoringQualification;

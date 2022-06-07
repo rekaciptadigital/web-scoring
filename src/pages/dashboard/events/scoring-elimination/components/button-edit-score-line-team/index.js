@@ -28,7 +28,7 @@ import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
-function ButtonEditScoreLine({
+function ButtonEditScoreTeam({
   disabled,
   scoring,
   headerInfo,
@@ -86,9 +86,14 @@ function ModalEditor({
   const {
     isError: isErrorScoringDetail,
     errors: errorsScoringDetail,
-    data: scoringDetails,
+    // TODO:
+    // data: scoringDetails,
     fetchScoringDetail,
-  } = useScoringDetail(scoring);
+    // TODO: scoring, fetch detail
+  } = useScoringDetail(/* scoring */ {});
+
+  // TODO: hapus
+  const scoringDetails = fakeDetails;
 
   const isSettled = Boolean(scoringDetails) || (!scoringDetails && isErrorScoringDetail);
   const headerPlayer1 = headerInfo?.teams[0];
@@ -120,7 +125,8 @@ function ModalEditor({
   } = useSubmitScores();
 
   const { submitAdminTotal, isLoading: isSubmitingTotal } = useSubmitAdminTotal({
-    eliminationId: scoring.elimination_id,
+    // TODO: elimination ID
+    eliminationId: scoring?.elimination_id || 333,
     round: scoring.round,
     match: scoring.match,
   });
@@ -172,9 +178,17 @@ function ModalEditor({
                   <RankLabel>
                     #{headerPlayer1?.potition || headerPlayer1?.postition || "-"}
                   </RankLabel>
-                  <NameLabel>
-                    {player1?.participant.member.name || headerPlayer1?.name || "-"}
-                  </NameLabel>
+
+                  <div>
+                    <TeamNameLabel>
+                      {player1?.participant.member.name || headerPlayer1?.name || "-"}
+                    </TeamNameLabel>
+                    <MembersList>
+                      <li>Anggota satu</li>
+                      <li>Anggota dua</li>
+                      <li>Anggota tigaaa...</li>
+                    </MembersList>
+                  </div>
                 </PlayerNameData>
               </PlayerLabelContainerLeft>
 
@@ -259,11 +273,19 @@ function ModalEditor({
                   <RankLabel>
                     #{headerPlayer2?.potition || headerPlayer2?.postition || "-"}
                   </RankLabel>
-                  <NameLabel>
-                    {player2?.participant.member.name ||
-                      headerPlayer2?.name ||
-                      "Nama archer tidak tersedia"}
-                  </NameLabel>
+
+                  <div>
+                    <TeamNameLabel>
+                      {player2?.participant.member.name ||
+                        headerPlayer2?.name ||
+                        "Nama archer tidak tersedia"}
+                    </TeamNameLabel>
+                    <MembersList>
+                      <li>Anggota satu</li>
+                      <li>Anggota dua</li>
+                      <li>Anggota tigaaa...</li>
+                    </MembersList>
+                  </div>
                 </PlayerNameData>
               </PlayerLabelContainerRight>
             </ScoresheetHeader>
@@ -422,18 +444,18 @@ const BudrestNumberLabel = styled.div`
 
 const PlayerLabelContainerLeft = styled.div`
   flex-grow: 1;
-  margin-right: 2rem;
+  margin-right: 1rem;
 `;
 
 const PlayerLabelContainerRight = styled.div`
   flex-grow: 1;
-  margin-left: 2rem;
+  margin-left: 1rem;
 `;
 
 const PlayerNameData = styled.div`
-  min-width: 11rem;
+  min-width: 12rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   align-items: center;
 `;
 
@@ -447,10 +469,18 @@ const RankLabel = styled.span`
   text-align: center;
 `;
 
-const NameLabel = styled.span`
+const TeamNameLabel = styled.span`
   display: block;
   font-weight: 600;
   text-align: left;
+`;
+
+const MembersList = styled.ol`
+  margin: 0;
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  text-align: left;
+  font-size: 0.625rem;
 `;
 
 const HeadToHeadScores = styled.div`
@@ -587,4 +617,227 @@ function _getDistanceCategoryLabel(classCategory) {
   return classCategory.split(" - ")?.[1]?.trim() || "-";
 }
 
-export { ButtonEditScoreLine };
+export { ButtonEditScoreTeam };
+
+const fakeDetails = [
+  {
+    participant: {
+      id: 1426,
+      eventId: 22,
+      userId: 618,
+      name: "Muhammad Usman Al Fatih",
+      type: "individual",
+      email: "muhammadusmanalfatih9@gmail.com",
+      phoneNumber: "087700656735",
+      age: 13,
+      gender: "male",
+      teamCategoryId: "individu male",
+      ageCategoryId: "U-15",
+      competitionCategoryId: "Compound",
+      distanceId: 40,
+      qualificationDate: null,
+      transactionLogId: 1358,
+      uniqueId: "07b5cd5f-e57e-4122-9afb-68ad4724a692",
+      createdAt: "2022-03-22 20:32:15",
+      updatedAt: "2022-05-13 00:35:23",
+      teamName: "Tim Kiri",
+      eventCategoryId: 91,
+      status: 1,
+      clubId: 49,
+      reasonRefund: null,
+      uploadImageRefund: null,
+      isPresent: 1,
+      registerBy: 1,
+      categoryLabel: "individu male-U-15-Compound-40m",
+      member: {
+        id: 1265,
+        archeryEventParticipantId: 1426,
+        name: "Tim Kiri Tim Kiri Tim Kiri",
+        teamCategoryId: "individu male",
+        email: null,
+        phoneNumber: null,
+        club: null,
+        age: 13,
+        gender: "male",
+        qualificationDate: null,
+        createdAt: "2022-03-22 20:32:15",
+        updatedAt: "2022-05-12 16:47:11",
+        birthdate: "2008-07-13",
+        userId: 618,
+        isSeries: 0,
+        haveShootOff: 0,
+        cityId: null,
+      },
+      club: "AR-RIDHO ARCHERY",
+    },
+    scores: {
+      shot: [
+        {
+          score: ["10", "9", "5"],
+          total: 24,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+      ],
+      extraShot: [
+        {
+          distanceFromX: 0,
+          score: "",
+          status: null,
+        },
+        {
+          distanceFromX: 0,
+          score: "",
+          status: null,
+        },
+        {
+          distanceFromX: 0,
+          score: "",
+          status: null,
+        },
+      ],
+      win: 0,
+      total: 24,
+      eliminationtScoreType: 2,
+      result: 24,
+      adminTotal: 0,
+      isDifferent: 1,
+    },
+    round: "2",
+    isUpdated: 1,
+  },
+  {
+    participant: {
+      id: 1049,
+      eventId: 22,
+      userId: 95,
+      name: "Arbiansyah Abdillah Muttaqin",
+      type: "individual",
+      email: "bianrizki99@gmail.com",
+      phoneNumber: "081289186199",
+      age: 13,
+      gender: "male",
+      teamCategoryId: "individu male",
+      ageCategoryId: "U-15",
+      competitionCategoryId: "Compound",
+      distanceId: 40,
+      qualificationDate: null,
+      transactionLogId: 985,
+      uniqueId: "d0b173d5-8ec2-4b15-9962-edf9de0dfb95",
+      createdAt: "2022-03-21 07:01:31",
+      updatedAt: "2022-03-21 07:05:45",
+      teamName: "Tim Kanan",
+      eventCategoryId: 91,
+      status: 1,
+      clubId: 2,
+      reasonRefund: null,
+      uploadImageRefund: null,
+      isPresent: 1,
+      registerBy: 1,
+      categoryLabel: "individu male-U-15-Compound-40m",
+      member: {
+        id: 891,
+        archeryEventParticipantId: 1049,
+        name: "Tim Kanan Tim Kanan Tim Kanan",
+        teamCategoryId: "individu male",
+        email: null,
+        phoneNumber: null,
+        club: null,
+        age: 13,
+        gender: "male",
+        qualificationDate: null,
+        createdAt: "2022-03-21 07:01:31",
+        updatedAt: "2022-05-12 16:47:10",
+        birthdate: "2008-07-30",
+        userId: 95,
+        isSeries: 1,
+        haveShootOff: 0,
+        cityId: null,
+      },
+      club: "Focus Archery Center",
+    },
+    scores: {
+      shot: [
+        {
+          score: ["7", "6", "5"],
+          total: 18,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+        {
+          score: ["", "", ""],
+          total: 0,
+          status: null,
+          point: null,
+        },
+      ],
+      extraShot: [
+        {
+          distanceFromX: 0,
+          score: "",
+          status: null,
+        },
+        {
+          distanceFromX: 0,
+          score: "",
+          status: null,
+        },
+        {
+          distanceFromX: 0,
+          score: "",
+          status: null,
+        },
+      ],
+      win: 0,
+      total: 18,
+      eliminationtScoreType: 2,
+      result: 18,
+      adminTotal: 0,
+      isDifferent: 1,
+    },
+    round: "2",
+    isUpdated: 1,
+  },
+];

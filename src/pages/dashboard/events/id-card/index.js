@@ -279,8 +279,7 @@ function PageEventIdCard() {
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
-  
-  console.log(editorData?.orientation, 'artata');
+
   return (
     <React.Fragment>
         <SubNavbar eventId={event_id} />
@@ -518,7 +517,25 @@ function PageEventIdCard() {
                   </div>
                 )}
                 </Row>
-              ) :null}
+              ) : (
+              <>
+                <div className="mt-3">
+                  <Col lg="2">
+                    <div className="mt-2">
+                      <label className="ml-2">Visibilty:</label>
+                        <ButtonVisible>
+                          <div>
+                            <DisplayObject
+                              none={currentObject?.display}
+                              onChange={() => handleRemove()}
+                              />
+                          </div>
+                        </ButtonVisible>
+                    </div>
+                  </Col>
+                </div>
+              </>
+              )}
               </Col>
             </Row>
           </Col>

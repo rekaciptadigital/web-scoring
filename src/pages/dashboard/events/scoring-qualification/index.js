@@ -260,7 +260,7 @@ function PageEventScoringQualification() {
                   messagePrompt="Pemeringkatan eliminasi sudah ditentukan"
                   buttonConfirmLabel="Tutup"
                 >
-                  {getLabelButtonSetBracket(activeCategoryDetail?.isTeam)}
+                  Lanjut ke Eliminasi
                 </ButtonConfirmWarning>
               ) : (
                 <ButtonConfirmPrompt
@@ -278,7 +278,7 @@ function PageEventScoringQualification() {
                     setElimination(localCountNumber, { onSuccess() {} });
                   }}
                 >
-                  {getLabelButtonSetBracket(activeCategoryDetail?.isTeam)}
+                  Lanjut ke Eliminasi
                 </ButtonConfirmPrompt>
               )}
             </HorizontalSpaced>
@@ -480,15 +480,5 @@ const FilterItemButton = styled.button`
     background-color: var(--ma-primary-blue-50);
   }
 `;
-
-/* =========================== */
-// utils
-
-const getLabelButtonSetBracket = (isTeam) => {
-  if (!isTeam) {
-    return "Tentukan Eliminasi";
-  }
-  return "Lanjut ke Eliminasi";
-};
 
 export default PageEventScoringQualification;

@@ -279,8 +279,6 @@ function PageEventIdCard() {
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
-  
-  console.log(currentObject, 'ratata');
 
   return (
     <React.Fragment>

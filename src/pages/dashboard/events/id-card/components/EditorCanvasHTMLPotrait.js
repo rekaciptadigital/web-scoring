@@ -99,8 +99,8 @@ const EditorCanvasContainer = styled.div`
 
 const EditorBackground = styled.div`
   position: relative;
-  width: ${({ height }) => height}px;
-  height: ${({ width }) => width}px;
+  width: ${({ width }) => width}px;
+  height: ${({ height }) => height}px;
   background-color: white;
   background-image: var(--editor-bg-image);
   background-repeat: no-repeat;

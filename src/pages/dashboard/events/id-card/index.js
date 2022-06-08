@@ -6,6 +6,10 @@ import {
   optionsFontSize,
   optionsFontFamily,
   getSelectedFontFamily,
+  optionsPaperSize,
+  getSelectedPaperSize,
+  optionsOrientation,
+  getSelectedOrientation,
 } from './utils/index';
 import { prepareSaveData } from "./utils";
 import { DEJAVU_SANS } from "../../certificates/utils/font-family-list";
@@ -24,8 +28,9 @@ import FontBoldToggle from "./components/FontBoldToggle";
 import ColorPickerContainer from "./components/ColorPickerContainer";
 import PreviewCanvas from "./components/preview/PreviewCanvas";
 import { SubNavbar } from "../components/submenus-settings";
+import DisplayObject from "./components/DisplayObject";
 
-const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT, LABEL_PHOTO_PROFILE } = idCardFields;
+const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
 
 function PageEventIdCard() {
   const { event_id } = useParams();
@@ -49,6 +54,7 @@ function PageEventIdCard() {
 
   const [currentObject, setCurrentObject] = React.useState(null);
 //   const [isEditorDirty, setEditorAsDirty] = React.useState(false);
+
 
   const targetCertificateType = React.useRef(1);
   const [needSavingConfirmation, setNeedSavingConfirmation] = React.useState(false);
@@ -97,6 +103,8 @@ function PageEventIdCard() {
             event_id: event_id,
             backgroundUrl: result.data.background,
             fields: parsedEditorData.fields || defaultEditorData.fields,
+            paperSize: parsedEditorData.paperSize || defaultEditorData.paperSize,
+            // orientation: parsedEditorData.orientation || defaultEditorData.orientation,
             qrFields: parsedEditorData.qrFields || defaultEditorData.qrFields,
             photoProfileField: parsedEditorData.photoProfileField || defaultEditorData.photoProfileField,
           });
@@ -177,6 +185,22 @@ function PageEventIdCard() {
     }));
   };
 
+  const handlePaperSizeChange = (ev) => {
+    const { value } = ev;
+    setEditorData((data) => ({
+      ...data,
+      paperSize: value,
+    }));
+  };
+
+  const handleOrientationChange = (ev) => {
+    const { value } = ev;
+    setEditorData((data) => ({
+      ...data,
+      orientation: value,
+    }));
+  };
+
   const handleFontColorChange = (color) => {
     setCurrentObject((currentData) => ({
       ...currentData,
@@ -188,6 +212,20 @@ function PageEventIdCard() {
     setCurrentObject((currentData) => ({
       ...currentData,
       fontWeight: currentData.fontWeight ? undefined : "bold",
+    }));
+  };
+  
+  const handleRemove = () => {
+    setCurrentObject((currentData) => ({
+      ...currentData,
+      display: currentData.display ? undefined : "none",
+    }))
+  };
+
+  const handleReset = () => {
+    setEditorData((data) => ({
+      ...data,
+      fields: defaultEditorData.fields,
     }));
   };
 
@@ -217,12 +255,12 @@ function PageEventIdCard() {
     });
     // setEditorDirty();
   };
-
+  
   const handleClickSave = async () => {
     setStatus("saving");
     const queryString = { event_id, type_certificate: currentCertificateType };
     const data = await prepareSaveData(editorData, queryString);
-
+    
     const result = await IdCardService.save(data);
     if (result.data) {
       const editorDataSaved = JSON.parse(result.data.editorData);
@@ -231,12 +269,12 @@ function PageEventIdCard() {
         ...editorDataSaved,
         event_id: event_id,
       }));
-    //   setEditorClean();
+      //   setEditorClean();
     }
-
+    
     setStatus("done");
   };
-
+  
   const handleOpenPreview = () => setModePreview(true);
   const handleClosePreview = () => setModePreview(false);
   const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
@@ -287,6 +325,7 @@ function PageEventIdCard() {
                       Pratinjau
                     </BSButton>
 
+
                     <Modal
                       isOpen={isModePreview}
                       size="lg"
@@ -305,6 +344,16 @@ function PageEventIdCard() {
                         </div>
                       </ModalBody>
                     </Modal>
+                  </div>
+
+                  <div>
+                    <BSButton
+                      tag="a"
+                      color="warning"
+                      onClick={() => handleReset()}
+                      >
+                      Reset
+                    </BSButton>
                   </div>
 
                   {isSaving && <div className="indicator-message">Saving ID Card...</div>}
@@ -352,6 +401,34 @@ function PageEventIdCard() {
                 </div>
                 </Row>
 
+                <Row>
+                  <div className="mt-3">
+                    <div>
+                      <label>Paper Size:</label>
+                      <Select
+                        options={optionsPaperSize}
+                        placeholder="Paper Size"
+                        value={getSelectedPaperSize(optionsPaperSize, editorData)}
+                        onChange={(ev) => handlePaperSizeChange(ev)}
+                        />
+                    </div>
+                    </div>
+                </Row>
+
+                <Row>
+                  <div className="mt-3">
+                    <div>
+                      <label>Orientation:</label>
+                      <Select
+                        options={optionsOrientation}
+                        placeholder="Pilih Orientasi Kertas"
+                        value={getSelectedOrientation(optionsOrientation, editorData)}
+                        onChange={(ev) => handleOrientationChange(ev)}
+                        />
+                    </div>
+                    </div>
+                </Row>
+
               {currentObject?.name == 'player_name' || currentObject?.name == 'category' || currentObject?.name == 'birthdate' || currentObject?.name == 'location_and_date' || currentObject?.name == 'club_member' || currentObject?.name == 'status_event' ? (
                 <Row>
                 {currentObject?.name && (
@@ -396,7 +473,7 @@ function PageEventIdCard() {
                     </ButtonEditor>
                     </Col>
 
-                        <Col lg="1">
+                    <Col lg="1">
                     <ButtonEditor>
                       <div>
                         <FontBoldToggle
@@ -406,11 +483,24 @@ function PageEventIdCard() {
                       </div>
                     </ButtonEditor>
                     </Col>
+                    <Col lg="2">
+                      <div className="mt-2">
+                        <label className="ml-2">Visibilty:</label>
+                          <ButtonVisible>
+                            <div>
+                              <DisplayObject
+                                none={currentObject?.display}
+                                onChange={() => handleRemove()}
+                                />
+                            </div>
+                          </ButtonVisible>
+                      </div>
+                    </Col>
                     </EditorSection>
                   </div>
                 )}
                 </Row>
-              ) : null}
+              ) :null}
               </Col>
             </Row>
           </Col>
@@ -482,11 +572,15 @@ const ButtonEditor = styled.div`
     margin-left: 1rem;
 `;
 
-
+const ButtonVisible = styled.div`
+    margin-top: 0.3rem !important;
+    margin-left: 1rem;
+`;
 
 
 const defaultEditorData = {
-  paperSize: "A4", // || [1280, 908] || letter
+  paperSize: 'A4',
+  orientation: 'Potrait',
   backgroundUrl: null,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
@@ -510,36 +604,29 @@ const defaultEditorData = {
     },
     {
       name: LABEL_LOCATION_AND_DATE,
-      x: 850,
+      x: 150,
       y: 100,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
       name: LABEL_CATEGORY,
-      x: 850,
+      x: 150,
       y: 150,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
       name: LABEL_CLUB_MEMBER,
-      x: 640,
+      x: 200,
       y: 200,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },
     {
       name: LABEL_STATUS_EVENT,
-      x: 640,
+      x: 200,
       y: 250,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
-      name: LABEL_PHOTO_PROFILE,
-      x: 40,
-      y: 50,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },

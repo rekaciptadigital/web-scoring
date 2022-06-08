@@ -14,6 +14,7 @@ import IconCheck from "components/ma/icons/fill/check";
 
 import { eventMenus } from "./utils/menus";
 import { target } from "./utils/icon-svgs";
+import { ButtonOutlineBlue } from "components/ma";
 
 function PageEventDetailHome() {
   const { event_id } = useParams();
@@ -84,9 +85,17 @@ function PageEventDetailHome() {
             <DashboardHeading className="mb-5">
               <HeaderMain>
                 <h1 className="mb-3">{eventDetail.publicInformation.eventName}</h1>
-                <LandingPageLinkPlaceholder
-                  url={eventDetail.publicInformation.eventUrl || "https://myarchery.id"}
-                />
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+
+                  <LandingPageLinkPlaceholder
+                    url={eventDetail.publicInformation.eventUrl || "https://myarchery.id"}
+                    />
+                    <ButtonOutlineBlue >
+                      <a href={`/dashboard/event/${event_id}/dos`}>
+                        <span>Ke Halaman DOS</span>
+                      </a>
+                    </ButtonOutlineBlue>
+                </div>
               </HeaderMain>
 
               <div>

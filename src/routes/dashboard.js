@@ -12,6 +12,7 @@ import PageEventBudRestDetail from "../pages/dashboard/events/budrests/detail";
 import PageEventFaqs from "../pages/dashboard/events/faqs";
 import PageEventScoringQualification from "pages/dashboard/events/scoring-qualification";
 import PageEventScoringElimination from "pages/dashboard/events/scoring-elimination";
+import PageEventReports from "pages/dashboard/events/reports";
 import PageEventDetailSchedulingScoring from "pages/dashboard/events/scheduling-scoring";
 import PageConfigEliminationDetail from "pages/dashboard/events/scheduling-scoring/views/manage-elimination-detail";
 import ListCategory from "../pages/dashboard/category";
@@ -45,14 +46,17 @@ const dashboardRoutes = [
     path: "/dashboard/event/:event_id/scoring-elimination",
     component: PageEventScoringElimination,
   },
+  // TODO: hapus ketika nanti udah gak dipakai/diakses
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",
     component: PageEventDetailSchedulingScoring,
   },
+  // TODO: hapus ketika nanti udah gak dipakai/diakses
   {
     path: "/dashboard/event/:event_id/scheduling-scoring/elimination",
     component: PageConfigEliminationDetail,
   },
+  { path: "/dashboard/event/:event_id/reports", component: PageEventReports, exact: true },
   { path: "/dashboard/member/:event_id", component: ListMember },
   { path: "/dashboard/category", component: ListCategory },
   { path: "/dashboard/scoring", component: ListScoring },

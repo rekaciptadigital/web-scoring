@@ -39,7 +39,7 @@ export default function EditorCanvasHTMLPotrait({
   };
 
   return (
-    <EditorCanvasContainer ref={containerDiv} ratio={1280 / 908}>
+    <EditorCanvasContainer ref={containerDiv} ratio={500 / 500}>
       <EditorBackground
         width={908}
         height={1280}

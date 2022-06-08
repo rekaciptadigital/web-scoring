@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
-import { ScoringService } from "services";
+import { DosService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
@@ -10,7 +10,7 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
 
   const fetchScoringMembers = () => {
     const getFunction = () => {
-      return ScoringService.getQualificationScoringMembersV2({
+      return DosService.getQualificationMembersV2({
         event_category_id: categoryDetailId,
         name: debouncedSearchQuery || undefined,
         elimination_template: eliminationParticipantsCount,

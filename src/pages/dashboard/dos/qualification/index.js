@@ -7,40 +7,20 @@ import { useSubmitEliminationCount } from "./hooks/submit-elimination-count";
 import { useSubmitEliminationConfig } from "./hooks/submit-elimination-config";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
-import Select from "react-select";
 import {
   SpinnerDotBlock,
-  ButtonBlue,
   ButtonOutlineBlue,
   LoadingScreen,
   AlertSubmitError,
 } from "components/ma";
-import { SubNavbar } from "../../events/components/submenus-matches";
+import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
-import { SearchBox } from "./components/search-box";
 import { ProcessingToast, toast } from "./components/processing-toast";
-import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
-import { ButtonConfirmWarning } from "./components/button-confirm-warning";
-import { ButtonShowBracket } from "./components/button-show-bracket";
 
-import IconCheck from "components/ma/icons/fill/check";
 import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
-
-const optionsParticipantsCount = [
-  { value: 8, label: 8 },
-  { value: 16, label: 16 },
-  { value: 32, label: 32 },
-];
-
-function _getSelectedFromValue(countValue) {
-  if (!countValue) {
-    return null;
-  }
-  return optionsParticipantsCount.find((option) => option.value === countValue);
-}
 
 function PageDosQualification() {
   const { event_id } = useParams();
@@ -50,7 +30,6 @@ function PageDosQualification() {
     data: categoryDetails,
     errors: errorsCategoryDetail,
     isSettled: isSettledCategories,
-    fetchCategoryDetails,
   } = useCategoryDetails(eventId);
 
   const {
@@ -64,17 +43,14 @@ function PageDosQualification() {
   } = useCategoriesWithFilters(categoryDetails);
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
-  const [localCountNumber, setLocalCountNumber] = React.useState(null);
 
   const {
-    submit: updateEliminationMemberCount,
     isLoading: isLoadingSubmitCount,
     isError: isErrorSubmitCount,
     errors: errorsSubmitCount,
   } = useSubmitEliminationCount(activeCategoryDetail?.categoryDetailId);
 
   const {
-    submit: setElimination,
     isLoading: isLoadingSubmitElimination,
     isError: isErrorSubmitElimination,
     errors: errorsSubmitElimination,
@@ -85,7 +61,6 @@ function PageDosQualification() {
   );
 
   const resetOnChangeCategory = () => {
-    setLocalCountNumber(null);
     setInputSearchQuery("");
   };
 
@@ -192,51 +167,6 @@ function PageDosQualification() {
 
           <ToolbarRight>
             <HorizontalSpaced>
-              <SelectEliminationCounts>
-                <label htmlFor="elimination-members-count">Peserta Eliminasi</label>
-                <Select
-                  placeholder="Pilih jumlah"
-                  options={optionsParticipantsCount}
-                  value={_getSelectedFromValue(
-                    localCountNumber || activeCategoryDetail?.defaultEliminationCount
-                  )}
-                  onChange={(option) => {
-                    setLocalCountNumber(option.value);
-                    updateEliminationMemberCount(option.value, {
-                      onSuccess() {
-                        fetchCategoryDetails();
-                      },
-                      onError() {
-                        setLocalCountNumber(activeCategoryDetail?.defaultEliminationCount);
-                      },
-                    });
-                  }}
-                />
-
-                {Boolean(activeCategoryDetail?.defaultEliminationCount) && (
-                  <AppliedIconWrapper>
-                    <IconCheck size="20" />
-                  </AppliedIconWrapper>
-                )}
-              </SelectEliminationCounts>
-
-              <PushBottom>
-                <SearchBox
-                  placeholder="Cari peserta"
-                  value={inputSearchQuery}
-                  onChange={(ev) => setInputSearchQuery(ev.target.value)}
-                />
-              </PushBottom>
-
-              <PushBottom>
-                <ButtonShowBracket
-                  categoryDetailId={activeCategoryDetail?.categoryDetailId}
-                  eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
-                />
-              </PushBottom>
-            </HorizontalSpaced>
-
-            <HorizontalSpaced>
               <ButtonOutlineBlue
                 onClick={() => {
                   toast.loading("Sedang menyiapkan dokumen scoresheet...");
@@ -250,36 +180,9 @@ function PageDosQualification() {
                 <span>
                   <IconDownload size="16" />
                 </span>{" "}
-                <span>Unduh Dokumen</span>
+                <span>Unduh Laporan</span>
               </ButtonOutlineBlue>
 
-              {activeCategoryDetail?.eliminationLock ? (
-                <ButtonConfirmWarning
-                  customButton={ButtonBlue}
-                  messagePrompt="Pemeringkatan eliminasi sudah ditentukan"
-                  buttonConfirmLabel="Tutup"
-                >
-                  Tentukan Eliminasi
-                </ButtonConfirmWarning>
-              ) : (
-                <ButtonConfirmPrompt
-                  customButton={ButtonBlue}
-                  messagePrompt="Anda akan menentukan pemeringkatan eliminasi"
-                  messageDescription={
-                    <React.Fragment>
-                      Jumlah peserta dan data yang telah ditentukan tidak dapat diubah kembali.
-                      Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.
-                    </React.Fragment>
-                  }
-                  buttonCancelLabel="Batalkan"
-                  buttonConfirmLabel="Iya, Tentukan Eliminasi"
-                  onConfirm={() => {
-                    setElimination(localCountNumber, { onSuccess() {} });
-                  }}
-                >
-                  Tentukan Eliminasi
-                </ButtonConfirmPrompt>
-              )}
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
@@ -388,16 +291,6 @@ const ToolbarRight = styled.div`
   }
 `;
 
-const SelectEliminationCounts = styled.div`
-  position: relative;
-`;
-
-const AppliedIconWrapper = styled.div`
-  position: absolute;
-  bottom: 0.5rem;
-  left: -2rem;
-`;
-
 const HorizontalSpaced = styled.div`
   display: flex;
   gap: 0.5rem;
@@ -405,10 +298,6 @@ const HorizontalSpaced = styled.div`
   > * {
     flex-grow: 1;
   }
-`;
-
-const PushBottom = styled.div`
-  align-self: flex-end;
 `;
 
 const CategoryFilter = styled.div`

@@ -8,8 +8,8 @@ import { Card, CardBody, Row, Col } from "reactstrap";
 import iconSchedule from "../../../../assets/images/schedule.png";
 
 const CardMenuProfileContainer = styled(Card)`
-  overflow: hidden;
-  transition: all 0.4s;
+transition: all 0.4s;
+overflow-y: auto:
 
   &::before {
     content: " ";
@@ -105,6 +105,11 @@ const CardMenuProfileContainer = styled(Card)`
     line-height: 120%;
     color: #0D47A1;
   }
+
+  .content-scroll {
+    overflow-y: scroll:
+    height: 400px;
+  }
 `;
 
 function CardSchedule(cardData) {
@@ -143,7 +148,8 @@ function CardSchedule(cardData) {
                   <Row>
                     <p className="d-flex flex-column text-banner">Berikut adalah kategori perlombaan yang dipertandingkan pada event <b>PRO Jakarta Open 2022,</b> antara lain:</p>
                         {cardData?.cardData.map((item) => (
-                            <>
+                          <>
+                            <div className="content-scroll">
                             <p className="text-banner">{item?.date}</p>
                             <ol className="text-banner">
                                 {item?.schedule.map((detail) => (
@@ -151,7 +157,8 @@ function CardSchedule(cardData) {
                                     <li>{detail?.categoryDetailLabel}</li>
                                 ))}
                             </ol>
-                            </>
+                            </div>
+                          </>
                         ))}
                   </Row>
 

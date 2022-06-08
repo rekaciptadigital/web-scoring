@@ -32,8 +32,6 @@ const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields
 function CertificateNew() {
   const event_id = new URLSearchParams(useLocation().search).get("event_id");
   const eventId = parseInt(event_id);
-  console.log(event_id, 'eventId');
-
 
   const isMounted = React.useRef(null);
   const abortControllerRef = React.useRef(null);
@@ -91,7 +89,7 @@ function CertificateNew() {
       if (result.success) {
         // Kalau belum ada data template tapi dapatnya objek kosongan
         // Dikenali dari gak ada `certificateId`-nya
-        if (!result.data.id) {
+        if (!result.data?.id) {
           setEditorData({
             ...defaultEditorData,
             typeCertificate: currentCertificateType,

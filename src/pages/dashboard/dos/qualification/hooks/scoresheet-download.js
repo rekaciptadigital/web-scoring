@@ -1,5 +1,5 @@
 import { useFetcher } from "utils/hooks/alt-fetcher";
-import { ScoringService } from "services";
+import { DosService } from "services";
 
 import { urlUtil } from "utils";
 
@@ -14,7 +14,7 @@ function useScoresheetDownload(eventCategoryId) {
     const queryString = { event_category_id: eventCategoryId };
 
     const getFunction = () => {
-      return ScoringService.getScoresheetDownloadUrl(queryString);
+      return DosService.getQualificationDownloadUrl(queryString);
     };
     const onSuccess = (data) => {
       consumerSuccessHandler?.();

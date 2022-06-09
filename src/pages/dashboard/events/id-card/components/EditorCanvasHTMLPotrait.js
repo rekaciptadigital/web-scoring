@@ -39,9 +39,9 @@ export default function EditorCanvasHTMLPotrait({
   };
 
   return (
-    <EditorCanvasContainer ref={containerDiv} ratio={500 / 500}>
+    <EditorCanvasContainer ref={containerDiv} ratio={700 / 700}>
       <EditorBackground
-        width={908}
+        width={1280}
         height={1280}
         scale={containerDiv.current?.offsetWidth / 1280}
         style={{ "--editor-bg-image": `url(${getBackgroundImage()})` }}
@@ -100,7 +100,7 @@ const EditorCanvasContainer = styled.div`
 const EditorBackground = styled.div`
   position: relative;
   width: ${({ width }) => width}px;
-  height: ${({ height }) => height}px;
+  height: ${({ height }) => height * 1.3}px;
   background-color: white;
   background-image: var(--editor-bg-image);
   background-repeat: no-repeat;

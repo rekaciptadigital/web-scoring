@@ -2,9 +2,10 @@ import React from "react";
 import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
 import { AuthLayout } from "./layouts";
 import { AuthenticationMiddleware } from "./middlewares";
-import { authenticationRoutes, dashboardRoutes, certificateRoutes, workingRoutes } from "./routes";
+import { authenticationRoutes, dashboardRoutes, certificateRoutes, workingRoutes, dosRoutes } from "./routes";
 
 import { LayoutDashboard } from "layouts/ma";
+import { LayoutDashboardDos } from "layouts/dashboard-dos";
 
 import "./assets/scss/theme.scss";
 import "react-datepicker/dist/react-datepicker.css";
@@ -55,6 +56,16 @@ const App = () => {
             <AuthenticationMiddleware
               path={route.path}
               layout={AuthLayout}
+              component={route.component}
+              key={idx}
+              isAuthProtected={false}
+              exact
+            />
+          ))}
+           {dosRoutes.map((route, idx) => (
+            <AuthenticationMiddleware
+              path={route.path}
+              layout={LayoutDashboardDos}
               component={route.component}
               key={idx}
               isAuthProtected={false}

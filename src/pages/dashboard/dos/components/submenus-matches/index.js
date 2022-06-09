@@ -8,7 +8,7 @@ import IconHome from "components/ma/icons/mono/home";
 import IconBudRest from "components/ma/icons/mono/bud-rest";
 
 function SubNavbar() {
-  const { event_id } = useParams();
+  const { event_id, date_event } = useParams();
   const eventId = parseInt(event_id);
   return (
     <StyledSubNavbar>
@@ -24,7 +24,7 @@ function SubNavbar() {
           </li>
 
           <li>
-            <NavLinkItem to={`/dashboard/event/${eventId}/dos-qualification`}>
+            <NavLinkItem to={`/dashboard/event/${eventId}/${date_event}/dos-qualification`}>
               <span>
                 <IconBudRest size="16" />
               </span>

@@ -23,14 +23,14 @@ import IconDownload from "components/ma/icons/mono/download";
 import classnames from "classnames";
 
 function PageDosQualification() {
-  const { event_id } = useParams();
+  const { event_id, date_event } = useParams();
   const eventId = parseInt(event_id);
 
   const {
     data: categoryDetails,
     errors: errorsCategoryDetail,
     isSettled: isSettledCategories,
-  } = useCategoryDetails(eventId);
+  } = useCategoryDetails(eventId, date_event);
 
   const {
     activeCategoryDetail,

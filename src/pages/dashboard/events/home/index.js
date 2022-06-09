@@ -91,7 +91,7 @@ function PageEventDetailHome() {
                     url={eventDetail.publicInformation.eventUrl || "https://myarchery.id"}
                     />
                     <ButtonOutlineBlue >
-                      <a href={`/dashboard/event/${event_id}/dos`}>
+                      <a href={`/dashboard/event/${event_id}/dos`} target="_blank" rel="noreferrer">
                         <span>Ke Halaman DOS</span>
                       </a>
                     </ButtonOutlineBlue>

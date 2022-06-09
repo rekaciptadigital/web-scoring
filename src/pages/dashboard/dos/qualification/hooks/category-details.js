@@ -2,12 +2,12 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { GeneralService } from "services";
 
-function useCategoryDetails(eventId) {
+function useCategoryDetails(eventId, date_event) {
   const fetcher = useFetcher();
 
   const fetchCategoryDetails = () => {
     const getFunction = () => {
-      return GeneralService.getCategoryV2({ event_id: eventId });
+      return GeneralService.getCategoryNonAuth({ event_id: eventId, date_event: date_event });
     };
     fetcher.runAsync(getFunction);
   };

@@ -2,10 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { useDispatch } from "react-redux";
+
 import * as AuthStore from "store/slice/authentication";
 import { AdminService } from "services";
 
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Card, CardBody } from "reactstrap";
 
 const CardMenuProfileContainer = styled(Card)`
@@ -138,6 +139,7 @@ const CardMenuProfileContainer = styled(Card)`
 
 function CardEventDos(cardData) {
   const dispatch = useDispatch();
+  const { event_id } = useParams();
 
   React.useEffect(() => {
     const getUser = async () => {
@@ -158,7 +160,7 @@ function CardEventDos(cardData) {
         <div className="d-flex ">
         <div className="flex-grow-1 ms-4">
         <React.Fragment>
-        <h4 className="mt-1">{item?.date}</h4>
+        <h4 className="mt-1">{item?.dateFormatted}</h4>
         <p className="mt-2 d-flex flex-column">
         <span>Update Event event pertandingan untuk DOS</span>
         </p>
@@ -170,7 +172,7 @@ function CardEventDos(cardData) {
         </span>
         
         <div className="float-end">
-        <Link to="/dashboard">
+        <Link to={`/dashboard/event/${event_id}/${item?.date}/dos-qualification`}>
         <span className="detail-link">
         Lihat Detail 
         </span>

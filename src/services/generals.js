@@ -14,4 +14,7 @@ export default {
   getCategoryV2(queryString = null) {
     return API.get("/general/v2/category-details", queryString);
   },
+  getCategoryNonAuth(querString = null) {
+    return API.get("/web/v1/dashboard-dos/category-details", querString);
+  }
 };

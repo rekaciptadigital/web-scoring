@@ -5,6 +5,7 @@ import { EventsService } from "services";
 
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
+import { SpinnerDotBlock } from "components/ma";
 import CardMenu from "../components/CardMenu";
 import CardMenuWithButton from "../components/CardMenuWithButton";
 
@@ -113,12 +114,14 @@ function PageEventDetailHome() {
                 badge={renderManageEventMenuBadge()}
               />
               <CardMenu menu={eventMenus[8]} href={`/dashboard/event/${event_id}/budrests`} />
+
               <CardMenuWithButton
                 eventDetail={eventDetail}
                 spanLabel={"Peserta Individu : " + eventDetail?.totalParticipantIndividual}
                 menu={eventMenus[2]}
                 href={`/dashboard/member/${event_id}?type=individual`}
               />
+
               <CardMenuWithButton
                 team={true}
                 eventDetail={eventDetail}
@@ -126,6 +129,7 @@ function PageEventDetailHome() {
                 spanLabel={"Peserta Beregu : " + eventDetail?.totalParticipantTeam}
                 href={`/dashboard/member/${event_id}?type=team`}
               />
+
               <CardMenu
                 menu={{
                   icon: target,
@@ -143,11 +147,30 @@ function PageEventDetailHome() {
                   )
                 }
               />
-              <CardMenu menu={eventMenus[6]} href={eventMenus[6].computeLink(event_id)} />
+
+              <CardMenu
+                menu={{
+                  icon: fileText,
+                  title: "Laporan",
+                  description: "Laporan jumlah peserta, laporan keuangan, laporan pertandingan",
+                }}
+                href={`/dashboard/event/${event_id}/reports`}
+              />
+
+              <CardMenu
+                menu={{
+                  icon: fileText,
+                  title: "Sertifikat",
+                  description: "Master e-sertifikat",
+                }}
+                href={`/dashboard/certificate/new?event_id=${event_id}`}
+              />
             </MenuGridWrapper>
           </React.Fragment>
         ) : (
-          <div>Sedang memuat data event...</div>
+          <div>
+            <SpinnerDotBlock />
+          </div>
         )}
       </Container>
     </StyledPageWrapper>

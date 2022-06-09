@@ -203,14 +203,12 @@ function ListMember() {
       }
     }
   }
-  console.log(splitRegu);
-
 
   const handlePageChange = (page) => {
     setPage(page);
   };
 
-  console.log(eventCategoriesDetail, 'ratata')
+  console.log(arrayAge, 'ratata')
   return (
     <React.Fragment>
       <div>

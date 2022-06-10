@@ -1,12 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
-import { useScoreEditor } from "../../hooks/score-editor";
-import { useParticipantPresence } from "../../hooks/participant-presence";
-
 import { LoadingScreen, SpinnerDotBlock } from "components/ma";
-
-import classnames from "classnames";
 
 function ScoringTable({
   categoryDetailId,
@@ -16,20 +11,11 @@ function ScoringTable({
   
   const {
     data: scoringMembers,
-    searchQuery,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
     getSessionNumbersList,
   } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount);
   const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
-
-  const { isLoading: isLoadingCheckPresence } = useParticipantPresence();
-
-  const {
-    isEditorOpen,
-    checkIsRowActive,
-  } = useScoreEditor(scoringMembers, searchQuery);
-
 
   const sessionNumbersList = getSessionNumbersList();
 
@@ -43,7 +29,7 @@ function ScoringTable({
 
   return (
     <React.Fragment>
-      <LoadingScreen loading={isLoadingCheckPresence} />
+      <LoadingScreen />
 
       <TableContainer>
         <div>
@@ -55,7 +41,6 @@ function ScoringTable({
                 <th className="name">Nama Peserta</th>
                 <th className="name">Nama Klub</th>
                 <SessionStatsColumnHeadingGroup
-                  collapsed={isEditorOpen}
                   sessionList={sessionNumbersList}
                 />
                 <th></th>
@@ -67,7 +52,6 @@ function ScoringTable({
                 return (
                   <tr
                     key={row.member.id}
-                    className={classnames({ "row-active": checkIsRowActive(row.member.id) })}
                   >
                     <td>
                       {row.rank || (
@@ -84,7 +68,6 @@ function ScoringTable({
                     </td>
 
                     <SessionStatsCellsGroup
-                      collapsed={isEditorOpen}
                       sessions={row.sessions}
                       sessionNumbersList={sessionNumbersList}
                       total={row.total}
@@ -104,10 +87,7 @@ function ScoringTable({
   );
 }
 
-function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
-  if (collapsed) {
-    return <th className="stats">Total</th>;
-  }
+function SessionStatsColumnHeadingGroup({ sessionList }) {
 
   if (!sessionList) {
     return (
@@ -134,16 +114,12 @@ function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
 }
 
 function SessionStatsCellsGroup({
-  collapsed,
   sessions,
   sessionNumbersList,
   total,
   totalX,
   totalXPlusTen,
 }) {
-  if (collapsed) {
-    return <td className="stats">{total}</td>;
-  }
 
   if (!sessions) {
     return (

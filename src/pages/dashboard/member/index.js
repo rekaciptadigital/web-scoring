@@ -369,11 +369,15 @@ function ListMember() {
                     </span>
                   </div>
                   {arrayAge.map((age, index) => {
+                    // {arrayEventCategoryDetailsId.map((eventId) => {
                     if (indexCategory > -1) {
                       return (
                         <div key={index}>
                           <span
-                            onClick={() => setAgeCategoryFilter(age)}
+                            onClick={() => {
+                              setAgeCategoryFilter(age)
+                              // setEventCategoryDetailsIdFilter(eventId)
+                            }}
                             style={{
                               border: "1px solid #0D47A1",
                               padding: "8px 12px",
@@ -390,6 +394,7 @@ function ListMember() {
                       );
                     }
                     return null;
+                    // })}
                   })}
                 </div>
               </div>

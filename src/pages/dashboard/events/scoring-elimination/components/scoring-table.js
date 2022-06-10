@@ -106,6 +106,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
                   ) : (
                     <BudrestInputAsync
+                      categoryId={categoryDetailId}
                       playerDetail={player1 || player2}
                       disabled={hasWinner || noData}
                       scoring={scoring}
@@ -130,6 +131,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <InlineScoreInput>
                       <ValidationIndicator position="left" isValid={player1?.isDifferent !== 1} />
                       <TotalInputAsync
+                        categoryId={categoryDetailId}
                         playerDetail={player1}
                         disabled={hasWinner || !player1?.name}
                         scoring={scoring}
@@ -169,6 +171,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                   {!noData && !hasWinner ? (
                     <InlineScoreInput>
                       <TotalInputAsync
+                        categoryId={categoryDetailId}
                         playerDetail={player2}
                         disabled={hasWinner || !player2?.name}
                         scoring={scoring}

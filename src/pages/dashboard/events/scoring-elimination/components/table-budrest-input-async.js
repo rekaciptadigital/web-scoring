@@ -7,13 +7,14 @@ import { toast } from "./processing-toast";
 
 import IconLoading from "./icon-loading";
 
-function BudrestInputAsync({ playerDetail, disabled, scoring, onSuccess }) {
+function BudrestInputAsync({ categoryId, playerDetail, disabled, scoring, onSuccess }) {
   const inputRef = React.useRef(null);
   const [isDirty, setDirty] = React.useState(false);
   const previousValue = React.useRef(null);
   const [inputValue, setInputValue] = React.useState("");
 
   const { submitBudrest, isLoading, isError, errors } = useSubmitBudrest({
+    categoryId: categoryId,
     eliminationId: scoring.elimination_id,
     round: scoring.round,
     match: scoring.match,

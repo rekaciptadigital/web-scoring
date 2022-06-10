@@ -3,15 +3,11 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
-import { useSubmitEliminationCount } from "./hooks/submit-elimination-count";
-import { useSubmitEliminationConfig } from "./hooks/submit-elimination-config";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
 import {
   SpinnerDotBlock,
   ButtonOutlineBlue,
-  LoadingScreen,
-  AlertSubmitError,
 } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -43,18 +39,6 @@ function PageDosQualification() {
   } = useCategoriesWithFilters(categoryDetails);
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
-
-  const {
-    isLoading: isLoadingSubmitCount,
-    isError: isErrorSubmitCount,
-    errors: errorsSubmitCount,
-  } = useSubmitEliminationCount(activeCategoryDetail?.categoryDetailId);
-
-  const {
-    isLoading: isLoadingSubmitElimination,
-    isError: isErrorSubmitElimination,
-    errors: errorsSubmitElimination,
-  } = useSubmitEliminationConfig(activeCategoryDetail?.categoryDetailId);
 
   const { handleDownloadScoresheet } = useScoresheetDownload(
     activeCategoryDetail?.categoryDetailId
@@ -92,11 +76,7 @@ function PageDosQualification() {
   return (
     <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
       <ProcessingToast />
-      <LoadingScreen loading={isLoadingSubmitCount || isLoadingSubmitElimination} />
-
-      <AlertSubmitError isError={isErrorSubmitCount} errors={errorsSubmitCount} />
-      <AlertSubmitError isError={isErrorSubmitElimination} errors={errorsSubmitElimination} />
-
+  
       <TabBar>
         <TabButtonList>
           {optionsCompetitionCategory.map((option) => (

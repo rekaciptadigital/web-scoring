@@ -9,6 +9,7 @@ import illustrationAlert from "assets/images/events/alert-publication.svg";
 function ButtonConfirmPrompt({
   children,
   disabled,
+  title,
   reverseButtons,
   buttonConfirmLabel,
   onConfirm,
@@ -41,6 +42,7 @@ function ButtonConfirmPrompt({
     onClick: () => setShowAlert(true),
     disabled: disabled,
     flexible: flexible,
+    title: title,
   };
 
   return (

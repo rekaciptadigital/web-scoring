@@ -3,32 +3,35 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
-import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
-import {
-  SpinnerDotBlock,
-  ButtonOutlineBlue,
-} from "components/ma";
+import { ButtonOutlineBlue, SpinnerDotBlock } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
-import { ScoringTable } from "./components/scoring-table";
 import { ProcessingToast, toast } from "./components/processing-toast";
-
-import IconDownload from "components/ma/icons/mono/download";
+import { ButtonShowBracket } from "./components/button-show-bracket";
+// import { ScoringTable } from "./components/scoring-table";
 
 import classnames from "classnames";
+import IconDownload from "components/ma/icons/mono/download";
+import { useScoresheetDownload } from "./hooks/scoreheet-download";
 
-function PageDosQualification() {
+const propsContentWrapper = {
+  pageTitle: "DOS Eliminasi",
+  navbar: <SubNavbar />,
+};
+
+function PageDosElimination() {
   const { event_id, date_event } = useParams();
   const eventId = parseInt(event_id);
 
   const {
+    isSettled: isSettledCategories,
     data: categoryDetails,
     errors: errorsCategoryDetail,
-    isSettled: isSettledCategories,
   } = useCategoryDetails(eventId, date_event);
 
   const {
+    activeCompetitionCategory,
     activeCategoryDetail,
     optionsCompetitionCategory,
     optionsAgeCategory,
@@ -38,21 +41,15 @@ function PageDosQualification() {
     selectOptionGenderCategory,
   } = useCategoriesWithFilters(categoryDetails);
 
-  const [inputSearchQuery, setInputSearchQuery] = React.useState("");
+  const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
   const { handleDownloadScoresheet } = useScoresheetDownload(
     activeCategoryDetail?.categoryDetailId
   );
 
-  const resetOnChangeCategory = () => {
-    setInputSearchQuery("");
-  };
-
-  const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
-
   if (errorFetchingInitialCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
+      <ContentLayoutWrapper {...propsContentWrapper}>
         <ViewWrapper>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
@@ -67,26 +64,23 @@ function PageDosQualification() {
 
   if (!isSettledCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
+      <ContentLayoutWrapper {...propsContentWrapper}>
         <SpinnerDotBlock />
       </ContentLayoutWrapper>
     );
   }
 
   return (
-    <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
+    <ContentLayoutWrapper {...propsContentWrapper}>
       <ProcessingToast />
-  
+
       <TabBar>
         <TabButtonList>
           {optionsCompetitionCategory.map((option) => (
             <li key={option.competitionCategory}>
               <TabButton
                 className={classnames({ "tab-active": option.isActive })}
-                onClick={() => {
-                  resetOnChangeCategory();
-                  selectOptionCompetitionCategory(option.competitionCategory);
-                }}
+                onClick={() => selectOptionCompetitionCategory(option.competitionCategory)}
               >
                 {option.competitionCategory}
               </TabButton>
@@ -100,16 +94,13 @@ function PageDosQualification() {
           <FilterBars>
             <CategoryFilter>
               <FilterLabel>Kelas:</FilterLabel>
-              <FilterList>
+              <FilterList key={activeCompetitionCategory}>
                 {optionsAgeCategory?.length > 0 ? (
                   optionsAgeCategory.map((option) => (
                     <li key={option.ageCategory}>
                       <FilterItemButton
                         className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => {
-                          resetOnChangeCategory();
-                          selectOptionAgeCategory(option.ageCategory);
-                        }}
+                        onClick={() => selectOptionAgeCategory(option.ageCategory)}
                       >
                         {option.ageCategory}
                       </FilterItemButton>
@@ -123,16 +114,13 @@ function PageDosQualification() {
 
             <CategoryFilter>
               <FilterLabel>Jenis Regu:</FilterLabel>
-              <FilterList>
+              <FilterList key={activeCompetitionCategory}>
                 {optionsGenderCategory?.length > 0 ? (
                   optionsGenderCategory.map((option) => (
                     <li key={option.genderCategory}>
                       <FilterItemButton
                         className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => {
-                          resetOnChangeCategory();
-                          selectOptionGenderCategory(option.genderCategory);
-                        }}
+                        onClick={() => selectOptionGenderCategory(option.genderCategory)}
                       >
                         {option.genderCategoryLabel}
                       </FilterItemButton>
@@ -148,33 +136,36 @@ function PageDosQualification() {
           <ToolbarRight>
             <HorizontalSpaced>
               <ButtonOutlineBlue
-                onClick={() => {
-                  toast.loading("Sedang menyiapkan dokumen scoresheet...");
-                  handleDownloadScoresheet({
-                    onSuccess() {
-                      toast.dismiss();
-                    },
-                  });
-                }}
-              >
+                  onClick={() => {
+                    toast.loading("Sedang menyiapkan dokumen scoresheet...");
+                    handleDownloadScoresheet({
+                      onSuccess() {
+                        toast.dismiss();
+                      },
+                    });
+                  }}
+                >
                 <span>
                   <IconDownload size="16" />
                 </span>{" "}
                 <span>Unduh Laporan</span>
               </ButtonOutlineBlue>
-
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
-
-        <ScoringTable
-          key={activeCategoryDetail?.categoryDetailId}
-          categoryDetailId={activeCategoryDetail?.categoryDetailId}
-          searchName={inputSearchQuery}
-          onChangeParticipantPresence={resetOnChangeCategory}
-          eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
-        />
       </ViewWrapper>
+      
+      <ButtonShowBracket
+        categoryDetailId={activeCategoryDetail?.categoryDetailId}
+        // eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
+      />
+
+      {/* <ScoringTable
+        key={activeCategoryDetail?.categoryDetailId}
+        categoryDetailId={activeCategoryDetail?.categoryDetailId}
+        categoryDetails={activeCategoryDetail}
+        eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
+      /> */}
     </ContentLayoutWrapper>
   );
 }
@@ -337,4 +328,4 @@ const FilterItemButton = styled.button`
   }
 `;
 
-export default PageDosQualification;
+export default PageDosElimination;

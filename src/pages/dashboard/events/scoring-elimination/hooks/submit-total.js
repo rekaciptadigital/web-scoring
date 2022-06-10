@@ -1,12 +1,13 @@
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { ScoringService } from "services";
 
-function useSubmitAdminTotal({ eliminationId, round, match }) {
+function useSubmitAdminTotal({ categoryId, eliminationId, round, match }) {
   const fetcher = useFetcher();
 
   const submitAdminTotal = (payload, options = {}) => {
     const postFunction = () => {
       return ScoringService.saveScoreAdminTotal({
+        category_id: categoryId,
         elimination_id: eliminationId,
         round: round,
         match: match,

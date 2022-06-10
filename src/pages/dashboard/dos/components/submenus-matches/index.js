@@ -33,7 +33,7 @@ function SubNavbar() {
           </li>
 
           <li>
-            <NavLinkItem to={`/dashboard/event/${eventId}/scoring-elimination`}>
+            <NavLinkItem to={`/dashboard/event/${eventId}/${date_event}/dos-elimination`}>
               <span>
                 <IconBudRest size="16" />
               </span>

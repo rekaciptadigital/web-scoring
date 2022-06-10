@@ -25,6 +25,7 @@ function ListMember() {
   const [indexCategory, setIndexCategory] = useState(-1);
   const [ageCategoryFilter, setAgeCategoryFilter] = useState("");
   const [teamCategoryFilter, setTeamCategoryFilter] = useState("");
+  const [eventCategoryDetailsIdFilter, setEventCategoryDetailsIdFilter] = useState("");
   const [name, setName] = useState("");
   const [teamFilter, setTeamFilter] = useState("");
   const [page, setPage] = useState(1);
@@ -177,6 +178,7 @@ function ListMember() {
   let arrayAge = [];
   let arrayRegu = [];
   let splitRegu = [];
+  let arrayEventCategoryDetailsId = [];
   // let arrayDistance = [];
 
   // console.log(indexCategory);
@@ -185,6 +187,7 @@ function ListMember() {
   // console.log([...new Set(dumpArray?.map((d) => d.ageCategory))]);
   arrayAge = [...new Set(dumpArray?.map((d) => d.ageCategory))];
   arrayRegu = [...new Set(dumpArray?.map((d) => d.teamCategory))];
+  arrayEventCategoryDetailsId = [...new Set(dumpArray?.map((d) => d.eventCategoryDetailsId))];
   // arrayDistance = dumpArray?.map((d) => d.distancesCategory);
 
   for (let i = 0; i < arrayRegu.length; i++) {
@@ -208,7 +211,7 @@ function ListMember() {
     setPage(page);
   };
 
-  console.log(arrayAge, 'ratata')
+  console.log(arrayEventCategoryDetailsId,eventCategoryDetailsIdFilter, ageCategoryFilter, 'ratata')
   return (
     <React.Fragment>
       <div>
@@ -348,8 +351,11 @@ function ListMember() {
                 >
                   <div>
                     <span
-                      onClick={() => setAgeCategoryFilter("")}
-                      style={{
+                      onClick={() => {
+                        setAgeCategoryFilter("");
+                        setEventCategoryDetailsIdFilter("");
+                      }}
+                        style={{
                         border: "1px solid #0D47A1",
                         padding: "8px 12px",
                         borderRadius: "5px",

@@ -34,7 +34,7 @@ export default {
 
   /**
    *
-   * @param {Object} queryString  { elimination_id, round, match, budrest_number }
+   * @param {Object} queryString  { category_id, elimination_id, round, match, budrest_number }
    * @returns {Promise} { success, data, errors, message }
    */
   saveBudrestElimination(data = null) {
@@ -43,7 +43,7 @@ export default {
 
   /**
    *
-   * @param {Object} queryString  { elimination_id, round, match, member_id, admin_total }
+   * @param {Object} queryString  { category_id, elimination_id, round, match, member_id, admin_total }
    * @returns {Promise} { success, data, errors, message }
    */
   saveScoreAdminTotal(data = null) {

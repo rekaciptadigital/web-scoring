@@ -120,6 +120,7 @@ function ModalEditor({
   } = useSubmitScores();
 
   const { submitAdminTotal, isLoading: isSubmitingTotal } = useSubmitAdminTotal({
+    categoryId: categoryDetails?.categoryDetailId,
     eliminationId: scoring.elimination_id,
     round: scoring.round,
     match: scoring.match,

@@ -14,7 +14,7 @@ import IconInfo from "components/ma/icons/mono/info";
 import IconCheck from "components/ma/icons/fill/check";
 
 import { eventMenus } from "./utils/menus";
-import { target } from "./utils/icon-svgs";
+import { target, fileText } from "./utils/icon-svgs";
 import { ButtonOutlineBlue } from "components/ma";
 
 function PageEventDetailHome() {

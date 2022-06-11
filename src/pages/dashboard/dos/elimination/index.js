@@ -137,7 +137,7 @@ function PageDosElimination() {
             <HorizontalSpaced>
               <ButtonOutlineBlue
                   onClick={() => {
-                    toast.loading("Sedang menyiapkan dokumen scoresheet...");
+                    toast.loading("Sedang menyiapkan dokumen elimination DOS...");
                     handleDownloadScoresheet({
                       onSuccess() {
                         toast.dismiss();

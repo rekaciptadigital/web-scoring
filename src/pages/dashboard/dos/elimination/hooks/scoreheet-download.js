@@ -14,7 +14,7 @@ function useScoresheetDownload(eventCategoryId) {
     const queryString = { event_category_id: eventCategoryId };
 
     const getFunction = () => {
-      return DosService.getQualificationDownloadUrl(queryString);
+      return DosService.getEliminationDownloadUrl(queryString);
     };
     const onSuccess = (data) => {
       consumerSuccessHandler?.();

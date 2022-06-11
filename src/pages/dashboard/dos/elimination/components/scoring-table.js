@@ -6,7 +6,6 @@ import { SpinnerDotBlock } from "components/ma";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
-import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 import { ButtonSetWinner } from "./button-set-winner";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
@@ -220,7 +219,6 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       />
                     )}
 
-                    <ButtonDownloadScoresheet disabled={noData} scoring={scoring} />
                   </HorizontalSpaced>
                 </td>
               </tr>

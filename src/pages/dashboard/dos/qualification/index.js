@@ -149,7 +149,7 @@ function PageDosQualification() {
             <HorizontalSpaced>
               <ButtonOutlineBlue
                 onClick={() => {
-                  toast.loading("Sedang menyiapkan dokumen scoresheet...");
+                  toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
                   handleDownloadScoresheet({
                     onSuccess() {
                       toast.dismiss();

@@ -14,12 +14,11 @@ function useScoresheetDownload(eventCategoryId) {
     const queryString = { event_category_id: eventCategoryId };
 
     const getFunction = () => {
-      return DosService.getQualificationDownloadUrl(queryString);
+      return DosService.getEliminationDownloadUrl(queryString);
     };
     const onSuccess = (data) => {
       consumerSuccessHandler?.();
       const downloadUrl = _handleURLFromResponse(data);
-      console.log(downloadUrl, 'ratata');
       urlUtil.openUrlOnNewTab(downloadUrl);
     };
 
@@ -33,7 +32,7 @@ function useScoresheetDownload(eventCategoryId) {
 function _handleURLFromResponse(url) {
   const API_URL = process.env.REACT_APP_API_URL || "https://api-staging.myarchery.id";
   const segments = url.split("/");
-  const assetSegmentIndex = segments.findIndex((segment) => segment === "storage");
+  const assetSegmentIndex = segments.findIndex((segment) => segment === "asset");
   const downloadUrl = API_URL + "/" + segments.slice(assetSegmentIndex).join("/");
   return downloadUrl;
 }

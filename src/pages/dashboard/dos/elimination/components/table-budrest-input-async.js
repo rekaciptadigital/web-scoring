@@ -1,20 +1,19 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useSubmitAdminTotal } from "../hooks/submit-total";
+import { useSubmitBudrest } from "../hooks/submit-budrest";
 
 import { AlertSubmitError } from "components/ma";
 import { toast } from "./processing-toast";
 
 import IconLoading from "./icon-loading";
 
-function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSuccess }) {
+function BudrestInputAsync({ playerDetail, disabled, scoring, onSuccess }) {
   const inputRef = React.useRef(null);
   const [isDirty, setDirty] = React.useState(false);
   const previousValue = React.useRef(null);
   const [inputValue, setInputValue] = React.useState("");
 
-  const { submitAdminTotal, isLoading, isError, errors } = useSubmitAdminTotal({
-    categoryId: categoryId,
+  const { submitBudrest, isLoading, isError, errors } = useSubmitBudrest({
     eliminationId: scoring.elimination_id,
     round: scoring.round,
     match: scoring.match,
@@ -25,8 +24,8 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
       return;
     }
     isDirty && setDirty(false);
-    previousValue.current = playerDetail.adminTotal;
-    setInputValue(playerDetail.adminTotal);
+    previousValue.current = playerDetail.budrestNumber;
+    setInputValue(playerDetail.budrestNumber);
   }, [playerDetail]);
 
   // nge-debounce action/event handler submit
@@ -36,25 +35,22 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
     }
 
     const debounceTimer = setTimeout(() => {
-      toast.loading("Sedang menyimpan skor total...");
-      submitAdminTotal(
-        { memberId: playerDetail.id, value: inputValue },
-        {
-          onSuccess() {
-            toast.dismiss();
-            toast.success("Total berhasil disimpan");
-            inputRef.current?.focus();
-            onSuccess?.();
-          },
-          onError() {
-            isDirty && setDirty(false);
-            setInputValue(previousValue.current);
-            toast.dismiss();
-            toast.error("Gagal menyimpan total");
-          },
-        }
-      );
-    }, 1000);
+      toast.loading("Sedang menyimpan nomor bantalan...");
+      submitBudrest(inputValue, {
+        onSuccess() {
+          toast.dismiss();
+          toast.success("Nomor bantalan berhasil disimpan");
+          inputRef.current?.focus();
+          onSuccess?.();
+        },
+        onError() {
+          isDirty && setDirty(false);
+          setInputValue(previousValue.current);
+          toast.dismiss();
+          toast.error("Gagal menyimpan total");
+        },
+      });
+    }, 1100);
 
     return () => clearTimeout(debounceTimer);
   }, [inputValue]);
@@ -62,7 +58,7 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
   return (
     <React.Fragment>
       <InputAsyncWrapper>
-        <InputInlineScore
+        <InputBudrestNumber
           ref={inputRef}
           type="text"
           placeholder="-"
@@ -70,11 +66,7 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
           value={disabled ? "" : inputValue || ""}
           onChange={(ev) => {
             !isDirty && setDirty(true);
-            setInputValue((previousValue) => {
-              const { value } = ev.target;
-              const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-              return validatedNumberValue;
-            });
+            setInputValue(ev.target.value?.toUpperCase?.());
           }}
           onFocus={(ev) => ev.target.select()}
         />
@@ -126,13 +118,12 @@ const InputAsyncWrapper = styled.span`
   }
 `;
 
-const InputInlineScore = styled.input`
+const InputBudrestNumber = styled.input`
   padding: calc(0.625rem - 1px) calc(0.5rem - 1px);
   width: 3rem;
-  border: solid 1px var(--ma-gray-200);
+  border: solid 1px var(--ma-gray-400);
   border-radius: 0.25rem;
-  color: var(--ma-gray-500);
-  font-size: 0.85em;
+  font-weight: 600;
   text-align: center;
 
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -143,4 +134,4 @@ const InputInlineScore = styled.input`
   }
 `;
 
-export { TotalInputAsync };
+export { BudrestInputAsync };

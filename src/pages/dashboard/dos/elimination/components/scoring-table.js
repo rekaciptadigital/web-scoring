@@ -6,7 +6,6 @@ import { SpinnerDotBlock } from "components/ma";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
-import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 import { ButtonSetWinner } from "./button-set-winner";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
@@ -106,7 +105,6 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
                   ) : (
                     <BudrestInputAsync
-                      categoryId={categoryDetailId}
                       playerDetail={player1 || player2}
                       disabled={hasWinner || noData}
                       scoring={scoring}
@@ -131,7 +129,6 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <InlineScoreInput>
                       <ValidationIndicator position="left" isValid={player1?.isDifferent !== 1} />
                       <TotalInputAsync
-                        categoryId={categoryDetailId}
                         playerDetail={player1}
                         disabled={hasWinner || !player1?.name}
                         scoring={scoring}
@@ -171,7 +168,6 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                   {!noData && !hasWinner ? (
                     <InlineScoreInput>
                       <TotalInputAsync
-                        categoryId={categoryDetailId}
                         playerDetail={player2}
                         disabled={hasWinner || !player2?.name}
                         scoring={scoring}
@@ -223,7 +219,6 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       />
                     )}
 
-                    <ButtonDownloadScoresheet disabled={noData} scoring={scoring} />
                   </HorizontalSpaced>
                 </td>
               </tr>

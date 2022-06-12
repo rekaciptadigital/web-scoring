@@ -7,14 +7,13 @@ import { toast } from "./processing-toast";
 
 import IconLoading from "./icon-loading";
 
-function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSuccess }) {
+function TotalInputAsync({ playerDetail, disabled, scoring, onSuccess }) {
   const inputRef = React.useRef(null);
   const [isDirty, setDirty] = React.useState(false);
   const previousValue = React.useRef(null);
   const [inputValue, setInputValue] = React.useState("");
 
   const { submitAdminTotal, isLoading, isError, errors } = useSubmitAdminTotal({
-    categoryId: categoryId,
     eliminationId: scoring.elimination_id,
     round: scoring.round,
     match: scoring.match,

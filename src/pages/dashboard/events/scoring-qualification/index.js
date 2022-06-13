@@ -298,6 +298,7 @@ function PageEventScoringQualification() {
             <ScoringTable
               key={activeCategoryDetail?.categoryDetailId}
               categoryDetailId={activeCategoryDetail?.categoryDetailId}
+              isLocked={!activeCategoryDetail || activeCategoryDetail?.eliminationLock}
               searchName={inputSearchQuery}
               onChangeParticipantPresence={resetOnChangeCategory}
               eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}

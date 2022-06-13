@@ -24,7 +24,7 @@ export default function EditorFieldText({
   selected,
   setEditorDirty,
 }) {
-  const { y, fontFamily, fontSize, color, fontWeight, x } = data;
+  const { y, fontFamily, fontSize, color, fontWeight, x, display } = data;
 
   const divRef = React.useRef(null);
   const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
@@ -39,11 +39,11 @@ export default function EditorFieldText({
     // Perubahan data yang memengaruhi width DOM perlu diupdate di sini,
     // agar jarak left & transform x bisa dikalkulasi ulang dengan benar
     setCurrentOffsetWidth(divRef.current?.offsetWidth);
-  }, [fontSize, fontFamily, fontWeight]);
+  }, [fontSize, fontFamily, fontWeight, display]);
 
   React.useEffect(() => {
     setEditorDirty?.();
-  }, [y, fontSize, fontFamily, fontWeight, color, x]);
+  }, [y, fontSize, fontFamily, fontWeight, color, x, display]);
 
   const highlightOnMouseOver = () => {
     setActiveStrokeColor(boundingStroke.highlighted.color);
@@ -65,7 +65,6 @@ export default function EditorFieldText({
 
   return (
     <Draggable
-      axis="y"
       scale={0.5}
       position={translatePosition}
       onStart={() => handleDrag()}
@@ -81,6 +80,7 @@ export default function EditorFieldText({
           color: color || undefined,
           fontFamily: fontFamily || undefined,
           fontWeight: fontWeight || "normal",
+          display: display || "inline-block",
         }}
         onMouseOver={() => highlightOnMouseOver()}
         onMouseLeave={() => idleOnMouseLeave()}

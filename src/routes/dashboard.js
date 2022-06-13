@@ -24,7 +24,7 @@ import Bagan from "pages/dashboard/results/bagan";
 import EditResult from "pages/dashboard/results/edit";
 import ListSchedule from "../pages/dashboard/schedule";
 import Eliminasi from "../pages/dashboard/eliminasi";
-import PageEventOfficial from "pages/dashboard/events/officials";
+import PageEventOfficial from "pages/dashboard/events/official";
 import PageEventIdCard from "pages/dashboard/events/id-card";
 
 const dashboardRoutes = [

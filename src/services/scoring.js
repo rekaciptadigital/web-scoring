@@ -11,6 +11,10 @@ export default {
     const qs = { event_category_id };
     return API.get("/web/v1/archery-score-sheet/download", qs);
   },
+  getScoresheetEliminationDownloadUrl({ event_elimination_id, round, match }) {
+    const qs = { event_elimination_id, round, match };
+    return API.get("/web/v1/archery-score-sheet/score-sheet-elimination", qs);
+  },
 
   // V2
 

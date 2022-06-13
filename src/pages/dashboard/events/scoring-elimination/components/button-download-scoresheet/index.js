@@ -1,13 +1,19 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useDownloadScoresheet } from "../../hooks/download-scoresheet";
 
-import { ButtonOutlineBlue } from "components/ma";
+import { ButtonOutlineBlue, AlertSubmitError } from "components/ma";
+import { toast } from "../processing-toast";
 
 import IconFile from "components/ma/icons/mono/file";
 import IconLoading from "./icon-loading";
 
-function ButtonDownloadScoresheet({ title = "Unduh scoresheet", disabled }) {
-  const [isLoading] = React.useState(false);
+function ButtonDownloadScoresheet({ title = "Unduh scoresheet", disabled, scoring }) {
+  const { downloadScoresheet, isLoading, isError, errors } = useDownloadScoresheet({
+    eliminationId: scoring.elimination_id,
+    round: scoring.round,
+    match: scoring.match,
+  });
 
   if (isLoading) {
     return (
@@ -20,9 +26,29 @@ function ButtonDownloadScoresheet({ title = "Unduh scoresheet", disabled }) {
   }
 
   return (
-    <ButtonOutlineBlue title={title} flexible disabled={disabled}>
-      <IconFile size="16" />
-    </ButtonOutlineBlue>
+    <React.Fragment>
+      <ButtonOutlineBlue
+        title={title}
+        flexible
+        disabled={disabled}
+        onClick={() => {
+          toast.loading("Sedang menyiapkan scoresheet...");
+          downloadScoresheet({
+            onSuccess() {
+              toast.dismiss();
+              toast.success("Scoresheet siap diunduh");
+            },
+            onError() {
+              toast.dismiss();
+            },
+          });
+        }}
+      >
+        <IconFile size="16" />
+      </ButtonOutlineBlue>
+
+      <AlertSubmitError isError={isError} errors={errors} />
+    </React.Fragment>
   );
 }
 

@@ -9,7 +9,6 @@ import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ProcessingToast, toast } from "./components/processing-toast";
 import { ButtonShowBracket } from "./components/button-show-bracket";
-// import { ScoringTable } from "./components/scoring-table";
 
 import classnames from "classnames";
 import IconDownload from "components/ma/icons/mono/download";
@@ -160,12 +159,6 @@ function PageDosElimination() {
         // eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
       />
 
-      {/* <ScoringTable
-        key={activeCategoryDetail?.categoryDetailId}
-        categoryDetailId={activeCategoryDetail?.categoryDetailId}
-        categoryDetails={activeCategoryDetail}
-        eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
-      /> */}
     </ContentLayoutWrapper>
   );
 }

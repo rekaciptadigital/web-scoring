@@ -48,7 +48,7 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
       {isOpen && (
         <Modal
           isOpen
-          size={bracketData.eliminationId ? "xl" : "md"}
+          size={bracketData.eliminationId || bracketData.eliminationGroupId ? "xl" : "md"}
           centered
           backdrop="static"
           autoFocus
@@ -79,6 +79,21 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
                       )}
                     />
                   </Scrollable>
+                ) : bracketData.eliminationGroupId ? (
+                  <Scrollable>
+                    <Bracket
+                      rounds={bracketData.rounds || []}
+                      renderSeedComponent={(bracketProps) => (
+                        <SeedBaganTeam
+                          bracketProps={bracketProps}
+                          configs={{
+                            totalRounds: bracketData.rounds.length - 1,
+                            eliminationId: bracketData.eliminationGroupId,
+                          }}
+                        />
+                      )}
+                    />
+                  </Scrollable>
                 ) : (
                   <NoBracketAvailable />
                 )}
@@ -102,7 +117,7 @@ function NoBracketAvailable() {
 function SeedBagan({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
 
-  const noData = !seed.teams[0]?.name || !seed.teams[0]?.name;
+  const noData = !seed.teams[0]?.name || !seed.teams[1]?.name;
   const isBye = seed.teams.some((team) => team.status === "bye");
 
   const isFinalRound =
@@ -127,6 +142,7 @@ function SeedBagan({ bracketProps, configs }) {
           {seed.teams.map((team, index) => (
             <SeedTeam
               key={index}
+              title={team.name}
               className={classnames({
                 "item-active": !noData,
                 "item-winner": parseInt(team.win) === 1 && !isBye,
@@ -142,16 +158,65 @@ function SeedBagan({ bracketProps, configs }) {
   );
 }
 
+function SeedBaganTeam({ bracketProps, configs }) {
+  const { roundIndex, seed, breakpoint } = bracketProps;
+
+  // ?: cari pengecekan yang lebih sederhana?
+  const noData =
+    !seed.teams[0]?.teamName ||
+    !seed.teams[1]?.teamName ||
+    !seed.teams[0]?.memberTeam?.length ||
+    !seed.teams[1]?.memberTeam?.length;
+  const isBye = seed.teams.some((team) => team.status === "bye");
+
+  const isFinalRound =
+    (configs.totalRounds === 4 && roundIndex === 3) ||
+    (configs.totalRounds === 3 && roundIndex === 2);
+  const isThirdPlaceRound =
+    (configs.totalRounds === 4 && roundIndex === 4) ||
+    (configs.totalRounds === 3 && roundIndex === 3);
+
+  return (
+    <Seed
+      mobileBreakpoint={breakpoint}
+      className={classnames({
+        "round-final": isFinalRound,
+        "round-third-place": isThirdPlaceRound,
+      })}
+    >
+      <SeedItem>
+        <ItemContainer>
+          {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
+          {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
+          {seed.teams.map((team, index) => (
+            <SeedTeam
+              key={index}
+              title={team.teamName}
+              className={classnames({
+                "item-active": !noData,
+                "item-winner": parseInt(team.win) === 1 && !isBye,
+              })}
+            >
+              <BoxName>{team.teamName || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxScore team={team} />
+            </SeedTeam>
+          ))}
+        </ItemContainer>
+      </SeedItem>
+    </Seed>
+  );
+}
+
 function BoxScore({ team }) {
   if (!team) {
     return null;
   }
 
-  if (team.adminTotal && typeof team.adminTotal === "number") {
+  if (typeof team.adminTotal === "number") {
     return <BoxScoreWrapper>{team.adminTotal}</BoxScoreWrapper>;
   }
 
-  if (team.totalScoring && typeof team.totalScoring === "number") {
+  if (typeof team.totalScoring === "number") {
     return <BoxScoreWrapper>{team.totalScoring}</BoxScoreWrapper>;
   }
 

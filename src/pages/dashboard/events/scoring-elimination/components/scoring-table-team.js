@@ -32,207 +32,10 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
     );
   }
 
-  const isDebugging = true;
-
-  if (isDebugging) {
-    return (
-      <SectionTableContainer>
-        <div>debugging</div>
-
-        <StagesTabs
-          labels={["1 Besar", "2 Kecil", "Apa", "Itu?", "Aaaa..."]}
-          currentTab={selectedTab}
-          onChange={(index) => setSelectedTab(index)}
-        />
-
-        <MembersTable className="table table-responsive">
-          <thead>
-            <tr>
-              <th>Bantalan</th>
-              <th>Tim</th>
-              <th>Total</th>
-              <th></th>
-              <th>Total</th>
-              <th>Tim</th>
-              <th></th>
-            </tr>
-          </thead>
-
-          <tbody key={selectedTab}>
-            {fakeRows.map((row, index) => {
-              const player1 = row.teams[0];
-              const player2 = row.teams[1];
-
-              const roundNumber = selectedTab + 1;
-              const matchNumber = index + 1;
-
-              // TODO: elimination ID
-              const code = `2-${data?.eliminationId || 333}-${matchNumber}-${roundNumber}`;
-
-              const scoring = {
-                code: code,
-                // TODO: elimination ID
-                elimination_id: data?.eliminationId || 333,
-                round: roundNumber,
-                match: matchNumber,
-              };
-
-              const noData = false;
-              const hasWinner = false;
-              const budrestNumber = "10A";
-
-              return (
-                <tr key={index}>
-                  <td>
-                    {noData || hasWinner ? (
-                      <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
-                    ) : (
-                      <BudrestInputAsync
-                        playerDetail={player1 || player2}
-                        disabled={hasWinner || noData}
-                        scoring={scoring}
-                        onSuccess={fetchEliminationMatches}
-                      />
-                    )}
-                  </td>
-
-                  <td>
-                    <PlayerLabelContainerLeft>
-                      <PlayerNameData>
-                        {(player1?.potition || player1?.postition) && (
-                          <RankLabel>#{player1?.potition || player1?.postition || "-"}</RankLabel>
-                        )}
-                        <div>
-                          <TeamNameLabel>{player1?.name || <NoArcherLabel />}</TeamNameLabel>
-                          <MembersList>
-                            <li>Anggota satu</li>
-                            <li>Anggota dua</li>
-                            <li>Anggota tigaaa</li>
-                          </MembersList>
-                        </div>
-                      </PlayerNameData>
-                    </PlayerLabelContainerLeft>
-                  </td>
-
-                  <td>
-                    {!noData && !hasWinner ? (
-                      <InlineScoreInput>
-                        <ValidationIndicator position="left" isValid={player1?.isDifferent !== 1} />
-                        <TotalInputAsync
-                          playerDetail={player1}
-                          disabled={hasWinner || !player1?.name}
-                          scoring={scoring}
-                          onSuccess={fetchEliminationMatches}
-                        />
-                      </InlineScoreInput>
-                    ) : (
-                      <NoArcherWrapper>-</NoArcherWrapper>
-                    )}
-                  </td>
-
-                  <td>
-                    {!noData && (
-                      <HeadToHeadScoreLabels>
-                        <ScoreTotalLabel
-                          className={classnames({
-                            "score-label-higher": player1?.adminTotal > player2?.adminTotal,
-                          })}
-                        >
-                          {player1?.adminTotal || 0}
-                        </ScoreTotalLabel>
-
-                        <span>&ndash;</span>
-
-                        <ScoreTotalLabel
-                          className={classnames({
-                            "score-label-higher": player2?.adminTotal > player1?.adminTotal,
-                          })}
-                        >
-                          {player2?.adminTotal || 0}
-                        </ScoreTotalLabel>
-                      </HeadToHeadScoreLabels>
-                    )}
-                  </td>
-
-                  <td>
-                    {!noData && !hasWinner ? (
-                      <InlineScoreInput>
-                        <TotalInputAsync
-                          playerDetail={player2}
-                          disabled={hasWinner || !player2?.name}
-                          scoring={scoring}
-                          onSuccess={fetchEliminationMatches}
-                        />
-                        <ValidationIndicator
-                          position="right"
-                          isValid={player2?.isDifferent !== 1}
-                        />
-                      </InlineScoreInput>
-                    ) : (
-                      <NoArcherWrapper>-</NoArcherWrapper>
-                    )}
-                  </td>
-
-                  <td>
-                    <PlayerLabelContainerRight>
-                      <PlayerNameData>
-                        {(player2?.potition || player2?.postition) && (
-                          <RankLabel>#{player2?.potition || player2?.postition || "-"}</RankLabel>
-                        )}
-                        <div>
-                          <TeamNameLabel>{player2?.name || <NoArcherLabel />}</TeamNameLabel>
-                          <MembersList>
-                            <li>Anggota satu</li>
-                            <li>Anggota dua</li>
-                            <li>Anggota tigaaa</li>
-                          </MembersList>
-                        </div>
-                      </PlayerNameData>
-                    </PlayerLabelContainerRight>
-                  </td>
-
-                  <td>
-                    <HorizontalSpaced>
-                      {!hasWinner && (
-                        <ButtonSetWinner
-                          title={
-                            hasWinner
-                              ? "Pemenang telah ditentukan"
-                              : "Tentukan pemenang untuk match ini"
-                          }
-                          disabled={noData}
-                          scoring={scoring}
-                          onSuccess={fetchEliminationMatches}
-                        >
-                          Tentukan
-                        </ButtonSetWinner>
-                      )}
-
-                      {!hasWinner && (
-                        <ButtonEditScoreTeam
-                          disabled={noData}
-                          headerInfo={row}
-                          budrestNumber={budrestNumber}
-                          scoring={scoring}
-                          onSuccessSubmit={fetchEliminationMatches}
-                          categoryDetails={categoryDetails}
-                        />
-                      )}
-                    </HorizontalSpaced>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </MembersTable>
-      </SectionTableContainer>
-    );
-  }
-
   // Tabel dirender sebagai "state kosong" ketika:
   // 1. belum menentukan jumlah peserta eliminasi di page skoring kualifikasi (belum ada ID eliminasi/`eliminationId`)
   // 2. belum menentukan bagan eliminasi (terlempar error)
-  if (!data?.eliminationId) {
+  if (!data?.eliminationGroupId) {
     return (
       <SectionTableContainer>
         <EmptyBracketContainer>
@@ -266,32 +69,33 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
         <thead>
           <tr>
             <th>Bantalan</th>
-            <th>Nama Peserta</th>
+            <th>Tim</th>
             <th>Total</th>
             <th></th>
             <th>Total</th>
-            <th>Nama Peserta</th>
+            <th>Tim</th>
             <th></th>
           </tr>
         </thead>
 
         <tbody key={selectedTab}>
           {currentRows.map((row, index) => {
-            const player1 = row.teams[0];
-            const player2 = row.teams[1];
+            const team1 = row.teams[0];
+            const team2 = row.teams[1];
 
             const roundNumber = selectedTab + 1;
             const matchNumber = index + 1;
-            const code = `2-${data.eliminationId}-${matchNumber}-${roundNumber}`;
+
+            const code = `2-${data?.eliminationGroupId}-${matchNumber}-${roundNumber}-t`;
 
             const scoring = {
               code: code,
-              elimination_id: data.eliminationId,
+              elimination_id: data?.eliminationGroupId,
               round: roundNumber,
               match: matchNumber,
             };
 
-            const noData = !player1?.name || !player2?.name;
+            const noData = !team1?.memberTeam?.length || !team2?.memberTeam?.length;
             const hasWinner = row.teams.some((team) => team.win === 1);
             const budrestNumber = _getBudrestNumber(row);
 
@@ -302,7 +106,8 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                     <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
                   ) : (
                     <BudrestInputAsync
-                      playerDetail={player1 || player2}
+                      categoryId={categoryDetailId}
+                      playerDetail={team1 || team2}
                       disabled={hasWinner || noData}
                       scoring={scoring}
                       onSuccess={fetchEliminationMatches}
@@ -313,10 +118,17 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                 <td>
                   <PlayerLabelContainerLeft>
                     <PlayerNameData>
-                      {(player1?.potition || player1?.postition) && (
-                        <RankLabel>#{player1?.potition || player1?.postition || "-"}</RankLabel>
-                      )}
-                      <TeamNameLabel>{player1?.name || <NoArcherLabel />}</TeamNameLabel>
+                      {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
+                      <div>
+                        <TeamNameLabel>{team1?.teamName || <NoArcherTeamLabel />}</TeamNameLabel>
+                        {Boolean(team1?.memberTeam?.length) && (
+                          <MembersList>
+                            {team1.memberTeam.map((member) => (
+                              <li key={member.memberId}>{member.name}</li>
+                            ))}
+                          </MembersList>
+                        )}
+                      </div>
                     </PlayerNameData>
                   </PlayerLabelContainerLeft>
                 </td>
@@ -324,10 +136,11 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                 <td>
                   {!noData && !hasWinner ? (
                     <InlineScoreInput>
-                      <ValidationIndicator position="left" isValid={player1?.isDifferent !== 1} />
+                      <ValidationIndicator position="left" isValid={team1?.isDifferent !== 1} />
                       <TotalInputAsync
-                        playerDetail={player1}
-                        disabled={hasWinner || !player1?.name}
+                        categoryId={categoryDetailId}
+                        playerDetail={team1}
+                        disabled={hasWinner || !team1?.teamName}
                         scoring={scoring}
                         onSuccess={fetchEliminationMatches}
                       />
@@ -342,20 +155,20 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                     <HeadToHeadScoreLabels>
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": player1?.adminTotal > player2?.adminTotal,
+                          "score-label-higher": team1?.adminTotal > team2?.adminTotal,
                         })}
                       >
-                        {player1?.adminTotal || 0}
+                        {team1?.adminTotal || 0}
                       </ScoreTotalLabel>
 
                       <span>&ndash;</span>
 
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": player2?.adminTotal > player1?.adminTotal,
+                          "score-label-higher": team2?.adminTotal > team1?.adminTotal,
                         })}
                       >
-                        {player2?.adminTotal || 0}
+                        {team2?.adminTotal || 0}
                       </ScoreTotalLabel>
                     </HeadToHeadScoreLabels>
                   )}
@@ -365,12 +178,13 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                   {!noData && !hasWinner ? (
                     <InlineScoreInput>
                       <TotalInputAsync
-                        playerDetail={player2}
-                        disabled={hasWinner || !player2?.name}
+                        categoryId={categoryDetailId}
+                        playerDetail={team2}
+                        disabled={hasWinner || !team2?.teamName}
                         scoring={scoring}
                         onSuccess={fetchEliminationMatches}
                       />
-                      <ValidationIndicator position="right" isValid={player2?.isDifferent !== 1} />
+                      <ValidationIndicator position="right" isValid={team2?.isDifferent !== 1} />
                     </InlineScoreInput>
                   ) : (
                     <NoArcherWrapper>-</NoArcherWrapper>
@@ -380,10 +194,17 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                 <td>
                   <PlayerLabelContainerRight>
                     <PlayerNameData>
-                      {(player2?.potition || player2?.postition) && (
-                        <RankLabel>#{player2?.potition || player2?.postition || "-"}</RankLabel>
-                      )}
-                      <TeamNameLabel>{player2?.name || <NoArcherLabel />}</TeamNameLabel>
+                      {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
+                      <div>
+                        <TeamNameLabel>{team2?.teamName || <NoArcherTeamLabel />}</TeamNameLabel>
+                        {Boolean(team2?.memberTeam?.length) && (
+                          <MembersList>
+                            {team2.memberTeam.map((member) => (
+                              <li key={member.memberId}>{member.name}</li>
+                            ))}
+                          </MembersList>
+                        )}
+                      </div>
                     </PlayerNameData>
                   </PlayerLabelContainerRight>
                 </td>
@@ -445,8 +266,8 @@ function StagesTabs({ labels, currentTab, onChange }) {
   );
 }
 
-function NoArcherLabel() {
-  return <NoArcherWrapper>Belum ada archer</NoArcherWrapper>;
+function NoArcherTeamLabel() {
+  return <NoArcherWrapper>Belum ada tim</NoArcherWrapper>;
 }
 
 function ValidationIndicator({ position, isValid }) {
@@ -760,130 +581,3 @@ function _getBudrestNumber(row) {
 }
 
 export { ScoringTableTeam };
-
-const fakeRows = [
-  {
-    date: "  - ",
-    teams: [
-      {
-        id: 1265,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 1,
-        win: 1,
-        totalScoring: 10,
-        status: "win",
-        adminTotal: 16,
-        budrestNumber: "10A",
-        isDifferent: 1,
-      },
-      {
-        id: 1709,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 8,
-        win: 0,
-        totalScoring: 20,
-        status: "wait",
-        adminTotal: 13,
-        budrestNumber: "10A",
-        isDifferent: 1,
-      },
-    ],
-  },
-  {
-    date: "  - ",
-    teams: [
-      {
-        id: 931,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 5,
-        win: 0,
-        totalScoring: 100,
-        status: "wait",
-        adminTotal: 101,
-        budrestNumber: "10B",
-        isDifferent: 1,
-      },
-      {
-        id: 891,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 4,
-        win: 1,
-        totalScoring: 0,
-        status: "win",
-        adminTotal: 151,
-        budrestNumber: "10B",
-        isDifferent: 1,
-      },
-    ],
-  },
-  {
-    date: "  - ",
-    teams: [
-      {
-        id: 1174,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 3,
-        win: 0,
-        totalScoring: 0,
-        status: "wait",
-        adminTotal: 20,
-        budrestNumber: "12B",
-        isDifferent: 1,
-      },
-      {
-        id: 1004,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 6,
-        win: 1,
-        totalScoring: 0,
-        status: "win",
-        adminTotal: 201,
-        budrestNumber: "12B",
-        isDifferent: 1,
-      },
-    ],
-  },
-  {
-    date: "  - ",
-    teams: [
-      {
-        id: 1724,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 7,
-        win: 0,
-        totalScoring: 28,
-        status: "wait",
-        adminTotal: 29,
-        budrestNumber: "1B",
-        isDifferent: 1,
-      },
-      {
-        id: 1115,
-        name: "Nama Tim",
-        gender: "male",
-        club: null,
-        potition: 2,
-        win: 1,
-        totalScoring: 30,
-        status: "win",
-        adminTotal: 31,
-        budrestNumber: "1B",
-        isDifferent: 1,
-      },
-    ],
-  },
-];

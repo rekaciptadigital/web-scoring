@@ -5,15 +5,12 @@ import { useScoringMembers } from "../../hooks/scoring-members";
 import { SpinnerDotBlock } from "components/ma";
 
 function ScoringTableTeam({ categoryDetailId, eliminationParticipantsCount, searchName }) {
+  // TODO: refaktor param jadi objek konfig
   const {
-    // TODO: data members
-    // data: scoringMembers,
+    data: scoringMembers,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
-  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount);
-
-  // TODO: hapus mock
-  const scoringMembers = fakeMembers;
+  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, true); // isTeam === true
 
   const isSettledScoringMembers =
     Boolean(scoringMembers) || (!scoringMembers && isErrorScoringMembers);
@@ -23,7 +20,7 @@ function ScoringTableTeam({ categoryDetailId, eliminationParticipantsCount, sear
   }
 
   if (!scoringMembers?.length) {
-    return <EmptyMembers>Tidak ada peserta di kategori ini</EmptyMembers>;
+    return <EmptyMembers>Tidak ada peserta beregu di kategori ini</EmptyMembers>;
   }
 
   return (
@@ -44,26 +41,22 @@ function ScoringTableTeam({ categoryDetailId, eliminationParticipantsCount, sear
           </thead>
 
           <tbody>
-            {scoringMembers?.map((row) => (
-              <tr key={row.member.id}>
-                <td>
-                  {row.rank || (
-                    <GrayedOutText style={{ fontSize: "0.75em" }}>
-                      belum
-                      <br />
-                      ada data
-                    </GrayedOutText>
-                  )}
-                </td>
+            {scoringMembers?.map((row, rowIndex) => (
+              <tr key={row.participantId}>
+                <td>{rowIndex + 1}</td>
 
                 <td className="name">
                   <div>
-                    <TeamNameLabel>Nama Tim</TeamNameLabel>
-                    <MembersList>
-                      <li>Anggota satu</li>
-                      <li>Anggota dua</li>
-                      <li>Anggota tigaaaa...</li>
-                    </MembersList>
+                    <TeamNameLabel>{row.team}</TeamNameLabel>
+                    {row.teams?.length ? (
+                      <MembersList>
+                        {row.teams?.map((teamMember, index) => (
+                          <li key={index}>{teamMember.name}</li>
+                        ))}
+                      </MembersList>
+                    ) : (
+                      <span>Belum ada anggota</span>
+                    )}
                   </div>
                 </td>
 
@@ -194,6 +187,3 @@ const LoadingContainer = styled.div`
 `;
 
 export { ScoringTableTeam };
-
-// TODO: hapus mock
-const fakeMembers = [{ member: { id: 1 } }, { member: { id: 2 } }];

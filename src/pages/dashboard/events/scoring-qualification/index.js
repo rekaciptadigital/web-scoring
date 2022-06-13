@@ -254,6 +254,7 @@ function PageEventScoringQualification() {
                 <span>Unduh Dokumen</span>
               </ButtonOutlineBlue>
 
+              {/* TODO: 2x munculkan modal warning ketika mau set eliminasi */}
               {activeCategoryDetail?.eliminationLock ? (
                 <ButtonConfirmWarning
                   customButton={ButtonBlue}
@@ -275,7 +276,11 @@ function PageEventScoringQualification() {
                   buttonCancelLabel="Batalkan"
                   buttonConfirmLabel="Iya, Tentukan Eliminasi"
                   onConfirm={() => {
-                    setElimination(localCountNumber, { onSuccess() {} });
+                    setElimination(localCountNumber, {
+                      onSuccess: () => {
+                        fetchCategoryDetails();
+                      },
+                    });
                   }}
                 >
                   Lanjut ke Eliminasi
@@ -288,7 +293,7 @@ function PageEventScoringQualification() {
         {activeCategoryDetail &&
           (activeCategoryDetail.isTeam ? (
             <ScoringTableTeam
-              key={activeCategoryDetail?.categoryDetailId}
+              key={_makeTableKeyByCategory(activeCategoryDetail)}
               categoryDetailId={activeCategoryDetail?.categoryDetailId}
               searchName={inputSearchQuery}
               onChangeParticipantPresence={resetOnChangeCategory}
@@ -296,7 +301,7 @@ function PageEventScoringQualification() {
             />
           ) : (
             <ScoringTable
-              key={activeCategoryDetail?.categoryDetailId}
+              key={_makeTableKeyByCategory(activeCategoryDetail)}
               categoryDetailId={activeCategoryDetail?.categoryDetailId}
               isLocked={!activeCategoryDetail || activeCategoryDetail?.eliminationLock}
               searchName={inputSearchQuery}
@@ -481,5 +486,15 @@ const FilterItemButton = styled.button`
     background-color: var(--ma-primary-blue-50);
   }
 `;
+
+/* ================================ */
+// utils
+
+function _makeTableKeyByCategory(activeCategoryDetail) {
+  if (!activeCategoryDetail) {
+    return "default-key";
+  }
+  return activeCategoryDetail.categoryDetailId;
+}
 
 export default PageEventScoringQualification;

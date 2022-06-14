@@ -116,9 +116,12 @@ function NoBracketAvailable() {
 
 function SeedBagan({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
+  const roundNumber = roundIndex + 1;
 
   const noData = !seed.teams[0]?.name || !seed.teams[1]?.name;
-  const isBye = seed.teams.some((team) => team.status === "bye");
+  const isBye =
+    seed.teams.some((team) => team.status === "bye") ||
+    (roundNumber === 1 && seed.teams.every((team) => !team.name));
 
   const isFinalRound =
     (configs.totalRounds === 4 && roundIndex === 3) ||
@@ -145,10 +148,10 @@ function SeedBagan({ bracketProps, configs }) {
               title={team.name}
               className={classnames({
                 "item-active": !noData,
-                "item-winner": parseInt(team.win) === 1 && !isBye,
+                "item-winner": !isBye && parseInt(team.win) === 1,
               })}
             >
-              <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>{team.name || <ByeLabel isBye={isBye} />}</BoxName>
               <BoxScore team={team} />
             </SeedTeam>
           ))}
@@ -160,6 +163,7 @@ function SeedBagan({ bracketProps, configs }) {
 
 function SeedBaganTeam({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
+  const roundNumber = roundIndex + 1;
 
   // ?: cari pengecekan yang lebih sederhana?
   const noData =
@@ -167,7 +171,10 @@ function SeedBaganTeam({ bracketProps, configs }) {
     !seed.teams[1]?.teamName ||
     !seed.teams[0]?.memberTeam?.length ||
     !seed.teams[1]?.memberTeam?.length;
-  const isBye = seed.teams.some((team) => team.status === "bye");
+
+  const isBye =
+    seed.teams.some((team) => team.status === "bye") ||
+    (roundNumber === 1 && seed.teams.every((team) => !team.teamName));
 
   const isFinalRound =
     (configs.totalRounds === 4 && roundIndex === 3) ||
@@ -197,7 +204,7 @@ function SeedBaganTeam({ bracketProps, configs }) {
                 "item-winner": parseInt(team.win) === 1 && !isBye,
               })}
             >
-              <BoxName>{team.teamName || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>{team.teamName || <ByeLabel isBye={isBye} />}</BoxName>
               <BoxScore team={team} />
             </SeedTeam>
           ))}
@@ -205,6 +212,13 @@ function SeedBaganTeam({ bracketProps, configs }) {
       </SeedItem>
     </Seed>
   );
+}
+
+function ByeLabel({ isBye }) {
+  if (isBye) {
+    return <ByeLabelSpan>&#171; bye &#187;</ByeLabelSpan>;
+  }
+  return <React.Fragment>&ndash;</React.Fragment>;
 }
 
 function BoxScore({ team }) {
@@ -222,6 +236,13 @@ function BoxScore({ team }) {
 
   return null;
 }
+
+const ByeLabelSpan = styled.span`
+  text-align: center;
+  vertical-align: middle;
+  color: var(--ma-gray-200);
+  font-weight: 600;
+`;
 
 /* ================================== */
 // styles

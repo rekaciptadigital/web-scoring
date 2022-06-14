@@ -95,14 +95,21 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
               match: matchNumber,
             };
 
-            const noData = !team1?.memberTeam?.length || !team2?.memberTeam?.length;
+            const isBye =
+              row.teams.some((team) => team.status === "bye") ||
+              (roundNumber === 1 && row.teams.every((team) => !team.teamName));
+            const noData =
+              !team1?.teamName ||
+              !team2?.teamName ||
+              !team1?.memberTeam?.length ||
+              !team2?.memberTeam?.length;
             const hasWinner = row.teams.some((team) => team.win === 1);
             const budrestNumber = _getBudrestNumber(row);
 
             return (
               <tr key={index}>
                 <td>
-                  {noData || hasWinner ? (
+                  {isBye || noData || hasWinner ? (
                     <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
                   ) : (
                     <BudrestInputAsync
@@ -120,7 +127,9 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                     <PlayerNameData>
                       {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
                       <div>
-                        <TeamNameLabel>{team1?.teamName || <NoArcherTeamLabel />}</TeamNameLabel>
+                        <TeamNameLabel>
+                          {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                        </TeamNameLabel>
                         {Boolean(team1?.memberTeam?.length) && (
                           <MembersList>
                             {team1.memberTeam.map((member) => (
@@ -196,7 +205,9 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                     <PlayerNameData>
                       {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
                       <div>
-                        <TeamNameLabel>{team2?.teamName || <NoArcherTeamLabel />}</TeamNameLabel>
+                        <TeamNameLabel>
+                          {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                        </TeamNameLabel>
                         {Boolean(team2?.memberTeam?.length) && (
                           <MembersList>
                             {team2.memberTeam.map((member) => (
@@ -211,7 +222,7 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
 
                 <td>
                   <HorizontalSpaced>
-                    {!hasWinner && (
+                    {!hasWinner && !isBye && (
                       <ButtonSetWinner
                         title={
                           hasWinner
@@ -227,7 +238,7 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                       </ButtonSetWinner>
                     )}
 
-                    {!hasWinner && (
+                    {!hasWinner && !isBye && (
                       <ButtonEditScoreTeam
                         disabled={noData}
                         headerInfo={row}
@@ -237,6 +248,9 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                         categoryDetails={categoryDetails}
                       />
                     )}
+
+                    {/* TODO: */}
+                    {/* <ButtonDownloadScoresheet disabled={noData} scoring={scoring} /> */}
                   </HorizontalSpaced>
                 </td>
               </tr>
@@ -267,8 +281,11 @@ function StagesTabs({ labels, currentTab, onChange }) {
   );
 }
 
-function NoArcherTeamLabel() {
-  return <NoArcherWrapper>Belum ada tim</NoArcherWrapper>;
+function NoArcherTeamLabel({ isBye }) {
+  if (isBye) {
+    return <NoArcherWrapper>&#171; bye &#187;</NoArcherWrapper>;
+  }
+  return <NoArcherWrapper>&#171; Belum ada tim &#187;</NoArcherWrapper>;
 }
 
 function ValidationIndicator({ position, isValid }) {
@@ -484,8 +501,7 @@ const PlayerNameData = styled.div`
   align-items: center;
 `;
 
-const RankLabel = styled.span`
-  display: block;
+const RankLabel = styled.div`
   padding: 0.625rem 0.5rem;
   min-width: 3rem;
   background-color: var(--ma-primary-blue-50);
@@ -493,8 +509,7 @@ const RankLabel = styled.span`
   font-weight: 600;
 `;
 
-const TeamNameLabel = styled.span`
-  display: block;
+const TeamNameLabel = styled.div`
   font-weight: 600;
   text-align: left;
 `;
@@ -507,9 +522,15 @@ const MembersList = styled.ol`
   font-size: 0.625rem;
 `;
 
-const NoArcherWrapper = styled.span`
-  color: var(--ma-gray-200);
-  font-weight: 400;
+const NoArcherWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  min-height: 4.625rem;
+  color: var(--ma-gray-400);
 `;
 
 const HeadToHeadScoreLabels = styled.div`

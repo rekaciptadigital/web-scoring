@@ -95,6 +95,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               match: matchNumber,
             };
 
+            const isBye =
+              row.teams.some((team) => team.status === "bye") ||
+              (roundNumber === 1 && row.teams.every((team) => !team.name));
             const noData = !player1?.name || !player2?.name;
             const hasWinner = row.teams.some((team) => team.win === 1);
             const budrestNumber = _getBudrestNumber(row);
@@ -102,7 +105,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
             return (
               <tr key={index}>
                 <td>
-                  {noData || hasWinner ? (
+                  {isBye || noData || hasWinner ? (
                     <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
                   ) : (
                     <BudrestInputAsync
@@ -118,10 +121,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerLeft>
                     <PlayerNameData>
-                      {(player1?.potition || player1?.postition) && (
-                        <RankLabel>#{player1?.potition || player1?.postition || "-"}</RankLabel>
-                      )}
-                      <NameLabel>{player1?.name || <NoArcherLabel />}</NameLabel>
+                      {player1?.potition && <RankLabel>#{player1?.potition || "-"}</RankLabel>}
+                      <NameLabel>{player1?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerLeft>
                 </td>
@@ -187,17 +188,15 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerRight>
                     <PlayerNameData>
-                      {(player2?.potition || player2?.postition) && (
-                        <RankLabel>#{player2?.potition || player2?.postition || "-"}</RankLabel>
-                      )}
-                      <NameLabel>{player2?.name || <NoArcherLabel />}</NameLabel>
+                      {player2?.potition && <RankLabel>#{player2?.potition || "-"}</RankLabel>}
+                      <NameLabel>{player2?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerRight>
                 </td>
 
                 <td>
                   <HorizontalSpaced>
-                    {!hasWinner && (
+                    {!hasWinner && !isBye && (
                       <ButtonSetWinner
                         title={
                           hasWinner
@@ -213,7 +212,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       </ButtonSetWinner>
                     )}
 
-                    {!hasWinner && (
+                    {!hasWinner && !isBye && (
                       <ButtonEditScoreLine
                         disabled={noData}
                         headerInfo={row}
@@ -255,8 +254,11 @@ function StagesTabs({ labels, currentTab, onChange }) {
   );
 }
 
-function NoArcherLabel() {
-  return <NoArcherWrapper>Belum ada archer</NoArcherWrapper>;
+function NoArcherLabel({ isBye }) {
+  if (isBye) {
+    return <NoArcherWrapper>&#171; bye &#187;</NoArcherWrapper>;
+  }
+  return <NoArcherWrapper>&#171; Belum ada archer &#187;</NoArcherWrapper>;
 }
 
 function ValidationIndicator({ position, isValid }) {
@@ -472,8 +474,7 @@ const PlayerNameData = styled.div`
   align-items: center;
 `;
 
-const RankLabel = styled.span`
-  display: block;
+const RankLabel = styled.div`
   padding: 0.625rem 0.5rem;
   min-width: 3rem;
   background-color: var(--ma-primary-blue-50);
@@ -481,15 +482,19 @@ const RankLabel = styled.span`
   font-weight: 600;
 `;
 
-const NameLabel = styled.span`
-  display: block;
+const NameLabel = styled.div`
   font-weight: 600;
   text-align: left;
 `;
 
-const NoArcherWrapper = styled.span`
-  color: var(--ma-gray-200);
-  font-weight: 400;
+const NoArcherWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  color: var(--ma-gray-400);
 `;
 
 const HeadToHeadScoreLabels = styled.div`

@@ -111,7 +111,9 @@ function SeedBagan({ bracketProps, configs }) {
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
           {seed.teams.map((team, index) => (
             <SeedTeam key={index}>
-              <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>
+                {team.name || team.teamName || <React.Fragment>&ndash;</React.Fragment>}
+              </BoxName>
             </SeedTeam>
           ))}
         </ItemContainer>

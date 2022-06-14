@@ -7,4 +7,7 @@ export default {
   save(data = null) {
     return API.post("/web/v2/id-card/template", data, null, true);
   },
+  getDownloadIdCard(qs = null) {
+    return API.get("/web/v2/id-card/download-by-category", qs);
+  }
 };

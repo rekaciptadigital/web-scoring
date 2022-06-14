@@ -500,17 +500,7 @@ const WarningIconWrapper = styled.span`
 const CheckboxWrapper = styled.span`
   .rc-checkbox-disabled,
   .rc-checkbox-disabled .rc-checkbox-input {
-    cursor: not-allowed;
-  }
-
-  .rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner,
-  .rc-checkbox-disabled.rc-checkbox-checked:hover .rc-checkbox-inner {
-    background-color: var(--ma-blue);
-    border-color: var(--ma-blue);
-  }
-
-  .rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner:after {
-    border-color: #ffffff;
+    cursor: default;
   }
 `;
 

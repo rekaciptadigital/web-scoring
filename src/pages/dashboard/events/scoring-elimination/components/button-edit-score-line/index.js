@@ -111,26 +111,42 @@ function ModalEditor({
     setTotal: setTotalP2,
   } = useAdminTotal(player2?.scores);
 
+  // untuk nge-"queue" refetch, lihat yang panggil ini di bawah
+  const shouldRefetch = React.useRef(false);
+
   // mutate
   const {
     submitScoringDetail,
-    isLoading: isSubmiting,
-    isError: isErrorSubmit,
-    errors: errorsSubmit,
+    isLoading: isSubmitingDetail,
+    isError: isErrorSubmitDetail,
+    errors: errorsSubmitDetail,
   } = useSubmitScores();
 
-  const { submitAdminTotal, isLoading: isSubmitingTotal } = useSubmitAdminTotal({
-    categoryId: categoryDetails?.categoryDetailId,
-    eliminationId: scoring.elimination_id,
+  const {
+    submitAdminTotal: submitAdminTotalP1,
+    isLoading: isSubmitingTotalP1,
+    isError: isErrorSubmitingTotalP1,
+    errors: errorsSubmitingTotalP1,
+  } = useSubmitAdminTotal({
+    categoryId: categoryDetails.categoryDetailId,
+    memberId: player1?.participant.member.id,
+    eliminationId: scoring?.elimination_id,
     round: scoring.round,
     match: scoring.match,
   });
 
-  const onSuccess = () => {
-    toast.success("Detail skor berhasil disimpan");
-    fetchScoringDetail();
-    onSuccessSubmit?.();
-  };
+  const {
+    submitAdminTotal: submitAdminTotalP2,
+    isLoading: isSubmitingTotalP2,
+    isError: isErrorSubmitingTotalP2,
+    errors: errorsSubmitingTotalP2,
+  } = useSubmitAdminTotal({
+    categoryId: categoryDetails.categoryDetailId,
+    memberId: player2?.participant.member.id,
+    eliminationId: scoring?.elimination_id,
+    round: scoring.round,
+    match: scoring.match,
+  });
 
   if (!isSettled) {
     return (
@@ -151,12 +167,16 @@ function ModalEditor({
 
   return (
     <React.Fragment>
-      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
       <AlertSubmitError isError={isErrorScoringDetail} errors={errorsScoringDetail} />
+      <AlertSubmitError isError={isErrorSubmitDetail} errors={errorsSubmitDetail} />
+      <AlertSubmitError isError={isErrorSubmitingTotalP1} errors={errorsSubmitingTotalP1} />
+      <AlertSubmitError isError={isErrorSubmitingTotalP2} errors={errorsSubmitingTotalP2} />
 
       <Modal isOpen centered backdrop="static" size="lg" autoFocus onClosed={onClose}>
         <ModalBody>
-          <LoadingBlocker isLoading={isSubmitingTotal || isSubmiting} />
+          <LoadingBlocker
+            isLoading={isSubmitingTotalP1 || isSubmitingTotalP2 || isSubmitingDetail}
+          />
           <BodyWrapper>
             <ModalHeaderBar>
               <h4>Scoresheet</h4>
@@ -303,39 +323,69 @@ function ModalEditor({
             <HorizontalSpaced>
               <Button onClick={onClose}>Batal</Button>
               <ButtonBlue
-                onClick={() => {
+                onClick={async () => {
+                  // Hack promise sederhana untuk menghindari "race condition" ketika harus
+                  // refetch data tapi menunggu semua request async dari ketiga API selesai,
+                  // apapun hasilnya, sukses maupun gagal.
+
+                  // Preparing refetching "queue"
+                  const savingTotal1 = {};
+                  const savingTotal2 = {};
+                  const savingScoreDetails = {};
+
+                  savingTotal1.promise = new Promise((resolve) => {
+                    savingTotal1.done = resolve;
+                  });
+                  savingTotal2.promise = new Promise((resolve) => {
+                    savingTotal2.done = resolve;
+                  });
+                  savingScoreDetails.promise = new Promise((resolve) => {
+                    savingScoreDetails.done = resolve;
+                  });
+
+                  const waitForAllDone = () => {
+                    return Promise.all([
+                      savingTotal1.promise,
+                      savingTotal2.promise,
+                      savingScoreDetails.promise,
+                    ]);
+                  };
+
+                  // Running requests in queue
+                  // 1.
                   if (isDirtyTotalP1) {
-                    submitAdminTotal(
-                      {
-                        memberId: player1.participant.member.id,
-                        value: adminTotalP1,
+                    submitAdminTotalP1(adminTotalP1, {
+                      onSuccess: () => {
+                        toast.success("Total tim 1 berhasil disimpan");
+                        savingTotal1.done();
+                        shouldRefetch.current = true;
                       },
-                      {
-                        onSuccess: () => {
-                          toast.success("Total berhasil disimpan");
-                        },
-                        onError: () => {
-                          toast.error("Gagal menyimpan total");
-                        },
-                      }
-                    );
+                      onError: () => {
+                        toast.error("Gagal menyimpan total tim 1");
+                        savingTotal1.done();
+                      },
+                    });
+                  } else {
+                    // done tanpa kirim request
+                    savingTotal1.done();
                   }
 
+                  // 2.
                   if (isDirtyTotalP2) {
-                    submitAdminTotal(
-                      {
-                        memberId: player2.participant.member.id,
-                        value: adminTotalP2,
+                    submitAdminTotalP2(adminTotalP2, {
+                      onSuccess: () => {
+                        toast.success("Total archer 2 berhasil disimpan");
+                        savingTotal2.done();
+                        shouldRefetch.current = true;
                       },
-                      {
-                        onSuccess: () => {
-                          toast.success("Total berhasil disimpan");
-                        },
-                        onError: () => {
-                          toast.error("Gagal menyimpan total");
-                        },
-                      }
-                    );
+                      onError: () => {
+                        toast.error("Gagal menyimpan total archer 2");
+                        savingTotal2.done();
+                      },
+                    });
+                  } else {
+                    // done tanpa kirim request
+                    savingTotal2.done();
                   }
 
                   const payload = {
@@ -346,7 +396,28 @@ function ModalEditor({
                       payload: [gridDataPlayer1, gridDataPlayer2],
                     }),
                   };
-                  submitScoringDetail(payload, { onSuccess });
+
+                  submitScoringDetail(payload, {
+                    onSuccess: () => {
+                      toast.success("Detail skor berhasil disimpan");
+                      savingScoreDetails.done();
+                      shouldRefetch.current = true;
+                    },
+                    onError: () => {
+                      toast.error("Gagal menyimpan detail");
+                      savingScoreDetails.done();
+                    },
+                  });
+
+                  // Eksekusi logic di bawah hanya setelah queue-nya selesai/resolve semua
+                  await waitForAllDone();
+
+                  if (shouldRefetch.current) {
+                    fetchScoringDetail();
+                    onSuccessSubmit?.();
+                  }
+
+                  shouldRefetch.current = false;
                 }}
               >
                 Simpan

@@ -86,14 +86,9 @@ function ModalEditor({
   const {
     isError: isErrorScoringDetail,
     errors: errorsScoringDetail,
-    // TODO:
-    // data: scoringDetails,
+    data: scoringDetails,
     fetchScoringDetail,
-    // TODO: scoring, fetch detail
-  } = useScoringDetail(/* scoring */ {});
-
-  // TODO: hapus
-  const scoringDetails = fakeDetails;
+  } = useScoringDetail(scoring);
 
   const isSettled = Boolean(scoringDetails) || (!scoringDetails && isErrorScoringDetail);
   const headerPlayer1 = headerInfo?.teams[0];
@@ -116,26 +111,42 @@ function ModalEditor({
     setTotal: setTotalP2,
   } = useAdminTotal(player2?.scores);
 
+  // untuk nge-"queue" refetch, lihat yang panggil ini di bawah
+  const shouldRefetch = React.useRef(false);
+
   // mutate
   const {
     submitScoringDetail,
-    isLoading: isSubmiting,
-    isError: isErrorSubmit,
-    errors: errorsSubmit,
+    isLoading: isSubmitingDetail,
+    isError: isErrorSubmitDetail,
+    errors: errorsSubmitDetail,
   } = useSubmitScores();
 
-  const { submitAdminTotal, isLoading: isSubmitingTotal } = useSubmitAdminTotal({
-    // TODO: elimination ID
-    eliminationId: scoring?.elimination_id || 333,
+  const {
+    submitAdminTotal: submitAdminTotalP1,
+    isLoading: isSubmitingTotalP1,
+    isError: isErrorSubmitingTotalP1,
+    errors: errorsSubmitingTotalP1,
+  } = useSubmitAdminTotal({
+    categoryId: categoryDetails.categoryDetailId,
+    participantId: player1?.teamDetail.participantId,
+    eliminationId: scoring?.elimination_id,
     round: scoring.round,
     match: scoring.match,
   });
 
-  const onSuccess = () => {
-    toast.success("Detail skor berhasil disimpan");
-    fetchScoringDetail();
-    onSuccessSubmit?.();
-  };
+  const {
+    submitAdminTotal: submitAdminTotalP2,
+    isLoading: isSubmitingTotalP2,
+    isError: isErrorSubmitingTotalP2,
+    errors: errorsSubmitingTotalP2,
+  } = useSubmitAdminTotal({
+    categoryId: categoryDetails.categoryDetailId,
+    participantId: player2?.teamDetail.participantId,
+    eliminationId: scoring?.elimination_id,
+    round: scoring.round,
+    match: scoring.match,
+  });
 
   if (!isSettled) {
     return (
@@ -156,12 +167,16 @@ function ModalEditor({
 
   return (
     <React.Fragment>
-      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
       <AlertSubmitError isError={isErrorScoringDetail} errors={errorsScoringDetail} />
+      <AlertSubmitError isError={isErrorSubmitDetail} errors={errorsSubmitDetail} />
+      <AlertSubmitError isError={isErrorSubmitingTotalP1} errors={errorsSubmitingTotalP1} />
+      <AlertSubmitError isError={isErrorSubmitingTotalP2} errors={errorsSubmitingTotalP2} />
 
       <Modal isOpen centered backdrop="static" size="lg" autoFocus onClosed={onClose}>
         <ModalBody>
-          <LoadingBlocker isLoading={isSubmitingTotal || isSubmiting} />
+          <LoadingBlocker
+            isLoading={isSubmitingTotalP1 || isSubmitingTotalP2 || isSubmitingDetail}
+          />
           <BodyWrapper>
             <ModalHeaderBar>
               <h4>Scoresheet</h4>
@@ -175,19 +190,21 @@ function ModalEditor({
 
               <PlayerLabelContainerLeft>
                 <PlayerNameData>
-                  <RankLabel>
-                    #{headerPlayer1?.potition || headerPlayer1?.postition || "-"}
-                  </RankLabel>
+                  <RankLabel>#{headerPlayer1?.potition || "-"}</RankLabel>
 
                   <div>
                     <TeamNameLabel>
-                      {player1?.participant.member.name || headerPlayer1?.name || "-"}
+                      {player1?.teamDetail.teamName ||
+                        headerPlayer1?.teamName ||
+                        "Nama tim tidak tersedia"}
                     </TeamNameLabel>
-                    <MembersList>
-                      <li>Anggota satu</li>
-                      <li>Anggota dua</li>
-                      <li>Anggota tigaaa...</li>
-                    </MembersList>
+                    {Boolean(player1?.listMember?.length) && (
+                      <MembersList>
+                        {player1.listMember.map((member) => (
+                          <li key={member.memberId}>{member.name}</li>
+                        ))}
+                      </MembersList>
+                    )}
                   </div>
                 </PlayerNameData>
               </PlayerLabelContainerLeft>
@@ -270,21 +287,21 @@ function ModalEditor({
 
               <PlayerLabelContainerRight>
                 <PlayerNameData>
-                  <RankLabel>
-                    #{headerPlayer2?.potition || headerPlayer2?.postition || "-"}
-                  </RankLabel>
+                  <RankLabel>#{headerPlayer2?.potition || "-"}</RankLabel>
 
                   <div>
                     <TeamNameLabel>
-                      {player2?.participant.member.name ||
-                        headerPlayer2?.name ||
-                        "Nama archer tidak tersedia"}
+                      {player2?.teamDetail.teamName ||
+                        headerPlayer2?.teamName ||
+                        "Nama tim tidak tersedia"}
                     </TeamNameLabel>
-                    <MembersList>
-                      <li>Anggota satu</li>
-                      <li>Anggota dua</li>
-                      <li>Anggota tigaaa...</li>
-                    </MembersList>
+                    {Boolean(player2?.listMember?.length) && (
+                      <MembersList>
+                        {player2.listMember.map((member) => (
+                          <li key={member.memberId}>{member.name}</li>
+                        ))}
+                      </MembersList>
+                    )}
                   </div>
                 </PlayerNameData>
               </PlayerLabelContainerRight>
@@ -324,41 +341,72 @@ function ModalEditor({
             <HorizontalSpaced>
               <Button onClick={onClose}>Batal</Button>
               <ButtonBlue
-                onClick={() => {
+                onClick={async () => {
+                  // Hack promise sederhana untuk menghindari "race condition" ketika harus
+                  // refetch data tapi menunggu semua request async dari ketiga API selesai,
+                  // apapun hasilnya, sukses maupun gagal.
+
+                  // Preparing refetching "queue"
+                  const savingTotal1 = {};
+                  const savingTotal2 = {};
+                  const savingScoreDetails = {};
+
+                  savingTotal1.promise = new Promise((resolve) => {
+                    savingTotal1.done = resolve;
+                  });
+                  savingTotal2.promise = new Promise((resolve) => {
+                    savingTotal2.done = resolve;
+                  });
+                  savingScoreDetails.promise = new Promise((resolve) => {
+                    savingScoreDetails.done = resolve;
+                  });
+
+                  const waitForAllDone = () => {
+                    return Promise.all([
+                      savingTotal1.promise,
+                      savingTotal2.promise,
+                      savingScoreDetails.promise,
+                    ]);
+                  };
+
+                  // Running requests in queue
+                  // 1.
                   if (isDirtyTotalP1) {
-                    submitAdminTotal(
-                      {
-                        memberId: player1.participant.member.id,
-                        value: adminTotalP1,
+                    submitAdminTotalP1(adminTotalP1, {
+                      onSuccess: () => {
+                        toast.success("Total tim 1 berhasil disimpan");
+                        savingTotal1.done();
+                        shouldRefetch.current = true;
                       },
-                      {
-                        onSuccess: () => {
-                          toast.success("Total berhasil disimpan");
-                        },
-                        onError: () => {
-                          toast.error("Gagal menyimpan total");
-                        },
-                      }
-                    );
+                      onError: () => {
+                        toast.error("Gagal menyimpan total tim 1");
+                        savingTotal1.done();
+                      },
+                    });
+                  } else {
+                    // done tanpa kirim request
+                    savingTotal1.done();
                   }
 
+                  // 2.
                   if (isDirtyTotalP2) {
-                    submitAdminTotal(
-                      {
-                        memberId: player2.participant.member.id,
-                        value: adminTotalP2,
+                    submitAdminTotalP2(adminTotalP2, {
+                      onSuccess: () => {
+                        toast.success("Total tim 2 berhasil disimpan");
+                        savingTotal2.done();
+                        shouldRefetch.current = true;
                       },
-                      {
-                        onSuccess: () => {
-                          toast.success("Total berhasil disimpan");
-                        },
-                        onError: () => {
-                          toast.error("Gagal menyimpan total");
-                        },
-                      }
-                    );
+                      onError: () => {
+                        toast.error("Gagal menyimpan total tim 2");
+                        savingTotal2.done();
+                      },
+                    });
+                  } else {
+                    // done tanpa kirim request
+                    savingTotal2.done();
                   }
 
+                  // 3.
                   const payload = {
                     save_permanent: 0,
                     ...scoring,
@@ -367,7 +415,28 @@ function ModalEditor({
                       payload: [gridDataPlayer1, gridDataPlayer2],
                     }),
                   };
-                  submitScoringDetail(payload, { onSuccess });
+
+                  submitScoringDetail(payload, {
+                    onSuccess: () => {
+                      toast.success("Detail skor berhasil disimpan");
+                      savingScoreDetails.done();
+                      shouldRefetch.current = true;
+                    },
+                    onError: () => {
+                      toast.error("Gagal menyimpan detail");
+                      savingScoreDetails.done();
+                    },
+                  });
+
+                  // Eksekusi logic di bawah hanya setelah queue-nya selesai/resolve semua
+                  await waitForAllDone();
+
+                  if (shouldRefetch.current) {
+                    fetchScoringDetail();
+                    onSuccessSubmit?.();
+                  }
+
+                  shouldRefetch.current = false;
                 }}
               >
                 Simpan
@@ -402,7 +471,7 @@ const BodyWrapper = styled.div`
 
 const Modal = styled(BSModal)`
   position: relative;
-  max-width: 56.25rem;
+  max-width: 62rem;
 `;
 
 const ModalHeaderBar = styled.div`
@@ -600,8 +669,8 @@ const LoadingContainer = styled.div`
 
 // Nge-update payload detail skor di rambahan & shoot-off
 function _makeMemberScoresPayload({ state, payload }) {
-  const members = state.map((member, index) => ({
-    member_id: member.participant.member.id,
+  const participants = state.map((member, index) => ({
+    participant_id: member?.teamDetail?.participantId,
     scores: {
       shot: payload[index].shot.map((rambahan) => ({ score: rambahan })),
       extraShot: payload[index].extraShot,
@@ -610,7 +679,7 @@ function _makeMemberScoresPayload({ state, payload }) {
     },
   }));
   //coba tanpa type?
-  return { type: 2, members };
+  return { type: 2, participants };
 }
 
 function _getDistanceCategoryLabel(classCategory) {
@@ -618,226 +687,3 @@ function _getDistanceCategoryLabel(classCategory) {
 }
 
 export { ButtonEditScoreTeam };
-
-const fakeDetails = [
-  {
-    participant: {
-      id: 1426,
-      eventId: 22,
-      userId: 618,
-      name: "Muhammad Usman Al Fatih",
-      type: "individual",
-      email: "muhammadusmanalfatih9@gmail.com",
-      phoneNumber: "087700656735",
-      age: 13,
-      gender: "male",
-      teamCategoryId: "individu male",
-      ageCategoryId: "U-15",
-      competitionCategoryId: "Compound",
-      distanceId: 40,
-      qualificationDate: null,
-      transactionLogId: 1358,
-      uniqueId: "07b5cd5f-e57e-4122-9afb-68ad4724a692",
-      createdAt: "2022-03-22 20:32:15",
-      updatedAt: "2022-05-13 00:35:23",
-      teamName: "Tim Kiri",
-      eventCategoryId: 91,
-      status: 1,
-      clubId: 49,
-      reasonRefund: null,
-      uploadImageRefund: null,
-      isPresent: 1,
-      registerBy: 1,
-      categoryLabel: "individu male-U-15-Compound-40m",
-      member: {
-        id: 1265,
-        archeryEventParticipantId: 1426,
-        name: "Tim Kiri Tim Kiri Tim Kiri",
-        teamCategoryId: "individu male",
-        email: null,
-        phoneNumber: null,
-        club: null,
-        age: 13,
-        gender: "male",
-        qualificationDate: null,
-        createdAt: "2022-03-22 20:32:15",
-        updatedAt: "2022-05-12 16:47:11",
-        birthdate: "2008-07-13",
-        userId: 618,
-        isSeries: 0,
-        haveShootOff: 0,
-        cityId: null,
-      },
-      club: "AR-RIDHO ARCHERY",
-    },
-    scores: {
-      shot: [
-        {
-          score: ["10", "9", "5"],
-          total: 24,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-      ],
-      extraShot: [
-        {
-          distanceFromX: 0,
-          score: "",
-          status: null,
-        },
-        {
-          distanceFromX: 0,
-          score: "",
-          status: null,
-        },
-        {
-          distanceFromX: 0,
-          score: "",
-          status: null,
-        },
-      ],
-      win: 0,
-      total: 24,
-      eliminationtScoreType: 2,
-      result: 24,
-      adminTotal: 0,
-      isDifferent: 1,
-    },
-    round: "2",
-    isUpdated: 1,
-  },
-  {
-    participant: {
-      id: 1049,
-      eventId: 22,
-      userId: 95,
-      name: "Arbiansyah Abdillah Muttaqin",
-      type: "individual",
-      email: "bianrizki99@gmail.com",
-      phoneNumber: "081289186199",
-      age: 13,
-      gender: "male",
-      teamCategoryId: "individu male",
-      ageCategoryId: "U-15",
-      competitionCategoryId: "Compound",
-      distanceId: 40,
-      qualificationDate: null,
-      transactionLogId: 985,
-      uniqueId: "d0b173d5-8ec2-4b15-9962-edf9de0dfb95",
-      createdAt: "2022-03-21 07:01:31",
-      updatedAt: "2022-03-21 07:05:45",
-      teamName: "Tim Kanan",
-      eventCategoryId: 91,
-      status: 1,
-      clubId: 2,
-      reasonRefund: null,
-      uploadImageRefund: null,
-      isPresent: 1,
-      registerBy: 1,
-      categoryLabel: "individu male-U-15-Compound-40m",
-      member: {
-        id: 891,
-        archeryEventParticipantId: 1049,
-        name: "Tim Kanan Tim Kanan Tim Kanan",
-        teamCategoryId: "individu male",
-        email: null,
-        phoneNumber: null,
-        club: null,
-        age: 13,
-        gender: "male",
-        qualificationDate: null,
-        createdAt: "2022-03-21 07:01:31",
-        updatedAt: "2022-05-12 16:47:10",
-        birthdate: "2008-07-30",
-        userId: 95,
-        isSeries: 1,
-        haveShootOff: 0,
-        cityId: null,
-      },
-      club: "Focus Archery Center",
-    },
-    scores: {
-      shot: [
-        {
-          score: ["7", "6", "5"],
-          total: 18,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-        {
-          score: ["", "", ""],
-          total: 0,
-          status: null,
-          point: null,
-        },
-      ],
-      extraShot: [
-        {
-          distanceFromX: 0,
-          score: "",
-          status: null,
-        },
-        {
-          distanceFromX: 0,
-          score: "",
-          status: null,
-        },
-        {
-          distanceFromX: 0,
-          score: "",
-          status: null,
-        },
-      ],
-      win: 0,
-      total: 18,
-      eliminationtScoreType: 2,
-      result: 18,
-      adminTotal: 0,
-      isDifferent: 1,
-    },
-    round: "2",
-    isUpdated: 1,
-  },
-];

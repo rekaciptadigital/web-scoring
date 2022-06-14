@@ -206,6 +206,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                         }
                         disabled={noData}
                         scoring={scoring}
+                        categoryId={categoryDetailId}
                         onSuccess={fetchEliminationMatches}
                       >
                         Tentukan

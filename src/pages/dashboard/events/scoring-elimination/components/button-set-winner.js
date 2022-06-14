@@ -5,9 +5,10 @@ import { ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
 import { ButtonConfirmPrompt } from "./button-confirm-prompt";
 import { toast } from "./processing-toast";
 
-function ButtonSetWinner({ title, disabled, scoring, onSuccess }) {
+function ButtonSetWinner({ title, disabled, categoryId, scoring, onSuccess }) {
   const { submitSetWinner, isLoading, isError, errors } = useSubmitSetWinner({
     eliminationId: scoring.elimination_id,
+    categoryId: categoryId,
     round: scoring.round,
     match: scoring.match,
   });

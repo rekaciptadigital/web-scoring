@@ -219,6 +219,7 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                             : "Tentukan pemenang untuk match ini"
                         }
                         disabled={noData}
+                        categoryId={categoryDetailId}
                         scoring={scoring}
                         onSuccess={fetchEliminationMatches}
                       >

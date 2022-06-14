@@ -56,7 +56,7 @@ export default {
 
   /**
    *
-   * @param {Object} queryString  { elimination_id, round, match }
+   * @param {Object} queryString  { elimination_id, category_id, round, match }
    * @returns {Promise} { success, data, errors, message }
    */
   saveScorePermanent(data = null) {

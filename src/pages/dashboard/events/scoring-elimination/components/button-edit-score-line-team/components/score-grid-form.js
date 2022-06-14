@@ -154,7 +154,7 @@ function ScoreGridForm({ scoringType = 1, gridData = defaultGrid, onChange }) {
             <React.Fragment>
               <THTotal>{sumScoresAllRambahan(gridData?.shot)}</THTotal>
               <THTotal>
-                <ScoreCounter>{"..."}</ScoreCounter>
+                <ScoreCounter>{gridData?.stats.result}</ScoreCounter>
               </THTotal>
             </React.Fragment>
           )}

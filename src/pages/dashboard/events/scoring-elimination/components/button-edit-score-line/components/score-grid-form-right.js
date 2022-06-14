@@ -144,7 +144,7 @@ function ScoreGridFormRight({ scoringType = 1, gridData = defaultGrid, onChange 
           {parseInt(scoringType) === 1 && (
             <React.Fragment>
               <THTotal>
-                <ScoreCounter>{"..."}</ScoreCounter>
+                <ScoreCounter>{gridData?.stats.result}</ScoreCounter>
               </THTotal>
               <THTotal>{sumScoresAllRambahan(gridData?.shot)}</THTotal>
             </React.Fragment>

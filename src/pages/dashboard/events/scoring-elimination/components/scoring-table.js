@@ -57,6 +57,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
   // Happy path
   const tabLabels = _getTabLabels(data.rounds);
   const currentRows = data.rounds[selectedTab]?.seeds || [];
+  const thTotalLabel = _getTotalLabel(categoryDetails);
 
   return (
     <SectionTableContainer>
@@ -71,9 +72,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
           <tr>
             <th>Bantalan</th>
             <th>Nama Peserta</th>
-            <th>Total</th>
+            <ThTotal>{thTotalLabel}</ThTotal>
             <th></th>
-            <th>Total</th>
+            <ThTotal>{thTotalLabel}</ThTotal>
             <th>Nama Peserta</th>
             <th></th>
           </tr>
@@ -291,6 +292,10 @@ function ValidationIndicator({ position, isValid }) {
 
 const SectionTableContainer = styled.section`
   background-color: #ffffff;
+`;
+
+const ThTotal = styled.th`
+  white-space: nowrap;
 `;
 
 const BudrestNumberLabel = styled.div`
@@ -564,6 +569,17 @@ function _getBudrestNumber(row) {
   }
 
   return "-";
+}
+
+function _getTotalLabel(categoryDetails) {
+  if (!categoryDetails?.originalCategoryDetail?.competitionCategoryId) {
+    return "Total";
+  }
+  const TYPE_POINT = "Total Set Poin";
+  const TYPE_ACCUMULATION = "Total Skor";
+  return categoryDetails.originalCategoryDetail.competitionCategoryId.toLowerCase() === "compound"
+    ? TYPE_ACCUMULATION
+    : TYPE_POINT;
 }
 
 export { ScoringTable };

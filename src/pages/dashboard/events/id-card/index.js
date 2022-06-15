@@ -92,7 +92,7 @@ function PageEventIdCard() {
 
       if (result.success) {
         // Kalau belum ada data template tapi dapatnya objek kosongan
-        if (!result.data.id) {
+        if (!result?.data?.id) {
           setEditorData({
             ...defaultEditorData,
           });

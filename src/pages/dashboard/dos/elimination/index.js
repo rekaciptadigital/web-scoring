@@ -69,6 +69,7 @@ function PageDosElimination() {
     );
   }
 
+
   return (
     <ContentLayoutWrapper {...propsContentWrapper}>
       <ProcessingToast />
@@ -155,10 +156,10 @@ function PageDosElimination() {
       </ViewWrapper>
       
       <ButtonShowBracket
-        categoryDetailId={activeCategoryDetail?.categoryDetailId}
-        // eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
+      categoryDetailId={activeCategoryDetail?.categoryDetailId}
+      // eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
       />
-
+      
     </ContentLayoutWrapper>
   );
 }

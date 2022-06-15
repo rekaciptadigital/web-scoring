@@ -107,7 +107,7 @@ const CardMenuProfileContainer = styled(Card)`
   }
 `;
 
-function CardRingkasanDos() {
+function CardRingkasanDos({eventName}) {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const dispatch = useDispatch();
 
@@ -135,7 +135,7 @@ function CardRingkasanDos() {
                         <h4 className="mt-1 title-banner">Ringkasan Pertandingan DOS</h4>
                         
                         <p className="mt-2 d-flex flex-column text-banner">
-                        <span>Lihat ringkasan pertandingan untuk DOS (Director of Shooting) pada event <b>PRO Jakarta Open 2022.</b> Anda dapat melihat:</span>
+                        <span>Lihat ringkasan pertandingan untuk DOS (Director of Shooting) pada event <b>{eventName}.</b> Anda dapat melihat:</span>
                         <span>1. Jadwal Pertandingan.</span>
                         <span>2. Ringkasan pertadingan peserta pada kualifikasi dan eliminasi.</span>
                         </p>

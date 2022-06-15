@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { DosService } from "services";
+import { DosService, EventsService } from "services";
 import MetaTags from "react-meta-tags";
 import { Container, Row, Col } from "reactstrap";
 import { CardEventDos, CardRingkasanDos, CardSchedule } from "./components";
@@ -9,6 +9,7 @@ import { CardEventDos, CardRingkasanDos, CardSchedule } from "./components";
 const DashboardDos = () => {
     const { event_id } = useParams();
     const [data, setData] = React.useState([]);
+    const [eventDetail, setEventDetail] = React.useState([]);
 
     React.useEffect(() => {
   
@@ -26,8 +27,19 @@ const DashboardDos = () => {
             });
         }
       }
+      
+      const getEventDetail = async () => {
+        const { message, errors, data } = await EventsService.getEventById({
+          id: event_id,
+        });
+        if (data) {
+          setEventDetail(data);
+        } else console.log(message);
+        console.log(errors);
+      };
 
       getDosData();
+      getEventDetail();
     }, [event_id]);
 
     return (
@@ -47,9 +59,11 @@ const DashboardDos = () => {
           </Col>
 
           <Col md={6}>
-            <CardRingkasanDos/>  
-            {data?.dataDos && data?.dataDos.length > 0 ? (
-              <CardSchedule cardData={data?.dataDos}/>
+            {eventDetail?.publicInformation?.eventName && (
+              <CardRingkasanDos eventName={eventDetail?.publicInformation?.eventName}/>  
+            )}
+            {eventDetail?.publicInformation?.eventName && data?.dataDos && data?.dataDos.length > 0 ? (
+              <CardSchedule cardData={data?.dataDos} eventName={eventDetail?.publicInformation?.eventName} />
             ) : <p>Loading ...</p>}
           </Col>
         </Row>

@@ -112,7 +112,7 @@ overflow-y: auto:
   }
 `;
 
-function CardSchedule(cardData) {
+function CardSchedule(cardData, {eventName}) {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const dispatch = useDispatch();
 
@@ -146,7 +146,7 @@ function CardSchedule(cardData) {
                   </Row>
 
                   <Row>
-                    <p className="d-flex flex-column text-banner">Berikut adalah kategori perlombaan yang dipertandingkan pada event <b>PRO Jakarta Open 2022,</b> antara lain:</p>
+                    <p className="d-flex flex-column text-banner">Berikut adalah kategori perlombaan yang dipertandingkan pada event <b>{eventName},</b> antara lain:</p>
                         {cardData?.cardData.map((item) => (
                           <>
                             <div className="content-scroll">

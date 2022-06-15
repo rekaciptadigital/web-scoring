@@ -265,26 +265,16 @@ function PageEventScoringQualification() {
                 </ButtonConfirmWarning>
               ) : (
                 <ButtonConfirmPrompt
-                  customButton={ButtonBlue}
-                  messagePrompt="Anda akan menentukan pemeringkatan eliminasi"
-                  messageDescription={
-                    <React.Fragment>
-                      Jumlah peserta dan data yang telah ditentukan tidak dapat diubah kembali.
-                      Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.
-                    </React.Fragment>
-                  }
-                  buttonCancelLabel="Batalkan"
-                  buttonConfirmLabel="Iya, Tentukan Eliminasi"
+                  title="Tentukan bagan eliminasi"
                   onConfirm={() => {
                     setElimination(localCountNumber, {
                       onSuccess: () => {
+                        toast.success("Bagan eliminasi selesai");
                         fetchCategoryDetails();
                       },
                     });
                   }}
-                >
-                  Lanjut ke Eliminasi
-                </ButtonConfirmPrompt>
+                />
               )}
             </HorizontalSpaced>
           </ToolbarRight>

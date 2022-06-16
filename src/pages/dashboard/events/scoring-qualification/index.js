@@ -191,7 +191,7 @@ function PageEventScoringQualification() {
             </CategoryFilter>
           </FilterBars>
 
-          <ToolbarRight>
+          <ToolbarRight key={activeCategoryDetail?.categoryDetailId}>
             <HorizontalSpaced>
               <SelectEliminationCounts>
                 <label htmlFor="elimination-members-count">Babak Eliminasi</label>
@@ -239,6 +239,7 @@ function PageEventScoringQualification() {
 
             <HorizontalSpaced>
               <ButtonOutlineBlue
+                disabled={activeCategoryDetail?.isTeam}
                 onClick={() => {
                   toast.loading("Sedang menyiapkan dokumen scoresheet...");
                   handleDownloadScoresheet({

@@ -126,6 +126,7 @@ function CardSchedule(cardData, {eventName}) {
     getUser();
   }, []);
 
+  console.log(eventName, 'ratata');
   return (
     <>
     <CardMenuProfileContainer>

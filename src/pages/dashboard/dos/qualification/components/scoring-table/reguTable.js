@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
 import { LoadingScreen, SpinnerDotBlock } from "components/ma";
 
-function ScoringTable({
+function ScoringTeamTable({
   categoryDetailId,
   eliminationParticipantsCount,
   searchName,
@@ -39,7 +39,7 @@ function ScoringTable({
             <thead>
               <tr>
                 <th>Peringkat</th>
-                <th className="name">Nama Peserta</th>
+                <th className="name">Nama Tim</th>
                 <th className="name">Nama Klub</th>
                 <SessionStatsColumnHeadingGroup
                   sessionList={sessionNumbersList}
@@ -52,7 +52,7 @@ function ScoringTable({
               {scoringMembers?.map((row) => {
                 return (
                   <tr
-                    key={row?.member?.id}
+                    key={row?.clubId}
                   >
                     <td>
                       {row?.rank || (
@@ -63,7 +63,7 @@ function ScoringTable({
                         </GrayedOutText>
                       )}
                     </td>
-                    <td className="name">{row?.member?.name}</td>
+                    <td className="name">{row?.team}</td>
                     <td className="name">
                       <ClubName>{row?.clubName}</ClubName>
                     </td>
@@ -102,11 +102,6 @@ function SessionStatsColumnHeadingGroup({ sessionList }) {
 
   return (
     <React.Fragment>
-      {sessionList.map((sessionNumber) => (
-        <th key={sessionNumber} className="stats">
-          Sesi {sessionNumber}
-        </th>
-      ))}
       <th className="stats">Total</th>
       <th className="stats">X</th>
       <th className="stats">X+10</th>
@@ -252,4 +247,4 @@ const LoadingContainer = styled.div`
   background-color: rgba(255, 255, 255, 0.6);
 `;
 
-export { ScoringTable };
+export { ScoringTeamTable };

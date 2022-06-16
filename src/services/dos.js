@@ -19,5 +19,8 @@ export default {
     const qs = { event_category_id };
     return API.get("/web/v1/dashboard-dos/download-elimination", qs);
   },
+  getDosQualification(qs) {
+    return API.get("/web/v1/dashboard-dos/scorer-qualification", qs);
+  }
 
 };

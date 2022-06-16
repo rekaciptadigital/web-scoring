@@ -4,7 +4,12 @@ import { DosService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
-function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationParticipantsCount) {
+function useScoringMembers(
+  categoryDetailId,
+  inputSearchQuery,
+  eliminationParticipantsCount,
+  isTeam = false
+) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
 
@@ -13,10 +18,11 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
       return DosService.getQualificationMembersV2({
         event_category_id: categoryDetailId,
         name: debouncedSearchQuery || undefined,
-        elimination_template: eliminationParticipantsCount,
       });
     };
-    fetcher.runAsync(getFunction, { transform });
+    fetcher.runAsync(getFunction, {
+      transform: (data) => mapIsPresent(data, isTeam),
+    });
   };
 
   React.useEffect(() => {
@@ -39,9 +45,16 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
     if (!fetcher.data?.length) {
       return null;
     }
-    return Object.keys(fetcher.data[0].sessions)
+    if (isTeam) {
+      return Object.keys(fetcher?.data[0])
+      .map((key) => parseInt(key))
+      // .filter((sessionNumber) => sessionNumber !== 11);
+    } else if (!isTeam) {
+      console.log(isTeam, 'nilai');
+      return Object.keys(fetcher?.data[0]?.sessions)
       .map((key) => parseInt(key))
       .filter((sessionNumber) => sessionNumber !== 11);
+    }
   };
 
   return {
@@ -52,7 +65,10 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
   };
 }
 
-function transform(initialScoringMembers) {
+function mapIsPresent(initialScoringMembers, isTeam = false) {
+  if (isTeam) {
+    return initialScoringMembers;
+  }
   return initialScoringMembers.map((row) => ({
     ...row,
     member: {

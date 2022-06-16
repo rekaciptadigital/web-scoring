@@ -17,6 +17,7 @@ import { ProcessingToast, toast } from "./components/processing-toast";
 import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
+import { ScoringTeamTable } from "./components/scoring-table/reguTable";
 
 function PageDosQualification() {
   const { event_id, date_event } = useParams();
@@ -72,6 +73,8 @@ function PageDosQualification() {
       </ContentLayoutWrapper>
     );
   }
+
+  console.log(activeCategoryDetail?.isTeam, 'ratata');
 
   return (
     <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
@@ -166,14 +169,26 @@ function PageDosQualification() {
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
-
+              
+      {activeCategoryDetail?.isTeam == true ? (
+        <ScoringTeamTable
+        key={activeCategoryDetail?.categoryDetailId}
+        categoryDetailId={activeCategoryDetail?.categoryDetailId}
+        searchName={inputSearchQuery}
+        onChangeParticipantPresence={resetOnChangeCategory}
+        eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+        isTeam={activeCategoryDetail?.isTeam}
+      />
+      ) : (
         <ScoringTable
           key={activeCategoryDetail?.categoryDetailId}
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
           searchName={inputSearchQuery}
           onChangeParticipantPresence={resetOnChangeCategory}
           eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+          isTeam={activeCategoryDetail?.isTeam}
         />
+      )}
       </ViewWrapper>
     </ContentLayoutWrapper>
   );

@@ -7,6 +7,7 @@ import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreTeam } from "./button-edit-score-line-team";
 import { ButtonSetWinner } from "./button-set-winner";
+import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
@@ -165,7 +166,8 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                     <HeadToHeadScoreLabels>
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": team1?.adminTotal > team2?.adminTotal,
+                          "score-label-higher":
+                            team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
                         })}
                       >
                         {team1?.adminTotal || 0}
@@ -175,7 +177,8 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
 
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": team2?.adminTotal > team1?.adminTotal,
+                          "score-label-higher":
+                            team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
                         })}
                       >
                         {team2?.adminTotal || 0}
@@ -250,8 +253,11 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                       />
                     )}
 
-                    {/* TODO: */}
-                    {/* <ButtonDownloadScoresheet disabled={noData} scoring={scoring} /> */}
+                    <ButtonDownloadScoresheet
+                      disabled={noData}
+                      categoryId={categoryDetailId}
+                      scoring={scoring}
+                    />
                   </HorizontalSpaced>
                 </td>
               </tr>

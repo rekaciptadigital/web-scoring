@@ -3,7 +3,7 @@ import { ScoringService } from "services";
 
 import { urlUtil } from "utils";
 
-function useDownloadScoresheet({ eliminationId, round, match }) {
+function useDownloadScoresheet({ categoryId, eliminationId, round, match }) {
   const fetcher = useFetcher();
 
   const downloadScoresheet = async ({ onSuccess: consumerSuccessHandler, onError }) => {
@@ -14,6 +14,7 @@ function useDownloadScoresheet({ eliminationId, round, match }) {
 
     const getFunction = () => {
       return ScoringService.getScoresheetEliminationDownloadUrl({
+        category_id: categoryId,
         event_elimination_id: eliminationId,
         round: round,
         match: match,

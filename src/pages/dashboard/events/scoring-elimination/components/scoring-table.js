@@ -224,7 +224,11 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       />
                     )}
 
-                    <ButtonDownloadScoresheet disabled={noData} scoring={scoring} />
+                    <ButtonDownloadScoresheet
+                      disabled={noData}
+                      categoryId={categoryDetailId}
+                      scoring={scoring}
+                    />
                   </HorizontalSpaced>
                 </td>
               </tr>

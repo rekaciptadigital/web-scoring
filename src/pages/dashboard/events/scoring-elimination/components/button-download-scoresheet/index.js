@@ -8,8 +8,9 @@ import { toast } from "../processing-toast";
 import IconFile from "components/ma/icons/mono/file";
 import IconLoading from "./icon-loading";
 
-function ButtonDownloadScoresheet({ title = "Unduh scoresheet", disabled, scoring }) {
+function ButtonDownloadScoresheet({ title = "Unduh scoresheet", disabled, scoring, categoryId }) {
   const { downloadScoresheet, isLoading, isError, errors } = useDownloadScoresheet({
+    categoryId: categoryId,
     eliminationId: scoring.elimination_id,
     round: scoring.round,
     match: scoring.match,

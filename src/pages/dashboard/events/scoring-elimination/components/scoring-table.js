@@ -150,7 +150,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <HeadToHeadScoreLabels>
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": player1?.adminTotal > player2?.adminTotal,
+                          "score-label-higher":
+                            player1?.status === "win" || player1?.adminTotal > player2?.adminTotal,
                         })}
                       >
                         {player1?.adminTotal || 0}
@@ -160,7 +161,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
 
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": player2?.adminTotal > player1?.adminTotal,
+                          "score-label-higher":
+                            player2?.status === "win" || player2?.adminTotal > player1?.adminTotal,
                         })}
                       >
                         {player2?.adminTotal || 0}

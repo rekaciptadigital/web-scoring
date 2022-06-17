@@ -162,7 +162,7 @@ function CardEventDos(cardData) {
         <React.Fragment>
         <h4 className="mt-1">{item?.dateFormatted}</h4>
         <p className="mt-2 d-flex flex-column">
-        <span>Update Event event pertandingan untuk DOS</span>
+        <span>Update event pertandingan untuk DOS</span>
         </p>
         
         <div style={{ background: '#E7EDF6', padding: '20px', borderRadius: '8px' }}>

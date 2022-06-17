@@ -9,7 +9,7 @@ import {
   SeedItem as RBSeedItem,
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
-import { LoadingScreen, AlertSubmitError } from "components/ma";
+import { LoadingScreen } from "components/ma";
 
 // import IconBranch from "components/ma/icons/mono/branch";
 // import IconX from "components/ma/icons/mono/x";
@@ -22,8 +22,6 @@ function ButtonShowBracket({ categoryDetailId }) {
     data: bracketData,
     fetchEliminationTemplate,
     isLoading,
-    isError,
-    errors,
   } = useEliminationBracketTemplate(categoryDetailId);
 
   React.useEffect(() => {
@@ -37,7 +35,6 @@ function ButtonShowBracket({ categoryDetailId }) {
   return (
     <React.Fragment>
       <LoadingScreen loading={isLoading} />
-      <AlertSubmitError isError={isError} errors={errors} />
 
       {/* <ButtonYellow
         flexible

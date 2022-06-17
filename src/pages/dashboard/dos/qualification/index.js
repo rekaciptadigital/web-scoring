@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
+import { useSessionDownload } from "./hooks/download-session";
 
 import {
   SpinnerDotBlock,
@@ -18,6 +19,8 @@ import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
 import { ScoringTeamTable } from "./components/scoring-table/reguTable";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
+import { useSessionDownloadTwo } from "./hooks/download-session-two";
 
 function PageDosQualification() {
   const { event_id, date_event } = useParams();
@@ -43,8 +46,18 @@ function PageDosQualification() {
   const [session, setSession] = React.useState(1);
   const [onSessionOne, setOnSessionOne ] = React.useState(true);
   const [onSessionTwo, setOnSessionTwo ] = React.useState(false);
+  const [onAllSession, setOnAllSession] = React.useState(false);
+  const [menu, setMenu] = React.useState(false);
 
   const { handleDownloadScoresheet } = useScoresheetDownload(
+    activeCategoryDetail?.categoryDetailId
+  );
+
+  const { handleDownloadSession } = useSessionDownload(
+    activeCategoryDetail?.categoryDetailId
+  );
+
+  const { handleDownloadSessionTwo } = useSessionDownloadTwo(
     activeCategoryDetail?.categoryDetailId
   );
 
@@ -157,6 +170,7 @@ function PageDosQualification() {
                       onClick={() => {
                         setOnSessionOne(true);
                         setOnSessionTwo(false);
+                        setOnAllSession(false);
                         setSession(1);
                       }}
                     >
@@ -167,10 +181,22 @@ function PageDosQualification() {
                       onClick={() => {
                         setOnSessionTwo(true);
                         setOnSessionOne(false);
+                        setOnAllSession(false);
                         setSession(2);
                       }}
                     >
                       Sesi 2
+                    </FilterItemButton>
+                    <FilterItemButton
+                      className={classnames({ "filter-item-active": onAllSession })}
+                      onClick={() => {
+                        setOnSessionOne(false);
+                        setOnSessionTwo(false);
+                        setOnAllSession(true);
+                        setSession(0);
+                      }}
+                    >
+                      Semua Sesi
                     </FilterItemButton>
                   </FilterList>
             </CategoryFilter>
@@ -180,6 +206,7 @@ function PageDosQualification() {
 
           <ToolbarRight>
             <HorizontalSpaced>
+              {activeCategoryDetail?.isTeam == true ? (
               <ButtonOutlineBlue
                 onClick={() => {
                   toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
@@ -189,12 +216,65 @@ function PageDosQualification() {
                     },
                   });
                 }}
+                >
+                  <span>
+                    <IconDownload size="16" />
+                  </span>{" "}
+                  <span>Unduh Laporan</span>
+                </ButtonOutlineBlue>
+              ) : (
+              <Dropdown
+                isOpen={menu}
+                toggle={() => setMenu(!menu)}
               >
-                <span>
-                  <IconDownload size="16" />
-                </span>{" "}
-                <span>Unduh Laporan</span>
-              </ButtonOutlineBlue>
+                  <DropdownToggle tag="span">
+                    <ButtonOutlineBlue
+                    >
+                      <span>
+                        <IconDownload size="16" />
+                      </span>{" "}
+                      <span>Unduh Laporan</span>
+                      </ButtonOutlineBlue>
+                  </DropdownToggle>
+                  
+                  <DropdownMenu className="dropdown-menu-end">
+                    <DropdownItem tag="button" onClick={() => {
+                        toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
+                        handleDownloadSession({
+                          onSuccess() {
+                            toast.dismiss();
+                          },
+                        });
+                      }}>
+                          {" "}
+                          <span>Laporan Sesi I</span>
+                      </DropdownItem>
+                    <DropdownItem tag="button" onClick={() => {
+                        toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
+                        handleDownloadSessionTwo({
+                          onSuccess() {
+                            toast.dismiss();
+                          },
+                        });
+                      }}>
+                          {" "}
+                          <span>Laporan Sesi II</span>
+                      </DropdownItem>
+                      <DropdownItem tag="button" onClick={() => {
+                        toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
+                        handleDownloadScoresheet({
+                          onSuccess() {
+                            toast.dismiss();
+                          },
+                        });
+                      }}>
+                          {" "}
+                          <span>All Sesi</span>
+                      </DropdownItem>
+
+                  </DropdownMenu>
+                </Dropdown>
+                )}
 
             </HorizontalSpaced>
           </ToolbarRight>

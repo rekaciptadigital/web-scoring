@@ -7,8 +7,7 @@ export default {
   getQualificationMembersV2(qs) {
     return API.get("/web/v1/dashboard-dos/scorer-qualification", qs);
   },
-  getQualificationDownloadUrl({ event_category_id }) {
-    const qs = { event_category_id };
+  getQualificationDownloadUrl(qs) {
     return API.get("/web/v1/dashboard-dos/download-score-qualification", qs);
   },
   getEventEliminationTemplate(qs) {

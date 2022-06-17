@@ -51,7 +51,6 @@ function useScoringMembers(
       .map((key) => parseInt(key))
       // .filter((sessionNumber) => sessionNumber !== 11);
     } else if (!isTeam) {
-      console.log(isTeam, 'nilai');
       return Object.keys(fetcher?.data[0]?.sessions)
       .map((key) => parseInt(key))
       .filter((sessionNumber) => sessionNumber !== 11);

@@ -29,8 +29,6 @@ function ScoringTable({
     return <EmptyMembers>Tidak ada peserta di kategori ini</EmptyMembers>;
   }
 
-  console.log(session, 'resession');
-
   return (
     <React.Fragment>
       <LoadingScreen />

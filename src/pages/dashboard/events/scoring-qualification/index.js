@@ -18,6 +18,7 @@ import {
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
+import { ScoringTableTeam } from "./components/scoring-table-team";
 import { SearchBox } from "./components/search-box";
 import { ProcessingToast, toast } from "./components/processing-toast";
 import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
@@ -30,9 +31,9 @@ import IconDownload from "components/ma/icons/mono/download";
 import classnames from "classnames";
 
 const optionsParticipantsCount = [
-  { value: 8, label: 8 },
-  { value: 16, label: 16 },
-  { value: 32, label: 32 },
+  { value: 8, label: "8 Besar" },
+  { value: 16, label: "16 Besar" },
+  { value: 32, label: "32 Besar" },
 ];
 
 function _getSelectedFromValue(countValue) {
@@ -190,10 +191,10 @@ function PageEventScoringQualification() {
             </CategoryFilter>
           </FilterBars>
 
-          <ToolbarRight>
+          <ToolbarRight key={activeCategoryDetail?.categoryDetailId}>
             <HorizontalSpaced>
               <SelectEliminationCounts>
-                <label htmlFor="elimination-members-count">Peserta Eliminasi</label>
+                <label htmlFor="elimination-members-count">Babak Eliminasi</label>
                 <Select
                   placeholder="Pilih jumlah"
                   options={optionsParticipantsCount}
@@ -238,6 +239,7 @@ function PageEventScoringQualification() {
 
             <HorizontalSpaced>
               <ButtonOutlineBlue
+                disabled={activeCategoryDetail?.isTeam}
                 onClick={() => {
                   toast.loading("Sedang menyiapkan dokumen scoresheet...");
                   handleDownloadScoresheet({
@@ -253,45 +255,51 @@ function PageEventScoringQualification() {
                 <span>Unduh Dokumen</span>
               </ButtonOutlineBlue>
 
+              {/* TODO: 2x munculkan modal warning ketika mau set eliminasi */}
               {activeCategoryDetail?.eliminationLock ? (
                 <ButtonConfirmWarning
                   customButton={ButtonBlue}
                   messagePrompt="Pemeringkatan eliminasi sudah ditentukan"
                   buttonConfirmLabel="Tutup"
                 >
-                  Tentukan Eliminasi
+                  Lanjut ke Eliminasi
                 </ButtonConfirmWarning>
               ) : (
                 <ButtonConfirmPrompt
-                  customButton={ButtonBlue}
-                  messagePrompt="Anda akan menentukan pemeringkatan eliminasi"
-                  messageDescription={
-                    <React.Fragment>
-                      Jumlah peserta dan data yang telah ditentukan tidak dapat diubah kembali.
-                      Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.
-                    </React.Fragment>
-                  }
-                  buttonCancelLabel="Batalkan"
-                  buttonConfirmLabel="Iya, Tentukan Eliminasi"
+                  title="Tentukan bagan eliminasi"
                   onConfirm={() => {
-                    setElimination(localCountNumber, { onSuccess() {} });
+                    setElimination(localCountNumber, {
+                      onSuccess: () => {
+                        toast.success("Bagan eliminasi selesai");
+                        fetchCategoryDetails();
+                      },
+                    });
                   }}
-                >
-                  Tentukan Eliminasi
-                </ButtonConfirmPrompt>
+                />
               )}
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
 
-        <ScoringTable
-          key={activeCategoryDetail?.categoryDetailId}
-          categoryDetailId={activeCategoryDetail?.categoryDetailId}
-          isLocked={!activeCategoryDetail || activeCategoryDetail?.eliminationLock}
-          searchName={inputSearchQuery}
-          onChangeParticipantPresence={resetOnChangeCategory}
-          eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
-        />
+        {activeCategoryDetail &&
+          (activeCategoryDetail.isTeam ? (
+            <ScoringTableTeam
+              key={_makeTableKeyByCategory(activeCategoryDetail)}
+              categoryDetailId={activeCategoryDetail?.categoryDetailId}
+              searchName={inputSearchQuery}
+              onChangeParticipantPresence={resetOnChangeCategory}
+              eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+            />
+          ) : (
+            <ScoringTable
+              key={_makeTableKeyByCategory(activeCategoryDetail)}
+              categoryDetailId={activeCategoryDetail?.categoryDetailId}
+              isLocked={!activeCategoryDetail || activeCategoryDetail?.eliminationLock}
+              searchName={inputSearchQuery}
+              onChangeParticipantPresence={resetOnChangeCategory}
+              eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+            />
+          ))}
       </ViewWrapper>
     </ContentLayoutWrapper>
   );
@@ -365,7 +373,7 @@ const TabButton = styled.button`
 
 const ToolbarTop = styled.div`
   display: flex;
-  gap: 1.5rem;
+  gap: 1.5rem 2.25rem;
 
   > *:nth-child(1) {
     flex-grow: 1;
@@ -391,12 +399,13 @@ const ToolbarRight = styled.div`
 
 const SelectEliminationCounts = styled.div`
   position: relative;
+  min-width: 7.5rem;
 `;
 
 const AppliedIconWrapper = styled.div`
   position: absolute;
   bottom: 0.5rem;
-  left: -2rem;
+  left: -1.5rem;
 `;
 
 const HorizontalSpaced = styled.div`
@@ -468,5 +477,15 @@ const FilterItemButton = styled.button`
     background-color: var(--ma-primary-blue-50);
   }
 `;
+
+/* ================================ */
+// utils
+
+function _makeTableKeyByCategory(activeCategoryDetail) {
+  if (!activeCategoryDetail) {
+    return "default-key";
+  }
+  return activeCategoryDetail.categoryDetailId;
+}
 
 export default PageEventScoringQualification;

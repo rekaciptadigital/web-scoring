@@ -5,9 +5,9 @@ import { useEliminationMatches } from "../hooks/elimination-matches";
 import { SpinnerDotBlock } from "components/ma";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
-import { ButtonEditScoreLine } from "./button-edit-score-line";
-import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
+import { ButtonEditScoreTeam } from "./button-edit-score-line-team";
 import { ButtonSetWinner } from "./button-set-winner";
+import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
@@ -16,7 +16,7 @@ import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracke
 
 import classnames from "classnames";
 
-function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
+function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
   const { isError, data, fetchEliminationMatches } = useEliminationMatches(
     categoryDetailId,
     eliminationMemberCounts
@@ -36,7 +36,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
   // Tabel dirender sebagai "state kosong" ketika:
   // 1. belum menentukan jumlah peserta eliminasi di page skoring kualifikasi (belum ada ID eliminasi/`eliminationId`)
   // 2. belum menentukan bagan eliminasi (terlempar error)
-  if (!data?.eliminationId) {
+  if (!data?.eliminationGroupId) {
     return (
       <SectionTableContainer>
         <EmptyBracketContainer>
@@ -71,35 +71,40 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
         <thead>
           <tr>
             <th>Bantalan</th>
-            <th>Nama Peserta</th>
+            <th>Tim</th>
             <ThTotal>{thTotalLabel}</ThTotal>
             <th></th>
             <ThTotal>{thTotalLabel}</ThTotal>
-            <th>Nama Peserta</th>
+            <th>Tim</th>
             <th></th>
           </tr>
         </thead>
 
         <tbody key={selectedTab}>
           {currentRows.map((row, index) => {
-            const player1 = row.teams[0];
-            const player2 = row.teams[1];
+            const team1 = row.teams[0];
+            const team2 = row.teams[1];
 
             const roundNumber = selectedTab + 1;
             const matchNumber = index + 1;
-            const code = `2-${data.eliminationId}-${matchNumber}-${roundNumber}`;
+
+            const code = `2-${data?.eliminationGroupId}-${matchNumber}-${roundNumber}-t`;
 
             const scoring = {
               code: code,
-              elimination_id: data.eliminationId,
+              elimination_id: data?.eliminationGroupId,
               round: roundNumber,
               match: matchNumber,
             };
 
             const isBye =
               row.teams.some((team) => team.status === "bye") ||
-              (roundNumber === 1 && row.teams.every((team) => !team.name));
-            const noData = !player1?.name || !player2?.name;
+              (roundNumber === 1 && row.teams.every((team) => !team.teamName));
+            const noData =
+              !team1?.teamName ||
+              !team2?.teamName ||
+              !team1?.memberTeam?.length ||
+              !team2?.memberTeam?.length;
             const hasWinner = row.teams.some((team) => team.win === 1);
             const budrestNumber = _getBudrestNumber(row);
 
@@ -111,7 +116,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                   ) : (
                     <BudrestInputAsync
                       categoryId={categoryDetailId}
-                      playerDetail={player1 || player2}
+                      playerDetail={team1 || team2}
                       disabled={hasWinner || noData}
                       scoring={scoring}
                       onSuccess={fetchEliminationMatches}
@@ -122,8 +127,19 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerLeft>
                     <PlayerNameData>
-                      {player1?.potition && <RankLabel>#{player1?.potition || "-"}</RankLabel>}
-                      <NameLabel>{player1?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
+                      {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
+                      <div>
+                        <TeamNameLabel>
+                          {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                        </TeamNameLabel>
+                        {Boolean(team1?.memberTeam?.length) && (
+                          <MembersList>
+                            {team1.memberTeam.map((member) => (
+                              <li key={member.memberId}>{member.name}</li>
+                            ))}
+                          </MembersList>
+                        )}
+                      </div>
                     </PlayerNameData>
                   </PlayerLabelContainerLeft>
                 </td>
@@ -131,11 +147,11 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   {!noData && !hasWinner ? (
                     <InlineScoreInput>
-                      <ValidationIndicator position="left" isValid={player1?.isDifferent !== 1} />
+                      <ValidationIndicator position="left" isValid={team1?.isDifferent !== 1} />
                       <TotalInputAsync
                         categoryId={categoryDetailId}
-                        playerDetail={player1}
-                        disabled={hasWinner || !player1?.name}
+                        playerDetail={team1}
+                        disabled={hasWinner || !team1?.teamName}
                         scoring={scoring}
                         onSuccess={fetchEliminationMatches}
                       />
@@ -151,10 +167,10 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       <ScoreTotalLabel
                         className={classnames({
                           "score-label-higher":
-                            player1?.status === "win" || player1?.adminTotal > player2?.adminTotal,
+                            team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
                         })}
                       >
-                        {player1?.adminTotal || 0}
+                        {team1?.adminTotal || 0}
                       </ScoreTotalLabel>
 
                       <span>&ndash;</span>
@@ -162,10 +178,10 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       <ScoreTotalLabel
                         className={classnames({
                           "score-label-higher":
-                            player2?.status === "win" || player2?.adminTotal > player1?.adminTotal,
+                            team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
                         })}
                       >
-                        {player2?.adminTotal || 0}
+                        {team2?.adminTotal || 0}
                       </ScoreTotalLabel>
                     </HeadToHeadScoreLabels>
                   )}
@@ -176,12 +192,12 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <InlineScoreInput>
                       <TotalInputAsync
                         categoryId={categoryDetailId}
-                        playerDetail={player2}
-                        disabled={hasWinner || !player2?.name}
+                        playerDetail={team2}
+                        disabled={hasWinner || !team2?.teamName}
                         scoring={scoring}
                         onSuccess={fetchEliminationMatches}
                       />
-                      <ValidationIndicator position="right" isValid={player2?.isDifferent !== 1} />
+                      <ValidationIndicator position="right" isValid={team2?.isDifferent !== 1} />
                     </InlineScoreInput>
                   ) : (
                     <NoArcherWrapper>-</NoArcherWrapper>
@@ -191,8 +207,19 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerRight>
                     <PlayerNameData>
-                      {player2?.potition && <RankLabel>#{player2?.potition || "-"}</RankLabel>}
-                      <NameLabel>{player2?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
+                      {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
+                      <div>
+                        <TeamNameLabel>
+                          {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                        </TeamNameLabel>
+                        {Boolean(team2?.memberTeam?.length) && (
+                          <MembersList>
+                            {team2.memberTeam.map((member) => (
+                              <li key={member.memberId}>{member.name}</li>
+                            ))}
+                          </MembersList>
+                        )}
+                      </div>
                     </PlayerNameData>
                   </PlayerLabelContainerRight>
                 </td>
@@ -207,8 +234,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                             : "Tentukan pemenang untuk match ini"
                         }
                         disabled={noData}
-                        scoring={scoring}
                         categoryId={categoryDetailId}
+                        scoring={scoring}
                         onSuccess={fetchEliminationMatches}
                       >
                         Tentukan
@@ -216,7 +243,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     )}
 
                     {!hasWinner && !isBye && (
-                      <ButtonEditScoreLine
+                      <ButtonEditScoreTeam
                         disabled={noData}
                         headerInfo={row}
                         budrestNumber={budrestNumber}
@@ -261,11 +288,11 @@ function StagesTabs({ labels, currentTab, onChange }) {
   );
 }
 
-function NoArcherLabel({ isBye }) {
+function NoArcherTeamLabel({ isBye }) {
   if (isBye) {
     return <NoArcherWrapper>&#171; bye &#187;</NoArcherWrapper>;
   }
-  return <NoArcherWrapper>&#171; Belum ada archer &#187;</NoArcherWrapper>;
+  return <NoArcherWrapper>&#171; Belum ada tim &#187;</NoArcherWrapper>;
 }
 
 function ValidationIndicator({ position, isValid }) {
@@ -481,7 +508,7 @@ const PlayerLabelContainerRight = styled.div`
 
 const PlayerNameData = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   align-items: center;
 `;
 
@@ -493,9 +520,17 @@ const RankLabel = styled.div`
   font-weight: 600;
 `;
 
-const NameLabel = styled.div`
+const TeamNameLabel = styled.div`
   font-weight: 600;
   text-align: left;
+`;
+
+const MembersList = styled.ol`
+  margin: 0;
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  text-align: left;
+  font-size: 0.625rem;
 `;
 
 const NoArcherWrapper = styled.div`
@@ -505,6 +540,7 @@ const NoArcherWrapper = styled.div`
   text-align: center;
   vertical-align: middle;
   width: 100%;
+  min-height: 4.625rem;
   color: var(--ma-gray-400);
 `;
 
@@ -588,4 +624,4 @@ function _getTotalLabel(categoryDetails) {
     : TYPE_POINT;
 }
 
-export { ScoringTable };
+export { ScoringTableTeam };

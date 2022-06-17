@@ -11,8 +11,12 @@ export default {
     const qs = { event_category_id };
     return API.get("/web/v1/archery-score-sheet/download", qs);
   },
-  getScoresheetEliminationDownloadUrl({ event_elimination_id, round, match }) {
-    const qs = { event_elimination_id, round, match };
+
+  /**
+   * @param {Object} queryString { event_elimination_id, category_id, round, match }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getScoresheetEliminationDownloadUrl(qs) {
     return API.get("/web/v1/archery-score-sheet/score-sheet-elimination", qs);
   },
 
@@ -56,7 +60,7 @@ export default {
 
   /**
    *
-   * @param {Object} queryString  { elimination_id, round, match }
+   * @param {Object} queryString  { elimination_id, category_id, round, match }
    * @returns {Promise} { success, data, errors, message }
    */
   saveScorePermanent(data = null) {

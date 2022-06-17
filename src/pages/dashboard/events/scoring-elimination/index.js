@@ -10,6 +10,7 @@ import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ProcessingToast } from "./components/processing-toast";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 import { ScoringTable } from "./components/scoring-table";
+import { ScoringTableTeam } from "./components/scoring-table-team";
 
 import classnames from "classnames";
 
@@ -56,6 +57,7 @@ function PageEventScoringElimination() {
     );
   }
 
+  // TODO: loading ganti ketika belum settle filter, enggak lagi ke fetch detail
   if (!isSettledCategories) {
     return (
       <ContentLayoutWrapper {...propsContentWrapper}>
@@ -138,12 +140,22 @@ function PageEventScoringElimination() {
         </ToolbarTop>
       </ViewWrapper>
 
-      <ScoringTable
-        key={activeCategoryDetail?.categoryDetailId}
-        categoryDetailId={activeCategoryDetail?.categoryDetailId}
-        categoryDetails={activeCategoryDetail}
-        eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
-      />
+      {activeCategoryDetail &&
+        (activeCategoryDetail.isTeam ? (
+          <ScoringTableTeam
+            key={activeCategoryDetail?.categoryDetailId}
+            categoryDetailId={activeCategoryDetail?.categoryDetailId}
+            categoryDetails={activeCategoryDetail}
+            eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
+          />
+        ) : (
+          <ScoringTable
+            key={activeCategoryDetail?.categoryDetailId}
+            categoryDetailId={activeCategoryDetail?.categoryDetailId}
+            categoryDetails={activeCategoryDetail}
+            eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
+          />
+        ))}
     </ContentLayoutWrapper>
   );
 }

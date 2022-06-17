@@ -180,10 +180,6 @@ function _runCategoriesGrouping(categoryDetailsSortedByID) {
     const classCategory = categoryDetail.classCategory;
     const genderCategory = categoryDetail.teamCategoryId;
 
-    if (genderCategory !== "individu male" && genderCategory !== "individu female") {
-      return groupingResult;
-    }
-
     if (!groupingResult[competitionCategoryId]) {
       groupingResult[competitionCategoryId] = {};
     }
@@ -195,6 +191,7 @@ function _runCategoriesGrouping(categoryDetailsSortedByID) {
     groupingResult[competitionCategoryId][classCategory][genderCategory] = {
       originalCategoryDetail: categoryDetail,
       categoryDetailId: categoryDetail.id,
+      isTeam: categoryDetail.categoryTeam?.toLowerCase?.() === "team",
       teamCategoryLabel: _getTeamLabelFromCategoryLabel(categoryDetail.labelCategory),
       quota: categoryDetail.quota,
       totalParticipant: categoryDetail.totalParticipant,
@@ -219,6 +216,10 @@ function _makeOptionsCompetitionCategory(groupedCategoryDetails, activeCompetiti
   }));
 }
 
+/**
+ * Struktur untuk filter yang atas:
+ * [U-15 - 70m] [U-15 - 40m] [...] ...dst
+ */
 function _makeOptionsAgeCategory(
   groupedCategoryDetails,
   activeCompetitionCategory,
@@ -233,6 +234,10 @@ function _makeOptionsAgeCategory(
   }));
 }
 
+/**
+ * Struktur untuk filter yang bawah:
+ * [Individu Putra] [Individu Putri] [Beregu Putra] [Beregu Putri] [Beregu Campuran]
+ */
 function _makeOptionsGenderCategory(
   groupedCategoryDetails,
   activeCompetitionCategory,
@@ -244,7 +249,14 @@ function _makeOptionsGenderCategory(
   }
   return Object.keys(groupedCategoryDetails[activeCompetitionCategory][activeAgeCategory]).map(
     (teamCategoryId) => {
-      const labels = { "individu male": "Individu Putra", "individu female": "Individu Putri" };
+      const labels = {
+        "individu male": "Individu Putra",
+        "individu female": "Individu Putri",
+        male_team: "Beregu Putra",
+        female_team: "Beregu Putri",
+        mix_team: "Beregu Campuran",
+      };
+
       return {
         genderCategory: teamCategoryId,
         genderCategoryLabel: labels[teamCategoryId],

@@ -28,7 +28,7 @@ import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
-function ButtonEditScoreLine({
+function ButtonEditScoreTeam({
   disabled,
   scoring,
   headerInfo,
@@ -129,7 +129,7 @@ function ModalEditor({
     errors: errorsSubmitingTotalP1,
   } = useSubmitAdminTotal({
     categoryId: categoryDetails.categoryDetailId,
-    memberId: player1?.participant.member.id,
+    participantId: player1?.teamDetail.participantId,
     eliminationId: scoring?.elimination_id,
     round: scoring.round,
     match: scoring.match,
@@ -142,7 +142,7 @@ function ModalEditor({
     errors: errorsSubmitingTotalP2,
   } = useSubmitAdminTotal({
     categoryId: categoryDetails.categoryDetailId,
-    memberId: player2?.participant.member.id,
+    participantId: player2?.teamDetail.participantId,
     eliminationId: scoring?.elimination_id,
     round: scoring.round,
     match: scoring.match,
@@ -190,12 +190,22 @@ function ModalEditor({
 
               <PlayerLabelContainerLeft>
                 <PlayerNameData>
-                  <RankLabel>
-                    #{headerPlayer1?.potition || headerPlayer1?.postition || "-"}
-                  </RankLabel>
-                  <NameLabel>
-                    {player1?.participant.member.name || headerPlayer1?.name || "-"}
-                  </NameLabel>
+                  <RankLabel>#{headerPlayer1?.potition || "-"}</RankLabel>
+
+                  <div>
+                    <TeamNameLabel>
+                      {player1?.teamDetail.teamName ||
+                        headerPlayer1?.teamName ||
+                        "Nama tim tidak tersedia"}
+                    </TeamNameLabel>
+                    {Boolean(player1?.listMember?.length) && (
+                      <MembersList>
+                        {player1.listMember.map((member) => (
+                          <li key={member.memberId}>{member.name}</li>
+                        ))}
+                      </MembersList>
+                    )}
+                  </div>
                 </PlayerNameData>
               </PlayerLabelContainerLeft>
 
@@ -277,14 +287,22 @@ function ModalEditor({
 
               <PlayerLabelContainerRight>
                 <PlayerNameData>
-                  <RankLabel>
-                    #{headerPlayer2?.potition || headerPlayer2?.postition || "-"}
-                  </RankLabel>
-                  <NameLabel>
-                    {player2?.participant.member.name ||
-                      headerPlayer2?.name ||
-                      "Nama archer tidak tersedia"}
-                  </NameLabel>
+                  <RankLabel>#{headerPlayer2?.potition || "-"}</RankLabel>
+
+                  <div>
+                    <TeamNameLabel>
+                      {player2?.teamDetail.teamName ||
+                        headerPlayer2?.teamName ||
+                        "Nama tim tidak tersedia"}
+                    </TeamNameLabel>
+                    {Boolean(player2?.listMember?.length) && (
+                      <MembersList>
+                        {player2.listMember.map((member) => (
+                          <li key={member.memberId}>{member.name}</li>
+                        ))}
+                      </MembersList>
+                    )}
+                  </div>
                 </PlayerNameData>
               </PlayerLabelContainerRight>
             </ScoresheetHeader>
@@ -374,12 +392,12 @@ function ModalEditor({
                   if (isDirtyTotalP2) {
                     submitAdminTotalP2(adminTotalP2, {
                       onSuccess: () => {
-                        toast.success("Total archer 2 berhasil disimpan");
+                        toast.success("Total tim 2 berhasil disimpan");
                         savingTotal2.done();
                         shouldRefetch.current = true;
                       },
                       onError: () => {
-                        toast.error("Gagal menyimpan total archer 2");
+                        toast.error("Gagal menyimpan total tim 2");
                         savingTotal2.done();
                       },
                     });
@@ -388,6 +406,7 @@ function ModalEditor({
                     savingTotal2.done();
                   }
 
+                  // 3.
                   const payload = {
                     save_permanent: 0,
                     ...scoring,
@@ -452,7 +471,7 @@ const BodyWrapper = styled.div`
 
 const Modal = styled(BSModal)`
   position: relative;
-  max-width: 56.25rem;
+  max-width: 62rem;
 `;
 
 const ModalHeaderBar = styled.div`
@@ -494,18 +513,18 @@ const BudrestNumberLabel = styled.div`
 
 const PlayerLabelContainerLeft = styled.div`
   flex-grow: 1;
-  margin-right: 2rem;
+  margin-right: 1rem;
 `;
 
 const PlayerLabelContainerRight = styled.div`
   flex-grow: 1;
-  margin-left: 2rem;
+  margin-left: 1rem;
 `;
 
 const PlayerNameData = styled.div`
-  min-width: 11rem;
+  min-width: 12rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   align-items: center;
 `;
 
@@ -519,10 +538,18 @@ const RankLabel = styled.span`
   text-align: center;
 `;
 
-const NameLabel = styled.span`
+const TeamNameLabel = styled.span`
   display: block;
   font-weight: 600;
   text-align: left;
+`;
+
+const MembersList = styled.ol`
+  margin: 0;
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  text-align: left;
+  font-size: 0.625rem;
 `;
 
 const HeadToHeadScores = styled.div`
@@ -642,8 +669,8 @@ const LoadingContainer = styled.div`
 
 // Nge-update payload detail skor di rambahan & shoot-off
 function _makeMemberScoresPayload({ state, payload }) {
-  const members = state.map((member, index) => ({
-    member_id: member.participant.member.id,
+  const participants = state.map((member, index) => ({
+    participant_id: member?.teamDetail?.participantId,
     scores: {
       shot: payload[index].shot.map((rambahan) => ({ score: rambahan })),
       extraShot: payload[index].extraShot,
@@ -652,11 +679,11 @@ function _makeMemberScoresPayload({ state, payload }) {
     },
   }));
   //coba tanpa type?
-  return { type: 2, members };
+  return { type: 2, participants };
 }
 
 function _getDistanceCategoryLabel(classCategory) {
   return classCategory.split(" - ")?.[1]?.trim() || "-";
 }
 
-export { ButtonEditScoreLine };
+export { ButtonEditScoreTeam };

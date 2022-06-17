@@ -8,6 +8,7 @@ function ScoringTable({
   eliminationParticipantsCount,
   searchName,
   isTeam,
+  session,
 }) {
   
   const {
@@ -15,7 +16,7 @@ function ScoringTable({
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
     getSessionNumbersList,
-  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, isTeam);
+  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, isTeam, session);
   const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
 
   const sessionNumbersList = getSessionNumbersList();
@@ -27,6 +28,8 @@ function ScoringTable({
   if (!scoringMembers?.length) {
     return <EmptyMembers>Tidak ada peserta di kategori ini</EmptyMembers>;
   }
+
+  console.log(session, 'resession');
 
   return (
     <React.Fragment>

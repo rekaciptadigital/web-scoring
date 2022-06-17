@@ -3,16 +3,15 @@ import { DosService } from "services";
 
 import { urlUtil } from "utils";
 
-function useScoresheetDownload(eventCategoryId) {
+function useSessionDownload(eventCategoryId) {
   const fetcher = useFetcher();
 
-  const handleDownloadScoresheet = async ({ onSuccess: consumerSuccessHandler }) => {
+  const handleDownloadSession = async ({ onSuccess: consumerSuccessHandler }) => {
     if (!eventCategoryId) {
       return;
     }
 
-    const queryString = { event_category_id: eventCategoryId };
-
+    const queryString = { event_category_id: eventCategoryId, session: 1 };
     const getFunction = () => {
       return DosService.getQualificationDownloadUrl(queryString);
     };
@@ -25,7 +24,7 @@ function useScoresheetDownload(eventCategoryId) {
     fetcher.runAsync(getFunction, { onSuccess });
   };
 
-  return { ...fetcher, handleDownloadScoresheet };
+  return { ...fetcher, handleDownloadSession };
 }
 
 // utils
@@ -37,4 +36,4 @@ function _handleURLFromResponse(url) {
   return downloadUrl;
 }
 
-export { useScoresheetDownload };
+export { useSessionDownload };

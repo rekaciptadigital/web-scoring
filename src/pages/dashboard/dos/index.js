@@ -42,6 +42,9 @@ const DashboardDos = () => {
       getEventDetail();
     }, [event_id]);
 
+    const eventNameSchedule = eventDetail?.publicInformation?.eventName;
+
+    // console.log( eventNameSchedule, 'kiko')
     return (
     <StyledPageWrapper>
       <MetaTags>
@@ -62,8 +65,10 @@ const DashboardDos = () => {
             {eventDetail?.publicInformation?.eventName && (
               <CardRingkasanDos eventName={eventDetail?.publicInformation?.eventName}/>  
             )}
-            {eventDetail?.publicInformation?.eventName && data?.dataDos && data?.dataDos.length > 0 ? (
-              <CardSchedule cardData={data?.dataDos} eventName={eventDetail?.publicInformation?.eventName} />
+            { data?.dataDos && data?.dataDos.length > 0 ? (
+              <>
+              <CardSchedule cardData={data?.dataDos} eventName={eventNameSchedule} />
+              </>
             ) : <p>Loading ...</p>}
           </Col>
         </Row>

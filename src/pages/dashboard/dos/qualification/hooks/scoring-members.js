@@ -8,7 +8,8 @@ function useScoringMembers(
   categoryDetailId,
   inputSearchQuery,
   eliminationParticipantsCount,
-  isTeam = false
+  isTeam = false,
+  session,
 ) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
@@ -17,7 +18,7 @@ function useScoringMembers(
     const getFunction = () => {
       return DosService.getQualificationMembersV2({
         event_category_id: categoryDetailId,
-        name: debouncedSearchQuery || undefined,
+        session: session,
       });
     };
     fetcher.runAsync(getFunction, {
@@ -30,7 +31,7 @@ function useScoringMembers(
       return;
     }
     fetchScoringMembers();
-  }, [categoryDetailId, eliminationParticipantsCount, debouncedSearchQuery]);
+  }, [categoryDetailId, eliminationParticipantsCount, debouncedSearchQuery, session]);
 
   React.useEffect(() => {
     const debounceTimer = setTimeout(() => {

@@ -40,6 +40,9 @@ function PageDosQualification() {
   } = useCategoriesWithFilters(categoryDetails);
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
+  const [session, setSession] = React.useState(1);
+  const [onSessionOne, setOnSessionOne ] = React.useState(true);
+  const [onSessionTwo, setOnSessionTwo ] = React.useState(false);
 
   const { handleDownloadScoresheet } = useScoresheetDownload(
     activeCategoryDetail?.categoryDetailId
@@ -73,8 +76,6 @@ function PageDosQualification() {
       </ContentLayoutWrapper>
     );
   }
-
-  console.log(activeCategoryDetail?.isTeam, 'ratata');
 
   return (
     <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
@@ -146,7 +147,36 @@ function PageDosQualification() {
                 )}
               </FilterList>
             </CategoryFilter>
+          
+            {activeCategoryDetail?.isTeam == false && (
+            <CategoryFilter>
+                <FilterLabel>Pilih Sesi:</FilterLabel>
+                  <FilterList>
+                    <FilterItemButton
+                      className={classnames({ "filter-item-active": onSessionOne })}
+                      onClick={() => {
+                        setOnSessionOne(true);
+                        setOnSessionTwo(false);
+                        setSession(1);
+                      }}
+                    >
+                      Sesi 1
+                    </FilterItemButton>
+                    <FilterItemButton
+                      className={classnames({ "filter-item-active": onSessionTwo })}
+                      onClick={() => {
+                        setOnSessionTwo(true);
+                        setOnSessionOne(false);
+                        setSession(2);
+                      }}
+                    >
+                      Sesi 2
+                    </FilterItemButton>
+                  </FilterList>
+            </CategoryFilter>
+            )}
           </FilterBars>
+
 
           <ToolbarRight>
             <HorizontalSpaced>
@@ -187,6 +217,7 @@ function PageDosQualification() {
           onChangeParticipantPresence={resetOnChangeCategory}
           eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
           isTeam={activeCategoryDetail?.isTeam}
+          session={session}
         />
       )}
       </ViewWrapper>

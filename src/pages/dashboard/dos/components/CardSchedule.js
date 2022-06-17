@@ -126,7 +126,7 @@ function CardSchedule(cardData, {eventName}) {
     getUser();
   }, []);
 
-  console.log(eventName, 'ratata');
+  console.log(eventName, 'ta');
   return (
     <>
     <CardMenuProfileContainer>
@@ -147,11 +147,11 @@ function CardSchedule(cardData, {eventName}) {
                   </Row>
 
                   <Row>
-                    <p className="d-flex flex-column text-banner">Berikut adalah kategori perlombaan yang dipertandingkan pada event <b>{eventName},</b> antara lain:</p>
+                    <p className="d-flex flex-column text-banner">Berikut adalah kategori perlombaan yang dipertandingkan pada event ini, antara lain:</p>
                         {cardData?.cardData.map((item) => (
                           <>
                             <div className="content-scroll">
-                            <p className="text-banner">{item?.date}</p>
+                            <p className="text-banner">{item?.dateFormatted}</p>
                             <ol className="text-banner">
                                 {item?.schedule.map((detail) => (
                                     // eslint-disable-next-line react/jsx-key

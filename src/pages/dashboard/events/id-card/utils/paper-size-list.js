@@ -9,7 +9,6 @@ export const optionsPaperSize = [
 ];
 
 export const getSelectedPaperSize = (optionsPaperSize, fieldData) => {
-    console.log(fieldData, 'paper');
   return {
     value: fieldData?.paperSize,
     label: optionsPaperSize.find((font) => {

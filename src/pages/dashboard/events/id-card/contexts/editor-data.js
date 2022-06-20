@@ -43,36 +43,38 @@ const A4 = "a4";
 const A5 = "a5";
 const A6 = "a6";
 
-// Dalam pixel, 150 PPI
+// Dalam pixel, 110 PPI
+// Referensi:
+// https://a-size.com/a4-paper-size/
 const dimensions = {
   [A4]: {
     [OR_LANDSCAPE]: {
-      width: 1123,
-      height: 794,
+      width: 1287,
+      height: 910,
     },
     [OR_PORTRAIT]: {
-      width: 794,
-      height: 1123,
+      width: 910,
+      height: 1287,
     },
   },
   [A5]: {
     [OR_LANDSCAPE]: {
-      width: 794,
-      height: 559,
+      width: 911,
+      height: 641,
     },
     [OR_PORTRAIT]: {
-      width: 559,
-      height: 794,
+      width: 641,
+      height: 911,
     },
   },
   [A6]: {
     [OR_LANDSCAPE]: {
-      width: 559,
-      height: 397,
+      width: 642,
+      height: 454,
     },
     [OR_PORTRAIT]: {
-      width: 397,
-      height: 559,
+      width: 454,
+      height: 642,
     },
   },
 };

@@ -9,13 +9,14 @@ const orientationOptions = [
 ];
 
 function SelectPaperOrientation() {
-  const { data, setOrientation } = useEditor();
+  const { isLoading, data, setOrientation } = useEditor();
   return (
     <SelectSetting
       options={orientationOptions}
       placeholder="Pilih orientasi kertas"
       value={getOptionFromValue(orientationOptions, data.paperOrientation)}
       onChange={(option) => setOrientation(option.value)}
+      disabled={isLoading}
     />
   );
 }

@@ -9,13 +9,14 @@ const sizeOptions = [
 ];
 
 function SelectPaperSize() {
-  const { data, setPaperSize } = useEditor();
+  const { isLoading, data, setPaperSize } = useEditor();
   return (
     <SelectSetting
       placeholder="Pilih ukuran kertas"
       options={sizeOptions}
       value={getOptionFromValue(sizeOptions, data.paperSize)}
       onChange={(option) => setPaperSize(option.value)}
+      disabled={isLoading}
     />
   );
 }

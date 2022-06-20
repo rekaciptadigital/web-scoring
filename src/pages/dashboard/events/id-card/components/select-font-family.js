@@ -2,18 +2,24 @@ import * as React from "react";
 
 import Select from "react-select";
 
-const optionsScoreNumbers = ["Nama Font"].map((value) => ({ value: value, label: value }));
+const ARIAL = "Arial, sans-serif";
+const DEJAVU_SANS = "'DejaVu Sans', sans-serif";
+const POPPINS = "'Poppins', sans-serif";
 
-function SelectFontFamily() {
-  const selectedOption = _getOptionFromValue("Nama Font");
+const optionsFontFamily = [
+  { value: ARIAL, label: "Arial" },
+  { value: DEJAVU_SANS, label: "DejaVu Sans" },
+  { value: POPPINS, label: "Poppins" },
+];
+
+function SelectFontFamily({ fontFamily, onChange }) {
   return (
     <Select
       placeholder="-"
       styles={customSelectStyles}
-      // onChange={handleChange}
-      // onFocus={handleFocus}
-      value={selectedOption}
-      options={optionsScoreNumbers}
+      options={optionsFontFamily}
+      value={_getOptionFromValue(fontFamily)}
+      onChange={(opt) => onChange?.(opt.value)}
       menuPlacement="top"
     />
   );
@@ -58,7 +64,7 @@ const customSelectStyles = {
 };
 
 function _getOptionFromValue(value) {
-  return optionsScoreNumbers.find((option) => option.value === value);
+  return optionsFontFamily.find((option) => option.value === value);
 }
 
 export { SelectFontFamily };

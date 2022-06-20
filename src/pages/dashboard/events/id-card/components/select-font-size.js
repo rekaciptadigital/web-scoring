@@ -1,23 +1,43 @@
 import * as React from "react";
 
-import Select from "react-select";
+import Select from "react-select/creatable";
 
-const optionsScoreNumbers = [14, 16, 18, 20, 21, 24, 27, 28, 30, 32, 36, 40, 42, 46].map(
-  (value) => ({ value: value, label: value })
-);
+const defaultSizeNumbers = [14, 16, 18, 20, 21, 24, 27, 28, 30, 32, 36, 40, 42, 46];
 
-function SelectFontSize() {
-  const selectedOption = _getOptionFromValue(14);
+function SelectFontSize({ fontSize, onChange }) {
+  const [sizeNumbers, setSizeNumbers] = React.useState(defaultSizeNumbers);
+
+  const optionsSizeNumbers = React.useMemo(
+    () => sizeNumbers.map((value) => ({ value: value, label: value })),
+    [sizeNumbers]
+  );
+
+  const foundOption = _getOptionByValue(optionsSizeNumbers, fontSize);
+
+  React.useEffect(() => {
+    if (!fontSize || foundOption) {
+      return;
+    }
+    setSizeNumbers(_createNewSizeNumberUpdater(fontSize));
+    onChange?.(Number(fontSize));
+  }, [fontSize, foundOption]);
+
   return (
     <Select
       placeholder="-"
       styles={customSelectStyles}
-      // onChange={handleChange}
-      // onFocus={handleFocus}
-      value={selectedOption}
-      options={optionsScoreNumbers}
+      options={optionsSizeNumbers}
+      value={foundOption}
+      onChange={(opt) => onChange?.(opt.value)}
+      onCreateOption={(inputString) => {
+        if (!inputString || isNaN(inputString)) {
+          return;
+        }
+        setSizeNumbers(_createNewSizeNumberUpdater(inputString));
+        onChange?.(Number(inputString));
+      }}
+      formatCreateLabel={(inputString) => inputString}
       menuPlacement="top"
-      // noOptionsMessage={handleNoOption}
     />
   );
 }
@@ -58,8 +78,16 @@ const customSelectStyles = {
   }),
 };
 
-function _getOptionFromValue(value) {
-  return optionsScoreNumbers.find((option) => option.value === value);
+/* ========================= */
+// utils
+
+const _getOptionByValue = (numberList, value) => {
+  const foundOption = numberList.find((option) => option.value === value);
+  return foundOption;
+};
+
+function _createNewSizeNumberUpdater(value) {
+  return (sizeNumbers) => [...sizeNumbers, Number(value)].sort((a, b) => a - b);
 }
 
 export { SelectFontSize };

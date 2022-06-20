@@ -1,28 +1,43 @@
 import * as React from "react";
+import { useEditor } from "../contexts/editor-data";
 
-// eslint-disable-next-line no-unused-vars
-import { SelectSetting, getOptionFromValue } from "./select-settings";
+import { SelectSetting } from "./select-settings";
 
-const dataOptions = [
-  { value: "player_name", label: "Nama Peserta" },
-  { value: "location_and_date", label: "Tempat & Tanggal Pertandingan" },
-  { value: "category", label: "Kategori Pertandingan" },
-  { value: "club_member", label: "Asal Klub" },
-  { value: "status_event", label: "Status (Peserta/Official)" },
-];
+const FIELD_LABELS = {
+  player_name: "Nama Peserta",
+  location_and_date: "Tempat & Tanggal Pertandingan",
+  category: "Kategori Pertandingan",
+  club_member: "Asal Klub",
+  status_event: "Status (Peserta/Official)",
+  photoProfile: "Foto Profil",
+  qrCode: "QR Code",
+};
 
-// eslint-disable-next-line no-unused-vars
-function SelectVisibleData({ value }) {
+const defaultDataOptions = _mapValuesToOptions(Object.keys(FIELD_LABELS));
+
+function SelectVisibleData() {
+  const { isLoading, visibleFieldNames, setVisibleFields } = useEditor();
+  const values = _mapValuesToOptions(visibleFieldNames);
   return (
     <SelectSetting
       isMulti
       isClearable={false}
-      settingOptions={dataOptions}
+      settingOptions={defaultDataOptions}
       placeholder="Pilih data yang akan ditampilkan"
       noOptionsMessage="Semua data telah ditampilkan"
-      value={dataOptions}
+      value={isLoading ? null : values}
+      options={defaultDataOptions}
+      onChange={(opts) => setVisibleFields(opts?.map((opt) => opt.value) || [])}
+      disabled={isLoading}
     />
   );
+}
+
+function _mapValuesToOptions(values) {
+  if (!values?.length) {
+    return [];
+  }
+  return values.map((name) => ({ value: name, label: FIELD_LABELS[name] }));
 }
 
 export { SelectVisibleData };

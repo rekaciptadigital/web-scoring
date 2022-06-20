@@ -5,9 +5,14 @@ import Draggable from "react-draggable";
 
 import classnames from "classnames";
 
-function MoveableObject({ children, scale, isSelected, onSelect, onMove }) {
+function MoveableObject({ children, scale, isSelected, onSelect, x, y, onMove }) {
   return (
-    <Draggable scale={scale} onStart={onSelect} onStop={onMove}>
+    <Draggable
+      scale={scale}
+      position={{ x, y }}
+      onStart={onSelect}
+      onStop={(ev, translation) => onMove?.({ x: translation.x, y: translation.y })}
+    >
       <MoveableContainerDiv
         className={classnames({ "object-active": isSelected })}
         style={{

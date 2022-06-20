@@ -11,6 +11,7 @@ function SelectSetting({
   onChange,
   onFocus,
   noOptionsMessage,
+  disabled,
 }) {
   return (
     <Select
@@ -23,6 +24,7 @@ function SelectSetting({
       isClearable={isClearable}
       onChange={onChange}
       onFocus={onFocus}
+      isDisabled={disabled}
     />
   );
 }

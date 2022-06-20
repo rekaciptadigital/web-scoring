@@ -1,12 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useContainerOffsetWidth } from "../../hooks/container-offset-width";
-
 import { useEditor } from "../../contexts/editor-data";
 
 import { MoveableObject } from "./components/moveable-object";
-
-import IconImage from "components/ma/icons/mono/image";
+import { TextData } from "./components/object-data-text";
 
 // TODO: moveable components:
 // - [ ] 1. Text data: data digenerate dari server
@@ -19,92 +17,63 @@ function CanvasArea() {
   const containerDiv = React.useRef(null);
   const offsetWidth = useContainerOffsetWidth(containerDiv);
 
-  const { getPaperDimensions } = useEditor();
+  const {
+    data: editorData,
+    getPaperDimensions,
+    getBgImage,
+    visibleFields,
+    setFieldPosition,
+    activeObject: activeObjectName,
+    setActiveObject,
+  } = useEditor();
   const { width, height } = getPaperDimensions();
   const canvasScale = _getCanvasScale(offsetWidth, width);
+  const bgImage = getBgImage();
 
-  const [selected, setSelected] = React.useState(null);
-  const isSelected = (name) => selected === name;
-
-  const setObjectPosition = (name, coordinate) => console.log(name, coordinate);
-
-  const getObjectProps = ({ name, onMove } = {}) => {
+  const getObjectProps = (name) => {
     return {
       scale: canvasScale,
-      onMove: onMove,
-      isSelected: name && isSelected(name),
-      onSelect: () => name && setSelected(name),
+      isSelected: activeObjectName === name,
+      onSelect: () => setActiveObject(name || null),
     };
   };
 
   return (
     <CanvasContainer
       ref={containerDiv}
+      title={_makeContainerTitleText(editorData)}
       style={{ "--canvas-area-ratio": `${100 * (height / width)}%` }}
     >
       <MoveableArea
         width={width}
         height={height}
         canvasScale={canvasScale}
-        bgImage={undefined}
-        onDeselect={() => setSelected(null)}
+        bgImage={bgImage}
+        onDeselect={() => setActiveObject(null)}
       >
-        <MoveableObject
-          {...getObjectProps({
-            name: "memberName",
-            onMove: ({ x, y } = {}) => setObjectPosition("memberName", { x, y }),
-          })}
-        >
-          <TextData text={"FAKE MEMBER NAME DATA - any kind of object -- XXXLPW"} />
-        </MoveableObject>
-
-        <MoveableObject
-          {...getObjectProps({
-            name: "svgIcon",
-            onMove: ({ x, y } = {}) => setObjectPosition("svgIcon", { x, y }),
-          })}
-        >
-          <div>
-            <IconImage size="160" />
-          </div>
-          <h2>Anggap aja QR</h2>
-        </MoveableObject>
-
-        <MoveableObject
-          {...getObjectProps({
-            name: "budrestNumber",
-            onMove: ({ x, y } = {}) => setObjectPosition("budrestNumber", { x, y }),
-          })}
-        >
-          <TextData text={"Nomor Bantalan"} />
-        </MoveableObject>
-
-        <MoveableObject
-          {...getObjectProps({
-            name: "categoryDetailName",
-            onMove: ({ x, y } = {}) => setObjectPosition("categoryDetailName", { x, y }),
-          })}
-        >
-          <TextData text={"Kategori Pertandingan"} />
-        </MoveableObject>
-
-        <MoveableObject
-          {...getObjectProps({
-            name: "clubName",
-            onMove: ({ x, y } = {}) => setObjectPosition("clubName", { x, y }),
-          })}
-        >
-          <TextData text={"Nama Klub"} />
-        </MoveableObject>
-
-        <MoveableObject
-          {...getObjectProps({
-            name: "eventName",
-            onMove: ({ x, y } = {}) => setObjectPosition("eventName", { x, y }),
-          })}
-        >
-          <TextData text={"Nama Event"} />
-        </MoveableObject>
+        {visibleFields.map((field) => (
+          <MoveableObject
+            key={field.name}
+            {...getObjectProps(field.name)}
+            x={field.x}
+            y={field.y}
+            onMove={({ x, y } = {}) => setFieldPosition(field.name, { x, y })}
+          >
+            {field.type === "text" && (
+              <TextData
+                title={field.name}
+                text={field.label || field.name}
+                fontFamily={field.fontFamily}
+                fontSize={field.fontSize}
+                color={field.color}
+                isBold={field.isBold}
+              />
+            )}
+            {field.type === "box" && (
+              <div title={field.label + ` (variabel: ${field.name})`}>{field.name}</div>
+            )}
+          </MoveableObject>
+        ))}
       </MoveableArea>
     </CanvasContainer>
   );
@@ -117,17 +86,13 @@ function MoveableArea({ children, width, height, canvasScale, bgImage, onDeselec
         "--canvas-actual-width": `${width}px`,
         "--canvas-actual-height": `${height}px`,
         "--canvas-scale": canvasScale,
-        "--canvas-bg-image": bgImage,
+        "--canvas-bg-image": bgImage && `url(${bgImage})`,
       }}
     >
       <DeselectClickArea onClick={onDeselect} />
       {children}
     </MoveableContainer>
   );
-}
-
-function TextData({ text }) {
-  return <h1>{text || "Tidak ada teks"}</h1>;
 }
 
 /* ================================ */
@@ -151,7 +116,7 @@ const MoveableContainer = styled.div`
   width: var(--canvas-actual-width);
   height: var(--canvas-actual-height);
   background-color: white;
-  background-image: var(--editor-bg-image);
+  background-image: var(--canvas-bg-image);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -175,6 +140,17 @@ function _getCanvasScale(offsetWidth, actualPaperPixels) {
     return 1;
   }
   return offsetWidth / actualPaperPixels;
+}
+
+function _makeContainerTitleText(data) {
+  if (!data?.paperSize || !data?.paperOrientation) {
+    return;
+  }
+  const orientationLabels = {
+    p: "Portrait",
+    l: "Landscape",
+  };
+  return `Kertas ${data.paperSize.toUpperCase?.()} (${orientationLabels[data.paperOrientation]})`;
 }
 
 export { CanvasArea };

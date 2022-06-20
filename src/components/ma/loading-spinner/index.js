@@ -1,13 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
 
-function SpinnerDotBlock({ message }) {
+function SpinnerDotBlock({ message, children }) {
   return (
     <StyledSpinnerContainer>
       <div className="spinner-grow" role="status">
         <span className="sr-only">Loading...</span>
       </div>
-      {Boolean(message) && <div>{message}</div>}
+      {(message || children) && <div>{message || children}</div>}
     </StyledSpinnerContainer>
   );
 }
@@ -19,10 +19,6 @@ const StyledSpinnerContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 1.5rem;
-
-  > *:nth-child(2) {
-    font-weight: 600;
-  }
 `;
 
 export { SpinnerDotBlock };

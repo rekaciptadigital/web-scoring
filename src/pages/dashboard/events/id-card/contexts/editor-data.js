@@ -2,6 +2,27 @@ import * as React from "react";
 import { useParams } from "react-router-dom";
 import { IdCardService } from "services";
 import { useFetcher } from "utils/hooks/alt-fetcher";
+import { toast } from "../components/processing-toast";
+
+import { stringUtil } from "utils";
+import { renderTemplateString, convertBase64 } from "../utils/index";
+
+const EditorContext = React.createContext();
+
+function EditorProvider({ children }) {
+  const { event_id } = useParams();
+  const editor = useEditorData(event_id);
+
+  return <EditorContext.Provider value={editor}>{children}</EditorContext.Provider>;
+}
+
+function useEditor() {
+  const editor = React.useContext(EditorContext);
+  return editor;
+}
+
+/* ====================================== */
+// hooks
 
 const FIELD_TYPE_TEXT = "text";
 // TODO: pakai nanti
@@ -93,129 +114,41 @@ const defaultEditorData = {
   },
 };
 
-const EditorContext = React.createContext();
-
-function editorReducer(state, action) {
-  if (action.type === "CHANGE_BG_IMAGE") {
-    if (!action.payload) {
-      return state;
-    }
-    const imagePreviewUrl = URL.createObjectURL(action.payload);
-    return {
-      ...state,
-      backgroundPreviewUrl: imagePreviewUrl,
-      backgroundFileRaw: action.payload,
-    };
-  }
-
-  if (action.type === "CHANGE_VISIBLE_FIELDS") {
-    // Data dari select
-    const visibleNames = action.payload?.length ? action.payload : [];
-    const visiblesByName = visibleNames.reduce(
-      (visibles, name) => ({ ...visibles, [name]: true }),
-      {}
-    );
-
-    // Data dari state yang existing
-    const names = Object.keys(state.fields);
-    const fields = names.reduce((fields, name) => {
-      return {
-        ...fields,
-        [name]: { ...state.fields[name], isVisible: Boolean(visiblesByName[name]) },
-      };
-    }, {});
-
-    return { ...state, fields: fields };
-  }
-
-  if (action.type === "CHANGE_FIELD_COORDS") {
-    return {
-      ...state,
-      fields: {
-        ...state.fields,
-        [action.name]: {
-          ...state.fields[action.name],
-          x: Math.ceil(action.payload.x),
-          y: Math.ceil(action.payload.y),
-        },
-      },
-    };
-  }
-
-  if (action.type === "TOGGLE_FIELD_TEXT_BOLD") {
-    return {
-      ...state,
-      fields: {
-        ...state.fields,
-        [action.name]: {
-          ...state.fields[action.name],
-          isBold: !state.fields[action.name].isBold,
-        },
-      },
-    };
-  }
-
-  if (action.type === "CHANGE_FIELD_TEXT_FONT_FAMILY") {
-    return {
-      ...state,
-      fields: {
-        ...state.fields,
-        [action.name]: {
-          ...state.fields[action.name],
-          fontFamily: action.payload,
-        },
-      },
-    };
-  }
-
-  if (action.type === "CHANGE_FIELD_TEXT_COLOR") {
-    return {
-      ...state,
-      fields: {
-        ...state.fields,
-        [action.name]: {
-          ...state.fields[action.name],
-          color: action.payload,
-        },
-      },
-    };
-  }
-
-  if (action.type === "CHANGE_FIELD_TEXT_FONT_SIZE") {
-    return {
-      ...state,
-      fields: {
-        ...state.fields,
-        [action.name]: {
-          ...state.fields[action.name],
-          fontSize: action.payload,
-        },
-      },
-    };
-  }
-
-  return { ...state, ...action };
-}
-
 function useEditorData(event_id) {
-  const { data: idCard, isLoading } = useIdCard(event_id);
+  const { data: idCard, isLoading: isLoadingIdCard, fetchIdCard } = useIdCard(event_id);
   const [data, dispatch] = React.useReducer(editorReducer, defaultEditorData);
   const [activeObject, setActiveObject] = React.useState(null);
+  const { submitIdCard, isLoading: isSubmiting } = useSubmitIdCard();
 
   React.useEffect(() => {
     if (!idCard?.editorData) {
       return;
     }
-    dispatch({
-      ...defaultEditorData,
-      // Merge data dari server
-      // TODO: hapus mock, pakai data asli server
-      ...(mockServerEditorData || idCard.editorData),
-    });
+    dispatch({ type: "INIT", payload: _buildEditorData(idCard) });
   }, [idCard]);
 
+  const isLoading = !idCard && isLoadingIdCard;
+  const isFetching = idCard && isLoadingIdCard;
+  const isSaving = isSubmiting || isFetching;
+  const isDirty = Boolean(data?.isDirty);
   const isPortrait = data.paperOrientation === OR_PORTRAIT;
   const isLandscape = data.paperOrientation === OR_LANDSCAPE;
+
+  const saveEditor = async () => {
+    toast.loading("Menyimpan ID card...");
+    const payload = await _prepareSaveData(data);
+    submitIdCard(payload, {
+      onSuccess() {
+        toast.dismiss();
+        toast.success("ID card berhasil disimpan");
+        fetchIdCard();
+      },
+      onError() {
+        toast.dismiss();
+        toast.error("Gagal menyimpan ID card");
+      },
+    });
+  };
 
   const setOrientation = (value) => dispatch({ paperOrientation: value });
 
@@ -270,6 +203,10 @@ function useEditorData(event_id) {
   return {
     isLoading,
     data,
+    saveEditor,
+    isSaving,
+    isFetching,
+    isDirty,
     isPortrait,
     isLandscape,
     setOrientation,
@@ -290,18 +227,116 @@ function useEditorData(event_id) {
   };
 }
 
-function EditorProvider({ children }) {
-  const { event_id } = useParams();
-  const editor = useEditorData(event_id);
+function editorReducer(state, action) {
+  if (action.type === "INIT") {
+    return action.payload;
+  }
 
-  return <EditorContext.Provider value={editor}>{children}</EditorContext.Provider>;
-}
+  if (action.type === "CHANGE_BG_IMAGE") {
+    if (!action.payload) {
+      return state;
+    }
+    const imagePreviewUrl = URL.createObjectURL(action.payload);
+    return {
+      ...state,
+      isDirty: true,
+      backgroundPreviewUrl: imagePreviewUrl,
+      backgroundFileRaw: action.payload,
+    };
+  }
 
-/* ==================================== */
+  if (action.type === "CHANGE_VISIBLE_FIELDS") {
+    // Data dari select
+    const visibleNames = action.payload?.length ? action.payload : [];
+    const visiblesByName = visibleNames.reduce(
+      (visibles, name) => ({ ...visibles, [name]: true }),
+      {}
+    );
 
-function useEditor() {
-  const editor = React.useContext(EditorContext);
-  return editor;
+    // Data dari state yang existing
+    const names = Object.keys(state.fields);
+    const fields = names.reduce((fields, name) => {
+      return {
+        ...fields,
+        [name]: { ...state.fields[name], isVisible: Boolean(visiblesByName[name]) },
+      };
+    }, {});
+
+    return { ...state, isDirty: true, fields: fields };
+  }
+
+  if (action.type === "CHANGE_FIELD_COORDS") {
+    return {
+      ...state,
+      isDirty: true,
+      fields: {
+        ...state.fields,
+        [action.name]: {
+          ...state.fields[action.name],
+          x: Math.ceil(action.payload.x),
+          y: Math.ceil(action.payload.y),
+        },
+      },
+    };
+  }
+
+  if (action.type === "TOGGLE_FIELD_TEXT_BOLD") {
+    return {
+      ...state,
+      isDirty: true,
+      fields: {
+        ...state.fields,
+        [action.name]: {
+          ...state.fields[action.name],
+          isBold: !state.fields[action.name].isBold,
+        },
+      },
+    };
+  }
+
+  if (action.type === "CHANGE_FIELD_TEXT_FONT_FAMILY") {
+    return {
+      ...state,
+      isDirty: true,
+      fields: {
+        ...state.fields,
+        [action.name]: {
+          ...state.fields[action.name],
+          fontFamily: action.payload,
+        },
+      },
+    };
+  }
+
+  if (action.type === "CHANGE_FIELD_TEXT_COLOR") {
+    return {
+      ...state,
+      isDirty: true,
+      fields: {
+        ...state.fields,
+        [action.name]: {
+          ...state.fields[action.name],
+          color: action.payload,
+        },
+      },
+    };
+  }
+
+  if (action.type === "CHANGE_FIELD_TEXT_FONT_SIZE") {
+    return {
+      ...state,
+      isDirty: true,
+      fields: {
+        ...state.fields,
+        [action.name]: {
+          ...state.fields[action.name],
+          fontSize: action.payload,
+        },
+      },
+    };
+  }
+
+  return { ...state, isDirty: true, ...action };
 }
 
 function useIdCard(eventId) {
@@ -316,7 +351,7 @@ function useIdCard(eventId) {
     };
   }, []);
 
-  React.useEffect(() => {
+  const fetchIdCard = () => {
     const getFunction = () => {
       return IdCardService.getForEditor({ event_id: eventId }, abortControllerRef.current.signal);
     };
@@ -325,14 +360,74 @@ function useIdCard(eventId) {
         return { ...data, editorData: JSON.parse(data.editorData) };
       },
     });
+  };
+
+  React.useEffect(() => {
+    if (!eventId) {
+      return;
+    }
+    fetchIdCard();
   }, [eventId]);
 
-  return { ...fetcher };
+  return { ...fetcher, fetchIdCard };
+}
+
+function useSubmitIdCard() {
+  const fetcher = useFetcher();
+
+  const submitIdCard = (data, options) => {
+    const postFunction = () => IdCardService.save(data);
+    fetcher.runAsync(postFunction, options);
+  };
+
+  return { ...fetcher, submitIdCard };
+}
+
+/* ======================== */
+// utils
+
+function _buildEditorData(idCard) {
+  if (!idCard?.editorData) {
+    return defaultEditorData;
+  }
+  return {
+    ...idCard.editorData,
+    key: stringUtil.createRandom(),
+    backgroundUrl: idCard.background,
+  };
+}
+
+async function _prepareSaveData(editorFormData) {
+  const editorData = {
+    event_id: editorFormData.event_id,
+    paperSize: editorFormData.paperSize,
+    paperOrientation: editorFormData.paperOrientation,
+    backgroundFileRaw: undefined,
+    backgroundPreviewUrl: undefined,
+    fields: editorFormData.fields,
+  };
+
+  const imageBase64ForUpload = editorFormData.backgroundFileRaw
+    ? await convertBase64(editorFormData.backgroundFileRaw)
+    : undefined;
+
+  const certificateHtmlTemplate = renderTemplateString(editorData);
+  const templateInBase64 = btoa(certificateHtmlTemplate);
+
+  const payload = {
+    event_id: parseInt(editorFormData.event_id),
+    html_template: templateInBase64,
+    background_url: imageBase64ForUpload,
+    editor_data: JSON.stringify(editorData),
+  };
+
+  return payload;
 }
 
 export { EditorProvider, useEditor, OR_PORTRAIT, OR_LANDSCAPE, A4, A5, A6 };
 
 // TODO: hapus mock
+// eslint-disable-next-line no-unused-vars
 const mockServerEditorData = {
   backgroundUrl:
     "https://api-staging.myarchery.id/asset/background_id_card/background_id_card_22.png#1655287468",

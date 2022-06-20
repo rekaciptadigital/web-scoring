@@ -45,6 +45,7 @@ function CanvasArea() {
       style={{ "--canvas-area-ratio": `${100 * (height / width)}%` }}
     >
       <MoveableArea
+        key={editorData.key}
         width={width}
         height={height}
         canvasScale={canvasScale}
@@ -74,7 +75,7 @@ function MoveableArea({ children, width, height, canvasScale, bgImage, onDeselec
         "--canvas-actual-width": `${width}px`,
         "--canvas-actual-height": `${height}px`,
         "--canvas-scale": canvasScale,
-        "--canvas-bg-image": bgImage && `url(${bgImage})`,
+        "--canvas-bg-image": bgImage && `url("${bgImage}")`,
       }}
     >
       <DeselectClickArea onClick={onDeselect} />
@@ -103,13 +104,14 @@ const CanvasContainer = styled.div`
 const MoveableContainer = styled.div`
   width: var(--canvas-actual-width);
   height: var(--canvas-actual-height);
+  transform: scale(var(--canvas-scale, 1));
+  transform-origin: top left;
+
   background-color: white;
   background-image: var(--canvas-bg-image);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  transform: scale(var(--canvas-scale, 1));
-  transform-origin: top left;
 `;
 
 const DeselectClickArea = styled.div`

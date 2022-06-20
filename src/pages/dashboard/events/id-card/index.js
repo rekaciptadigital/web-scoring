@@ -8,6 +8,7 @@ import { Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
 import { SpinnerDotBlock, NoticeBarInfo, ButtonOutlineBlue, ButtonBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
+import { ProcessingToast } from "./components/processing-toast";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { CanvasArea } from "./components/canvas-area";
 import { PreviewCanvas } from "./components/canvas-preview";
@@ -30,36 +31,64 @@ function PageEventIdCard() {
   };
 
   return (
-    <ContentLayoutWrapper {...propsContentWrapper}>
-      <CardSheet>
+    <React.Fragment>
+      <ProcessingToast />
+
+      <ContentLayoutWrapper {...propsContentWrapper}>
         <EditorProvider>
-          <Editor>
-            <EditorHeaderBar>
-              <div>
-                <NoticeBarInfo>
-                  Geser keterangan yang ada di dalam ID Card sesuai yang Anda inginkan
-                </NoticeBarInfo>
-              </div>
+          <CardSheet>
+            <SavingBlocker />
 
-              <ActionButtons>
-                <ButtonPreview />
-                <ButtonBlue>Simpan</ButtonBlue>
-              </ActionButtons>
-            </EditorHeaderBar>
+            <EditorLayout>
+              <EditorHeader />
+              <EditorBody>
+                <div>
+                  <EditorScreen />
+                </div>
 
-            <EditorBody>
-              <div>
-                <EditorScreen />
-              </div>
-
-              <div>
-                <ControlPanel />
-              </div>
-            </EditorBody>
-          </Editor>
+                <div>
+                  <ControlPanel />
+                </div>
+              </EditorBody>
+            </EditorLayout>
+          </CardSheet>
         </EditorProvider>
-      </CardSheet>
-    </ContentLayoutWrapper>
+      </ContentLayoutWrapper>
+    </React.Fragment>
+  );
+}
+
+function SavingBlocker() {
+  const { isSaving, isFetching } = useEditor();
+  if (!isSaving) {
+    return null;
+  }
+  return (
+    <SavingBlockerWrapper>
+      <SpinnerDotBlock>
+        {isFetching && <LoadingText className="text-white">Memperbarui data...</LoadingText>}
+      </SpinnerDotBlock>
+    </SavingBlockerWrapper>
+  );
+}
+
+function EditorHeader() {
+  const { isDirty, saveEditor } = useEditor();
+  return (
+    <EditorHeaderBar>
+      <div>
+        <NoticeBarInfo>
+          Geser keterangan yang ada di dalam ID Card sesuai yang Anda inginkan
+        </NoticeBarInfo>
+      </div>
+
+      <ActionButtons>
+        <ButtonPreview />
+        <ButtonBlue disabled={!isDirty} onClick={() => saveEditor()}>
+          Simpan
+        </ButtonBlue>
+      </ActionButtons>
+    </EditorHeaderBar>
   );
 }
 
@@ -268,7 +297,9 @@ function EditorScreen() {
     return (
       <EditorCanvas>
         <LoadingCanvas>
-          <SpinnerDotBlock message="Menyiapkan editor..." />
+          <SpinnerDotBlock>
+            <LoadingText>Menyiapkan editor...</LoadingText>
+          </SpinnerDotBlock>
         </LoadingCanvas>
       </EditorCanvas>
     );
@@ -294,7 +325,28 @@ const CardSheet = styled.div`
   background-color: #ffffff;
 `;
 
-const Editor = styled.div`
+const SavingBlockerWrapper = styled.div`
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.5);
+`;
+
+const LoadingText = styled.span`
+  font-weight: 600;
+
+  &.text-white {
+    color: #ffffff;
+  }
+`;
+
+const EditorLayout = styled.div`
   > * + * {
     margin-top: 1.25rem;
   }

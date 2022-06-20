@@ -151,7 +151,7 @@ function ControlPanel() {
         {!activeObjectName ? (
           <InstructionText>Belum ada teks terseleksi</InstructionText>
         ) : currentField.type !== "text" ? (
-          <InstructionText>Bukan objek teks</InstructionText>
+          <InstructionText>Objek bukan teks</InstructionText>
         ) : (
           <EditorTextControls key={activeObjectName}>
             <SelectFontFamily
@@ -341,7 +341,7 @@ const InstructionText = styled.p`
 const BGImagePickerWrapper = styled.div`
   background-color: var(--ma-primary-blue-50);
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: top center;
   background-size: cover;
   background-image: var(--picker-choosen-image);
 `;

@@ -16,7 +16,7 @@ const FIELD_LABELS = {
 const defaultDataOptions = _mapValuesToOptions(Object.keys(FIELD_LABELS));
 
 function SelectVisibleData() {
-  const { isLoading, visibleFieldNames, setVisibleFields } = useEditor();
+  const { isLoading, visibleFieldNames, setVisibleFields, setActiveObject } = useEditor();
   const values = _mapValuesToOptions(visibleFieldNames);
   return (
     <SelectSetting
@@ -27,7 +27,10 @@ function SelectVisibleData() {
       noOptionsMessage="Semua data telah ditampilkan"
       value={isLoading ? null : values}
       options={defaultDataOptions}
-      onChange={(opts) => setVisibleFields(opts?.map((opt) => opt.value) || [])}
+      onChange={(opts) => {
+        setVisibleFields(opts?.map((opt) => opt.value) || []);
+        setActiveObject(null);
+      }}
       disabled={isLoading}
     />
   );

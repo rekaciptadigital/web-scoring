@@ -4,7 +4,10 @@ import { IdCardService } from "services";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 
 const FIELD_TYPE_TEXT = "text";
-const FIELD_TYPE_BOX = "box";
+// TODO: pakai nanti
+// const FIELD_TYPE_BOX = "box";
+const FIELD_TYPE_BOX_AVATAR = "box-avatar";
+const FIELD_TYPE_BOX_QR = "box-qr";
 
 const LABEL_MEMBER_NAME = "member_name";
 const LABEL_CATEGORY_NAME = "category_name";
@@ -357,7 +360,7 @@ const mockServerEditorData = {
     category: {
       type: FIELD_TYPE_TEXT,
       name: "category",
-      label: "Ketegori Tanding",
+      label: "Kategori Tanding",
       isVisible: true,
       x: 252,
       y: 248,
@@ -385,7 +388,7 @@ const mockServerEditorData = {
       fontSize: 36,
     },
     photoProfile: {
-      type: FIELD_TYPE_BOX,
+      type: FIELD_TYPE_BOX_AVATAR,
       name: "photoProfile",
       label: "Foto Profil",
       isVisible: true,
@@ -393,7 +396,7 @@ const mockServerEditorData = {
       y: 250,
     },
     qrCode: {
-      type: FIELD_TYPE_BOX,
+      type: FIELD_TYPE_BOX_QR,
       name: "qrCode",
       label: "QR Code",
       isVisible: true,

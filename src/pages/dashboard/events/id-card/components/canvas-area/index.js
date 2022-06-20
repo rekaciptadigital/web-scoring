@@ -4,7 +4,7 @@ import { useContainerOffsetWidth } from "../../hooks/container-offset-width";
 import { useEditor } from "../../contexts/editor-data";
 
 import { MoveableObject } from "./components/moveable-object";
-import { TextData } from "./components/object-data-text";
+import { FieldDataObject } from "./components/field-data-object";
 
 // TODO: moveable components:
 // - [ ] 1. Text data: data digenerate dari server
@@ -59,19 +59,7 @@ function CanvasArea() {
             y={field.y}
             onMove={({ x, y } = {}) => setFieldPosition(field.name, { x, y })}
           >
-            {field.type === "text" && (
-              <TextData
-                title={field.name}
-                text={field.label || field.name}
-                fontFamily={field.fontFamily}
-                fontSize={field.fontSize}
-                color={field.color}
-                isBold={field.isBold}
-              />
-            )}
-            {field.type === "box" && (
-              <div title={field.label + ` (variabel: ${field.name})`}>{field.name}</div>
-            )}
+            <FieldDataObject field={field} />
           </MoveableObject>
         ))}
       </MoveableArea>

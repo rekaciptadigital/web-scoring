@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useEventDetail } from "./hooks/event-detail";
 
 import { EditorProvider, useEditor } from "./contexts/editor-data";
 
@@ -93,6 +94,9 @@ function EditorHeader() {
 }
 
 function ButtonPreview() {
+  const { event_id } = useParams();
+  const { data, isPortrait } = useEditor();
+  const { data: eventDetail } = useEventDetail(event_id);
   const [isOpen, setOpen] = React.useState(false);
   return (
     <React.Fragment>
@@ -119,11 +123,23 @@ function ButtonPreview() {
                 </div>
               </ModalHeaderBar>
 
-              <div>
-                <PreviewCanvas />
-              </div>
+              <PreviewCanvasContainer
+                style={{
+                  "--preview-canvas-container-padding": isPortrait
+                    ? "0.25rem 12rem"
+                    : "0.25rem 7rem",
+                }}
+              >
+                <PreviewCanvas
+                  key={`${data.paperSize}-${data.paperOrientation}`}
+                  eventDetail={eventDetail}
+                />
+              </PreviewCanvasContainer>
 
-              <PreviewCaption>Ukuran: {"A4 (21 cm x 29,7 cm)"}</PreviewCaption>
+              <PreviewCaption>
+                Ukuran: {data?.paperSize?.toUpperCase?.()}
+                {false && "(21 cm x 29,7 cm)"}
+              </PreviewCaption>
             </PreviewContainer>
           </ModalBody>
         </Modal>
@@ -506,6 +522,20 @@ const LoadingCanvas = styled.div`
 const PreviewContainer = styled.div`
   > * + * {
     margin-top: 1rem;
+  }
+`;
+
+const PreviewCanvasContainer = styled.div`
+  height: 37.5rem;
+  background-color: var(--ma-gray-50);
+  padding: var(--preview-canvas-container-padding);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > * {
+    box-shadow: 0 5px 20px rgba(18, 38, 63, 0.07);
   }
 `;
 

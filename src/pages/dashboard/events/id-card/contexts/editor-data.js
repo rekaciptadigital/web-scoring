@@ -30,12 +30,6 @@ const FIELD_TYPE_TEXT = "text";
 const FIELD_TYPE_BOX_AVATAR = "box-avatar";
 const FIELD_TYPE_BOX_QR = "box-qr";
 
-const LABEL_MEMBER_NAME = "member_name";
-const LABEL_CATEGORY_NAME = "category_name";
-const LABEL_RANK = "ranked";
-
-const DEJAVU_SANS = "'DejaVu Sans', sans-serif";
-
 const OR_PORTRAIT = "p";
 const OR_LANDSCAPE = "l";
 
@@ -80,38 +74,77 @@ const dimensions = {
 };
 
 const defaultEditorData = {
-  paperSize: A4,
+  paperSize: A6,
   paperOrientation: OR_PORTRAIT,
   backgroundUrl: undefined,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
   fields: {
-    [LABEL_MEMBER_NAME]: {
+    player_name: {
       type: FIELD_TYPE_TEXT,
-      name: LABEL_MEMBER_NAME,
+      name: "player_name",
+      label: "Nama Peserta",
       isVisible: true,
-      x: 640,
-      y: 280,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 60,
+      x: 88,
+      y: 64,
+      fontFamily: "'DejaVu Sans', sans-serif",
+      fontSize: 24,
     },
-    [LABEL_RANK]: {
+    location_and_date: {
       type: FIELD_TYPE_TEXT,
-      name: LABEL_RANK,
+      name: "location_and_date",
+      label: "Tempat/Tanggal Pertandingan",
       isVisible: true,
-      x: 640,
-      y: 370,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
+      x: 88,
+      y: 134,
+      fontFamily: "'DejaVu Sans', sans-serif",
+      fontSize: 24,
     },
-    [LABEL_CATEGORY_NAME]: {
+    category: {
       type: FIELD_TYPE_TEXT,
-      name: LABEL_CATEGORY_NAME,
+      name: "category",
+      label: "Kategori Pertandingan",
       isVisible: true,
-      x: 640,
-      y: 430,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
+      x: 88,
+      y: 232,
+      fontFamily: "'DejaVu Sans', sans-serif",
+      fontSize: 24,
+    },
+    club_member: {
+      type: FIELD_TYPE_TEXT,
+      name: "club_member",
+      label: "Asal Klub",
+      isVisible: true,
+      x: 88,
+      y: 354,
+      fontFamily: "'DejaVu Sans', sans-serif",
+      fontSize: 24,
+    },
+    status_event: {
+      type: FIELD_TYPE_TEXT,
+      name: "status_event",
+      label: "Peserta/Official",
+      isVisible: true,
+      x: 88,
+      y: 400,
+      fontFamily: "'DejaVu Sans', sans-serif",
+      fontSize: 24,
+    },
+    photoProfile: {
+      type: FIELD_TYPE_BOX_AVATAR,
+      name: "photoProfile",
+      label: "Foto Profil",
+      isVisible: true,
+      x: 88,
+      y: 480,
+    },
+    qrCode: {
+      type: FIELD_TYPE_BOX_QR,
+      name: "qrCode",
+      label: "QR Code",
+      isVisible: true,
+      x: 246,
+      y: 480,
     },
   },
 };
@@ -359,6 +392,9 @@ function useIdCard(eventId) {
     };
     fetcher.runAsync(getFunction, {
       transform(data) {
+        if (!data) {
+          return data;
+        }
         return { ...data, editorData: JSON.parse(data.editorData) };
       },
     });
@@ -427,79 +463,3 @@ async function _prepareSaveData(editorFormData) {
 }
 
 export { EditorProvider, useEditor, OR_PORTRAIT, OR_LANDSCAPE, A4, A5, A6 };
-
-// TODO: hapus mock
-// eslint-disable-next-line no-unused-vars
-const mockServerEditorData = {
-  backgroundUrl:
-    "https://api-staging.myarchery.id/asset/background_id_card/background_id_card_22.png#1655287468",
-  fields: {
-    player_name: {
-      type: FIELD_TYPE_TEXT,
-      name: "player_name",
-      label: "Nama Peserta",
-      isVisible: true,
-      x: 174,
-      y: 64,
-      fontFamily: "'DejaVu Sans', sans-serif",
-      fontSize: 45,
-    },
-    location_and_date: {
-      type: FIELD_TYPE_TEXT,
-      name: "location_and_date",
-      label: "Tempat/Tanggal Tanding",
-      isVisible: true,
-      x: 214,
-      y: 154,
-      fontFamily: "'DejaVu Sans', sans-serif",
-      fontSize: 36,
-    },
-    category: {
-      type: FIELD_TYPE_TEXT,
-      name: "category",
-      label: "Kategori Tanding",
-      isVisible: true,
-      x: 252,
-      y: 248,
-      fontFamily: "'DejaVu Sans', sans-serif",
-      fontSize: 36,
-    },
-    club_member: {
-      type: FIELD_TYPE_TEXT,
-      name: "club_member",
-      label: "Asal Klub",
-      isVisible: true,
-      x: 324,
-      y: 328,
-      fontFamily: "'DejaVu Sans', sans-serif",
-      fontSize: 36,
-    },
-    status_event: {
-      type: FIELD_TYPE_TEXT,
-      name: "status_event",
-      label: "Peserta/Official",
-      isVisible: true,
-      x: 272,
-      y: 436,
-      fontFamily: "'DejaVu Sans', sans-serif",
-      fontSize: 36,
-    },
-    photoProfile: {
-      type: FIELD_TYPE_BOX_AVATAR,
-      name: "photoProfile",
-      label: "Foto Profil",
-      isVisible: true,
-      x: 30,
-      y: 250,
-    },
-    qrCode: {
-      type: FIELD_TYPE_BOX_QR,
-      name: "qrCode",
-      label: "QR Code",
-      isVisible: true,
-      x: 0,
-      y: 650,
-    },
-  },
-  event_id: 22,
-};

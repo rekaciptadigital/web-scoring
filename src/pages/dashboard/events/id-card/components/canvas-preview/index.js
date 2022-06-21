@@ -21,7 +21,7 @@ function PreviewCanvas({ eventDetail }) {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
 
   const textByName = {
-    player_name: "Widodo Muhammad Mahfuzon",
+    player_name: "Widodo Mahfudz Muhammad Akhiar",
     location_and_date: _getLocationDate(eventDetail),
     category: "Umum - 70m - Individu Putra",
     club_member: "My Archery Club",
@@ -79,7 +79,7 @@ function _getCanvasScale(offsetWidth, actualPaperPixels) {
 
 function _getLocationDate(eventDetail) {
   if (!eventDetail) {
-    return "-";
+    return `Jakarta, ${datetime.formatFullDateLabel(new Date())}`;
   }
   return `${eventDetail.publicInformation.eventCity.nameCity.toLowerCase?.()}, ${datetime.formatFullDateLabel(
     eventDetail.publicInformation.eventStart

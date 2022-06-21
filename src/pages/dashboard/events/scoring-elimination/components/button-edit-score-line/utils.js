@@ -46,4 +46,12 @@ function hasWinner(scoringData) {
   return scoringData.some(hasAttributeWinToBeTrue);
 }
 
-export { sumScoresList, sumScoresAllRambahan, makeScoringPayload, hasWinner };
+function _getValueFromInput(inputString) {
+  const numberValue = Number(inputString);
+  const checkValue = !isNaN(numberValue) ? numberValue : inputString;
+  const value =
+    ["m", "x", 2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(checkValue) > -1 ? checkValue : false;
+  return value;
+}
+
+export { sumScoresList, sumScoresAllRambahan, makeScoringPayload, hasWinner, _getValueFromInput };

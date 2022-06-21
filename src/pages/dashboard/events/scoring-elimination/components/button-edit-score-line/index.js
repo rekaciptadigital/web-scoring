@@ -5,6 +5,7 @@ import { useSubmitScores } from "../../hooks/submit-scores";
 import { useGridForm } from "../../hooks/grid-form";
 import { useAdminTotal } from "../../hooks/admin-total";
 import { useSubmitAdminTotal } from "../../hooks/submit-total";
+import { InputSwitcherProvider } from "./contexts/input-switcher";
 
 import { Modal as BSModal, ModalBody } from "reactstrap";
 import {
@@ -303,21 +304,23 @@ function ModalEditor({
             </CategoryLabel>
 
             <SplitEditor>
-              <div>
-                <ScoreGridForm
-                  scoringType={player1?.scores.eliminationtScoreType}
-                  gridData={gridDataPlayer1}
-                  onChange={(value) => setGridDataPlayer1(value)}
-                />
-              </div>
+              <InputSwitcherProvider grid={gridDataPlayer1?.shot || gridDataPlayer2?.shot}>
+                <div>
+                  <ScoreGridForm
+                    scoringType={player1?.scores.eliminationtScoreType}
+                    gridData={gridDataPlayer1}
+                    onChange={(value) => setGridDataPlayer1(value)}
+                  />
+                </div>
 
-              <div>
-                <ScoreGridFormRight
-                  scoringType={player2?.scores.eliminationtScoreType}
-                  gridData={gridDataPlayer2}
-                  onChange={(value) => setGridDataPlayer2(value)}
-                />
-              </div>
+                <div>
+                  <ScoreGridFormRight
+                    scoringType={player2?.scores.eliminationtScoreType}
+                    gridData={gridDataPlayer2}
+                    onChange={(value) => setGridDataPlayer2(value)}
+                  />
+                </div>
+              </InputSwitcherProvider>
             </SplitEditor>
 
             <HorizontalSpaced>

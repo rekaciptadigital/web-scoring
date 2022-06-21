@@ -5,6 +5,7 @@ import { useSubmitScores } from "../../hooks/submit-scores";
 import { useGridForm } from "../../hooks/grid-form";
 import { useAdminTotal } from "../../hooks/admin-total";
 import { useSubmitAdminTotal } from "../../hooks/submit-total";
+import { InputSwitcherProvider } from "./contexts/input-switcher";
 
 import { Modal as BSModal, ModalBody } from "reactstrap";
 import {
@@ -27,6 +28,7 @@ import IconDistance from "components/ma/icons/mono/arrow-left-right";
 import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
+import { sumScoresList } from "./utils";
 
 function ButtonEditScoreLine({
   disabled,
@@ -303,21 +305,40 @@ function ModalEditor({
             </CategoryLabel>
 
             <SplitEditor>
-              <div>
-                <ScoreGridForm
-                  scoringType={player1?.scores.eliminationtScoreType}
-                  gridData={gridDataPlayer1}
-                  onChange={(value) => setGridDataPlayer1(value)}
-                />
-              </div>
+              <InputSwitcherProvider grid={gridDataPlayer1?.shot || gridDataPlayer2?.shot}>
+                <div>
+                  <ScoreGridForm
+                    scoringType={player1?.scores.eliminationtScoreType}
+                    gridData={gridDataPlayer1}
+                    onChange={(value) => {
+                      if (player1?.scores.eliminationtScoreType === 1) {
+                        // Itung poin real-time untuk tipe skoring poin
+                        const [valP1, valP2] = _computePoints(value, gridDataPlayer2);
+                        setGridDataPlayer1(valP1);
+                        setGridDataPlayer2(valP2); // opponent
+                      } else {
+                        setGridDataPlayer1(value);
+                      }
+                    }}
+                  />
+                </div>
 
-              <div>
-                <ScoreGridFormRight
-                  scoringType={player2?.scores.eliminationtScoreType}
-                  gridData={gridDataPlayer2}
-                  onChange={(value) => setGridDataPlayer2(value)}
-                />
-              </div>
+                <div>
+                  <ScoreGridFormRight
+                    scoringType={player2?.scores.eliminationtScoreType}
+                    gridData={gridDataPlayer2}
+                    onChange={(value) => {
+                      if (player2?.scores.eliminationtScoreType === 1) {
+                        const [valP2, valP1] = _computePoints(value, gridDataPlayer1);
+                        setGridDataPlayer2(valP2);
+                        setGridDataPlayer1(valP1); // opponent
+                      } else {
+                        setGridDataPlayer2(value);
+                      }
+                    }}
+                  />
+                </div>
+              </InputSwitcherProvider>
             </SplitEditor>
 
             <HorizontalSpaced>
@@ -657,6 +678,51 @@ function _makeMemberScoresPayload({ state, payload }) {
 
 function _getDistanceCategoryLabel(classCategory) {
   return classCategory.split(" - ")?.[1]?.trim() || "-";
+}
+
+function _computePoints(value, valueOpponent) {
+  const sums = value.shot.reduce((sums, rambahan, index) => {
+    const pointA = sumScoresList(rambahan);
+    const pointB = sumScoresList(valueOpponent.shot[index]);
+    sums.push([pointA, pointB]);
+    return sums;
+  }, []);
+
+  const points = sums.reduce((points, [a, b]) => {
+    let pair = [1, 1];
+    if (a > b) {
+      pair = [2, 0];
+    } else if (a < b) {
+      pair = [0, 2];
+    } else if (a === 0 && b === 0) {
+      pair = [0, 0];
+    }
+    points.push(pair);
+    return points;
+  }, []);
+
+  const resultPair = [value, valueOpponent].map((player, playerIndex) => {
+    const stats = points.reduce((stats, pointPair, rambahanIndex) => {
+      const point = pointPair[playerIndex];
+      stats[rambahanIndex] = { ...player.stats[rambahanIndex], point };
+      return stats;
+    }, {});
+
+    const result = points.reduce((total, pointPair) => {
+      return total + pointPair[playerIndex];
+    }, 0);
+
+    return {
+      ...player,
+      stats: {
+        ...player.stats,
+        ...stats,
+        result: result,
+      },
+    };
+  });
+
+  return resultPair;
 }
 
 export { ButtonEditScoreLine };

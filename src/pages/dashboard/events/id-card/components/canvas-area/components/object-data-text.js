@@ -1,16 +1,15 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useEditor, A6 } from "../../../contexts/editor-data";
+import { useEditor } from "../../../contexts/editor-data";
 
 function TextData({ title, text, fontSize, fontFamily, color, isBold }) {
-  const { data, getPaperDimensions } = useEditor();
-  const { width } = getPaperDimensions();
-  const fraction = data.paperSize === A6 ? 0.6 : 0.7;
+  const { getConfigMaxTextWidth } = useEditor();
+  const textWidth = getConfigMaxTextWidth();
   return (
     <Text
       title={"variabel: " + title}
       style={{
-        "--data-text-container-width": width * fraction + "px",
+        "--data-text-container-width": textWidth + "px",
         "--data-text-font-size": fontSize + "px",
         "--data-text-font-family": fontFamily,
         "--data-text-color": color,

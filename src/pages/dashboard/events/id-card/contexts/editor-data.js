@@ -171,7 +171,8 @@ function useEditorData(event_id) {
 
   const saveEditor = async () => {
     toast.loading("Menyimpan ID card...");
-    const payload = await _prepareSaveData(data);
+    const config = { maxTextWidth: getConfigMaxTextWidth() };
+    const payload = await _prepareSaveData(data, config);
     submitIdCard(payload, {
       onSuccess() {
         toast.dismiss();
@@ -235,6 +236,13 @@ function useEditorData(event_id) {
     dispatch({ type: "TOGGLE_FIELD_TEXT_BOLD", name: name });
   };
 
+  const getConfigMaxTextWidth = () => {
+    const { width: paperWidth } = getPaperDimensions();
+    const fraction = data.paperSize === A6 ? 0.6 : 0.7;
+    const maxWidth = paperWidth * fraction;
+    return Math.ceil(maxWidth);
+  };
+
   return {
     isLoading,
     data,
@@ -259,6 +267,7 @@ function useEditorData(event_id) {
     setFieldTextFontSize,
     setFieldTextColor,
     toggleFieldTextBold,
+    getConfigMaxTextWidth,
   };
 }
 
@@ -435,13 +444,14 @@ function _buildEditorData(idCard) {
   };
 }
 
-async function _prepareSaveData(editorFormData) {
+async function _prepareSaveData(editorFormData, config = {}) {
   const editorData = {
     event_id: editorFormData.event_id,
     paperSize: editorFormData.paperSize,
     paperOrientation: editorFormData.paperOrientation,
-    backgroundFileRaw: undefined,
-    backgroundPreviewUrl: undefined,
+    backgroundUrl: editorFormData.backgroundUrl,
+    backgroundFileRaw: editorFormData.backgroundFileRaw,
+    backgroundPreviewUrl: editorFormData.backgroundPreviewUrl,
     fields: editorFormData.fields,
   };
 
@@ -449,14 +459,19 @@ async function _prepareSaveData(editorFormData) {
     ? await convertBase64(editorFormData.backgroundFileRaw)
     : undefined;
 
-  const certificateHtmlTemplate = renderTemplateString(editorData);
+  const certificateHtmlTemplate = renderTemplateString(editorData, config);
   const templateInBase64 = btoa(certificateHtmlTemplate);
 
   const payload = {
     event_id: parseInt(editorFormData.event_id),
     html_template: templateInBase64,
     background_url: imageBase64ForUpload,
-    editor_data: JSON.stringify(editorData),
+    editor_data: JSON.stringify({
+      ...editorData,
+      backgroundUrl: undefined,
+      backgroundFileRaw: undefined,
+      backgroundPreviewUrl: undefined,
+    }),
   };
 
   return payload;

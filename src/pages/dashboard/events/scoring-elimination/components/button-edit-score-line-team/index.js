@@ -471,7 +471,7 @@ const BodyWrapper = styled.div`
 
 const Modal = styled(BSModal)`
   position: relative;
-  max-width: 62rem;
+  max-width: 72rem;
 `;
 
 const ModalHeaderBar = styled.div`

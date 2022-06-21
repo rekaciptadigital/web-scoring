@@ -150,16 +150,24 @@ const defaultEditorData = {
 };
 
 function useEditorData(event_id) {
-  const { data: idCard, isLoading: isLoadingIdCard, fetchIdCard } = useIdCard(event_id);
+  const {
+    data: idCard,
+    isLoading: isLoadingIdCard,
+    isError: isErrorFetching,
+    errors: errorsFetching,
+    fetchIdCard,
+  } = useIdCard(event_id);
   const [data, dispatch] = React.useReducer(editorReducer, defaultEditorData);
   const [activeObject, setActiveObject] = React.useState(null);
-  const { submitIdCard, isLoading: isSubmiting } = useSubmitIdCard();
+  const {
+    submitIdCard,
+    isLoading: isSubmiting,
+    isError: isErrorSubmiting,
+    errors: errorsSubmiting,
+  } = useSubmitIdCard();
 
   React.useEffect(() => {
-    if (!idCard?.editorData) {
-      return;
-    }
-    dispatch({ type: "INIT", payload: _buildEditorData(idCard) });
+    dispatch({ type: "INIT", payload: _buildEditorData(idCard, parseInt(event_id)) });
   }, [idCard]);
 
   const isLoading = !idCard && isLoadingIdCard;
@@ -245,8 +253,12 @@ function useEditorData(event_id) {
 
   return {
     isLoading,
+    isErrorFetching,
+    errorsFetching,
     data,
     saveEditor,
+    isErrorSubmiting,
+    errorsSubmiting,
     isSaving,
     isFetching,
     isDirty,
@@ -433,13 +445,19 @@ function useSubmitIdCard() {
 /* ======================== */
 // utils
 
-function _buildEditorData(idCard) {
+function _buildEditorData(idCard, eventId) {
   if (!idCard?.editorData) {
-    return defaultEditorData;
+    return {
+      key: stringUtil.createRandom(),
+      event_id: eventId,
+      ...defaultEditorData,
+    };
   }
   return {
-    ...idCard.editorData,
     key: stringUtil.createRandom(),
+    event_id: eventId,
+    ...idCard.editorData,
+    // Tarik data background ke editor data
     backgroundUrl: idCard.background,
   };
 }

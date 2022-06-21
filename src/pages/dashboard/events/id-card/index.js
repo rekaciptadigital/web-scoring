@@ -7,7 +7,13 @@ import { EditorProvider, useEditor } from "./contexts/editor-data";
 
 import { Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
-import { SpinnerDotBlock, NoticeBarInfo, ButtonOutlineBlue, ButtonBlue } from "components/ma";
+import {
+  SpinnerDotBlock,
+  NoticeBarInfo,
+  ButtonOutlineBlue,
+  ButtonBlue,
+  AlertSubmitError,
+} from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
 import { ProcessingToast } from "./components/processing-toast";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -74,7 +80,14 @@ function SavingBlocker() {
 }
 
 function EditorHeader() {
-  const { isDirty, saveEditor } = useEditor();
+  const {
+    isDirty,
+    saveEditor,
+    isErrorFetching,
+    errorsFetching,
+    isErrorSubmiting,
+    errorsSubmiting,
+  } = useEditor();
   return (
     <EditorHeaderBar>
       <div>
@@ -88,6 +101,8 @@ function EditorHeader() {
         <ButtonBlue disabled={!isDirty} onClick={() => saveEditor()}>
           Simpan
         </ButtonBlue>
+        <AlertSubmitError isError={isErrorFetching} errors={errorsFetching} />
+        <AlertSubmitError isError={isErrorSubmiting} errors={errorsSubmiting} />
       </ActionButtons>
     </EditorHeaderBar>
   );

@@ -61,13 +61,16 @@ function renderTemplateString(editorData, config) {
   </head>
 
   <body>
-    ${renderFieldText(LABEL_PLAYER_NAME)}
-    ${renderFieldText(LABEL_LOCATION_AND_DATE)}
-    ${renderFieldText(LABEL_CATEGORY)}
-    ${renderFieldText(LABEL_CLUB_MEMBER)}
-    ${renderFieldText(LABEL_STATUS_EVENT)}
-    ${renderQrCode()}
-    ${renderAvatar()}
+    ${renderFieldText(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME].isVisible)}
+    ${renderFieldText(
+      LABEL_LOCATION_AND_DATE,
+      editorData.fields[LABEL_LOCATION_AND_DATE].isVisible
+    )}
+    ${renderFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY].isVisible)}
+    ${renderFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER].isVisible)}
+    ${renderFieldText(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT].isVisible)}
+    ${renderQrCode(editorData.fields["qrCode"].isVisible)}
+    ${renderAvatar(editorData.fields["photoProfile"].isVisible)}
   </body>
 </html>`;
 }
@@ -98,7 +101,10 @@ function renderCssField(name, data = {}) {
       }`;
 }
 
-function renderFieldText(name) {
+function renderFieldText(name, isVisible) {
+  if (!isVisible) {
+    return "";
+  }
   const placeholderString = name === LABEL_PLAYER_NAME ? `{%${name}%}` : `{%${name}%}`;
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
@@ -125,7 +131,10 @@ function renderCssAvatarField(data = {}) {
     }`;
 }
 
-function renderQrCode() {
+function renderQrCode(isVisible) {
+  if (!isVisible) {
+    return "";
+  }
   const urlPlaceholder = "{%certificate_verify_url%}";
   return `
     <div id="qr-code-container">
@@ -142,7 +151,10 @@ function renderQrCode() {
     </div>`;
 }
 
-function renderAvatar() {
+function renderAvatar(isVisible) {
+  if (!isVisible) {
+    return "";
+  }
   const urlPlaceholder = "{%avatar%}";
   return `
     <div id="qr-avatar-container">

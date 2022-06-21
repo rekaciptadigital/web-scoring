@@ -1,28 +1,19 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useInputSwitcher } from "../contexts/input-switcher";
 
 import { SelectScore } from "./select-score-compact";
 import { SelectScoreShootOff } from "./select-score-shoot-off";
 
-import { sumScoresList, sumScoresAllRambahan } from "../utils";
-
-const defaultGrid = {
-  shot: [
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ],
-  stats: { 0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {} },
-  extraShot: [
-    { score: "", distanceFromX: 0 },
-    { score: "", distanceFromX: 0 },
-    { score: "", distanceFromX: 0 },
-  ],
-};
+import { sumScoresList, sumScoresAllRambahan, getValueFromInput } from "../utils";
+import { defaultGrid } from "../constants";
 
 function ScoreGridForm({ scoringType = 1, gridData = defaultGrid, onChange }) {
+  const { shouldFocusInput, move: _move, setPosition: _setPosition } = useInputSwitcher();
+  const SIDE = 0;
+  const move = (pos) => _move(SIDE, pos);
+  const setPosition = (pos) => _setPosition(SIDE, pos);
+
   const handleChangeScores = ({ rambahan: rambahanIndex, shot: shotIndex, value }) => {
     const updatedShot = gridData.shot.map((rambahan, index) => {
       if (index !== rambahanIndex) {
@@ -85,20 +76,39 @@ function ScoreGridForm({ scoringType = 1, gridData = defaultGrid, onChange }) {
             <tr key={rambahanIndex}>
               <TDRambahan>
                 <RambahanUhuy>
-                  {rambahan.map((shot, shotIndex) => (
-                    <SelectScore
-                      key={shotIndex}
-                      name={`score-${rambahanIndex}-${shotIndex}`}
-                      value={shot}
-                      onChange={(value) => {
-                        handleChangeScores({
-                          rambahan: rambahanIndex,
-                          shot: shotIndex,
-                          value,
-                        });
-                      }}
-                    />
-                  ))}
+                  {rambahan.map((shot, shotIndex) => {
+                    const pos = { y: rambahanIndex, x: shotIndex };
+                    const isFocus = shouldFocusInput(SIDE, pos);
+                    return (
+                      <SelectScore
+                        key={shotIndex}
+                        name={`score-${rambahanIndex}-${shotIndex}`}
+                        value={shot}
+                        onChange={(value) => {
+                          handleChangeScores({
+                            rambahan: rambahanIndex,
+                            shot: shotIndex,
+                            value,
+                          });
+                          move(pos);
+                        }}
+                        onInputChange={(inputString) => {
+                          const value = getValueFromInput(inputString);
+                          if (!value) {
+                            return;
+                          }
+                          handleChangeScores({
+                            rambahan: rambahanIndex,
+                            shot: shotIndex,
+                            value: value,
+                          });
+                          move(pos);
+                        }}
+                        isFocus={isFocus}
+                        onFocus={() => setPosition(pos)}
+                      />
+                    );
+                  })}
                 </RambahanUhuy>
               </TDRambahan>
 

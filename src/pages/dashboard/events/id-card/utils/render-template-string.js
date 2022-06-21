@@ -1,9 +1,14 @@
 import { idCardFields } from "constants/index";
 
-const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
+const {
+  LABEL_PLAYER_NAME,
+  LABEL_LOCATION_AND_DATE,
+  LABEL_CATEGORY,
+  LABEL_CLUB_MEMBER,
+  LABEL_STATUS_EVENT,
+} = idCardFields;
 
-
-function renderTemplateString(editorData) {
+function renderTemplateString(editorData, config) {
   const documentTitle = editorData.title || "My Archery Certificate";
 
   return `<!DOCTYPE html>
@@ -29,6 +34,7 @@ function renderTemplateString(editorData) {
         position: absolute;
         left: 0px;
         right: 0px;
+        width: ${config.maxTextWidth}px;
         text-align: center;
       }
 
@@ -37,31 +43,34 @@ function renderTemplateString(editorData) {
         width: 35mm;
         height: 35mm;
       }
-     
+
       .qr-code-img {
         margin: 0;
         width: 50mm;
         height: 50mm;
       }
 
-      ${renderCssField(LABEL_PLAYER_NAME, editorData.fields[0])}
-      ${renderCssField(LABEL_LOCATION_AND_DATE, editorData.fields[1])}
-      ${renderCssField(LABEL_CATEGORY, editorData.fields[2])}
-      ${renderCssField(LABEL_CLUB_MEMBER, editorData.fields[3])}
-      ${renderCssField(LABEL_STATUS_EVENT, editorData.fields[4])}
-      ${renderCssQrField(LABEL_STATUS_EVENT, editorData.qrFields)} 
-      ${renderCssAvatarField(LABEL_STATUS_EVENT, editorData.photoProfileField)}      
+      ${renderCssField(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME])}
+      ${renderCssField(LABEL_LOCATION_AND_DATE, editorData.fields[LABEL_LOCATION_AND_DATE])}
+      ${renderCssField(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY])}
+      ${renderCssField(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER])}
+      ${renderCssField(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT])}
+      ${renderCssQrField(editorData.fields["qrCode"])}
+      ${renderCssAvatarField(editorData.fields["photoProfile"])}
     </style>
   </head>
 
   <body>
-    ${renderFieldText(LABEL_PLAYER_NAME)}
-    ${renderFieldText(LABEL_LOCATION_AND_DATE)}
-    ${renderFieldText(LABEL_CATEGORY)}
-    ${renderFieldText(LABEL_CLUB_MEMBER)}
-    ${renderFieldText(LABEL_STATUS_EVENT)}
-    ${renderQrCode()}
-    ${renderAvatar()}
+    ${renderFieldText(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME].isVisible)}
+    ${renderFieldText(
+      LABEL_LOCATION_AND_DATE,
+      editorData.fields[LABEL_LOCATION_AND_DATE].isVisible
+    )}
+    ${renderFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY].isVisible)}
+    ${renderFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER].isVisible)}
+    ${renderFieldText(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT].isVisible)}
+    ${renderQrCode(editorData.fields["qrCode"].isVisible)}
+    ${renderAvatar(editorData.fields["photoProfile"].isVisible)}
   </body>
 </html>`;
 }
@@ -76,7 +85,6 @@ const renderCssBackgroundImage = (editorData) => {
 };
 
 function renderCssField(name, data = {}) {
-
   const { y, fontFamily, fontWeight, fontSize, color, x } = data;
 
   const computeColor = () => (color ? `color: ${color};` : "");
@@ -93,37 +101,40 @@ function renderCssField(name, data = {}) {
       }`;
 }
 
-function renderFieldText(name) {
+function renderFieldText(name, isVisible) {
+  if (!isVisible) {
+    return "";
+  }
   const placeholderString = name === LABEL_PLAYER_NAME ? `{%${name}%}` : `{%${name}%}`;
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 
-function renderCssQrField(name, data = {}) {
-  console.log(data, 'data');  
+function renderCssQrField(data = {}) {
   const { y, x } = data;
-
   return `
     #qr-code-container {
       position: absolute;
       top: ${y}px;
-      left: ${x}px;   
-      padding-left: 300px;  
-    }`
+      left: ${x}px;
+      padding-left: 300px;
+    }`;
 }
 
-function renderCssAvatarField(name, data = {}) {
+function renderCssAvatarField(data = {}) {
   const { y, x } = data;
-
   return `
     #qr-avatar-container {
       position: absolute;
       top: ${y}px;
-      left: ${x}px;   
-      padding-left: 250px;  
-    }`
+      left: ${x}px;
+      padding-left: 250px;
+    }`;
 }
 
-function renderQrCode() {
+function renderQrCode(isVisible) {
+  if (!isVisible) {
+    return "";
+  }
   const urlPlaceholder = "{%certificate_verify_url%}";
   return `
     <div id="qr-code-container">
@@ -140,7 +151,10 @@ function renderQrCode() {
     </div>`;
 }
 
-function renderAvatar() {
+function renderAvatar(isVisible) {
+  if (!isVisible) {
+    return "";
+  }
   const urlPlaceholder = "{%avatar%}";
   return `
     <div id="qr-avatar-container">

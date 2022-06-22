@@ -8,9 +8,17 @@ const optionsScoreNumbers = ["", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((v
   label: !value ? "-" : isNaN(value) ? value.toUpperCase() : value,
 }));
 
-function SelectScore({ name, value, onChange }) {
+function SelectScore({ name, value, onChange, onInputChange, isFocus, onFocus }) {
   const covertedValueType = _convertScoreValueType(value);
   const selectedOption = _getOptionFromValue(covertedValueType);
+  const refSelect = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!isFocus) {
+      return;
+    }
+    refSelect.current?.focus();
+  }, [isFocus]);
 
   const handleChange = (option) => {
     if (option.value === covertedValueType) {
@@ -24,6 +32,7 @@ function SelectScore({ name, value, onChange }) {
   return (
     <SelectContainer>
       <Select
+        ref={refSelect}
         name={name}
         placeholder="-"
         styles={customSelectStyles}
@@ -31,6 +40,8 @@ function SelectScore({ name, value, onChange }) {
         value={selectedOption}
         options={optionsScoreNumbers}
         noOptionsMessage={handleNoOption}
+        onInputChange={onInputChange}
+        onFocus={onFocus}
       />
     </SelectContainer>
   );

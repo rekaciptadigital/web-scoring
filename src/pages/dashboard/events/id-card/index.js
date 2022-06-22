@@ -1,671 +1,582 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { IdCardService } from "services";
-import {
-  optionsFontSize,
-  optionsFontFamily,
-  getSelectedFontFamily,
-  optionsPaperSize,
-  getSelectedPaperSize,
-  optionsOrientation,
-  getSelectedOrientation,
-} from './utils/index';
-import { prepareSaveData } from "./utils";
-import { DEJAVU_SANS } from "../../certificates/utils/font-family-list";
-import { idCardFields } from "constants/index";
+import { useParams } from "react-router-dom";
+import { useEventDetail } from "./hooks/event-detail";
 
-import MetaTags from "react-meta-tags";
-import { Container, Col, Row, Card, Button as BSButton, Modal, ModalBody } from "reactstrap";
+import { EditorProvider, useEditor } from "./contexts/editor-data";
+
+import { Modal, ModalBody } from "reactstrap";
 import { CompactPicker } from "react-color";
-import Select from "react-select";
-import { ProcessingBlocker } from "../../certificates/new/processing-blocker";
-import { AlertPromptSave } from "../../certificates/new/alert-prompt-save";
-
-import EditorBgImagePicker from "./components/EditorBgImagePicker";
-import EditorCanvasHTML from "./components/EditorCanvasHTML";
-import EditorCanvasHTMLPotrait from "./components/EditorCanvasHTMLPotrait";
-import FontBoldToggle from "./components/FontBoldToggle";
-import ColorPickerContainer from "./components/ColorPickerContainer";
-import PreviewCanvas from "./components/preview/PreviewCanvas";
+import {
+  SpinnerDotBlock,
+  NoticeBarInfo,
+  ButtonOutlineBlue,
+  ButtonBlue,
+  AlertSubmitError,
+} from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
-import DisplayObject from "./components/DisplayObject";
+import { ProcessingToast } from "./components/processing-toast";
+import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
+import { CanvasArea } from "./components/canvas-area";
+import { PreviewCanvas } from "./components/canvas-preview";
+import { SelectPaperSize } from "./components/select-paper-size";
+import { SelectPaperOrientation } from "./components/select-paper-orientation";
+import { SelectVisibleData } from "./components/select-visible-data";
+import { SelectFontFamily } from "./components/select-font-family";
+import { SelectFontSize } from "./components/select-font-size";
 
-const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
+import IconImage from "components/ma/icons/mono/image";
+import IconX from "components/ma/icons/mono/x";
 
 function PageEventIdCard() {
   const { event_id } = useParams();
+  const eventId = parseInt(event_id);
 
-  const isMounted = React.useRef(null);
-  const abortControllerRef = React.useRef(null);
-
-  React.useEffect(() => {
-    isMounted.current = true;
-    abortControllerRef.current = new AbortController();
-    return () => {
-      isMounted.current = false;
-      abortControllerRef.current.abort();
-    };
-  }, []);
-
-  const [currentCertificateType, setCurrentCertificateType] = React.useState(1);
-
-  const [status, setStatus] = React.useState("idle");
-  const [editorData, setEditorData] = React.useState(null);
-
-  const [currentObject, setCurrentObject] = React.useState(null);
-//   const [isEditorDirty, setEditorAsDirty] = React.useState(false);
-
-
-  const targetCertificateType = React.useRef(1);
-  const [needSavingConfirmation, setNeedSavingConfirmation] = React.useState(false);
-
-  const [isModePreview, setModePreview] = React.useState(false);
-
-  const isSaving = status === "saving";
-  const isLoading = status === "loading";
-
-//   const setEditorClean = () => setEditorAsDirty(false);
-//   const setEditorDirty = () => setEditorAsDirty(true);
-
-  const image = {
-    preview: editorData?.backgroundPreviewUrl || editorData?.backgroundUrl || null,
-    raw: editorData?.backgroundFileRaw || null,
+  const propsContentWrapper = {
+    pageTitle: "Editor ID Card",
+    navbar: <SubNavbar eventId={eventId} />,
   };
-
-  React.useEffect(() => {
-    setStatus("loading");
-
-    const getCertificateData = async () => {
-      const queryString = { event_id: event_id };
-      const result = await IdCardService.getForEditor(
-        queryString,
-        abortControllerRef.current.signal
-      );
-
-      // Batalkan update state ketika komponen udah di-unmount.
-      // Menghindari memory leak ketika belum selesai loading tapi user pindah halamanan.
-      // Data sertifikat makan memory besar.
-      if (!isMounted.current) {
-        return;
-      }
-
-      if (result.success) {
-        // Kalau belum ada data template tapi dapatnya objek kosongan
-        if (!result?.data?.id) {
-          setEditorData({
-            ...defaultEditorData,
-          });
-        } else {
-          // Data editor dari data sertifikat yang sudah ada di server
-          const parsedEditorData = result.data.editorData ? JSON.parse(result.data.editorData) : "";
-          setEditorData({
-            ...defaultEditorData,
-            event_id: event_id,
-            backgroundUrl: result.data.background,
-            fields: parsedEditorData.fields || defaultEditorData.fields,
-            paperSize: parsedEditorData.paperSize || defaultEditorData.paperSize,
-            // orientation: parsedEditorData.orientation || defaultEditorData.orientation,
-            qrFields: parsedEditorData.qrFields || defaultEditorData.qrFields,
-            photoProfileField: parsedEditorData.photoProfileField || defaultEditorData.photoProfileField,
-          });
-        }
-      } else {
-        // Kalau belum ada data template tapi dilempar error
-        setEditorData({
-          ...defaultEditorData,
-        });
-      }
-
-      setStatus("done");
-    //   setEditorClean();
-      setCurrentObject(null);
-    };
-
-    getCertificateData();
-  }, [currentCertificateType]);
-
-  React.useEffect(() => {
-    if (!currentObject) {
-      return;
-    }
-    setEditorData((editorData) => {
-      const fieldsUpdated = editorData.fields.map((field) => {
-        if (field.name === currentObject.name) {
-          return currentObject;
-        }
-        return field;
-      });
-
-      return {
-        ...editorData,
-        fields: fieldsUpdated,
-        qrFields: currentObject.name == editorData.qrFields.name ? currentObject : editorData.qrFields,
-        photoProfileField: currentObject.name == editorData.photoProfileField.name ? currentObject : editorData.photoProfileField,
-      };
-    });
-  }, [currentObject]);
-
-//   const handleTipeSertifikatChange = async (ev) => {
-//     if (parseInt(ev.value) === parseInt(editorData.typeCertificate)) {
-//       return;
-//     }
-
-//     if (!isEditorDirty) {
-//       setCurrentCertificateType(ev.value);
-//     } else {
-//       setNeedSavingConfirmation(true);
-//       targetCertificateType.current = ev.value;
-//     }
-//   };
-
-  /**
-   * Ke-trigger ketika seleksi objek teks & juga ketika geser posisinya.
-   */
-  const handleEditorChange = (data) => {
-    setCurrentObject((currentData) => {
-      return ({
-      ...currentData,
-      ...data,
-    })});
-  };
-
-  const handleFontSizeChange = (ev) => {
-    const { value } = ev;
-    setCurrentObject((currentData) => ({
-      ...currentData,
-      fontSize: value,
-    }));
-  };
-
-  const handleFontFamilyChange = (ev) => {
-    const { value } = ev;
-    setCurrentObject((currentData) => ({
-      ...currentData,
-      fontFamily: value,
-    }));
-  };
-
-  const handlePaperSizeChange = (ev) => {
-    const { value } = ev;
-    setEditorData((data) => ({
-      ...data,
-      paperSize: value,
-    }));
-  };
-
-  const handleOrientationChange = (ev) => {
-    const { value } = ev;
-    setEditorData((data) => ({
-      ...data,
-      orientation: value,
-    }));
-  };
-
-  const handleFontColorChange = (color) => {
-    setCurrentObject((currentData) => ({
-      ...currentData,
-      color: color.hex,
-    }));
-  };
-
-  const handleFontBoldChange = () => {
-    setCurrentObject((currentData) => ({
-      ...currentData,
-      fontWeight: currentData.fontWeight ? undefined : "bold",
-    }));
-  };
-  
-  const handleRemove = () => {
-    setCurrentObject((currentData) => ({
-      ...currentData,
-      display: currentData.display ? undefined : "none",
-    }))
-  };
-
-  const handleReset = () => {
-    setEditorData((data) => ({
-      ...data,
-      fields: defaultEditorData.fields,
-    }));
-  };
-
-  const handleSelectBg = (imageData) => {
-    if (!imageData) {
-      return;
-    }
-    const imagePreviewUrl = URL.createObjectURL(imageData);
-    setEditorData((data) => {
-      return {
-        ...data,
-        backgroundPreviewUrl: imagePreviewUrl,
-        backgroundFileRaw: imageData,
-      };
-    });
-    // setEditorDirty();
-  };
-
-  const handleHapusBg = () => {
-    setEditorData((data) => {
-      return {
-        ...data,
-        backgroundPreviewUrl: undefined,
-        backgroundFileRaw: undefined,
-        backgroundUrl: null,
-      };
-    });
-    // setEditorDirty();
-  };
-  
-  const handleClickSave = async () => {
-    setStatus("saving");
-    const queryString = { event_id, type_certificate: currentCertificateType };
-    const data = await prepareSaveData(editorData, queryString);
-    
-    const result = await IdCardService.save(data);
-    if (result.data) {
-      const editorDataSaved = JSON.parse(result.data.editorData);
-      setEditorData((editorData) => ({
-        ...editorData,
-        ...editorDataSaved,
-        event_id: event_id,
-      }));
-      //   setEditorClean();
-    }
-    
-    setStatus("done");
-  };
-  
-  const handleOpenPreview = () => setModePreview(true);
-  const handleClosePreview = () => setModePreview(false);
-  const handleTogglePreview = () => setModePreview((isModePreview) => !isModePreview);
 
   return (
     <React.Fragment>
-        <SubNavbar eventId={event_id} />
-        
-        <MetaTags>
-                <title>Dashboard | Id Card</title>
-        </MetaTags>
+      <ProcessingToast />
 
-      <Container fluid>
-       
-        {/* Konten */}
-        <Row>
-          <Col lg="12">
-            <Row>
-              <Col lg="8">
-                <h1>ID Card</h1>
-                <p>
-                Geser keterangan yang ada di dalam ID Card sesuai yang Anda inginkan
-                </p>
-              </Col>
+      <ContentLayoutWrapper {...propsContentWrapper}>
+        <EditorProvider>
+          <CardSheet>
+            <SavingBlocker />
 
-              <Col lg="4">
-                <EditorActionButtons>
-
-                  <div>
-                    <BSButton
-                      tag="a"
-                      color="primary"
-                      onClick={() => handleClickSave()}
-                      disabled={isSaving || isLoading}
-                    >
-                      Simpan
-                    </BSButton>
-                  </div>
-
-                  <div>
-                    <BSButton
-                      tag="a"
-                      color="secondary"
-                      outline
-                      onClick={() => handleOpenPreview()}
-                      disabled={isSaving || isLoading}
-                    >
-                      Pratinjau
-                    </BSButton>
-
-
-                    <Modal
-                      isOpen={isModePreview}
-                      size="lg"
-                      autoFocus={true}
-                      centered={true}
-                      className="modalPreview"
-                      tabIndex="-1"
-                      toggle={() => handleTogglePreview()}
-                    >
-                      <ModalBody>
-                        <PreviewCanvas data={editorData} />
-                        <div className="mt-4 mb-2 text-center">
-                          <BSButton color="primary" onClick={() => handleClosePreview()}>
-                            Tutup
-                          </BSButton>
-                        </div>
-                      </ModalBody>
-                    </Modal>
-                  </div>
-
-                  <div>
-                    <BSButton
-                      tag="a"
-                      color="warning"
-                      onClick={() => handleReset()}
-                      >
-                      Reset
-                    </BSButton>
-                  </div>
-
-                  {isSaving && <div className="indicator-message">Saving ID Card...</div>}
-                  {isLoading && <div className="indicator-message">Loading ID Card...</div>}
-                </EditorActionButtons>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col lg="6">
-                <Card>
-                  {editorData ? (
-                    <>
-                    {editorData?.orientation == 'Landscape' ? (
-                      <React.Fragment>
-                        <EditorCanvasHTML
-                          key={currentCertificateType}
-                          data={editorData}
-                          onChange={(data) => handleEditorChange(data)}
-                          currentObject={currentObject}
-                          onSelect={(target) => setCurrentObject(target)}
-                          // setEditorDirty={setEditorDirty}
-                          />
-                        {(isSaving || isLoading) && <ProcessingBlocker />}
-                      </React.Fragment>
-                    ) : (
-                      <React.Fragment>
-                        <EditorCanvasHTMLPotrait
-                          key={currentCertificateType}
-                          data={editorData}
-                          onChange={(data) => handleEditorChange(data)}
-                          currentObject={currentObject}
-                          onSelect={(target) => setCurrentObject(target)}
-                          // setEditorDirty={setEditorDirty}
-                          />
-                        {(isSaving || isLoading) && <ProcessingBlocker />}
-                      </React.Fragment>
-                    )}
-                    </>
-                  ) : (
-                    <div
-                      className="d-flex align-items-center justify-content-center"
-                      style={{ height: 160 }}
-                    >
-                      Preparing editor...
-                    </div>
-                  )}
-                </Card>
-              </Col>
-
-              <Col lg="6">
-                <Row>
-
-                <div className="ratio ratio-21x9">
-                  <EditorBgImagePicker
-                    image={image}
-                    onSelectImage={(imageData) => handleSelectBg(imageData)}
-                    onRemoveImage={() => handleHapusBg()}
-                    />
-                  {(isSaving || isLoading) && <ProcessingBlocker />}
+            <EditorLayout>
+              <EditorHeader />
+              <EditorBody>
+                <div>
+                  <EditorScreen />
                 </div>
-                </Row>
 
-                <Row>
-                  <div className="mt-3">
-                    <div>
-                      <label>Paper Size:</label>
-                      <Select
-                        options={optionsPaperSize}
-                        placeholder="Paper Size"
-                        value={getSelectedPaperSize(optionsPaperSize, editorData)}
-                        onChange={(ev) => handlePaperSizeChange(ev)}
-                        />
-                    </div>
-                    </div>
-                </Row>
-
-                <Row>
-                  <div className="mt-3">
-                    <div>
-                      <label>Orientation:</label>
-                      <Select
-                        options={optionsOrientation}
-                        placeholder="Pilih Orientasi Kertas"
-                        value={getSelectedOrientation(optionsOrientation, editorData)}
-                        onChange={(ev) => handleOrientationChange(ev)}
-                        />
-                    </div>
-                    </div>
-                </Row>
-
-              {currentObject?.name == 'player_name' || currentObject?.name == 'category' || currentObject?.name == 'birthdate' || currentObject?.name == 'location_and_date' || currentObject?.name == 'club_member' || currentObject?.name == 'status_event' ? (
-                <Row>
-                {currentObject?.name && (
-                  
-                    <div className="mt-3">
-                    <div>
-                      <label>Font family:</label>
-                      <Select
-                        options={optionsFontFamily}
-                        placeholder="Font Family"
-                        value={getSelectedFontFamily(optionsFontFamily, currentObject)}
-                        onChange={(ev) => handleFontFamilyChange(ev)}
-                        />
-                    </div>
-
-                    <EditorSection>
-                    <Col lg="2">
-                    <div className="mt-2">
-                      <label>Font size:</label>
-                      <Select
-                        options={optionsFontSize}
-                        placeholder="font size"
-                        value={{
-                            value: currentObject?.fontSize,
-                            label: currentObject?.fontSize,
-                        }}
-                        onChange={(ev) => handleFontSizeChange(ev)}
-                        />
-                    </div>
-                    </Col>
-
-                    <Col lg="1">
-                    <ButtonEditor>
-                      <div>
-                        <ColorPickerContainer color={currentObject?.color}>
-                          <CompactPicker
-                            color={currentObject?.color}
-                            onChange={(color) => handleFontColorChange(color)}
-                            />
-                        </ColorPickerContainer>
-                      </div>
-                    </ButtonEditor>
-                    </Col>
-
-                    <Col lg="1">
-                    <ButtonEditor>
-                      <div>
-                        <FontBoldToggle
-                          bold={currentObject?.fontWeight}
-                          onChange={() => handleFontBoldChange()}
-                          />
-                      </div>
-                    </ButtonEditor>
-                    </Col>
-                    <Col lg="2">
-                      <div className="mt-2">
-                        <label className="ml-2">Visibilty:</label>
-                          <ButtonVisible>
-                            <div>
-                              <DisplayObject
-                                none={currentObject?.display}
-                                onChange={() => handleRemove()}
-                                />
-                            </div>
-                          </ButtonVisible>
-                      </div>
-                    </Col>
-                    </EditorSection>
-                  </div>
-                )}
-                </Row>
-              ) : (
-              <>
-                <div className="mt-3">
-                  <Col lg="2">
-                    <div className="mt-2">
-                      <label className="ml-2">Visibilty:</label>
-                        <ButtonVisible>
-                          <div>
-                            <DisplayObject
-                              none={currentObject?.display}
-                              onChange={() => handleRemove()}
-                              />
-                          </div>
-                        </ButtonVisible>
-                    </div>
-                  </Col>
+                <div>
+                  <ControlPanel />
                 </div>
-              </>
-              )}
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Container>
-
-      <AlertPromptSave
-        shouldConfirm={needSavingConfirmation}
-        onConfirm={() => {
-          setNeedSavingConfirmation(false);
-
-          const submitSave = async () => {
-            setStatus("saving");
-            const queryString = { event_id, type_certificate: currentCertificateType };
-            const data = await prepareSaveData(editorData, queryString);
-
-            const result = await IdCardService.save(data);
-            if (result.data) {
-              setCurrentCertificateType(targetCertificateType.current);
-            }
-          };
-          submitSave();
-        }}
-        onClose={() => {
-          setNeedSavingConfirmation(false);
-          setCurrentCertificateType(targetCertificateType.current);
-        }}
-        labelCancel="Lanjut tanpa simpan"
-        labelConfirm="Simpan"
-      >
-        ID Card belum disimpan. Apakah ingin disimpan?
-      </AlertPromptSave>
+              </EditorBody>
+            </EditorLayout>
+          </CardSheet>
+        </EditorProvider>
+      </ContentLayoutWrapper>
     </React.Fragment>
   );
 }
 
-const EditorActionButtons = styled.div`
+function SavingBlocker() {
+  const { isSaving, isFetching } = useEditor();
+  if (!isSaving) {
+    return null;
+  }
+  return (
+    <SavingBlockerWrapper>
+      <SpinnerDotBlock>
+        {isFetching && <LoadingText className="text-white">Memperbarui data...</LoadingText>}
+      </SpinnerDotBlock>
+    </SavingBlockerWrapper>
+  );
+}
+
+function EditorHeader() {
+  const {
+    isDirty,
+    saveEditor,
+    isErrorFetching,
+    errorsFetching,
+    isErrorSubmiting,
+    errorsSubmiting,
+  } = useEditor();
+  return (
+    <EditorHeaderBar>
+      <div>
+        <NoticeBarInfo>
+          Geser keterangan yang ada di dalam ID Card sesuai yang Anda inginkan
+        </NoticeBarInfo>
+      </div>
+
+      <ActionButtons>
+        <ButtonPreview />
+        <ButtonBlue disabled={!isDirty} onClick={() => saveEditor()}>
+          Simpan
+        </ButtonBlue>
+        <AlertSubmitError isError={isErrorFetching} errors={errorsFetching} />
+        <AlertSubmitError isError={isErrorSubmiting} errors={errorsSubmiting} />
+      </ActionButtons>
+    </EditorHeaderBar>
+  );
+}
+
+function ButtonPreview() {
+  const { event_id } = useParams();
+  const { data, isPortrait } = useEditor();
+  const { data: eventDetail } = useEventDetail(event_id);
+  const [isOpen, setOpen] = React.useState(false);
+  return (
+    <React.Fragment>
+      <ButtonOutlineBlue onClick={() => setOpen(true)}>Pratinjau</ButtonOutlineBlue>
+      {isOpen && (
+        <Modal
+          isOpen
+          size="lg"
+          autoFocus
+          centered
+          className="modalPreview"
+          tabIndex="-1"
+          toggle={() => setOpen((open) => !open)}
+          unmountOnClose
+        >
+          <ModalBody>
+            <PreviewContainer>
+              <ModalHeaderBar>
+                <div></div>
+                <div>
+                  <EditorCloseButton flexible onClick={() => setOpen(false)}>
+                    <IconX size="16" />
+                  </EditorCloseButton>
+                </div>
+              </ModalHeaderBar>
+
+              <PreviewCanvasContainer
+                style={{
+                  "--preview-canvas-container-padding": isPortrait
+                    ? "0.25rem 12rem"
+                    : "0.25rem 7rem",
+                }}
+              >
+                <PreviewCanvas
+                  key={`${data.paperSize}-${data.paperOrientation}`}
+                  eventDetail={eventDetail}
+                />
+              </PreviewCanvasContainer>
+
+              <PreviewCaption>
+                Ukuran: {data?.paperSize?.toUpperCase?.()}
+                {false && "(21 cm x 29,7 cm)"}
+              </PreviewCaption>
+            </PreviewContainer>
+          </ModalBody>
+        </Modal>
+      )}
+    </React.Fragment>
+  );
+}
+
+function ControlPanel() {
+  const {
+    data,
+    getBgImage,
+    setBgImage,
+    activeObject: activeObjectName,
+    setFieldTextFontFamily,
+    setFieldTextFontSize,
+    setFieldTextColor,
+    toggleFieldTextBold,
+  } = useEditor();
+  const bgImage = getBgImage();
+  const currentField = data?.fields?.[activeObjectName];
+  const fontFamily = currentField?.fontFamily;
+  const fontSize = currentField?.fontSize;
+  const color = currentField?.color;
+  const isBold = currentField?.isBold;
+
+  return (
+    <ControlPanelWrapper key={activeObjectName}>
+      <div>
+        <ControlGroupLabel>Latar</ControlGroupLabel>
+        <BackgroundImagePicker image={bgImage} onChange={(rawData) => setBgImage(rawData)} />
+        <InstructionText>
+          Unggah gambar sesuai ukuran kertas cetak dengan besar file maks 5MB, format PNG/JPEG
+        </InstructionText>
+      </div>
+
+      <div>
+        <ControlGroupLabel>Ukuran Cetak</ControlGroupLabel>
+        <SelectPaperSize />
+      </div>
+
+      <div>
+        <ControlGroupLabel>Orientasi</ControlGroupLabel>
+        <SelectPaperOrientation />
+      </div>
+
+      <div>
+        <ControlGroupLabel>Data</ControlGroupLabel>
+        <SelectVisibleData />
+      </div>
+
+      <div>
+        <ControlGroupLabel>Teks</ControlGroupLabel>
+        {!activeObjectName ? (
+          <InstructionText>Belum ada teks terseleksi</InstructionText>
+        ) : currentField.type !== "text" ? (
+          <InstructionText>Objek bukan teks</InstructionText>
+        ) : (
+          <EditorTextControls key={activeObjectName}>
+            <SelectFontFamily
+              fontFamily={fontFamily}
+              onChange={(value) => setFieldTextFontFamily(activeObjectName, value)}
+            />
+            <SelectFontSize
+              fontSize={fontSize}
+              onChange={(value) => setFieldTextFontSize(activeObjectName, value)}
+            />
+            <FontColorPicker
+              color={color}
+              onChange={(color) => setFieldTextColor(activeObjectName, color)}
+            />
+            <FontBoldToggle
+              isBold={isBold}
+              onChange={() => toggleFieldTextBold(activeObjectName)}
+            />
+          </EditorTextControls>
+        )}
+      </div>
+    </ControlPanelWrapper>
+  );
+}
+
+function BackgroundImagePicker({ image, onChange }) {
+  return (
+    <BGImagePickerWrapper style={{ "--picker-choosen-image": `url("${image}")` }}>
+      <TopLayer htmlFor="background-image-picker">
+        <LabelsContainer>
+          <span>
+            <IconImage />
+          </span>
+          <span>Unggah Latar</span>
+        </LabelsContainer>
+      </TopLayer>
+      <HiddenImageInput
+        id="background-image-picker"
+        type="file"
+        onChange={(ev) => {
+          if (!ev.target.files?.[0]) {
+            return;
+          }
+          onChange?.(ev.target.files[0]);
+        }}
+      />
+    </BGImagePickerWrapper>
+  );
+}
+
+function FontColorPicker({ color, onChange }) {
+  return (
+    <ColorPickerContainer color={color}>
+      <CompactPicker color={color} onChange={(color) => onChange?.(color.hex)} />
+    </ColorPickerContainer>
+  );
+}
+
+function ColorPickerContainer({ children, color = "#495057" }) {
+  const [isShowPicker, setShowPicker] = React.useState(false);
+
+  React.useEffect(() => {
+    isShowPicker && setShowPicker(false);
+  }, [color]);
+
+  return (
+    <ColorPickerWrapper>
+      <ControlButtonContainer title="Warna teks" onClick={() => setShowPicker((show) => !show)}>
+        <ControlButtonLabel
+          style={{
+            "--label-bold": 700,
+            "--label-color": color,
+            "--label-bg-color": color === "#ffffff" ? "var(--ma-gray-200)" : undefined,
+          }}
+        >
+          A
+        </ControlButtonLabel>
+      </ControlButtonContainer>
+
+      {isShowPicker && (
+        <FloatingPickerContainer>
+          <div onClick={() => setShowPicker(false)} />
+          {children}
+        </FloatingPickerContainer>
+      )}
+    </ColorPickerWrapper>
+  );
+}
+
+function FontBoldToggle({ isBold = false, onChange }) {
+  return (
+    <ControlButtonContainer
+      title="Bold"
+      onClick={onChange}
+      style={{ "--label-pressed-bg-color": isBold ? "var(--ma-primary-blue-50)" : undefined }}
+    >
+      <ControlButtonLabel
+        style={{
+          "--label-bold": isBold ? "700" : undefined,
+          "--label-color": isBold ? "#000000" : undefined,
+        }}
+      >
+        B
+      </ControlButtonLabel>
+      <div />
+    </ControlButtonContainer>
+  );
+}
+
+function EditorScreen() {
+  const { isLoading, data, isPortrait } = useEditor();
+
+  if (isLoading) {
+    return (
+      <EditorCanvas>
+        <LoadingCanvas>
+          <SpinnerDotBlock>
+            <LoadingText>Menyiapkan editor...</LoadingText>
+          </SpinnerDotBlock>
+        </LoadingCanvas>
+      </EditorCanvas>
+    );
+  }
+
+  return (
+    <EditorCanvas
+      style={{ "--canvas-container-padding": isPortrait ? "0.25rem 10rem" : "0.25rem 5rem" }}
+    >
+      <CanvasArea key={`${data.paperSize}-${data.paperOrientation}`} />
+    </EditorCanvas>
+  );
+}
+
+/* ========================== */
+// styles
+
+const CardSheet = styled.div`
   position: relative;
-  width: 100%;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+`;
+
+const SavingBlockerWrapper = styled.div`
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  column-gap: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+`;
 
-  & > * {
-    flex: 1 1 30%;
+const LoadingText = styled.span`
+  font-weight: 600;
 
-    :first-child {
-      flex: 1 0 40%;
-    }
-  }
-
-  & > * > a {
-    display: block;
-  }
-
-  .indicator-message {
-    position: absolute;
-    bottom: -1.8em;
+  &.text-white {
+    color: #ffffff;
   }
 `;
 
-const EditorSection = styled.div`
+const EditorLayout = styled.div`
+  > * + * {
+    margin-top: 1.25rem;
+  }
+`;
+
+const EditorHeaderBar = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
+  gap: 1.25rem;
+`;
+
+const ActionButtons = styled.div`
   display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 0.5rem;
 `;
 
-const ButtonEditor = styled.div`
-    margin-top: 2.5rem !important;
-    margin-left: 1rem;
+const EditorBody = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
+  gap: 1.25rem;
 `;
 
-const ButtonVisible = styled.div`
-    margin-top: 0.3rem !important;
-    margin-left: 1rem;
+const ControlPanelWrapper = styled.div`
+  > * + * {
+    margin-top: 1.5rem;
+  }
 `;
 
+const ControlGroupLabel = styled.p`
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+`;
 
-const defaultEditorData = {
-  paperSize: 'A4',
-  orientation: 'Potrait',
-  backgroundUrl: null,
-  backgroundPreviewUrl: undefined,
-  backgroundFileRaw: undefined,
-  photoProfileField: {
-    name: 'photoProfile',
-    x: 30,
-    y: 250,
-  },
-  qrFields: {
-    name: 'qrCode',
-    x: 0,
-    y: 650,
-  },
-  fields: [
-    {
-      name: LABEL_PLAYER_NAME,
-      x: 150,
-      y: 50,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 45,
-    },
-    {
-      name: LABEL_LOCATION_AND_DATE,
-      x: 150,
-      y: 100,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
-      name: LABEL_CATEGORY,
-      x: 150,
-      y: 150,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
-      name: LABEL_CLUB_MEMBER,
-      x: 200,
-      y: 200,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
-      name: LABEL_STATUS_EVENT,
-      x: 200,
-      y: 250,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-  ],
-};
+const InstructionText = styled.p`
+  margin: 0;
+  margin-top: 0.375rem;
+  color: var(--ma-gray-500);
+  text-align: center;
+`;
+
+const BGImagePickerWrapper = styled.div`
+  background-color: var(--ma-primary-blue-50);
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  background-image: var(--picker-choosen-image);
+`;
+
+const TopLayer = styled.label`
+  margin: 0;
+  cursor: pointer;
+  min-height: 110px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.5);
+`;
+
+const HiddenImageInput = styled.input`
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+`;
+
+const LabelsContainer = styled.span`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ma-blue);
+`;
+
+const EditorTextControls = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const ControlButtonContainer = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 5px;
+  width: 2.625rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(204, 204, 204);
+  background-color: #ffffff;
+  text-align: center;
+  cursor: pointer;
+
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:hover {
+    border-color: rgb(179, 179, 179);
+  }
+
+  &:focus {
+    border-color: #2684ff;
+    box-shadow: 0 0 0 1px #2684ff;
+  }
+`;
+
+const ControlButtonLabel = styled.h5`
+  margin: 0;
+  color: var(--label-color);
+  font-weight: var(--label-bold);
+  background-color: var(--label-bg-color);
+`;
+
+const ColorPickerWrapper = styled.div`
+  position: relative;
+
+  > * {
+    height: 100%;
+  }
+`;
+
+const FloatingPickerContainer = styled.div`
+  position: absolute;
+
+  > * {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+`;
+
+const EditorCanvas = styled.div`
+  height: 37.5rem;
+  background-color: var(--ma-gray-500);
+  padding: var(--canvas-container-padding);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > * {
+    box-shadow: 0 5px 20px rgba(18, 38, 63, 0.07);
+  }
+`;
+
+const LoadingCanvas = styled.div`
+  min-width: 18rem;
+  min-height: 18rem;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+`;
+
+const PreviewContainer = styled.div`
+  > * + * {
+    margin-top: 1rem;
+  }
+`;
+
+const PreviewCanvasContainer = styled.div`
+  height: 37.5rem;
+  background-color: var(--ma-gray-50);
+  padding: var(--preview-canvas-container-padding);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > * {
+    box-shadow: 0 5px 20px rgba(18, 38, 63, 0.07);
+  }
+`;
+
+const PreviewCaption = styled.p`
+  margin-bottom: 0;
+  text-align: center;
+`;
+
+const ModalHeaderBar = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const EditorCloseButton = styled.button`
+  padding: 0.375rem 0.625rem;
+  border: none;
+  background-color: transparent;
+  color: var(--ma-blue);
+
+  transition: all 0.15s;
+
+  &:hover {
+    box-shadow: 0 0 0 1px var(--ma-gray-200);
+  }
+`;
 
 export default PageEventIdCard;

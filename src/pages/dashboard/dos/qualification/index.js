@@ -102,10 +102,10 @@ function PageDosQualification() {
                 className={classnames({ "tab-active": option.isActive })}
                 onClick={() => {
                   resetOnChangeCategory();
-                  selectOptionCompetitionCategory(option.competitionCategory);
+                  selectOptionCompetitionCategory(option?.competitionCategory);
                 }}
               >
-                {option.competitionCategory}
+                {option?.competitionCategory}
               </TabButton>
             </li>
           ))}
@@ -289,7 +289,7 @@ function PageDosQualification() {
         eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
         isTeam={activeCategoryDetail?.isTeam}
       />
-      ) : (
+      ) : activeCategoryDetail?.isTeam == false ? (
         <ScoringTable
           key={activeCategoryDetail?.categoryDetailId}
           categoryDetailId={activeCategoryDetail?.categoryDetailId}
@@ -299,6 +299,10 @@ function PageDosQualification() {
           isTeam={activeCategoryDetail?.isTeam}
           session={session}
         />
+      ) : (
+        <NoBracketWrapper>
+          <h4>Bagan belum tersedia</h4>
+        </NoBracketWrapper>
       )}
       </ViewWrapper>
     </ContentLayoutWrapper>
@@ -307,6 +311,18 @@ function PageDosQualification() {
 
 /* =============================== */
 // styles
+
+const NoBracketWrapper = styled.div`
+  min-height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > *:nth-child(1) {
+    margin-top: -2rem;
+    color: var(--ma-gray-400);
+  }
+`;
 
 const ViewWrapper = styled.div`
   padding: 1.875rem;

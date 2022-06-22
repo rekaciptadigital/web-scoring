@@ -74,7 +74,7 @@ function useCategoriesWithFilters(eventCategories) {
 function _filtersReducer(state, action) {
   switch (action.type) {
     case "INIT": {
-      if (!action.payload) {
+      if (!action.payload.length) {
         return state;
       }
 

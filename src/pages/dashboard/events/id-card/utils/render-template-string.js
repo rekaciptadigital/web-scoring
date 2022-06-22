@@ -8,6 +8,10 @@ const {
   LABEL_STATUS_EVENT,
 } = idCardFields;
 
+// TODO: pindah ke file constants?
+const LABEL_QR_CODE = "qrCode";
+const LABEL_AVATAR = "photoProfile";
+
 function renderTemplateString(editorData, config) {
   const documentTitle = editorData.title || "My Archery Certificate";
 
@@ -22,7 +26,7 @@ function renderTemplateString(editorData, config) {
       }
 
       body {
-        ${renderCssBackgroundImage(editorData)}
+        background-image: url({%background%});
         background-image-resize: 6; /* properti custom mpdf, mirip background-size: cover */
         position: relative;
         margin: 0px;
@@ -30,61 +34,46 @@ function renderTemplateString(editorData, config) {
         font-family: "DejaVu Sans", sans-serif;
       }
 
+      /* Properti default semua field teks */
       .field-text {
         position: absolute;
+        top: 0px;
         left: 0px;
-        right: 0px;
         width: ${config.maxTextWidth}px;
         text-align: center;
       }
 
-      .qr-code-centering {
-        margin: 0 auto;
-        width: 35mm;
-        height: 35mm;
-      }
-
-      .qr-code-img {
-        margin: 0;
-        width: 50mm;
-        height: 50mm;
-      }
-
-      ${renderCssField(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME])}
-      ${renderCssField(LABEL_LOCATION_AND_DATE, editorData.fields[LABEL_LOCATION_AND_DATE])}
-      ${renderCssField(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY])}
-      ${renderCssField(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER])}
-      ${renderCssField(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT])}
-      ${renderCssQrField(editorData.fields["qrCode"])}
-      ${renderCssAvatarField(editorData.fields["photoProfile"])}
+      /* Properti spesifik masing-masing field yang dinamis menurut data "desain" di editor */
+      ${renderCSSFieldText(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME])}
+      ${renderCSSFieldText(LABEL_LOCATION_AND_DATE, editorData.fields[LABEL_LOCATION_AND_DATE])}
+      ${renderCSSFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY])}
+      ${renderCSSFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER])}
+      ${renderCSSFieldText(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT])}
+      ${renderCssFieldBoxQR(editorData.fields[LABEL_QR_CODE])}
+      ${renderCSSAvatarField(editorData.fields[LABEL_AVATAR])}
     </style>
   </head>
 
   <body>
-    ${renderFieldText(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME].isVisible)}
-    ${renderFieldText(
+    <!--
+      Sesuai spek mpdf, semua konten yang pakai positioning harus
+      di children langsung dari <body>
+     -->
+    ${renderHTMLFieldText(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME].isVisible)}
+    ${renderHTMLFieldText(
       LABEL_LOCATION_AND_DATE,
       editorData.fields[LABEL_LOCATION_AND_DATE].isVisible
     )}
-    ${renderFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY].isVisible)}
-    ${renderFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER].isVisible)}
-    ${renderFieldText(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT].isVisible)}
-    ${renderQrCode(editorData.fields["qrCode"].isVisible)}
-    ${renderAvatar(editorData.fields["photoProfile"].isVisible)}
+    ${renderHTMLFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY].isVisible)}
+    ${renderHTMLFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER].isVisible)}
+    ${renderHTMLFieldText(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT].isVisible)}
+    ${renderHTMLFieldBoxQR(editorData.fields[LABEL_QR_CODE].isVisible)}
+    ${renderHTMLFieldBoxAvatar(editorData.fields[LABEL_AVATAR].isVisible)}
   </body>
 </html>`;
 }
 
-const renderCssBackgroundImage = (editorData) => {
-  if (!editorData.backgroundFileRaw && !editorData.backgroundUrl) {
-    return "";
-  }
-  return `
-      background-image: url({%background%});
-  `;
-};
-
-function renderCssField(name, data = {}) {
+function renderCSSFieldText(name, data = {}) {
   const { y, fontFamily, fontWeight, fontSize, color, x } = data;
 
   const computeColor = () => (color ? `color: ${color};` : "");
@@ -101,7 +90,7 @@ function renderCssField(name, data = {}) {
       }`;
 }
 
-function renderFieldText(name, isVisible) {
+function renderHTMLFieldText(name, isVisible) {
   if (!isVisible) {
     return "";
   }
@@ -109,60 +98,91 @@ function renderFieldText(name, isVisible) {
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 
-function renderCssQrField(data = {}) {
+function renderCssFieldBoxQR(data = {}) {
   const { y, x } = data;
   return `
-    #qr-code-container {
+    #field-box-qr-container {
       position: absolute;
       top: ${y}px;
       left: ${x}px;
-      padding-left: 300px;
+    }
+
+    #qr-code--render-container {
+      width: 30mm;
+      height: 30mm;
+      padding: 2mm;
+      background-color: white;
+    }
+
+    .qr-code--img {
+      margin: 0;
     }`;
 }
 
-function renderCssAvatarField(data = {}) {
-  const { y, x } = data;
-  return `
-    #qr-avatar-container {
-      position: absolute;
-      top: ${y}px;
-      left: ${x}px;
-      padding-left: 250px;
-    }`;
-}
-
-function renderQrCode(isVisible) {
+function renderHTMLFieldBoxQR(isVisible) {
   if (!isVisible) {
     return "";
   }
+  // Docs untuk barcode mpdf:
+  // https://mpdf.github.io/reference/html-control-tags/barcode.html
+  // Example: https://github.com/mpdf/mpdf-examples/blob/development/example37_barcodes.php#L382=
+
+  // `size=1` itu 25mm. Untuk 30mm, size diskala jadi `size=1.2`
+  // Ref: https://github.com/mpdf/mpdf-examples/blob/development/example37_barcodes.php#L368=
   const urlPlaceholder = "{%certificate_verify_url%}";
   return `
-    <div id="qr-code-container">
-      <div class="qr-code-centering">
+    <div id="field-box-qr-container">
+      <div class="qr-code--render-container">
         <barcode
-          class="qr-code-img"
+          class="barcode qr-code--img"
           code="${urlPlaceholder}"
           type="QR"
           error="M"
-          class="barcode"
-          size="1"
-          disableborder="1" />
+          size="1.2"
+          disableborder="1"
+          title="QR Code"
+          alt="QR Code"
+          />
       </div>
     </div>`;
 }
 
-function renderAvatar(isVisible) {
+function renderCSSAvatarField(data = {}) {
+  const { y, x } = data;
+  return `
+    #field-box-avatar-container {
+      position: absolute;
+      top: ${y}px;
+      left: ${x}px;
+    }
+
+    #avatar--render-container {
+      width: 30mm;
+      height: 30mm;
+      background-color: white;
+    }
+
+    .avatar--img {
+      margin: 0;
+    }`;
+}
+
+function renderHTMLFieldBoxAvatar(isVisible) {
   if (!isVisible) {
     return "";
   }
   const urlPlaceholder = "{%avatar%}";
   return `
-    <div id="qr-avatar-container">
-      <div class="qr-code-centering">
+    <div id="field-box-avatar-container">
+      <div class="avatar--render-container">
         <img
-          class="qr-code-img"
+          class="avatar--img"
+          width="30mm"
+          height="30mm"
           src="${urlPlaceholder}"
-          class="barcode" />
+          title="Foto Profil User"
+          alt="Foto Profil User"
+          />
       </div>
     </div>`;
 }

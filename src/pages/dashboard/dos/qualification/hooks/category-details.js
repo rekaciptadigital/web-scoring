@@ -7,7 +7,7 @@ function useCategoryDetails(eventId, date_event) {
 
   const fetchCategoryDetails = () => {
     const getFunction = () => {
-      return GeneralService.getCategoryNonAuth({ event_id: eventId, date_event: date_event });
+      return GeneralService.getCategoryNonAuth({ event_id: eventId, date_event: date_event, category_dos: true });
     };
     fetcher.runAsync(getFunction);
   };
@@ -17,9 +17,9 @@ function useCategoryDetails(eventId, date_event) {
       return;
     }
     fetchCategoryDetails();
-  }, [eventId]);
+  }, [eventId, date_event]);
 
-  const isSettled = fetcher.data || (!fetcher.data && fetcher.status === "error");
+  const isSettled = fetcher?.data || (!fetcher?.data && fetcher?.status === "error");
 
   return { ...fetcher, isSettled, fetchCategoryDetails };
 }

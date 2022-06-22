@@ -27,25 +27,25 @@ function FieldDataObject({ field }) {
   if (field.type === "box-qr") {
     const title = field.label + ` (variabel: ${field.name})`;
     return (
-      <BoxImageWrapper title={title}>
+      <BoxQRWrapper title={title}>
         <div>
-          <IconQR size="calc(3cm - 10px)" />
+          <IconQR size="calc(174px - 10px)" />
         </div>
-      </BoxImageWrapper>
+      </BoxQRWrapper>
     );
   }
 
   if (field.type === "box-avatar") {
     const title = field.label + ` (variabel: ${field.name})`;
     return (
-      <BoxImageWrapper title={title} style={{ width: "3cm", height: "3cm", padding: "5px" }}>
+      <BoxAvatarWrapper title={title}>
         <div>
           <div>
             <IconUser size="2cm" />
           </div>
           <h5>{field.label}</h5>
         </div>
-      </BoxImageWrapper>
+      </BoxAvatarWrapper>
     );
   }
 
@@ -53,9 +53,24 @@ function FieldDataObject({ field }) {
   return null;
 }
 
-const BoxImageWrapper = styled.div`
-  width: 3cm;
-  height: 3cm;
+const BoxQRWrapper = styled.div`
+  width: 130px;
+  height: 130px;
+  padding: 5px;
+
+  > * {
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const BoxAvatarWrapper = styled.div`
+  width: 174px;
+  height: 174px;
   padding: 5px;
 
   > * {

@@ -10,6 +10,7 @@ import { BreadcrumbDashboard } from "../events/components/breadcrumb";
 import {
   SpinnerDotBlock,
   ButtonOutlineBlue,
+  AlertSubmitError
 } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { MemberTable } from "./components/member-table";
@@ -42,10 +43,11 @@ function PageDosQualification() {
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
 
-  const { handleDownloadIdCard } = useMemberDownload(
-    activeCategoryDetail?.categoryDetailId,
-    eventId,
-  );
+  const {
+    handleDownloadIdCard,
+    isError: isErrorDownloadID,
+    errors: errorsDownloadID,
+  } = useMemberDownload(activeCategoryDetail?.categoryDetailId, eventId);
 
   const resetOnChangeCategory = () => {
     setInputSearchQuery("");
@@ -160,11 +162,16 @@ function PageDosQualification() {
                   <HorizontalSpaced>
                     <ButtonOutlineBlue
                       onClick={() => {
-                        toast.loading("Sedang menyiapkan dokumen ID CARD...");
+                        toast.loading("Sedang menyiapkan dokumen ID card...");
                         handleDownloadIdCard({
                           onSuccess() {
                             toast.dismiss();
+                            toast.success("ID card siap diunduh");
                           },
+                          onError() {
+                            toast.dismiss();
+                            toast.error("Gagal mengunduh ID card");
+                          }
                         });
                       }}
                     >
@@ -173,7 +180,7 @@ function PageDosQualification() {
                       </span>{" "}
                       <span>Unduh ID Card</span>
                     </ButtonOutlineBlue>
-
+                    <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
                   </HorizontalSpaced>
                 </ToolbarRight>
               </ToolbarTop>

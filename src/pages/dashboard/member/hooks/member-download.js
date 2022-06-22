@@ -1,12 +1,15 @@
+import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { IdCardService } from "services";
+
+import { toast } from "../components/processing-toast";
 
 import { urlUtil } from "utils";
 
 function useMemberDownload(eventCategoryId, eventId) {
   const fetcher = useFetcher();
 
-  const handleDownloadIdCard = async ({ onSuccess: consumerSuccessHandler }) => {
+  const handleDownloadIdCard = async ({ onSuccess: consumerSuccessHandler, ...options }) => {
     if (!eventCategoryId) {
       return;
     }
@@ -16,26 +19,23 @@ function useMemberDownload(eventCategoryId, eventId) {
     const getFunction = () => {
       return IdCardService.getDownloadIdCard(queryString);
     };
+
     const onSuccess = (data) => {
       consumerSuccessHandler?.();
-      const downloadUrl = _handleURLFromResponse(data);
-      console.log(downloadUrl, 'ratata');
-      urlUtil.openUrlOnNewTab(downloadUrl);
+      urlUtil.openUrlOnNewTab(data.fileName);
     };
 
-    fetcher.runAsync(getFunction, { onSuccess });
+    fetcher.runAsync(getFunction, { onSuccess, ...options });
   };
 
-  return { ...fetcher, handleDownloadIdCard };
-}
+  // Hack sementara buat paksa hilangkan toast yang
+  // mungkin masih muncul/ketinggalan pas pindah/unmount page
+  // TODO: refaktor ke tempat yang lebih proper
+  React.useEffect(() => {
+    return () => toast.dismiss();
+  }, []);
 
-// utils
-function _handleURLFromResponse(url) {
-  const API_URL = process.env.REACT_APP_API_URL || "https://api-staging.myarchery.id";
-  const segments = url.split("/");
-  const assetSegmentIndex = segments.findIndex((segment) => segment === "storage");
-  const downloadUrl = API_URL + "/" + segments.slice(assetSegmentIndex).join("/");
-  return downloadUrl;
+  return { ...fetcher, handleDownloadIdCard };
 }
 
 export { useMemberDownload };

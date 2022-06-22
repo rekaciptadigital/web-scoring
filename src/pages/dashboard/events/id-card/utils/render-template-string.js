@@ -105,12 +105,10 @@ function renderCssFieldBoxQR(data = {}) {
       position: absolute;
       top: ${y}px;
       left: ${x}px;
-    }
 
-    #qr-code--render-container {
-      width: 30mm;
-      height: 30mm;
-      padding: 2mm;
+      width: 28mm;
+      height: 28mm;
+      padding: 1mm;
       background-color: white;
     }
 
@@ -129,21 +127,18 @@ function renderHTMLFieldBoxQR(isVisible) {
 
   // `size=1` itu 25mm. Untuk 30mm, size diskala jadi `size=1.2`
   // Ref: https://github.com/mpdf/mpdf-examples/blob/development/example37_barcodes.php#L368=
-  const urlPlaceholder = "{%certificate_verify_url%}";
   return `
     <div id="field-box-qr-container">
-      <div class="qr-code--render-container">
-        <barcode
-          class="barcode qr-code--img"
-          code="${urlPlaceholder}"
-          type="QR"
-          error="M"
-          size="1.2"
-          disableborder="1"
-          title="QR Code"
-          alt="QR Code"
-          />
-      </div>
+      <barcode
+        class="barcode qr-code--img"
+        code="{%certificate_verify_url%}"
+        type="QR"
+        error="M"
+        size="1.15"
+        disableborder="1"
+        title="QR Code"
+        alt="QR Code"
+        />
     </div>`;
 }
 
@@ -154,16 +149,16 @@ function renderCSSAvatarField(data = {}) {
       position: absolute;
       top: ${y}px;
       left: ${x}px;
-    }
+      width: 40mm;
+      height: 40mm;
+      overflow: hidden;
 
-    #avatar--render-container {
-      width: 30mm;
-      height: 30mm;
-      background-color: white;
-    }
-
-    .avatar--img {
-      margin: 0;
+      /* Uncomment aja warna bg kalau perlu */
+      /* background-color: white; */
+      background-image: url({%avatar%});
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
     }`;
 }
 
@@ -171,20 +166,7 @@ function renderHTMLFieldBoxAvatar(isVisible) {
   if (!isVisible) {
     return "";
   }
-  const urlPlaceholder = "{%avatar%}";
-  return `
-    <div id="field-box-avatar-container">
-      <div class="avatar--render-container">
-        <img
-          class="avatar--img"
-          width="30mm"
-          height="30mm"
-          src="${urlPlaceholder}"
-          title="Foto Profil User"
-          alt="Foto Profil User"
-          />
-      </div>
-    </div>`;
+  return `<div id="field-box-avatar-container"></div>`;
 }
 
 export { renderTemplateString };

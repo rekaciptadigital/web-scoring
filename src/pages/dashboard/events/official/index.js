@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { MetaTags } from "react-meta-tags";
-import { SearchBox } from "./components/search-box";
+// import { SearchBox } from "./components/search-box";
 
 import { useParams } from "react-router-dom";
 import { Container, Col, Row } from "reactstrap";
@@ -20,7 +20,7 @@ function PageEventOfficial() {
   const { event_id } = useParams();
   const eventId = event_id;
 
-  const [inputSearchQuery, setInputSearchQuery] = React.useState("");
+  // const [inputSearchQuery, setInputSearchQuery] = React.useState("");
   const [filter, setFilter] = React.useState(1);
 
   const {
@@ -40,7 +40,7 @@ function PageEventOfficial() {
           <ToolbarTop>
             <FilterBars>
               <CategoryFilter>
-                <FilterLabel>Kelas:</FilterLabel>
+                <FilterLabel>Status:</FilterLabel>
                 <FilterList>
                   {filterPayment?.length > 0 ? (
                     filterPayment.map((option) => (
@@ -70,7 +70,7 @@ function PageEventOfficial() {
                                 {officialMembers?.member?.length} Pendaftar
                             </OfficialLabel>
                         </Col>
-                        <Col md={4}>
+                        {/* <Col md={4}>
                             <PushBottom>
                                 <SearchBox
                                 placeholder="Cari peserta"
@@ -78,7 +78,7 @@ function PageEventOfficial() {
                                 onChange={(ev) => setInputSearchQuery(ev.target.value)}
                                 />
                             </PushBottom>
-                        </Col>
+                        </Col> */}
                     </Row>
 
                 </HorizontalSpaced>
@@ -117,9 +117,9 @@ color: #757575;
   font-size: 16px;
 `;
 
-const PushBottom = styled.div`
-  align-self: flex-end;
-`;
+// const PushBottom = styled.div`
+//   align-self: flex-end;
+// `;
 
 const ViewWrapper = styled.div`
   padding: 1.875rem;

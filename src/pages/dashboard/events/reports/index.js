@@ -158,7 +158,7 @@ function SpinningLoadingIndicator() {
 }
 
 function ReportGenerateDateInfo({ reportInfos, name }) {
-  const { data, isLoading: isFetching, isError, isRetryEnabled, fetchInfos } = reportInfos;
+  const { data, isLoading: isFetching, isError } = reportInfos;
   const isLoading = !data && isFetching;
 
   const _getReportGenerateDate = (name) => {
@@ -182,17 +182,10 @@ function ReportGenerateDateInfo({ reportInfos, name }) {
     );
   }
 
-  if (isError) {
+  if (isError || !data) {
     return (
       <PillLabel>
-        <FailedText>
-          Gagal mengambil info tanggal generate laporan
-          {!isRetryEnabled && (
-            <React.Fragment>
-              . <RetryLink onClick={() => fetchInfos()}>Coba lagi.</RetryLink>
-            </React.Fragment>
-          )}
-        </FailedText>
+        <FailedText>Info tanggal generate laporan tidak tersedia</FailedText>
       </PillLabel>
     );
   }
@@ -283,19 +276,6 @@ const PillLabel = styled.span`
 const FailedText = styled.span`
   font-weight: normal;
   color: var(--ma-gray-500);
-`;
-
-const RetryLink = styled.a`
-  color: var(--ma-gray-500);
-
-  &,
-  &:hover {
-    text-decoration: underline !important;
-  }
-
-  &:hover {
-    color: var(--ma-blue);
-  }
 `;
 
 const ThumbWrapper = styled.span`

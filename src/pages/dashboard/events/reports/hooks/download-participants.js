@@ -19,28 +19,14 @@ function useReportParticipants() {
     const customOptions = {
       ...options,
       onSuccess: (data) => {
-        const downloadURL = _handleURLFromResponse(data);
         onSuccess?.(data);
-        urlUtil.openUrlOnNewTab(downloadURL);
+        urlUtil.openUrlOnNewTab(data);
       },
     };
     fetcher.runAsync(getFunction, customOptions);
   };
 
   return { ...fetcher, downloadParticipants };
-}
-
-// utils
-function _handleURLFromResponse(url) {
-  const API_URL = process.env.REACT_APP_API_URL || "https://api-staging.myarchery.id";
-  const segments = url.split("/").filter((segment) => Boolean(segment));
-
-  if (API_URL === process.env.REACT_APP_API_URL) {
-    return segments.join("/");
-  }
-
-  const downloadUrl = API_URL + "/" + segments.join("/");
-  return downloadUrl;
 }
 
 export { useReportParticipants };

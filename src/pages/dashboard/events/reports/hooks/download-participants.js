@@ -34,6 +34,11 @@ function useReportParticipants() {
 function _handleURLFromResponse(url) {
   const API_URL = process.env.REACT_APP_API_URL || "https://api-staging.myarchery.id";
   const segments = url.split("/").filter((segment) => Boolean(segment));
+
+  if (API_URL === process.env.REACT_APP_API_URL) {
+    return segments.join("/");
+  }
+
   const downloadUrl = API_URL + "/" + segments.join("/");
   return downloadUrl;
 }

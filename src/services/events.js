@@ -87,6 +87,12 @@ export default {
   getEventLaporan(qs = null) {
     return API.get("/web/v1/archery/events/participant/excel/download", qs);
   },
+  getEventReportInfos(qs = null) {
+    return API.get("/web/v1/archery/events/report-event-list", qs);
+  },
+  getEventRoundupsReport(qs = null) {
+    return API.get("/web/v1/archery/events/report-result", qs);
+  },
   getEventMemberNew(qs = null) {
     return API.get("/web/v2/members", qs);
   },

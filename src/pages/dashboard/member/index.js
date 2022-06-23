@@ -412,7 +412,7 @@ function ListMember() {
                         cursor: "pointer",
                       }}
                     >
-                      Semua
+                      All
                     </span>
                   </div>
                   {splitRegu.map((regu, index) => {

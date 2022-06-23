@@ -61,6 +61,17 @@ function EditorForm({ scoresData, isLoading, onChange }) {
                             score: value,
                           });
                         }}
+                        onInputChange={(inputString) => {
+                          const value = _getValueFromInput(inputString);
+                          if (!value) {
+                            return;
+                          }
+                          handleSelectScore({
+                            rambahan: rambahanIndex,
+                            shot: shotIndex,
+                            score: value,
+                          });
+                        }}
                         isFocus={isFocus}
                         onFocus={() => setPosition(pos)}
                       />
@@ -308,6 +319,14 @@ function _countXPlusTen(gridData) {
   }, 0);
 
   return counts;
+}
+
+function _getValueFromInput(inputString) {
+  const numberValue = Number(inputString);
+  const checkValue = !isNaN(numberValue) ? numberValue : inputString;
+  const value =
+    ["m", "x", 2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(checkValue) > -1 ? checkValue : false;
+  return value;
 }
 
 export { EditorForm };

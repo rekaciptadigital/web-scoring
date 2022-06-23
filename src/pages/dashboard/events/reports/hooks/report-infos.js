@@ -3,13 +3,14 @@ import { useParams } from "react-router-dom";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EventsService } from "services";
 
+// TODO: implemen retry lagi kalau butuh
 function useReportInfos() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
   const fetcher = useFetcher();
 
   const fetchInfos = () => {
-    const getFunction = () => {
+    const getFunction = async () => {
       return EventsService.getEventReportInfos({ event_id: eventId });
     };
     fetcher.runAsync(getFunction);

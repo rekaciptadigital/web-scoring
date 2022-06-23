@@ -7,9 +7,11 @@ function useReportInfos() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
   const fetcher = useFetcher();
+  const retryCountRemaining = React.useRef(5);
+  const [isRetryEnabled, setRetryEnabled] = React.useState(true);
 
   const fetchInfos = () => {
-    const getFunction = () => {
+    const getFunction = async () => {
       return EventsService.getEventReportInfos({ event_id: eventId });
     };
     fetcher.runAsync(getFunction);
@@ -22,7 +24,35 @@ function useReportInfos() {
     fetchInfos();
   }, [eventId]);
 
-  return { ...fetcher, fetchInfos };
+  React.useEffect(() => {
+    if (!fetcher.isError && !isRetryEnabled && !retryCountRemaining.current) {
+      retryCountRemaining.current = 5;
+      setRetryEnabled(true);
+    }
+  }, [fetcher.isError, isRetryEnabled]);
+
+  // Retry fetch info ketika gagal
+  React.useEffect(() => {
+    if (!fetcher.isError || !(isRetryEnabled && fetcher.isError)) {
+      return;
+    }
+
+    const retryTimer = setInterval(() => {
+      if (!retryCountRemaining.current) {
+        setRetryEnabled(false);
+        clearInterval(retryTimer);
+        return;
+      }
+      fetchInfos();
+      retryCountRemaining.current = retryCountRemaining.current - 1;
+    }, 3000);
+
+    return () => {
+      clearInterval(retryTimer);
+    };
+  }, [fetcher.isError, isRetryEnabled]);
+
+  return { ...fetcher, fetchInfos, isRetryEnabled };
 }
 
 export { useReportInfos };

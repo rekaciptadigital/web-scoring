@@ -21,8 +21,7 @@ import { datetime } from "utils";
 function PageEventReports() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
-  const { data: reportInfos, isLoading: isFetchingInfos } = useReportInfos();
-  const isLoadingInfos = !reportInfos && isFetchingInfos;
+  const reportInfos = useReportInfos();
 
   const {
     downloadParticipants,
@@ -37,17 +36,6 @@ function PageEventReports() {
     isError: isErrorRoundups,
     errors: errorsRoundups,
   } = useReportRoundups();
-
-  const _getReportGenerateDate = (name) => {
-    if (!reportInfos?.length) {
-      return "";
-    }
-    const foundDate = reportInfos.find((info) => info.reportType === name)?.dateGenerate;
-    if (!foundDate) {
-      return "";
-    }
-    return datetime.formatFullDateLabel(foundDate);
-  };
 
   const _makeDownloadHandler = (downloadFn) => {
     return () => {
@@ -71,9 +59,6 @@ function PageEventReports() {
     navbar: <SubNavbar eventId={eventId} />,
   };
 
-  const generateDateParticipant = _getReportGenerateDate("participant");
-  const generateDateRoundups = _getReportGenerateDate("competition");
-
   return (
     <ContentLayoutWrapper {...pageLayoutProps}>
       <CardList>
@@ -82,17 +67,7 @@ function PageEventReports() {
             icon={IconUsersGroup}
             title="Laporan Jumlah Peserta"
             description="Laporan jumlah peserta yang mengikuti pertandingan"
-            customFooter={
-              <PillLabel>
-                {isLoadingInfos ? (
-                  <SpinningLoadingIndicator />
-                ) : generateDateParticipant ? (
-                  "Sudah di-generate pada tanggal " + generateDateParticipant
-                ) : (
-                  "Tersedia"
-                )}
-              </PillLabel>
-            }
+            customFooter={<ReportGenerateDateInfo name="participant" reportInfos={reportInfos} />}
             onDownload={_makeDownloadHandler(downloadParticipants)}
             isLoading={isLoadingParticipants}
             isError={isErrorParticipants}
@@ -107,17 +82,7 @@ function PageEventReports() {
             icon={IconMedal}
             title="Laporan Pertandingan"
             description="Laporan hasil akhir pertandingan"
-            customFooter={
-              <PillLabel>
-                {isLoadingInfos ? (
-                  <SpinningLoadingIndicator />
-                ) : generateDateRoundups ? (
-                  "Sudah di-generate pada tanggal " + generateDateRoundups
-                ) : (
-                  "Tersedia"
-                )}
-              </PillLabel>
-            }
+            customFooter={<ReportGenerateDateInfo name="competition" reportInfos={reportInfos} />}
             onDownload={_makeDownloadHandler(downloadRoundups)}
             isLoading={isLoadingRoundups}
             isError={isErrorRoundups}
@@ -189,6 +154,53 @@ function SpinningLoadingIndicator() {
     <SpinningLoader>
       <IconLoading size="16" />
     </SpinningLoader>
+  );
+}
+
+function ReportGenerateDateInfo({ reportInfos, name }) {
+  const { data, isLoading: isFetching, isError, isRetryEnabled, fetchInfos } = reportInfos;
+  const isLoading = !data && isFetching;
+
+  const _getReportGenerateDate = (name) => {
+    if (!reportInfos.data?.length) {
+      return "";
+    }
+    const foundDate = reportInfos.data.find((info) => info.reportType === name)?.dateGenerate;
+    if (!foundDate) {
+      return "";
+    }
+    return datetime.formatFullDateLabel(foundDate);
+  };
+
+  const generateDate = _getReportGenerateDate(name);
+
+  if (isLoading) {
+    return (
+      <PillLabel>
+        <SpinningLoadingIndicator />
+      </PillLabel>
+    );
+  }
+
+  if (isError) {
+    return (
+      <PillLabel>
+        <FailedText>
+          Gagal mengambil info tanggal generate laporan
+          {!isRetryEnabled && (
+            <React.Fragment>
+              . <RetryLink onClick={() => fetchInfos()}>Coba lagi.</RetryLink>
+            </React.Fragment>
+          )}
+        </FailedText>
+      </PillLabel>
+    );
+  }
+
+  return (
+    <PillLabel>
+      {generateDate ? "Sudah di-generate pada tanggal " + generateDate : "Tersedia"}
+    </PillLabel>
   );
 }
 
@@ -266,6 +278,24 @@ const PillLabel = styled.span`
   background-color: var(--ma-gray-100);
   color: var(--ma-blue);
   font-weight: 600;
+`;
+
+const FailedText = styled.span`
+  font-weight: normal;
+  color: var(--ma-gray-500);
+`;
+
+const RetryLink = styled.a`
+  color: var(--ma-gray-500);
+
+  &,
+  &:hover {
+    text-decoration: underline !important;
+  }
+
+  &:hover {
+    color: var(--ma-blue);
+  }
 `;
 
 const ThumbWrapper = styled.span`

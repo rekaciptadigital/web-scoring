@@ -74,7 +74,7 @@ function useCategoriesWithFilters(eventCategories) {
 function _filtersReducer(state, action) {
   switch (action.type) {
     case "INIT": {
-      if (!action.payload) {
+      if (!action.payload?.length) {
         return state;
       }
 
@@ -93,23 +93,23 @@ function _filtersReducer(state, action) {
     }
 
     case "UPDATE_AGE_CATEGORY": {
-      const activeCompetitionCategory = state.competitionCategory;
+      const activeCompetitionCategory = state?.competitionCategory;
       return {
         ...state,
         ageCategories: {
           ...state.ageCategories,
-          [activeCompetitionCategory]: action.payload,
+          [activeCompetitionCategory]: action?.payload,
         },
       };
     }
 
     case "UPDATE_GENDER_CATEGORY": {
-      const activeCompetitionCategory = state.competitionCategory;
+      const activeCompetitionCategory = state?.competitionCategory;
       return {
         ...state,
         genderCategories: {
           ...state.genderCategories,
-          [activeCompetitionCategory]: action.payload,
+          [activeCompetitionCategory]: action?.payload,
         },
       };
     }

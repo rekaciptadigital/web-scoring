@@ -1,16 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { useParams } from "react-router-dom";
-import { useOfficialMembers } from "../../hooks/official-members";
-
-function OfficialTable( {searchName} ) {
-    const { event_id } = useParams();
-    const eventId = event_id;
-
-    const {
-        data: officialMembers
-    } = useOfficialMembers(eventId, searchName);
+function OfficialTable( {officialMembers} ) {
 
   return (
     <React.Fragment>
@@ -22,6 +13,7 @@ function OfficialTable( {searchName} ) {
                 <th className="name">Nama Klub</th>
                 <th className="name">Email</th>
                 <th className="name">Telepon</th>
+                <th className="name">Status Pembayaran</th>
                 <th></th>
               </tr>
             </thead>
@@ -29,16 +21,23 @@ function OfficialTable( {searchName} ) {
             <tbody>
               {officialMembers?.member?.map((row) => {
                   return (
-                      <tr key={row.userName}>
-                        <td className="name">{row.userName}</td>
+                      <tr key={row?.userName}>
+                        <td className="name">{row?.userName}</td>
                         <td className="name">
-                            <ClubName>{row.clubName}</ClubName>
+                            <ClubName>{row?.clubName}</ClubName>
                         </td>
                         <td className="name">
-                            <ClubName>{row.email}</ClubName>
+                            <ClubName>{row?.email}</ClubName>
                         </td>
                         <td className="name">
-                            <ClubName>{row.phoneNumber}</ClubName>
+                            <ClubName>{row?.phoneNumber}</ClubName>
+                        </td>
+                        <td>
+                            {row?.statusLabel == 'Pending' ? (
+                              <LabelPaymentYellow>{row?.statusLabel}</LabelPaymentYellow>
+                            ) : row?.statusLabel == 'Lunas' ? (
+                              <LabelPaymentGreen>{row?.statusLabel}</LabelPaymentGreen>
+                            ) : <LabelPaymentYellow>{row?.statusLabel}</LabelPaymentYellow> }
                         </td>
                       </tr>
                   );
@@ -104,5 +103,26 @@ const MembersTable = styled.table`
     cursor: auto;
   }
 `;
+
+const LabelPaymentYellow = styled.span`
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: #FFB420;
+  background: #FFE8BA;
+  border-radius: 30px;
+  padding: 5px 10px 5px 10px;
+`;
+
+const LabelPaymentGreen = styled.span`
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: #05944F;
+  background: #DAF0E3;
+  border-radius: 30px;
+  padding: 5px 10px 5px 10px;
+`;
+
 
 export { OfficialTable }

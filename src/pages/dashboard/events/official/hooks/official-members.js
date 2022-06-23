@@ -4,7 +4,7 @@ import { OfficialService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
-function useOfficialMembers(eventId, inputSearchQuery) {
+function useOfficialMembers(eventId, filter, inputSearchQuery) {
     const fetcher = useFetcher();
     const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
 
@@ -14,6 +14,7 @@ function useOfficialMembers(eventId, inputSearchQuery) {
           return OfficialService.get({
               event_id: eventId,
               userName: debouncedSearchQuery || undefined,
+              status: filter,
           });
         };
         fetcher.runAsync(getFunction);
@@ -21,7 +22,7 @@ function useOfficialMembers(eventId, inputSearchQuery) {
 
   React.useEffect(() => {
     fetchOfficialMembers();
-  }, [eventId, debouncedSearchQuery]);
+  }, [eventId, filter, debouncedSearchQuery]);
 
   React.useEffect(() => {
     const debounceTimer = setTimeout(() => {

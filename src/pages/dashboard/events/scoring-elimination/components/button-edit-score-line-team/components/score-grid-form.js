@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useInputSwitcher } from "../contexts/input-switcher";
+import { useInputSwitcher } from "../../../contexts/input-switcher";
 
 import { SelectScore } from "./select-score-compact";
 import { SelectScoreShootOff } from "./select-score-shoot-off";

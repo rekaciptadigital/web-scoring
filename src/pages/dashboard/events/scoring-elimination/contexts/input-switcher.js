@@ -7,12 +7,13 @@ function useInputSwitcher() {
   return switcher;
 }
 
-function InputSwitcherProvider({ grid, children }) {
-  const switcher = useSwitcher(grid);
+function InputSwitcherProvider({ scoringDetails, grid, children }) {
+  const switcher = useSwitcher(scoringDetails, grid);
   return <InputSwitcher.Provider value={switcher}>{children}</InputSwitcher.Provider>;
 }
 
-function useSwitcher(grid) {
+function useSwitcher(scoringDetails, grid) {
+  const [gridLeft, gridRight] = grid;
   const [switcher, dispatch] = React.useReducer(reducer, {
     size: { y: 0, x: 0 },
     side: 0,
@@ -20,11 +21,11 @@ function useSwitcher(grid) {
   });
 
   React.useEffect(() => {
-    if (!grid || switcher.size.y > 0 || switcher.size.x > 0) {
+    if (!scoringDetails) {
       return;
     }
-    dispatch({ type: "INIT", payload: grid });
-  }, [grid, switcher.size.y, switcher.size.x]);
+    dispatch({ type: "INIT", payload: [gridLeft, gridRight] });
+  }, [scoringDetails]);
 
   const move = (side, pos) => {
     dispatch({ type: "MOVE_NEXT", payload: { side, pos } });
@@ -43,9 +44,65 @@ function useSwitcher(grid) {
 
 function reducer(state, action) {
   if (action.type === "INIT") {
-    const y = action.payload.length;
-    const x = action.payload[0].length;
-    return { ...state, size: { y, x } };
+    // Init size
+    const [gridLeft, gridRight] = action.payload;
+    const sizeY = gridLeft.length || gridRight.length;
+    const sizeX = gridLeft[0].length || gridRight[0].length;
+
+    /**
+     * * Init side & position
+     *
+     * Posisi default yang aktif itu input pertama yang belum diisi,
+     * dihitung dari depan. Kiri atas grid sebelah kiri, ke kanan bawah
+     * grid sebelah kanan.
+     */
+    let side = 0;
+    let distance = 0;
+    let emptyIsFound = false;
+
+    // Nge-track grid, yang sebelah mana
+    for (let sideIndex = 0; sideIndex < 2; sideIndex++) {
+      const grid = action.payload[sideIndex];
+
+      // Nge-track rambahan
+      for (let rambahanIndex = 0; rambahanIndex < sizeY; rambahanIndex++) {
+        const rambahan = grid[rambahanIndex];
+
+        // Nge-track "shot"/skor
+        for (let shotIndex = 0; shotIndex < sizeX; shotIndex++) {
+          distance++;
+          const score = rambahan[shotIndex];
+          if (score) {
+            continue;
+          }
+          emptyIsFound = true;
+          side = sideIndex;
+          break;
+        }
+
+        if (!emptyIsFound) {
+          continue;
+        }
+        break;
+      }
+
+      if (!emptyIsFound) {
+        continue;
+      }
+      break;
+    }
+
+    const gridSize = sizeX * sizeY;
+    distance = side > 0 ? distance - gridSize : distance;
+    const mod = distance % sizeX;
+    const indexX = mod ? mod - 1 : sizeX - 1;
+    const indexY = Math.floor(distance / sizeX) + (mod ? 0 : -1);
+
+    return {
+      size: { y: sizeY, x: sizeX },
+      side: side,
+      pos: { y: indexY, x: indexX },
+    };
   }
 
   if (action.type === "SET_POSITION") {

@@ -8,7 +8,7 @@ function OfficialTable( {officialMembers} ) {
          <MembersTable className="table table-responsive">
             <thead>
               <tr>
-                {/* <th>No.</th> */}
+                <th className="name">No.</th>
                 <th className="name">Nama Official</th>
                 <th className="name">Nama Klub</th>
                 <th className="name">Email</th>

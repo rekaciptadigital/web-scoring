@@ -65,18 +65,37 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
 
               <div>
                 <Scrollable>
-                  <Bracket
-                    rounds={bracketData.rounds || []}
-                    renderSeedComponent={(bracketProps) => (
-                      <SeedBagan
-                        bracketProps={bracketProps}
-                        configs={{
-                          totalRounds: bracketData.rounds.length - 1,
-                          eliminationId: bracketData.eliminationId,
-                        }}
-                      />
-                    )}
-                  />
+                  {bracketData.eliminationId || bracketData.eliminationGroupId ? (
+                    <Bracket
+                      rounds={bracketData.rounds || []}
+                      renderSeedComponent={(bracketProps) => (
+                        <SeedBagan
+                          bracketProps={bracketProps}
+                          configs={{
+                            totalRounds: bracketData.rounds.length - 1,
+                            eliminationId:
+                              bracketData.eliminationId || bracketData.eliminationGroupId,
+                          }}
+                        />
+                      )}
+                    />
+                  ) : bracketData.rounds?.length ? (
+                    <Bracket
+                      rounds={bracketData.rounds || []}
+                      renderSeedComponent={(bracketProps) => (
+                        <SeedPreview
+                          bracketProps={bracketProps}
+                          configs={{
+                            totalRounds: bracketData.rounds.length - 1,
+                            eliminationId:
+                              bracketData.eliminationId || bracketData.eliminationGroupId,
+                          }}
+                        />
+                      )}
+                    />
+                  ) : (
+                    <NoBracketAvailable />
+                  )}
                 </Scrollable>
               </div>
             </BodyWrapper>
@@ -84,6 +103,49 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
         </Modal>
       )}
     </React.Fragment>
+  );
+}
+
+function NoBracketAvailable() {
+  return (
+    <NoBracketWrapper>
+      <h4>Bagan belum tersedia</h4>
+    </NoBracketWrapper>
+  );
+}
+
+function SeedPreview({ bracketProps, configs }) {
+  const { roundIndex, seed, breakpoint } = bracketProps;
+
+  const isFinalRound =
+    (configs.totalRounds === 4 && roundIndex === 3) ||
+    (configs.totalRounds === 3 && roundIndex === 2);
+  const isThirdPlaceRound =
+    (configs.totalRounds === 4 && roundIndex === 4) ||
+    (configs.totalRounds === 3 && roundIndex === 3);
+
+  return (
+    <Seed
+      mobileBreakpoint={breakpoint}
+      className={classnames({
+        "round-final": isFinalRound,
+        "round-third-place": isThirdPlaceRound,
+      })}
+    >
+      <SeedItem>
+        <ItemContainer>
+          {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
+          {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
+          {seed.teams.map((team, index) => (
+            <SeedTeam key={index}>
+              <BoxName>
+                {team.name || team.team || <React.Fragment>&ndash;</React.Fragment>}
+              </BoxName>
+            </SeedTeam>
+          ))}
+        </ItemContainer>
+      </SeedItem>
+    </Seed>
   );
 }
 
@@ -111,7 +173,9 @@ function SeedBagan({ bracketProps, configs }) {
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
           {seed.teams.map((team, index) => (
             <SeedTeam key={index}>
-              <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>
+                {team.name || team.teamName || <React.Fragment>&ndash;</React.Fragment>}
+              </BoxName>
             </SeedTeam>
           ))}
         </ItemContainer>
@@ -137,6 +201,18 @@ const TopBar = styled.div`
 
 const Scrollable = styled.div`
   overflow-x: auto;
+`;
+
+const NoBracketWrapper = styled.div`
+  min-height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > *:nth-child(1) {
+    margin-top: -2rem;
+    color: var(--ma-gray-400);
+  }
 `;
 
 const EditorCloseButton = styled.button`

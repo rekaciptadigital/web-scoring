@@ -87,6 +87,12 @@ export default {
   getEventLaporan(qs = null) {
     return API.get("/web/v1/archery/events/participant/excel/download", qs);
   },
+  getEventReportInfos(qs = null) {
+    return API.get("/web/v1/archery/events/report-event-list", qs);
+  },
+  getEventRoundupsReport(qs = null) {
+    return API.get("/web/v1/archery/events/report-result", qs);
+  },
   getEventMemberNew(qs = null) {
     return API.get("/web/v2/members", qs);
   },
@@ -125,5 +131,13 @@ export default {
    */
   getCategoryDetailV2(qs = null) {
     return API.get("/general/v2/category-details", qs);
+  },
+
+  /**
+   * ID Card
+   */
+  getDownloadIdCard({ event_id, type, team_category_id, age_category_id, competition_category_id, distance_id }) {
+    const qs = { event_id,  type, team_category_id, age_category_id, competition_category_id, distance_id };
+    return API.get("/web/v2/id-card/download-by-category", qs);
   },
 };

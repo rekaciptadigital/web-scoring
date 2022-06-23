@@ -65,17 +65,27 @@ function rowsAfterFilter(originalRows, searchKeyword) {
   if (!searchKeyword) {
     return originalRows;
   }
-
+  /**
+   * Cocokkan kata kunci dari search box dengan:
+   * 1. nama peserta
+   * 2. opsional: nama klub, kalau "ada" klubnya
+   */
   const filteredList = originalRows.filter((memberBudrest) => {
     const archerName = memberBudrest.name.toLowerCase();
-    const clubName = memberBudrest.clubName.toLowerCase();
+    const clubName = memberBudrest.clubName?.toLowerCase() || ""; // ada kemungkinan peserta "gak punya" klub
     const keyword = searchKeyword.trim().toLowerCase();
+
+    if (!clubName) {
+      // skip mencocokkan di nama klub
+      const foundIndexOnArcher = archerName.indexOf(keyword);
+      return foundIndexOnArcher >= 0;
+    }
 
     const foundIndexOnArcher = archerName.indexOf(keyword);
     const foundIndexOnClub = clubName.indexOf(keyword);
-
     return foundIndexOnArcher >= 0 || foundIndexOnClub >= 0;
   });
+
   return filteredList;
 }
 

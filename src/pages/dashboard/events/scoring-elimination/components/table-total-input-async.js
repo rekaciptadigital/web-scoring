@@ -7,13 +7,16 @@ import { toast } from "./processing-toast";
 
 import IconLoading from "./icon-loading";
 
-function TotalInputAsync({ playerDetail, disabled, scoring, onSuccess }) {
+function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSuccess }) {
   const inputRef = React.useRef(null);
   const [isDirty, setDirty] = React.useState(false);
   const previousValue = React.useRef(null);
   const [inputValue, setInputValue] = React.useState("");
 
   const { submitAdminTotal, isLoading, isError, errors } = useSubmitAdminTotal({
+    categoryId: categoryId,
+    participantId: playerDetail?.participantId,
+    memberId: playerDetail.id,
     eliminationId: scoring.elimination_id,
     round: scoring.round,
     match: scoring.match,
@@ -36,23 +39,20 @@ function TotalInputAsync({ playerDetail, disabled, scoring, onSuccess }) {
 
     const debounceTimer = setTimeout(() => {
       toast.loading("Sedang menyimpan skor total...");
-      submitAdminTotal(
-        { memberId: playerDetail.id, value: inputValue },
-        {
-          onSuccess() {
-            toast.dismiss();
-            toast.success("Total berhasil disimpan");
-            inputRef.current?.focus();
-            onSuccess?.();
-          },
-          onError() {
-            isDirty && setDirty(false);
-            setInputValue(previousValue.current);
-            toast.dismiss();
-            toast.error("Gagal menyimpan total");
-          },
-        }
-      );
+      submitAdminTotal(inputValue, {
+        onSuccess() {
+          toast.dismiss();
+          toast.success("Total berhasil disimpan");
+          inputRef.current?.focus();
+          onSuccess?.();
+        },
+        onError() {
+          isDirty && setDirty(false);
+          setInputValue(previousValue.current);
+          toast.dismiss();
+          toast.error("Gagal menyimpan total");
+        },
+      });
     }, 1000);
 
     return () => clearTimeout(debounceTimer);

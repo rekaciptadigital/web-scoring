@@ -2,9 +2,10 @@ import * as React from "react";
 import styled from "styled-components";
 import { useScoringDetail } from "../../hooks/scoring-detail";
 import { useSubmitScores } from "../../hooks/submit-scores";
-import { useGridForm } from "../../hooks/grid-form.js";
+import { useGridForm } from "../../hooks/grid-form";
 import { useAdminTotal } from "../../hooks/admin-total";
 import { useSubmitAdminTotal } from "../../hooks/submit-total";
+import { InputSwitcherProvider } from "../../contexts/input-switcher";
 
 import { Modal as BSModal, ModalBody } from "reactstrap";
 import {
@@ -27,6 +28,7 @@ import IconDistance from "components/ma/icons/mono/arrow-left-right";
 import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
+import { sumScoresList } from "./utils";
 
 function ButtonEditScoreLine({
   disabled,
@@ -111,25 +113,42 @@ function ModalEditor({
     setTotal: setTotalP2,
   } = useAdminTotal(player2?.scores);
 
+  // untuk nge-"queue" refetch, lihat yang panggil ini di bawah
+  const shouldRefetch = React.useRef(false);
+
   // mutate
   const {
     submitScoringDetail,
-    isLoading: isSubmiting,
-    isError: isErrorSubmit,
-    errors: errorsSubmit,
+    isLoading: isSubmitingDetail,
+    isError: isErrorSubmitDetail,
+    errors: errorsSubmitDetail,
   } = useSubmitScores();
 
-  const { submitAdminTotal, isLoading: isSubmitingTotal } = useSubmitAdminTotal({
-    eliminationId: scoring.elimination_id,
+  const {
+    submitAdminTotal: submitAdminTotalP1,
+    isLoading: isSubmitingTotalP1,
+    isError: isErrorSubmitingTotalP1,
+    errors: errorsSubmitingTotalP1,
+  } = useSubmitAdminTotal({
+    categoryId: categoryDetails.categoryDetailId,
+    memberId: player1?.participant.member.id,
+    eliminationId: scoring?.elimination_id,
     round: scoring.round,
     match: scoring.match,
   });
 
-  const onSuccess = () => {
-    toast.success("Detail skor berhasil disimpan");
-    fetchScoringDetail();
-    onSuccessSubmit?.();
-  };
+  const {
+    submitAdminTotal: submitAdminTotalP2,
+    isLoading: isSubmitingTotalP2,
+    isError: isErrorSubmitingTotalP2,
+    errors: errorsSubmitingTotalP2,
+  } = useSubmitAdminTotal({
+    categoryId: categoryDetails.categoryDetailId,
+    memberId: player2?.participant.member.id,
+    eliminationId: scoring?.elimination_id,
+    round: scoring.round,
+    match: scoring.match,
+  });
 
   if (!isSettled) {
     return (
@@ -150,12 +169,16 @@ function ModalEditor({
 
   return (
     <React.Fragment>
-      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
       <AlertSubmitError isError={isErrorScoringDetail} errors={errorsScoringDetail} />
+      <AlertSubmitError isError={isErrorSubmitDetail} errors={errorsSubmitDetail} />
+      <AlertSubmitError isError={isErrorSubmitingTotalP1} errors={errorsSubmitingTotalP1} />
+      <AlertSubmitError isError={isErrorSubmitingTotalP2} errors={errorsSubmitingTotalP2} />
 
       <Modal isOpen centered backdrop="static" size="lg" autoFocus onClosed={onClose}>
         <ModalBody>
-          <LoadingBlocker isLoading={isSubmitingTotal || isSubmiting} />
+          <LoadingBlocker
+            isLoading={isSubmitingTotalP1 || isSubmitingTotalP2 || isSubmitingDetail}
+          />
           <BodyWrapper>
             <ModalHeaderBar>
               <h4>Scoresheet</h4>
@@ -282,59 +305,111 @@ function ModalEditor({
             </CategoryLabel>
 
             <SplitEditor>
-              <div>
-                <ScoreGridForm
-                  scoringType={player1?.scores.eliminationtScoreType}
-                  gridData={gridDataPlayer1}
-                  onChange={(value) => setGridDataPlayer1(value)}
-                />
-              </div>
+              <InputSwitcherProvider
+                scoringDetails={scoringDetails}
+                grid={[gridDataPlayer1?.shot, gridDataPlayer2?.shot]}
+              >
+                <div>
+                  <ScoreGridForm
+                    scoringType={player1?.scores.eliminationtScoreType}
+                    gridData={gridDataPlayer1}
+                    onChange={(value) => {
+                      if (player1?.scores.eliminationtScoreType === 1) {
+                        // Itung poin real-time untuk tipe skoring poin
+                        const [valP1, valP2] = _computePoints(value, gridDataPlayer2);
+                        setGridDataPlayer1(valP1);
+                        setGridDataPlayer2(valP2); // opponent
+                      } else {
+                        setGridDataPlayer1(value);
+                      }
+                    }}
+                  />
+                </div>
 
-              <div>
-                <ScoreGridFormRight
-                  scoringType={player2?.scores.eliminationtScoreType}
-                  gridData={gridDataPlayer2}
-                  onChange={(value) => setGridDataPlayer2(value)}
-                />
-              </div>
+                <div>
+                  <ScoreGridFormRight
+                    scoringType={player2?.scores.eliminationtScoreType}
+                    gridData={gridDataPlayer2}
+                    onChange={(value) => {
+                      if (player2?.scores.eliminationtScoreType === 1) {
+                        const [valP2, valP1] = _computePoints(value, gridDataPlayer1);
+                        setGridDataPlayer2(valP2);
+                        setGridDataPlayer1(valP1); // opponent
+                      } else {
+                        setGridDataPlayer2(value);
+                      }
+                    }}
+                  />
+                </div>
+              </InputSwitcherProvider>
             </SplitEditor>
 
             <HorizontalSpaced>
               <Button onClick={onClose}>Batal</Button>
               <ButtonBlue
-                onClick={() => {
+                onClick={async () => {
+                  // Hack promise sederhana untuk menghindari "race condition" ketika harus
+                  // refetch data tapi menunggu semua request async dari ketiga API selesai,
+                  // apapun hasilnya, sukses maupun gagal.
+
+                  // Preparing refetching "queue"
+                  const savingTotal1 = {};
+                  const savingTotal2 = {};
+                  const savingScoreDetails = {};
+
+                  savingTotal1.promise = new Promise((resolve) => {
+                    savingTotal1.done = resolve;
+                  });
+                  savingTotal2.promise = new Promise((resolve) => {
+                    savingTotal2.done = resolve;
+                  });
+                  savingScoreDetails.promise = new Promise((resolve) => {
+                    savingScoreDetails.done = resolve;
+                  });
+
+                  const waitForAllDone = () => {
+                    return Promise.all([
+                      savingTotal1.promise,
+                      savingTotal2.promise,
+                      savingScoreDetails.promise,
+                    ]);
+                  };
+
+                  // Running requests in queue
+                  // 1.
                   if (isDirtyTotalP1) {
-                    submitAdminTotal(
-                      {
-                        memberId: player1.participant.member.id,
-                        value: adminTotalP1,
+                    submitAdminTotalP1(adminTotalP1, {
+                      onSuccess: () => {
+                        toast.success("Total tim 1 berhasil disimpan");
+                        savingTotal1.done();
+                        shouldRefetch.current = true;
                       },
-                      {
-                        onSuccess: () => {
-                          toast.success("Total berhasil disimpan");
-                        },
-                        onError: () => {
-                          toast.error("Gagal menyimpan total");
-                        },
-                      }
-                    );
+                      onError: () => {
+                        toast.error("Gagal menyimpan total tim 1");
+                        savingTotal1.done();
+                      },
+                    });
+                  } else {
+                    // done tanpa kirim request
+                    savingTotal1.done();
                   }
 
+                  // 2.
                   if (isDirtyTotalP2) {
-                    submitAdminTotal(
-                      {
-                        memberId: player2.participant.member.id,
-                        value: adminTotalP2,
+                    submitAdminTotalP2(adminTotalP2, {
+                      onSuccess: () => {
+                        toast.success("Total archer 2 berhasil disimpan");
+                        savingTotal2.done();
+                        shouldRefetch.current = true;
                       },
-                      {
-                        onSuccess: () => {
-                          toast.success("Total berhasil disimpan");
-                        },
-                        onError: () => {
-                          toast.error("Gagal menyimpan total");
-                        },
-                      }
-                    );
+                      onError: () => {
+                        toast.error("Gagal menyimpan total archer 2");
+                        savingTotal2.done();
+                      },
+                    });
+                  } else {
+                    // done tanpa kirim request
+                    savingTotal2.done();
                   }
 
                   const payload = {
@@ -345,7 +420,28 @@ function ModalEditor({
                       payload: [gridDataPlayer1, gridDataPlayer2],
                     }),
                   };
-                  submitScoringDetail(payload, { onSuccess });
+
+                  submitScoringDetail(payload, {
+                    onSuccess: () => {
+                      toast.success("Detail skor berhasil disimpan");
+                      savingScoreDetails.done();
+                      shouldRefetch.current = true;
+                    },
+                    onError: () => {
+                      toast.error("Gagal menyimpan detail");
+                      savingScoreDetails.done();
+                    },
+                  });
+
+                  // Eksekusi logic di bawah hanya setelah queue-nya selesai/resolve semua
+                  await waitForAllDone();
+
+                  if (shouldRefetch.current) {
+                    fetchScoringDetail();
+                    onSuccessSubmit?.();
+                  }
+
+                  shouldRefetch.current = false;
                 }}
               >
                 Simpan
@@ -585,6 +681,51 @@ function _makeMemberScoresPayload({ state, payload }) {
 
 function _getDistanceCategoryLabel(classCategory) {
   return classCategory.split(" - ")?.[1]?.trim() || "-";
+}
+
+function _computePoints(value, valueOpponent) {
+  const sums = value.shot.reduce((sums, rambahan, index) => {
+    const pointA = sumScoresList(rambahan);
+    const pointB = sumScoresList(valueOpponent.shot[index]);
+    sums.push([pointA, pointB]);
+    return sums;
+  }, []);
+
+  const points = sums.reduce((points, [a, b]) => {
+    let pair = [1, 1];
+    if (a > b) {
+      pair = [2, 0];
+    } else if (a < b) {
+      pair = [0, 2];
+    } else if (a === 0 && b === 0) {
+      pair = [0, 0];
+    }
+    points.push(pair);
+    return points;
+  }, []);
+
+  const resultPair = [value, valueOpponent].map((player, playerIndex) => {
+    const stats = points.reduce((stats, pointPair, rambahanIndex) => {
+      const point = pointPair[playerIndex];
+      stats[rambahanIndex] = { ...player.stats[rambahanIndex], point };
+      return stats;
+    }, {});
+
+    const result = points.reduce((total, pointPair) => {
+      return total + pointPair[playerIndex];
+    }, 0);
+
+    return {
+      ...player,
+      stats: {
+        ...player.stats,
+        ...stats,
+        result: result,
+      },
+    };
+  });
+
+  return resultPair;
 }
 
 export { ButtonEditScoreLine };

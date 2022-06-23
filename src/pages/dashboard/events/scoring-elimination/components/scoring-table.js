@@ -6,8 +6,7 @@ import { SpinnerDotBlock } from "components/ma";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
-// TODO: uncomment saat ready
-// import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
+import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 import { ButtonSetWinner } from "./button-set-winner";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
@@ -58,6 +57,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
   // Happy path
   const tabLabels = _getTabLabels(data.rounds);
   const currentRows = data.rounds[selectedTab]?.seeds || [];
+  const thTotalLabel = _getTotalLabel(categoryDetails);
 
   return (
     <SectionTableContainer>
@@ -72,9 +72,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
           <tr>
             <th>Bantalan</th>
             <th>Nama Peserta</th>
-            <th>Total</th>
+            <ThTotal>{thTotalLabel}</ThTotal>
             <th></th>
-            <th>Total</th>
+            <ThTotal>{thTotalLabel}</ThTotal>
             <th>Nama Peserta</th>
             <th></th>
           </tr>
@@ -96,6 +96,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               match: matchNumber,
             };
 
+            const isBye =
+              row.teams.some((team) => team.status === "bye") ||
+              (roundNumber === 1 && row.teams.every((team) => !team.name));
             const noData = !player1?.name || !player2?.name;
             const hasWinner = row.teams.some((team) => team.win === 1);
             const budrestNumber = _getBudrestNumber(row);
@@ -103,10 +106,11 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
             return (
               <tr key={index}>
                 <td>
-                  {noData || hasWinner ? (
+                  {isBye || noData || hasWinner ? (
                     <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
                   ) : (
                     <BudrestInputAsync
+                      categoryId={categoryDetailId}
                       playerDetail={player1 || player2}
                       disabled={hasWinner || noData}
                       scoring={scoring}
@@ -118,10 +122,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerLeft>
                     <PlayerNameData>
-                      {(player1?.potition || player1?.postition) && (
-                        <RankLabel>#{player1?.potition || player1?.postition || "-"}</RankLabel>
-                      )}
-                      <NameLabel>{player1?.name || <NoArcherLabel />}</NameLabel>
+                      {player1?.potition && <RankLabel>#{player1?.potition || "-"}</RankLabel>}
+                      <NameLabel>{player1?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerLeft>
                 </td>
@@ -131,6 +133,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <InlineScoreInput>
                       <ValidationIndicator position="left" isValid={player1?.isDifferent !== 1} />
                       <TotalInputAsync
+                        categoryId={categoryDetailId}
                         playerDetail={player1}
                         disabled={hasWinner || !player1?.name}
                         scoring={scoring}
@@ -147,7 +150,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     <HeadToHeadScoreLabels>
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": player1?.adminTotal > player2?.adminTotal,
+                          "score-label-higher":
+                            player1?.status === "win" || player1?.adminTotal > player2?.adminTotal,
                         })}
                       >
                         {player1?.adminTotal || 0}
@@ -157,7 +161,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
 
                       <ScoreTotalLabel
                         className={classnames({
-                          "score-label-higher": player2?.adminTotal > player1?.adminTotal,
+                          "score-label-higher":
+                            player2?.status === "win" || player2?.adminTotal > player1?.adminTotal,
                         })}
                       >
                         {player2?.adminTotal || 0}
@@ -170,6 +175,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                   {!noData && !hasWinner ? (
                     <InlineScoreInput>
                       <TotalInputAsync
+                        categoryId={categoryDetailId}
                         playerDetail={player2}
                         disabled={hasWinner || !player2?.name}
                         scoring={scoring}
@@ -185,17 +191,15 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerRight>
                     <PlayerNameData>
-                      {(player2?.potition || player2?.postition) && (
-                        <RankLabel>#{player2?.potition || player2?.postition || "-"}</RankLabel>
-                      )}
-                      <NameLabel>{player2?.name || <NoArcherLabel />}</NameLabel>
+                      {player2?.potition && <RankLabel>#{player2?.potition || "-"}</RankLabel>}
+                      <NameLabel>{player2?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerRight>
                 </td>
 
                 <td>
                   <HorizontalSpaced>
-                    {!hasWinner && (
+                    {!hasWinner && !isBye && (
                       <ButtonSetWinner
                         title={
                           hasWinner
@@ -204,13 +208,14 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                         }
                         disabled={noData}
                         scoring={scoring}
+                        categoryId={categoryDetailId}
                         onSuccess={fetchEliminationMatches}
                       >
                         Tentukan
                       </ButtonSetWinner>
                     )}
 
-                    {!hasWinner && (
+                    {!hasWinner && !isBye && (
                       <ButtonEditScoreLine
                         disabled={noData}
                         headerInfo={row}
@@ -221,8 +226,11 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       />
                     )}
 
-                    {/* TODO: uncomment saat ready */}
-                    {/* <ButtonDownloadScoresheet disabled={noData} /> */}
+                    <ButtonDownloadScoresheet
+                      disabled={noData}
+                      categoryId={categoryDetailId}
+                      scoring={scoring}
+                    />
                   </HorizontalSpaced>
                 </td>
               </tr>
@@ -253,8 +261,11 @@ function StagesTabs({ labels, currentTab, onChange }) {
   );
 }
 
-function NoArcherLabel() {
-  return <NoArcherWrapper>Belum ada archer</NoArcherWrapper>;
+function NoArcherLabel({ isBye }) {
+  if (isBye) {
+    return <NoArcherWrapper>&#171; bye &#187;</NoArcherWrapper>;
+  }
+  return <NoArcherWrapper>&#171; Belum ada archer &#187;</NoArcherWrapper>;
 }
 
 function ValidationIndicator({ position, isValid }) {
@@ -287,6 +298,10 @@ function ValidationIndicator({ position, isValid }) {
 
 const SectionTableContainer = styled.section`
   background-color: #ffffff;
+`;
+
+const ThTotal = styled.th`
+  white-space: nowrap;
 `;
 
 const BudrestNumberLabel = styled.div`
@@ -470,8 +485,7 @@ const PlayerNameData = styled.div`
   align-items: center;
 `;
 
-const RankLabel = styled.span`
-  display: block;
+const RankLabel = styled.div`
   padding: 0.625rem 0.5rem;
   min-width: 3rem;
   background-color: var(--ma-primary-blue-50);
@@ -479,15 +493,19 @@ const RankLabel = styled.span`
   font-weight: 600;
 `;
 
-const NameLabel = styled.span`
-  display: block;
+const NameLabel = styled.div`
   font-weight: 600;
   text-align: left;
 `;
 
-const NoArcherWrapper = styled.span`
-  color: var(--ma-gray-200);
-  font-weight: 400;
+const NoArcherWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  color: var(--ma-gray-400);
 `;
 
 const HeadToHeadScoreLabels = styled.div`
@@ -557,6 +575,17 @@ function _getBudrestNumber(row) {
   }
 
   return "-";
+}
+
+function _getTotalLabel(categoryDetails) {
+  if (!categoryDetails?.originalCategoryDetail?.competitionCategoryId) {
+    return "Total";
+  }
+  const TYPE_POINT = "Total Set Poin";
+  const TYPE_ACCUMULATION = "Total Skor";
+  return categoryDetails.originalCategoryDetail.competitionCategoryId.toLowerCase() === "compound"
+    ? TYPE_ACCUMULATION
+    : TYPE_POINT;
 }
 
 export { ScoringTable };

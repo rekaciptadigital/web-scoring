@@ -19,6 +19,7 @@ import classnames from "classnames";
 
 function ScoringTable({
   categoryDetailId,
+  isLocked,
   eliminationParticipantsCount,
   onChangeParticipantPresence,
   searchName,
@@ -158,6 +159,17 @@ function ScoringTable({
             <tbody>
               {scoringMembers?.map((row) => {
                 const shouldRenderShootoffWarning = [1, 2].indexOf(parseInt(row.haveShootOff)) >= 0;
+                const getCheckboxTitleText = (row) => {
+                  if (!isLocked) {
+                    return row.member.isPresent
+                      ? "Hapus centang untuk tidak mengikutkan dalam eliminasi"
+                      : "Centang untuk mengikutkan dalam eliminasi";
+                  }
+                  if (isLocked)
+                    return row.member.isPresent
+                      ? "Peserta diikutkan dalam pemeringkatan eliminasi"
+                      : "Peserta tidak diikutkan dalam pemeringkatan eliminasi";
+                };
                 return (
                   <tr
                     key={row.member.id}
@@ -201,14 +213,10 @@ function ScoringTable({
                         )}
 
                         <CheckboxWithPrompt
-                          disabled={isEditorOpen}
+                          disabled={isLocked || isEditorOpen}
                           checked={row.member.isPresent}
                           onChange={() => checkPresenceByRow(row)}
-                          title={
-                            row.member.isPresent
-                              ? "Hapus centang untuk tidak mengikutkan dalam eliminasi"
-                              : "Centang untuk mengikutkan dalam eliminasi"
-                          }
+                          title={getCheckboxTitleText(row)}
                         />
 
                         {checkIsRowActive(row.member.id) ? (
@@ -219,7 +227,7 @@ function ScoringTable({
                           <ExpanderButton
                             flexible
                             onClick={() => handleClickSelectRow(row)}
-                            disabled={!row.member.isPresent}
+                            disabled={isLocked || !row.member.isPresent}
                           >
                             <IconChevronRight size="16" />
                           </ExpanderButton>
@@ -493,16 +501,6 @@ const CheckboxWrapper = styled.span`
   .rc-checkbox-disabled,
   .rc-checkbox-disabled .rc-checkbox-input {
     cursor: default;
-  }
-
-  .rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner,
-  .rc-checkbox-disabled.rc-checkbox-checked:hover .rc-checkbox-inner {
-    background-color: var(--ma-blue);
-    border-color: var(--ma-blue);
-  }
-
-  .rc-checkbox-disabled.rc-checkbox-checked .rc-checkbox-inner:after {
-    border-color: #ffffff;
   }
 `;
 

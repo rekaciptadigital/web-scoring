@@ -48,7 +48,7 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
       {isOpen && (
         <Modal
           isOpen
-          size={bracketData.eliminationId ? "xl" : "md"}
+          size={bracketData.eliminationId || bracketData.eliminationGroupId ? "xl" : "md"}
           centered
           backdrop="static"
           autoFocus
@@ -79,6 +79,21 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
                       )}
                     />
                   </Scrollable>
+                ) : bracketData.eliminationGroupId ? (
+                  <Scrollable>
+                    <Bracket
+                      rounds={bracketData.rounds || []}
+                      renderSeedComponent={(bracketProps) => (
+                        <SeedBaganTeam
+                          bracketProps={bracketProps}
+                          configs={{
+                            totalRounds: bracketData.rounds.length - 1,
+                            eliminationId: bracketData.eliminationGroupId,
+                          }}
+                        />
+                      )}
+                    />
+                  </Scrollable>
                 ) : (
                   <NoBracketAvailable />
                 )}
@@ -101,9 +116,12 @@ function NoBracketAvailable() {
 
 function SeedBagan({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
+  const roundNumber = roundIndex + 1;
 
-  const noData = !seed.teams[0]?.name || !seed.teams[0]?.name;
-  const isBye = seed.teams.some((team) => team.status === "bye");
+  const noData = !seed.teams[0]?.name || !seed.teams[1]?.name;
+  const isBye =
+    seed.teams.some((team) => team.status === "bye") ||
+    (roundNumber === 1 && seed.teams.every((team) => !team.name));
 
   const isFinalRound =
     (configs.totalRounds === 4 && roundIndex === 3) ||
@@ -127,12 +145,13 @@ function SeedBagan({ bracketProps, configs }) {
           {seed.teams.map((team, index) => (
             <SeedTeam
               key={index}
+              title={team.name}
               className={classnames({
                 "item-active": !noData,
-                "item-winner": parseInt(team.win) === 1 && !isBye,
+                "item-winner": !isBye && parseInt(team.win) === 1,
               })}
             >
-              <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>{team.name || <ByeLabel isBye={isBye} />}</BoxName>
               <BoxScore team={team} />
             </SeedTeam>
           ))}
@@ -142,21 +161,88 @@ function SeedBagan({ bracketProps, configs }) {
   );
 }
 
+function SeedBaganTeam({ bracketProps, configs }) {
+  const { roundIndex, seed, breakpoint } = bracketProps;
+  const roundNumber = roundIndex + 1;
+
+  // ?: cari pengecekan yang lebih sederhana?
+  const noData =
+    !seed.teams[0]?.teamName ||
+    !seed.teams[1]?.teamName ||
+    !seed.teams[0]?.memberTeam?.length ||
+    !seed.teams[1]?.memberTeam?.length;
+
+  const isBye =
+    seed.teams.some((team) => team.status === "bye") ||
+    (roundNumber === 1 && seed.teams.every((team) => !team.teamName));
+
+  const isFinalRound =
+    (configs.totalRounds === 4 && roundIndex === 3) ||
+    (configs.totalRounds === 3 && roundIndex === 2);
+  const isThirdPlaceRound =
+    (configs.totalRounds === 4 && roundIndex === 4) ||
+    (configs.totalRounds === 3 && roundIndex === 3);
+
+  return (
+    <Seed
+      mobileBreakpoint={breakpoint}
+      className={classnames({
+        "round-final": isFinalRound,
+        "round-third-place": isThirdPlaceRound,
+      })}
+    >
+      <SeedItem>
+        <ItemContainer>
+          {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
+          {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
+          {seed.teams.map((team, index) => (
+            <SeedTeam
+              key={index}
+              title={team.teamName}
+              className={classnames({
+                "item-active": !noData,
+                "item-winner": parseInt(team.win) === 1 && !isBye,
+              })}
+            >
+              <BoxName>{team.teamName || <ByeLabel isBye={isBye} />}</BoxName>
+              <BoxScore team={team} />
+            </SeedTeam>
+          ))}
+        </ItemContainer>
+      </SeedItem>
+    </Seed>
+  );
+}
+
+function ByeLabel({ isBye }) {
+  if (isBye) {
+    return <ByeLabelSpan>&#171; bye &#187;</ByeLabelSpan>;
+  }
+  return <React.Fragment>&ndash;</React.Fragment>;
+}
+
 function BoxScore({ team }) {
   if (!team) {
     return null;
   }
 
-  if (team.adminTotal && typeof team.adminTotal === "number") {
+  if (typeof team.adminTotal === "number") {
     return <BoxScoreWrapper>{team.adminTotal}</BoxScoreWrapper>;
   }
 
-  if (team.totalScoring && typeof team.totalScoring === "number") {
+  if (typeof team.totalScoring === "number") {
     return <BoxScoreWrapper>{team.totalScoring}</BoxScoreWrapper>;
   }
 
   return null;
 }
+
+const ByeLabelSpan = styled.span`
+  text-align: center;
+  vertical-align: middle;
+  color: var(--ma-gray-200);
+  font-weight: 600;
+`;
 
 /* ================================== */
 // styles

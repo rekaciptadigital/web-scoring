@@ -12,6 +12,7 @@ import PageEventBudRestDetail from "../pages/dashboard/events/budrests/detail";
 import PageEventFaqs from "../pages/dashboard/events/faqs";
 import PageEventScoringQualification from "pages/dashboard/events/scoring-qualification";
 import PageEventScoringElimination from "pages/dashboard/events/scoring-elimination";
+import PageEventReports from "pages/dashboard/events/reports";
 import PageEventDetailSchedulingScoring from "pages/dashboard/events/scheduling-scoring";
 import PageConfigEliminationDetail from "pages/dashboard/events/scheduling-scoring/views/manage-elimination-detail";
 import ListCategory from "../pages/dashboard/category";
@@ -25,6 +26,7 @@ import EditResult from "pages/dashboard/results/edit";
 import ListSchedule from "../pages/dashboard/schedule";
 import Eliminasi from "../pages/dashboard/eliminasi";
 import PageEventOfficial from "pages/dashboard/events/official";
+import Legacy_PageEventIdCard from "pages/dashboard/events/id-card/_legacy";
 import PageEventIdCard from "pages/dashboard/events/id-card";
 
 const dashboardRoutes = [
@@ -35,7 +37,8 @@ const dashboardRoutes = [
   { path: "/dashboard/event/:event_id/budrests", component: PageEventBudRests },
   { path: "/dashboard/event/:event_id/budrests/detail", component: PageEventBudRestDetail },
   { path: "/dashboard/event/:event_id/faqs", component: PageEventFaqs },
-  { path: "/dashboard/event/id-card/:event_id", component: PageEventIdCard },
+  { path: "/dashboard/event/id-card/:event_id", component: Legacy_PageEventIdCard },
+  { path: "/dashboard/event/:event_id/id-card", component: PageEventIdCard },
   { path: "/dashboard/event/:event_id/official", component: PageEventOfficial },
   {
     path: "/dashboard/event/:event_id/scoring-qualification",
@@ -45,14 +48,17 @@ const dashboardRoutes = [
     path: "/dashboard/event/:event_id/scoring-elimination",
     component: PageEventScoringElimination,
   },
+  // TODO: hapus ketika nanti udah gak dipakai/diakses
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",
     component: PageEventDetailSchedulingScoring,
   },
+  // TODO: hapus ketika nanti udah gak dipakai/diakses
   {
     path: "/dashboard/event/:event_id/scheduling-scoring/elimination",
     component: PageConfigEliminationDetail,
   },
+  { path: "/dashboard/event/:event_id/reports", component: PageEventReports, exact: true },
   { path: "/dashboard/member/:event_id", component: ListMember },
   { path: "/dashboard/category", component: ListCategory },
   { path: "/dashboard/scoring", component: ListScoring },

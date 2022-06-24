@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useInputSwitcher } from "./hooks/input-switcher";
 
 import { SpinnerDotBlock } from "components/ma";
 import { SelectScore } from "./select-score";
@@ -11,21 +12,9 @@ import { SelectScore } from "./select-score";
  */
 function EditorForm({ scoresData, isLoading, onChange }) {
   const scoresFromProp = _makeScoresDataFromProp(scoresData);
-
+  const rambahanNumbers = scoresFromProp ? Object.keys(scoresFromProp) : [];
   const [selectedScore, setSelectedScore] = React.useState(null);
-  const [nextFocusedSelector, setNextFocusedSelector] = React.useState({
-    rambahanIndex: 0,
-    shotIndex: 0,
-  });
-
-  const shouldFocusSelector = (rambahanIndex, shotIndex) => {
-    return (
-      Boolean(scoresData) &&
-      !isLoading &&
-      rambahanIndex === nextFocusedSelector.rambahanIndex &&
-      shotIndex === nextFocusedSelector.shotIndex
-    );
-  };
+  const { shouldFocusSelector, move, setPosition } = useInputSwitcher(scoresData);
 
   React.useEffect(() => {
     if (!selectedScore) {
@@ -36,20 +25,7 @@ function EditorForm({ scoresData, isLoading, onChange }) {
 
   const handleSelectScore = (selectData) => {
     setSelectedScore(selectData);
-
-    if (selectData.rambahan >= 5 && selectData.shot >= 5) {
-      return;
-    } else if (selectData.shot >= 5) {
-      setNextFocusedSelector({
-        rambahanIndex: selectData.rambahan + 1,
-        shotIndex: 0,
-      });
-    } else {
-      setNextFocusedSelector({
-        rambahanIndex: selectData.rambahan,
-        shotIndex: selectData.shot + 1,
-      });
-    }
+    move({ y: selectData.rambahan, x: selectData.shot });
   };
 
   return (
@@ -66,27 +42,42 @@ function EditorForm({ scoresData, isLoading, onChange }) {
           </thead>
 
           <tbody>
-            {[1, 2, 3, 4, 5, 6].map((rambahanNumber, rambahanIndex) => (
+            {rambahanNumbers.map((rambahanNumber, rambahanIndex) => (
               <tr key={rambahanNumber}>
                 <RambahanCell>{rambahanNumber}</RambahanCell>
 
-                {scoresFromProp[rambahanNumber].map((scoreItem, shotIndex) => (
-                  <RambahanCell key={shotIndex}>
-                    <SelectScore
-                      name={`shot-score-${rambahanIndex}-${shotIndex}`}
-                      value={scoreItem}
-                      onChange={(value) => {
-                        handleSelectScore({
-                          rambahan: rambahanIndex,
-                          shot: shotIndex,
-                          score: value,
-                        });
-                      }}
-                      isFocus={shouldFocusSelector(rambahanIndex, shotIndex)}
-                      onFocus={() => setNextFocusedSelector({ rambahanIndex, shotIndex })}
-                    />
-                  </RambahanCell>
-                ))}
+                {scoresFromProp[rambahanNumber].map((scoreItem, shotIndex) => {
+                  const pos = { y: rambahanIndex, x: shotIndex };
+                  const isFocus = shouldFocusSelector(pos);
+                  return (
+                    <RambahanCell key={shotIndex}>
+                      <SelectScore
+                        name={`shot-score-${rambahanIndex}-${shotIndex}`}
+                        value={scoreItem}
+                        onChange={(value) => {
+                          handleSelectScore({
+                            rambahan: rambahanIndex,
+                            shot: shotIndex,
+                            score: value,
+                          });
+                        }}
+                        onInputChange={(inputString) => {
+                          const value = _getValueFromInput(inputString);
+                          if (!value) {
+                            return;
+                          }
+                          handleSelectScore({
+                            rambahan: rambahanIndex,
+                            shot: shotIndex,
+                            score: value,
+                          });
+                        }}
+                        isFocus={isFocus}
+                        onFocus={() => setPosition(pos)}
+                      />
+                    </RambahanCell>
+                  );
+                })}
 
                 <RambahanCell>{_sumRambahanTotal(scoresFromProp[rambahanNumber])}</RambahanCell>
               </tr>
@@ -328,6 +319,14 @@ function _countXPlusTen(gridData) {
   }, 0);
 
   return counts;
+}
+
+function _getValueFromInput(inputString) {
+  const numberValue = Number(inputString);
+  const checkValue = !isNaN(numberValue) ? numberValue : inputString;
+  const value =
+    ["m", "x", 2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(checkValue) > -1 ? checkValue : false;
+  return value;
 }
 
 export { EditorForm };

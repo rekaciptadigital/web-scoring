@@ -6,26 +6,29 @@ import { urlUtil } from "utils";
 function useScoresheetDownload(eventCategoryId) {
   const fetcher = useFetcher();
 
-  const handleDownloadScoresheet = async ({ onSuccess: consumerSuccessHandler }) => {
+  const download = async (sessionNumber, { onSuccess, ...options }) => {
     if (!eventCategoryId) {
       return;
     }
 
-    const queryString = { event_category_id: eventCategoryId };
-
     const getFunction = () => {
-      return ScoringService.getScoresheetDownloadUrl(queryString);
-    };
-    const onSuccess = (data) => {
-      consumerSuccessHandler?.();
-      const downloadUrl = _handleURLFromResponse(data);
-      urlUtil.openUrlOnNewTab(downloadUrl);
+      return ScoringService.getScoresheetDownloadUrl({
+        event_category_id: eventCategoryId,
+        session: sessionNumber,
+      });
     };
 
-    fetcher.runAsync(getFunction, { onSuccess });
+    fetcher.runAsync(getFunction, {
+      ...options,
+      onSuccess: (data) => {
+        onSuccess?.();
+        const downloadUrl = _handleURLFromResponse(data);
+        urlUtil.openUrlOnNewTab(downloadUrl);
+      },
+    });
   };
 
-  return { ...fetcher, handleDownloadScoresheet };
+  return { ...fetcher, download };
 }
 
 // utils

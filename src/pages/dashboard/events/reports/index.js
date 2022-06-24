@@ -14,6 +14,7 @@ import IconUsersGroup from "components/ma/icons/mono/users-group";
 // TODO: buat finance nanti kalau udah ready
 // import IconMoney from "components/ma/icons/mono/money";
 import IconMedal from "components/ma/icons/mono/medal";
+import IconInfo from "components/ma/icons/mono/info";
 import IconLoading from "./components/icon-loading";
 
 import { datetime } from "utils";
@@ -37,6 +38,14 @@ function PageEventReports() {
     errors: errorsRoundups,
   } = useReportRoundups();
 
+  const _getIsReportAvailable = (name) => {
+    if (!reportInfos.data?.length) {
+      return false;
+    }
+    const isAvailable = reportInfos.data.find((info) => info.reportType === name)?.isAvailable;
+    return Boolean(isAvailable); // bisa undefined kalau find()-nya gak dapat
+  };
+
   const _makeDownloadHandler = (downloadFn) => {
     return () => {
       const toastId = toast.loading("Sedang menyiapkan dokumen unduhan...");
@@ -44,6 +53,7 @@ function PageEventReports() {
         onSuccess() {
           toast.remove(toastId);
           toast.success("Unduhan dimulai");
+          reportInfos.fetchInfos();
         },
         onError() {
           toast.remove(toastId);
@@ -59,6 +69,10 @@ function PageEventReports() {
     navbar: <SubNavbar eventId={eventId} />,
   };
 
+  const participantIsAvailable = _getIsReportAvailable("participant");
+  const competitionIsAvailable = _getIsReportAvailable("competition");
+  // TODO: finance
+
   return (
     <ContentLayoutWrapper {...pageLayoutProps}>
       <CardList>
@@ -67,7 +81,14 @@ function PageEventReports() {
             icon={IconUsersGroup}
             title="Laporan Jumlah Peserta"
             description="Laporan jumlah peserta yang mengikuti pertandingan"
-            customFooter={<ReportGenerateDateInfo name="participant" reportInfos={reportInfos} />}
+            customFooter={
+              <ReportGenerateDateInfo
+                name="participant"
+                reportInfos={reportInfos}
+                isAvailable={participantIsAvailable}
+              />
+            }
+            downloadDisabled={!participantIsAvailable}
             onDownload={_makeDownloadHandler(downloadParticipants)}
             isLoading={isLoadingParticipants}
             isError={isErrorParticipants}
@@ -82,7 +103,14 @@ function PageEventReports() {
             icon={IconMedal}
             title="Laporan Pertandingan"
             description="Laporan hasil akhir pertandingan"
-            customFooter={<ReportGenerateDateInfo name="competition" reportInfos={reportInfos} />}
+            customFooter={
+              <ReportGenerateDateInfo
+                name="competition"
+                reportInfos={reportInfos}
+                isAvailable={competitionIsAvailable}
+              />
+            }
+            downloadDisabled={!competitionIsAvailable}
             onDownload={_makeDownloadHandler(downloadRoundups)}
             isLoading={isLoadingRoundups}
             isError={isErrorRoundups}
@@ -99,6 +127,7 @@ function ReportingMediaObject({
   title = "Set judul kartu dulu",
   description = "Set deskripsi kartu dulu",
   customFooter,
+  downloadDisabled = false,
   onDownload,
   isLoading,
   isError,
@@ -121,7 +150,8 @@ function ReportingMediaObject({
 
           <div>
             <ButtonDownload
-              title={"Unduh " + title}
+              title={downloadDisabled ? `Belum tersedia ${title}` : `Unduh ${title}`}
+              disabled={downloadDisabled}
               onDownload={onDownload}
               isLoading={isLoading}
               isError={isError}
@@ -157,11 +187,11 @@ function SpinningLoadingIndicator() {
   );
 }
 
-function ReportGenerateDateInfo({ reportInfos, name }) {
-  const { data, isLoading: isFetching, isError } = reportInfos;
+function ReportGenerateDateInfo({ reportInfos, name, isAvailable }) {
+  const { data, isLoading: isFetching, isError, fetchInfos } = reportInfos;
   const isLoading = !data && isFetching;
 
-  const _getReportGenerateDate = (name) => {
+  const generateDate = React.useMemo(() => {
     if (!reportInfos.data?.length) {
       return "";
     }
@@ -170,9 +200,7 @@ function ReportGenerateDateInfo({ reportInfos, name }) {
       return "";
     }
     return datetime.formatFullDateLabel(foundDate);
-  };
-
-  const generateDate = _getReportGenerateDate(name);
+  }, [name, reportInfos]);
 
   if (isLoading) {
     return (
@@ -184,15 +212,21 @@ function ReportGenerateDateInfo({ reportInfos, name }) {
 
   if (isError || !data) {
     return (
-      <PillLabel>
-        <FailedText>Info tanggal generate laporan tidak tersedia</FailedText>
+      <PillLabel title="Gagal mengambil info tanggal generate laporan. Klik untuk coba lagi.">
+        <FailedText onClick={fetchInfos}>
+          <IconInfo size="12" />
+        </FailedText>
       </PillLabel>
     );
   }
 
+  if (!isAvailable) {
+    return <PillLabel title="Laporan tersedia setelah event berakhir.">Tidak Tersedia</PillLabel>;
+  }
+
   return (
     <PillLabel>
-      {generateDate ? "Sudah di-generate pada tanggal " + generateDate : "Tersedia"}
+      {!generateDate ? "Tersedia" : `Sudah di-generate pada tanggal ${generateDate}`}
     </PillLabel>
   );
 }
@@ -276,6 +310,7 @@ const PillLabel = styled.span`
 const FailedText = styled.span`
   font-weight: normal;
   color: var(--ma-gray-500);
+  cursor: pointer;
 `;
 
 const ThumbWrapper = styled.span`

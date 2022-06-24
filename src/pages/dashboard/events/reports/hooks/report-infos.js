@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EventsService } from "services";
 
-// TODO: implemen retry lagi kalau butuh
 function useReportInfos() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);

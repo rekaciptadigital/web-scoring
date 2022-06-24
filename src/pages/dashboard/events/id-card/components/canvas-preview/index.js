@@ -7,9 +7,21 @@ import { useEditor } from "../../contexts/editor-data";
 
 import { DisplayObject } from "./components/display-object";
 
+import { idCardFields } from "constants/index";
 import { datetime } from "utils";
 
 import avatarMan from "assets/images/users/avatar-man.png";
+
+const {
+  LABEL_PLAYER_NAME,
+  LABEL_GENDER,
+  LABEL_LOCATION_AND_DATE,
+  LABEL_CATEGORY,
+  LABEL_CLUB_MEMBER,
+  LABEL_BUDREST,
+  LABEL_STATUS_EVENT,
+  LABEL_AVATAR,
+} = idCardFields;
 
 function PreviewCanvas({ eventDetail }) {
   const containerDiv = React.useRef(null);
@@ -21,12 +33,14 @@ function PreviewCanvas({ eventDetail }) {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
 
   const textByName = {
-    player_name: "Widodo Mahfudz Muhammad Akhiar",
-    location_and_date: _getLocationDate(eventDetail),
-    category: "Umum - 70m - Individu Putra",
-    club_member: "My Archery Club",
-    status_event: "Peserta",
-    photoProfile: userProfile?.avatar || avatarMan,
+    [LABEL_PLAYER_NAME]: "Widodo Mahfudz Muhammad Akhiar",
+    [LABEL_GENDER]: "Putra",
+    [LABEL_LOCATION_AND_DATE]: _getLocationDate(eventDetail),
+    [LABEL_CATEGORY]: "Umum - 70m - Individu Putra",
+    [LABEL_BUDREST]: "14A",
+    [LABEL_CLUB_MEMBER]: "My Archery Club",
+    [LABEL_STATUS_EVENT]: "Peserta",
+    [LABEL_AVATAR]: userProfile?.avatar || avatarMan,
   };
 
   return (

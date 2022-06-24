@@ -3,8 +3,13 @@ import styled from "styled-components";
 
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
+import { ProcessingToast, toast } from "./processing-toast";
 
 function ContentLayoutWrapper({ children, pageTitle, navbar }) {
+  React.useEffect(() => {
+    return () => toast.dismiss();
+  }, []);
+
   return (
     <React.Fragment>
       <MetaTags>
@@ -14,6 +19,7 @@ function ContentLayoutWrapper({ children, pageTitle, navbar }) {
       {navbar}
 
       <Container fluid>
+        <ProcessingToast />
         <StyledPageWrapper>{children}</StyledPageWrapper>
       </Container>
     </React.Fragment>

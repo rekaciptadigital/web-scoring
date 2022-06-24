@@ -198,6 +198,7 @@ function _runCategoriesGrouping(categoryDetailsSortedByID) {
       remainingQuota: categoryDetail.quota - categoryDetail.totalParticipant,
       defaultEliminationCount: categoryDetail.defaultEliminationCount || undefined,
       eliminationLock: categoryDetail.eliminationLock,
+      sessionCount: categoryDetail.sessionInQualification,
     };
 
     return groupingResult;

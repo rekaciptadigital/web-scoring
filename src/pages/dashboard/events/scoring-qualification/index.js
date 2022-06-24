@@ -8,25 +8,19 @@ import { useSubmitEliminationConfig } from "./hooks/submit-elimination-config";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
 import Select from "react-select";
-import {
-  SpinnerDotBlock,
-  ButtonBlue,
-  ButtonOutlineBlue,
-  LoadingScreen,
-  AlertSubmitError,
-} from "components/ma";
+import { SpinnerDotBlock, ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
 import { SearchBox } from "./components/search-box";
-import { ProcessingToast, toast } from "./components/processing-toast";
+import { toast } from "./components/processing-toast";
+import { ButtonDownloadScoresheet } from "./components/button-download-scoresheet";
 import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
 import { ButtonConfirmWarning } from "./components/button-confirm-warning";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 
 import IconCheck from "components/ma/icons/fill/check";
-import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
 
@@ -81,9 +75,7 @@ function PageEventScoringQualification() {
     errors: errorsSubmitElimination,
   } = useSubmitEliminationConfig(activeCategoryDetail?.categoryDetailId);
 
-  const { handleDownloadScoresheet } = useScoresheetDownload(
-    activeCategoryDetail?.categoryDetailId
-  );
+  const { download } = useScoresheetDownload(activeCategoryDetail?.categoryDetailId);
 
   const resetOnChangeCategory = () => {
     setLocalCountNumber(null);
@@ -117,9 +109,7 @@ function PageEventScoringQualification() {
 
   return (
     <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
-      <ProcessingToast />
       <LoadingScreen loading={isLoadingSubmitCount || isLoadingSubmitElimination} />
-
       <AlertSubmitError isError={isErrorSubmitCount} errors={errorsSubmitCount} />
       <AlertSubmitError isError={isErrorSubmitElimination} errors={errorsSubmitElimination} />
 
@@ -238,24 +228,19 @@ function PageEventScoringQualification() {
             </HorizontalSpaced>
 
             <HorizontalSpaced>
-              <ButtonOutlineBlue
-                disabled={activeCategoryDetail?.isTeam}
-                onClick={() => {
+              <ButtonDownloadScoresheet
+                sessionCount={activeCategoryDetail?.sessionCount}
+                onDownload={(sessionNumber) => {
                   toast.loading("Sedang menyiapkan dokumen scoresheet...");
-                  handleDownloadScoresheet({
-                    onSuccess() {
+                  const options = {
+                    onSuccess: () => {
                       toast.dismiss();
                     },
-                  });
+                  };
+                  download(sessionNumber, options);
                 }}
-              >
-                <span>
-                  <IconDownload size="16" />
-                </span>{" "}
-                <span>Unduh Dokumen</span>
-              </ButtonOutlineBlue>
+              />
 
-              {/* TODO: 2x munculkan modal warning ketika mau set eliminasi */}
               {activeCategoryDetail?.eliminationLock ? (
                 <ButtonConfirmWarning
                   customButton={ButtonBlue}

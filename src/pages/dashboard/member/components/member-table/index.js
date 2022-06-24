@@ -12,6 +12,7 @@ function MemberTable({
   eliminationParticipantsCount,
   searchName,
   eventId,
+  statusFilter,
 }) {
   
   const {
@@ -19,7 +20,7 @@ function MemberTable({
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
 
-  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, eventId);
+  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, eventId, statusFilter);
   
   const [ isOpenAlert, setIsOpenAlert ] = React.useState(false);
   const [ dataCategories, setDataCategories ] = React.useState([]);
@@ -89,7 +90,7 @@ function MemberTable({
                 <th className="name">Email</th>
                 <th className="name">Telepon</th>
                 <th className="name">Status Pembayaran</th>
-                <th className="name">...</th>
+                <th>...</th>
               </tr>
             </thead>
 
@@ -117,43 +118,11 @@ function MemberTable({
                       <ClubName>{row?.member?.phoneNumber}</ClubName>
                     </td>
                     <td>
-                      {row?.member?.statusPayment === 'Gratis' ? (
-                      <>
-                        <span
-                          className="py-1 px-2"
-                          style={{ color: "#05944F", backgroundColor: "#DAF0E3", borderRadius: "25px" }}
-                        >
-                          {row.statusPayment}
-                        </span>
-                      </>      
-                      ) : row?.member?.statusPayment === 'Belum Lunas' ? (
-                        <>
-                        <span
-                          className="py-1 px-2"
-                          style={{ color: "#FFB420", backgroundColor: "#FFE8BA", borderRadius: "25px" }}
-                        >
-                          {row.statusPayment}
-                        </span>
-                      </>
-                      ) : row?.member?.statusPayment === 'Expired' ? (
-                        <>
-                        <span
-                          className="py-1 px-2"
-                          style={{ color: "#FFB420", backgroundColor: "#AFAFAF", borderRadius: "25px" }}
-                        >
-                          {row.statusPayment}
-                        </span>
-                      </>
-                      ) : row?.member?.statusPayment === 'Lunas' && (
-                        <>
-                          <span
-                            className="py-1 px-2"
-                            style={{ color: "#05944F", backgroundColor: "#DAF0E3", borderRadius: "25px" }}
-                          >
-                            {row.statusPayment}
-                          </span>
-                        </>      
-                        )}
+                        {row?.statusLabel == 'Pending' ? (
+                          <LabelPaymentYellow>{row?.statusPayment}</LabelPaymentYellow>
+                        ) : row?.statusPayment == 'Lunas' ? (
+                          <LabelPaymentGreen>{row?.statusPayment}</LabelPaymentGreen>
+                        ) : <LabelPaymentYellow>{row?.statusPayment}</LabelPaymentYellow> }
                     </td>
                     
                     <td>
@@ -171,7 +140,7 @@ function MemberTable({
                         </>
                       ) : (
                         <>
-                          <ButtonAturDisabled className="py-2 px-2">Atur Kategori</ButtonAturDisabled>
+                          <ButtonAturDisabled className="py-2 px-2">Pengaturan</ButtonAturDisabled>
                         </>
                       )}
                     </td>
@@ -399,7 +368,27 @@ const ButtonAturDisabled = styled.span`
   border-radius: 25px;
   font-weight: 600;
   background-color: #395d92;
- 
 `;
+
+const LabelPaymentYellow = styled.span`
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: #FFB420;
+  background: #FFE8BA;
+  border-radius: 30px;
+  padding: 5px 10px 5px 10px;
+`;
+
+const LabelPaymentGreen = styled.span`
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: #05944F;
+  background: #DAF0E3;
+  border-radius: 30px;
+  padding: 5px 10px 5px 10px;
+`;
+
 
 export { MemberTable };

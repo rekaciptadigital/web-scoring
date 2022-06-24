@@ -21,9 +21,17 @@ import IconDownload from "components/ma/icons/mono/download";
 import classnames from "classnames";
 import { Container } from "reactstrap";
 
+const filterPayment = [
+  { value: '1', label: 'Lunas'},
+  { value: '2', label: 'Pending'},
+  { value: '3', label: 'Failed'},
+  { value: '4', label: 'Expired'},
+];
+
 function PageDosQualification() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
+  const [filter, setFilter] = React.useState(1);
 
   const {
     data: categoryDetails,
@@ -156,6 +164,27 @@ function PageDosQualification() {
                       )}
                     </FilterList>
                   </CategoryFilter>
+
+                  <CategoryFilter>
+                    <FilterLabel>Status:</FilterLabel>
+                    <FilterList>
+                      {filterPayment?.length > 0 ? (
+                        filterPayment.map((option) => (
+                          <li key={option.value}>
+                            <FilterItemButton
+                              onClick={() => {
+                                setFilter(option.value);
+                              }}
+                            >
+                              {option.label}
+                            </FilterItemButton>
+                          </li>
+                        ))
+                      ) : (
+                        <li>Tidak tersedia filter kelas</li>
+                      )}
+                    </FilterList>
+                  </CategoryFilter>
                 </FilterBars>
 
                 <ToolbarRight>
@@ -192,6 +221,7 @@ function PageDosQualification() {
                 searchName={inputSearchQuery}
                 onChangeParticipantPresence={resetOnChangeCategory}
                 eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+                statusFilter={filter}
               />
             </ViewWrapper>
           </Container>

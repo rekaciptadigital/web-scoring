@@ -3,14 +3,30 @@ import { useEditor } from "../contexts/editor-data";
 
 import { SelectSetting } from "./select-settings";
 
+import { idCardFields } from "constants/index";
+
+const {
+  LABEL_PLAYER_NAME,
+  LABEL_GENDER,
+  LABEL_LOCATION_AND_DATE,
+  LABEL_CATEGORY,
+  LABEL_CLUB_MEMBER,
+  LABEL_STATUS_EVENT,
+  LABEL_BUDREST,
+  LABEL_QR_CODE,
+  LABEL_AVATAR,
+} = idCardFields;
+
 const FIELD_LABELS = {
-  player_name: "Nama Peserta",
-  location_and_date: "Tempat & Tanggal Pertandingan",
-  category: "Kategori Pertandingan",
-  club_member: "Asal Klub",
-  status_event: "Status (Peserta/Official)",
-  photoProfile: "Foto Profil",
-  qrCode: "QR Code",
+  [LABEL_PLAYER_NAME]: "Nama Peserta",
+  [LABEL_GENDER]: "Jenis Kelamin",
+  [LABEL_LOCATION_AND_DATE]: "Tempat & Tanggal Pertandingan",
+  [LABEL_CATEGORY]: "Kategori Pertandingan",
+  [LABEL_CLUB_MEMBER]: "Asal Klub",
+  [LABEL_STATUS_EVENT]: "Status (Peserta/Official)",
+  [LABEL_BUDREST]: "Nomor Bantalan",
+  [LABEL_QR_CODE]: "QR Code",
+  [LABEL_AVATAR]: "Foto Profil",
 };
 
 const defaultDataOptions = _mapValuesToOptions(Object.keys(FIELD_LABELS));

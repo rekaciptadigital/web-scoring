@@ -5,12 +5,11 @@ const {
   LABEL_LOCATION_AND_DATE,
   LABEL_CATEGORY,
   LABEL_CLUB_MEMBER,
+  LABEL_BUDREST,
   LABEL_STATUS_EVENT,
+  LABEL_QR_CODE,
+  LABEL_AVATAR,
 } = idCardFields;
-
-// TODO: pindah ke file constants?
-const LABEL_QR_CODE = "qrCode";
-const LABEL_AVATAR = "photoProfile";
 
 function renderTemplateString(editorData, config) {
   const documentTitle = editorData.title || "My Archery Certificate";
@@ -48,6 +47,7 @@ function renderTemplateString(editorData, config) {
       ${renderCSSFieldText(LABEL_LOCATION_AND_DATE, editorData.fields[LABEL_LOCATION_AND_DATE])}
       ${renderCSSFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY])}
       ${renderCSSFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER])}
+      ${renderCSSFieldText(LABEL_BUDREST, editorData.fields[LABEL_BUDREST])}
       ${renderCSSFieldText(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT])}
       ${renderCssFieldBoxQR(editorData.fields[LABEL_QR_CODE])}
       ${renderCSSAvatarField(editorData.fields[LABEL_AVATAR])}
@@ -66,6 +66,7 @@ function renderTemplateString(editorData, config) {
     )}
     ${renderHTMLFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY].isVisible)}
     ${renderHTMLFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER].isVisible)}
+    ${renderHTMLFieldText(LABEL_BUDREST, editorData.fields[LABEL_BUDREST].isVisible)}
     ${renderHTMLFieldText(LABEL_STATUS_EVENT, editorData.fields[LABEL_STATUS_EVENT].isVisible)}
     ${renderHTMLFieldBoxQR(editorData.fields[LABEL_QR_CODE].isVisible)}
     ${renderHTMLFieldBoxAvatar(editorData.fields[LABEL_AVATAR].isVisible)}
@@ -94,7 +95,7 @@ function renderHTMLFieldText(name, isVisible) {
   if (!isVisible) {
     return "";
   }
-  const placeholderString = name === LABEL_PLAYER_NAME ? `{%${name}%}` : `{%${name}%}`;
+  const placeholderString = _makePlaceholderStringByName(name);
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 
@@ -121,6 +122,7 @@ function renderHTMLFieldBoxQR(isVisible) {
   if (!isVisible) {
     return "";
   }
+  const placeholderString = _makePlaceholderStringByName("certificate_verify_url");
   // Docs untuk barcode mpdf:
   // https://mpdf.github.io/reference/html-control-tags/barcode.html
   // Example: https://github.com/mpdf/mpdf-examples/blob/development/example37_barcodes.php#L382=
@@ -131,7 +133,7 @@ function renderHTMLFieldBoxQR(isVisible) {
     <div id="field-box-qr-container">
       <barcode
         class="barcode qr-code--img"
-        code="{%certificate_verify_url%}"
+        code="${placeholderString}"
         type="QR"
         error="M"
         size="1.15"
@@ -144,6 +146,7 @@ function renderHTMLFieldBoxQR(isVisible) {
 
 function renderCSSAvatarField(data = {}) {
   const { y, x } = data;
+  const placeholderString = _makePlaceholderStringByName("avatar");
   return `
     #field-box-avatar-container {
       position: absolute;
@@ -155,7 +158,7 @@ function renderCSSAvatarField(data = {}) {
 
       /* Uncomment aja warna bg kalau perlu */
       /* background-color: white; */
-      background-image: url({%avatar%});
+      background-image: url(${placeholderString});
       background-repeat: no-repeat;
       background-position: center center;
       background-size: contain;
@@ -167,6 +170,10 @@ function renderHTMLFieldBoxAvatar(isVisible) {
     return "";
   }
   return `<div id="field-box-avatar-container"></div>`;
+}
+
+function _makePlaceholderStringByName(name) {
+  return `{%${name}%}`;
 }
 
 export { renderTemplateString };

@@ -21,8 +21,10 @@ function useOfficialMembers(eventId, filter, inputSearchQuery) {
       };
 
   React.useEffect(() => {
-    fetchOfficialMembers();
-  }, [eventId, filter, debouncedSearchQuery]);
+    if(filter) {
+      fetchOfficialMembers();
+    }
+  }, [eventId, filter]);
 
   React.useEffect(() => {
     const debounceTimer = setTimeout(() => {

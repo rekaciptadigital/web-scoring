@@ -20,7 +20,7 @@ function OfficialTable( {officialMembers} ) {
             <tbody>
               {officialMembers?.member?.map((row) => {
                   return (
-                      <tr key={row?.userName}>
+                      <tr key={row?.expiredTime}>
                         <td className="name">{row?.userName}</td>
                         <td className="name">
                             <ClubName>{row?.clubName}</ClubName>

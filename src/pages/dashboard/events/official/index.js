@@ -7,6 +7,8 @@ import { useParams } from "react-router-dom";
 import { Container, Col, Row } from "reactstrap";
 import { SubNavbar } from "../components/submenus-settings";
 import { OfficialTable } from "./components/list-official";
+import { ProcessingToast } from "./components/processing-toast";
+import { ButtonDownloadIDCard } from "./components/button-download-id-card";
 import { useOfficialMembers } from "./hooks/official-members";
 
 const filterPayment = [
@@ -35,6 +37,7 @@ function PageEventOfficial() {
                 <title>Dashboard | Official</title>
         </MetaTags>
 
+        <ProcessingToast />
         <Container fluid>
         <ViewWrapper>
           <ToolbarTop>
@@ -70,15 +73,18 @@ function PageEventOfficial() {
                                 {officialMembers?.member?.length} Pendaftar
                             </OfficialLabel>
                         </Col>
-                        {/* <Col md={4}>
-                            <PushBottom>
+                        <Col md={4}>
+                            {/* <PushBottom>
                                 <SearchBox
                                 placeholder="Cari peserta"
                                 value={inputSearchQuery}
                                 onChange={(ev) => setInputSearchQuery(ev.target.value)}
                                 />
-                            </PushBottom>
-                        </Col> */}
+                            </PushBottom> */}
+                            <PushRight>
+                              <ButtonDownloadIDCard />
+                            </PushRight>
+                        </Col>
                     </Row>
 
                 </HorizontalSpaced>
@@ -204,6 +210,14 @@ const FilterItemButton = styled.button`
   &:hover {
     background-color: var(--ma-primary-blue-50);
   }
+`;
+
+const PushRight = styled.div`
+  margin: 0.75rem 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 0.5rem;
 `;
 
 export default PageEventOfficial

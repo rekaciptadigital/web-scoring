@@ -4,8 +4,22 @@ import { IdCardService } from "services";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { toast } from "../components/processing-toast";
 
+import { idCardFields } from "constants/index";
+
 import { stringUtil } from "utils";
 import { renderTemplateString, convertBase64 } from "../utils/index";
+
+const {
+  LABEL_PLAYER_NAME,
+  LABEL_GENDER,
+  LABEL_LOCATION_AND_DATE,
+  LABEL_CATEGORY,
+  LABEL_CLUB_MEMBER,
+  LABEL_STATUS_EVENT,
+  LABEL_BUDREST,
+  LABEL_QR_CODE,
+  LABEL_AVATAR,
+} = idCardFields;
 
 const EditorContext = React.createContext();
 
@@ -73,78 +87,112 @@ const dimensions = {
   },
 };
 
+function _getCenterXText(size, orientation) {
+  const paperWidth = dimensions[size][orientation].width;
+  const center = paperWidth / 2;
+  const textWidth = paperWidth * (size === A6 ? 0.6 : 0.7);
+  return Math.floor(center - textWidth / 2);
+}
+
+function _getCenterXAvatar(size, orientation) {
+  const paperWidth = dimensions[size][orientation].width;
+  const center = paperWidth / 2;
+  const boxWidth = 174;
+  return Math.floor(center - boxWidth / 2);
+}
+
 const defaultEditorData = {
-  paperSize: A6,
+  paperSize: A5,
   paperOrientation: OR_PORTRAIT,
   backgroundUrl: undefined,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
   fields: {
-    player_name: {
+    [LABEL_PLAYER_NAME]: {
       type: FIELD_TYPE_TEXT,
-      name: "player_name",
+      name: LABEL_PLAYER_NAME,
       label: "Nama Peserta",
       isVisible: true,
-      x: 88,
-      y: 64,
+      x: _getCenterXText(A5, OR_PORTRAIT),
+      y: 269,
       fontFamily: "'DejaVu Sans', sans-serif",
       fontSize: 24,
     },
-    location_and_date: {
+    [LABEL_GENDER]: {
       type: FIELD_TYPE_TEXT,
-      name: "location_and_date",
+      name: LABEL_GENDER,
+      label: "Jenis Kelamin",
+      isVisible: true,
+      x: _getCenterXText(A5, OR_PORTRAIT),
+      y: 464,
+      fontFamily: "'DejaVu Sans', sans-serif",
+      fontSize: 24,
+    },
+    [LABEL_LOCATION_AND_DATE]: {
+      type: FIELD_TYPE_TEXT,
+      name: LABEL_LOCATION_AND_DATE,
       label: "Tempat/Tanggal Pertandingan",
       isVisible: true,
-      x: 88,
-      y: 134,
+      x: _getCenterXText(A5, OR_PORTRAIT),
+      y: 638,
       fontFamily: "'DejaVu Sans', sans-serif",
       fontSize: 24,
     },
-    category: {
+    [LABEL_CATEGORY]: {
       type: FIELD_TYPE_TEXT,
-      name: "category",
+      name: LABEL_CATEGORY,
       label: "Kategori Pertandingan",
       isVisible: true,
-      x: 88,
-      y: 232,
+      x: _getCenterXText(A5, OR_PORTRAIT),
+      y: 510,
       fontFamily: "'DejaVu Sans', sans-serif",
       fontSize: 24,
     },
-    club_member: {
+    [LABEL_CLUB_MEMBER]: {
       type: FIELD_TYPE_TEXT,
-      name: "club_member",
+      name: LABEL_CLUB_MEMBER,
       label: "Asal Klub",
       isVisible: true,
-      x: 88,
-      y: 354,
+      x: _getCenterXText(A5, OR_PORTRAIT),
+      y: 338,
       fontFamily: "'DejaVu Sans', sans-serif",
       fontSize: 24,
     },
-    status_event: {
+    [LABEL_BUDREST]: {
       type: FIELD_TYPE_TEXT,
-      name: "status_event",
+      name: LABEL_BUDREST,
+      label: "Nomor Bantalan",
+      isVisible: true,
+      x: _getCenterXText(A5, OR_PORTRAIT),
+      y: 595,
+      fontFamily: "'DejaVu Sans', sans-serif",
+      fontSize: 24,
+    },
+    [LABEL_STATUS_EVENT]: {
+      type: FIELD_TYPE_TEXT,
+      name: LABEL_STATUS_EVENT,
       label: "Peserta/Official",
       isVisible: true,
-      x: 88,
-      y: 400,
+      x: _getCenterXText(A5, OR_PORTRAIT),
+      y: 417,
       fontFamily: "'DejaVu Sans', sans-serif",
       fontSize: 24,
     },
-    photoProfile: {
+    [LABEL_AVATAR]: {
       type: FIELD_TYPE_BOX_AVATAR,
-      name: "photoProfile",
+      name: LABEL_AVATAR,
       label: "Foto Profil",
       isVisible: true,
-      x: 70,
-      y: 450,
+      x: _getCenterXAvatar(A5, OR_PORTRAIT),
+      y: 50,
     },
-    qrCode: {
+    [LABEL_QR_CODE]: {
       type: FIELD_TYPE_BOX_QR,
-      name: "qrCode",
+      name: LABEL_QR_CODE,
       label: "QR Code",
       isVisible: true,
-      x: 253,
-      y: 497,
+      x: 50,
+      y: 720,
     },
   },
 };
@@ -186,6 +234,7 @@ function useEditorData(event_id) {
         toast.dismiss();
         toast.success("ID card berhasil disimpan");
         fetchIdCard();
+        setActiveObject(null);
       },
       onError() {
         toast.dismiss();
@@ -470,7 +519,7 @@ async function _prepareSaveData(editorFormData, config = {}) {
     backgroundUrl: editorFormData.backgroundUrl,
     backgroundFileRaw: editorFormData.backgroundFileRaw,
     backgroundPreviewUrl: editorFormData.backgroundPreviewUrl,
-    fields: editorFormData.fields,
+    fields: _buildFields(editorFormData.fields),
   };
 
   const imageBase64ForUpload = editorFormData.backgroundFileRaw
@@ -493,6 +542,57 @@ async function _prepareSaveData(editorFormData, config = {}) {
   };
 
   return payload;
+}
+
+function _buildFields(fields) {
+  let updatedFields = {};
+  const fieldNamesFromDefault = Object.keys(defaultEditorData.fields);
+
+  // Ngisi data buat field yang baru ditambahkan
+  for (const targetName of fieldNamesFromDefault) {
+    const existingData = fields[targetName];
+    updatedFields[targetName] = existingData || _getNewFieldData(fields, targetName);
+  }
+
+  return updatedFields;
+}
+
+/**
+ * Untuk auto "update" data editor kalau ada permintaan
+ * tambah field data baru:
+ * 1. tambah baru
+ * 2. "rename"
+ */
+function _getNewFieldData(editorDataFields, targetName) {
+  // Field yang baru ditambahkan disembunyikan dulu by default
+  // supaya gak mengganggu "desain" yang udah ada
+  const dataFromDefault = {
+    ...defaultEditorData.fields[targetName],
+    isVisible: false,
+  };
+
+  // mapping nama baru dari nama lama (rename key)
+  const obsoleteNames = {
+    [LABEL_QR_CODE]: "qrCode",
+    [LABEL_AVATAR]: "photoProfile",
+  };
+  const obsoleteName = obsoleteNames[targetName];
+  // tambah baru (1)
+  if (!obsoleteName) {
+    return dataFromDefault;
+  }
+
+  // cari data yang masih pakai nama lama
+  const existingData = editorDataFields[obsoleteName];
+  if (!existingData) {
+    delete editorDataFields[obsoleteName]; // in case namanya ada tapi gak ada datanya
+    return dataFromDefault;
+  }
+
+  // "rename" (2)
+  // pindahkan data lama ke nama key yang baru
+  delete editorDataFields[obsoleteName];
+  return existingData;
 }
 
 export { EditorProvider, useEditor, OR_PORTRAIT, OR_LANDSCAPE, A4, A5, A6 };

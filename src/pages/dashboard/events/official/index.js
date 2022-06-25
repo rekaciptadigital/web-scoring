@@ -7,6 +7,8 @@ import { useParams } from "react-router-dom";
 import { Container, Col, Row } from "reactstrap";
 import { SubNavbar } from "../components/submenus-settings";
 import { OfficialTable } from "./components/list-official";
+import { ProcessingToast } from "./components/processing-toast";
+import { ButtonDownloadIDCard } from "./components/button-download-id-card";
 import { useOfficialMembers } from "./hooks/official-members";
 
 
@@ -28,6 +30,7 @@ function PageEventOfficial() {
                 <title>Dashboard | Official</title>
         </MetaTags>
 
+        <ProcessingToast />
         <Container fluid>
             <ToolbarRight>
                 <HorizontalSpaced>
@@ -45,6 +48,10 @@ function PageEventOfficial() {
                                 onChange={(ev) => setInputSearchQuery(ev.target.value)}
                                 />
                             </PushBottom>
+
+                            <PushRight>
+                              <ButtonDownloadIDCard />
+                            </PushRight>
                         </Col>
                     </Row>
 
@@ -85,6 +92,14 @@ color: #757575;
 
 const PushBottom = styled.div`
   align-self: flex-end;
+`;
+
+const PushRight = styled.div`
+  margin: 0.75rem 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 0.5rem;
 `;
 
 export default PageEventOfficial

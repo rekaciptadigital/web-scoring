@@ -6,7 +6,7 @@ import { ButtonOutlineBlue } from "components/ma";
 
 import IconDownload from "components/ma/icons/mono/download";
 
-function ButtonDownloadScoresheet({ sessionCount, onDownload }) {
+function ButtonDownloadScoresheet({ disabled, sessionCount, onDownload }) {
   const [isOpen, setOpen] = React.useState(false);
 
   const sessionNumbers = React.useMemo(() => {
@@ -15,6 +15,20 @@ function ButtonDownloadScoresheet({ sessionCount, onDownload }) {
     }
     return [...new Array(sessionCount)].map((item, index) => index + 1);
   }, [sessionCount]);
+
+  if (disabled) {
+    return (
+      <ButtonOutlineBlue
+        disabled
+        title="Scoresheet kualifikasi hanya tersedia untuk kualfikasi individu"
+      >
+        <span>
+          <IconDownload size="16" />
+        </span>{" "}
+        <span>Unduh Dokumen</span>
+      </ButtonOutlineBlue>
+    );
+  }
 
   return (
     <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>

@@ -64,10 +64,10 @@ function ListMemberBudrestsByCategory({
                     selectedNumber={memberBudrest.budRestNumber}
                     onSubmit={(opt) => {
                       const params = {
+                        categoryId: group.id,
                         scheduleId: memberBudrest.scheduleFullDayId,
                         budrestNumber: opt.value,
                       };
-
                       submit(params, {
                         onSuccess() {
                           onChangeItem?.();

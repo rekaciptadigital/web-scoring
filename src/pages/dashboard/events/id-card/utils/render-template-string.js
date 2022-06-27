@@ -2,6 +2,7 @@ import { idCardFields } from "constants/index";
 
 const {
   LABEL_PLAYER_NAME,
+  LABEL_GENDER,
   LABEL_LOCATION_AND_DATE,
   LABEL_CATEGORY,
   LABEL_CLUB_MEMBER,
@@ -44,6 +45,7 @@ function renderTemplateString(editorData, config) {
 
       /* Properti spesifik masing-masing field yang dinamis menurut data "desain" di editor */
       ${renderCSSFieldText(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME])}
+      ${renderCSSFieldText(LABEL_GENDER, editorData.fields[LABEL_GENDER])}
       ${renderCSSFieldText(LABEL_LOCATION_AND_DATE, editorData.fields[LABEL_LOCATION_AND_DATE])}
       ${renderCSSFieldText(LABEL_CATEGORY, editorData.fields[LABEL_CATEGORY])}
       ${renderCSSFieldText(LABEL_CLUB_MEMBER, editorData.fields[LABEL_CLUB_MEMBER])}
@@ -60,6 +62,7 @@ function renderTemplateString(editorData, config) {
       di children langsung dari <body>
      -->
     ${renderHTMLFieldText(LABEL_PLAYER_NAME, editorData.fields[LABEL_PLAYER_NAME].isVisible)}
+    ${renderHTMLFieldText(LABEL_GENDER, editorData.fields[LABEL_GENDER].isVisible)}
     ${renderHTMLFieldText(
       LABEL_LOCATION_AND_DATE,
       editorData.fields[LABEL_LOCATION_AND_DATE].isVisible

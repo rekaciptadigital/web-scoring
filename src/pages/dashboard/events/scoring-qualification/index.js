@@ -50,6 +50,7 @@ function PageEventScoringQualification() {
 
   const {
     activeCategoryDetail,
+    activeCompetitionCategory,
     optionsCompetitionCategory,
     optionsAgeCategory,
     optionsGenderCategory,
@@ -133,7 +134,7 @@ function PageEventScoringQualification() {
 
       <ViewWrapper>
         <ToolbarTop>
-          <FilterBars>
+          <FilterBars key={activeCompetitionCategory}>
             <CategoryFilter>
               <FilterLabel>Kelas:</FilterLabel>
               <FilterList>
@@ -230,6 +231,7 @@ function PageEventScoringQualification() {
             <HorizontalSpaced>
               <ButtonDownloadScoresheet
                 sessionCount={activeCategoryDetail?.sessionCount}
+                disabled={activeCategoryDetail?.isTeam}
                 onDownload={(sessionNumber) => {
                   toast.loading("Sedang menyiapkan dokumen scoresheet...");
                   const options = {

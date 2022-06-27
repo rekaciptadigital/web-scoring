@@ -88,7 +88,6 @@ function PageEventReports() {
                 isAvailable={participantIsAvailable}
               />
             }
-            downloadDisabled={!participantIsAvailable}
             onDownload={_makeDownloadHandler(downloadParticipants)}
             isLoading={isLoadingParticipants}
             isError={isErrorParticipants}

@@ -526,8 +526,8 @@ async function _prepareSaveData(editorFormData, config = {}) {
     ? await convertBase64(editorFormData.backgroundFileRaw)
     : undefined;
 
-  const certificateHtmlTemplate = renderTemplateString(editorData, config);
-  const templateInBase64 = btoa(certificateHtmlTemplate);
+  const idCardHtmlTemplate = renderTemplateString(editorData, config);
+  const templateInBase64 = btoa(idCardHtmlTemplate);
 
   const payload = {
     event_id: parseInt(editorFormData.event_id),
@@ -552,6 +552,9 @@ function _buildFields(fields) {
   for (const targetName of fieldNamesFromDefault) {
     const existingData = fields[targetName];
     updatedFields[targetName] = existingData || _getNewFieldData(fields, targetName);
+
+    // Memastikan properti `name` selalu sama value dengan key-nya
+    updatedFields[targetName].name = targetName;
   }
 
   return updatedFields;

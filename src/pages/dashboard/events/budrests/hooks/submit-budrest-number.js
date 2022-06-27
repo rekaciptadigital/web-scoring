@@ -4,12 +4,13 @@ import { BudRestService } from "services";
 function useSubmitBudrestNumber(eventId) {
   const fetcher = useFetcher();
 
-  const submit = ({ scheduleId, budrestNumber }, { onSuccess: consumerSuccessHandler }) => {
+  const submit = (params, { onSuccess: consumerSuccessHandler }) => {
     const putFunction = () => {
       return BudRestService.putMemberNumbers({
         event_id: eventId,
-        schedule_id: scheduleId,
-        bud_rest_number: budrestNumber,
+        category_id: params.categoryId,
+        schedule_id: params.scheduleId,
+        bud_rest_number: params.budrestNumber,
       });
     };
     fetcher.runAsync(putFunction, {

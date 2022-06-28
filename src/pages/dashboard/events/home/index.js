@@ -86,16 +86,28 @@ function PageEventDetailHome() {
             <DashboardHeading className="mb-5">
               <HeaderMain>
                 <h1 className="mb-3">{eventDetail.publicInformation.eventName}</h1>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-
+                <div style={{ display: "flex", gap: "0.5rem" }}>
                   <LandingPageLinkPlaceholder
                     url={eventDetail.publicInformation.eventUrl || "https://myarchery.id"}
-                    />
-                    <ButtonOutlineBlue >
-                      <a href={`/dashboard/event/${event_id}/dos`} target="_blank" rel="noreferrer">
-                        <span>Ke Halaman DOS</span>
-                      </a>
-                    </ButtonOutlineBlue>
+                  />
+
+                  <ButtonOutlineBlue
+                    as="a"
+                    href={`/dashboard/event/${event_id}/dos`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Ke Halaman DOS
+                  </ButtonOutlineBlue>
+
+                  <ButtonOutlineBlue
+                    as="a"
+                    href={`/live-score/${event_id}/qualification`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Ke Live Score
+                  </ButtonOutlineBlue>
                 </div>
               </HeaderMain>
 

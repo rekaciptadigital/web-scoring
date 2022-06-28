@@ -2,11 +2,13 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { BudRestService } from "services";
 
-function useBudrestNumbers(eventId, date) {
+function useBudrestNumbers(eventId, categoryId) {
   const fetcher = useFetcher();
 
   const fetchBudrestNumbers = () => {
-    const getFunction = () => BudRestService.getNumbersByEventId({ event_id: eventId, date: date });
+    const getFunction = () => {
+      return BudRestService.getNumbersByEventId({ event_id: eventId, category_id: categoryId });
+    };
     fetcher.runAsync(getFunction);
   };
 

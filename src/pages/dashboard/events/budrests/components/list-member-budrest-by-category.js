@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import { useBudrestNumbers } from "../hooks/budrest-numbers";
 import { useSubmitBudrestNumber } from "../hooks/submit-budrest-number";
 
 import { AlertSubmitError } from "components/ma";
@@ -16,15 +17,31 @@ const TOOLTIP_WARNING_TEXT = `Terdapat peserta dari klub yang
 sama dalam satu bantalan. Silakan
 ubah bantalan salah satu peserta.`;
 
-function ListMemberBudrestsByCategory({
-  group,
-  budrestList,
-  budrestOptions,
-  onChangeItem,
-  isUpdatingData,
-}) {
+function ListMemberBudrestsByCategory({ group, budrestList, onChangeItem, isUpdatingData }) {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
+  const categoryId = group.id;
+
+  const {
+    data: budrestNumbers,
+    isLoading: isLoadingNumberList,
+    fetchBudrestNumbers,
+  } = useBudrestNumbers(eventId, categoryId);
+
+  const isUpdating = isUpdatingData && budrestNumbers && isLoadingNumberList;
+
+  // Di-memo dulu sebelum dioper ke komponen Select yang di-memo juga
+  const optionsBudrestNumber = React.useMemo(() => {
+    if (!budrestNumbers) {
+      return [];
+    }
+    return budrestNumbers.map((numberItem) => ({
+      label: numberItem.label,
+      value: numberItem.label,
+      isEmpty: numberItem.isEmpty,
+    }));
+  }, [budrestNumbers]);
+
   const {
     submit,
     isLoading: isLoadingSubmit,
@@ -33,13 +50,15 @@ function ListMemberBudrestsByCategory({
   } = useSubmitBudrestNumber(eventId);
 
   return (
-    <div key={group.id}>
+    <div key={categoryId}>
       <LoadingScreen loading={isLoadingSubmit} />
       <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
       <CategoryLabelHead>{group.label}</CategoryLabelHead>
 
       <ListMemberNumbers>
-        {isUpdatingData && <UpdateLoadingBlocker>Memperbarui data...</UpdateLoadingBlocker>}
+        {isUpdating && isLoadingNumberList && (
+          <UpdateLoadingBlocker>Memperbarui data...</UpdateLoadingBlocker>
+        )}
         <table className="table table-responsive">
           <thead>
             <tr>
@@ -60,18 +79,22 @@ function ListMemberBudrestsByCategory({
 
                 <td>
                   <BudrestNumberChooser
-                    options={budrestOptions}
+                    options={optionsBudrestNumber}
                     selectedNumber={memberBudrest.budRestNumber}
                     onSubmit={(opt) => {
                       const params = {
-                        categoryId: group.id,
+                        categoryId: categoryId,
                         scheduleId: memberBudrest.scheduleFullDayId,
                         budrestNumber: opt.value,
                       };
                       submit(params, {
                         onSuccess() {
+                          fetchBudrestNumbers();
                           onChangeItem?.();
                           toast.success("Berhasil menyimpan nomor bantalan");
+                        },
+                        onError() {
+                          toast.error("Gagal menyimpan nomor bantalan");
                         },
                       });
                     }}

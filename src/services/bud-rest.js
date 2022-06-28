@@ -40,7 +40,7 @@ export default {
 
   /**
    *
-   * @param {Object} queryString { event_id }
+   * @param {Object} queryString { event_id, category_id }
    * @returns {Promise} { success, data, errors, message }
    */
   getNumbersByEventId(queryString = null) {

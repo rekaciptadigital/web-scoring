@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { useRouteQueryParams } from "./hooks/route-params";
 import { useMemberBudrests } from "./hooks/member-budrests";
 import { useSearchMemberBudrests } from "./hooks/search-member-budrest";
-import { useBudrestNumbers } from "./hooks/budrest-numbers";
 
 import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import { ProcessingToast } from "pages/dashboard/events/new/components/processing-toast";
@@ -31,25 +30,6 @@ function PageEventBudRestDetail() {
     setSearchKeyword,
     searchResults: memberBudrestsFiltered,
   } = useSearchMemberBudrests(memberBudrests);
-
-  const {
-    data: budrestNumbers,
-    fetchBudrestNumbers,
-    isLoading: isLoadingNumberList,
-  } = useBudrestNumbers(eventId, dateFromParam);
-
-  // Di-memo dulu sebelum dioper ke komponen Select yang di-memo juga
-  const optionsBudrestNumber = React.useMemo(() => {
-    if (!budrestNumbers) {
-      return [];
-    }
-
-    return budrestNumbers.map((numberItem) => ({
-      label: numberItem.label,
-      value: numberItem.label,
-      isEmpty: numberItem.isEmpty,
-    }));
-  }, [budrestNumbers]);
 
   if (!dateFromParam) {
     return (
@@ -137,16 +117,8 @@ function PageEventBudRestDetail() {
                   key={group.id}
                   group={group}
                   budrestList={memberBudrestsFiltered.budrestsByCategory[group.id]}
-                  budrestOptions={optionsBudrestNumber}
-                  onChangeItem={() => {
-                    fetchBudrestNumbers();
-                    fetchMemberBudrests();
-                  }}
-                  isUpdatingData={
-                    memberBudrests &&
-                    budrestNumbers &&
-                    (isLoadingMemberBudrests || isLoadingNumberList)
-                  }
+                  onChangeItem={() => fetchMemberBudrests()}
+                  isUpdatingData={memberBudrests && isLoadingMemberBudrests}
                 />
               ))
             ) : (

@@ -11,6 +11,7 @@ import { SubNavbar } from "../components/submenus-settings";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ListMemberBudrestsByCategory } from "./components/list-member-budrest-by-category";
 import { SearchBox } from "./components/search-box";
+import { ButtonDownloadReport } from "./components/button-download-report";
 
 import { datetime } from "utils";
 
@@ -97,11 +98,12 @@ function PageEventBudRestDetail() {
               <h6 className="fw-bold">{dateLabel}</h6>
             </div>
 
-            <div>
+            <ButtonGroup>
+              <ButtonDownloadReport />
               <ButtonBlue as={Link} to={`/dashboard/event/${eventId}/budrests`}>
                 Selesai
               </ButtonBlue>
-            </div>
+            </ButtonGroup>
           </SpacedHeader>
 
           <SearchBox
@@ -176,6 +178,12 @@ const SpacedHeader = styled.div`
 
   > *:nth-child(2) {
     flex-shrink: 0;
+  }
+`;
+
+const ButtonGroup = styled.div`
+  > * + * {
+    margin-left: 0.5rem;
   }
 `;
 

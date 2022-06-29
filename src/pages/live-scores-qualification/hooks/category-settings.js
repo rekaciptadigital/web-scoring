@@ -23,6 +23,8 @@ function useCategorySettings() {
     [filters.categoryDetails, activeCategory, activeTeam]
   );
 
+  const maxSessionCount = React.useMemo(() => _getHighestSessionCount(categories), [categories]);
+
   // Set kategori default sesaat setelah loading
   // Harus jalan cuma sekali di awal ketika belum ada data defaultnya aja
   React.useEffect(() => {
@@ -64,6 +66,7 @@ function useCategorySettings() {
     selectTeam,
     activeTeam,
     activeCategoryDetail,
+    maxSessionCount,
     settingCategories,
     setSettingCategories,
   };
@@ -193,6 +196,24 @@ function _makeTeamOptions(categoryDetails, activeCategory) {
     id: team,
     label: teamFilterLabels[team],
   }));
+}
+
+function _getHighestSessionCount(categories) {
+  if (!categories?.length) {
+    return 0;
+  }
+  let lastHighestCount = 0;
+  for (const category of categories) {
+    if (
+      !category.isShow ||
+      !category.sessionInQualification ||
+      category.sessionInQualification <= lastHighestCount
+    ) {
+      continue;
+    }
+    lastHighestCount = category.sessionInQualification;
+  }
+  return lastHighestCount;
 }
 
 export { useCategorySettings };

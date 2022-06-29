@@ -16,7 +16,7 @@ import logo from "assets/images/myachery/myachery.png";
 
 function HUD() {
   const { data: eventDetail, isLoading } = useEventDetail();
-  const { sessionNumber, setSessionNumber, isSessionSet, settingCategories } = useDisplaySettings();
+  const { sessionNumber, isSessionSet, settingCategories } = useDisplaySettings();
   return (
     <SectionTop>
       <Header>
@@ -48,11 +48,7 @@ function HUD() {
         </Infos>
 
         <Settings>
-          <MenuSessionOptions
-            sessionCount={2}
-            sessionNumber={sessionNumber}
-            onSelect={(value) => setSessionNumber(value)}
-          >
+          <MenuSessionOptions>
             <LabelLiveScore className={classnames({ "label-is-live": isSessionSet })}>
               {isSessionSet ? (
                 <React.Fragment>

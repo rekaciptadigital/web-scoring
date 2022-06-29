@@ -1,25 +1,15 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useDisplaySettings } from "../contexts/display-settings";
 
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 
 import IconDot from "components/ma/icons/mono/dot";
 
-function MenuSessionOptions({
-  children,
-  sessionNumber: activeSessionNumber,
-  sessionCount,
-  onSelect,
-}) {
+function MenuSessionOptions({ children }) {
   const [isOpen, setOpen] = React.useState(false);
-
-  const sessionNumbers = React.useMemo(() => {
-    if (!sessionCount) {
-      return [];
-    }
-    return [...[...new Array(sessionCount)].map((item, index) => index + 1), 0];
-  }, [sessionCount]);
-
+  const { maxSessionCount, sessionNumber, setSessionNumber } = useDisplaySettings();
+  const sessionNumbers = React.useMemo(() => _makeOptions(maxSessionCount), [maxSessionCount]);
   return (
     <div>
       <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>
@@ -35,11 +25,18 @@ function MenuSessionOptions({
               </ItemActionWrapper>
             </DropdownItem>
           ) : (
-            sessionNumbers.map((sessionNumber) => (
-              <DropdownItem key={sessionNumber} onClick={() => onSelect?.(sessionNumber)}>
+            sessionNumbers.map((optionSessionNumber) => (
+              <DropdownItem
+                key={optionSessionNumber}
+                onClick={() => setSessionNumber(optionSessionNumber)}
+              >
                 <ItemActionWrapper>
-                  {sessionNumber > 0 ? <span>Sesi {sessionNumber}</span> : <span>Semua sesi</span>}
-                  {sessionNumber === activeSessionNumber && (
+                  {optionSessionNumber > 0 ? (
+                    <span>Sesi {optionSessionNumber}</span>
+                  ) : (
+                    <span>Semua sesi</span>
+                  )}
+                  {optionSessionNumber === sessionNumber && (
                     <span>
                       <IconDot size="8" />
                     </span>
@@ -71,5 +68,14 @@ const ItemActionWrapper = styled.div`
     color: var(--ma-field-focused);
   }
 `;
+
+function _makeOptions(count) {
+  if (!count) {
+    return [];
+  }
+  const arrayFromCount = [...new Array(count)];
+  const sessionNumbers = arrayFromCount.map((item, index) => index + 1);
+  return [...sessionNumbers, 0];
+}
 
 export { MenuSessionOptions };

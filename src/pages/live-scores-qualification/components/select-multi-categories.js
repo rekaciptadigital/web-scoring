@@ -4,8 +4,8 @@ import { useDisplaySettings } from "../contexts/display-settings";
 import { SelectSetting } from "./select-settings";
 
 function SelectCategories() {
-  const { categories, settingCategories, setSettingCategories } = useDisplaySettings();
-  const options = categories.map((label) => ({ value: label, label: label }));
+  const { categoryOptions, settingCategories, setSettingCategories } = useDisplaySettings();
+  const options = categoryOptions.map((label) => ({ value: label, label: label }));
   const values = settingCategories.map((label) => ({ value: label, label: label }));
   return (
     <SelectSetting

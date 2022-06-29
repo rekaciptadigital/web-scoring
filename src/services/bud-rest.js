@@ -55,4 +55,13 @@ export default {
   putMemberNumbers(queryString = null) {
     return API.put("/web/v2/schedule-full-day/change_bud_rest", null, queryString);
   },
+
+  /**
+   *
+   * @param {Object} queryString { event_id, date }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getDownloadMembersBudrestByDate(queryString = null) {
+    return API.get("/web/v2/schedule-full-day/download-budrest", queryString);
+  },
 };

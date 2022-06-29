@@ -3,14 +3,21 @@ import styled from "styled-components";
 
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 
-function MenuSessionOptions({ children, sessionCount, onSelect }) {
+import IconDot from "components/ma/icons/mono/dot";
+
+function MenuSessionOptions({
+  children,
+  sessionNumber: activeSessionNumber,
+  sessionCount,
+  onSelect,
+}) {
   const [isOpen, setOpen] = React.useState(false);
 
   const sessionNumbers = React.useMemo(() => {
     if (!sessionCount) {
       return [];
     }
-    return [...new Array(sessionCount)].map((item, index) => index + 1);
+    return [...[...new Array(sessionCount)].map((item, index) => index + 1), 0];
   }, [sessionCount]);
 
   return (
@@ -31,7 +38,12 @@ function MenuSessionOptions({ children, sessionCount, onSelect }) {
             sessionNumbers.map((sessionNumber) => (
               <DropdownItem key={sessionNumber} onClick={() => onSelect?.(sessionNumber)}>
                 <ItemActionWrapper>
-                  <span>Sesi {sessionNumber}</span>
+                  {sessionNumber > 0 ? <span>Sesi {sessionNumber}</span> : <span>Semua sesi</span>}
+                  {sessionNumber === activeSessionNumber && (
+                    <span>
+                      <IconDot size="8" />
+                    </span>
+                  )}
                 </ItemActionWrapper>
               </DropdownItem>
             ))
@@ -56,7 +68,7 @@ const ItemActionWrapper = styled.div`
   }
   > *:nth-child(2) {
     flex-shrink: 0;
-    color: var(--ma-blue);
+    color: var(--ma-field-focused);
   }
 `;
 

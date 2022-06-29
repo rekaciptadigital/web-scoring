@@ -11,34 +11,55 @@ import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconMedal from "components/ma/icons/fill/medal-gold.js";
 
 import classnames from "classnames";
-import { stringUtil } from "utils";
+import { stringUtil, datetime } from "utils";
+
+import logo from "assets/images/myachery/myachery.png";
 
 function PageLiveScore() {
   const [columns, setColumns] = React.useState([{ key: stringUtil.createRandom() }]);
-  const [sessionNumber, setSessionNumber] = React.useState(0);
+  const [sessionNumber, setSessionNumber] = React.useState(-1);
+  const isSessionSet = sessionNumber > -1;
 
   return (
     <ContentLayoutWrapper pageTitle="Live Score">
       <SectionTop>
         <Header>
           <Infos>
-            <div>Logo</div>
+            <div>
+              <span className="logo-sm">
+                <img src={logo} alt="" height="64" />
+              </span>
+            </div>
             <MainTitleContainer>
               <EventTitle>
                 Judul Event Ini Panjang Anti Lorem Ipsum Lorem Ipsum Club Anti Lorem Ipsum Lorem
                 Ipsum Club
               </EventTitle>
-              <div>Kualifikasi</div>
+              {isSessionSet ? (
+                <div>
+                  Kualifikasi | Terakhir diperbarui: {datetime.formatFullDateLabel(new Date())}
+                </div>
+              ) : (
+                <div>Kualifikasi</div>
+              )}
             </MainTitleContainer>
           </Infos>
 
           <Settings>
-            <MenuSessionOptions sessionCount={2} onSelect={(value) => setSessionNumber(value)}>
-              <LabelLiveScore className={classnames({ "label-is-live": Boolean(sessionNumber) })}>
-                {sessionNumber ? (
+            <MenuSessionOptions
+              sessionCount={2}
+              sessionNumber={sessionNumber}
+              onSelect={(value) => setSessionNumber(value)}
+            >
+              <LabelLiveScore className={classnames({ "label-is-live": isSessionSet })}>
+                {isSessionSet ? (
                   <React.Fragment>
                     <LiveScoreIndicator isLive />
-                    <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
+                    {sessionNumber > 0 ? (
+                      <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
+                    ) : (
+                      <span>Live Score Kualifikasi Semua Sesi</span>
+                    )}
                   </React.Fragment>
                 ) : (
                   <React.Fragment>
@@ -49,7 +70,7 @@ function PageLiveScore() {
               </LabelLiveScore>
             </MenuSessionOptions>
             <DisplaySettings
-              session={sessionNumber}
+              sessionNumber={sessionNumber}
               onChangeSession={(value) => setSessionNumber(value)}
             />
           </Settings>

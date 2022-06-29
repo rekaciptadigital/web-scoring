@@ -8,7 +8,7 @@ import { SelectSession } from "./select-session";
 
 import IconSettings from "components/ma/icons/mono/settings";
 
-function DisplaySettings({ session, categories, onChangeSession }) {
+function DisplaySettings({ sessionNumber, categories, onChangeSession }) {
   const [isOpen, setOpen] = React.useState(true);
   return (
     <React.Fragment>
@@ -36,7 +36,7 @@ function DisplaySettings({ session, categories, onChangeSession }) {
                   <SelectCategories value={categories} />
                 </div>
                 <div>
-                  <SelectSession value={session} onChange={onChangeSession} />
+                  <SelectSession value={sessionNumber} onChange={onChangeSession} />
                 </div>
                 <BottomAction>
                   <ButtonBlue onClick={() => setOpen((open) => !open)}>Tutup</ButtonBlue>

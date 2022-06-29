@@ -1,17 +1,13 @@
 import * as React from "react";
-import { useCategoryDetails } from "./event-categories";
 
-function useCategorySettings() {
-  const { data: categories, status } = useCategoryDetails();
+function useCategoryFilters(categories) {
   const [filters, dispatch] = React.useReducer(filterReducer, {
     category: null,
     teams: null,
     categoryDetails: null,
-    settingCategories: [],
   });
 
   const { activeCategory, activeTeam, activeCategoryDetail } = _getActiveData(filters);
-  const { settingCategories } = filters;
 
   const categoryOptions = React.useMemo(
     () => _makeCategoryOptions(filters.categoryDetails),
@@ -23,8 +19,6 @@ function useCategorySettings() {
     [filters.categoryDetails, activeCategory, activeTeam]
   );
 
-  const maxSessionCount = React.useMemo(() => _getHighestSessionCount(categories), [categories]);
-
   // Set kategori default sesaat setelah loading
   // Harus jalan cuma sekali di awal ketika belum ada data defaultnya aja
   React.useEffect(() => {
@@ -34,41 +28,18 @@ function useCategorySettings() {
     dispatch({ type: "INIT", payload: categories });
   }, [categories]);
 
-  React.useEffect(() => {
-    if (!activeCategory) {
-      return;
-    }
-    window.scrollTo(0, 0);
-  }, [activeCategory]);
-
-  const isLoading = !categories && status === "loading";
-  const isFetching = categories && status === "loading";
-
-  const setSettingCategories = (value) => {
-    dispatch({ type: "SET_CATEGORY_QUEUE", payload: value });
-  };
-
-  const selectCategory = (category) => {
-    dispatch({ type: "SELECT_CATEGORY", payload: category });
-  };
-
-  const selectTeam = (team) => {
-    dispatch({ type: "SELECT_TEAM", payload: team });
+  const switchCategoryDetail = ({ category, team }) => {
+    dispatch({ type: "SWITCH_CATEGORY_DETAIL", payload: { category, team } });
   };
 
   return {
-    isLoading,
-    isFetching,
     categoryOptions,
-    selectCategory,
     activeCategory,
     teamOptions,
-    selectTeam,
     activeTeam,
     activeCategoryDetail,
-    maxSessionCount,
-    settingCategories,
-    setSettingCategories,
+    categoryDetails: filters.categoryDetails,
+    switchCategoryDetail,
   };
 }
 
@@ -77,26 +48,13 @@ function filterReducer(state, action) {
     return _makeInitialState(state, action.payload);
   }
 
-  if (action.type === "SET_CATEGORY_QUEUE") {
+  if (action.type === "SWITCH_CATEGORY_DETAIL") {
     return {
       ...state,
-      settingCategories: action.payload,
-    };
-  }
-
-  if (action.type === "SELECT_CATEGORY") {
-    return {
-      ...state,
-      category: action.payload,
-    };
-  }
-
-  if (action.type === "SELECT_TEAM") {
-    return {
-      ...state,
+      category: action.payload.category,
       teams: {
         ...state.teams,
-        [state.category]: action.payload,
+        [action.payload.category]: action.payload.team,
       },
     };
   }
@@ -109,13 +67,11 @@ function _makeInitialState(state, payload) {
   const categories = Object.keys(groupedCategories);
   const defaultCategory = state.category || categories[0];
   const defaultTeam = state.teams || _makeDefaultTeamState(groupedCategories, categories);
-  const defaultSettingCategories = categories || [];
 
   return {
     category: defaultCategory,
     teams: defaultTeam,
     categoryDetails: groupedCategories,
-    settingCategories: defaultSettingCategories,
   };
 }
 
@@ -198,22 +154,4 @@ function _makeTeamOptions(categoryDetails, activeCategory) {
   }));
 }
 
-function _getHighestSessionCount(categories) {
-  if (!categories?.length) {
-    return 0;
-  }
-  let lastHighestCount = 0;
-  for (const category of categories) {
-    if (
-      !category.isShow ||
-      !category.sessionInQualification ||
-      category.sessionInQualification <= lastHighestCount
-    ) {
-      continue;
-    }
-    lastHighestCount = category.sessionInQualification;
-  }
-  return lastHighestCount;
-}
-
-export { useCategorySettings };
+export { useCategoryFilters };

@@ -1,15 +1,12 @@
 import * as React from "react";
 import styled from "styled-components";
-import { DisplaySettingsProvider } from "./contexts/display-settings";
+import { DisplaySettingsProvider, useDisplaySettings } from "./contexts/display-settings";
 
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { HUD } from "./components/hud";
+import { ScoringTable } from "./components/scoring-table";
 
 import IconAlertTri from "components/ma/icons/mono/alert-triangle";
-import IconBudrest from "components/ma/icons/mono/bud-rest";
-import IconMedal from "components/ma/icons/fill/medal-gold.js";
-
-import classnames from "classnames";
 
 function PageLiveScore() {
   return (
@@ -22,75 +19,29 @@ function PageLiveScore() {
   );
 }
 
-const colSpans = {
-  1: 7,
-  2: 5,
-  3: 3,
-};
-
 function DataDisplay({ columns = [{ key: 1 }] }) {
-  const columnCount = columns.length;
-  const teamColSpanConfig = colSpans[columnCount];
+  const { activeCategory, activeTeam, activeCategoryDetail, isRunning, next } =
+    useDisplaySettings();
+
   return (
     <DisplayWrapper>
-      {columns.map((column, index) =>
-        index === 1 ? (
+      {columns.map((column) =>
+        isRunning ? (
           <TableContainer key={column.key}>
-            <CategoryBar className={classnames({ "category-column-odd": index === 1 })}>
-              Nama Kategori Jiaha Haha (Debug: key {column.key})
-            </CategoryBar>
+            <CategoryBar>Nama Kategori Jiaha Haha (Debug: key {column.key})</CategoryBar>
 
-            <ScoreTable className="table table-responsive">
-              <thead>
-                <tr>
-                  <th colSpan={teamColSpanConfig} className="heading-cell-men">
-                    Putra
-                  </th>
-                  <th colSpan={teamColSpanConfig} className="heading-cell-women">
-                    Putri
-                  </th>
-                </tr>
-                <tr>
-                  {["left", "right"].map((side) => (
-                    <React.Fragment key={side}>
-                      <th className="cell-rank">
-                        <IconMedal size="16" />
-                      </th>
-                      {columnCount < 3 && (
-                        <th className="heading-cell-budrest">
-                          <IconBudrest size="16" />
-                        </th>
-                      )}
-                      <th>Nama</th>
-                      {columnCount < 2 && <th>Klub</th>}
-                      {columnCount < 2 && <th className="cell-numbers">X</th>}
-                      {columnCount < 3 && <th className="cell-numbers">X+10</th>}
-                      <th className="cell-total">Total</th>
-                    </React.Fragment>
-                  ))}
-                </tr>
-              </thead>
+            {/* Fake navigasi */}
+            <h4>{activeCategory}</h4>
+            <h4>{activeTeam}</h4>
+            <h4>{activeCategoryDetail?.id}</h4>
 
-              <tbody>
-                {[1, 2, 3, 4, 5, ...(index === 1 ? [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] : [])].map(
-                  (rank, rankIndex) => (
-                    <tr key={rank}>
-                      {["left", "right"].map((side) => (
-                        <React.Fragment key={side}>
-                          <td className="cell-rank">{rank}</td>
-                          {columnCount < 3 && <td>{rank}A</td>}
-                          <td>Nama Peserta Tata Tatata</td>
-                          {columnCount < 2 && <td>Club On</td>}
-                          {columnCount < 2 && <td className="cell-numbers">30</td>}
-                          {columnCount < 3 && <td className="cell-numbers">20</td>}
-                          <td className="cell-total">{400 - rankIndex}</td>
-                        </React.Fragment>
-                      ))}
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </ScoreTable>
+            {activeCategoryDetail && (
+              <ScoringTable
+                key={activeCategoryDetail.id}
+                categoryDetail={activeCategoryDetail}
+                onEmptyData={() => next()}
+              />
+            )}
           </TableContainer>
         ) : (
           <TableEmptyContainer key={column.key}>
@@ -149,47 +100,6 @@ const CategoryBar = styled.div`
 
   &.category-column-odd {
     background-color: var(--ma-primary-blue-3);
-  }
-`;
-
-const ScoreTable = styled.table`
-  tr {
-    background-color: var(--ma-primary-blue-50);
-
-    .cell-rank,
-    .cell-numbers {
-      text-align: center;
-    }
-
-    .cell-total {
-      text-align: right;
-    }
-  }
-
-  thead {
-    color: var(--ma-txt-black);
-
-    .heading-cell-men {
-      text-align: center;
-      background-color: var(--ma-primary-blue-100);
-    }
-
-    .heading-cell-women {
-      text-align: center;
-      background-color: var(--ma-primary-blue-200);
-    }
-
-    .heading-cell-budrest {
-      color: var(--ma-text-negative);
-    }
-  }
-
-  tbody tr {
-    cursor: auto;
-
-    &:nth-child(odd) {
-      background-color: #ffffff;
-    }
   }
 `;
 

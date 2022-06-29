@@ -11,22 +11,14 @@ import IconSettings from "components/ma/icons/mono/settings";
 
 function DisplaySettings() {
   const [isOpen, setOpen] = React.useState(true);
-  const { isLoading } = useDisplaySettings();
+  const { isLoading, run } = useDisplaySettings();
   return (
     <React.Fragment>
       <div>
-        <ButtonSetting onClick={() => setOpen((open) => !open)} />
+        <ButtonSetting onClick={() => setOpen(true)} />
       </div>
       {isOpen && (
-        <Modal
-          isOpen
-          size="md"
-          autoFocus
-          centered
-          tabIndex="-1"
-          toggle={() => setOpen((open) => !open)}
-          unmountOnClose
-        >
+        <Modal isOpen size="md" autoFocus centered tabIndex="-1" unmountOnClose>
           <ModalBody>
             <VerticalSpaced>
               <div>
@@ -55,7 +47,14 @@ function DisplaySettings() {
                   </div>
 
                   <BottomAction>
-                    <ButtonBlue onClick={() => setOpen((open) => !open)}>Tutup</ButtonBlue>
+                    <ButtonBlue
+                      onClick={() => {
+                        setOpen(false);
+                        run();
+                      }}
+                    >
+                      Terapkan
+                    </ButtonBlue>
                   </BottomAction>
                 </React.Fragment>
               )}

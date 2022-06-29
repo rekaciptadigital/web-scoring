@@ -1,12 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
-import { Tutorial } from "./components/tutorial";
+import { DisplaySettings } from "./components/display-settings";
+import { MenuSessionOptions } from "./components/menu-session-options";
 
 import IconDot from "components/ma/icons/mono/dot";
-import IconPlus from "components/ma/icons/mono/plus";
 import IconAlertTri from "components/ma/icons/mono/alert-triangle";
 import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconMedal from "components/ma/icons/fill/medal-gold.js";
@@ -16,39 +15,45 @@ import { stringUtil } from "utils";
 
 function PageLiveScore() {
   const [columns, setColumns] = React.useState([{ key: stringUtil.createRandom() }]);
-  const columnCount = columns.length;
-  const addColumn = () => {
-    setColumns((columns) => {
-      const newColumn = { key: stringUtil.createRandom() };
-      return [...columns, newColumn];
-    });
-  };
+  const [sessionNumber, setSessionNumber] = React.useState(0);
+
   return (
     <ContentLayoutWrapper pageTitle="Live Score">
       <SectionTop>
-        <Tutorial isOpen={false} />
         <Header>
           <Infos>
             <div>Logo</div>
-            <div>
-              <EventTitle>Judul Event Ini Panjang Anti Lorem Ipsum Lorem Ipsum Club</EventTitle>
+            <MainTitleContainer>
+              <EventTitle>
+                Judul Event Ini Panjang Anti Lorem Ipsum Lorem Ipsum Club Anti Lorem Ipsum Lorem
+                Ipsum Club
+              </EventTitle>
               <div>Kualifikasi</div>
-            </div>
+            </MainTitleContainer>
           </Infos>
-          <div>
-            <LabelLiveScore>
-              <LiveScoreIndicator />
-              <span>Live Score Kualifikasi Sesi 1/2/3/4/5 (?)</span>
-            </LabelLiveScore>
-          </div>
+
+          <Settings>
+            <MenuSessionOptions sessionCount={2} onSelect={(value) => setSessionNumber(value)}>
+              <LabelLiveScore className={classnames({ "label-is-live": Boolean(sessionNumber) })}>
+                {sessionNumber ? (
+                  <React.Fragment>
+                    <LiveScoreIndicator isLive />
+                    <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>
+                    <LiveScoreIndicator />
+                    <span>Pilih Sesi Live Score</span>
+                  </React.Fragment>
+                )}
+              </LabelLiveScore>
+            </MenuSessionOptions>
+            <DisplaySettings
+              session={sessionNumber}
+              onChangeSession={(value) => setSessionNumber(value)}
+            />
+          </Settings>
         </Header>
-        <ActionBar>
-          <div>
-            <ButtonBlue disabled={columnCount >= 3} onClick={addColumn}>
-              <IconPlus size="16" /> Tambah Kategori
-            </ButtonBlue>
-          </div>
-        </ActionBar>
       </SectionTop>
 
       <ScoresGrid
@@ -63,9 +68,9 @@ function PageLiveScore() {
   );
 }
 
-function LiveScoreIndicator() {
+function LiveScoreIndicator({ isLive = false }) {
   return (
-    <LiveScoreIndicatorWrapper>
+    <LiveScoreIndicatorWrapper className={classnames({ "indicator-is-live": isLive })}>
       <IconDot size="14" />
     </LiveScoreIndicatorWrapper>
   );
@@ -78,12 +83,12 @@ const gridColumnConfigs = {
 };
 
 const colSpans = {
-  1: 6,
+  1: 7,
   2: 5,
   3: 3,
 };
 
-function ScoresGrid({ columns = [], onRemoveColumn }) {
+function ScoresGrid({ columns = [] }) {
   const columnCount = columns.length;
   const gridConfig = gridColumnConfigs[columnCount];
   const teamColSpanConfig = colSpans[columnCount];
@@ -91,27 +96,7 @@ function ScoresGrid({ columns = [], onRemoveColumn }) {
     <GridWrapper style={{ "--scores-grid-template-columns": gridConfig }}>
       {columns.map((column, index) => (
         <Column key={column.key}>
-          <div>
-            <label htmlFor="team">Jenis Regu</label>
-            <br />
-            <select id="team" placeholder="Pilih Jenis Regu" value="" readOnly>
-              <option value="i">Individu</option>
-              <option value="t">Beregu</option>
-              <option value="tm">Beregu Campuran</option>
-            </select>
-
-            <input placeholder="Cari Kategori" />
-
-            <ButtonOutlineBlue
-              flexible
-              disabled={columnCount <= 1}
-              onClick={() => onRemoveColumn?.(index)}
-            >
-              -
-            </ButtonOutlineBlue>
-          </div>
-
-          {index === 0 || index === 1 ? (
+          {index === 1 ? (
             <TableContainer>
               <CategoryBar className={classnames({ "category-column-odd": index === 1 })}>
                 Nama Kategori Jiaha Haha (Debug: key {column.key})
@@ -139,9 +124,10 @@ function ScoresGrid({ columns = [], onRemoveColumn }) {
                           </th>
                         )}
                         <th>Nama</th>
-                        {columnCount < 2 && <th>X</th>}
-                        {columnCount < 3 && <th>X+10</th>}
-                        <th>Total</th>
+                        {columnCount < 2 && <th>Klub</th>}
+                        {columnCount < 2 && <th className="cell-numbers">X</th>}
+                        {columnCount < 3 && <th className="cell-numbers">X+10</th>}
+                        <th className="cell-total">Total</th>
                       </React.Fragment>
                     ))}
                   </tr>
@@ -155,16 +141,17 @@ function ScoresGrid({ columns = [], onRemoveColumn }) {
                     4,
                     5,
                     ...(index === 1 ? [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] : []),
-                  ].map((rank) => (
+                  ].map((rank, rankIndex) => (
                     <tr key={rank}>
                       {["left", "right"].map((side) => (
                         <React.Fragment key={side}>
                           <td className="cell-rank">{rank}</td>
                           {columnCount < 3 && <td>{rank}A</td>}
-                          <td>kolom 2</td>
-                          {columnCount < 2 && <td>30</td>}
-                          {columnCount < 3 && <td>20</td>}
-                          <td>400</td>
+                          <td>Nama Peserta Tata Tatata</td>
+                          {columnCount < 2 && <td>Club On</td>}
+                          {columnCount < 2 && <td className="cell-numbers">30</td>}
+                          {columnCount < 3 && <td className="cell-numbers">20</td>}
+                          <td className="cell-total">{400 - rankIndex}</td>
                         </React.Fragment>
                       ))}
                     </tr>
@@ -219,6 +206,10 @@ const Infos = styled.div`
   }
 `;
 
+const MainTitleContainer = styled.div`
+  max-width: 56.25rem;
+`;
+
 const EventTitle = styled.h1`
   margin: 0;
   color: var(--ma-blue);
@@ -227,31 +218,44 @@ const EventTitle = styled.h1`
   text-transform: uppercase;
 `;
 
+const Settings = styled.div`
+  display: flex;
+`;
+
 const LabelLiveScore = styled.span`
+  cursor: pointer;
+  user-select: none;
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.75rem;
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
   background-color: var(--ma-gray-200);
 
-  color: var(--ma-blue);
-  font-size: 1rem;
+  color: var(--ma-gray-500);
+  font-size: 1.25rem;
   font-weight: 600;
   text-transform: uppercase;
   text-align: center;
   vertical-align: middle;
 
+  margin-right: 2px;
+
   > * + * {
     margin-left: 0.5rem;
+  }
+
+  &.label-is-live {
+    color: var(--ma-blue);
   }
 `;
 
 const LiveScoreIndicatorWrapper = styled.span`
-  color: var(--ma-text-negative);
-`;
+  color: var(--ma-gray-400);
 
-const ActionBar = styled.div`
-  display: flex;
-  justify-content: flex-end;
+  &.indicator-is-live {
+    color: var(--ma-text-negative);
+  }
 `;
 
 const GridWrapper = styled.div`
@@ -311,8 +315,13 @@ const ScoreTable = styled.table`
   tr {
     background-color: var(--ma-primary-blue-50);
 
-    .cell-rank {
+    .cell-rank,
+    .cell-numbers {
       text-align: center;
+    }
+
+    .cell-total {
+      text-align: right;
     }
   }
 

@@ -2,9 +2,16 @@ import React from "react";
 import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
 import { AuthLayout } from "./layouts";
 import { AuthenticationMiddleware } from "./middlewares";
-import { authenticationRoutes, dashboardRoutes, certificateRoutes, workingRoutes, dosRoutes } from "./routes";
+import {
+  authenticationRoutes,
+  dashboardRoutes,
+  certificateRoutes,
+  workingRoutes,
+  dosRoutes,
+  liveScoreRoutes,
+} from "./routes";
 
-import { LayoutDashboard } from "layouts/ma";
+import { LayoutDashboard, LayoutLiveScores } from "layouts/ma";
 import { LayoutDashboardDos } from "layouts/dashboard-dos";
 
 import "./assets/scss/theme.scss";
@@ -52,6 +59,16 @@ const App = () => {
               exact
             />
           ))}
+          {liveScoreRoutes.map((route, idx) => (
+            <AuthenticationMiddleware
+              path={route.path}
+              layout={LayoutLiveScores}
+              component={route.component}
+              key={idx}
+              isAuthProtected={false}
+              exact
+            />
+          ))}
           {workingRoutes.map((route, idx) => (
             <AuthenticationMiddleware
               path={route.path}
@@ -62,7 +79,7 @@ const App = () => {
               exact
             />
           ))}
-           {dosRoutes.map((route, idx) => (
+          {dosRoutes.map((route, idx) => (
             <AuthenticationMiddleware
               path={route.path}
               layout={LayoutDashboardDos}

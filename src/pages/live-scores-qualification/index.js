@@ -1,107 +1,26 @@
 import * as React from "react";
 import styled from "styled-components";
+import { DisplaySettingsProvider } from "./contexts/display-settings";
 
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
-import { DisplaySettings } from "./components/display-settings";
-import { MenuSessionOptions } from "./components/menu-session-options";
+import { HUD } from "./components/hud";
 
-import IconDot from "components/ma/icons/mono/dot";
 import IconAlertTri from "components/ma/icons/mono/alert-triangle";
 import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconMedal from "components/ma/icons/fill/medal-gold.js";
 
 import classnames from "classnames";
-import { stringUtil, datetime } from "utils";
-
-import logo from "assets/images/myachery/myachery.png";
 
 function PageLiveScore() {
-  const [columns, setColumns] = React.useState([{ key: stringUtil.createRandom() }]);
-  const [sessionNumber, setSessionNumber] = React.useState(-1);
-  const isSessionSet = sessionNumber > -1;
-
   return (
-    <ContentLayoutWrapper pageTitle="Live Score">
-      <SectionTop>
-        <Header>
-          <Infos>
-            <div>
-              <span className="logo-sm">
-                <img src={logo} alt="" height="64" />
-              </span>
-            </div>
-            <MainTitleContainer>
-              <EventTitle>
-                Judul Event Ini Panjang Anti Lorem Ipsum Lorem Ipsum Club Anti Lorem Ipsum Lorem
-                Ipsum Club
-              </EventTitle>
-              {isSessionSet ? (
-                <div>
-                  Kualifikasi | Terakhir diperbarui: {datetime.formatFullDateLabel(new Date())}
-                </div>
-              ) : (
-                <div>Kualifikasi</div>
-              )}
-            </MainTitleContainer>
-          </Infos>
-
-          <Settings>
-            <MenuSessionOptions
-              sessionCount={2}
-              sessionNumber={sessionNumber}
-              onSelect={(value) => setSessionNumber(value)}
-            >
-              <LabelLiveScore className={classnames({ "label-is-live": isSessionSet })}>
-                {isSessionSet ? (
-                  <React.Fragment>
-                    <LiveScoreIndicator isLive />
-                    {sessionNumber > 0 ? (
-                      <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
-                    ) : (
-                      <span>Live Score Kualifikasi Semua Sesi</span>
-                    )}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <LiveScoreIndicator />
-                    <span>Pilih Sesi Live Score</span>
-                  </React.Fragment>
-                )}
-              </LabelLiveScore>
-            </MenuSessionOptions>
-            <DisplaySettings
-              sessionNumber={sessionNumber}
-              onChangeSession={(value) => setSessionNumber(value)}
-            />
-          </Settings>
-        </Header>
-      </SectionTop>
-
-      <ScoresGrid
-        columns={columns}
-        onRemoveColumn={(value) => {
-          setColumns((columns) => {
-            return columns.filter((column, index) => index !== value);
-          });
-        }}
-      />
-    </ContentLayoutWrapper>
+    <DisplaySettingsProvider>
+      <ContentLayoutWrapper pageTitle="Live Score">
+        <HUD />
+        <DataDisplay />
+      </ContentLayoutWrapper>
+    </DisplaySettingsProvider>
   );
 }
-
-function LiveScoreIndicator({ isLive = false }) {
-  return (
-    <LiveScoreIndicatorWrapper className={classnames({ "indicator-is-live": isLive })}>
-      <IconDot size="14" />
-    </LiveScoreIndicatorWrapper>
-  );
-}
-
-const gridColumnConfigs = {
-  1: "1fr",
-  2: "1fr 1fr",
-  3: "1fr 1fr 1fr",
-};
 
 const colSpans = {
   1: 7,
@@ -109,60 +28,52 @@ const colSpans = {
   3: 3,
 };
 
-function ScoresGrid({ columns = [] }) {
+function DataDisplay({ columns = [{ key: 1 }] }) {
   const columnCount = columns.length;
-  const gridConfig = gridColumnConfigs[columnCount];
   const teamColSpanConfig = colSpans[columnCount];
   return (
-    <GridWrapper style={{ "--scores-grid-template-columns": gridConfig }}>
-      {columns.map((column, index) => (
-        <Column key={column.key}>
-          {index === 1 ? (
-            <TableContainer>
-              <CategoryBar className={classnames({ "category-column-odd": index === 1 })}>
-                Nama Kategori Jiaha Haha (Debug: key {column.key})
-              </CategoryBar>
+    <DisplayWrapper>
+      {columns.map((column, index) =>
+        index === 1 ? (
+          <TableContainer key={column.key}>
+            <CategoryBar className={classnames({ "category-column-odd": index === 1 })}>
+              Nama Kategori Jiaha Haha (Debug: key {column.key})
+            </CategoryBar>
 
-              <ScoreTable className="table table-responsive">
-                <thead>
-                  <tr>
-                    <th colSpan={teamColSpanConfig} className="heading-cell-men">
-                      Putra
-                    </th>
-                    <th colSpan={teamColSpanConfig} className="heading-cell-women">
-                      Putri
-                    </th>
-                  </tr>
-                  <tr>
-                    {["left", "right"].map((side) => (
-                      <React.Fragment key={side}>
-                        <th className="cell-rank">
-                          <IconMedal size="16" />
+            <ScoreTable className="table table-responsive">
+              <thead>
+                <tr>
+                  <th colSpan={teamColSpanConfig} className="heading-cell-men">
+                    Putra
+                  </th>
+                  <th colSpan={teamColSpanConfig} className="heading-cell-women">
+                    Putri
+                  </th>
+                </tr>
+                <tr>
+                  {["left", "right"].map((side) => (
+                    <React.Fragment key={side}>
+                      <th className="cell-rank">
+                        <IconMedal size="16" />
+                      </th>
+                      {columnCount < 3 && (
+                        <th className="heading-cell-budrest">
+                          <IconBudrest size="16" />
                         </th>
-                        {columnCount < 3 && (
-                          <th className="heading-cell-budrest">
-                            <IconBudrest size="16" />
-                          </th>
-                        )}
-                        <th>Nama</th>
-                        {columnCount < 2 && <th>Klub</th>}
-                        {columnCount < 2 && <th className="cell-numbers">X</th>}
-                        {columnCount < 3 && <th className="cell-numbers">X+10</th>}
-                        <th className="cell-total">Total</th>
-                      </React.Fragment>
-                    ))}
-                  </tr>
-                </thead>
+                      )}
+                      <th>Nama</th>
+                      {columnCount < 2 && <th>Klub</th>}
+                      {columnCount < 2 && <th className="cell-numbers">X</th>}
+                      {columnCount < 3 && <th className="cell-numbers">X+10</th>}
+                      <th className="cell-total">Total</th>
+                    </React.Fragment>
+                  ))}
+                </tr>
+              </thead>
 
-                <tbody>
-                  {[
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    ...(index === 1 ? [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] : []),
-                  ].map((rank, rankIndex) => (
+              <tbody>
+                {[1, 2, 3, 4, 5, ...(index === 1 ? [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] : [])].map(
+                  (rank, rankIndex) => (
                     <tr key={rank}>
                       {["left", "right"].map((side) => (
                         <React.Fragment key={side}>
@@ -176,130 +87,37 @@ function ScoresGrid({ columns = [] }) {
                         </React.Fragment>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </ScoreTable>
-            </TableContainer>
-          ) : (
-            <TableEmptyContainer>
+                  )
+                )}
+              </tbody>
+            </ScoreTable>
+          </TableContainer>
+        ) : (
+          <TableEmptyContainer key={column.key}>
+            <div>
               <div>
-                <div>
-                  <IconAlertTri size="42" />
-                </div>
-                <p>Kategori belum dipilih</p>
-                <p>(Debug: key {column.key})</p>
+                <IconAlertTri size="52" />
               </div>
-            </TableEmptyContainer>
-          )}
-        </Column>
-      ))}
-    </GridWrapper>
+              <p>Kategori belum dipilih</p>
+            </div>
+          </TableEmptyContainer>
+        )
+      )}
+    </DisplayWrapper>
   );
 }
 
 /* ========================= */
 // styles
 
-const SectionTop = styled.div`
-  > * + * {
-    margin-top: 1.25rem;
-  }
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-`;
-
-const Infos = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  color: var(--ma-gray-500);
-
-  > *:nth-child(1) {
-    flex-shrink: 0;
-  }
-
-  > *:nth-child(2) {
-    flex-grow: 1;
-  }
-`;
-
-const MainTitleContainer = styled.div`
-  max-width: 56.25rem;
-`;
-
-const EventTitle = styled.h1`
-  margin: 0;
-  color: var(--ma-blue);
-  font-size: 1.25rem;
-  font-weight: 600;
-  text-transform: uppercase;
-`;
-
-const Settings = styled.div`
-  display: flex;
-`;
-
-const LabelLiveScore = styled.span`
-  cursor: pointer;
-  user-select: none;
-  display: inline-block;
-  min-height: 2.5rem;
-  padding: 0.25rem 0.75rem;
-  border-top-left-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
-  background-color: var(--ma-gray-200);
-
-  color: var(--ma-gray-500);
-  font-size: 1.25rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  text-align: center;
-  vertical-align: middle;
-
-  margin-right: 2px;
-
-  > * + * {
-    margin-left: 0.5rem;
-  }
-
-  &.label-is-live {
-    color: var(--ma-blue);
-  }
-`;
-
-const LiveScoreIndicatorWrapper = styled.span`
-  color: var(--ma-gray-400);
-
-  &.indicator-is-live {
-    color: var(--ma-text-negative);
-  }
-`;
-
-const GridWrapper = styled.div`
+const DisplayWrapper = styled.div`
   display: grid;
   gap: 1.5rem;
   grid-template-columns: var(--scores-grid-template-columns, 1fr);
 `;
 
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  > *:nth-child(1) {
-    flex-shrink: 1;
-  }
-
-  > *:nth-child(2) {
-    flex-grow: 1;
-  }
-`;
-
 const TableEmptyContainer = styled.div`
-  border-radius: 0.25rem;
+  border-radius: 0.375rem;
   background-color: var(--ma-gray-100);
   display: flex;
   justify-content: center;
@@ -310,13 +128,15 @@ const TableEmptyContainer = styled.div`
       margin-top: 0.5rem;
     }
 
-    text-align: center;
     color: var(--ma-gray-400);
+    font-size: 1.75rem;
+    font-weight: 600;
+    text-align: center;
   }
 `;
 
 const TableContainer = styled.div`
-  border-radius: 0.25rem;
+  border-radius: 0.375rem;
   overflow: hidden;
 `;
 

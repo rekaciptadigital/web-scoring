@@ -1,11 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useEventDetail } from "../hooks/event-detail";
 import { useDisplaySettings } from "../contexts/display-settings";
 
 import { DisplaySettings } from "./display-settings";
 import { MenuSessionOptions } from "./menu-session-options";
 
 import IconDot from "components/ma/icons/mono/dot";
+import IconLoading from "./icon-loading";
 
 import classnames from "classnames";
 import { datetime } from "utils";
@@ -13,7 +15,8 @@ import { datetime } from "utils";
 import logo from "assets/images/myachery/myachery.png";
 
 function HUD() {
-  const { sessionNumber, setSessionNumber, isSessionSet } = useDisplaySettings();
+  const { data: eventDetail, isLoading } = useEventDetail();
+  const { sessionNumber, setSessionNumber, isSessionSet, settingCategories } = useDisplaySettings();
   return (
     <SectionTop>
       <Header>
@@ -25,12 +28,18 @@ function HUD() {
           </div>
           <MainTitleContainer>
             <EventTitle>
-              Judul Event Ini Panjang Anti Lorem Ipsum Lorem Ipsum Club Anti Lorem Ipsum Lorem Ipsum
-              Club
+              {isLoading ? (
+                <SpinningLoader>
+                  <IconLoading />
+                </SpinningLoader>
+              ) : (
+                eventDetail?.eventName
+              )}
             </EventTitle>
             {isSessionSet ? (
               <div>
-                Kualifikasi | Terakhir diperbarui: {datetime.formatFullDateLabel(new Date())}
+                Kualifikasi | Terakhir diperbarui: {datetime.formatFullDateLabel(new Date())} (TODO:
+                jam update)
               </div>
             ) : (
               <div>Kualifikasi</div>
@@ -47,7 +56,7 @@ function HUD() {
             <LabelLiveScore className={classnames({ "label-is-live": isSessionSet })}>
               {isSessionSet ? (
                 <React.Fragment>
-                  <LiveScoreIndicator isLive />
+                  <LiveScoreIndicator isLive={Boolean(settingCategories?.length)} />
                   {sessionNumber > 0 ? (
                     <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
                   ) : (
@@ -62,10 +71,8 @@ function HUD() {
               )}
             </LabelLiveScore>
           </MenuSessionOptions>
-          <DisplaySettings
-            sessionNumber={sessionNumber}
-            onChangeSession={(value) => setSessionNumber(value)}
-          />
+
+          <DisplaySettings />
         </Settings>
       </Header>
     </SectionTop>
@@ -166,6 +173,21 @@ const LiveScoreIndicatorWrapper = styled.span`
 
   &.indicator-is-live {
     color: var(--ma-text-negative);
+  }
+`;
+
+const SpinningLoader = styled.span`
+  display: inline-block;
+  animation: spin-loading 0.7s infinite linear;
+
+  @keyframes spin-loading {
+    0% {
+      transform: rotateZ(0deg);
+    }
+
+    100% {
+      transform: rotateZ(360deg);
+    }
   }
 `;
 

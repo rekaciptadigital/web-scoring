@@ -4,6 +4,7 @@ import { useDisplaySettings } from "../contexts/display-settings";
 
 import { Modal, ModalBody } from "reactstrap";
 import { SpinnerDotBlock, ButtonBlue } from "components/ma";
+import { ToggleStage } from "./toggle-stage";
 import { SelectCategories } from "./select-multi-categories";
 import { SelectSession } from "./select-session";
 
@@ -32,6 +33,10 @@ function DisplaySettings() {
                 </div>
               ) : (
                 <React.Fragment>
+                  <div>
+                    <ToggleStage />
+                  </div>
+
                   <div>
                     <label>Kategori</label>
                     <SelectCategories />
@@ -73,6 +78,9 @@ function ButtonSetting({ onClick }) {
     </ButtonSettingStyled>
   );
 }
+
+/* ====================== */
+// utils
 
 const ButtonSettingStyled = styled.button`
   border: none;

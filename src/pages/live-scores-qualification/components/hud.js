@@ -16,7 +16,7 @@ import logo from "assets/images/myachery/myachery.png";
 
 function HUD() {
   const { data: eventDetail, isLoading } = useEventDetail();
-  const { isRunning, sessionNumber, lastUpdated } = useDisplaySettings();
+  const { isRunning, isSessionSet, sessionNumber, lastUpdated } = useDisplaySettings();
   const textLastUpdated = datetime.formatFullDateLabel(lastUpdated, { withTime: true });
   return (
     <SectionTop>
@@ -46,12 +46,17 @@ function HUD() {
         </Infos>
 
         <Settings>
-          <MenuSessionOptions>
-            <LabelLiveScore className={classnames({ "label-is-live": isRunning })}>
+          <MenuSessionOptions disabled={!isRunning}>
+            <LabelLiveScore
+              className={classnames({ "label-is-live": isRunning })}
+              disabled={!isRunning}
+            >
               {isRunning ? (
                 <React.Fragment>
                   <LiveScoreIndicator isLive={isRunning} />
-                  {sessionNumber > 0 ? (
+                  {!isSessionSet ? (
+                    <span>Pilih Sesi Live Score</span>
+                  ) : sessionNumber > 0 ? (
                     <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
                   ) : (
                     <span>Live Score Kualifikasi Semua Sesi</span>
@@ -60,7 +65,7 @@ function HUD() {
               ) : (
                 <React.Fragment>
                   <LiveScoreIndicator />
-                  <span>Pilih Sesi Live Score</span>
+                  <span>Pilih Kategori Live Score</span>
                 </React.Fragment>
               )}
             </LabelLiveScore>
@@ -127,9 +132,8 @@ const Settings = styled.div`
   display: flex;
 `;
 
-const LabelLiveScore = styled.span`
-  cursor: pointer;
-  user-select: none;
+const LabelLiveScore = styled.button`
+  border: none;
   display: inline-block;
   min-height: 2.5rem;
   padding: 0.25rem 0.75rem;
@@ -160,6 +164,11 @@ const LabelLiveScore = styled.span`
     background-color: var(--ma-gray-100);
     color: var(--ma-blue);
   }
+
+  &:disabled {
+    background-color: var(--ma-gray-200);
+    color: var(--ma-gray-500);
+  }
 `;
 
 const LiveScoreIndicatorWrapper = styled.span`
@@ -167,6 +176,10 @@ const LiveScoreIndicatorWrapper = styled.span`
 
   &.indicator-is-live {
     color: var(--ma-text-negative);
+  }
+
+  > * {
+    transform: translateY(-2px);
   }
 `;
 

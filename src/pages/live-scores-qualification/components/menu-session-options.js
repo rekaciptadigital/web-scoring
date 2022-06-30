@@ -6,10 +6,14 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap
 
 import IconDot from "components/ma/icons/mono/dot";
 
-function MenuSessionOptions({ children }) {
+function MenuSessionOptions({ children, disabled }) {
   const [isOpen, setOpen] = React.useState(false);
   const { maxSessionCount, sessionNumber, setSessionNumber } = useDisplaySettings();
   const sessionNumbers = React.useMemo(() => _makeOptions(maxSessionCount), [maxSessionCount]);
+
+  if (disabled) {
+    return <div>{children}</div>;
+  }
   return (
     <div>
       <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>

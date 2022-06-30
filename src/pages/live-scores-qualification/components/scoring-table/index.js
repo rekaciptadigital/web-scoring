@@ -24,27 +24,24 @@ function ScoringTable() {
 
   // Nge-skip yang gak ada datanya
   React.useEffect(() => {
-    if (!data || data.length) {
+    const noParticipantData = Array.isArray(data) && !data.length;
+    if (noParticipantData) {
+      next();
+    } else {
       setCheckingSession(false);
-      return;
     }
-    next();
   }, [data]);
 
   // Nge-skip yang gak ada sesinya.
   // Misal gak punya sesi 3.
+  const sessions = data?.[0]?.sessions;
   React.useEffect(() => {
-    if (isTeam || sessionNumber === 0) {
+    if (isIndividual && sessionNumber > 0 && sessions && !sessions[sessionNumber]) {
+      next();
+    } else {
       setCheckingSession(false);
-      return;
     }
-    const sessionData = data?.[0]?.sessions[sessionNumber];
-    if (sessionData) {
-      setCheckingSession(false);
-      return;
-    }
-    next();
-  }, [data, isTeam, sessionNumber]);
+  }, [isIndividual, sessions, sessionNumber]);
 
   if (isLoading || checkingSession) {
     return (

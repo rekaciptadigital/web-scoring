@@ -116,7 +116,8 @@ const CategoryBar = styled.div`
   display: flex;
   gap: 1rem;
   justify-content: space-between;
-  padding: 0.75rem 1.5rem;
+  padding: 1.25rem 1.5rem;
+  padding-right: 1rem;
   background-color: var(--ma-blue);
   color: #ffffff;
   font-size: 1.625rem;

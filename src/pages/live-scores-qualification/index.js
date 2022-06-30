@@ -22,8 +22,7 @@ function PageLiveScore() {
 }
 
 function DataDisplay() {
-  const { activeCategory, activeCategoryDetail, isRunning, sessionNumber, next } =
-    useDisplaySettings();
+  const { activeCategory, activeCategoryDetail, isRunning, sessionNumber } = useDisplaySettings();
 
   if (!isRunning) {
     return (
@@ -61,11 +60,7 @@ function DataDisplay() {
       </CategoryBar>
 
       {activeCategoryDetail && (
-        <ScoringTable
-          key={activeCategoryDetail.id}
-          categoryDetail={activeCategoryDetail}
-          onEmptyData={() => next()}
-        />
+        <ScoringTable key={activeCategoryDetail.id} categoryDetail={activeCategoryDetail} />
       )}
     </TableContainer>
   );

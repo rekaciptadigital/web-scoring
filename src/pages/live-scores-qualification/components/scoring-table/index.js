@@ -6,28 +6,47 @@ import { useParticipantScorings } from "../../hooks/participant-scorings";
 import { LoadingFullPage } from "../loading-fullpage";
 import IconLoading from "../icon-loading";
 import { SessionCellsDataHeading, SessionCellsData } from "./components/session-cells-data";
+import { CountsBySession } from "./components/counts-by-session";
 
-function ScoringTable({ categoryDetail, onEmptyData }) {
-  const teamType = categoryDetail?.categoryTeam?.toLowerCase?.();
-
+function ScoringTable() {
+  const { activeCategoryDetail, sessionNumber, next } = useDisplaySettings();
+  const teamType = activeCategoryDetail?.categoryTeam?.toLowerCase?.();
   const { data, isLoading, isFetching } = useParticipantScorings({
-    categoryId: categoryDetail.id,
+    categoryId: activeCategoryDetail.id,
     teamType,
     shouldPoll: true,
   });
+  const [checkingSession, setCheckingSession] = React.useState(true);
+
+  const hasData = Boolean(data);
+  const isIndividual = teamType === "individual";
+  const isTeam = teamType === "team";
 
   // Nge-skip yang gak ada datanya
   React.useEffect(() => {
     if (!data || data.length) {
+      setCheckingSession(false);
       return;
     }
-    onEmptyData?.();
+    next();
   }, [data]);
 
-  const hasData = Boolean(data);
+  // Nge-skip yang gak ada sesinya.
+  // Misal gak punya sesi 3.
+  React.useEffect(() => {
+    if (isTeam || sessionNumber === 0) {
+      setCheckingSession(false);
+      return;
+    }
+    const sessionData = data?.[0]?.sessions[sessionNumber];
+    if (sessionData) {
+      setCheckingSession(false);
+      return;
+    }
+    next();
+  }, [data, isTeam, sessionNumber]);
 
-  if (isLoading) {
-    // TODO: pakai UI table yang aslinya
+  if (isLoading || checkingSession) {
     return (
       <SectionTableContainer>
         <ScoringEmptyBar>
@@ -39,7 +58,7 @@ function ScoringTable({ categoryDetail, onEmptyData }) {
     );
   }
 
-  if (teamType === "individual") {
+  if (isIndividual) {
     return (
       <AutoScrollingContainer shouldStart={hasData}>
         <SectionTableContainer>
@@ -51,7 +70,7 @@ function ScoringTable({ categoryDetail, onEmptyData }) {
                 <th className="text-uppercase">Nama</th>
                 <th className="text-uppercase">Klub</th>
                 <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
-                <th className="text-uppercase">Total</th>
+                {sessionNumber === 0 && <th className="text-uppercase">Total</th>}
                 <th className="text-uppercase">X</th>
                 <th className="text-uppercase">X+10</th>
               </tr>
@@ -76,10 +95,7 @@ function ScoringTable({ categoryDetail, onEmptyData }) {
                     <td>{scoring.member.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
 
                     <SessionCellsData sessions={scoring.sessions} />
-
-                    <td>{scoring.total}</td>
-                    <td>{scoring.totalX}</td>
-                    <td>{scoring.totalXPlusTen}</td>
+                    <CountsBySession scoring={scoring} />
                   </tr>
                 ))
               )}
@@ -90,7 +106,7 @@ function ScoringTable({ categoryDetail, onEmptyData }) {
     );
   }
 
-  if (teamType === "team") {
+  if (isTeam) {
     return (
       <AutoScrollingContainer shouldStart={hasData}>
         <SectionTableContainer>

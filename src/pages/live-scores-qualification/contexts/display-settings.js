@@ -11,6 +11,7 @@ function DisplaySettingsProvider({ children }) {
   const [settingCategories, setSettingCategories] = React.useState([]);
   const [sessionNumber, setSessionNumber] = React.useState(0);
   const controller = useDisplayController(filters, settingCategories);
+  const [lastUpdated, setLastUpdated] = React.useState(() => new Date());
 
   React.useEffect(() => {
     if (!filters.categoryOptions?.length || settingCategories.length) {
@@ -18,6 +19,15 @@ function DisplaySettingsProvider({ children }) {
     }
     setSettingCategories(filters.categoryOptions);
   }, [filters.categoryOptions]);
+
+  // Reset last updated ketika status dari gak running berubah jadi running.
+  // Supaya waktu/date yang tampil pas date-nya running.
+  React.useEffect(() => {
+    if (!controller.isRunning) {
+      return;
+    }
+    setLastUpdated(() => new Date());
+  }, [controller.isRunning]);
 
   const isSessionSet = sessionNumber > -1;
   const isLoading = !categories && status === "loading";
@@ -35,6 +45,8 @@ function DisplaySettingsProvider({ children }) {
     sessionNumber,
     setSessionNumber,
     isSessionSet,
+    lastUpdated,
+    setLastUpdated,
   };
 
   return (

@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useDisplaySettings } from "../../contexts/display-settings";
 import { useParticipantScorings } from "../../hooks/participant-scorings";
 
+import { LoadingFullPage } from "../loading-fullpage";
+import IconLoading from "../icon-loading";
 import { SessionCellsDataHeading, SessionCellsData } from "./components/session-cells-data";
 
 function ScoringTable({ categoryDetail, onEmptyData }) {
@@ -27,171 +29,147 @@ function ScoringTable({ categoryDetail, onEmptyData }) {
   if (isLoading) {
     // TODO: pakai UI table yang aslinya
     return (
-      <div
-        style={{
-          overflow: "auto",
-          height: 400,
-          textAlign: "left",
-          fontSize: "0.875rem",
-          fontweight: 400,
-        }}
-      >
-        Loading...
-      </div>
+      <SectionTableContainer>
+        <ScoringEmptyBar>
+          <SpinningLoader>
+            <IconLoading />
+          </SpinningLoader>
+        </ScoringEmptyBar>
+      </SectionTableContainer>
     );
   }
 
   if (teamType === "individual") {
     return (
-      <SectionTableContainer>
-        <div style={{ opacity: isFetching ? 1 : 0 }}>Refetching...</div>
-
-        <TableScores>
-          <thead>
-            <tr>
-              <th>Peringkat</th>
-              <th className="text-uppercase">Nama</th>
-              <th className="text-uppercase">Klub</th>
-              <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
-              <th className="text-uppercase">Total</th>
-              <th className="text-uppercase">X</th>
-              <th className="text-uppercase">X+10</th>
-            </tr>
-          </thead>
-
-          <ScrollTBody shouldStart={hasData}>
-            {!data?.length ? (
+      <AutoScrollingContainer shouldStart={hasData}>
+        <SectionTableContainer>
+          <LoadingFullPage isLoading={isFetching} />
+          <TableScores>
+            <thead>
               <tr>
-                <td colSpan="6">
-                  <ScoringEmptyRow>Belum ada data skor di kategori ini</ScoringEmptyRow>
-                </td>
+                <th>Peringkat</th>
+                <th className="text-uppercase">Nama</th>
+                <th className="text-uppercase">Klub</th>
+                <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
+                <th className="text-uppercase">Total</th>
+                <th className="text-uppercase">X</th>
+                <th className="text-uppercase">X+10</th>
               </tr>
-            ) : (
-              data.map((scoring, index) => (
-                <tr key={scoring.member.id}>
-                  <td>
-                    <DisplayRank>
-                      <span>{index + 1}</span>
-                    </DisplayRank>
+            </thead>
+
+            <tbody>
+              {!data?.length ? (
+                <tr>
+                  <td colSpan="6">
+                    <ScoringEmptyRow>Belum ada data skor di kategori ini</ScoringEmptyRow>
                   </td>
-                  <td>{scoring.member.name}</td>
-                  <td>{scoring.member.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
-
-                  <SessionCellsData sessions={scoring.sessions} />
-
-                  <td>{scoring.total}</td>
-                  <td>{scoring.totalX}</td>
-                  <td>{scoring.totalXPlusTen}</td>
                 </tr>
-              ))
-            )}
-          </ScrollTBody>
-        </TableScores>
-      </SectionTableContainer>
+              ) : (
+                data.map((scoring, index) => (
+                  <tr key={scoring.member.id}>
+                    <td>
+                      <DisplayRank>
+                        <span>{index + 1}</span>
+                      </DisplayRank>
+                    </td>
+                    <td>{scoring.member.name}</td>
+                    <td>{scoring.member.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
+
+                    <SessionCellsData sessions={scoring.sessions} />
+
+                    <td>{scoring.total}</td>
+                    <td>{scoring.totalX}</td>
+                    <td>{scoring.totalXPlusTen}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </TableScores>
+        </SectionTableContainer>
+      </AutoScrollingContainer>
     );
   }
 
   if (teamType === "team") {
     return (
-      <SectionTableContainer>
-        <div style={{ opacity: isFetching ? 1 : 0 }}>Refetching...</div>
-        {/* <FullPageLoadingIndicator isLoading={isLoading} /> */}
+      <AutoScrollingContainer shouldStart={hasData}>
+        <SectionTableContainer>
+          <LoadingFullPage isLoading={isFetching} />
 
-        <TableScores>
-          <thead>
-            <tr>
-              <th>Peringkat</th>
-              <th className="text-uppercase">Nama Tim</th>
-              <th className="text-uppercase">Klub</th>
-              <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
-              <th className="text-uppercase">Total</th>
-              <th className="text-uppercase">X</th>
-              <th className="text-uppercase">X+10</th>
-            </tr>
-          </thead>
-
-          <ScrollTBody shouldStart={hasData}>
-            {!data?.length ? (
+          <TableScores>
+            <thead>
               <tr>
-                <td colSpan="6">
-                  <ScoringEmptyRow>Belum ada data skor di kategori ini</ScoringEmptyRow>
-                </td>
+                <th>Peringkat</th>
+                <th className="text-uppercase">Nama Tim</th>
+                <th className="text-uppercase">Klub</th>
+                <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
+                <th className="text-uppercase">Total</th>
+                <th className="text-uppercase">X</th>
+                <th className="text-uppercase">X+10</th>
               </tr>
-            ) : (
-              data.map((scoring, index) => (
-                <tr key={scoring.participantId}>
-                  <td>
-                    <DisplayRank>
-                      <span>{index + 1}</span>
-                    </DisplayRank>
-                  </td>
+            </thead>
 
-                  <td>
-                    <div>
-                      <h3>{scoring.team}</h3>
-                      {Boolean(scoring.teams?.length) && (
-                        <ol>
-                          {scoring.teams.map((member) => (
-                            <li key={member.id}>{member.name}</li>
-                          ))}
-                        </ol>
-                      )}
-                    </div>
+            <tbody>
+              {!data?.length ? (
+                <tr>
+                  <td colSpan="6">
+                    <ScoringEmptyRow>Belum ada data skor di kategori ini</ScoringEmptyRow>
                   </td>
-
-                  <td>{scoring.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
-                  <td>{scoring.total}</td>
-                  <td>{scoring.totalX}</td>
-                  <td>{scoring.totalXPlusTen}</td>
                 </tr>
-              ))
-            )}
-          </ScrollTBody>
-        </TableScores>
-      </SectionTableContainer>
+              ) : (
+                data.map((scoring, index) => (
+                  <tr key={scoring.participantId}>
+                    <td>
+                      <DisplayRank>
+                        <span>{index + 1}</span>
+                      </DisplayRank>
+                    </td>
+
+                    <td>
+                      <TeamMembersBlock>
+                        <h3>{scoring.team}</h3>
+                        {scoring.teams?.length ? (
+                          <ol>
+                            {scoring.teams.map((member) => (
+                              <li key={member.id}>{member.name}</li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <EmptyMembers>Belum ada data peserta anggota</EmptyMembers>
+                        )}
+                      </TeamMembersBlock>
+                    </td>
+
+                    <td>{scoring.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
+                    <td>{scoring.total}</td>
+                    <td>{scoring.totalX}</td>
+                    <td>{scoring.totalXPlusTen}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </TableScores>
+        </SectionTableContainer>
+      </AutoScrollingContainer>
     );
   }
 
-  // TODO: hapus atau ganti error handling
   return (
-    <React.Fragment>
-      <div style={{ opacity: isFetching ? 1 : 0 }}>Refetching...</div>
-      <table className="table bg-dark text-light">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>No</th>
-            <th>Nama</th>
-            <th>No</th>
-            <th>Nama</th>
-          </tr>
-        </thead>
-
-        <ScrollTBody shouldStart={hasData}>
-          {data?.map((row, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{row.team || row.member?.name || "no name"}</td>
-              <td>{index + 1}</td>
-              <td>{row.team || row.member?.name || "no name"}</td>
-              <td>{index + 1}</td>
-              <td>{row.team || row.member?.name || "no name"}</td>
-            </tr>
-          ))}
-        </ScrollTBody>
-      </table>
-    </React.Fragment>
+    <SectionTableContainer>
+      <ScoringEmptyBar>Error</ScoringEmptyBar>
+    </SectionTableContainer>
   );
 }
 
-function ScrollTBody({ children, shouldStart }) {
+function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
   const scrollContainerRef = React.useRef(null);
-  const dirRef = React.useRef(1);
+  const direction = React.useRef(1);
   const [timerDone, setTimerDone] = React.useState(false);
   const [scrollDone, setScrollDone] = React.useState(false);
   const { next } = useDisplaySettings();
 
+  // Timer untuk tabel yang isinya sedikit
+  // set 5 detik
   React.useEffect(() => {
     if (!shouldStart) {
       return;
@@ -202,6 +180,7 @@ function ScrollTBody({ children, shouldStart }) {
     return () => clearTimeout(timer);
   }, [shouldStart]);
 
+  // Eksekusi auto switch kategori
   React.useEffect(() => {
     if (!shouldStart || !timerDone || !scrollDone) {
       return;
@@ -209,64 +188,86 @@ function ScrollTBody({ children, shouldStart }) {
     next();
   }, [shouldStart, timerDone, scrollDone]);
 
+  // Auto scrolling bolak-balik bawah-atas
   React.useEffect(() => {
     if (!shouldStart) {
       return;
     }
 
     const timer = setInterval(() => {
+      if (!scrollContainerRef.current) {
+        return;
+      }
+
       const container = scrollContainerRef.current;
+      direction.current *= _getDirection(container);
+      container.scrollTop += direction.current * deltaY;
 
-      const lowestScrollPos = container.scrollTop + container.offsetHeight;
-      if (lowestScrollPos >= container.scrollHeight) {
-        dirRef.current *= -1;
+      if (!_checkIsFinish(container, direction.current)) {
+        return;
       }
-
-      container.scrollTop += dirRef.current * 20;
-
-      if (dirRef.current === -1 && container.scrollTop === 0) {
-        setScrollDone(true);
-      }
+      setScrollDone(true);
     }, 50);
 
     return () => clearInterval(timer);
   }, [shouldStart]);
 
-  return <tbody ref={scrollContainerRef}>{children}</tbody>;
+  return <div ref={scrollContainerRef}>{children}</div>;
+}
+
+function _getDirection(container) {
+  let dir = 1;
+  const lowestScrollPos = container.scrollTop + container.offsetHeight;
+  if (lowestScrollPos >= container.scrollHeight) {
+    dir = -1;
+  }
+  return dir;
+}
+
+function _checkIsFinish(container, direction) {
+  return direction === -1 && container.scrollTop === 0;
 }
 
 const SectionTableContainer = styled.div`
   position: relative;
 `;
 
+const ScoringEmptyBar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 30rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  background-color: #ffffff;
+  color: var(--ma-blue);
+`;
+
+const SpinningLoader = styled.span`
+  display: inline-block;
+  animation: spin-loading 0.7s infinite linear;
+
+  @keyframes spin-loading {
+    0% {
+      transform: rotateZ(0deg);
+    }
+
+    100% {
+      transform: rotateZ(360deg);
+    }
+  }
+`;
+
 const TableScores = styled.table`
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 0.25rem;
-  font-size: calc(0.875rem * 2);
+  font-size: 1.75rem;
 
-  thead,
-  tbody,
-  tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  tbody {
-    table-layout: fixed;
-    display: block;
-    overflow-y: auto;
-    width: 100%;
-    max-height: 600px;
-    text-align: left;
-    font-weight: 400;
-
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
+  thead {
+    position: sticky;
+    top: 0.25rem;
   }
 
   th,
@@ -292,6 +293,24 @@ const TableScores = styled.table`
 const DisplayRank = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  min-height: 4rem;
+  padding-left: 2rem;
+`;
+
+const TeamMembersBlock = styled.div`
+  min-height: 9.375rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  ol {
+    margin: 0;
+  }
+`;
+
+const EmptyMembers = styled.div`
+  color: var(--ma-gray-200);
 `;
 
 const ScoringEmptyRow = styled.div`

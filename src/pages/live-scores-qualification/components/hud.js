@@ -16,7 +16,8 @@ import logo from "assets/images/myachery/myachery.png";
 
 function HUD() {
   const { data: eventDetail, isLoading } = useEventDetail();
-  const { sessionNumber, isSessionSet, settingCategories } = useDisplaySettings();
+  const { isRunning, sessionNumber, lastUpdated } = useDisplaySettings();
+  const textLastUpdated = datetime.formatFullDateLabel(lastUpdated, { withTime: true });
   return (
     <SectionTop>
       <Header>
@@ -36,11 +37,8 @@ function HUD() {
                 eventDetail?.eventName
               )}
             </EventTitle>
-            {isSessionSet ? (
-              <div>
-                Kualifikasi | Terakhir diperbarui: {datetime.formatFullDateLabel(new Date())} (TODO:
-                jam update)
-              </div>
+            {isRunning && textLastUpdated ? (
+              <div>Kualifikasi | Terakhir diperbarui: {textLastUpdated}</div>
             ) : (
               <div>Kualifikasi</div>
             )}
@@ -49,10 +47,10 @@ function HUD() {
 
         <Settings>
           <MenuSessionOptions>
-            <LabelLiveScore className={classnames({ "label-is-live": isSessionSet })}>
-              {isSessionSet ? (
+            <LabelLiveScore className={classnames({ "label-is-live": isRunning })}>
+              {isRunning ? (
                 <React.Fragment>
-                  <LiveScoreIndicator isLive={Boolean(settingCategories?.length)} />
+                  <LiveScoreIndicator isLive={isRunning} />
                   {sessionNumber > 0 ? (
                     <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
                   ) : (

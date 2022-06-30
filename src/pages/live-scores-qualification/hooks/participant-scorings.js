@@ -1,11 +1,14 @@
 import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EventQualificationService } from "services";
+import { useDisplaySettings } from "../contexts/display-settings";
 
 const POLLING_INTERVAL = 10000;
 
 function useParticipantScorings({ categoryId, teamType, shouldPoll }) {
   const fetcher = useFetcher();
+  const { setLastUpdated } = useDisplaySettings();
+
   const isLoading = !fetcher.data && fetcher.isLoading;
   const isFetching = fetcher.data && fetcher.isLoading;
 
@@ -20,7 +23,12 @@ function useParticipantScorings({ categoryId, teamType, shouldPoll }) {
     };
 
     const getData = () => {
-      const options = { transform: getDataTransformer(teamType) };
+      const options = {
+        transform: getDataTransformer(teamType),
+        onSuccess() {
+          setLastUpdated(() => new Date());
+        },
+      };
       fetcher.runAsync(getFunction, options);
     };
 

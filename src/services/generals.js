@@ -6,6 +6,13 @@ export default {
   },
 
   // V2
+  /**
+   * @param {Object} queryString { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getEventDetailByIdV2(queryString = null) {
+    return API.get("/general/v2/events/by-id", queryString);
+  },
 
   /**
    * @param {Object} queryString { event_id }
@@ -16,5 +23,5 @@ export default {
   },
   getCategoryNonAuth(querString = null) {
     return API.get("/web/v1/dashboard-dos/category-details", querString);
-  }
+  },
 };

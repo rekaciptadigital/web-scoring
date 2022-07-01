@@ -22,7 +22,8 @@ function PageLiveScore() {
 }
 
 function DataDisplay() {
-  const { activeCategory, isRunning, sessionNumber, isQualification } = useDisplaySettings();
+  const { activeCategory, isRunning, sessionNumber, isQualification, roundOptions, round } =
+    useDisplaySettings();
 
   if (!isRunning) {
     return (
@@ -63,14 +64,10 @@ function DataDisplay() {
               <IconDot size="0.375em" />
             </span>
             <span>{activeCategory}</span>
-            {sessionNumber > 0 && sessionNumber !== 11 && (
-              <React.Fragment>
-                <span>
-                  <IconDot size="0.375em" />
-                </span>
-                <span>Sesi {sessionNumber}</span>
-              </React.Fragment>
-            )}
+            <span>
+              <IconDot size="0.375em" />
+            </span>
+            <span>{roundOptions[round]}</span>
           </DetailInfo>
         )}
 

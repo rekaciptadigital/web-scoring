@@ -13,7 +13,7 @@ import IconLoading from "./icon-loading";
 import classnames from "classnames";
 
 function ScoringElimination() {
-  const { activeCategoryDetail } = useDisplaySettings();
+  const { activeCategoryDetail, round: activeRound } = useDisplaySettings();
   const teamType = activeCategoryDetail?.categoryTeam?.toLowerCase?.();
   const { data, isLoading, isFetching } = useBracketTemplate({
     categoryId: activeCategoryDetail.id,
@@ -48,8 +48,7 @@ function ScoringElimination() {
     );
   }
 
-  const selectedTab = 0;
-  const currentRows = data?.rounds[selectedTab]?.seeds || [];
+  const currentRows = data?.rounds[activeRound]?.seeds || [];
 
   if (isIndividual) {
     return (
@@ -62,27 +61,25 @@ function ScoringElimination() {
               <tr>
                 <th className="text-start">
                   <MedalWrapper>
-                    <IconTrophyBlue size="52" />
+                    <IconTrophyBlue size="42" />
                   </MedalWrapper>
                 </th>
-                <th className="text-start">Nama</th>
-                <th>{_getScoreLabel(activeCategoryDetail)}</th>
-                <th className="text-start">Nama</th>
+                <th className="text-start text-uppercase">Nama</th>
+                <th className="text-uppercase">{_getScoreLabel(activeCategoryDetail)}</th>
+                <th className="text-start text-uppercase">Nama</th>
                 <th className="text-end">
                   <MedalWrapper>
-                    <IconTrophyBlue size="52" />
+                    <IconTrophyBlue size="42" />
                   </MedalWrapper>
                 </th>
               </tr>
             </thead>
 
-            <tbody key={selectedTab}>
+            <tbody key={activeRound}>
               {currentRows.map((row, index) => {
                 const player1 = row.teams[0];
                 const player2 = row.teams[1];
-
-                const roundNumber = selectedTab + 1;
-
+                const roundNumber = activeRound + 1;
                 const isBye =
                   row.teams.some((team) => team.status === "bye") ||
                   (roundNumber === 1 && row.teams.every((team) => !team.name));
@@ -101,45 +98,45 @@ function ScoringElimination() {
                     </td>
 
                     <td width="40%">
-                      <PlayerLabelContainerLeft>
-                        <PlayerNameData>
-                          <NameLabel>{player1?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
-                        </PlayerNameData>
-                      </PlayerLabelContainerLeft>
+                      <PlayerNameData>
+                        <NameLabel>{player1?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
+                        <ClubNameLabel>{player1?.club?.name || player1?.clubName}</ClubNameLabel>
+                      </PlayerNameData>
                     </td>
 
                     <td>
-                      {!noData && (
-                        <HeadToHeadScoreLabels>
-                          <ScoreTotalLabel
-                            className={classnames({
-                              "score-label-higher":
-                                player1?.status === "win" ||
-                                player1?.adminTotal > player2?.adminTotal,
-                            })}
-                          >
-                            {player1?.adminTotal || 0}
-                          </ScoreTotalLabel>
+                      <HeadToHeadScoreLabels>
+                        {!noData && (
+                          <React.Fragment>
+                            <ScoreTotalLabel
+                              className={classnames({
+                                "score-label-higher":
+                                  player1?.status === "win" ||
+                                  player1?.adminTotal > player2?.adminTotal,
+                              })}
+                            >
+                              {player1?.adminTotal || 0}
+                            </ScoreTotalLabel>
 
-                          <ScoreTotalLabel
-                            className={classnames({
-                              "score-label-higher":
-                                player2?.status === "win" ||
-                                player2?.adminTotal > player1?.adminTotal,
-                            })}
-                          >
-                            {player2?.adminTotal || 0}
-                          </ScoreTotalLabel>
-                        </HeadToHeadScoreLabels>
-                      )}
+                            <ScoreTotalLabel
+                              className={classnames({
+                                "score-label-higher":
+                                  player2?.status === "win" ||
+                                  player2?.adminTotal > player1?.adminTotal,
+                              })}
+                            >
+                              {player2?.adminTotal || 0}
+                            </ScoreTotalLabel>
+                          </React.Fragment>
+                        )}
+                      </HeadToHeadScoreLabels>
                     </td>
 
                     <td width="40%">
-                      <PlayerLabelContainerRight>
-                        <PlayerNameData>
-                          <NameLabel>{player2?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
-                        </PlayerNameData>
-                      </PlayerLabelContainerRight>
+                      <PlayerNameData>
+                        <NameLabel>{player2?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
+                        <ClubNameLabel>{player2?.club?.name || player2?.clubName}</ClubNameLabel>
+                      </PlayerNameData>
                     </td>
 
                     <td className="text-end">
@@ -172,27 +169,25 @@ function ScoringElimination() {
               <tr>
                 <th className="text-start">
                   <MedalWrapper>
-                    <IconTrophyBlue size="52" />
+                    <IconTrophyBlue size="42" />
                   </MedalWrapper>
                 </th>
-                <th className="text-start">Tim</th>
-                <th>{_getScoreLabel(activeCategoryDetail)}</th>
-                <th className="text-start">Tim</th>
+                <th className="text-start text-uppercase">Tim</th>
+                <th className="text-uppercase">{_getScoreLabel(activeCategoryDetail)}</th>
+                <th className="text-start text-uppercase">Tim</th>
                 <th className="text-end">
                   <MedalWrapper>
-                    <IconTrophyBlue size="52" />
+                    <IconTrophyBlue size="42" />
                   </MedalWrapper>
                 </th>
               </tr>
             </thead>
 
-            <tbody key={selectedTab}>
+            <tbody key={activeRound}>
               {currentRows.map((row, index) => {
                 const team1 = row.teams[0];
                 const team2 = row.teams[1];
-
-                const roundNumber = selectedTab + 1;
-
+                const roundNumber = activeRound + 1;
                 const isBye =
                   row.teams.some((team) => team.status === "bye") ||
                   (roundNumber === 1 && row.teams.every((team) => !team.teamName));
@@ -215,71 +210,65 @@ function ScoringElimination() {
                     </td>
 
                     <td width="40%">
-                      <PlayerLabelContainerLeft>
-                        <PlayerNameData>
-                          <TeamMembersBlock>
-                            <TeamNameLabel>
-                              {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
-                            </TeamNameLabel>
-                            {team1?.memberTeam?.length ? (
-                              <MembersList>
-                                {team1.memberTeam.map((member) => (
-                                  <li key={member.memberId}>{member.name}</li>
-                                ))}
-                              </MembersList>
-                            ) : (
-                              team1?.teamName &&
-                              !isBye && <EmptyMembers>Belum ada data peserta anggota</EmptyMembers>
-                            )}
-                          </TeamMembersBlock>
-                        </PlayerNameData>
-                      </PlayerLabelContainerLeft>
+                      <TeamMembersBlock>
+                        <TeamNameLabel>
+                          {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                        </TeamNameLabel>
+                        {team1?.memberTeam?.length ? (
+                          <MembersList>
+                            {team1.memberTeam.map((member) => (
+                              <li key={member.memberId}>{member.name}</li>
+                            ))}
+                          </MembersList>
+                        ) : (
+                          team1?.teamName &&
+                          !isBye && <EmptyMembers>Belum ada data peserta anggota</EmptyMembers>
+                        )}
+                      </TeamMembersBlock>
                     </td>
 
                     <td>
-                      {!noData && (
-                        <HeadToHeadScoreLabels>
-                          <ScoreTotalLabel
-                            className={classnames({
-                              "score-label-higher":
-                                team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
-                            })}
-                          >
-                            {team1?.adminTotal || 0}
-                          </ScoreTotalLabel>
+                      <HeadToHeadScoreLabels>
+                        {!noData && (
+                          <React.Fragment>
+                            <ScoreTotalLabel
+                              className={classnames({
+                                "score-label-higher":
+                                  team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
+                              })}
+                            >
+                              {team1?.adminTotal || 0}
+                            </ScoreTotalLabel>
 
-                          <ScoreTotalLabel
-                            className={classnames({
-                              "score-label-higher":
-                                team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
-                            })}
-                          >
-                            {team2?.adminTotal || 0}
-                          </ScoreTotalLabel>
-                        </HeadToHeadScoreLabels>
-                      )}
+                            <ScoreTotalLabel
+                              className={classnames({
+                                "score-label-higher":
+                                  team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
+                              })}
+                            >
+                              {team2?.adminTotal || 0}
+                            </ScoreTotalLabel>
+                          </React.Fragment>
+                        )}
+                      </HeadToHeadScoreLabels>
                     </td>
 
                     <td width="40%">
-                      <PlayerLabelContainerRight>
-                        <PlayerNameData>
-                          <TeamMembersBlock>
-                            <TeamNameLabel>
-                              {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
-                            </TeamNameLabel>
-                            {team2?.memberTeam?.length ? (
-                              <MembersList>
-                                {team2.memberTeam.map((member) => (
-                                  <li key={member.memberId}>{member.name}</li>
-                                ))}
-                              </MembersList>
-                            ) : (
-                              team2?.teamName &&
-                              !isBye && <EmptyMembers>Belum ada data peserta anggota</EmptyMembers>
-                            )}
-                          </TeamMembersBlock>
-                        </PlayerNameData>
-                      </PlayerLabelContainerRight>
+                      <TeamMembersBlock>
+                        <TeamNameLabel>
+                          {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                        </TeamNameLabel>
+                        {team2?.memberTeam?.length ? (
+                          <MembersList>
+                            {team2.memberTeam.map((member) => (
+                              <li key={member.memberId}>{member.name}</li>
+                            ))}
+                          </MembersList>
+                        ) : (
+                          team2?.teamName &&
+                          !isBye && <EmptyMembers>Belum ada data peserta anggota</EmptyMembers>
+                        )}
+                      </TeamMembersBlock>
                     </td>
 
                     <td className="text-end">
@@ -415,7 +404,6 @@ const SpinningLoader = styled.span`
 `;
 
 const MembersTable = styled.table`
-  --indicator-space-margin: 3rem;
   font-size: 1.75rem;
   text-align: center;
 
@@ -455,23 +443,21 @@ const MedalWrapper = styled.span`
   margin: 0 1.5rem;
 `;
 
-const PlayerLabelContainerLeft = styled.div`
-  margin-right: var(--indicator-space-margin);
-`;
-
-const PlayerLabelContainerRight = styled.div`
-  margin-left: var(--indicator-space-margin);
-`;
-
 const PlayerNameData = styled.div`
   min-height: 9rem;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   gap: 0.5rem;
-  align-items: center;
 `;
 
 const NameLabel = styled.div`
   font-weight: 600;
+  text-align: left;
+`;
+
+const ClubNameLabel = styled.div`
+  font-size: 0.7em;
   text-align: left;
 `;
 
@@ -486,6 +472,7 @@ const NoArcherWrapper = styled.div`
 `;
 
 const HeadToHeadScoreLabels = styled.div`
+  min-width: 10rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -493,6 +480,7 @@ const HeadToHeadScoreLabels = styled.div`
 `;
 
 const ScoreTotalLabel = styled.span`
+  min-width: 5rem;
   color: var(--ma-primary-blue-100);
   font-weight: 600;
   white-space: nowrap;
@@ -523,7 +511,7 @@ const MembersList = styled.ol`
   margin-top: 0.5rem;
   padding-left: 1.5rem;
   text-align: left;
-  font-size: 0.875em;
+  font-size: 0.7em;
 `;
 
 /* ========================== */

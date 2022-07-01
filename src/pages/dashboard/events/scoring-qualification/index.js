@@ -25,6 +25,7 @@ import IconCheck from "components/ma/icons/fill/check";
 import classnames from "classnames";
 
 const optionsParticipantsCount = [
+  { value: 4, label: "4 Besar" },
   { value: 8, label: "8 Besar" },
   { value: 16, label: "16 Besar" },
   { value: 32, label: "32 Besar" },

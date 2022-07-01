@@ -8,6 +8,8 @@ import IconLoading from "../icon-loading";
 import { SessionCellsDataHeading, SessionCellsData } from "./components/session-cells-data";
 import { CountsBySession } from "./components/counts-by-session";
 
+import { misc } from "utils";
+
 function ScoringTable() {
   const { activeCategoryDetail, sessionNumber, next } = useDisplaySettings();
   const teamType = activeCategoryDetail?.categoryTeam?.toLowerCase?.();
@@ -92,7 +94,9 @@ function ScoringTable() {
                       </DisplayRank>
                     </td>
                     <td>{_getBudrestNumber(scoring.member)}</td>
-                    <td>{scoring.member.name}</td>
+                    <td>
+                      <NameLabel>{scoring.member.name}</NameLabel>
+                    </td>
                     <td>{scoring.member.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
 
                     <SessionCellsData sessions={scoring.sessions} />
@@ -117,7 +121,7 @@ function ScoringTable() {
             <thead>
               <tr>
                 <th>Peringkat</th>
-                <th className="text-uppercase">Nama Tim</th>
+                <th className="text-uppercase">Tim</th>
                 <th className="text-uppercase">Klub</th>
                 <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
                 <th className="text-uppercase">Total</th>
@@ -144,7 +148,7 @@ function ScoringTable() {
 
                     <td>
                       <TeamMembersBlock>
-                        <h3>{scoring.team}</h3>
+                        <TeamNameLabel>{scoring.team}</TeamNameLabel>
                         {scoring.teams?.length ? (
                           <ol>
                             {scoring.teams.map((member) => (
@@ -181,6 +185,7 @@ function ScoringTable() {
 function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
   const scrollContainerRef = React.useRef(null);
   const direction = React.useRef(1);
+  const [startScrolling, setStartScrolling] = React.useState(false);
   const [timerDone, setTimerDone] = React.useState(false);
   const [scrollDone, setScrollDone] = React.useState(false);
   const { next } = useDisplaySettings();
@@ -197,6 +202,22 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
     return () => clearTimeout(timer);
   }, [shouldStart]);
 
+  // Auto start scroll ketika props true, tapi delay dulu
+  React.useEffect(() => {
+    if (!shouldStart) {
+      // langsung pause
+      setStartScrolling(false);
+      return;
+    }
+
+    // delay start 2 detik
+    const pause = async () => {
+      await misc.sleep(2000);
+      setStartScrolling(true);
+    };
+    pause();
+  }, [shouldStart]);
+
   // Eksekusi auto switch kategori
   React.useEffect(() => {
     if (!shouldStart || !timerDone || !scrollDone) {
@@ -207,11 +228,11 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
 
   // Auto scrolling bolak-balik bawah-atas
   React.useEffect(() => {
-    if (!shouldStart) {
+    if (!startScrolling) {
       return;
     }
 
-    const timer = setInterval(() => {
+    const timer = setInterval(async () => {
       if (!scrollContainerRef.current) {
         return;
       }
@@ -220,30 +241,26 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
       direction.current *= _getDirection(container);
       container.scrollTop += direction.current * deltaY;
 
-      if (!_checkIsFinish(container, direction.current)) {
-        return;
+      if (_checkIsBottom(container)) {
+        setStartScrolling(false);
+        await misc.sleep(2000);
+        setStartScrolling(true);
       }
-      setScrollDone(true);
+
+      if (_checkIsFinish(container, direction.current)) {
+        await misc.sleep(2000);
+        setScrollDone(true);
+      }
     }, 50);
 
     return () => clearInterval(timer);
-  }, [shouldStart]);
+  }, [startScrolling]);
 
   return <div ref={scrollContainerRef}>{children}</div>;
 }
 
-function _getDirection(container) {
-  let dir = 1;
-  const lowestScrollPos = container.scrollTop + container.offsetHeight;
-  if (lowestScrollPos >= container.scrollHeight) {
-    dir = -1;
-  }
-  return dir;
-}
-
-function _checkIsFinish(container, direction) {
-  return direction === -1 && container.scrollTop === 0;
-}
+/* ============================ */
+// styles
 
 const SectionTableContainer = styled.div`
   position: relative;
@@ -315,15 +332,28 @@ const DisplayRank = styled.div`
   padding-left: 2rem;
 `;
 
+const NameLabel = styled.div`
+  font-weight: 600;
+  text-align: left;
+`;
+
 const TeamMembersBlock = styled.div`
-  min-height: 9.375rem;
+  min-height: 10rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
 
   ol {
     margin: 0;
+    margin-top: 0.5rem;
+    font-size: 0.8em;
+    padding-left: 1.5rem;
   }
+`;
+
+const TeamNameLabel = styled.div`
+  font-weight: 600;
+  text-align: left;
 `;
 
 const EmptyMembers = styled.div`
@@ -336,6 +366,27 @@ const ScoringEmptyRow = styled.div`
   align-items: center;
   background-color: #ffffff;
 `;
+
+/* ============================== */
+// utils
+
+function _getDirection(container) {
+  let dir = 1;
+  const lowestScrollPos = container.scrollTop + container.offsetHeight;
+  if (lowestScrollPos >= container.scrollHeight) {
+    dir = -1;
+  }
+  return dir;
+}
+
+function _checkIsFinish(container, direction) {
+  return direction === -1 && container.scrollTop === 0;
+}
+
+function _checkIsBottom(container) {
+  const lowestScrollPos = container.scrollTop + container.offsetHeight;
+  return lowestScrollPos === container.scrollHeight;
+}
 
 function _getBudrestNumber(member) {
   if (!member.budRestNumber || !member.targetFace) {

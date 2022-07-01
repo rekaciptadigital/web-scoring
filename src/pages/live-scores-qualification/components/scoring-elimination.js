@@ -11,6 +11,7 @@ import IconTrophyWin from "components/ma/icons/fill/trophy-win";
 import IconLoading from "./icon-loading";
 
 import classnames from "classnames";
+import { misc } from "utils";
 
 function ScoringElimination() {
   const { activeCategoryDetail, round: activeRound } = useDisplaySettings();
@@ -300,6 +301,7 @@ function ScoringElimination() {
 function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
   const scrollContainerRef = React.useRef(null);
   const direction = React.useRef(1);
+  const [startScrolling, setStartScrolling] = React.useState(false);
   const [timerDone, setTimerDone] = React.useState(false);
   const [scrollDone, setScrollDone] = React.useState(false);
   const { next } = useDisplaySettings();
@@ -316,6 +318,22 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
     return () => clearTimeout(timer);
   }, [shouldStart]);
 
+  // Auto start scroll ketika props true, tapi delay dulu
+  React.useEffect(() => {
+    if (!shouldStart) {
+      // langsung pause
+      setStartScrolling(false);
+      return;
+    }
+
+    // delay start 2 detik
+    const pause = async () => {
+      await misc.sleep(2000);
+      setStartScrolling(true);
+    };
+    pause();
+  }, [shouldStart]);
+
   // Eksekusi auto switch kategori
   React.useEffect(() => {
     if (!shouldStart || !timerDone || !scrollDone) {
@@ -326,11 +344,11 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
 
   // Auto scrolling bolak-balik bawah-atas
   React.useEffect(() => {
-    if (!shouldStart) {
+    if (!startScrolling) {
       return;
     }
 
-    const timer = setInterval(() => {
+    const timer = setInterval(async () => {
       if (!scrollContainerRef.current) {
         return;
       }
@@ -339,20 +357,22 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
       direction.current *= _getDirection(container);
       container.scrollTop += direction.current * deltaY;
 
-      if (!_checkIsFinish(container, direction.current)) {
-        return;
+      if (_checkIsBottom(container)) {
+        setStartScrolling(false);
+        await misc.sleep(2000);
+        setStartScrolling(true);
       }
-      setScrollDone(true);
+
+      if (_checkIsFinish(container, direction.current)) {
+        await misc.sleep(2000);
+        setScrollDone(true);
+      }
     }, 50);
 
     return () => clearInterval(timer);
-  }, [shouldStart]);
+  }, [startScrolling]);
 
   return <div ref={scrollContainerRef}>{children}</div>;
-}
-
-function _checkIsFinish(container, direction) {
-  return direction === -1 && container.scrollTop === 0;
 }
 
 function NoArcherLabel({ isBye }) {
@@ -524,6 +544,15 @@ function _getDirection(container) {
     dir = -1;
   }
   return dir;
+}
+
+function _checkIsBottom(container) {
+  const lowestScrollPos = container.scrollTop + container.offsetHeight;
+  return lowestScrollPos === container.scrollHeight;
+}
+
+function _checkIsFinish(container, direction) {
+  return direction === -1 && container.scrollTop === 0;
 }
 
 function _getScoreLabel(categoryDetails) {

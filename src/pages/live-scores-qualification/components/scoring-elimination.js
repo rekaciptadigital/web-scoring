@@ -13,6 +13,9 @@ import IconLoading from "./icon-loading";
 import classnames from "classnames";
 import { misc } from "utils";
 
+const PAUSE_DURATION = 2000; // 2000 ms
+const TIMER_DURATION = 5000; // 5000 ms
+
 function ScoringElimination() {
   const { activeCategoryDetail, round: activeRound } = useDisplaySettings();
   const teamType = activeCategoryDetail?.categoryTeam?.toLowerCase?.();
@@ -20,30 +23,12 @@ function ScoringElimination() {
     categoryId: activeCategoryDetail.id,
     shouldPoll: true,
   });
-  const [checkingRound, setCheckingRound] = React.useState(false);
 
   const hasData = Boolean(data);
   const isIndividual = teamType === "individual";
   const isTeam = teamType === "team";
 
-  const handleStartRoundChecking = async () => {
-    setCheckingRound(true);
-    await misc.sleep(400);
-    setCheckingRound(false);
-  };
-
-  // Nge-skip yang gak ada datanya
-  // TODO: pastikan dulu perlu skip di bagan yang belum ditentukan apa enggak
-  // React.useEffect(() => {
-  //   const noRoundData = data && !data.rounds[0].seeds.every(seed);
-  //   if (noRoundData) {
-  //     next();
-  //   } else {
-  //     setCheckingSession(false);
-  //   }
-  // }, [data]);
-
-  if (isLoading || checkingRound) {
+  if (isLoading) {
     return (
       <SectionTableContainer>
         <ScoringEmptyBar>
@@ -59,11 +44,7 @@ function ScoringElimination() {
 
   if (isIndividual) {
     return (
-      <AutoScrollingContainer
-        key={"round-" + activeRound}
-        shouldStart={hasData}
-        onRoundChecking={handleStartRoundChecking}
-      >
+      <AutoScrollingContainer key={"round-" + activeRound} shouldStart={hasData}>
         <SectionTableContainer>
           <LoadingFullPage isLoading={isFetching} />
 
@@ -171,11 +152,7 @@ function ScoringElimination() {
 
   if (isTeam) {
     return (
-      <AutoScrollingContainer
-        key={"round-" + activeRound}
-        shouldStart={hasData}
-        onRoundChecking={handleStartRoundChecking}
-      >
+      <AutoScrollingContainer key={"round-" + activeRound} shouldStart={hasData}>
         <SectionTableContainer>
           <LoadingFullPage isLoading={isFetching} />
 
@@ -312,28 +289,20 @@ function ScoringElimination() {
   );
 }
 
-function AutoScrollingContainer({ children, shouldStart, deltaY = 2, onRoundChecking }) {
+function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
   const scrollContainerRef = React.useRef(null);
   const direction = React.useRef(1);
   const [startScrolling, setStartScrolling] = React.useState(false);
   const [timerDone, setTimerDone] = React.useState(false);
   const [scrollDone, setScrollDone] = React.useState(false);
-  const { next, roundOptions, round, setRound } = useDisplaySettings();
+  const { next } = useDisplaySettings();
 
   // Eksekusi auto switch kategori
   React.useEffect(() => {
     if (!shouldStart || !timerDone || !scrollDone) {
       return;
     }
-
-    onRoundChecking?.();
-    const totalRounds = roundOptions.length;
-    const nextRound = round + 1;
-    if (nextRound < totalRounds) {
-      setRound(nextRound);
-    } else {
-      next();
-    }
+    next();
   }, [shouldStart, timerDone, scrollDone]);
 
   // Timer untuk tabel yang isinya sedikit
@@ -344,7 +313,7 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2, onRoundChec
     }
     const timer = setTimeout(() => {
       setTimerDone(true);
-    }, 5000);
+    }, TIMER_DURATION);
     return () => clearTimeout(timer);
   }, [shouldStart]);
 
@@ -358,7 +327,7 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2, onRoundChec
 
     // delay start 2 detik
     const pause = async () => {
-      await misc.sleep(2000);
+      await misc.sleep(PAUSE_DURATION);
       setStartScrolling(true);
     };
     pause();
@@ -381,12 +350,12 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2, onRoundChec
 
       if (_checkIsBottom(container)) {
         setStartScrolling(false);
-        await misc.sleep(2000);
+        await misc.sleep(PAUSE_DURATION);
         setStartScrolling(true);
       }
 
       if (_checkIsFinish(container, direction.current)) {
-        await misc.sleep(2000);
+        await misc.sleep(PAUSE_DURATION);
         setScrollDone(true);
       }
     }, 50);

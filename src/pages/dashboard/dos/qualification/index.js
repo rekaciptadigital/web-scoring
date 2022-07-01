@@ -17,7 +17,6 @@ import IconDownload from "components/ma/icons/mono/download";
 import classnames from "classnames";
 import { ScoringTeamTable } from "./components/scoring-table/reguTable";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
-import { useSessionDownloadTwo } from "./hooks/download-session-two";
 
 function PageDosQualification() {
   const { event_id, date_event } = useParams();
@@ -48,10 +47,6 @@ function PageDosQualification() {
   );
 
   const { handleDownloadSession } = useSessionDownload(activeCategoryDetail?.categoryDetailId);
-
-  const { handleDownloadSessionTwo } = useSessionDownloadTwo(
-    activeCategoryDetail?.categoryDetailId
-  );
 
   const resetOnChangeCategory = () => {
     setInputSearchQuery("");
@@ -211,34 +206,28 @@ function PageDosQualification() {
                   </DropdownToggle>
 
                   <DropdownMenu className="dropdown-menu-end">
-                    <DropdownItem
-                      tag="button"
-                      onClick={() => {
-                        toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
-                        handleDownloadSession({
-                          onSuccess() {
-                            toast.dismiss();
-                          },
-                        });
-                      }}
-                    >
-                      {" "}
-                      <span>Laporan Sesi I</span>
-                    </DropdownItem>
-                    <DropdownItem
-                      tag="button"
-                      onClick={() => {
-                        toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
-                        handleDownloadSessionTwo({
-                          onSuccess() {
-                            toast.dismiss();
-                          },
-                        });
-                      }}
-                    >
-                      {" "}
-                      <span>Laporan Sesi II</span>
-                    </DropdownItem>
+                    {sessionNumbers.map((session) => (
+                      <DropdownItem
+                        key={session}
+                        tag="button"
+                        onClick={() => {
+                          toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
+                          handleDownloadSession(session, {
+                            onSuccess() {
+                              toast.dismiss();
+                              toast.success("Unduhan dimulai");
+                            },
+                            onError() {
+                              toast.dismiss();
+                              toast.success("Gagal memulai unduhan");
+                            },
+                          });
+                        }}
+                      >
+                        <span>Laporan Sesi {session}</span>
+                      </DropdownItem>
+                    ))}
+
                     <DropdownItem
                       tag="button"
                       onClick={() => {
@@ -251,7 +240,7 @@ function PageDosQualification() {
                       }}
                     >
                       {" "}
-                      <span>All Sesi</span>
+                      <span>Semua Sesi</span>
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>

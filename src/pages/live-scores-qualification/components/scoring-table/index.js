@@ -10,6 +10,9 @@ import { CountsBySession } from "./components/counts-by-session";
 
 import { misc } from "utils";
 
+const PAUSE_DURATION = 2000;
+const TIMER_DURATION = 5000;
+
 function ScoringTable() {
   const { activeCategoryDetail, sessionNumber, next } = useDisplaySettings();
   const teamType = activeCategoryDetail?.categoryTeam?.toLowerCase?.();
@@ -198,7 +201,7 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
     }
     const timer = setTimeout(() => {
       setTimerDone(true);
-    }, 5000);
+    }, TIMER_DURATION);
     return () => clearTimeout(timer);
   }, [shouldStart]);
 
@@ -212,7 +215,7 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
 
     // delay start 2 detik
     const pause = async () => {
-      await misc.sleep(2000);
+      await misc.sleep(PAUSE_DURATION);
       setStartScrolling(true);
     };
     pause();
@@ -243,12 +246,12 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
 
       if (_checkIsBottom(container)) {
         setStartScrolling(false);
-        await misc.sleep(2000);
+        await misc.sleep(PAUSE_DURATION);
         setStartScrolling(true);
       }
 
       if (_checkIsFinish(container, direction.current)) {
-        await misc.sleep(2000);
+        await misc.sleep(PAUSE_DURATION);
         setScrollDone(true);
       }
     }, 50);

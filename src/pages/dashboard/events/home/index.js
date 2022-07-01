@@ -102,7 +102,7 @@ function PageEventDetailHome() {
 
                   <ButtonOutlineBlue
                     as="a"
-                    href={`/live-score/${event_id}/qualification`}
+                    href={`/live-score/${event_id}`}
                     target="_blank"
                     rel="noreferrer"
                   >

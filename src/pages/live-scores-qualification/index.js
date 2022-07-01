@@ -64,10 +64,14 @@ function DataDisplay() {
               <IconDot size="0.375em" />
             </span>
             <span>{activeCategory}</span>
-            <span>
-              <IconDot size="0.375em" />
-            </span>
-            <span>{roundOptions[round]}</span>
+            {roundOptions?.[round] && (
+              <React.Fragment>
+                <span>
+                  <IconDot size="0.375em" />
+                </span>
+                <RoundLabel>{roundOptions[round]}</RoundLabel>
+              </React.Fragment>
+            )}
           </DetailInfo>
         )}
 
@@ -141,6 +145,13 @@ const DetailInfo = styled.div`
   > * + * {
     margin-left: 1.5rem;
   }
+`;
+
+const RoundLabel = styled.span`
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  background-color: var(--ma-primary-blue-50);
+  color: var(--ma-gray-600);
 `;
 
 export default PageLiveScore;

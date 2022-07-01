@@ -56,8 +56,8 @@ function DisplaySettings() {
                     <ButtonBlue
                       onClick={() => {
                         setStage(localStage);
+                        run(localStage);
                         setOpen(false);
-                        run();
                       }}
                     >
                       Terapkan

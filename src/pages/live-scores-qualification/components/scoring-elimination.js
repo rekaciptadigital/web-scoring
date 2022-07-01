@@ -13,6 +13,9 @@ import IconLoading from "./icon-loading";
 import classnames from "classnames";
 import { misc } from "utils";
 
+const PAUSE_DURATION = 2000; // 2000 ms
+const TIMER_DURATION = 5000; // 5000 ms
+
 function ScoringElimination() {
   const { activeCategoryDetail, round: activeRound } = useDisplaySettings();
   const teamType = activeCategoryDetail?.categoryTeam?.toLowerCase?.();
@@ -20,22 +23,10 @@ function ScoringElimination() {
     categoryId: activeCategoryDetail.id,
     shouldPoll: true,
   });
-  // const [checkingSession, setCheckingSession] = React.useState(true);
 
   const hasData = Boolean(data);
   const isIndividual = teamType === "individual";
   const isTeam = teamType === "team";
-
-  // Nge-skip yang gak ada datanya
-  // TODO: pastikan dulu perlu skip di bagan yang belum ditentukan apa enggak
-  // React.useEffect(() => {
-  //   const noRoundData = data && !data.rounds[0].seeds.every(seed);
-  //   if (noRoundData) {
-  //     next();
-  //   } else {
-  //     setCheckingSession(false);
-  //   }
-  // }, [data]);
 
   if (isLoading) {
     return (
@@ -53,7 +44,7 @@ function ScoringElimination() {
 
   if (isIndividual) {
     return (
-      <AutoScrollingContainer shouldStart={hasData}>
+      <AutoScrollingContainer key={"round-" + activeRound} shouldStart={hasData}>
         <SectionTableContainer>
           <LoadingFullPage isLoading={isFetching} />
 
@@ -161,7 +152,7 @@ function ScoringElimination() {
 
   if (isTeam) {
     return (
-      <AutoScrollingContainer shouldStart={hasData}>
+      <AutoScrollingContainer key={"round-" + activeRound} shouldStart={hasData}>
         <SectionTableContainer>
           <LoadingFullPage isLoading={isFetching} />
 
@@ -306,6 +297,14 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
   const [scrollDone, setScrollDone] = React.useState(false);
   const { next } = useDisplaySettings();
 
+  // Eksekusi auto switch kategori
+  React.useEffect(() => {
+    if (!shouldStart || !timerDone || !scrollDone) {
+      return;
+    }
+    next();
+  }, [shouldStart, timerDone, scrollDone]);
+
   // Timer untuk tabel yang isinya sedikit
   // set 5 detik
   React.useEffect(() => {
@@ -314,7 +313,7 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
     }
     const timer = setTimeout(() => {
       setTimerDone(true);
-    }, 5000);
+    }, TIMER_DURATION);
     return () => clearTimeout(timer);
   }, [shouldStart]);
 
@@ -328,19 +327,11 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
 
     // delay start 2 detik
     const pause = async () => {
-      await misc.sleep(2000);
+      await misc.sleep(PAUSE_DURATION);
       setStartScrolling(true);
     };
     pause();
   }, [shouldStart]);
-
-  // Eksekusi auto switch kategori
-  React.useEffect(() => {
-    if (!shouldStart || !timerDone || !scrollDone) {
-      return;
-    }
-    next();
-  }, [shouldStart, timerDone, scrollDone]);
 
   // Auto scrolling bolak-balik bawah-atas
   React.useEffect(() => {
@@ -359,12 +350,12 @@ function AutoScrollingContainer({ children, shouldStart, deltaY = 2 }) {
 
       if (_checkIsBottom(container)) {
         setStartScrolling(false);
-        await misc.sleep(2000);
+        await misc.sleep(PAUSE_DURATION);
         setStartScrolling(true);
       }
 
       if (_checkIsFinish(container, direction.current)) {
-        await misc.sleep(2000);
+        await misc.sleep(PAUSE_DURATION);
         setScrollDone(true);
       }
     }, 50);
@@ -488,7 +479,7 @@ const NoArcherWrapper = styled.div`
   text-align: center;
   vertical-align: middle;
   width: 100%;
-  color: var(--ma-gray-400);
+  color: var(--ma-gray-200);
 `;
 
 const HeadToHeadScoreLabels = styled.div`
@@ -524,6 +515,7 @@ const TeamMembersBlock = styled.div`
 
 const EmptyMembers = styled.div`
   color: var(--ma-gray-200);
+  text-align: left;
 `;
 
 const MembersList = styled.ol`

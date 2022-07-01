@@ -19,8 +19,13 @@ function useDisplayController(filter, selectedCategories) {
     });
   }, [isRunning, controller.queue, controller.index]);
 
-  const run = () => {
-    dispatch({ type: "RUN", payload: selectedCategories, filter });
+  const run = (selectedStage) => {
+    dispatch({
+      type: "RUN",
+      filter: filter,
+      stage: selectedStage,
+      payload: selectedCategories,
+    });
   };
 
   const next = () => {
@@ -36,7 +41,7 @@ function controllerReducer(state, action) {
     for (const category of action.payload) {
       selectedCategories[category] = action.filter.categoryDetails[category];
     }
-    const queue = _makeQueue(selectedCategories);
+    const queue = _makeQueue(selectedCategories, action.stage);
     const index = queue.length ? 0 : -1;
     return { queue, index };
   }
@@ -51,15 +56,22 @@ function controllerReducer(state, action) {
   return state;
 }
 
-function _makeQueue(groups) {
+function _makeQueue(groups, stage) {
   if (!groups || !Object.keys(groups)?.length) {
     return [];
   }
   const queue = [];
+  const isElimination = stage === "elimination";
   for (const category in groups) {
     for (const team in groups[category]) {
       const categoryDetail = groups[category][team];
-      queue.push({ id: categoryDetail.id, category, team });
+      if (isElimination && !categoryDetail.eliminationLock) {
+        // Hanya antrikan kategori di eliminasi yang
+        // udah ditentukan bagannya aja. Yang belum, skip.
+        continue;
+      }
+      const item = { id: categoryDetail.id, category, team, stage };
+      queue.push(item);
     }
   }
   return queue;

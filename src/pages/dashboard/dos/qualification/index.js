@@ -6,10 +6,7 @@ import { useCategoriesWithFilters } from "./hooks/category-filters";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
 import { useSessionDownload } from "./hooks/download-session";
 
-import {
-  SpinnerDotBlock,
-  ButtonOutlineBlue,
-} from "components/ma";
+import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { SubNavbar } from "../components/submenus-matches";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ScoringTable } from "./components/scoring-table";
@@ -44,18 +41,13 @@ function PageDosQualification() {
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
   const [session, setSession] = React.useState(1);
-  const [onSessionOne, setOnSessionOne ] = React.useState(true);
-  const [onSessionTwo, setOnSessionTwo ] = React.useState(false);
-  const [onAllSession, setOnAllSession] = React.useState(false);
   const [menu, setMenu] = React.useState(false);
 
   const { handleDownloadScoresheet } = useScoresheetDownload(
     activeCategoryDetail?.categoryDetailId
   );
 
-  const { handleDownloadSession } = useSessionDownload(
-    activeCategoryDetail?.categoryDetailId
-  );
+  const { handleDownloadSession } = useSessionDownload(activeCategoryDetail?.categoryDetailId);
 
   const { handleDownloadSessionTwo } = useSessionDownloadTwo(
     activeCategoryDetail?.categoryDetailId
@@ -64,6 +56,9 @@ function PageDosQualification() {
   const resetOnChangeCategory = () => {
     setInputSearchQuery("");
   };
+
+  const sessionCount = activeCategoryDetail?.originalCategoryDetail.sessionInQualification;
+  const sessionNumbers = _makeSessionNumbers(sessionCount);
 
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
@@ -93,7 +88,7 @@ function PageDosQualification() {
   return (
     <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
       <ProcessingToast />
-  
+
       <TabBar>
         <TabButtonList>
           {optionsCompetitionCategory.map((option) => (
@@ -160,62 +155,44 @@ function PageDosQualification() {
                 )}
               </FilterList>
             </CategoryFilter>
-          
+
             {activeCategoryDetail?.isTeam == false && (
-            <CategoryFilter>
+              <CategoryFilter>
                 <FilterLabel>Pilih Sesi:</FilterLabel>
-                  <FilterList>
+                <FilterList>
+                  {sessionNumbers.map((number) => (
                     <FilterItemButton
-                      className={classnames({ "filter-item-active": onSessionOne })}
-                      onClick={() => {
-                        setOnSessionOne(true);
-                        setOnSessionTwo(false);
-                        setOnAllSession(false);
-                        setSession(1);
-                      }}
+                      key={number}
+                      className={classnames({ "filter-item-active": session === number })}
+                      onClick={() => setSession(number)}
                     >
-                      Sesi 1
+                      Sesi {number}
                     </FilterItemButton>
-                    <FilterItemButton
-                      className={classnames({ "filter-item-active": onSessionTwo })}
-                      onClick={() => {
-                        setOnSessionTwo(true);
-                        setOnSessionOne(false);
-                        setOnAllSession(false);
-                        setSession(2);
-                      }}
-                    >
-                      Sesi 2
-                    </FilterItemButton>
-                    <FilterItemButton
-                      className={classnames({ "filter-item-active": onAllSession })}
-                      onClick={() => {
-                        setOnSessionOne(false);
-                        setOnSessionTwo(false);
-                        setOnAllSession(true);
-                        setSession(0);
-                      }}
-                    >
-                      Semua Sesi
-                    </FilterItemButton>
-                  </FilterList>
-            </CategoryFilter>
+                  ))}
+
+                  <FilterItemButton
+                    className={classnames({ "filter-item-active": session === 0 })}
+                    onClick={() => setSession(0)}
+                  >
+                    Semua Sesi
+                  </FilterItemButton>
+                </FilterList>
+              </CategoryFilter>
             )}
           </FilterBars>
-
 
           <ToolbarRight>
             <HorizontalSpaced>
               {activeCategoryDetail?.isTeam == true ? (
-              <ButtonOutlineBlue
-                onClick={() => {
-                  toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
-                  handleDownloadScoresheet({
-                    onSuccess() {
-                      toast.dismiss();
-                    },
-                  });
-                }}
+                <ButtonOutlineBlue
+                  onClick={() => {
+                    toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
+                    handleDownloadScoresheet({
+                      onSuccess() {
+                        toast.dismiss();
+                      },
+                    });
+                  }}
                 >
                   <span>
                     <IconDownload size="16" />
@@ -223,87 +200,90 @@ function PageDosQualification() {
                   <span>Unduh Laporan</span>
                 </ButtonOutlineBlue>
               ) : (
-              <Dropdown
-                isOpen={menu}
-                toggle={() => setMenu(!menu)}
-              >
+                <Dropdown isOpen={menu} toggle={() => setMenu(!menu)}>
                   <DropdownToggle tag="span">
-                    <ButtonOutlineBlue
-                    >
+                    <ButtonOutlineBlue>
                       <span>
                         <IconDownload size="16" />
                       </span>{" "}
                       <span>Unduh Laporan</span>
-                      </ButtonOutlineBlue>
+                    </ButtonOutlineBlue>
                   </DropdownToggle>
-                  
+
                   <DropdownMenu className="dropdown-menu-end">
-                    <DropdownItem tag="button" onClick={() => {
+                    <DropdownItem
+                      tag="button"
+                      onClick={() => {
                         toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
                         handleDownloadSession({
                           onSuccess() {
                             toast.dismiss();
                           },
                         });
-                      }}>
-                          {" "}
-                          <span>Laporan Sesi I</span>
-                      </DropdownItem>
-                    <DropdownItem tag="button" onClick={() => {
+                      }}
+                    >
+                      {" "}
+                      <span>Laporan Sesi I</span>
+                    </DropdownItem>
+                    <DropdownItem
+                      tag="button"
+                      onClick={() => {
                         toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
                         handleDownloadSessionTwo({
                           onSuccess() {
                             toast.dismiss();
                           },
                         });
-                      }}>
-                          {" "}
-                          <span>Laporan Sesi II</span>
-                      </DropdownItem>
-                      <DropdownItem tag="button" onClick={() => {
+                      }}
+                    >
+                      {" "}
+                      <span>Laporan Sesi II</span>
+                    </DropdownItem>
+                    <DropdownItem
+                      tag="button"
+                      onClick={() => {
                         toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
                         handleDownloadScoresheet({
                           onSuccess() {
                             toast.dismiss();
                           },
                         });
-                      }}>
-                          {" "}
-                          <span>All Sesi</span>
-                      </DropdownItem>
-
+                      }}
+                    >
+                      {" "}
+                      <span>All Sesi</span>
+                    </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
-                )}
-
+              )}
             </HorizontalSpaced>
           </ToolbarRight>
         </ToolbarTop>
-              
-      {activeCategoryDetail?.isTeam == true ? (
-        <ScoringTeamTable
-        key={activeCategoryDetail?.categoryDetailId}
-        categoryDetailId={activeCategoryDetail?.categoryDetailId}
-        searchName={inputSearchQuery}
-        onChangeParticipantPresence={resetOnChangeCategory}
-        eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
-        isTeam={activeCategoryDetail?.isTeam}
-      />
-      ) : activeCategoryDetail?.isTeam == false ? (
-        <ScoringTable
-          key={activeCategoryDetail?.categoryDetailId}
-          categoryDetailId={activeCategoryDetail?.categoryDetailId}
-          searchName={inputSearchQuery}
-          onChangeParticipantPresence={resetOnChangeCategory}
-          eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
-          isTeam={activeCategoryDetail?.isTeam}
-          session={session}
-        />
-      ) : (
-        <NoBracketWrapper>
-          <h4>Bagan belum tersedia</h4>
-        </NoBracketWrapper>
-      )}
+
+        {activeCategoryDetail?.isTeam == true ? (
+          <ScoringTeamTable
+            key={activeCategoryDetail?.categoryDetailId}
+            categoryDetailId={activeCategoryDetail?.categoryDetailId}
+            searchName={inputSearchQuery}
+            onChangeParticipantPresence={resetOnChangeCategory}
+            eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+            isTeam={activeCategoryDetail?.isTeam}
+          />
+        ) : activeCategoryDetail?.isTeam == false ? (
+          <ScoringTable
+            key={activeCategoryDetail?.categoryDetailId}
+            categoryDetailId={activeCategoryDetail?.categoryDetailId}
+            searchName={inputSearchQuery}
+            onChangeParticipantPresence={resetOnChangeCategory}
+            eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+            isTeam={activeCategoryDetail?.isTeam}
+            session={session}
+          />
+        ) : (
+          <NoBracketWrapper>
+            <h4>Bagan belum tersedia</h4>
+          </NoBracketWrapper>
+        )}
       </ViewWrapper>
     </ContentLayoutWrapper>
   );
@@ -478,5 +458,13 @@ const FilterItemButton = styled.button`
     background-color: var(--ma-primary-blue-50);
   }
 `;
+
+function _makeSessionNumbers(sessionCount) {
+  if (!sessionCount) {
+    return [];
+  }
+  const qualificationSessions = [...new Array(sessionCount)].map((item, index) => index + 1);
+  return qualificationSessions;
+}
 
 export default PageDosQualification;

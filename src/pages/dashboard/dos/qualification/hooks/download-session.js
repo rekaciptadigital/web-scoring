@@ -6,12 +6,12 @@ import { urlUtil } from "utils";
 function useSessionDownload(eventCategoryId) {
   const fetcher = useFetcher();
 
-  const handleDownloadSession = async ({ onSuccess: consumerSuccessHandler }) => {
+  const handleDownloadSession = async (session, { onSuccess: consumerSuccessHandler }) => {
     if (!eventCategoryId) {
       return;
     }
 
-    const queryString = { event_category_id: eventCategoryId, session: 1 };
+    const queryString = { event_category_id: eventCategoryId, session: session };
     const getFunction = () => {
       return DosService.getQualificationDownloadUrl(queryString);
     };

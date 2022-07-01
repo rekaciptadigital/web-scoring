@@ -8,10 +8,13 @@ const DisplaySettingsContext = React.createContext();
 function DisplaySettingsProvider({ children }) {
   const { data: categories, status } = useCategoryDetails();
   const filters = useCategoryFilters(categories);
+  const [stage, setStage] = React.useState("qualification");
   const [settingCategories, setSettingCategories] = React.useState([]);
   const [sessionNumber, setSessionNumber] = React.useState(0);
   const controller = useDisplayController(filters, settingCategories);
   const [lastUpdated, setLastUpdated] = React.useState(() => new Date());
+  const [roundOptions, setRoundOptions] = React.useState(0);
+  const [round, setRound] = React.useState(0);
 
   React.useEffect(() => {
     if (!filters.categoryOptions?.length || settingCategories.length) {
@@ -32,13 +35,19 @@ function DisplaySettingsProvider({ children }) {
   const isSessionSet = sessionNumber > -1;
   const isLoading = !categories && status === "loading";
   const isFetching = categories && status === "loading";
+  const isQualification = stage === "qualification";
+  const isElimination = stage === "elimination";
   const maxSessionCount = React.useMemo(() => _getHighestSessionCount(categories), [categories]);
 
   const context = {
     isLoading,
     isFetching,
+    isQualification,
+    isElimination,
     ...filters,
     ...controller,
+    stage,
+    setStage,
     settingCategories,
     setSettingCategories,
     maxSessionCount,
@@ -47,6 +56,10 @@ function DisplaySettingsProvider({ children }) {
     isSessionSet,
     lastUpdated,
     setLastUpdated,
+    roundOptions,
+    setRoundOptions,
+    round,
+    setRound,
   };
 
   return (

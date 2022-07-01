@@ -6,10 +6,9 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap
 
 import IconDot from "components/ma/icons/mono/dot";
 
-function MenuSessionOptions({ children, disabled }) {
+function MenuRoundOptions({ children, disabled }) {
   const [isOpen, setOpen] = React.useState(false);
-  const { maxSessionCount, sessionNumber, setSessionNumber } = useDisplaySettings();
-  const sessionNumbers = React.useMemo(() => _makeOptions(maxSessionCount), [maxSessionCount]);
+  const { roundOptions, round, setRound } = useDisplaySettings();
 
   if (disabled) {
     return <div>{children}</div>;
@@ -20,27 +19,20 @@ function MenuSessionOptions({ children, disabled }) {
         <DropdownToggle tag="div">{children}</DropdownToggle>
 
         <DropdownMenu className="dropdown-menu-end">
-          <DropdownItem header>Pilih sesi yang ditampilkan</DropdownItem>
-          {!sessionNumbers?.length ? (
+          <DropdownItem header>Pilih babak yang ditampilkan</DropdownItem>
+          {!roundOptions?.length ? (
             <DropdownItem>
               <ItemActionWrapper>
-                <span>Tidak tersedia sesi</span>
+                <span>Babak tidak tersedia</span>
                 <span></span>
               </ItemActionWrapper>
             </DropdownItem>
           ) : (
-            sessionNumbers.map((optionSessionNumber) => (
-              <DropdownItem
-                key={optionSessionNumber}
-                onClick={() => setSessionNumber(optionSessionNumber)}
-              >
+            roundOptions.map((optionRound, optionIndex) => (
+              <DropdownItem key={optionRound} onClick={() => setRound(optionIndex)}>
                 <ItemActionWrapper>
-                  {optionSessionNumber > 0 ? (
-                    <span>Sesi {optionSessionNumber}</span>
-                  ) : (
-                    <span>Semua sesi</span>
-                  )}
-                  {optionSessionNumber === sessionNumber && (
+                  <span>{optionRound}</span>
+                  {optionIndex === round && (
                     <span>
                       <IconDot size="8" />
                     </span>
@@ -73,13 +65,4 @@ const ItemActionWrapper = styled.div`
   }
 `;
 
-function _makeOptions(count) {
-  if (!count) {
-    return [];
-  }
-  const arrayFromCount = [...new Array(count)];
-  const sessionNumbers = arrayFromCount.map((item, index) => index + 1);
-  return [...sessionNumbers, 0];
-}
-
-export { MenuSessionOptions };
+export { MenuRoundOptions };

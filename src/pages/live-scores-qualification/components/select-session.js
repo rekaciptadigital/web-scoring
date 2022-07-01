@@ -3,7 +3,7 @@ import { useDisplaySettings } from "../contexts/display-settings";
 
 import { SelectSetting } from "./select-settings";
 
-function SelectSession() {
+function SelectSession({ disabled }) {
   const { maxSessionCount, sessionNumber, setSessionNumber } = useDisplaySettings();
   const options = React.useMemo(() => _makeOptions(maxSessionCount), [maxSessionCount]);
   const selectedValue = options.find((s) => s.value === sessionNumber);
@@ -14,6 +14,7 @@ function SelectSession() {
       value={selectedValue || null}
       options={options}
       onChange={(opt) => setSessionNumber(opt.value)}
+      disabled={disabled}
     />
   );
 }

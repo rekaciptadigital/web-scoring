@@ -4,6 +4,7 @@ import { useDisplaySettings } from "../contexts/display-settings";
 
 import { Modal, ModalBody } from "reactstrap";
 import { SpinnerDotBlock, ButtonBlue } from "components/ma";
+import { ToggleStage } from "./toggle-stage";
 import { SelectCategories } from "./select-multi-categories";
 import { SelectSession } from "./select-session";
 
@@ -11,7 +12,8 @@ import IconSettings from "components/ma/icons/mono/settings";
 
 function DisplaySettings() {
   const [isOpen, setOpen] = React.useState(true);
-  const { isLoading, run } = useDisplaySettings();
+  const { isLoading, run, stage, setStage } = useDisplaySettings();
+  const [localStage, setLocalStage] = React.useState(stage);
   return (
     <React.Fragment>
       <div>
@@ -33,6 +35,10 @@ function DisplaySettings() {
               ) : (
                 <React.Fragment>
                   <div>
+                    <ToggleStage value={localStage} onChange={setLocalStage} />
+                  </div>
+
+                  <div>
                     <label>Kategori</label>
                     <SelectCategories />
                     <BottomInstruction>
@@ -43,12 +49,13 @@ function DisplaySettings() {
 
                   <div>
                     <label>Sesi</label>
-                    <SelectSession />
+                    <SelectSession disabled={localStage === "elimination"} />
                   </div>
 
                   <BottomAction>
                     <ButtonBlue
                       onClick={() => {
+                        setStage(localStage);
                         setOpen(false);
                         run();
                       }}
@@ -73,6 +80,9 @@ function ButtonSetting({ onClick }) {
     </ButtonSettingStyled>
   );
 }
+
+/* ====================== */
+// utils
 
 const ButtonSettingStyled = styled.button`
   border: none;

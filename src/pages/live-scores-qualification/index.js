@@ -5,7 +5,7 @@ import { DisplaySettingsProvider, useDisplaySettings } from "./contexts/display-
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { HUD } from "./components/hud";
 import { TeamFilterIndicator } from "./components/team-filter-indicator";
-import { ScoringTable } from "./components/scoring-table";
+import { TableView } from "./components/table-view";
 
 import IconDot from "components/ma/icons/mono/dot";
 import IconAlertTri from "components/ma/icons/mono/alert-triangle";
@@ -22,7 +22,8 @@ function PageLiveScore() {
 }
 
 function DataDisplay() {
-  const { activeCategory, activeCategoryDetail, isRunning, sessionNumber } = useDisplaySettings();
+  const { activeCategory, isRunning, sessionNumber, isQualification, roundOptions, round } =
+    useDisplaySettings();
 
   if (!isRunning) {
     return (
@@ -40,28 +41,40 @@ function DataDisplay() {
   return (
     <TableContainer>
       <CategoryBar>
-        <DetailInfo>
-          <span>Kualifikasi</span>
-          <span>
-            <IconDot size="0.375em" />
-          </span>
-          <span>{activeCategory}</span>
-          {sessionNumber > 0 && sessionNumber !== 11 && (
-            <React.Fragment>
-              <span>
-                <IconDot size="0.375em" />
-              </span>
-              <span>Sesi {sessionNumber}</span>
-            </React.Fragment>
-          )}
-        </DetailInfo>
+        {isQualification ? (
+          <DetailInfo>
+            <span>Kualifikasi</span>
+            <span>
+              <IconDot size="0.375em" />
+            </span>
+            <span>{activeCategory}</span>
+            {sessionNumber > 0 && sessionNumber !== 11 && (
+              <React.Fragment>
+                <span>
+                  <IconDot size="0.375em" />
+                </span>
+                <span>Sesi {sessionNumber}</span>
+              </React.Fragment>
+            )}
+          </DetailInfo>
+        ) : (
+          <DetailInfo>
+            <span>Eliminasi</span>
+            <span>
+              <IconDot size="0.375em" />
+            </span>
+            <span>{activeCategory}</span>
+            <span>
+              <IconDot size="0.375em" />
+            </span>
+            <span>{roundOptions[round]}</span>
+          </DetailInfo>
+        )}
 
         <TeamFilterIndicator />
       </CategoryBar>
 
-      {activeCategoryDetail && (
-        <ScoringTable key={activeCategoryDetail.id} categoryDetail={activeCategoryDetail} />
-      )}
+      <TableView />
     </TableContainer>
   );
 }
@@ -116,7 +129,8 @@ const CategoryBar = styled.div`
   display: flex;
   gap: 1rem;
   justify-content: space-between;
-  padding: 0.75rem 1.5rem;
+  padding: 1.25rem 1.5rem;
+  padding-right: 1rem;
   background-color: var(--ma-blue);
   color: #ffffff;
   font-size: 1.625rem;

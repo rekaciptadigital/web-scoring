@@ -39,6 +39,11 @@ function DisplaySettingsProvider({ children }) {
   const isElimination = stage === "elimination";
   const maxSessionCount = React.useMemo(() => _getHighestSessionCount(categories), [categories]);
 
+  const nextWithResetRound = () => {
+    setRound(0);
+    controller.next();
+  };
+
   const context = {
     isLoading,
     isFetching,
@@ -46,6 +51,7 @@ function DisplaySettingsProvider({ children }) {
     isElimination,
     ...filters,
     ...controller,
+    next: nextWithResetRound,
     stage,
     setStage,
     settingCategories,

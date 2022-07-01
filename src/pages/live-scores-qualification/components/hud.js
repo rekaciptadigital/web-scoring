@@ -16,8 +16,10 @@ import logo from "assets/images/myachery/myachery.png";
 
 function HUD() {
   const { data: eventDetail, isLoading } = useEventDetail();
-  const { isRunning, isSessionSet, sessionNumber, lastUpdated } = useDisplaySettings();
+  const { isRunning, isSessionSet, sessionNumber, lastUpdated, isElimination } =
+    useDisplaySettings();
   const textLastUpdated = datetime.formatFullDateLabel(lastUpdated, { withTime: true });
+
   return (
     <SectionTop>
       <Header>
@@ -46,30 +48,45 @@ function HUD() {
         </Infos>
 
         <Settings>
-          <MenuSessionOptions disabled={!isRunning}>
-            <LabelLiveScore
-              className={classnames({ "label-is-live": isRunning })}
-              disabled={!isRunning}
-            >
-              {isRunning ? (
-                <React.Fragment>
-                  <LiveScoreIndicator isLive={isRunning} />
-                  {!isSessionSet ? (
-                    <span>Pilih Sesi Live Score</span>
-                  ) : sessionNumber > 0 ? (
-                    <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
-                  ) : (
-                    <span>Live Score Kualifikasi Semua Sesi</span>
-                  )}
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <LiveScoreIndicator />
-                  <span>Pilih Kategori Live Score</span>
-                </React.Fragment>
-              )}
-            </LabelLiveScore>
-          </MenuSessionOptions>
+          {isElimination ? (
+            <div>
+              <LabelLiveScore
+                className={classnames({
+                  "label-is-live": isRunning,
+                  "label-is-elimination": isElimination,
+                })}
+                disabled={isElimination}
+              >
+                <LiveScoreIndicator isLive={isRunning} />
+                <span>Live Score Eliminasi</span>
+              </LabelLiveScore>
+            </div>
+          ) : (
+            <MenuSessionOptions disabled={!isRunning}>
+              <LabelLiveScore
+                className={classnames({ "label-is-live": isRunning })}
+                disabled={!isRunning}
+              >
+                {isRunning ? (
+                  <React.Fragment>
+                    <LiveScoreIndicator isLive={isRunning} />
+                    {!isSessionSet ? (
+                      <span>Pilih Sesi Live Score</span>
+                    ) : sessionNumber > 0 ? (
+                      <span>Live Score Kualifikasi Sesi {sessionNumber}</span>
+                    ) : (
+                      <span>Live Score Kualifikasi Semua Sesi</span>
+                    )}
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>
+                    <LiveScoreIndicator />
+                    <span>Pilih Kategori Live Score</span>
+                  </React.Fragment>
+                )}
+              </LabelLiveScore>
+            </MenuSessionOptions>
+          )}
 
           <DisplaySettings />
         </Settings>
@@ -154,7 +171,8 @@ const LabelLiveScore = styled.button`
     margin-left: 0.5rem;
   }
 
-  &.label-is-live {
+  &.label-is-live,
+  &.label-is-live.label-is-elimination {
     color: var(--ma-blue);
   }
 

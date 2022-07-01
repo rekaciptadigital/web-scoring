@@ -13,6 +13,8 @@ function DisplaySettingsProvider({ children }) {
   const [sessionNumber, setSessionNumber] = React.useState(0);
   const controller = useDisplayController(filters, settingCategories);
   const [lastUpdated, setLastUpdated] = React.useState(() => new Date());
+  const [roundOptions, setRoundOptions] = React.useState(0);
+  const [round, setRound] = React.useState(0);
 
   React.useEffect(() => {
     if (!filters.categoryOptions?.length || settingCategories.length) {
@@ -54,6 +56,10 @@ function DisplaySettingsProvider({ children }) {
     isSessionSet,
     lastUpdated,
     setLastUpdated,
+    roundOptions,
+    setRoundOptions,
+    round,
+    setRound,
   };
 
   return (

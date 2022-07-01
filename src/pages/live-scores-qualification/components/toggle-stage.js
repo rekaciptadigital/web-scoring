@@ -1,10 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useDisplaySettings } from "../contexts/display-settings";
+
 import IconDot from "components/ma/icons/mono/dot";
 
-function ToggleStage() {
-  const { isQualification, isElimination, setStage } = useDisplaySettings();
+function ToggleStage({ value, onChange }) {
+  const { setSessionNumber } = useDisplaySettings();
   return (
     <ToggleWrapper>
       <span>
@@ -13,14 +14,14 @@ function ToggleStage() {
           name="stage"
           id="stage-qualification"
           value="qualification"
-          checked={isQualification}
-          onChange={(ev) => setStage(ev.target.value)}
+          checked={value === "qualification"}
+          onChange={(ev) => onChange?.(ev.target.value)}
         />
         <ToggleButton htmlFor="stage-qualification">
           <span>
             <IconDot size="0.625em" />
           </span>
-          <span>Qualification</span>
+          <span>Kualifikasi</span>
         </ToggleButton>
       </span>
 
@@ -30,14 +31,17 @@ function ToggleStage() {
           name="stage"
           id="stage-elimination"
           value="elimination"
-          checked={isElimination}
-          onChange={(ev) => setStage(ev.target.value)}
+          checked={value === "elimination"}
+          onChange={(ev) => {
+            onChange?.(ev.target.value);
+            setSessionNumber(0);
+          }}
         />
         <ToggleButton htmlFor="stage-elimination">
           <span>
             <IconDot size="0.625em" />
           </span>
-          <span>Elimination</span>
+          <span>Eliminasi</span>
         </ToggleButton>
       </span>
     </ToggleWrapper>
@@ -74,6 +78,7 @@ const ToggleButton = styled.label`
 
   > *:nth-child(1) {
     color: var(--ma-gray-400);
+    transition: color 0.25s;
   }
 
   &:hover > *:nth-child(1) {

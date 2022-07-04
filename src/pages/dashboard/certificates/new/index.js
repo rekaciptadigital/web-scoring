@@ -78,6 +78,7 @@ function CertificateNew() {
         queryString,
         abortControllerRef.current.signal
       );
+      const defaultEditorData = getDefaultEditorData();
 
       // Batalkan update state ketika komponen udah di-unmount.
       // Menghindari memory leak ketika belum selesai loading tapi user pindah halamanan.
@@ -86,36 +87,31 @@ function CertificateNew() {
         return;
       }
 
+      setStatus("done");
+      setEditorClean();
+      setCurrentObject(null);
+
       if (result.success) {
         // Kalau belum ada data template tapi dapatnya objek kosongan
         // Dikenali dari gak ada `certificateId`-nya
         if (!result.data?.id) {
-          setEditorData({
-            ...defaultEditorData,
-            typeCertificate: currentCertificateType,
-          });
+          setEditorData({ ...defaultEditorData, typeCertificate: currentCertificateType });
         } else {
           // Data editor dari data sertifikat yang sudah ada di server
           const parsedEditorData = result.data.editorData ? JSON.parse(result.data.editorData) : "";
-          setEditorData({
+          const editorData = {
             ...defaultEditorData,
             typeCertificate: currentCertificateType,
             certificateId: result.data.id,
             backgroundUrl: result.data.backgroundUrl,
             fields: parsedEditorData.fields || defaultEditorData.fields,
-          });
+          };
+          setEditorData(editorData);
         }
       } else {
         // Kalau belum ada data template tapi dilempar error
-        setEditorData({
-          ...defaultEditorData,
-          typeCertificate: currentCertificateType,
-        });
+        setEditorData({ ...defaultEditorData, typeCertificate: currentCertificateType });
       }
-
-      setStatus("done");
-      setEditorClean();
-      setCurrentObject(null);
     };
 
     getCertificateData();
@@ -474,7 +470,7 @@ const EditorActionButtons = styled.div`
   }
 `;
 
-const defaultEditorData = {
+const getDefaultEditorData = () => ({
   paperSize: "A4", // || [1280, 908] || letter
   backgroundUrl: undefined,
   backgroundPreviewUrl: undefined,
@@ -502,6 +498,6 @@ const defaultEditorData = {
       fontSize: 36,
     },
   ],
-};
+});
 
 export default CertificateNew;

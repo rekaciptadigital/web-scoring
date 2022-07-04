@@ -1,6 +1,9 @@
 import { certificateFields, certificateTypes } from "constants/index";
 
 const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
+// landscape
+const A4_WIDTH = 1287;
+const fieldMaxWidth = Math.ceil(0.7 * A4_WIDTH);
 
 function renderTemplateString(editorData) {
   const documentTitle = editorData.title || "My Archery Certificate";
@@ -29,7 +32,8 @@ function renderTemplateString(editorData) {
         position: absolute;
         left: 0px;
         right: 0px;
-        text-align: center;
+        width: ${fieldMaxWidth}px;
+        text-align: right;
       }
 
       .qr-code-container {
@@ -85,7 +89,10 @@ const renderCssBackgroundImage = (editorData) => {
 };
 
 function renderCssField(name, data = {}) {
-  const { y, fontFamily, fontWeight, fontSize, color } = data;
+  const { x, y, offsetWidth, fontFamily, fontWeight, fontSize, color } = data;
+  const editorObject = { x, offsetWidth };
+  const templateObject = { offsetWidth: fieldMaxWidth };
+  const rightAlignedX = _getRightAlignedX(editorObject, templateObject);
 
   const computeColor = () => (color ? `color: ${color};` : "");
   const computeFontWeight = () => fontWeight || "normal";
@@ -93,6 +100,7 @@ function renderCssField(name, data = {}) {
   return `
       #field-${name} {
         top: ${y}px;
+        left: ${rightAlignedX}px;
         ${computeColor()}
         font-family: ${fontFamily};
         font-size: ${fontSize}px;
@@ -120,6 +128,11 @@ function renderQrCode() {
           disableborder="1" />
       </div>
     </div>`;
+}
+
+function _getRightAlignedX(editorObject, templateObject) {
+  const delta = templateObject.offsetWidth - editorObject.offsetWidth;
+  return editorObject.x - delta;
 }
 
 export { renderTemplateString };

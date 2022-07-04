@@ -6,6 +6,9 @@ import PreviewFieldText from "./PreviewFieldText";
 import QrCodeField from "../QrCodeField";
 
 const { LABEL_RANK } = certificateFields;
+// landscape
+const A4_WIDTH = 1287;
+const A4_HEIGHT = 910;
 
 export default function PreviewCanvas({ data }) {
   const { backgroundUrl, backgroundPreviewUrl, fields } = data;
@@ -14,17 +17,17 @@ export default function PreviewCanvas({ data }) {
 
   const getBackgroundImage = () => backgroundPreviewUrl || backgroundUrl || "";
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     containerDiv.current && setOffsetWidth(containerDiv.current.offsetWidth);
   }, []);
 
   return (
-    <PreviewCanvasContainer ref={containerDiv} ratio={908 / 1280}>
+    <PreviewCanvasContainer ref={containerDiv} ratio={A4_HEIGHT / A4_WIDTH}>
       <PreviewImage
-        width={1280}
-        height={908}
+        width={A4_WIDTH}
+        height={A4_HEIGHT}
         backgroundImage={getBackgroundImage()}
-        scale={offsetWidth ? offsetWidth / 1280 : 1}
+        scale={offsetWidth ? offsetWidth / A4_WIDTH : 1}
       >
         {fields?.length ? (
           fields.map((field) => {

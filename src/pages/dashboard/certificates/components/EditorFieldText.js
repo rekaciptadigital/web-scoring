@@ -61,8 +61,8 @@ export default function EditorFieldText({
 
   const handleDragStop = (translation) => {
     const data = {
-      x: translation.x,
-      y: translation.y,
+      x: Math.ceil(translation.x),
+      y: Math.ceil(translation.y),
       offsetWidth: currentOffsetWidth,
     };
     onChange?.(data);

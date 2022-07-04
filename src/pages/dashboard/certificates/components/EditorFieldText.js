@@ -23,27 +23,27 @@ export default function EditorFieldText({
   onChange,
   selected,
   setEditorDirty,
+  canvasScale,
 }) {
-  const { y, fontFamily, fontSize, color, fontWeight } = data;
-
   const divRef = React.useRef(null);
   const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
   const [activeStrokeColor, setActiveStrokeColor] = React.useState(boundingStroke.idle.color);
   const [activeStrokeDashArray, setActiveStrokeDashArray] = React.useState(
     boundingStroke.idle.dashArray
   );
+  const { x, y, fontFamily, fontSize, color, fontWeight } = data;
 
-  const translatePosition = { x: 0, y };
-
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     // Perubahan data yang memengaruhi width DOM perlu diupdate di sini,
     // agar jarak left & transform x bisa dikalkulasi ulang dengan benar
-    setCurrentOffsetWidth(divRef.current?.offsetWidth);
+    divRef.current && setCurrentOffsetWidth(divRef.current.offsetWidth);
+    const data = { offsetWidth: divRef.current.offsetWidth || 0 };
+    onChange?.(data);
   }, [fontSize, fontFamily, fontWeight]);
 
   React.useEffect(() => {
     setEditorDirty?.();
-  }, [y, fontSize, fontFamily, fontWeight, color]);
+  }, [x, y, fontSize, fontFamily, fontWeight, color]);
 
   const highlightOnMouseOver = () => {
     setActiveStrokeColor(boundingStroke.highlighted.color);
@@ -60,14 +60,18 @@ export default function EditorFieldText({
   };
 
   const handleDragStop = (translation) => {
-    onChange?.({ y: translation.y });
+    const data = {
+      x: translation.x,
+      y: translation.y,
+      offsetWidth: currentOffsetWidth,
+    };
+    onChange?.(data);
   };
 
   return (
     <Draggable
-      axis="y"
-      scale={0.5}
-      position={translatePosition}
+      scale={canvasScale}
+      position={{ x, y }}
       onStart={() => handleDrag()}
       onStop={(ev, position) => handleDragStop(position)}
     >
@@ -76,17 +80,17 @@ export default function EditorFieldText({
         style={{
           position: "absolute",
           top: 0,
-          left: 1280 / 2 - currentOffsetWidth / 2 || 0,
+          left: 0,
           fontSize: fontSize || 60,
           color: color || undefined,
           fontFamily: fontFamily || undefined,
           fontWeight: fontWeight || "normal",
+          textAlign: "right",
         }}
         onMouseOver={() => highlightOnMouseOver()}
         onMouseLeave={() => idleOnMouseLeave()}
       >
         <PlaceholderString>{name}</PlaceholderString>
-
         <span
           style={{
             position: "absolute",

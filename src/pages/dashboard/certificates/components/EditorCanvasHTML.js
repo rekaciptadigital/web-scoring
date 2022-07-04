@@ -6,6 +6,9 @@ import EditorFieldText from "./EditorFieldText";
 import QrCodeField from "./QrCodeField";
 
 const { LABEL_RANK } = certificateFields;
+// landscape
+const A4_WIDTH = 1287;
+const A4_HEIGHT = 910;
 
 export default function EditorCanvasHTML({
   data,
@@ -16,6 +19,12 @@ export default function EditorCanvasHTML({
 }) {
   const { backgroundUrl, backgroundPreviewUrl, fields } = data;
   const containerDiv = React.useRef(null);
+  const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
+  const canvasScale = _getCanvasScale(currentOffsetWidth, A4_WIDTH);
+
+  React.useLayoutEffect(() => {
+    containerDiv.current && setCurrentOffsetWidth(containerDiv.current?.offsetWidth);
+  }, []);
 
   const getBackgroundImage = () => backgroundPreviewUrl || backgroundUrl || "";
 
@@ -33,11 +42,11 @@ export default function EditorCanvasHTML({
   };
 
   return (
-    <EditorCanvasContainer ref={containerDiv} ratio={908 / 1280}>
+    <EditorCanvasContainer ref={containerDiv} ratio={A4_HEIGHT / A4_WIDTH}>
       <EditorBackground
-        width={1280}
-        height={908}
-        scale={containerDiv.current?.offsetWidth / 1280}
+        width={A4_WIDTH}
+        height={A4_HEIGHT}
+        scale={(containerDiv.current?.offsetWidth || A4_WIDTH) / A4_WIDTH}
         style={{ "--editor-bg-image": `url(${getBackgroundImage()})` }}
       >
         <DeselectClickArea onClick={() => handleDeselectField()} />
@@ -59,6 +68,7 @@ export default function EditorCanvasHTML({
                 onChange={(data) => onChange(data)}
                 onSelected={() => handleSelectField(field.name)}
                 setEditorDirty={setEditorDirty}
+                canvasScale={canvasScale}
               />
             );
           })
@@ -99,3 +109,10 @@ const DeselectClickArea = styled.div`
   right: 0;
   bottom: 0;
 `;
+
+function _getCanvasScale(offsetWidth, actualPaperPixels) {
+  if (!offsetWidth) {
+    return 1;
+  }
+  return offsetWidth / actualPaperPixels;
+}

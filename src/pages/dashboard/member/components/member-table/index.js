@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
-import { LoadingScreen, SpinnerDotBlock, ButtonBlue, Button } from "components/ma";
+import { LoadingScreen, SpinnerDotBlock, ButtonBlue, Button, ButtonOutlineBlue } from "components/ma";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Row, Col } from "reactstrap";
 import { EventsService } from "services";
@@ -82,7 +82,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam }) {
                 <th className="name">Email</th>
                 <th className="name">Telepon</th>
                 <th className="name">Status Pembayaran</th>
-                <th className="name">...</th>
+                <th className="name"></th>
               </tr>
             </thead>
 
@@ -150,19 +150,18 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam }) {
                     <td>
                       {row?.member?.statusPayment === 'Lunas' ? (
                         <>
-                        <ButtonAtur
+                        <ButtonOutlineBlue
                           onClick={() => {
                             onConfirm(row?.member?.participantId);
                             setIdParticipant(row?.member?.participantId);
                           }}
-                          className="py-2 px-2"
                         >
-                          Detail
-                        </ButtonAtur>
+                          Atur Kategori
+                        </ButtonOutlineBlue>
                         </>
                       ) : (
                         <>
-                          <ButtonAturDisabled className="py-2 px-2">Atur Kategori</ButtonAturDisabled>
+                          <ButtonOutlineBlue disabled>Atur Kategori</ButtonOutlineBlue>
                         </>
                       )}
                     </td>
@@ -325,7 +324,6 @@ const TableContainer = styled.div`
 
 const MembersTable = styled.table`
   text-align: center;
-  width: 1140px;
 
   thead {
     background-color: var(--ma-primary-blue-50);
@@ -370,29 +368,6 @@ const LoadingContainer = styled.div`
   left: 0;
   right: 0;
   background-color: rgba(255, 255, 255, 0.6);
-`;
-
-const ButtonAtur = styled.span`
-  cursor: pointer;
-  color: #0d47a1;
-  border: #0d47a1 1px solid;
-  border-radius: 25px;
-  font-weight: 600;
-  &:hover {
-    background-color: #0d47a1;
-    color: #fff;
-    border: #0d47a1 1px solid;
-  }
-`;
-
-const ButtonAturDisabled = styled.span`
-  cursor: not-allowed;
-  color: #cccccc;
-  border: #395d92 1px solid;
-  border-radius: 25px;
-  font-weight: 600;
-  background-color: #395d92;
- 
 `;
 
 export { MemberTable };

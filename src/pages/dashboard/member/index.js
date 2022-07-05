@@ -57,11 +57,13 @@ function PageDosQualification() {
     setInputSearchQuery("");
   };
 
+  const contentTitle = "Peserta" + (type ? (isTeam ? " Beregu" : " Individu") : "");
+  const pageTitle = contentTitle + " | MyArchery.id"
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
   if (errorFetchingInitialCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi">
+      <ContentLayoutWrapper pageTitle={pageTitle}>
         <ViewWrapper>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
@@ -76,7 +78,7 @@ function PageDosQualification() {
 
   if (!isSettledCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi">
+      <ContentLayoutWrapper pageTitle={pageTitle}>
         <SpinnerDotBlock />
       </ContentLayoutWrapper>
     );
@@ -86,15 +88,15 @@ function PageDosQualification() {
     <React.Fragment>
       <div>
         <MetaTags>
-          <title>Dashboard | Peserta{type ? (isTeam ? " Beregu" : " Individu") : ""}</title>
+          <title>{pageTitle}</title>
         </MetaTags>
 
         <Container fluid>
           <BreadcrumbDashboard to={`/dashboard/event/${event_id}/home`}>
-            Peserta{type ? (isTeam ? " Beregu" : " Individu") : ""}
+            {contentTitle}
           </BreadcrumbDashboard>
-            <ProcessingToast />
-        
+          <ProcessingToast />
+
             <TabBar>
               <TabButtonList>
                 {optionsCompetitionCategory.map((option) => (
@@ -191,12 +193,11 @@ function PageDosQualification() {
               </ToolbarTop>
 
               <MemberTable
-                eventId={event_id}
                 key={activeCategoryDetail?.categoryDetailId}
-                categoryDetailId={activeCategoryDetail?.categoryDetailId}
+                isTeam={isTeam}
+                eventId={event_id}
+                categoryDetail={activeCategoryDetail}
                 searchName={inputSearchQuery}
-                onChangeParticipantPresence={resetOnChangeCategory}
-                eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
               />
             </ViewWrapper>
           </Container>

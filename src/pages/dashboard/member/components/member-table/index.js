@@ -7,12 +7,12 @@ import { Row, Col } from "reactstrap";
 import { EventsService } from "services";
 import logoUpdate from "../../../../../assets/images/myachery/update-category.png";
 
-function MemberTable({ categoryDetailId, searchName, eventId }) {
+function MemberTable({ categoryDetail, searchName, eventId, isTeam }) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
-  } = useScoringMembers({ categoryDetailId, inputSearchQuery: searchName, eventId });
+  } = useScoringMembers({ categoryDetail, inputSearchQuery: searchName, eventId, isTeam });
   
   const [ isOpenAlert, setIsOpenAlert ] = React.useState(false);
   const [ dataCategories, setDataCategories ] = React.useState([]);

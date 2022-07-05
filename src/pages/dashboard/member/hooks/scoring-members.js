@@ -4,12 +4,29 @@ import { EventsService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
-function useScoringMembers({ categoryDetailId, inputSearchQuery, eventId }) {
+function useScoringMembers({ categoryDetail, inputSearchQuery, eventId, isTeam = false }) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
+  const { categoryDetailId, originalCategoryDetail } = categoryDetail || {};
+  const { competitionCategoryId, ageCategoryId, teamCategoryId } = originalCategoryDetail || {};
 
   const fetchScoringMembers = () => {
     const getFunction = () => {
+      if (isTeam) {
+        return EventsService.getEventMemberTeam({
+          // biar gak paginate sementara
+          // TODO: implemen pagination
+          limit: 100,
+          page: 1,
+          event_id: eventId,
+          competition_category_id: competitionCategoryId,
+          // TODO: pakai buat search? sementara gak dikirim dulu
+          // name: inputSearchQuery || undefined,
+          age_category_id: ageCategoryId,
+          team_category_id: teamCategoryId,
+        });
+      }
+
       return EventsService.getEventMemberNew({
         event_category_id: categoryDetailId,
         // TODO: pakai buat search? sementara gak dikirim dulu

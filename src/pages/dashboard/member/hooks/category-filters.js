@@ -1,6 +1,6 @@
 import * as React from "react";
 
-function useCategoriesWithFilters(eventCategories) {
+function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
   const [filterState, dispatch] = React.useReducer(_filtersReducer, {
     competitionCategory: null,
     ageCategories: null,
@@ -25,7 +25,7 @@ function useCategoriesWithFilters(eventCategories) {
     if (!eventCategories) {
       return;
     }
-    dispatch({ type: "INIT", payload: eventCategories });
+    dispatch({ type: "INIT", payload: eventCategories, isTeam: isTeam });
   }, [eventCategories]);
 
   const optionsCompetitionCategory = React.useMemo(() => {
@@ -83,6 +83,7 @@ function _filtersReducer(state, action) {
         previousCompetitionCategory: state.competitionCategory,
         previousAgeCategories: state.ageCategories,
         previousGenderCategories: state.genderCategories,
+        isTeam: action.isTeam,
       });
 
       return updatedState;
@@ -128,13 +129,14 @@ function _makeFilteringState({
   previousCompetitionCategory = null,
   previousAgeCategories = null,
   previousGenderCategories = null,
+  isTeam = false,
 }) {
   if (!categoryDetails?.length) {
     return;
   }
 
   const categoryDetailsSortedByID = categoryDetails.sort((first, then) => first.id - then.id);
-  const groupedCategories = _runCategoriesGrouping(categoryDetailsSortedByID);
+  const groupedCategories = _runCategoriesGrouping(categoryDetailsSortedByID, isTeam);
   const competitionCategoryKeys = Object.keys(groupedCategories);
 
   const defaultAgeCategories =
@@ -170,7 +172,7 @@ function _getTeamLabelFromCategoryLabel(labelCategoryDetail) {
   return fragments[lastIndex];
 }
 
-function _runCategoriesGrouping(categoryDetailsSortedByID) {
+function _runCategoriesGrouping(categoryDetailsSortedByID, isTeam = false) {
   const categoriesInGroups = categoryDetailsSortedByID.reduce((groupingResult, categoryDetail) => {
     if (!categoryDetail.isShow) {
       return groupingResult;
@@ -180,7 +182,10 @@ function _runCategoriesGrouping(categoryDetailsSortedByID) {
     const classCategory = categoryDetail.classCategory;
     const genderCategory = categoryDetail.teamCategoryId;
 
-    if (genderCategory !== "individu male" && genderCategory !== "individu female") {
+    const isIndividualCategory = ["individu male", "individu female"].indexOf(genderCategory) > -1;
+    const isTeamCategory = ["male_team", "female_team", "mix_team"].indexOf(genderCategory) > -1;
+
+    if ((!isTeam && isTeamCategory) || (isTeam && isIndividualCategory)) {
       return groupingResult;
     }
 
@@ -244,7 +249,14 @@ function _makeOptionsGenderCategory(
   }
   return Object.keys(groupedCategoryDetails[activeCompetitionCategory][activeAgeCategory]).map(
     (teamCategoryId) => {
-      const labels = { "individu male": "Individu Putra", "individu female": "Individu Putri" };
+      const labels = {
+        "individu male": "Individu Putra",
+        "individu female": "Individu Putri",
+        male_team: "Beregu Putra",
+        female_team: "Beregu Putri",
+        mix_team: "Beregu Campuran",
+      };
+
       return {
         genderCategory: teamCategoryId,
         genderCategoryLabel: labels[teamCategoryId],

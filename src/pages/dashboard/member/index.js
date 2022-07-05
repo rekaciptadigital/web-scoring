@@ -1,7 +1,7 @@
 import * as React from "react";
 import { MetaTags } from "react-meta-tags";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
 import { useMemberDownload } from "./hooks/member-download";
@@ -23,7 +23,11 @@ import { Container } from "reactstrap";
 
 function PageDosQualification() {
   const { event_id } = useParams();
+  const { search } = useLocation();
+
   const eventId = parseInt(event_id);
+  const type = new URLSearchParams(search).get("type");
+  const isTeam = type === "team";
 
   const {
     data: categoryDetails,
@@ -39,7 +43,7 @@ function PageDosQualification() {
     selectOptionCompetitionCategory,
     selectOptionAgeCategory,
     selectOptionGenderCategory,
-  } = useCategoriesWithFilters(categoryDetails);
+  } = useCategoriesWithFilters({ eventCategories: categoryDetails, isTeam: isTeam });
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
 
@@ -82,11 +86,12 @@ function PageDosQualification() {
     <React.Fragment>
       <div>
         <MetaTags>
-          <title>Dashboard | List - Member</title>
+          <title>Dashboard | Peserta{type ? (isTeam ? " Beregu" : " Individu") : ""}</title>
         </MetaTags>
+
         <Container fluid>
           <BreadcrumbDashboard to={`/dashboard/event/${event_id}/home`}>
-            List Member
+            Peserta{type ? (isTeam ? " Beregu" : " Individu") : ""}
           </BreadcrumbDashboard>
             <ProcessingToast />
         

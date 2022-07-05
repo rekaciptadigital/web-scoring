@@ -7,19 +7,12 @@ import { Row, Col } from "reactstrap";
 import { EventsService } from "services";
 import logoUpdate from "../../../../../assets/images/myachery/update-category.png";
 
-function MemberTable({
-  categoryDetailId,
-  eliminationParticipantsCount,
-  searchName,
-  eventId,
-}) {
-  
+function MemberTable({ categoryDetailId, searchName, eventId }) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
-
-  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, eventId);
+  } = useScoringMembers({ categoryDetailId, inputSearchQuery: searchName, eventId });
   
   const [ isOpenAlert, setIsOpenAlert ] = React.useState(false);
   const [ dataCategories, setDataCategories ] = React.useState([]);
@@ -96,9 +89,7 @@ function MemberTable({
             <tbody>
               {scoringMembers?.map((row) => {
                 return (
-                  <tr
-                    key={row.member.id}
-                  >
+                  <tr key={row.participantId}>
                     {/* <td className="name">{row?.member?.No}</td> */}
                     <td className="name">{row?.member?.name}</td>
                     <td className="name">
@@ -188,6 +179,7 @@ function MemberTable({
       <SweetAlert
           show={isOpenAlert}
           title=""
+          onConfirm={() => {}}
           custom
           style={{ width: 1100, borderRadius: "1.25rem" }}
           customButtons={
@@ -243,6 +235,7 @@ function MemberTable({
         <SweetAlert
           show={isUpdateCategory}
           title=""
+          onConfirm={() => {}}
           custom
           style={{ width: 740, borderRadius: "1.25rem" }}
           customButtons={
@@ -389,7 +382,7 @@ const ButtonAtur = styled.span`
     background-color: #0d47a1;
     color: #fff;
     border: #0d47a1 1px solid;
-
+  }
 `;
 
 const ButtonAturDisabled = styled.span`

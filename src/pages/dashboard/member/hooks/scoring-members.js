@@ -4,7 +4,7 @@ import { EventsService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
-function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationParticipantsCount, eventId) {
+function useScoringMembers({ categoryDetailId, inputSearchQuery, eventId }) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
 
@@ -12,8 +12,8 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
     const getFunction = () => {
       return EventsService.getEventMemberNew({
         event_category_id: categoryDetailId,
-        name: debouncedSearchQuery || undefined,
-        elimination_template: eliminationParticipantsCount,
+        // TODO: pakai buat search? sementara gak dikirim dulu
+        // name: debouncedSearchQuery || undefined,
         event_id: eventId,
         is_pagination: 1,
       });
@@ -26,7 +26,7 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
       return;
     }
     fetchScoringMembers();
-  }, [categoryDetailId, eliminationParticipantsCount, debouncedSearchQuery]);
+  }, [categoryDetailId, debouncedSearchQuery]);
 
   React.useEffect(() => {
     const debounceTimer = setTimeout(() => {

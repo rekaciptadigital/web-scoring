@@ -165,31 +165,33 @@ function PageDosQualification() {
                   </CategoryFilter>
                 </FilterBars>
 
-                <ToolbarRight>
-                  <HorizontalSpaced>
-                    <ButtonOutlineBlue
-                      onClick={() => {
-                        toast.loading("Sedang menyiapkan dokumen ID card...");
-                        handleDownloadIdCard({
-                          onSuccess() {
-                            toast.dismiss();
-                            toast.success("ID card siap diunduh");
-                          },
-                          onError() {
-                            toast.dismiss();
-                            toast.error("Gagal mengunduh ID card");
-                          }
-                        });
-                      }}
-                    >
-                      <span>
-                        <IconDownload size="16" />
-                      </span>{" "}
-                      <span>Unduh ID Card</span>
-                    </ButtonOutlineBlue>
-                    <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
-                  </HorizontalSpaced>
-                </ToolbarRight>
+                {!isTeam && (
+                  <ToolbarRight>
+                    <HorizontalSpaced>
+                      <ButtonOutlineBlue
+                        onClick={() => {
+                          toast.loading("Sedang menyiapkan dokumen ID card...");
+                          handleDownloadIdCard({
+                            onSuccess() {
+                              toast.dismiss();
+                              toast.success("ID card siap diunduh");
+                            },
+                            onError() {
+                              toast.dismiss();
+                              toast.error("Gagal mengunduh ID card");
+                            }
+                          });
+                        }}
+                      >
+                        <span>
+                          <IconDownload size="16" />
+                        </span>{" "}
+                        <span>Unduh ID Card</span>
+                      </ButtonOutlineBlue>
+                      <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
+                    </HorizontalSpaced>
+                  </ToolbarRight>
+                )}
               </ToolbarTop>
 
               <MemberTable

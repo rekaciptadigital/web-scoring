@@ -4,7 +4,13 @@ import { EventsService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
-function useScoringMembers({ categoryDetail, inputSearchQuery, eventId, isTeam = false }) {
+function useScoringMembers({
+  categoryDetail,
+  inputSearchQuery,
+  eventId,
+  isTeam = false,
+  status = 0,
+}) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
   const { categoryDetailId, originalCategoryDetail } = categoryDetail || {};
@@ -20,19 +26,21 @@ function useScoringMembers({ categoryDetail, inputSearchQuery, eventId, isTeam =
           page: 1,
           event_id: eventId,
           competition_category_id: competitionCategoryId,
-          // TODO: pakai buat search? sementara gak dikirim dulu
-          // name: inputSearchQuery || undefined,
           age_category_id: ageCategoryId,
           team_category_id: teamCategoryId,
+          status: status || undefined,
+          // TODO: pakai buat search? sementara gak dikirim dulu
+          // name: inputSearchQuery || undefined,
         });
       }
 
       return EventsService.getEventMemberNew({
+        is_pagination: 1,
+        event_id: eventId,
         event_category_id: categoryDetailId,
+        status: status || undefined,
         // TODO: pakai buat search? sementara gak dikirim dulu
         // name: debouncedSearchQuery || undefined,
-        event_id: eventId,
-        is_pagination: 1,
       });
     };
     fetcher.runAsync(getFunction, { transform });
@@ -43,7 +51,7 @@ function useScoringMembers({ categoryDetail, inputSearchQuery, eventId, isTeam =
       return;
     }
     fetchScoringMembers();
-  }, [categoryDetailId, debouncedSearchQuery]);
+  }, [isTeam, categoryDetailId, debouncedSearchQuery, status]);
 
   React.useEffect(() => {
     const debounceTimer = setTimeout(() => {

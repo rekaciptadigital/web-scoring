@@ -6,6 +6,7 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
     ageCategories: null,
     genderCategories: null,
     categoryDetails: null,
+    paymentStatus: null,
   });
 
   const {
@@ -13,6 +14,7 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
     ageCategories,
     genderCategories,
     categoryDetails,
+    paymentStatus,
   } = filterState;
 
   const activeAgeCategory = ageCategories?.[activeCompetitionCategory];
@@ -20,6 +22,7 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
   const activeCategoryDetail =
     categoryDetails?.[activeCompetitionCategory]?.[activeAgeCategory]?.[activeGenderCategory] ||
     null;
+  const activePaymentStatus = paymentStatus?.[activeCompetitionCategory];
 
   React.useEffect(() => {
     if (!eventCategories) {
@@ -45,6 +48,11 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
     );
   }, [categoryDetails, activeCompetitionCategory, activeAgeCategory, activeGenderCategory]);
 
+  const optionsPaymentStatus = React.useMemo(
+    () => _makeOptionsPaymentStatus(activePaymentStatus),
+    [activePaymentStatus]
+  );
+
   const selectOptionCompetitionCategory = (competitionCategory) => {
     dispatch({ type: "UPDATE_COMPETITION_CATEGORY", payload: competitionCategory });
   };
@@ -57,17 +65,24 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
     dispatch({ type: "UPDATE_GENDER_CATEGORY", payload: genderCategory });
   };
 
+  const selectOptionPaymentStatus = (statusId) => {
+    dispatch({ type: "UPDATE_PAYMENT_STATUS", payload: statusId });
+  };
+
   return {
     activeCompetitionCategory,
     activeAgeCategory,
     activeGenderCategory,
     activeCategoryDetail,
+    activePaymentStatus,
     optionsCompetitionCategory,
     optionsAgeCategory,
     optionsGenderCategory,
+    optionsPaymentStatus,
     selectOptionCompetitionCategory,
     selectOptionAgeCategory,
     selectOptionGenderCategory,
+    selectOptionPaymentStatus,
   };
 }
 
@@ -115,6 +130,17 @@ function _filtersReducer(state, action) {
       };
     }
 
+    case "UPDATE_PAYMENT_STATUS": {
+      const activeCompetitionCategory = state.competitionCategory;
+      return {
+        ...state,
+        paymentStatus: {
+          ...state.paymentStatus,
+          [activeCompetitionCategory]: action.payload,
+        },
+      };
+    }
+
     default: {
       return state;
     }
@@ -139,6 +165,8 @@ function _makeFilteringState({
   const groupedCategories = _runCategoriesGrouping(categoryDetailsSortedByID, isTeam);
   const competitionCategoryKeys = Object.keys(groupedCategories);
 
+  const defaultCompetitionCategory = previousCompetitionCategory || competitionCategoryKeys[0];
+
   const defaultAgeCategories =
     previousAgeCategories ||
     competitionCategoryKeys.reduce((ageCategories, competitionCategory) => {
@@ -158,11 +186,14 @@ function _makeFilteringState({
       return genderCategoriesInGroups;
     }, {});
 
+  const defaultPaymentStatus = { [defaultCompetitionCategory]: 1 };
+
   return {
-    competitionCategory: previousCompetitionCategory || competitionCategoryKeys[0],
+    competitionCategory: defaultCompetitionCategory,
     ageCategories: defaultAgeCategories,
     genderCategories: defaultGenderCategories,
     categoryDetails: groupedCategories,
+    paymentStatus: defaultPaymentStatus,
   };
 }
 
@@ -264,6 +295,20 @@ function _makeOptionsGenderCategory(
       };
     }
   );
+}
+
+function _makeOptionsPaymentStatus(activePaymentStatus = 1) {
+  const defaultOptions = [
+    { status: 1, label: "Lunas" },
+    { status: 4, label: "Belum Lunas" },
+    { status: 2, label: "Expired" },
+    { status: 3, label: "Gagal" },
+    { status: 0, label: "Semua" },
+  ];
+  return defaultOptions.map((payment) => ({
+    ...payment,
+    isActive: payment.status === activePaymentStatus,
+  }));
 }
 
 export { useCategoriesWithFilters };

@@ -37,12 +37,15 @@ function PageDosQualification() {
 
   const {
     activeCategoryDetail,
+    activePaymentStatus,
     optionsCompetitionCategory,
     optionsAgeCategory,
     optionsGenderCategory,
+    optionsPaymentStatus,
     selectOptionCompetitionCategory,
     selectOptionAgeCategory,
     selectOptionGenderCategory,
+    selectOptionPaymentStatus,
   } = useCategoriesWithFilters({ eventCategories: categoryDetails, isTeam: isTeam });
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
@@ -163,6 +166,28 @@ function PageDosQualification() {
                       )}
                     </FilterList>
                   </CategoryFilter>
+
+                  <CategoryFilter>
+                    <FilterLabel>Status Pembayaran:</FilterLabel>
+                    <FilterList>
+                      {optionsPaymentStatus?.length > 0 ? (
+                        optionsPaymentStatus.map((option) => (
+                          <li key={option.status}>
+                            <FilterItemButton
+                              className={classnames({ "filter-item-active": option.isActive })}
+                              onClick={() => {
+                                selectOptionPaymentStatus(option.status);
+                              }}
+                            >
+                              {option.label}
+                            </FilterItemButton>
+                          </li>
+                        ))
+                      ) : (
+                        <li>Tidak tersedia filter status pembayaran</li>
+                      )}
+                    </FilterList>
+                  </CategoryFilter>
                 </FilterBars>
 
                 {!isTeam && (
@@ -200,6 +225,7 @@ function PageDosQualification() {
                 eventId={event_id}
                 categoryDetail={activeCategoryDetail}
                 searchName={inputSearchQuery}
+                paymentStatus={activePaymentStatus}
               />
             </ViewWrapper>
           </Container>
@@ -315,7 +341,7 @@ const CategoryFilter = styled.div`
 
   > *:nth-child(1) {
     flex-shrink: 0;
-    min-width: 6.25rem;
+    width: 7.5rem;
   }
 
   > *:nth-child(2) {

@@ -1,18 +1,24 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
-import { LoadingScreen, SpinnerDotBlock, ButtonBlue, Button, ButtonOutlineBlue } from "components/ma";
+import { SpinnerDotBlock, ButtonBlue, Button, ButtonOutlineBlue } from "components/ma";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Row, Col } from "reactstrap";
 import { EventsService } from "services";
-import logoUpdate from "../../../../../assets/images/myachery/update-category.png";
+import logoUpdate from "assets/images/myachery/update-category.png";
 
-function MemberTable({ categoryDetail, searchName, eventId, isTeam }) {
+function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatus }) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
-  } = useScoringMembers({ categoryDetail, inputSearchQuery: searchName, eventId, isTeam });
+  } = useScoringMembers({
+    categoryDetail,
+    inputSearchQuery: searchName,
+    eventId,
+    isTeam,
+    status: paymentStatus,
+  });
   
   const [ isOpenAlert, setIsOpenAlert ] = React.useState(false);
   const [ dataCategories, setDataCategories ] = React.useState([]);
@@ -61,13 +67,20 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam }) {
   }
 
   if (!scoringMembers?.length) {
-    return <EmptyMembers>Tidak ada peserta di kategori ini</EmptyMembers>;
+    return (
+      <React.Fragment>
+        <EmptyMembers>
+          <div>
+            Tidak ada peserta {paymentStatus === 1 || paymentStatus === 0 ? "di kategori ini" : ""}
+          </div>
+          <LoadingBlocker isLoading={isLoadingScoringMembers} />
+        </EmptyMembers>
+      </React.Fragment>
+    );
   }
 
   return (
     <React.Fragment>
-      <LoadingScreen />
-
       <TableContainer>
         <div style={{overflowX: 'auto'}}>
           <LoadingBlocker isLoading={isLoadingScoringMembers} />
@@ -291,6 +304,7 @@ const GrayedOutText = styled.span`
 `;
 
 const EmptyMembers = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;

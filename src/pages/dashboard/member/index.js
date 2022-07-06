@@ -1,7 +1,7 @@
 import * as React from "react";
 import { MetaTags } from "react-meta-tags";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
 import { useMemberDownload } from "./hooks/member-download";
@@ -23,7 +23,11 @@ import { Container } from "reactstrap";
 
 function PageDosQualification() {
   const { event_id } = useParams();
+  const { search } = useLocation();
+
   const eventId = parseInt(event_id);
+  const type = new URLSearchParams(search).get("type");
+  const isTeam = type === "team";
 
   const {
     data: categoryDetails,
@@ -33,13 +37,16 @@ function PageDosQualification() {
 
   const {
     activeCategoryDetail,
+    activePaymentStatus,
     optionsCompetitionCategory,
     optionsAgeCategory,
     optionsGenderCategory,
+    optionsPaymentStatus,
     selectOptionCompetitionCategory,
     selectOptionAgeCategory,
     selectOptionGenderCategory,
-  } = useCategoriesWithFilters(categoryDetails);
+    selectOptionPaymentStatus,
+  } = useCategoriesWithFilters({ eventCategories: categoryDetails, isTeam: isTeam });
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
 
@@ -53,11 +60,13 @@ function PageDosQualification() {
     setInputSearchQuery("");
   };
 
+  const contentTitle = "Peserta" + (type ? (isTeam ? " Beregu" : " Individu") : "");
+  const pageTitle = contentTitle + " | MyArchery.id"
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
   if (errorFetchingInitialCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi">
+      <ContentLayoutWrapper pageTitle={pageTitle}>
         <ViewWrapper>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
@@ -72,7 +81,7 @@ function PageDosQualification() {
 
   if (!isSettledCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi">
+      <ContentLayoutWrapper pageTitle={pageTitle}>
         <SpinnerDotBlock />
       </ContentLayoutWrapper>
     );
@@ -82,14 +91,15 @@ function PageDosQualification() {
     <React.Fragment>
       <div>
         <MetaTags>
-          <title>Dashboard | List - Member</title>
+          <title>{pageTitle}</title>
         </MetaTags>
+
         <Container fluid>
           <BreadcrumbDashboard to={`/dashboard/event/${event_id}/home`}>
-            List Member
+            {contentTitle}
           </BreadcrumbDashboard>
-            <ProcessingToast />
-        
+          <ProcessingToast />
+
             <TabBar>
               <TabButtonList>
                 {optionsCompetitionCategory.map((option) => (
@@ -156,42 +166,66 @@ function PageDosQualification() {
                       )}
                     </FilterList>
                   </CategoryFilter>
+
+                  <CategoryFilter>
+                    <FilterLabel>Status Pembayaran:</FilterLabel>
+                    <FilterList>
+                      {optionsPaymentStatus?.length > 0 ? (
+                        optionsPaymentStatus.map((option) => (
+                          <li key={option.status}>
+                            <FilterItemButton
+                              className={classnames({ "filter-item-active": option.isActive })}
+                              onClick={() => {
+                                selectOptionPaymentStatus(option.status);
+                              }}
+                            >
+                              {option.label}
+                            </FilterItemButton>
+                          </li>
+                        ))
+                      ) : (
+                        <li>Tidak tersedia filter status pembayaran</li>
+                      )}
+                    </FilterList>
+                  </CategoryFilter>
                 </FilterBars>
 
-                <ToolbarRight>
-                  <HorizontalSpaced>
-                    <ButtonOutlineBlue
-                      onClick={() => {
-                        toast.loading("Sedang menyiapkan dokumen ID card...");
-                        handleDownloadIdCard({
-                          onSuccess() {
-                            toast.dismiss();
-                            toast.success("ID card siap diunduh");
-                          },
-                          onError() {
-                            toast.dismiss();
-                            toast.error("Gagal mengunduh ID card");
-                          }
-                        });
-                      }}
-                    >
-                      <span>
-                        <IconDownload size="16" />
-                      </span>{" "}
-                      <span>Unduh ID Card</span>
-                    </ButtonOutlineBlue>
-                    <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
-                  </HorizontalSpaced>
-                </ToolbarRight>
+                {!isTeam && (
+                  <ToolbarRight>
+                    <HorizontalSpaced>
+                      <ButtonOutlineBlue
+                        onClick={() => {
+                          toast.loading("Sedang menyiapkan dokumen ID card...");
+                          handleDownloadIdCard({
+                            onSuccess() {
+                              toast.dismiss();
+                              toast.success("ID card siap diunduh");
+                            },
+                            onError() {
+                              toast.dismiss();
+                              toast.error("Gagal mengunduh ID card");
+                            }
+                          });
+                        }}
+                      >
+                        <span>
+                          <IconDownload size="16" />
+                        </span>{" "}
+                        <span>Unduh ID Card</span>
+                      </ButtonOutlineBlue>
+                      <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
+                    </HorizontalSpaced>
+                  </ToolbarRight>
+                )}
               </ToolbarTop>
 
               <MemberTable
-                eventId={event_id}
                 key={activeCategoryDetail?.categoryDetailId}
-                categoryDetailId={activeCategoryDetail?.categoryDetailId}
+                isTeam={isTeam}
+                eventId={event_id}
+                categoryDetail={activeCategoryDetail}
                 searchName={inputSearchQuery}
-                onChangeParticipantPresence={resetOnChangeCategory}
-                eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
+                paymentStatus={activePaymentStatus}
               />
             </ViewWrapper>
           </Container>
@@ -307,7 +341,7 @@ const CategoryFilter = styled.div`
 
   > *:nth-child(1) {
     flex-shrink: 0;
-    min-width: 6.25rem;
+    width: 7.5rem;
   }
 
   > *:nth-child(2) {

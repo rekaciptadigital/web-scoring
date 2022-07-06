@@ -4,18 +4,43 @@ import { EventsService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
-function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationParticipantsCount, eventId) {
+function useScoringMembers({
+  categoryDetail,
+  inputSearchQuery,
+  eventId,
+  isTeam = false,
+  status = 0,
+}) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
+  const { categoryDetailId, originalCategoryDetail } = categoryDetail || {};
+  const { competitionCategoryId, ageCategoryId, teamCategoryId } = originalCategoryDetail || {};
 
   const fetchScoringMembers = () => {
     const getFunction = () => {
+      if (isTeam) {
+        return EventsService.getEventMemberTeam({
+          // biar gak paginate sementara
+          // TODO: implemen pagination
+          limit: 100,
+          page: 1,
+          event_id: eventId,
+          competition_category_id: competitionCategoryId,
+          age_category_id: ageCategoryId,
+          team_category_id: teamCategoryId,
+          status: status || undefined,
+          // TODO: pakai buat search? sementara gak dikirim dulu
+          // name: inputSearchQuery || undefined,
+        });
+      }
+
       return EventsService.getEventMemberNew({
-        event_category_id: categoryDetailId,
-        name: debouncedSearchQuery || undefined,
-        elimination_template: eliminationParticipantsCount,
-        event_id: eventId,
         is_pagination: 1,
+        event_id: eventId,
+        event_category_id: categoryDetailId,
+        status: status || undefined,
+        // TODO: pakai buat search? sementara gak dikirim dulu
+        // name: debouncedSearchQuery || undefined,
       });
     };
     fetcher.runAsync(getFunction, { transform });
@@ -26,7 +51,7 @@ function useScoringMembers(categoryDetailId, inputSearchQuery, eliminationPartic
       return;
     }
     fetchScoringMembers();
-  }, [categoryDetailId, eliminationParticipantsCount, debouncedSearchQuery]);
+  }, [isTeam, categoryDetailId, debouncedSearchQuery, status]);
 
   React.useEffect(() => {
     const debounceTimer = setTimeout(() => {

@@ -1,11 +1,12 @@
 import * as React from "react";
 
-function useCategoriesWithFilters(eventCategories) {
+function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
   const [filterState, dispatch] = React.useReducer(_filtersReducer, {
     competitionCategory: null,
     ageCategories: null,
     genderCategories: null,
     categoryDetails: null,
+    paymentStatus: null,
   });
 
   const {
@@ -13,6 +14,7 @@ function useCategoriesWithFilters(eventCategories) {
     ageCategories,
     genderCategories,
     categoryDetails,
+    paymentStatus,
   } = filterState;
 
   const activeAgeCategory = ageCategories?.[activeCompetitionCategory];
@@ -20,12 +22,13 @@ function useCategoriesWithFilters(eventCategories) {
   const activeCategoryDetail =
     categoryDetails?.[activeCompetitionCategory]?.[activeAgeCategory]?.[activeGenderCategory] ||
     null;
+  const activePaymentStatus = paymentStatus?.[activeCompetitionCategory];
 
   React.useEffect(() => {
     if (!eventCategories) {
       return;
     }
-    dispatch({ type: "INIT", payload: eventCategories });
+    dispatch({ type: "INIT", payload: eventCategories, isTeam: isTeam });
   }, [eventCategories]);
 
   const optionsCompetitionCategory = React.useMemo(() => {
@@ -45,6 +48,11 @@ function useCategoriesWithFilters(eventCategories) {
     );
   }, [categoryDetails, activeCompetitionCategory, activeAgeCategory, activeGenderCategory]);
 
+  const optionsPaymentStatus = React.useMemo(
+    () => _makeOptionsPaymentStatus(activePaymentStatus),
+    [activePaymentStatus]
+  );
+
   const selectOptionCompetitionCategory = (competitionCategory) => {
     dispatch({ type: "UPDATE_COMPETITION_CATEGORY", payload: competitionCategory });
   };
@@ -57,17 +65,24 @@ function useCategoriesWithFilters(eventCategories) {
     dispatch({ type: "UPDATE_GENDER_CATEGORY", payload: genderCategory });
   };
 
+  const selectOptionPaymentStatus = (statusId) => {
+    dispatch({ type: "UPDATE_PAYMENT_STATUS", payload: statusId });
+  };
+
   return {
     activeCompetitionCategory,
     activeAgeCategory,
     activeGenderCategory,
     activeCategoryDetail,
+    activePaymentStatus,
     optionsCompetitionCategory,
     optionsAgeCategory,
     optionsGenderCategory,
+    optionsPaymentStatus,
     selectOptionCompetitionCategory,
     selectOptionAgeCategory,
     selectOptionGenderCategory,
+    selectOptionPaymentStatus,
   };
 }
 
@@ -83,6 +98,7 @@ function _filtersReducer(state, action) {
         previousCompetitionCategory: state.competitionCategory,
         previousAgeCategories: state.ageCategories,
         previousGenderCategories: state.genderCategories,
+        isTeam: action.isTeam,
       });
 
       return updatedState;
@@ -114,6 +130,17 @@ function _filtersReducer(state, action) {
       };
     }
 
+    case "UPDATE_PAYMENT_STATUS": {
+      const activeCompetitionCategory = state.competitionCategory;
+      return {
+        ...state,
+        paymentStatus: {
+          ...state.paymentStatus,
+          [activeCompetitionCategory]: action.payload,
+        },
+      };
+    }
+
     default: {
       return state;
     }
@@ -128,14 +155,17 @@ function _makeFilteringState({
   previousCompetitionCategory = null,
   previousAgeCategories = null,
   previousGenderCategories = null,
+  isTeam = false,
 }) {
   if (!categoryDetails?.length) {
     return;
   }
 
   const categoryDetailsSortedByID = categoryDetails.sort((first, then) => first.id - then.id);
-  const groupedCategories = _runCategoriesGrouping(categoryDetailsSortedByID);
+  const groupedCategories = _runCategoriesGrouping(categoryDetailsSortedByID, isTeam);
   const competitionCategoryKeys = Object.keys(groupedCategories);
+
+  const defaultCompetitionCategory = previousCompetitionCategory || competitionCategoryKeys[0];
 
   const defaultAgeCategories =
     previousAgeCategories ||
@@ -156,11 +186,14 @@ function _makeFilteringState({
       return genderCategoriesInGroups;
     }, {});
 
+  const defaultPaymentStatus = { [defaultCompetitionCategory]: 1 };
+
   return {
-    competitionCategory: previousCompetitionCategory || competitionCategoryKeys[0],
+    competitionCategory: defaultCompetitionCategory,
     ageCategories: defaultAgeCategories,
     genderCategories: defaultGenderCategories,
     categoryDetails: groupedCategories,
+    paymentStatus: defaultPaymentStatus,
   };
 }
 
@@ -170,7 +203,7 @@ function _getTeamLabelFromCategoryLabel(labelCategoryDetail) {
   return fragments[lastIndex];
 }
 
-function _runCategoriesGrouping(categoryDetailsSortedByID) {
+function _runCategoriesGrouping(categoryDetailsSortedByID, isTeam = false) {
   const categoriesInGroups = categoryDetailsSortedByID.reduce((groupingResult, categoryDetail) => {
     if (!categoryDetail.isShow) {
       return groupingResult;
@@ -180,7 +213,10 @@ function _runCategoriesGrouping(categoryDetailsSortedByID) {
     const classCategory = categoryDetail.classCategory;
     const genderCategory = categoryDetail.teamCategoryId;
 
-    if (genderCategory !== "individu male" && genderCategory !== "individu female") {
+    const isIndividualCategory = ["individu male", "individu female"].indexOf(genderCategory) > -1;
+    const isTeamCategory = ["male_team", "female_team", "mix_team"].indexOf(genderCategory) > -1;
+
+    if ((!isTeam && isTeamCategory) || (isTeam && isIndividualCategory)) {
       return groupingResult;
     }
 
@@ -244,7 +280,14 @@ function _makeOptionsGenderCategory(
   }
   return Object.keys(groupedCategoryDetails[activeCompetitionCategory][activeAgeCategory]).map(
     (teamCategoryId) => {
-      const labels = { "individu male": "Individu Putra", "individu female": "Individu Putri" };
+      const labels = {
+        "individu male": "Individu Putra",
+        "individu female": "Individu Putri",
+        male_team: "Beregu Putra",
+        female_team: "Beregu Putri",
+        mix_team: "Beregu Campuran",
+      };
+
       return {
         genderCategory: teamCategoryId,
         genderCategoryLabel: labels[teamCategoryId],
@@ -252,6 +295,20 @@ function _makeOptionsGenderCategory(
       };
     }
   );
+}
+
+function _makeOptionsPaymentStatus(activePaymentStatus = 1) {
+  const defaultOptions = [
+    { status: 1, label: "Lunas" },
+    { status: 4, label: "Belum Lunas" },
+    { status: 2, label: "Expired" },
+    { status: 3, label: "Gagal" },
+    { status: 0, label: "Semua" },
+  ];
+  return defaultOptions.map((payment) => ({
+    ...payment,
+    isActive: payment.status === activePaymentStatus,
+  }));
 }
 
 export { useCategoriesWithFilters };

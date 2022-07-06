@@ -88,10 +88,9 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
         <MembersTable className="table table-responsive">
           <thead>
             <tr>
+              <th>No.</th>
               <th className="name">Nama Peserta</th>
               <th className="name">Nama Klub</th>
-              <th className="name">Kategori Lomba</th>
-              <th className="name">Kelas</th>
               <th className="name">Email</th>
               <th className="name">Telepon</th>
               <th className="name">Status Pembayaran</th>
@@ -100,16 +99,11 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
           </thead>
 
           <tbody>
-            {scoringMembers?.map((row) => {
+            {scoringMembers?.map((row, index) => {
               return (
                 <tr key={row.participantId}>
+                  <td>{index + 1}.</td>
                   <td className="name">{row?.member?.name}</td>
-                  <td className="name">
-                    <ClubName>{row?.member?.clubName}</ClubName>
-                  </td>
-                  <td className="name">
-                    <ClubName>{row?.member?.competitionCategoryId}</ClubName>
-                  </td>
                   <td className="name">
                     <ClubName>{row?.member?.clubName}</ClubName>
                   </td>

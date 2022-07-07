@@ -303,6 +303,7 @@ function _makeOptionsPaymentStatus(activePaymentStatus = 1) {
     { status: 4, label: "Belum Lunas" },
     { status: 2, label: "Expired" },
     { status: 3, label: "Gagal" },
+    { status: 5, label: "Refund" },
     { status: 0, label: "Semua" },
   ];
   return defaultOptions.map((payment) => ({

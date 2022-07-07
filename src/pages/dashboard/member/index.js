@@ -7,11 +7,7 @@ import { useCategoriesWithFilters } from "./hooks/category-filters";
 import { useMemberDownload } from "./hooks/member-download";
 import { BreadcrumbDashboard } from "../events/components/breadcrumb";
 
-import {
-  SpinnerDotBlock,
-  ButtonOutlineBlue,
-  AlertSubmitError
-} from "components/ma";
+import { SpinnerDotBlock, ButtonBlue, AlertSubmitError } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { MemberTable } from "./components/member-table";
 import { ProcessingToast, toast } from "./components/processing-toast";
@@ -61,7 +57,7 @@ function PageDosQualification() {
   };
 
   const contentTitle = "Peserta" + (type ? (isTeam ? " Beregu" : " Individu") : "");
-  const pageTitle = contentTitle + " | MyArchery.id"
+  const pageTitle = contentTitle + " | MyArchery.id";
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
   if (errorFetchingInitialCategories) {
@@ -100,137 +96,137 @@ function PageDosQualification() {
           </BreadcrumbDashboard>
           <ProcessingToast />
 
-            <TabBar>
-              <TabButtonList>
-                {optionsCompetitionCategory.map((option) => (
-                  <li key={option.competitionCategory}>
-                    <TabButton
-                      className={classnames({ "tab-active": option.isActive })}
+          <TabBar>
+            <TabButtonList>
+              {optionsCompetitionCategory.map((option) => (
+                <li key={option.competitionCategory}>
+                  <TabButton
+                    className={classnames({ "tab-active": option.isActive })}
+                    onClick={() => {
+                      resetOnChangeCategory();
+                      selectOptionCompetitionCategory(option.competitionCategory);
+                    }}
+                  >
+                    {option.competitionCategory}
+                  </TabButton>
+                </li>
+              ))}
+            </TabButtonList>
+          </TabBar>
+
+          <ViewWrapper>
+            <ToolbarTop>
+              <FilterBars>
+                <CategoryFilter>
+                  <FilterLabel>Kelas:</FilterLabel>
+                  <FilterList>
+                    {optionsAgeCategory?.length > 0 ? (
+                      optionsAgeCategory.map((option) => (
+                        <li key={option.ageCategory}>
+                          <FilterItemButton
+                            className={classnames({ "filter-item-active": option.isActive })}
+                            onClick={() => {
+                              resetOnChangeCategory();
+                              selectOptionAgeCategory(option.ageCategory);
+                            }}
+                          >
+                            {option.ageCategory}
+                          </FilterItemButton>
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak tersedia filter kelas</li>
+                    )}
+                  </FilterList>
+                </CategoryFilter>
+
+                <CategoryFilter>
+                  <FilterLabel>Jenis Regu:</FilterLabel>
+                  <FilterList>
+                    {optionsGenderCategory?.length > 0 ? (
+                      optionsGenderCategory.map((option) => (
+                        <li key={option.genderCategory}>
+                          <FilterItemButton
+                            className={classnames({ "filter-item-active": option.isActive })}
+                            onClick={() => {
+                              resetOnChangeCategory();
+                              selectOptionGenderCategory(option.genderCategory);
+                            }}
+                          >
+                            {option.genderCategoryLabel}
+                          </FilterItemButton>
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak tersedia filter jenis regu</li>
+                    )}
+                  </FilterList>
+                </CategoryFilter>
+
+                <CategoryFilter>
+                  <FilterLabel>Status Pembayaran:</FilterLabel>
+                  <FilterList>
+                    {optionsPaymentStatus?.length > 0 ? (
+                      optionsPaymentStatus.map((option) => (
+                        <li key={option.status}>
+                          <FilterItemButton
+                            className={classnames({ "filter-item-active": option.isActive })}
+                            onClick={() => {
+                              selectOptionPaymentStatus(option.status);
+                            }}
+                          >
+                            {option.label}
+                          </FilterItemButton>
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak tersedia filter status pembayaran</li>
+                    )}
+                  </FilterList>
+                </CategoryFilter>
+              </FilterBars>
+
+              {!isTeam && (
+                <ToolbarRight>
+                  <HorizontalSpaced>
+                    <ButtonBlue
                       onClick={() => {
-                        resetOnChangeCategory();
-                        selectOptionCompetitionCategory(option.competitionCategory);
+                        toast.loading("Sedang menyiapkan dokumen ID card...");
+                        handleDownloadIdCard({
+                          onSuccess() {
+                            toast.dismiss();
+                            toast.success("ID card siap diunduh");
+                          },
+                          onError() {
+                            toast.dismiss();
+                            toast.error("Gagal mengunduh ID card");
+                          },
+                        });
                       }}
                     >
-                      {option.competitionCategory}
-                    </TabButton>
-                  </li>
-                ))}
-              </TabButtonList>
-            </TabBar>
+                      <span>
+                        <IconDownload size="16" />
+                      </span>{" "}
+                      <span>Unduh ID Card</span>
+                    </ButtonBlue>
+                    <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
+                  </HorizontalSpaced>
+                </ToolbarRight>
+              )}
+            </ToolbarTop>
 
-            <ViewWrapper>
-              <ToolbarTop>
-                <FilterBars>
-                  <CategoryFilter>
-                    <FilterLabel>Kelas:</FilterLabel>
-                    <FilterList>
-                      {optionsAgeCategory?.length > 0 ? (
-                        optionsAgeCategory.map((option) => (
-                          <li key={option.ageCategory}>
-                            <FilterItemButton
-                              className={classnames({ "filter-item-active": option.isActive })}
-                              onClick={() => {
-                                resetOnChangeCategory();
-                                selectOptionAgeCategory(option.ageCategory);
-                              }}
-                            >
-                              {option.ageCategory}
-                            </FilterItemButton>
-                          </li>
-                        ))
-                      ) : (
-                        <li>Tidak tersedia filter kelas</li>
-                      )}
-                    </FilterList>
-                  </CategoryFilter>
-
-                  <CategoryFilter>
-                    <FilterLabel>Jenis Regu:</FilterLabel>
-                    <FilterList>
-                      {optionsGenderCategory?.length > 0 ? (
-                        optionsGenderCategory.map((option) => (
-                          <li key={option.genderCategory}>
-                            <FilterItemButton
-                              className={classnames({ "filter-item-active": option.isActive })}
-                              onClick={() => {
-                                resetOnChangeCategory();
-                                selectOptionGenderCategory(option.genderCategory);
-                              }}
-                            >
-                              {option.genderCategoryLabel}
-                            </FilterItemButton>
-                          </li>
-                        ))
-                      ) : (
-                        <li>Tidak tersedia filter jenis regu</li>
-                      )}
-                    </FilterList>
-                  </CategoryFilter>
-
-                  <CategoryFilter>
-                    <FilterLabel>Status Pembayaran:</FilterLabel>
-                    <FilterList>
-                      {optionsPaymentStatus?.length > 0 ? (
-                        optionsPaymentStatus.map((option) => (
-                          <li key={option.status}>
-                            <FilterItemButton
-                              className={classnames({ "filter-item-active": option.isActive })}
-                              onClick={() => {
-                                selectOptionPaymentStatus(option.status);
-                              }}
-                            >
-                              {option.label}
-                            </FilterItemButton>
-                          </li>
-                        ))
-                      ) : (
-                        <li>Tidak tersedia filter status pembayaran</li>
-                      )}
-                    </FilterList>
-                  </CategoryFilter>
-                </FilterBars>
-
-                {!isTeam && (
-                  <ToolbarRight>
-                    <HorizontalSpaced>
-                      <ButtonOutlineBlue
-                        onClick={() => {
-                          toast.loading("Sedang menyiapkan dokumen ID card...");
-                          handleDownloadIdCard({
-                            onSuccess() {
-                              toast.dismiss();
-                              toast.success("ID card siap diunduh");
-                            },
-                            onError() {
-                              toast.dismiss();
-                              toast.error("Gagal mengunduh ID card");
-                            }
-                          });
-                        }}
-                      >
-                        <span>
-                          <IconDownload size="16" />
-                        </span>{" "}
-                        <span>Unduh ID Card</span>
-                      </ButtonOutlineBlue>
-                      <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
-                    </HorizontalSpaced>
-                  </ToolbarRight>
-                )}
-              </ToolbarTop>
-
-              <MemberTable
-                key={activeCategoryDetail?.categoryDetailId}
-                isTeam={isTeam}
-                eventId={event_id}
-                categoryDetail={activeCategoryDetail}
-                searchName={inputSearchQuery}
-                paymentStatus={activePaymentStatus}
-              />
-            </ViewWrapper>
-          </Container>
-        </div>
-      </React.Fragment>
+            <MemberTable
+              key={activeCategoryDetail?.categoryDetailId}
+              isTeam={isTeam}
+              eventId={event_id}
+              categoryDetail={activeCategoryDetail}
+              searchName={inputSearchQuery}
+              paymentStatus={activePaymentStatus}
+            />
+          </ViewWrapper>
+        </Container>
+      </div>
+    </React.Fragment>
   );
 }
 

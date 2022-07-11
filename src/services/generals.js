@@ -1,6 +1,13 @@
 import API from "../utils/api";
 
 export default {
+  getProvinces(qs = null) {
+    const queryString = {
+      limit: qs?.limit || 50,
+      page: qs?.page || 1,
+    };
+    return API.get("/api/general/get-province", queryString);
+  },
   getCities(qs) {
     return API.get("/api/general/get-city", qs);
   },

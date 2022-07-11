@@ -1,20 +1,22 @@
 import React, { useEffect } from "react";
+import styled from "styled-components";
 import { useHistory, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as AuthenticationStore from "store/slice/authentication";
-import { AuthenticationService } from "services";
 import toastr from "toastr";
+import { useSubmitRegister } from "./hooks/submit-register";
 
 import MetaTags from "react-meta-tags";
 import { Col, Container, Row, Card, CardBody } from "reactstrap";
 import { AvField, AvForm } from "availity-reactstrap-validation";
-import { ButtonBlue, ButtonGhostBlue } from "components/ma";
+import { ButtonBlue, ButtonGhostBlue, LoadingScreen } from "components/ma";
 import { ProcessingToast, toast } from "./components/processing-toast";
 import { SelectInfoSource } from "./components/select-info-source";
 import { SelectCity } from "./components/select-city";
 import { SelectProvince } from "./components/select-province";
+import { AlertSuccess } from "./components/alert-registration-success";
 
-import IconLeft from "components/ma/icons/mono/arrow-left";
+import IconArrowLeft from "components/ma/icons/mono/arrow-left";
 
 import myachery from "assets/images/myachery/logo 3.png";
 
@@ -25,24 +27,33 @@ const Register = () => {
   const [screen, setScreen] = React.useState(0);
   const [provinceId, setProvinceId] = React.useState();
   const [formStep1, setFormStep1] = React.useState(null);
+  const { submit, isLoading, isSuccess, data: submitSuccessData } = useSubmitRegister();
 
   const handleValidSubmit = async (values) => {
     const payload = _makePayload(formStep1, values);
-    const { data, message, success } = await AuthenticationService.register(payload);
-    if (success) {
-      if (data) {
-        dispatch(AuthenticationStore.register());
-      }
-    } else {
-      toastr.error(message);
-    }
+    submit(payload, {
+      onError: (errors) => {
+        if (!errors.length) {
+          return;
+        }
+        errors.forEach((message) => toastr.error(message));
+      },
+    });
   };
 
   useEffect(() => {
     if (isLoggedIn) {
-      history.push("/");
+      history.push("/dashboard");
     }
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    window.scrollTo(0, 100);
+  }, [screen]);
+
+  useEffect(() => {
+    return () => toast.dismiss();
+  }, []);
 
   return (
     <React.Fragment>
@@ -55,8 +66,15 @@ const Register = () => {
         </Link>
       </div>
       <div className="account-pages my-5 pt-sm-5">
+        <ProcessingToast />
+        <LoadingScreen loading={isLoading} />
+        <AlertSuccess
+          isSuccess={isSuccess}
+          onConfirm={() => {
+            submitSuccessData && dispatch(AuthenticationStore.register());
+          }}
+        />
         <Container>
-          <ProcessingToast />
           <Row className="justify-content-center">
             <Col md={8} lg={6} xl={5}>
               <Card className="overflow-hidden">
@@ -158,14 +176,14 @@ const Register = () => {
                   ) : screen === 1 ? (
                     <div className="p-2" key="step-2">
                       <div className="mb-3">
-                        <ButtonGhostBlue flexible onClick={() => setScreen(0)}>
-                          <IconLeft size="14" /> Kembali
-                        </ButtonGhostBlue>
+                        <ButtonBack flexible onClick={() => setScreen(0)}>
+                          <IconArrowLeft size="16" />
+                        </ButtonBack>
                       </div>
 
                       <AvForm
                         className="form-horizontal"
-                        onValidSubmit={(e, v) => handleValidSubmit(v)}
+                        onValidSubmit={(e, values) => handleValidSubmit(values)}
                       >
                         <div className="mb-3">
                           <AvField
@@ -281,5 +299,25 @@ function _makePayload(formStep1, values) {
     },
   };
 }
+
+const ButtonBack = styled(ButtonGhostBlue)`
+  > *:nth-child(1) {
+    transform: translateX(-0.75rem);
+    transition: transform 0.15s ease-in-out;
+  }
+
+  &:hover > *:nth-child(1) {
+    transform: translateX(0);
+  }
+
+  > *:nth-child(2) {
+    visibility: hidden;
+    transition: visibility 0.35s ease-in-out;
+  }
+
+  &:hover > *:nth-child(2) {
+    visibility: visible;
+  }
+`;
 
 export default Register;

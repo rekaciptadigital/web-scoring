@@ -148,7 +148,7 @@ function CardUserProfile() {
                 </p>
 
                 <div className="float-end">
-                  <ButtonBlueOutline tag={Link} className="menu-link" to="#">
+                  <ButtonBlueOutline tag={Link} className="menu-link" to="/dashboard/profile">
                     Edit Profil
                   </ButtonBlueOutline>
                 </div>

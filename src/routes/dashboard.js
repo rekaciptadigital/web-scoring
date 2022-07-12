@@ -1,4 +1,5 @@
 // Dashboard
+import PageUserProfile from "pages/dashboard/profile";
 import EventsNewFullday from "pages/dashboard/events/new/fullday";
 import EventsNewMarathon from "pages/dashboard/events/new/marathon";
 import PreWizard from "pages/dashboard/events/new/pre-wizard";
@@ -31,6 +32,7 @@ import PageEventIdCard from "pages/dashboard/events/id-card";
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
+  { path: "/dashboard/profile", component: PageUserProfile },
   { path: "/dashboard/events", component: ListEvent },
   { path: "/dashboard/event/:event_id/home", component: PageEventDetailHome },
   { path: "/dashboard/event/:event_id/manage", component: EventsNewFullday },

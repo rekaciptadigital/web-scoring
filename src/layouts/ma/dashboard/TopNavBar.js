@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import * as AuthStore from "store/slice/authentication";
@@ -47,13 +48,19 @@ const ProfileMenu = (props) => {
   const handleCancelLogout = () => setConfirmLogout(false);
   const handleLogout = () => push("/logout");
 
+  const avatarURL = _getAvatarURL(userProfile.avatar, user1);
+
   return (
     <React.Fragment>
       {/* Menu ketika layar large ke atas */}
       <List className="d-none d-lg-flex my-auto">
         <ListInlineItem className="d-flex justify-content-center align-items-center">
           <Link to="/dashboard">
-            <img className="rounded-circle header-profile-user" src={user1} alt="Header Avatar" />
+            <AvatarImg
+              className="rounded-circle header-profile-user"
+              src={avatarURL}
+              alt="Header Avatar"
+            />
             <span style={{ color: "#000" }} className="d-none d-lg-inline-block ms-2 me-1">
               {username}
             </span>
@@ -75,7 +82,11 @@ const ProfileMenu = (props) => {
         className="d-inline-block d-lg-none"
       >
         <DropdownToggle className="btn header-item " id="page-header-user-dropdown" tag="button">
-          <img className="rounded-circle header-profile-user" src={user1} alt="Header Avatar" />
+          <AvatarImg
+            className="rounded-circle header-profile-user"
+            src={avatarURL}
+            alt="Header Avatar"
+          />
           <span className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
           <i className="mdi mdi-chevron-down d-none d-xl-inline-block" />
         </DropdownToggle>
@@ -111,5 +122,18 @@ const ProfileMenu = (props) => {
     </React.Fragment>
   );
 };
+
+const AvatarImg = styled.img`
+  object-fit: cover;
+`;
+
+function _getAvatarURL(URL, fallbackURL) {
+  if (!URL) {
+    return fallbackURL;
+  }
+  const segments = URL.split("#");
+  const params = "?timestamp=" + new Date().getTime();
+  return segments[0] + params + "#" + segments[1];
+}
 
 export default withTranslation()(ProfileMenu);

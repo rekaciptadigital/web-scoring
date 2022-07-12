@@ -3,8 +3,9 @@ import styled from "styled-components";
 import { useSelector } from "react-redux";
 import * as AuthStore from "store/slice/authentication";
 import { useProfileForm } from "./hooks/profile-form";
+import { useSubmitProfile } from "./hooks/submit-profile";
 
-import { ButtonBlue } from "components/ma";
+import { AlertSubmitError, LoadingScreen, ButtonBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { Breadcrumb } from "./components/breadcrumb";
 import { AvatarUploader } from "./components/avatar-uploader";
@@ -12,14 +13,30 @@ import { ProcessingToast } from "./components/processing-toast";
 import { FieldInputText } from "./components/field-input-text";
 import { FieldSelectProvince } from "./components/field-select-province";
 import { FieldSelectCity } from "./components/field-select-city";
+import { AlertSuccess } from "./components/alert-success";
 
 function PageUserProfile() {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const { values, setValue, isDirty } = useProfileForm(userProfile);
+  const {
+    submit,
+    isLoading: isSubmiting,
+    isError,
+    errors,
+    isSuccess,
+  } = useSubmitProfile(userProfile, values);
+
+  const handleSubmit = (ev) => {
+    ev.preventDefault();
+    submit();
+  };
 
   return (
     <ContentLayoutWrapper pageTitle="Profil Pengguna">
       <ProcessingToast />
+      <LoadingScreen loading={isSubmiting} />
+      <AlertSubmitError isError={isError} errors={errors} />
+      <AlertSuccess isSuccess={isSuccess} />
       <div>
         <Breadcrumb label="Profil Event Organizer" to="/dashboard" />
       </div>
@@ -39,57 +56,59 @@ function PageUserProfile() {
           </div>
 
           <div>
-            <div>
-              <InputGrid>
-                <div>
+            <form onSubmit={handleSubmit}>
+              <div>
+                <InputGrid>
+                  <div>
+                    <FieldInputText
+                      label="Nama"
+                      name="name"
+                      placeholder="Masukkan nama penyelenggara"
+                      required
+                      value={values.name}
+                      onChange={(value) => setValue("name", value)}
+                    />
+                    <InputInstruction>
+                      Masukkan nama pribadi / organisasi / institusi / klub
+                    </InputInstruction>
+                  </div>
+
                   <FieldInputText
-                    label="Nama"
-                    name="name"
-                    placeholder="Masukkan nama penyelenggara"
+                    label="Email"
+                    placeholder="Masukkan email"
                     required
-                    value={values.name}
-                    onChange={(value) => setValue("name", value)}
+                    value={userProfile?.email}
+                    disabled
+                    readOnly
                   />
-                  <InputInstruction>
-                    Masukkan nama pribadi / organisasi / institusi / club{" "}
-                  </InputInstruction>
-                </div>
 
-                <FieldInputText
-                  label="Email"
-                  placeholder="Masukkan email"
-                  required
-                  value={userProfile?.email}
-                  disabled
-                  readOnly
-                />
+                  <FieldSelectProvince
+                    value={values.provinceId}
+                    onChange={(value) => setValue("provinceId", value)}
+                  />
 
-                <FieldSelectProvince
-                  value={values.provinceId}
-                  onChange={(value) => setValue("provinceId", value)}
-                />
+                  <FieldSelectCity
+                    provinceId={values.provinceId}
+                    value={values.cityId}
+                    onChange={(value) => setValue("cityId", value)}
+                  />
 
-                <FieldSelectCity
-                  provinceId={values.provinceId}
-                  value={values.cityId}
-                  onChange={(value) => setValue("cityId", value)}
-                />
+                  <FieldInputText
+                    label="Nomor Telepon"
+                    placeholder="Masukkan nomor telepon (nomor WhatsApp)"
+                    required
+                    value={values.phone}
+                    onChange={(value) => setValue("phone", value)}
+                  />
+                </InputGrid>
+              </div>
 
-                <FieldInputText
-                  label="Nomor Telepon"
-                  placeholder="Masukkan nomor telepon (nomor WhatsApp)"
-                  required
-                  value={values.phone}
-                  onChange={(value) => setValue("phone", value)}
-                />
-              </InputGrid>
-            </div>
-
-            <BottomAction>
-              <ButtonBlue flexible disabled={!isDirty}>
-                Simpan
-              </ButtonBlue>
-            </BottomAction>
+              <BottomAction>
+                <ButtonBlue flexible disabled={!isDirty}>
+                  Simpan
+                </ButtonBlue>
+              </BottomAction>
+            </form>
           </div>
         </ProfileFormLayout>
       </CardSheet>

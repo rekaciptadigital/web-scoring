@@ -3,6 +3,8 @@ import * as React from "react";
 const STATUS_CLEAN = "clean";
 const STATUS_DIRTY = "dirty";
 
+// TODO: validasi field instan/on change & on submit
+
 function useProfileForm(userProfile = null) {
   const initialState = React.useMemo(() => _makeInitialState(userProfile), [userProfile]);
   const [state, dispatch] = React.useReducer(formReducer, initialState);
@@ -20,8 +22,13 @@ function useProfileForm(userProfile = null) {
     dispatch({ type: "INIT", payload: _makeInitialState(userProfile) });
   }, [isUnchanged, userProfile]);
 
-  const isClean = state.status === STATUS_CLEAN;
-  const isDirty = state.status === STATUS_DIRTY;
+  const status = React.useMemo(
+    () => _checkFormStatus(state.initialData, state.data),
+    [state.initialData, state.data]
+  );
+
+  const isClean = status === STATUS_CLEAN;
+  const isDirty = status === STATUS_DIRTY;
 
   const setValue = (fieldName, value) => {
     dispatch({ type: "UPDATE_FIELD_VALUE", field: fieldName, payload: value });
@@ -39,11 +46,7 @@ function formReducer(state, action) {
       ...state.data,
       [action.field]: action.payload,
     };
-    return {
-      ...state,
-      data: formData,
-      status: _checkFormStatus(state.initialData, formData),
-    };
+    return { ...state, data: formData };
   }
   return state;
 }
@@ -54,7 +57,6 @@ function _makeInitialState(userProfile) {
       initialData: null,
       data: null,
       errors: null,
-      status: "uninitialized",
     };
   }
   const initialData = {
@@ -70,7 +72,6 @@ function _makeInitialState(userProfile) {
     // data untuk field yang sedang "live", yang bisa diubah-ubah
     data: { ...initialData },
     errors: null,
-    status: STATUS_CLEAN,
   };
 }
 

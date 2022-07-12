@@ -5,17 +5,20 @@ import storage from "redux-persist/lib/storage";
 import authenticationReducer from "./slice/authentication";
 import adminReducer from "./slice/admin";
 import eventReducer from "./slice/events";
+import locationReducer from "./slice/location";
 
 const persistConfig = {
   key: "archery",
   version: 1,
   storage,
+  blacklist: ["location"],
 };
 
 const rootReducer = combineReducers({
   authentication: authenticationReducer,
   admin: adminReducer,
   events: eventReducer,
+  location: locationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

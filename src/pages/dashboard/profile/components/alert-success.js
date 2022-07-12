@@ -32,14 +32,14 @@ function AlertSuccess({ isSuccess = false, onConfirm }) {
       customButtons={
         <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
           <ButtonBlue block onClick={handleConfirm}>
-            Masuk
+            Kembali
           </ButtonBlue>
         </span>
       }
     >
       <IllustationAlertPrompt />
       <h4>Berhasil</h4>
-      <p className="text-muted">Selamat! Akun Anda telah berhasil dibuat</p>
+      <p className="text-muted">Profil Anda berhasil diperbarui</p>
     </SweetAlert>
   );
 }

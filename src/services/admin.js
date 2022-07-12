@@ -10,4 +10,7 @@ export default {
   updateAvatar(data = null, qs = null) {
     return API.put("/web/v1/user/avatar", data, qs, true);
   },
+  updatePassword(data = null, qs = null) {
+    return API.put("/web/v1/user/password", data, qs, true);
+  },
 };

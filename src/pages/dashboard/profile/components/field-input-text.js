@@ -5,6 +5,7 @@ import classnames from "classnames";
 function FieldInputText({
   children,
   label,
+  type = "text",
   required,
   name,
   placeholder,
@@ -31,6 +32,7 @@ function FieldInputText({
           "warning-validation": warnings?.length,
         })}
         id={fieldID}
+        type={type}
         name={name}
         value={value}
         onChange={(ev) => onChange?.(ev.target.value)}

@@ -1,11 +1,20 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import * as AuthStore from "store/slice/authentication";
 import { useProfileForm } from "./hooks/profile-form";
 import { useSubmitProfile } from "./hooks/submit-profile";
+import { usePasswordForm } from "./hooks/password-form";
+import { useSubmitPassword } from "./hooks/submit-password";
 
-import { AlertSubmitError, LoadingScreen, ButtonBlue } from "components/ma";
+import {
+  AlertSubmitError,
+  LoadingScreen,
+  Button,
+  ButtonBlue,
+  ButtonOutlineBlue,
+} from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { Breadcrumb } from "./components/breadcrumb";
 import { AvatarUploader } from "./components/avatar-uploader";
@@ -36,7 +45,11 @@ function PageUserProfile() {
       <ProcessingToast />
       <LoadingScreen loading={isSubmiting} />
       <AlertSubmitError isError={isError} errors={errors} />
-      <AlertSuccess isSuccess={isSuccess} />
+      <AlertSuccess
+        isSuccess={isSuccess}
+        buttonLabel="Kembali"
+        description="Profil Anda berhasil diperbarui"
+      />
       <div>
         <Breadcrumb label="Profil Event Organizer" to="/dashboard" />
       </div>
@@ -112,9 +125,107 @@ function PageUserProfile() {
           </div>
         </ProfileFormLayout>
       </CardSheet>
+
+      <CardSheet>
+        <div>
+          <CardTitle>Keamanan Akun</CardTitle>
+        </div>
+
+        <div>
+          <PasswordEditor />
+        </div>
+      </CardSheet>
     </ContentLayoutWrapper>
   );
 }
+
+function PasswordEditor() {
+  const [isOpen, setOpen] = React.useState(false);
+
+  if (!isOpen) {
+    return (
+      <PWEditorDisplay>
+        <FieldInputText label="Kata Sandi" type="password" value="password" readOnly disabled />
+        <div>
+          <ButtonOutlineBlue onClick={() => setOpen(true)}>Ubah Kata Sandi</ButtonOutlineBlue>
+        </div>
+      </PWEditorDisplay>
+    );
+  }
+
+  return <PasswordEditorForm onClose={() => setOpen(false)} />;
+}
+
+function PasswordEditorForm({ onClose }) {
+  const { values, setValue, isValid } = usePasswordForm();
+  const {
+    submit: submitPassword,
+    isLoading,
+    isError,
+    errors,
+    isSuccess,
+  } = useSubmitPassword(values);
+
+  return (
+    <PWEditorForm>
+      <LoadingScreen loading={isLoading} />
+      <AlertSubmitError isError={isError} errors={errors} />
+      <AlertSuccess
+        isSuccess={isSuccess}
+        buttonLabel="Kembali"
+        description="Password Anda berhasil diperbarui"
+        onConfirm={onClose}
+      />
+      <div>
+        <CardTitle>Ubah Sandi</CardTitle>
+        <p>Masukan kata sandi Anda yang baru. Kata sandi harus berbeda dengan kata sandi lama.</p>
+      </div>
+
+      <VerticalFields>
+        <ExistingPasswordFieldGroup>
+          <FieldInputText
+            label="Kata Sandi Saat Ini"
+            type="password"
+            placeholder="Masukkan kata sandi saat ini"
+            value={values.password_old}
+            onChange={(value) => setValue("password_old", value)}
+          />
+
+          <div>
+            <ButtonOutlineBlue as={Link} to="/forgot-password" tabIndex="-1">
+              Lupa Kata Sandi
+            </ButtonOutlineBlue>
+          </div>
+        </ExistingPasswordFieldGroup>
+
+        <FieldInputText
+          label="Kata Sandi Baru"
+          type="password"
+          placeholder="Masukkan kata sandi baru"
+          value={values.password}
+          onChange={(value) => setValue("password", value)}
+        />
+        <FieldInputText
+          label="Konfirmasi Kata Sandi"
+          type="password"
+          placeholder="Masukkan ulang kata sandi baru di atas"
+          value={values.password_confirmation}
+          onChange={(value) => setValue("password_confirmation", value)}
+        />
+      </VerticalFields>
+
+      <BottomAction>
+        <Button onClick={onClose}>Batal</Button>
+        <ButtonBlue disabled={!isValid} onClick={submitPassword}>
+          Simpan
+        </ButtonBlue>
+      </BottomAction>
+    </PWEditorForm>
+  );
+}
+
+/* ============================ */
+// styles
 
 const CardSheet = styled.div`
   position: relative;
@@ -197,6 +308,46 @@ const BottomAction = styled.div`
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+`;
+
+const PWEditorDisplay = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+
+  > *:nth-child(2) {
+    flex-shrink: 0;
+  }
+`;
+
+const PWEditorForm = styled.div`
+  > * + * {
+    margin-top: 1.5rem;
+  }
+`;
+
+const VerticalFields = styled.div`
+  > * + * {
+    margin-top: 0.75rem;
+  }
+`;
+
+const ExistingPasswordFieldGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+
+  > *:nth-child(2) {
+    flex-shrink: 0;
+  }
 `;
 
 export default PageUserProfile;

@@ -6,7 +6,7 @@ import { ButtonBlue } from "components/ma";
 
 import imgSuccess from "assets/images/myachery/update-category.png";
 
-function AlertSuccess({ isSuccess = false, onConfirm }) {
+function AlertSuccess({ isSuccess = false, onConfirm, buttonLabel = "Kembali", description }) {
   const [isAlertOpen, setAlertOpen] = React.useState(false);
 
   const handleConfirm = () => {
@@ -32,14 +32,14 @@ function AlertSuccess({ isSuccess = false, onConfirm }) {
       customButtons={
         <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
           <ButtonBlue block onClick={handleConfirm}>
-            Kembali
+            {buttonLabel}
           </ButtonBlue>
         </span>
       }
     >
       <IllustationAlertPrompt />
       <h4>Berhasil</h4>
-      <p className="text-muted">Profil Anda berhasil diperbarui</p>
+      {description && <p className="text-muted">{description}</p>}
     </SweetAlert>
   );
 }

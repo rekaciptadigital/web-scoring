@@ -8,7 +8,7 @@ import { AdminService } from "services";
 import { Link } from "react-router-dom";
 import { Card, CardBody } from "reactstrap";
 import { ButtonBlueOutline } from "components/ma";
-import { user } from "pages/dashboard/events/home/utils/icon-svgs";
+import { user as userIcon } from "pages/dashboard/events/home/utils/icon-svgs";
 
 const CardMenuProfileContainer = styled(Card)`
   overflow: hidden;
@@ -60,6 +60,7 @@ const CardMenuProfileContainer = styled(Card)`
     --thumbnail-radius: 150px;
     width: var(--thumbnail-radius);
     height: var(--thumbnail-radius);
+    overflow: hidden;
     border-radius: var(--thumbnail-radius);
 
     background-color: #efefef;
@@ -74,6 +75,14 @@ const CardMenuProfileContainer = styled(Card)`
         z-index: 10;
         width: 100%;
         height: 100%;
+      }
+    }
+
+    .menu-user-avatar {
+      &-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
   }
@@ -116,6 +125,8 @@ function CardUserProfile() {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const dispatch = useDispatch();
 
+  const avatarURL = _getAvatarURL(userProfile.avatar);
+
   React.useEffect(() => {
     const getUser = async () => {
       const { data, success } = await AdminService.profile();
@@ -130,11 +141,19 @@ function CardUserProfile() {
     <CardMenuProfileContainer>
       <CardBody>
         <div className="d-flex ">
-          <div className="menu-thumbnail flex-shrink-0">
-            <div className="menu-icon">
-              <img className="menu-icon-img" src={user} />
+          {!userProfile?.avatar ? (
+            <div className="menu-thumbnail flex-shrink-0">
+              <div className="menu-icon">
+                <img className="menu-icon-img" src={userIcon} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="menu-thumbnail flex-shrink-0">
+              <div className="menu-user-avatar">
+                <img className="menu-user-avatar-img" src={avatarURL} />
+              </div>
+            </div>
+          )}
 
           <div className="flex-grow-1 ms-4">
             {!userProfile ? (
@@ -148,7 +167,7 @@ function CardUserProfile() {
                 </p>
 
                 <div className="float-end">
-                  <ButtonBlueOutline tag={Link} className="menu-link" to="#">
+                  <ButtonBlueOutline tag={Link} className="menu-link" to="/dashboard/profile">
                     Edit Profil
                   </ButtonBlueOutline>
                 </div>
@@ -159,6 +178,15 @@ function CardUserProfile() {
       </CardBody>
     </CardMenuProfileContainer>
   );
+}
+
+function _getAvatarURL(URL, fallbackURL) {
+  if (!URL) {
+    return fallbackURL;
+  }
+  const segments = URL.split("#");
+  const params = "?timestamp=" + new Date().getTime();
+  return segments[0] + params + "#" + segments[1];
 }
 
 export default CardUserProfile;

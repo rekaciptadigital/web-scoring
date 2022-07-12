@@ -1,13 +1,22 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useSelector } from "react-redux";
+import * as AuthStore from "store/slice/authentication";
+import { useProfileForm } from "./hooks/profile-form";
 
 import { ButtonBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { Breadcrumb } from "./components/breadcrumb";
 import { AvatarUploader } from "./components/avatar-uploader";
 import { ProcessingToast } from "./components/processing-toast";
+import { FieldInputText } from "./components/field-input-text";
+import { FieldSelectProvince } from "./components/field-select-province";
+import { FieldSelectCity } from "./components/field-select-city";
 
 function PageUserProfile() {
+  const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
+  const { values, setValue, isDirty } = useProfileForm(userProfile);
+
   return (
     <ContentLayoutWrapper pageTitle="Profil Pengguna">
       <ProcessingToast />
@@ -30,10 +39,56 @@ function PageUserProfile() {
           </div>
 
           <div>
-            <div>form</div>
+            <div>
+              <InputGrid>
+                <div>
+                  <FieldInputText
+                    label="Nama"
+                    name="name"
+                    placeholder="Masukkan nama penyelenggara"
+                    required
+                    value={values.name}
+                    onChange={(value) => setValue("name", value)}
+                  />
+                  <InputInstruction>
+                    Masukkan nama pribadi / organisasi / institusi / club{" "}
+                  </InputInstruction>
+                </div>
+
+                <FieldInputText
+                  label="Email"
+                  placeholder="Masukkan email"
+                  required
+                  value={userProfile?.email}
+                  disabled
+                  readOnly
+                />
+
+                <FieldSelectProvince
+                  value={values.provinceId}
+                  onChange={(value) => setValue("provinceId", value)}
+                />
+
+                <FieldSelectCity
+                  provinceId={values.provinceId}
+                  value={values.cityId}
+                  onChange={(value) => setValue("cityId", value)}
+                />
+
+                <FieldInputText
+                  label="Nomor Telepon"
+                  placeholder="Masukkan nomor telepon (nomor WhatsApp)"
+                  required
+                  value={values.phone}
+                  onChange={(value) => setValue("phone", value)}
+                />
+              </InputGrid>
+            </div>
 
             <BottomAction>
-              <ButtonBlue flexible>Simpan</ButtonBlue>
+              <ButtonBlue flexible disabled={!isDirty}>
+                Simpan
+              </ButtonBlue>
             </BottomAction>
           </div>
         </ProfileFormLayout>
@@ -64,7 +119,7 @@ const CardTitle = styled.h5`
 
 const ProfileFormLayout = styled.div`
   display: flex;
-  gap: 2.5rem;
+  gap: 4rem;
 
   > *:nth-child(1) {
     width: 11.25rem;
@@ -81,6 +136,10 @@ const ProfileFormLayout = styled.div`
     display: flex;
     flex-direction: column;
 
+    > * + * {
+      margin-top: 1.5rem;
+    }
+
     > *:nth-child(1) {
       flex-grow: 1;
     }
@@ -96,6 +155,21 @@ const UploadInstruction = styled.p`
   padding: 0.75rem;
   border-radius: 0.5rem;
   background-color: var(--ma-gray-50);
+  color: var(--ma-gray-500);
+  font-size: 0.875em;
+`;
+
+const InputGrid = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-auto-rows: minmax(5.5rem, auto);
+  gap: 0.5rem 1.5rem;
+`;
+
+const InputInstruction = styled.p`
+  margin: 0;
+  margin-top: 0.375rem;
+  border-radius: 0.5rem;
   color: var(--ma-gray-500);
   font-size: 0.875em;
 `;

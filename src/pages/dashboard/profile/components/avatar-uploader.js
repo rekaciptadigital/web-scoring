@@ -38,6 +38,13 @@ function AvatarUploader() {
     });
   };
 
+  const inputProps = {
+    type: "file",
+    accept: "image/jpg,image/jpeg,image/png",
+    id: "uploader",
+    onChange: handleChooseImage,
+  };
+
   if (!avatar) {
     return (
       <UploaderContainer htmlFor="uploader" title="Upload foto profil">
@@ -48,7 +55,7 @@ function AvatarUploader() {
           <span>Unggah foto</span>
         </PictureContainer>
         <LoadingIndicator isLoading={isLoading} />
-        <FileInput type="file" id="uploader" onChange={handleChooseImage} />
+        <FileInput {...inputProps} />
       </UploaderContainer>
     );
   }
@@ -62,7 +69,7 @@ function AvatarUploader() {
       <UploadButton>
         <IconPictureUpload />
       </UploadButton>
-      <FileInput type="file" id="uploader" onChange={handleChooseImage} />
+      <FileInput {...inputProps} />
     </UploaderContainer>
   );
 }

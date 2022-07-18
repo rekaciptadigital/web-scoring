@@ -37,6 +37,7 @@ function SelectCity({ name, placeholder, value, provinceId, onChange, errors, di
       label: city.name,
       value: parseInt(city.id),
     }));
+    
     setLocalOptions([...loadedOptions, ...options]);
     return {
       options: options,

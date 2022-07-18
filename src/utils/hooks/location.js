@@ -51,7 +51,7 @@ function useLocation() {
       if (!provinces?.length) {
         return null;
       }
-      return provinces.find((province) => province.id === provinceId) || null;
+      return provinces.find((province) => province.id === parseInt(provinceId)) || null;
     },
     [provinces]
   );
@@ -61,7 +61,7 @@ function useLocation() {
       if (!cities?.length) {
         return null;
       }
-      return cities.find((city) => city.id === cityId) || null;
+      return cities.find((city) => city.id === parseInt(cityId)) || null;
     },
     [cities]
   );

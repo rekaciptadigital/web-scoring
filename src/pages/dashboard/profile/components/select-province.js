@@ -20,9 +20,9 @@ function SelectProvince({ name, placeholder, value, onChange, errors, disabled }
       page: page,
       name: searchQuery,
     });
-    const options = result.data.map((city) => ({
-      label: city.name,
-      value: parseInt(city.id),
+    const options = result.data.map((province) => ({
+      label: province.name,
+      value: parseInt(province.id),
     }));
     setLocalOptions([...loadedOptions, ...options]);
     return {

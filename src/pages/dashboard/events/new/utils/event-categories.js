@@ -1,15 +1,35 @@
 import { stringUtil } from "utils";
 
 function makeStateCategories(eventCategories) {
+  const groupedCategories = _runNestedGroupBy(eventCategories);
+  const uiState = _makeFormUiState(groupedCategories);
+  return uiState;
+}
+
+/**
+ * Bikin kategori yang di-group secara "multiple nested".
+ * Untuk mempermudah konstruksi data state form yang lumayan rumit.
+ *
+ * Struktur object grouping:
+ * {
+ *   [competitionCategoryId]: {
+ *     [ageCategoryId + "-" + distanceCategoryId]: {
+ *       label,
+ *       categoryDetailsId,
+ *       ageCategoryId,
+ *       distanceId,
+ *       teamCategoryId,
+ *       quota,
+ *       isShow,
+ *     }
+ *   }
+ * }
+ */
+function _runNestedGroupBy(categoryDetails) {
   const groupedCategories = {};
-  eventCategories.forEach((category) => {
-    if (!groupedCategories[category.competitionCategoryId.id]) {
-      groupedCategories[category.competitionCategoryId.id] = {};
-    }
-    if (!groupedCategories[category.competitionCategoryId.id][category.ageCategoryId.id]) {
-      groupedCategories[category.competitionCategoryId.id][category.ageCategoryId.id] = [];
-    }
-    groupedCategories[category.competitionCategoryId.id][category.ageCategoryId.id].push({
+
+  categoryDetails.forEach((category) => {
+    const categoryDetail = {
       label: category.label,
       categoryDetailsId: category.categoryDetailsId,
       ageCategoryId: category.ageCategoryId,
@@ -17,47 +37,85 @@ function makeStateCategories(eventCategories) {
       teamCategoryId: category.teamCategoryId,
       quota: category.quota,
       isShow: Boolean(category.isShow),
-    });
-  });
-
-  const flattened = Object.keys(groupedCategories).map((competitionGroup) => {
-    return {
-      key: stringUtil.createRandom(),
-      isAlive: true,
-      competitionCategoryId: { value: competitionGroup, label: competitionGroup },
-      categoryDetails: Object.keys(groupedCategories[competitionGroup]).map((ageGroup) => {
-        const categoryData = {
-          key: stringUtil.createRandom(),
-          isAlive: true,
-          ageCategoryId: {
-            value: groupedCategories[competitionGroup][ageGroup][0].ageCategoryId.id,
-            label: groupedCategories[competitionGroup][ageGroup][0].ageCategoryId.label,
-          },
-          distanceId: {
-            value: groupedCategories[competitionGroup][ageGroup][0].distanceId.id,
-            label: groupedCategories[competitionGroup][ageGroup][0].distanceId.label,
-          },
-          quotas: groupedCategories[competitionGroup][ageGroup].map((detail) => ({
-            categoryDetailsId: detail.categoryDetailsId,
-            teamCategoryId: detail.teamCategoryId.id,
-            teamCategoryLabel: detail.teamCategoryId.label,
-            quota: detail.quota,
-            isShow: detail.isShow,
-          })),
-        };
-
-        const sortedQuotaData = sortQuotasByTeams(categoryData.quotas);
-        categoryData.quotas = fillEmptyQuotaSlot(sortedQuotaData);
-        return categoryData;
-      }),
     };
+
+    const competitionCategoryId = category.competitionCategoryId.id;
+    const ageCategoryId = category.ageCategoryId.id;
+    const distanceId = category.distanceId.id;
+    const ageDistanceIdPair = ageCategoryId + "-" + distanceId;
+
+    if (!groupedCategories[competitionCategoryId]) {
+      groupedCategories[competitionCategoryId] = {};
+    }
+    if (!groupedCategories[competitionCategoryId][ageDistanceIdPair]) {
+      groupedCategories[competitionCategoryId][ageDistanceIdPair] = [];
+    }
+
+    groupedCategories[competitionCategoryId][ageDistanceIdPair].push(categoryDetail);
   });
-  return flattened;
+
+  return groupedCategories;
 }
 
-/* ========================================= */
+function _makeFormUiState(groupedCategories) {
+  const competitionCategoryIds = Object.keys(groupedCategories);
 
-function sortQuotasByTeams(quotaData) {
+  const uiStateData = competitionCategoryIds.map((competitionCategoryId) => {
+    const parentState = {
+      key: stringUtil.createRandom(),
+      isAlive: true,
+      competitionCategoryId: {
+        value: competitionCategoryId,
+        label: competitionCategoryId,
+      },
+      categoryDetails: [],
+    };
+
+    const categoryDetailsByAgeDistanceId = groupedCategories[competitionCategoryId];
+    const ageDistanceIdPairs = Object.keys(categoryDetailsByAgeDistanceId);
+
+    const childrenDetailGroups = ageDistanceIdPairs.map((ageDistanceIdPair) => {
+      const categoryDetails = categoryDetailsByAgeDistanceId[ageDistanceIdPair];
+      const commonCategory = categoryDetails[0];
+
+      const detailGroupsStateData = {
+        key: stringUtil.createRandom(),
+        isAlive: true,
+        ageCategoryId: {
+          value: commonCategory.ageCategoryId.id,
+          label: commonCategory.ageCategoryId.label,
+        },
+        distanceId: {
+          value: commonCategory.distanceId.id,
+          label: commonCategory.distanceId.label,
+        },
+        quotas: categoryDetails.map((detail) => ({
+          categoryDetailsId: detail.categoryDetailsId,
+          teamCategoryId: detail.teamCategoryId.id,
+          teamCategoryLabel: detail.teamCategoryId.label,
+          quota: detail.quota,
+          isShow: detail.isShow,
+        })),
+      };
+
+      const sortedQuotaData = _sortQuotaByTeam(detailGroupsStateData.quotas);
+
+      return {
+        ...detailGroupsStateData,
+        quotas: _fillEmptyQuotaSlot(sortedQuotaData),
+      };
+    });
+
+    return {
+      ...parentState,
+      categoryDetails: childrenDetailGroups,
+    };
+  });
+
+  return uiStateData;
+}
+
+function _sortQuotaByTeam(quotaData) {
   const SORTED_TEAM_IDS = [
     "individu male",
     "individu female",
@@ -73,7 +131,7 @@ function sortQuotasByTeams(quotaData) {
   return sortedQuotaItems;
 }
 
-function fillEmptyQuotaSlot(sortedQuotaItems) {
+function _fillEmptyQuotaSlot(sortedQuotaItems) {
   return defaultQuotasData.map((quota, index) => {
     if (quota.teamCategoryId === sortedQuotaItems[index]?.teamCategoryId) {
       return sortedQuotaItems[index];

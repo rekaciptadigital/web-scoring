@@ -84,6 +84,13 @@ const variantStyles = {
     "--button-font-color": "var(--ma-blue)",
     "--button-font-color-hover": "#ffffff",
   },
+  "outline-red": {
+    "--button-bg-color": "none",
+    "--button-bg-color-hover": "var(--ma-red)",
+    "--button-outline-color": "var(--ma-red)",
+    "--button-font-color": "var(--ma-red)",
+    "--button-font-color-hover": "#ffffff",
+  },
   // TODO: button link (?)
 };
 
@@ -144,6 +151,10 @@ function ButtonSmallOutlineBlue(props) {
   return <ButtonBase color="outline-blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
 }
 
+function ButtonOutlineRed(props) {
+  return <ButtonBase color="outline-red" {...props} />;
+}
+
 const ButtonBlueOutline = styled(BSButton)`
   &,
   &:focus,
@@ -171,4 +182,5 @@ export {
   ButtonGhostBlue,
   ButtonSmallBlue,
   ButtonSmallOutlineBlue,
+  ButtonOutlineRed,
 };

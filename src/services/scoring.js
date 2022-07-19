@@ -19,6 +19,14 @@ export default {
     return API.get("/web/v1/archery-score-sheet/score-sheet-elimination", qs);
   },
 
+  /**
+   * @param {Object} queryString  { elimination_id, category_id, round, match }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  cancelScoringWinner(data = null) {
+    return API.post("/web/v1/archery/scorer/cancel-scoring-eliminasi", data, null, true);
+  },
+
   // V2
 
   /**

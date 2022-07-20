@@ -29,4 +29,12 @@ export default {
   setEventEliminationV2(qs) {
     return API.post("/web/v2/event-elimination/set", qs, null, true);
   },
+
+  /**
+   * @param {Object} queryString { category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  cancelTemplateScoring(qs) {
+    return API.post("/web/v2/event-elimination/clean-elimination-scoring", qs, null, true);
+  },
 };

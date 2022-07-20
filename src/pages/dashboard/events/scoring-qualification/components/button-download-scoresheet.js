@@ -20,7 +20,7 @@ function ButtonDownloadScoresheet({ disabled, sessionCount, onDownload }) {
     return (
       <ButtonOutlineBlue
         disabled
-        title="Scoresheet kualifikasi hanya tersedia untuk kualfikasi individu"
+        title="Scoresheet kualifikasi hanya tersedia untuk kualifikasi individu"
       >
         <span>
           <IconDownload size="16" />

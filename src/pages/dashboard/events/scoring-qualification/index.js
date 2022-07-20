@@ -17,7 +17,7 @@ import { SearchBox } from "./components/search-box";
 import { toast } from "./components/processing-toast";
 import { ButtonDownloadScoresheet } from "./components/button-download-scoresheet";
 import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
-import { ButtonConfirmWarning } from "./components/button-confirm-warning";
+import { ButtonCancelBracket } from "./components/button-cancel-bracket";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 
 import IconCheck from "components/ma/icons/fill/check";
@@ -62,6 +62,7 @@ function PageEventScoringQualification() {
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
   const [localCountNumber, setLocalCountNumber] = React.useState(null);
+  const countNumberInputRef = React.useRef(null);
 
   const {
     submit: updateEliminationMemberCount,
@@ -188,6 +189,8 @@ function PageEventScoringQualification() {
               <SelectEliminationCounts>
                 <label htmlFor="elimination-members-count">Babak Eliminasi</label>
                 <Select
+                  ref={countNumberInputRef}
+                  openMenuOnFocus
                   placeholder="Pilih jumlah"
                   options={optionsParticipantsCount}
                   value={_getSelectedFromValue(
@@ -204,6 +207,7 @@ function PageEventScoringQualification() {
                       },
                     });
                   }}
+                  isDisabled={Boolean(activeCategoryDetail?.eliminationLock)}
                 />
 
                 {Boolean(activeCategoryDetail?.defaultEliminationCount) && (
@@ -245,13 +249,14 @@ function PageEventScoringQualification() {
               />
 
               {activeCategoryDetail?.eliminationLock ? (
-                <ButtonConfirmWarning
-                  customButton={ButtonBlue}
-                  messagePrompt="Pemeringkatan eliminasi sudah ditentukan"
-                  buttonConfirmLabel="Tutup"
-                >
+                <ButtonCancelBracket
+                  categoryId={activeCategoryDetail?.categoryDetailId}
+                  onSuccess={fetchCategoryDetails}
+                />
+              ) : !localCountNumber ? (
+                <ButtonBlue onClick={() => countNumberInputRef.current?.focus?.()}>
                   Lanjut ke Eliminasi
-                </ButtonConfirmWarning>
+                </ButtonBlue>
               ) : (
                 <ButtonConfirmPrompt
                   title="Tentukan bagan eliminasi"

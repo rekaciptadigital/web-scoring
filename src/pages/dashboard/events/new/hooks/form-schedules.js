@@ -3,6 +3,7 @@ import {
   makeDefaultForm,
   makeStateSchedules,
   makeDefaultFormMarathon,
+  makeStateSchedulesMarathon,
 } from "../utils/event-schedules";
 import { eventConfigs } from "constants/index";
 
@@ -42,17 +43,20 @@ function formReducer(state, action) {
 
       if (!action.payload.schedules?.length) {
         const data = isMarathon
-          ? makeDefaultFormMarathon(action.payload.categoryDetails)
+          ? makeDefaultFormMarathon(action.payload.categoryDetails, action.payload.eventDetail)
           : makeDefaultForm(action.payload.eventDetail);
 
         return { ...state, data, isEmpty: true };
       }
 
-      return {
-        ...state,
-        data: makeStateSchedules(action.payload.eventDetail, action.payload.schedules),
-        isEmpty: !action.payload.schedules.length,
-      };
+      const data = isMarathon
+        ? makeStateSchedulesMarathon(
+            action.payload.categoryDetails,
+            action.payload.schedules,
+            action.payload.eventDetail
+          )
+        : makeStateSchedules(action.payload.eventDetail, action.payload.schedules);
+      return { ...state, data, isEmpty: !action.payload.schedules.length };
     }
 
     case "FIELD_CHANGE": {

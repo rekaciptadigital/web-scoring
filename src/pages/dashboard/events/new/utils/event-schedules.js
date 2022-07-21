@@ -125,7 +125,15 @@ function makeStateSchedules(eventDetail, schedules) {
 /* ================================ */
 // MARATHON
 
-function makeDefaultFormMarathon(categoryDetails) {
+function makeDefaultFormMarathon(categoryDetails, eventDetail) {
+  let eventStartDate = null;
+  let eventEndDate = null;
+
+  if (eventDetail) {
+    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
+    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  }
+
   const groupedCategories = _groupByCompetitionId(categoryDetails);
   const competitionIds = groupedCategories ? Object.keys(groupedCategories) : [];
 
@@ -145,8 +153,50 @@ function makeDefaultFormMarathon(categoryDetails) {
         label: categoryDetail.labelCategory,
       },
       idQualificationTime: undefined,
-      eventStartDatetime: "",
-      eventEndDatetime: "",
+      eventStartDatetime: eventStartDate,
+      eventEndDatetime: eventEndDate,
+    }));
+
+    return {
+      ...parentCompetitionCategory,
+      schedules,
+    };
+  });
+
+  return formState;
+}
+
+function makeStateSchedulesMarathon(categoryDetails, schedules, eventDetail) {
+  let eventStartDate = null;
+  let eventEndDate = null;
+
+  if (eventDetail) {
+    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
+    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  }
+
+  const structuredSchedules = _arrayToObject(schedules, "categoryDetailId");
+  const groupedCategories = _groupByCompetitionId(categoryDetails);
+  const competitionIds = groupedCategories ? Object.keys(groupedCategories) : [];
+
+  const formState = competitionIds.map((competitionCategoryId) => {
+    const categoryDetails = groupedCategories[competitionCategoryId];
+
+    const parentCompetitionCategory = {
+      key: stringUtil.createRandom(),
+      competitionCategory: competitionCategoryId,
+      schedules: [],
+    };
+
+    const schedules = categoryDetails.map((categoryDetail) => ({
+      key: stringUtil.createRandom(),
+      categoryDetail: {
+        value: categoryDetail.id,
+        label: categoryDetail.labelCategory,
+      },
+      idQualificationTime: structuredSchedules[categoryDetail.id] || undefined,
+      eventStartDatetime: eventStartDate,
+      eventEndDatetime: eventEndDate,
     }));
 
     return {
@@ -179,4 +229,15 @@ function _groupByCompetitionId(categoryDetails) {
   return groupedDataByCompetitionId;
 }
 
-export { makeDefaultForm, makeStateSchedules, makeDefaultFormMarathon };
+function _arrayToObject(schedules, targetKeyName) {
+  const structuredObject = {};
+
+  schedules.forEach((schedule) => {
+    const accessId = schedule[targetKeyName];
+    structuredObject[accessId] = schedule;
+  });
+
+  return structuredObject;
+}
+
+export { makeDefaultForm, makeStateSchedules, makeDefaultFormMarathon, makeStateSchedulesMarathon };

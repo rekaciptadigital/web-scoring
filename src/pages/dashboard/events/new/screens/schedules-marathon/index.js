@@ -9,6 +9,7 @@ import { FieldInputDateSmall, FieldInputTextSmall } from "../../../components/fo
 import { LoadingScreen } from "../../components/loading-screen-portal";
 import { ButtonWithConfirmPrompt } from "./components/button-confirm-prompt";
 
+import { setHours, setMinutes } from "date-fns";
 import { datetime } from "utils";
 
 function ScreenSchedulesMarathon({ eventDetail, formSchedules, onSuccessSubmit }) {
@@ -147,6 +148,15 @@ function EditorForm({ onClose, categoryGroup, eventDetail, onSuccessSubmit }) {
   const setDateStart = (key, value) => updateField(key, "eventStartDatetime", value);
   const setDateEnd = (key, value) => updateField(key, "eventEndDatetime", value);
 
+  const dateConstraint = React.useMemo(() => {
+    const eventStart = datetime.parseServerDatetime(eventDetail.publicInformation.eventStart);
+    const eventEnd = datetime.parseServerDatetime(eventDetail.publicInformation.eventEnd);
+    return {
+      min: eventDetail ? setHours(setMinutes(eventStart, 0), 0) : undefined,
+      max: eventDetail ? setHours(setMinutes(eventEnd, 59), 23) : undefined,
+    };
+  }, [eventDetail]);
+
   return (
     <VerticalSpacedBox>
       <LoadingScreen loading={isLoadingSubmit} />
@@ -210,11 +220,15 @@ function EditorForm({ onClose, categoryGroup, eventDetail, onSuccessSubmit }) {
                     <FieldInputDateSmall
                       value={schedule.eventStartDatetime}
                       onChange={(value) => setDateStart(schedule.key, value)}
+                      minDate={dateConstraint.min}
+                      maxDate={dateConstraint.max}
                     />
                     <span>&ndash;</span>
                     <FieldInputDateSmall
                       value={schedule.eventEndDatetime}
                       onChange={(value) => setDateEnd(schedule.key, value)}
+                      minDate={schedule.eventStartDatetime}
+                      maxDate={dateConstraint.max}
                     />
                   </TimeRangeBox>
                 </div>

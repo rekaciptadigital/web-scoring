@@ -1,6 +1,6 @@
 const EVENT_TYPES = {
   FULLDAY: "Full_day",
-  MARATHON: "marathon",
+  MARATHON: "Marathon",
 };
 
 const MATCH_TYPES = {

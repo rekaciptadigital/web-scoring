@@ -9,6 +9,14 @@ function parseServerDatetime(dateString) {
   }
 }
 
+function formatShortDate(date) {
+  try {
+    return format(date, "dd/MM/yyyy");
+  } catch {
+    return undefined;
+  }
+}
+
 function formatServerDatetime(date) {
   try {
     return format(date, "yyyy-MM-dd HH:mm:ss");
@@ -40,4 +48,10 @@ function formatFullDateLabel(date, { withDay = false, withTime = false } = {}) {
   }
 }
 
-export default { parseServerDatetime, formatServerDatetime, formatServerDate, formatFullDateLabel };
+export default {
+  parseServerDatetime,
+  formatShortDate,
+  formatServerDatetime,
+  formatServerDate,
+  formatFullDateLabel,
+};

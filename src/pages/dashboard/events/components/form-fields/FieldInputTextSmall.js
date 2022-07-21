@@ -41,8 +41,7 @@ const FieldInputTextWrapper = styled.div`
       box-shadow: 0 0 0 1px #2684ff;
     }
 
-    &:disabled,
-    &[readonly] {
+    &:disabled {
       background-color: #eff2f7;
       opacity: 1;
     }
@@ -69,6 +68,7 @@ function FieldInputTextSmall({
   value = "",
   onChange,
   disabled,
+  readOnly,
   errors,
   isTouched,
   onBlur,
@@ -90,6 +90,7 @@ function FieldInputTextSmall({
         onChange={handleChange}
         onBlur={onBlur}
         disabled={disabled}
+        readOnly={readOnly}
       />
       <InlineErrorMessage errors={errors} isTouched={isTouched} />
     </FieldInputTextWrapper>

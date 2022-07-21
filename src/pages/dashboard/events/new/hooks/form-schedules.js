@@ -42,7 +42,7 @@ function formReducer(state, action) {
 
       if (!action.payload.schedules?.length) {
         const data = isMarathon
-          ? makeDefaultFormMarathon(action.payload.eventDetail, action.payload.categoryDetails)
+          ? makeDefaultFormMarathon(action.payload.categoryDetails)
           : makeDefaultForm(action.payload.eventDetail);
 
         return { ...state, data, isEmpty: true };

@@ -2,6 +2,9 @@ import { differenceInDays, addDays, subDays } from "date-fns";
 import stringUtil from "utils/stringUtil";
 import { parseServerDatetime, formatServerDate } from "../utils/datetime";
 
+/* ================================ */
+// FULLDAY
+
 /**
  * Dipakai ketika sama sekali belum ada data schedule/qualification time-nya
  */
@@ -119,4 +122,61 @@ function makeStateSchedules(eventDetail, schedules) {
   return resultFormData;
 }
 
-export { makeDefaultForm, makeStateSchedules };
+/* ================================ */
+// MARATHON
+
+function makeDefaultFormMarathon(categoryDetails) {
+  const groupedCategories = _groupByCompetitionId(categoryDetails);
+  const competitionIds = groupedCategories ? Object.keys(groupedCategories) : [];
+
+  const formState = competitionIds.map((competitionCategoryId) => {
+    const categoryDetails = groupedCategories[competitionCategoryId];
+
+    const parentCompetitionCategory = {
+      key: stringUtil.createRandom(),
+      competitionCategory: competitionCategoryId,
+      schedules: [],
+    };
+
+    const schedules = categoryDetails.map((categoryDetail) => ({
+      key: stringUtil.createRandom(),
+      categoryDetail: {
+        value: categoryDetail.id,
+        label: categoryDetail.labelCategory,
+      },
+      idQualificationTime: undefined,
+      eventStartDatetime: "",
+      eventEndDatetime: "",
+    }));
+
+    return {
+      ...parentCompetitionCategory,
+      schedules,
+    };
+  });
+
+  return formState;
+}
+
+/* ================================ */
+// local utils
+
+function _groupByCompetitionId(categoryDetails) {
+  if (!categoryDetails?.length) {
+    return null;
+  }
+
+  const groupedDataByCompetitionId = {};
+
+  categoryDetails.forEach((categoryDetail) => {
+    const { competitionCategoryId } = categoryDetail;
+    if (!groupedDataByCompetitionId[competitionCategoryId]) {
+      groupedDataByCompetitionId[competitionCategoryId] = [];
+    }
+    groupedDataByCompetitionId[competitionCategoryId].push(categoryDetail);
+  });
+
+  return groupedDataByCompetitionId;
+}
+
+export { makeDefaultForm, makeStateSchedules, makeDefaultFormMarathon };

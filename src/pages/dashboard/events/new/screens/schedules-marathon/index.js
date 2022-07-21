@@ -109,21 +109,21 @@ function EditorDisplay({ canOpen, onOpen, categoryGroup }) {
 
                 <div>
                   <TimeRangeLabel>Tanggal Bertanding</TimeRangeLabel>
-                  <TimeRangeBox>
-                    {!schedule.idQualificationTime ? (
+                  {!schedule.idQualificationTime ? (
+                    <TimeRangeBox>
                       <DisplayField>Belum diatur</DisplayField>
-                    ) : (
-                      <React.Fragment>
-                        <DisplayField>
-                          {datetime.formatShortDate(schedule.eventStartDatetime)}
-                        </DisplayField>
-                        <span>&ndash;</span>
-                        <DisplayField>
-                          {datetime.formatShortDate(schedule.eventEndDatetime)}
-                        </DisplayField>
-                      </React.Fragment>
-                    )}
-                  </TimeRangeBox>
+                    </TimeRangeBox>
+                  ) : (
+                    <TimeRangeBox className="range-as-display">
+                      <DisplayField>
+                        {datetime.formatShortDate(schedule.eventStartDatetime)}
+                      </DisplayField>
+                      <span>&ndash;</span>
+                      <DisplayField>
+                        {datetime.formatShortDate(schedule.eventEndDatetime)}
+                      </DisplayField>
+                    </TimeRangeBox>
+                  )}
                 </div>
               </SessionDetailInput>
             </CategoryDetailItem>
@@ -343,6 +343,13 @@ const TimeRangeBox = styled.div`
   > *:last-child {
     max-width: 6.375rem;
     flex: 1;
+  }
+
+  &.range-as-display {
+    > *:first-child,
+    > *:last-child {
+      flex: 0;
+    }
   }
 `;
 

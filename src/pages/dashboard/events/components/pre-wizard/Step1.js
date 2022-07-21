@@ -2,7 +2,6 @@ import * as React from "react";
 import { eventConfigs } from "constants/index";
 
 import { SelectionCards, OptionCard, OptionTitle, OptionDescription } from "../SelectionCards";
-import OptionComingSoon from "./OptionComingSoon";
 
 const NAME_OPTION = "eventType";
 const { EVENT_TYPES } = eventConfigs;
@@ -21,19 +20,12 @@ export default function Step1({ eventType, onChange }) {
           </OptionDescription>
         </OptionCard>
 
-        <OptionComingSoon className="mt-3" blurTargetClassName="option-card">
-          <OptionCard
-            disabled
-            name={NAME_OPTION}
-            value={EVENT_TYPES.MARATHON}
-            className="option-card"
-          >
-            <OptionTitle>Marathon</OptionTitle>
-            <OptionDescription>
-              Kualifikasi &amp; Eliminasi per kategori selesai lebih dari 1 hari
-            </OptionDescription>
-          </OptionCard>
-        </OptionComingSoon>
+        <OptionCard name={NAME_OPTION} value={EVENT_TYPES.MARATHON} className="option-card mt-3">
+          <OptionTitle>Marathon</OptionTitle>
+          <OptionDescription>
+            Kualifikasi &amp; Eliminasi per kategori selesai lebih dari 1 hari
+          </OptionDescription>
+        </OptionCard>
       </SelectionCards>
     </div>
   );

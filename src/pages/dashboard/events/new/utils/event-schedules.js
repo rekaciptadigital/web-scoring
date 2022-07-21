@@ -188,16 +188,27 @@ function makeStateSchedulesMarathon(categoryDetails, schedules, eventDetail) {
       schedules: [],
     };
 
-    const schedules = categoryDetails.map((categoryDetail) => ({
-      key: stringUtil.createRandom(),
-      categoryDetail: {
-        value: categoryDetail.id,
-        label: categoryDetail.labelCategory,
-      },
-      idQualificationTime: structuredSchedules[categoryDetail.id] || undefined,
-      eventStartDatetime: eventStartDate,
-      eventEndDatetime: eventEndDate,
-    }));
+    const schedules = categoryDetails.map((categoryDetail) => {
+      const schedule = structuredSchedules[categoryDetail.id];
+      const idQualificationTime = schedule?.idQualificationTime || undefined;
+      const eventStartDatetime = schedule
+        ? parseServerDatetime(schedule.eventStartDatetime)
+        : eventStartDate;
+      const eventEndDatetime = schedule
+        ? parseServerDatetime(schedule.eventEndDatetime)
+        : eventEndDate;
+
+      return {
+        key: stringUtil.createRandom(),
+        categoryDetail: {
+          value: categoryDetail.id,
+          label: categoryDetail.labelCategory,
+        },
+        idQualificationTime: idQualificationTime,
+        eventStartDatetime: eventStartDatetime,
+        eventEndDatetime: eventEndDatetime,
+      };
+    });
 
     return {
       ...parentCompetitionCategory,

@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.14
+FROM node:lts-alpine3.10 #lts-alpine3.14
 
 CMD mkdir myarchery-web-admin
 WORKDIR myarchery-web-admin

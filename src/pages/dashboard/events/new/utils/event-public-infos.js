@@ -2,7 +2,7 @@ import { eventConfigs } from "constants/index";
 import { filesUtil, stringUtil } from "utils";
 import { parseServerDatetime, formatServerDatetime } from "./datetime";
 
-const { EVENT_TYPES, MATCH_TYPES } = eventConfigs;
+const { MATCH_TYPES } = eventConfigs;
 
 function makeStatePublicInfos(eventDetail) {
   if (!eventDetail) {
@@ -33,7 +33,7 @@ function makeStatePublicInfos(eventDetail) {
   };
 }
 
-async function makePayloadPublicInfos(formData, eventId) {
+async function makePayloadPublicInfos(formData, { eventId, eventType }) {
   if (!formData) {
     return null;
   }
@@ -58,7 +58,7 @@ async function makePayloadPublicInfos(formData, eventId) {
   if (!eventId) {
     // Mode create
     return {
-      eventType: EVENT_TYPES.FULLDAY,
+      eventType: eventType,
       eventCompetition: MATCH_TYPES.TOURNAMENT,
       ...payload,
     };

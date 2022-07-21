@@ -39,7 +39,7 @@ import { computeLastUnlockedStep } from "./utils/last-unlocked-step";
 import IconPlus from "components/ma/icons/mono/plus";
 
 function PageCreateEventFullday() {
-  const { eventId, setParamEventId, isManageEvent } = useRouteQueryParams();
+  const { eventId, setParamEventId, isManageEvent, eventType: qsEventType } = useRouteQueryParams();
 
   const {
     data: eventDetail,
@@ -50,6 +50,7 @@ function PageCreateEventFullday() {
   const schedulesProvider = useQualificationSchedules(eventDetail);
   const { data: schedules } = schedulesProvider;
 
+  const eventType = _checkEventType(eventDetail, qsEventType);
   // Forms
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
@@ -70,7 +71,7 @@ function PageCreateEventFullday() {
     isLoading: isSubmitingPublicInfos,
     isError: isErrorPublicInfos,
     errors: publicInfosErrors,
-  } = useSubmitPublicInfos();
+  } = useSubmitPublicInfos({ eventType: eventType, eventId: eventDetail?.id });
 
   const {
     submit: submitCategories,
@@ -120,7 +121,6 @@ function PageCreateEventFullday() {
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitPublicInfos(formPublicInfos.data, {
-                    eventId: eventDetail?.id,
                     onSuccess(data) {
                       toast.success("Informasi umum event berhasil disimpan");
                       const isCreateMode = !eventDetail?.id || !eventId;
@@ -267,5 +267,12 @@ const SpacedHeaderBar = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+
+/* ======================================= */
+// utils
+
+function _checkEventType(eventDetail, qsEventType) {
+  return eventDetail?.eventType || qsEventType || null;
+}
 
 export { PageCreateEventFullday };

@@ -7,7 +7,7 @@ import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
 import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
-import { ButtonSetWinner } from "./button-set-winner";
+import { ButtonSetWinner, ButtonCancelWinner } from "./button-set-winner";
 
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
@@ -199,32 +199,48 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
 
                 <td>
                   <HorizontalSpaced>
-                    {!hasWinner && !isBye && (
-                      <ButtonSetWinner
-                        title={
-                          hasWinner
-                            ? "Pemenang telah ditentukan"
-                            : "Tentukan pemenang untuk match ini"
-                        }
-                        disabled={noData}
-                        scoring={scoring}
-                        categoryId={categoryDetailId}
-                        onSuccess={fetchEliminationMatches}
-                      >
-                        Tentukan
-                      </ButtonSetWinner>
-                    )}
+                    {!isBye &&
+                      (!hasWinner ? (
+                        <React.Fragment>
+                          <ButtonSetWinner
+                            title="Tentukan pemenang untuk match ini"
+                            disabled={noData}
+                            scoring={scoring}
+                            categoryId={categoryDetailId}
+                            onSuccess={fetchEliminationMatches}
+                          >
+                            Tentukan
+                          </ButtonSetWinner>
 
-                    {!hasWinner && !isBye && (
-                      <ButtonEditScoreLine
-                        disabled={noData}
-                        headerInfo={row}
-                        budrestNumber={budrestNumber}
-                        scoring={scoring}
-                        onSuccessSubmit={fetchEliminationMatches}
-                        categoryDetails={categoryDetails}
-                      />
-                    )}
+                          <ButtonEditScoreLine
+                            disabled={noData}
+                            headerInfo={row}
+                            budrestNumber={budrestNumber}
+                            scoring={scoring}
+                            onSuccessSubmit={fetchEliminationMatches}
+                            categoryDetails={categoryDetails}
+                          />
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment>
+                          <ButtonCancelWinner
+                            title="Batalkan pemenang untuk mengubah skor kembali"
+                            scoring={scoring}
+                            categoryId={categoryDetailId}
+                            onSuccess={fetchEliminationMatches}
+                          />
+
+                          <ButtonEditScoreLine
+                            disabled={noData}
+                            viewMode
+                            headerInfo={row}
+                            budrestNumber={budrestNumber}
+                            scoring={scoring}
+                            onSuccessSubmit={fetchEliminationMatches}
+                            categoryDetails={categoryDetails}
+                          />
+                        </React.Fragment>
+                      ))}
 
                     <ButtonDownloadScoresheet
                       disabled={noData}

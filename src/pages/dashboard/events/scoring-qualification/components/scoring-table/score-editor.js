@@ -6,6 +6,7 @@ import { useSubmitScore } from "../../hooks/submit-score";
 import { AlertSubmitError } from "components/ma";
 import { EditorForm } from "./editor-form";
 import { EditorFormShootOff } from "./editor-form-shootoff";
+import { ConfirmPrompt } from "../confirm-prompt";
 
 import IconX from "components/ma/icons/mono/x";
 
@@ -16,6 +17,7 @@ import classnames from "classnames";
  * Komponen yang kerja beneran di bawah: `<ScoreEditorControl />`
  */
 function ScoreEditor({
+  isLocked,
   isOpen = false,
   memberId,
   sessionNumbersList,
@@ -31,6 +33,7 @@ function ScoreEditor({
   }
 
   const controlProps = {
+    isLocked,
     memberId,
     sessionNumbersList,
     hasShootOff,
@@ -49,6 +52,7 @@ function ScoreEditor({
 }
 
 function ScoreEditorControl({
+  isLocked,
   memberId,
   sessionNumbersList,
   hasShootOff = false,
@@ -156,43 +160,28 @@ function ScoreEditorControl({
     }
   };
 
-  const handleCloseEditor = () => {
+  const handleSaveScoreData = () => {
     if (sessionNumber === 11) {
       // shoot off
-      if (!isFormShootOffDirty) {
-        onClose?.();
-        return;
-      }
-
       const payload = { code: code, shoot_scores: formShootOffValue };
       submitScore(payload, {
         onSuccess() {
           onClose?.();
           onSaveSuccess?.();
         },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
       });
-    } else {
-      // sesi biasa
 
-      if (!isFormDirty) {
-        onClose?.();
-        return;
-      }
-
-      const payload = { code: code, shoot_scores: formValues };
-      submitScore(payload, {
-        onSuccess() {
-          onClose?.();
-          onSaveSuccess?.();
-        },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
-      });
+      return;
     }
+
+    // sesi biasa
+    const payload = { code: code, shoot_scores: formValues };
+    submitScore(payload, {
+      onSuccess() {
+        onClose?.();
+        onSaveSuccess?.();
+      },
+    });
   };
 
   return (
@@ -219,9 +208,23 @@ function ScoreEditorControl({
         )}
 
         <div>
-          <EditorCloseButton flexible onClick={handleCloseEditor}>
-            <IconX size="16" />
-          </EditorCloseButton>
+          <ConfirmPrompt
+            renderButton={({ handlePrompt }) => {
+              return (
+                <EditorCloseButton flexible onClick={handlePrompt}>
+                  <IconX size="16" />
+                </EditorCloseButton>
+              );
+            }}
+            messagePrompt="Ada data skor yang belum tersimpan"
+            messageDescription="Yakin akan menutup editor skor?"
+            reverseButtons
+            buttonConfirmLabel="Tutup Saja"
+            buttonCancelLabel="Simpan"
+            shouldPrompt={isFormDirty || isFormShootOffDirty}
+            onConfirm={onClose}
+            onCancel={handleSaveScoreData}
+          />
         </div>
       </EditorHeader>
 
@@ -229,6 +232,7 @@ function ScoreEditorControl({
         hasShootOff ? (
           <EditorFormShootOff
             key={sessionNumber}
+            viewMode={isLocked}
             isLoading={isLoadingForm}
             shootOffData={formShootOffValue}
             onChange={(shootOffData) => setShotOffValue(shootOffData)}
@@ -239,6 +243,7 @@ function ScoreEditorControl({
       ) : (
         <EditorForm
           key={sessionNumber}
+          viewMode={isLocked}
           isLoading={isLoadingForm}
           scoresData={formValues}
           onChange={(scoresData) => setFormValues(scoresData)}

@@ -627,7 +627,7 @@ function ModalEditorViewer({ headerInfo, budrestNumber, onClose, scoring, catego
           </SplitEditor>
 
           <HorizontalSpaced>
-            <ButtonBlue>Tutup</ButtonBlue>
+            <ButtonBlue onClick={onClose}>Tutup</ButtonBlue>
           </HorizontalSpaced>
         </BodyWrapper>
       </ModalBody>

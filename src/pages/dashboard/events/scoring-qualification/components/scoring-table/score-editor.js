@@ -6,6 +6,7 @@ import { useSubmitScore } from "../../hooks/submit-score";
 import { AlertSubmitError } from "components/ma";
 import { EditorForm } from "./editor-form";
 import { EditorFormShootOff } from "./editor-form-shootoff";
+import { ConfirmPrompt } from "../confirm-prompt";
 
 import IconX from "components/ma/icons/mono/x";
 
@@ -156,43 +157,28 @@ function ScoreEditorControl({
     }
   };
 
-  const handleCloseEditor = () => {
+  const handleSaveScoreData = () => {
     if (sessionNumber === 11) {
       // shoot off
-      if (!isFormShootOffDirty) {
-        onClose?.();
-        return;
-      }
-
       const payload = { code: code, shoot_scores: formShootOffValue };
       submitScore(payload, {
         onSuccess() {
           onClose?.();
           onSaveSuccess?.();
         },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
       });
-    } else {
-      // sesi biasa
 
-      if (!isFormDirty) {
-        onClose?.();
-        return;
-      }
-
-      const payload = { code: code, shoot_scores: formValues };
-      submitScore(payload, {
-        onSuccess() {
-          onClose?.();
-          onSaveSuccess?.();
-        },
-        onError() {
-          // TODO: prompt retry / switch without saving anyway
-        },
-      });
+      return;
     }
+
+    // sesi biasa
+    const payload = { code: code, shoot_scores: formValues };
+    submitScore(payload, {
+      onSuccess() {
+        onClose?.();
+        onSaveSuccess?.();
+      },
+    });
   };
 
   return (
@@ -219,9 +205,23 @@ function ScoreEditorControl({
         )}
 
         <div>
-          <EditorCloseButton flexible onClick={handleCloseEditor}>
-            <IconX size="16" />
-          </EditorCloseButton>
+          <ConfirmPrompt
+            renderButton={({ handlePrompt }) => {
+              return (
+                <EditorCloseButton flexible onClick={handlePrompt}>
+                  <IconX size="16" />
+                </EditorCloseButton>
+              );
+            }}
+            messagePrompt="Ada data skor yang belum tersimpan"
+            messageDescription="Yakin akan menutup editor skor?"
+            reverseButtons
+            buttonConfirmLabel="Tutup Saja"
+            buttonCancelLabel="Simpan"
+            shouldPrompt={isFormDirty || isFormShootOffDirty}
+            onConfirm={onClose}
+            onCancel={handleSaveScoreData}
+          />
         </div>
       </EditorHeader>
 

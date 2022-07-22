@@ -4,13 +4,16 @@ import { useInputSwitcher } from "./hooks/input-switcher";
 
 import { SpinnerDotBlock } from "components/ma";
 import { SelectScore } from "./select-score";
+import { DisplayScore } from "../display-score";
+
+import classnames from "classnames";
 
 /**
  * Controlled component
  * ...gak manage state di dalam kecuali untuk kebutuhan internal
  * (tapi gak di-ekspose langsung ke parent - lihat pemanggilan onChange?.(...))
  */
-function EditorForm({ scoresData, isLoading, onChange }) {
+function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
   const scoresFromProp = _makeScoresDataFromProp(scoresData);
   const rambahanNumbers = scoresFromProp ? Object.keys(scoresFromProp) : [];
   const [selectedScore, setSelectedScore] = React.useState(null);
@@ -44,42 +47,50 @@ function EditorForm({ scoresData, isLoading, onChange }) {
           <tbody>
             {rambahanNumbers.map((rambahanNumber, rambahanIndex) => (
               <tr key={rambahanNumber}>
-                <RambahanCell>{rambahanNumber}</RambahanCell>
+                <RambahanCell className={classnames({ "font-bold": viewMode })}>
+                  {rambahanNumber}
+                </RambahanCell>
 
                 {scoresFromProp[rambahanNumber].map((scoreItem, shotIndex) => {
                   const pos = { y: rambahanIndex, x: shotIndex };
                   const isFocus = shouldFocusSelector(pos);
                   return (
                     <RambahanCell key={shotIndex}>
-                      <SelectScore
-                        name={`shot-score-${rambahanIndex}-${shotIndex}`}
-                        value={scoreItem}
-                        onChange={(value) => {
-                          handleSelectScore({
-                            rambahan: rambahanIndex,
-                            shot: shotIndex,
-                            score: value,
-                          });
-                        }}
-                        onInputChange={(inputString) => {
-                          const value = _getValueFromInput(inputString);
-                          if (!value) {
-                            return;
-                          }
-                          handleSelectScore({
-                            rambahan: rambahanIndex,
-                            shot: shotIndex,
-                            score: value,
-                          });
-                        }}
-                        isFocus={isFocus}
-                        onFocus={() => setPosition(pos)}
-                      />
+                      {viewMode ? (
+                        <DisplayScore value={scoreItem} />
+                      ) : (
+                        <SelectScore
+                          name={`shot-score-${rambahanIndex}-${shotIndex}`}
+                          value={scoreItem}
+                          onChange={(value) => {
+                            handleSelectScore({
+                              rambahan: rambahanIndex,
+                              shot: shotIndex,
+                              score: value,
+                            });
+                          }}
+                          onInputChange={(inputString) => {
+                            const value = _getValueFromInput(inputString);
+                            if (!value) {
+                              return;
+                            }
+                            handleSelectScore({
+                              rambahan: rambahanIndex,
+                              shot: shotIndex,
+                              score: value,
+                            });
+                          }}
+                          isFocus={isFocus}
+                          onFocus={() => setPosition(pos)}
+                        />
+                      )}
                     </RambahanCell>
                   );
                 })}
 
-                <RambahanCell>{_sumRambahanTotal(scoresFromProp[rambahanNumber])}</RambahanCell>
+                <RambahanCell className={classnames({ "font-bold": viewMode })}>
+                  {_sumRambahanTotal(scoresFromProp[rambahanNumber])}
+                </RambahanCell>
               </tr>
             ))}
           </tbody>
@@ -216,6 +227,10 @@ const RambahanCell = styled.td`
     padding: 0.5rem 0.25rem;
     text-align: center;
     vertical-align: middle;
+
+    &.font-bold {
+      font-weight: 600;
+    }
   }
 `;
 

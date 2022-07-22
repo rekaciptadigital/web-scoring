@@ -19,6 +19,8 @@ import {
 import { toast } from "../processing-toast";
 import { ScoreGridForm } from "./components/score-grid-form";
 import { ScoreGridFormRight } from "./components/score-grid-form-right";
+import { ScoreGridViewer } from "./components/score-grid-viewer";
+import { ScoreGridViewerRight } from "./components/score-grid-viewer-right";
 
 import IconEdit from "components/ma/icons/mono/edit";
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
@@ -32,6 +34,7 @@ import { sumScoresList } from "./utils";
 
 function ButtonEditScoreLine({
   disabled,
+  viewMode,
   scoring,
   headerInfo,
   budrestNumber,
@@ -47,6 +50,32 @@ function ButtonEditScoreLine({
   const close = () => {
     setOpen(false);
   };
+
+  if (viewMode) {
+    return (
+      <React.Fragment>
+        <ButtonOutlineBlue
+          flexible
+          title={disabled ? undefined : "Lihat detail skor"}
+          onClick={open}
+          disabled={disabled}
+        >
+          <span>Detail</span>
+        </ButtonOutlineBlue>
+
+        {isOpen && (
+          <ModalEditorViewer
+            headerInfo={headerInfo}
+            budrestNumber={budrestNumber}
+            onClose={close}
+            scoring={scoring}
+            onSuccessSubmit={onSuccessSubmit}
+            categoryDetails={categoryDetails}
+          />
+        )}
+      </React.Fragment>
+    );
+  }
 
   return (
     <React.Fragment>
@@ -451,6 +480,158 @@ function ModalEditor({
         </ModalBody>
       </Modal>
     </React.Fragment>
+  );
+}
+
+function ModalEditorViewer({ headerInfo, budrestNumber, onClose, scoring, categoryDetails }) {
+  const {
+    isError: isErrorScoringDetail,
+    errors: errorsScoringDetail,
+    data: scoringDetails,
+  } = useScoringDetail(scoring);
+
+  const isSettled = Boolean(scoringDetails) || (!scoringDetails && isErrorScoringDetail);
+  const headerPlayer1 = headerInfo?.teams[0];
+  const headerPlayer2 = headerInfo?.teams[1];
+  const player1 = scoringDetails?.[0];
+  const player2 = scoringDetails?.[1];
+
+  const { value: gridDataPlayer1 } = useGridForm(player1?.scores);
+  const { value: gridDataPlayer2 } = useGridForm(player2?.scores);
+
+  if (!isSettled) {
+    return (
+      <React.Fragment>
+        <AlertSubmitError
+          isError={isErrorScoringDetail}
+          errors={errorsScoringDetail}
+          onConfirm={onClose}
+        />
+        <LoadingScreen loading />
+      </React.Fragment>
+    );
+  }
+
+  if (!scoringDetails && isErrorScoringDetail) {
+    return <AlertSubmitError isError errors={errorsScoringDetail} onConfirm={onClose} />;
+  }
+
+  return (
+    <Modal isOpen centered backdrop="static" size="lg" autoFocus onClosed={onClose}>
+      <ModalBody>
+        <BodyWrapper>
+          <ModalHeaderBar>
+            <h4>Scoresheet</h4>
+            <EditorCloseButton flexible onClick={onClose}>
+              <IconX size="16" />
+            </EditorCloseButton>
+          </ModalHeaderBar>
+
+          <ScoresheetHeader>
+            <BudrestNumberLabel>{budrestNumber || "-"}</BudrestNumberLabel>
+
+            <PlayerLabelContainerLeft>
+              <PlayerNameData>
+                <RankLabel>#{headerPlayer1?.potition || headerPlayer1?.postition || "-"}</RankLabel>
+                <NameLabel>
+                  {player1?.participant.member.name || headerPlayer1?.name || "-"}
+                </NameLabel>
+              </PlayerNameData>
+            </PlayerLabelContainerLeft>
+
+            <HeadToHeadScores>
+              <HeaderScoreInput>
+                {player1?.scores.isDifferent ? (
+                  <IndicatorIconFloating className="indicator-left indicator-warning">
+                    <IconAlertCircle />
+                  </IndicatorIconFloating>
+                ) : (
+                  <IndicatorIconFloating className="indicator-left indicator-valid">
+                    <IconCheckOkCircle />
+                  </IndicatorIconFloating>
+                )}
+              </HeaderScoreInput>
+
+              <HeadToHeadScoreLabels>
+                <ScoreCounter
+                  className={classnames({
+                    "score-counter-highlighted":
+                      player1?.scores?.adminTotal > player2?.scores?.adminTotal,
+                  })}
+                >
+                  {player1?.scores?.adminTotal || 0}
+                </ScoreCounter>
+
+                <span>&ndash;</span>
+
+                <ScoreCounter
+                  className={classnames({
+                    "score-counter-highlighted":
+                      player2?.scores?.adminTotal > player1?.scores?.adminTotal,
+                  })}
+                >
+                  {player2?.scores?.adminTotal || 0}
+                </ScoreCounter>
+              </HeadToHeadScoreLabels>
+
+              <HeaderScoreInput>
+                {player2?.scores.isDifferent ? (
+                  <IndicatorIconFloating className="indicator-right indicator-warning">
+                    <IconAlertCircle />
+                  </IndicatorIconFloating>
+                ) : (
+                  <IndicatorIconFloating className="indicator-right indicator-valid">
+                    <IconCheckOkCircle />
+                  </IndicatorIconFloating>
+                )}
+              </HeaderScoreInput>
+            </HeadToHeadScores>
+
+            <PlayerLabelContainerRight>
+              <PlayerNameData>
+                <RankLabel>#{headerPlayer2?.potition || headerPlayer2?.postition || "-"}</RankLabel>
+                <NameLabel>
+                  {player2?.participant.member.name ||
+                    headerPlayer2?.name ||
+                    "Nama archer tidak tersedia"}
+                </NameLabel>
+              </PlayerNameData>
+            </PlayerLabelContainerRight>
+          </ScoresheetHeader>
+
+          <CategoryLabel>
+            <div>{categoryDetails?.teamCategoryLabel}</div>
+            <div>
+              <IconBow size="16" /> {categoryDetails?.originalCategoryDetail.competitionCategoryId}{" "}
+              {categoryDetails?.originalCategoryDetail.ageCategoryId}
+            </div>
+            <div>
+              <IconDistance size="16" />{" "}
+              {_getDistanceCategoryLabel(categoryDetails?.originalCategoryDetail.classCategory)}
+            </div>
+          </CategoryLabel>
+
+          <SplitEditor>
+            <div>
+              <ScoreGridViewer
+                scoringType={player1?.scores.eliminationtScoreType}
+                gridData={gridDataPlayer1}
+              />
+            </div>
+            <div>
+              <ScoreGridViewerRight
+                scoringType={player2?.scores.eliminationtScoreType}
+                gridData={gridDataPlayer2}
+              />
+            </div>
+          </SplitEditor>
+
+          <HorizontalSpaced>
+            <ButtonBlue onClick={onClose}>Tutup</ButtonBlue>
+          </HorizontalSpaced>
+        </BodyWrapper>
+      </ModalBody>
+    </Modal>
   );
 }
 

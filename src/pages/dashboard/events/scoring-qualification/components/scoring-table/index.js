@@ -227,7 +227,7 @@ function ScoringTable({
                           <ExpanderButton
                             flexible
                             onClick={() => handleClickSelectRow(row)}
-                            disabled={isLocked || !row.member.isPresent}
+                            disabled={!row.member.isPresent}
                           >
                             <IconChevronRight size="16" />
                           </ExpanderButton>
@@ -243,6 +243,7 @@ function ScoringTable({
 
         <ScoreEditor
           key={`${categoryDetailId}-${activeRow?.member.id}`}
+          isLocked={isLocked}
           isOpen={isEditorOpen}
           memberId={activeRow?.member.id}
           sessionNumbersList={sessionNumbersList}

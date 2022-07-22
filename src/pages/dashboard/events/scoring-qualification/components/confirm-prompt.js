@@ -1,72 +1,23 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useSubmitCancelBracket } from "../hooks/submit-cancel-bracket";
 
 import SweetAlert from "react-bootstrap-sweetalert";
-import {
-  Button,
-  ButtonBlue,
-  ButtonOutlineRed,
-  LoadingScreen,
-  AlertSubmitError,
-} from "components/ma";
-import { toast } from "./processing-toast";
+import { Button, ButtonBlue } from "components/ma";
 
 import illustrationAlert from "assets/images/events/alert-publication.svg";
 
-function ButtonCancelBracket({ disabled, categoryId, onSuccess }) {
-  const { submitCancelBracket, isLoading, isError, errors } = useSubmitCancelBracket(categoryId);
-
-  return (
-    <React.Fragment>
-      <ButtonConfirmPrompt
-        customButton={ButtonOutlineRed}
-        flexible
-        reverseButtons
-        title="Membatalkan plotting bagan eliminasi dari daftar pemeringkatan peserta"
-        disabled={disabled}
-        messagePrompt="Yakin akan membatalkan plotting bagan eliminasi?"
-        messageDescription="Plotting peserta pada bagan akan dibatalkan. Skoring juga akan dibuka kembali dan skor dapat diubah."
-        buttonConfirmLabel="Yakin"
-        buttonCancelLabel="Tidak"
-        onConfirm={() => {
-          const options = {
-            onSuccess: () => {
-              toast.success("Plotting bagan eliminasi dibatalkan");
-              onSuccess?.();
-            },
-          };
-          submitCancelBracket(options);
-        }}
-      >
-        Batalkan Bagan Eliminasi
-      </ButtonConfirmPrompt>
-
-      <LoadingScreen loading={isLoading} />
-      <AlertSubmitError isError={isError} errors={errors} />
-    </React.Fragment>
-  );
-}
-
-function ButtonConfirmPrompt({
-  children,
-  disabled,
-  title,
+function ConfirmPrompt({
+  shouldPrompt,
+  renderButton,
   reverseButtons,
   buttonConfirmLabel,
   onConfirm,
   buttonCancelLabel,
   onCancel,
-  customButton,
-  flexible,
   messagePrompt,
   messageDescription,
 }) {
   const [showAlert, setShowAlert] = React.useState(false);
-
-  const closeAlert = () => {
-    setShowAlert(false);
-  };
 
   const handleCancel = () => {
     setShowAlert(false);
@@ -74,22 +25,27 @@ function ButtonConfirmPrompt({
   };
 
   const handleConfirm = () => {
+    setShowAlert(false);
     onConfirm?.();
-    closeAlert();
   };
 
-  const CustomButtomComp = customButton || Button;
-
-  const buttonTriggerProps = {
-    onClick: () => setShowAlert(true),
-    disabled: disabled,
-    flexible: flexible,
-    title: title,
+  const handlers = {
+    handlePrompt: () => {
+      if (shouldPrompt) {
+        setShowAlert(true);
+      } else {
+        handleConfirm();
+      }
+    },
   };
 
   return (
     <React.Fragment>
-      <CustomButtomComp {...buttonTriggerProps}>{children}</CustomButtomComp>
+      {renderButton ? (
+        renderButton(handlers)
+      ) : (
+        <span>Render button dengan prop render function yang disediakan</span>
+      )}
       <SweetAlert
         show={showAlert}
         title=""
@@ -134,4 +90,4 @@ const IllustationAlertPrompt = styled.div`
   background-size: contain;
 `;
 
-export { ButtonCancelBracket };
+export { ConfirmPrompt };

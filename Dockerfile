@@ -14,7 +14,7 @@ RUN npm cache clean --force
 RUN npm uninstall node-sass --force
 RUN npm i sass --legacy-peer-deps
 RUN npm install --force #--legacy-peer-deps
-RUN npm audit fix --force
+RUN npm audit fix
 RUN npm run build
 
 RUN rm -f config/.env

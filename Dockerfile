@@ -13,6 +13,7 @@ RUN apk add curl
 RUN npm uninstall node-sass --force
 RUN npm i sass --legacy-peer-deps
 RUN npm install --force #--legacy-peer-deps
+RUN npm cache
 RUN npm run build
 
 RUN rm -f config/.env

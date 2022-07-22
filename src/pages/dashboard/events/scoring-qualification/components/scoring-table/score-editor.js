@@ -17,6 +17,7 @@ import classnames from "classnames";
  * Komponen yang kerja beneran di bawah: `<ScoreEditorControl />`
  */
 function ScoreEditor({
+  isLocked,
   isOpen = false,
   memberId,
   sessionNumbersList,
@@ -32,6 +33,7 @@ function ScoreEditor({
   }
 
   const controlProps = {
+    isLocked,
     memberId,
     sessionNumbersList,
     hasShootOff,
@@ -50,6 +52,7 @@ function ScoreEditor({
 }
 
 function ScoreEditorControl({
+  isLocked,
   memberId,
   sessionNumbersList,
   hasShootOff = false,
@@ -229,6 +232,7 @@ function ScoreEditorControl({
         hasShootOff ? (
           <EditorFormShootOff
             key={sessionNumber}
+            viewMode={isLocked}
             isLoading={isLoadingForm}
             shootOffData={formShootOffValue}
             onChange={(shootOffData) => setShotOffValue(shootOffData)}
@@ -239,6 +243,7 @@ function ScoreEditorControl({
       ) : (
         <EditorForm
           key={sessionNumber}
+          viewMode={isLocked}
           isLoading={isLoadingForm}
           scoresData={formValues}
           onChange={(scoresData) => setFormValues(scoresData)}

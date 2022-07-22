@@ -3,13 +3,14 @@ import styled from "styled-components";
 
 import { SpinnerDotBlock } from "components/ma";
 import { SelectScoreShootOff } from "./select-score-shoot-off";
+import { DisplayScore } from "../display-score";
 
 /**
  * Controlled component
  * ...gak manage state di dalam kecuali untuk kebutuhan internal
  * (tapi gak di-ekspose langsung ke parent - lihat pemanggilan onChange?.(data))
  */
-function EditorFormShootOff({ shootOffData, isLoading, onChange }) {
+function EditorFormShootOff({ viewMode, shootOffData, isLoading, onChange }) {
   const scoresFromProp = _makeScoresDataFromProp(shootOffData);
 
   const [selectedScore, setSelectedScore] = React.useState(null);
@@ -52,27 +53,31 @@ function EditorFormShootOff({ shootOffData, isLoading, onChange }) {
         <ShootOffFormContainer>
           <ShootOffBar>
             <ShootOffGroup>
-              {scoresFromProp.map((scoreValue, index) => (
-                <SelectScoreShootOff
-                  key={index}
-                  name={`shot-off-score-${index + 1}`}
-                  value={scoreValue}
-                  onChange={(value) => {
-                    handleSelectScore({
-                      shotIndex: index,
-                      score: value.score,
-                      distanceFromX: value.distance,
-                    });
-                  }}
-                  isFocus={shouldFocusSelector(index)}
-                  onFocus={() => setNextFocusedSelector(index)}
-                  onBlur={() => setNextFocusedSelector(null)}
-                  onSetDistance={() => {
-                    const isLastIndex = index >= scoresFromProp.length - 1;
-                    setNextFocusedSelector(isLastIndex ? index : index + 1);
-                  }}
-                />
-              ))}
+              {scoresFromProp.map((scoreValue, index) =>
+                viewMode ? (
+                  <DisplayScore value={scoreValue} />
+                ) : (
+                  <SelectScoreShootOff
+                    key={index}
+                    name={`shot-off-score-${index + 1}`}
+                    value={scoreValue}
+                    onChange={(value) => {
+                      handleSelectScore({
+                        shotIndex: index,
+                        score: value.score,
+                        distanceFromX: value.distance,
+                      });
+                    }}
+                    isFocus={shouldFocusSelector(index)}
+                    onFocus={() => setNextFocusedSelector(index)}
+                    onBlur={() => setNextFocusedSelector(null)}
+                    onSetDistance={() => {
+                      const isLastIndex = index >= scoresFromProp.length - 1;
+                      setNextFocusedSelector(isLastIndex ? index : index + 1);
+                    }}
+                  />
+                )
+              )}
             </ShootOffGroup>
 
             <StatTotal>{_sumTotalShootOffScores(scoresFromProp)}</StatTotal>

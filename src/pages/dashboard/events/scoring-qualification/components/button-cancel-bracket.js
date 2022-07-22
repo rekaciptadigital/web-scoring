@@ -32,7 +32,7 @@ function ButtonCancelBracket({ disabled, categoryId, onSuccess }) {
         onConfirm={() => {
           const options = {
             onSuccess: () => {
-              toast.success("Pemenang berhasil dibatalkan");
+              toast.success("Plotting bagan eliminasi dibatalkan");
               onSuccess?.();
             },
           };

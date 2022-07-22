@@ -222,12 +222,24 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                           />
                         </React.Fragment>
                       ) : (
-                        <ButtonCancelWinner
-                          title="Batalkan pemenang untuk mengubah skor kembali"
-                          scoring={scoring}
-                          categoryId={categoryDetailId}
-                          onSuccess={fetchEliminationMatches}
-                        />
+                        <React.Fragment>
+                          <ButtonCancelWinner
+                            title="Batalkan pemenang untuk mengubah skor kembali"
+                            scoring={scoring}
+                            categoryId={categoryDetailId}
+                            onSuccess={fetchEliminationMatches}
+                          />
+
+                          <ButtonEditScoreLine
+                            disabled={noData}
+                            viewMode
+                            headerInfo={row}
+                            budrestNumber={budrestNumber}
+                            scoring={scoring}
+                            onSuccessSubmit={fetchEliminationMatches}
+                            categoryDetails={categoryDetails}
+                          />
+                        </React.Fragment>
                       ))}
 
                     <ButtonDownloadScoresheet

@@ -18,6 +18,8 @@ function FieldInputDateSmall({
   disabled,
   errors,
   warnings,
+  minDate,
+  maxDate,
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -42,6 +44,8 @@ function FieldInputDateSmall({
         locale={id}
         dateFormat="dd/MM/yyyy"
         disabled={disabled}
+        minDate={minDate}
+        maxDate={maxDate}
       />
     </FieldInputDateWrapper>
   );

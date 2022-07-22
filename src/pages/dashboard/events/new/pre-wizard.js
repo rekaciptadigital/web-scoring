@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { useHistory, useLocation, Link } from "react-router-dom";
 import styled from "styled-components";
 import { useWizardView } from "utils/hooks/wizard-view";
 import { eventConfigs } from "constants/index";
@@ -22,6 +22,8 @@ const stepsList = [
 const { EVENT_TYPES, MATCH_TYPES } = eventConfigs;
 
 export default function PreWizard() {
+  const { pathname, search } = useLocation();
+  const history = useHistory();
   const { currentStep, stepsTotal, goToNextStep, goToPreviousStep } = useWizardView(stepsList);
   const computeProgressValue = () => currentStep / stepsTotal;
 
@@ -39,6 +41,13 @@ export default function PreWizard() {
       return true;
     }
     return false;
+  };
+
+  const setParamEventType = (event_type) => {
+    const queryStrings = new URLSearchParams(search);
+    queryStrings.set("event_type", event_type);
+    const URLWithParams = queryStrings.toString();
+    history.replace(`${pathname}?${URLWithParams}`);
   };
 
   return (
@@ -66,20 +75,37 @@ export default function PreWizard() {
                 </WizardViewContent>
 
                 <WizardViewContent>
-                  <Step2 matchType={matchType} onChange={handleMatchTypeChange} />
+                  <Step2
+                    eventType={eventType}
+                    matchType={matchType}
+                    onChange={handleMatchTypeChange}
+                  />
                 </WizardViewContent>
               </WizardView>
 
               <ActionButtonGroup className="mt-5">
                 {currentStep === 2 ? (
-                  <Link className="button-action next" to="/dashboard/events/new/fullday">
+                  <Link
+                    className="button-action next"
+                    to={"/dashboard/events/new/fullday?event_type=" + eventType}
+                  >
                     Buat Event
                   </Link>
                 ) : (
                   <button
                     className="button-action next"
                     disabled={shouldButtonNextDisabled()}
-                    onClick={() => goToNextStep()}
+                    onClick={() => {
+                      goToNextStep();
+                      setParamEventType(eventType);
+
+                      // Untuk ngeset nilai default yang tampil di step 2-nya
+                      if (eventType === EVENT_TYPES.MARATHON) {
+                        setMatchType(MATCH_TYPES.GAMES);
+                      } else if (eventType === EVENT_TYPES.FULLDAY) {
+                        setMatchType(MATCH_TYPES.TOURNAMENT);
+                      }
+                    }}
                   >
                     Lanjut
                   </button>

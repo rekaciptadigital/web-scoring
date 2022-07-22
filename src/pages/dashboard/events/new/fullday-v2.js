@@ -31,15 +31,19 @@ import { ScreenPublicInfos } from "./screens/public-infos";
 import { ScreenFees } from "./screens/fees";
 import { ScreenCategories } from "./screens/categories";
 import { ScreenSchedules } from "./screens/schedules";
+import { ScreenSchedulesMarathon } from "./screens/schedules-marathon";
 import { ScreenFinish } from "./screens/finish";
 
+import { eventConfigs } from "constants/index";
 import { stepId } from "./constants/step-ids";
 import { computeLastUnlockedStep } from "./utils/last-unlocked-step";
 
 import IconPlus from "components/ma/icons/mono/plus";
 
+const { EVENT_TYPES } = eventConfigs;
+
 function PageCreateEventFullday() {
-  const { eventId, setParamEventId, isManageEvent } = useRouteQueryParams();
+  const { eventId, setParamEventId, isManageEvent, eventType: qsEventType } = useRouteQueryParams();
 
   const {
     data: eventDetail,
@@ -50,11 +54,18 @@ function PageCreateEventFullday() {
   const schedulesProvider = useQualificationSchedules(eventDetail);
   const { data: schedules } = schedulesProvider;
 
+  const eventType = _checkEventType(eventDetail, qsEventType);
+  const isTypeMarathon = eventType === EVENT_TYPES.MARATHON;
+
   // Forms
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
-  const formSchedules = useFormSchedules(schedules, eventDetail);
+  const formSchedules = useFormSchedules(schedules, {
+    eventType,
+    eventDetail,
+    categoryDetails: categories,
+  });
 
   const lastUnlockedStep = computeLastUnlockedStep([
     formPublicInfos.isEmpty,
@@ -70,7 +81,7 @@ function PageCreateEventFullday() {
     isLoading: isSubmitingPublicInfos,
     isError: isErrorPublicInfos,
     errors: publicInfosErrors,
-  } = useSubmitPublicInfos();
+  } = useSubmitPublicInfos({ eventType: eventType, eventId: eventDetail?.id });
 
   const {
     submit: submitCategories,
@@ -120,7 +131,6 @@ function PageCreateEventFullday() {
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitPublicInfos(formPublicInfos.data, {
-                    eventId: eventDetail?.id,
                     onSuccess(data) {
                       toast.success("Informasi umum event berhasil disimpan");
                       const isCreateMode = !eventDetail?.id || !eventId;
@@ -230,12 +240,21 @@ function PageCreateEventFullday() {
             </StepHeader>
 
             <StepBody>
-              <ScreenSchedules
-                eventDetail={eventDetail}
-                categories={categories}
-                formSchedules={formSchedules}
-                schedulesProvider={schedulesProvider}
-              />
+              {!isTypeMarathon ? (
+                <ScreenSchedules
+                  eventDetail={eventDetail}
+                  categories={categories}
+                  formSchedules={formSchedules}
+                  schedulesProvider={schedulesProvider}
+                />
+              ) : (
+                <ScreenSchedulesMarathon
+                  eventDetail={eventDetail}
+                  categories={categories}
+                  formSchedules={formSchedules}
+                  onSuccessSubmit={schedulesProvider.fetchSchedules}
+                />
+              )}
             </StepBody>
 
             <StepFooterActions>
@@ -267,5 +286,12 @@ const SpacedHeaderBar = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+
+/* ======================================= */
+// utils
+
+function _checkEventType(eventDetail, qsEventType) {
+  return eventDetail?.eventType || qsEventType || null;
+}
 
 export { PageCreateEventFullday };

@@ -2,6 +2,9 @@ import { differenceInDays, addDays, subDays } from "date-fns";
 import stringUtil from "utils/stringUtil";
 import { parseServerDatetime, formatServerDate } from "../utils/datetime";
 
+/* ================================ */
+// FULLDAY
+
 /**
  * Dipakai ketika sama sekali belum ada data schedule/qualification time-nya
  */
@@ -119,4 +122,133 @@ function makeStateSchedules(eventDetail, schedules) {
   return resultFormData;
 }
 
-export { makeDefaultForm, makeStateSchedules };
+/* ================================ */
+// MARATHON
+
+function makeDefaultFormMarathon(categoryDetails, eventDetail) {
+  let eventStartDate = null;
+  let eventEndDate = null;
+
+  if (eventDetail) {
+    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
+    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  }
+
+  const groupedCategories = _groupByCompetitionId(categoryDetails);
+  const competitionIds = groupedCategories ? Object.keys(groupedCategories) : [];
+
+  const formState = competitionIds.map((competitionCategoryId) => {
+    const categoryDetails = groupedCategories[competitionCategoryId];
+
+    const parentCompetitionCategory = {
+      key: stringUtil.createRandom(),
+      competitionCategory: competitionCategoryId,
+      schedules: [],
+    };
+
+    const schedules = categoryDetails.map((categoryDetail) => ({
+      key: stringUtil.createRandom(),
+      categoryDetail: {
+        value: categoryDetail.id,
+        label: categoryDetail.labelCategory,
+      },
+      idQualificationTime: undefined,
+      eventStartDatetime: eventStartDate,
+      eventEndDatetime: eventEndDate,
+    }));
+
+    return {
+      ...parentCompetitionCategory,
+      schedules,
+    };
+  });
+
+  return formState;
+}
+
+function makeStateSchedulesMarathon(categoryDetails, schedules, eventDetail) {
+  let eventStartDate = null;
+  let eventEndDate = null;
+
+  if (eventDetail) {
+    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
+    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  }
+
+  const structuredSchedules = _arrayToObject(schedules, "categoryDetailId");
+  const groupedCategories = _groupByCompetitionId(categoryDetails);
+  const competitionIds = groupedCategories ? Object.keys(groupedCategories) : [];
+
+  const formState = competitionIds.map((competitionCategoryId) => {
+    const categoryDetails = groupedCategories[competitionCategoryId];
+
+    const parentCompetitionCategory = {
+      key: stringUtil.createRandom(),
+      competitionCategory: competitionCategoryId,
+      schedules: [],
+    };
+
+    const schedules = categoryDetails.map((categoryDetail) => {
+      const schedule = structuredSchedules[categoryDetail.id];
+      const idQualificationTime = schedule?.idQualificationTime || undefined;
+      const eventStartDatetime = schedule
+        ? parseServerDatetime(schedule.eventStartDatetime)
+        : eventStartDate;
+      const eventEndDatetime = schedule
+        ? parseServerDatetime(schedule.eventEndDatetime)
+        : eventEndDate;
+
+      return {
+        key: stringUtil.createRandom(),
+        categoryDetail: {
+          value: categoryDetail.id,
+          label: categoryDetail.labelCategory,
+        },
+        idQualificationTime: idQualificationTime,
+        eventStartDatetime: eventStartDatetime,
+        eventEndDatetime: eventEndDatetime,
+      };
+    });
+
+    return {
+      ...parentCompetitionCategory,
+      schedules,
+    };
+  });
+
+  return formState;
+}
+
+/* ================================ */
+// local utils
+
+function _groupByCompetitionId(categoryDetails) {
+  if (!categoryDetails?.length) {
+    return null;
+  }
+
+  const groupedDataByCompetitionId = {};
+
+  categoryDetails.forEach((categoryDetail) => {
+    const { competitionCategoryId } = categoryDetail;
+    if (!groupedDataByCompetitionId[competitionCategoryId]) {
+      groupedDataByCompetitionId[competitionCategoryId] = [];
+    }
+    groupedDataByCompetitionId[competitionCategoryId].push(categoryDetail);
+  });
+
+  return groupedDataByCompetitionId;
+}
+
+function _arrayToObject(schedules, targetKeyName) {
+  const structuredObject = {};
+
+  schedules.forEach((schedule) => {
+    const accessId = schedule[targetKeyName];
+    structuredObject[accessId] = schedule;
+  });
+
+  return structuredObject;
+}
+
+export { makeDefaultForm, makeStateSchedules, makeDefaultFormMarathon, makeStateSchedulesMarathon };

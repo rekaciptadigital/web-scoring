@@ -1,7 +1,15 @@
 import * as React from "react";
-import { makeDefaultForm, makeStateSchedules } from "../utils/event-schedules";
+import {
+  makeDefaultForm,
+  makeStateSchedules,
+  makeDefaultFormMarathon,
+  makeStateSchedulesMarathon,
+} from "../utils/event-schedules";
+import { eventConfigs } from "constants/index";
 
-function useFormSchedules(schedules, eventDetail) {
+const { EVENT_TYPES } = eventConfigs;
+
+function useFormSchedules(schedules, { eventType, eventDetail, categoryDetails }) {
   const [state, dispatch] = React.useReducer(formReducer, {
     data: null,
     status: "",
@@ -9,8 +17,12 @@ function useFormSchedules(schedules, eventDetail) {
   });
 
   React.useEffect(() => {
-    dispatch({ type: "INIT_FORM", payload: { eventDetail, schedules } });
-  }, [eventDetail, schedules]);
+    dispatch({
+      type: "INIT_FORM",
+      eventType,
+      payload: { schedules, eventDetail, categoryDetails },
+    });
+  }, [eventType, eventDetail, categoryDetails, schedules]);
 
   const updateField = (keyParent, key, fieldName, payload) => {
     dispatch({
@@ -27,19 +39,24 @@ function useFormSchedules(schedules, eventDetail) {
 function formReducer(state, action) {
   switch (action.type) {
     case "INIT_FORM": {
+      const isMarathon = _checkTypeIsMarathon(action.eventType);
+
       if (!action.payload.schedules?.length) {
-        return {
-          ...state,
-          data: makeDefaultForm(action.payload.eventDetail),
-          isEmpty: true,
-        };
+        const data = isMarathon
+          ? makeDefaultFormMarathon(action.payload.categoryDetails, action.payload.eventDetail)
+          : makeDefaultForm(action.payload.eventDetail);
+
+        return { ...state, data, isEmpty: true };
       }
 
-      return {
-        ...state,
-        data: makeStateSchedules(action.payload.eventDetail, action.payload.schedules),
-        isEmpty: !action.payload.schedules.length,
-      };
+      const data = isMarathon
+        ? makeStateSchedulesMarathon(
+            action.payload.categoryDetails,
+            action.payload.schedules,
+            action.payload.eventDetail
+          )
+        : makeStateSchedules(action.payload.eventDetail, action.payload.schedules);
+      return { ...state, data, isEmpty: !action.payload.schedules.length };
     }
 
     case "FIELD_CHANGE": {
@@ -62,6 +79,10 @@ function formReducer(state, action) {
       };
     }
   }
+}
+
+function _checkTypeIsMarathon(eventType = EVENT_TYPES.FULLDAY) {
+  return eventType === EVENT_TYPES.MARATHON;
 }
 
 export { useFormSchedules };

@@ -125,7 +125,7 @@ function CardUserProfile() {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const dispatch = useDispatch();
 
-  const avatarURL = _getAvatarURL(userProfile.avatar);
+  const avatarURL = _getAvatarURL(userProfile?.avatar);
 
   React.useEffect(() => {
     const getUser = async () => {

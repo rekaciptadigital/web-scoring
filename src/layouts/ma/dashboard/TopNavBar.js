@@ -48,7 +48,7 @@ const ProfileMenu = (props) => {
   const handleCancelLogout = () => setConfirmLogout(false);
   const handleLogout = () => push("/logout");
 
-  const avatarURL = _getAvatarURL(userProfile.avatar, user1);
+  const avatarURL = _getAvatarURL(userProfile?.avatar, user1);
 
   return (
     <React.Fragment>

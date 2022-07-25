@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import { useRouteQueryParams } from "./hooks/route-params";
 import { useEventDetail } from "./hooks/event-detail";
 import { useCategoriesQualification } from "./hooks/qualification-categories";
@@ -193,8 +194,11 @@ function PageCreateEventFullday() {
                 </div>
 
                 <div>
+                  <ButtonOutlineBlue as={Link} to={`/dashboard/event/${eventId}/class-categories`}>
+                    Pengaturan Kelas
+                  </ButtonOutlineBlue>
+
                   <ButtonOutlineBlue
-                    corner="8"
                     disabled={formCategories.data?.length >= formCategories.maxLength}
                     onClick={() => formCategories.createEmptyCategory()}
                   >
@@ -285,6 +289,19 @@ const SpacedHeaderBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+
+  > *:nth-child(2) {
+    flex-shrink: 0;
+
+    > * + * {
+      margin-left: 0.5rem;
+    }
+  }
 `;
 
 /* ======================================= */

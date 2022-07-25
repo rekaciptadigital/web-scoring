@@ -14,7 +14,8 @@ import { ScoreEditor } from "./score-editor";
 import IconChevronLeft from "components/ma/icons/mono/chevron-left";
 import IconChevronRight from "components/ma/icons/mono/chevron-right";
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
-
+import IconBudrest from "components/ma/icons/mono/bud-rest";
+import IconMedal from "components/ma/icons/fill/medal-gold";
 import classnames from "classnames";
 
 function ScoringTable({
@@ -144,8 +145,12 @@ function ScoringTable({
           <MembersTable className="table table-responsive">
             <thead>
               <tr>
-                <th>Bantalan</th>
-                <th>Peringkat</th>
+                <th title="Bantalan">
+                  <BudrestColumn />
+                </th>
+                <th title="Peringkat">
+                  <IconMedal />
+                </th>
                 <th className="name">Nama Peserta</th>
                 <th className="name">Nama Klub</th>
                 <SessionStatsColumnHeadingGroup
@@ -256,6 +261,14 @@ function ScoringTable({
         />
       </TableContainer>
     </React.Fragment>
+  );
+}
+
+function BudrestColumn() {
+  return (
+    <BudrestColumnIconWrapper>
+      <IconBudrest />
+    </BudrestColumnIconWrapper>
   );
 }
 
@@ -443,6 +456,7 @@ const MembersTable = styled.table`
   }
 
   tbody td {
+    padding: 0.5rem 0.5rem;
     vertical-align: middle;
 
     &.name {
@@ -458,6 +472,10 @@ const MembersTable = styled.table`
   td {
     cursor: auto;
   }
+`;
+
+const BudrestColumnIconWrapper = styled.span`
+  color: var(--ma-red);
 `;
 
 const CellExpander = styled.div`

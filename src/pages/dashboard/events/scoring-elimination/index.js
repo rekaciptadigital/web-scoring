@@ -164,7 +164,7 @@ function PageEventScoringElimination() {
 // styles
 
 const ViewWrapper = styled.div`
-  padding: 1.875rem;
+  padding: 1rem 1.875rem;
   background-color: #ffffff;
 
   > * + * {
@@ -297,7 +297,7 @@ const FilterItemButton = styled.button`
   &:active,
   &:focus,
   &:focus-visible {
-    padding: 0.5rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     border: solid 1px var(--ma-blue-400);
     border-radius: 0.5rem;
     background-color: transparent;

@@ -7,7 +7,7 @@ import { AddClassCategory } from "./components/editor-class-category";
 import { ClassCategoryItem } from "./components/class-category-item";
 
 function PageClassCategory() {
-  const { data: classCategories } = useAgeCategories();
+  const { data: classCategories, fetchAgeCategories } = useAgeCategories();
   return (
     <ContentLayoutWrapper>
       <ContentHeader>
@@ -17,7 +17,7 @@ function PageClassCategory() {
         </div>
 
         <div>
-          <AddClassCategory />
+          <AddClassCategory onSuccessSubmit={fetchAgeCategories} />
         </div>
       </ContentHeader>
 

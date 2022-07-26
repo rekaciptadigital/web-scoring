@@ -1,18 +1,20 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useFormAgeCategory } from "../hooks/form-age-category";
+import { useSubmitAgeCategory } from "../hooks/submit-create-age-category";
 
 import { Modal, ModalBody } from "reactstrap";
-import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
+import { ButtonBlue, ButtonOutlineBlue, LoadingScreen, AlertSubmitError } from "components/ma";
 import { FieldInputText } from "./field-input-text";
 import { FieldInputAge } from "./field-input-age";
 import { FieldInputDateNarrow } from "./field-input-date-narrow";
 import { SelectRadio } from "./select-radio";
 import { ToggleSwitch } from "./toggle-switch";
+import { AlertSuccess } from "./alert-success";
 
 import IconAdd from "components/ma/icons/mono/plus";
 
-function AddClassCategory() {
+function AddClassCategory({ onSuccessSubmit }) {
   const [isOpen, setOpen] = React.useState(false);
   return (
     <React.Fragment>
@@ -20,15 +22,16 @@ function AddClassCategory() {
         <IconAdd size="16" /> Tambah Kelas
       </ButtonBlue>
 
-      {isOpen && <ModalEditor onClose={() => setOpen(false)} />}
+      {isOpen && <ModalEditor onClose={() => setOpen(false)} onSuccessSubmit={onSuccessSubmit} />}
     </React.Fragment>
   );
 }
 
-function ModalEditor({ onClose }) {
+function ModalEditor({ onClose, onSuccessSubmit }) {
   const { data, setLabel, setCriteria, setAgeValidator, toggleAsDate, setMin, setMax } =
     useFormAgeCategory();
   const { label, criteria, ageValidator, asDate, min, max } = data;
+  const { submit, isLoading, isSuccess, isError, errors } = useSubmitAgeCategory(data);
 
   return (
     <Modal isOpen backdrop="static" size="lg" autoFocus onClosed={onClose}>
@@ -177,9 +180,20 @@ function ModalEditor({ onClose }) {
 
           <BottomActions>
             <ButtonOutlineBlue onClick={onClose}>Batal</ButtonOutlineBlue>
-            <ButtonBlue onClick={onClose}>Simpan</ButtonBlue>
+            <ButtonSubmit
+              isSuccess={isSuccess}
+              onSubmit={() => {
+                submit({ onSuccess: onSuccessSubmit });
+              }}
+              onConfirm={() => {
+                onClose?.();
+              }}
+            />
           </BottomActions>
         </ModalLayout>
+
+        <LoadingScreen loading={isLoading} />
+        <AlertSubmitError isError={isError} errors={errors} />
       </ModalBody>
     </Modal>
   );
@@ -187,6 +201,19 @@ function ModalEditor({ onClose }) {
 
 function Show({ children, when }) {
   return when ? children : null;
+}
+
+function ButtonSubmit({ onSubmit, isSuccess, onConfirm }) {
+  return (
+    <React.Fragment>
+      <ButtonBlue onClick={onSubmit}>Simpan</ButtonBlue>
+      <AlertSuccess
+        isSuccess={isSuccess}
+        description="Berhasil membuat kelas baru"
+        onConfirm={onConfirm}
+      />
+    </React.Fragment>
+  );
 }
 
 /* ================================= */

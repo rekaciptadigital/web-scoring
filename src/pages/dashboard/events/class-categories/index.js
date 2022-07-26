@@ -2,11 +2,9 @@ import * as React from "react";
 import styled from "styled-components";
 import { useAgeCategories } from "./hooks/age-categories";
 
-import { ButtonBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
+import { AddClassCategory } from "./components/editor-class-category";
 import { ClassCategoryItem } from "./components/class-category-item";
-
-import IconAdd from "components/ma/icons/mono/plus";
 
 function PageClassCategory() {
   const { data: classCategories } = useAgeCategories();
@@ -19,9 +17,7 @@ function PageClassCategory() {
         </div>
 
         <div>
-          <ButtonBlue>
-            <IconAdd size="16" /> Tambah Kelas
-          </ButtonBlue>
+          <AddClassCategory />
         </div>
       </ContentHeader>
 

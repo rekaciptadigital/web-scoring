@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useFormAgeCategory } from "../hooks/form-age-category";
 
 import { Modal, ModalBody } from "reactstrap";
 import { ButtonBlue, ButtonOutlineBlue } from "components/ma";
@@ -25,16 +26,9 @@ function AddClassCategory() {
 }
 
 function ModalEditor({ onClose }) {
-  const [criteria, setCriteria] = React.useState(1);
-  const [ageValidator, setAgeValidator] = React.useState(null);
-  const [asDate, setAsDate] = React.useState(false);
-
-  React.useEffect(() => {
-    const defaultValidatorByCriteria = { 1: null, 2: "min" };
-    const validator = defaultValidatorByCriteria[criteria];
-    setAgeValidator(validator);
-    setAsDate(false);
-  }, [criteria]);
+  const { data, setLabel, setCriteria, setAgeValidator, toggleAsDate, setMin, setMax } =
+    useFormAgeCategory();
+  const { label, criteria, ageValidator, asDate, min, max } = data;
 
   return (
     <Modal isOpen backdrop="static" size="lg" autoFocus onClosed={onClose}>
@@ -47,7 +41,9 @@ function ModalEditor({ onClose }) {
               label="Nama Kelas"
               name="class-label"
               required
-              placeholder="Masukkan nama kelas, contoh: U-15"
+              placeholder="Misal, U-15"
+              value={label}
+              onChange={setLabel}
             />
 
             <FieldControl>
@@ -77,7 +73,7 @@ function ModalEditor({ onClose }) {
                     ]}
                     defaultValue={1}
                     value={ageValidator}
-                    onChange={(validator) => setAgeValidator(validator)}
+                    onChange={setAgeValidator}
                   />
                 </FieldControl>
 
@@ -86,7 +82,7 @@ function ModalEditor({ onClose }) {
                     label="Berdasarkan Tanggal"
                     name="as-date"
                     checked={asDate}
-                    onChange={() => setAsDate((on) => !on)}
+                    onChange={toggleAsDate}
                   />
                 </FieldToggle>
               </SplitFields>
@@ -98,6 +94,8 @@ function ModalEditor({ onClose }) {
                     name="age-min"
                     required
                     placeholder="Misal: 15"
+                    value={min}
+                    onChange={setMin}
                   />
                 </Show>
 
@@ -107,6 +105,8 @@ function ModalEditor({ onClose }) {
                     name="age-max"
                     required
                     placeholder="Misal: 15"
+                    value={max}
+                    onChange={setMax}
                   />
                 </Show>
 
@@ -117,12 +117,16 @@ function ModalEditor({ onClose }) {
                       name="age-min"
                       required
                       placeholder="Misal: 15"
+                      value={min}
+                      onChange={setMin}
                     />
                     <FieldInputAge
                       label="Usia Maksimum"
                       name="age-max"
                       required
                       placeholder="Misal: 15"
+                      value={max}
+                      onChange={setMax}
                     />
                   </SplitFields>
                 </Show>
@@ -134,6 +138,8 @@ function ModalEditor({ onClose }) {
                     label="Tanggal Lahir Minimum"
                     required
                     name="birthdate-min"
+                    value={min}
+                    onChange={setMin}
                   />
                 </Show>
 
@@ -142,6 +148,8 @@ function ModalEditor({ onClose }) {
                     label="Tanggal Lahir Maksimum"
                     required
                     name="birthdate-max"
+                    value={max}
+                    onChange={setMax}
                   />
                 </Show>
 
@@ -151,11 +159,15 @@ function ModalEditor({ onClose }) {
                       label="Tanggal Lahir Minimum"
                       required
                       name="birthdate-min"
+                      value={min}
+                      onChange={setMin}
                     />
                     <FieldInputDateNarrow
                       label="Tanggal Lahir Maksimum"
                       required
                       name="birthdate-max"
+                      value={max}
+                      onChange={setMax}
                     />
                   </SplitFields>
                 </Show>

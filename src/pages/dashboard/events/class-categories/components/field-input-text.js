@@ -19,7 +19,7 @@ function FieldInputText({
   onBlur,
 }) {
   const fieldID = `field-${name}`;
-  const handleChange = (ev) => onChange?.(ev);
+  const handleChange = (ev) => onChange?.(ev.target.value);
   return (
     <FieldInputTextWrapper>
       <label className="field-label" htmlFor={fieldID}>

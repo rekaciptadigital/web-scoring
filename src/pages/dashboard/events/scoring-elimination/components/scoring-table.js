@@ -478,7 +478,7 @@ const MembersTable = styled.table`
   }
 
   tbody td {
-    padding: 0.5rem 0.5rem;
+    padding: 0.25rem 0.25rem;
     vertical-align: middle;
   }
 

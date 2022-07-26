@@ -380,7 +380,7 @@ const ToolbarTop = styled.div`
 
 const FilterBars = styled.div`
   > * + * {
-    margin-top: 1.5rem;
+    margin-top: 0.5rem;
   }
 `;
 

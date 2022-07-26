@@ -456,7 +456,7 @@ const MembersTable = styled.table`
   }
 
   tbody td {
-    padding: 0.5rem 0.5rem;
+    padding: 0.125rem 0.125rem;
     vertical-align: middle;
 
     &.name {

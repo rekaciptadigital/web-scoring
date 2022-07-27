@@ -2,7 +2,6 @@ import { datetime } from "utils";
 
 function parseAgeCategoryResponseData(payload) {
   const isUsia = [
-    !payload.isAge,
     payload.minAge,
     payload.maxAge,
     payload.minDateOfBirth,

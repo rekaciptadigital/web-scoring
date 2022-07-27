@@ -22,6 +22,7 @@ import { AlertSuccess } from "./alert-success";
 
 import IconAdd from "components/ma/icons/mono/plus";
 
+import { startOfYesterday } from "date-fns";
 import { datetime } from "utils";
 
 function AddClassCategory({ onSuccessSubmit }) {
@@ -226,6 +227,7 @@ function EditorViewer({ ageCategoryId, onClose }) {
 function FormEditor({ form }) {
   const { data, setLabel, setCriteria, setAgeValidator, toggleAsDate, setMin, setMax } = form;
   const { label, criteria, ageValidator, asDate, min, max } = data;
+  const dateConstraintYesterday = _getDateYesterday();
   return (
     <Fields>
       <FieldInputText
@@ -286,7 +288,7 @@ function FormEditor({ form }) {
               name="age-min"
               required
               placeholder="Misal: 15"
-              value={min}
+              value={min || ""}
               onChange={setMin}
             />
           </Show>
@@ -297,7 +299,7 @@ function FormEditor({ form }) {
               name="age-max"
               required
               placeholder="Misal: 15"
-              value={max}
+              value={max || ""}
               onChange={setMax}
             />
           </Show>
@@ -309,7 +311,7 @@ function FormEditor({ form }) {
                 name="age-min"
                 required
                 placeholder="Misal: 15"
-                value={min}
+                value={min || ""}
                 onChange={setMin}
               />
               <FieldInputAge
@@ -317,7 +319,7 @@ function FormEditor({ form }) {
                 name="age-max"
                 required
                 placeholder="Misal: 15"
-                value={max}
+                value={max || ""}
                 onChange={setMax}
               />
             </SplitFields>
@@ -330,8 +332,9 @@ function FormEditor({ form }) {
               label="Tanggal Lahir Minimum"
               required
               name="birthdate-min"
-              value={min}
+              value={min || ""}
               onChange={setMin}
+              maxDate={dateConstraintYesterday}
             />
           </Show>
 
@@ -340,8 +343,10 @@ function FormEditor({ form }) {
               label="Tanggal Lahir Maksimum"
               required
               name="birthdate-max"
-              value={max}
+              value={max || ""}
               onChange={setMax}
+              minDate={min}
+              maxDate={dateConstraintYesterday}
             />
           </Show>
 
@@ -351,15 +356,18 @@ function FormEditor({ form }) {
                 label="Tanggal Lahir Minimum"
                 required
                 name="birthdate-min"
-                value={min}
+                value={min || ""}
                 onChange={setMin}
+                maxDate={max || dateConstraintYesterday}
               />
               <FieldInputDateNarrow
                 label="Tanggal Lahir Maksimum"
                 required
                 name="birthdate-max"
-                value={max}
+                value={max || ""}
                 onChange={setMax}
+                minDate={min}
+                maxDate={dateConstraintYesterday}
               />
             </SplitFields>
           </Show>
@@ -456,6 +464,10 @@ function _getAgeValidatorLabel(ageValidator) {
     range: "Rentang Minimum",
   };
   return labels[ageValidator] || "Data tidak tersedia";
+}
+
+function _getDateYesterday() {
+  return startOfYesterday(new Date());
 }
 
 export { AddClassCategory, EditClassCategory, ViewClassCategory };

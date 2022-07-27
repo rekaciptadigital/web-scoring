@@ -9,7 +9,7 @@ import { ClassCategoryItem } from "./components/class-category-item";
 function PageClassCategory() {
   const { data: classCategories, fetchAgeCategories } = useAgeCategories();
   return (
-    <ContentLayoutWrapper>
+    <ContentLayoutWrapper pageTitle="Pengaturan Kelas">
       <ContentHeader>
         <div>
           <h2>Pengaturan Kelas</h2>

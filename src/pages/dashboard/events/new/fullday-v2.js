@@ -44,7 +44,13 @@ import IconPlus from "components/ma/icons/mono/plus";
 const { EVENT_TYPES } = eventConfigs;
 
 function PageCreateEventFullday() {
-  const { eventId, setParamEventId, isManageEvent, eventType: qsEventType } = useRouteQueryParams();
+  const {
+    eventId,
+    setParamEventId,
+    isManageEvent,
+    eventType: qsEventType,
+    pathname,
+  } = useRouteQueryParams();
 
   const {
     data: eventDetail,
@@ -194,7 +200,13 @@ function PageCreateEventFullday() {
                 </div>
 
                 <div>
-                  <ButtonOutlineBlue as={Link} to={`/dashboard/event/${eventId}/class-categories`}>
+                  <ButtonOutlineBlue
+                    as={Link}
+                    to={{
+                      pathname: "/dashboard/class-categories",
+                      state: { from: pathname },
+                    }}
+                  >
                     Pengaturan Kelas
                   </ButtonOutlineBlue>
 

@@ -1,10 +1,14 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
 
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
+import { BreadcrumbDashboard } from "../../components/breadcrumb";
 
 function ContentLayoutWrapper({ children, pageTitle, navbar }) {
+  const { state } = useLocation();
+  const backButtonURL = state?.from || "/dashboard";
   return (
     <React.Fragment>
       <MetaTags>
@@ -14,6 +18,7 @@ function ContentLayoutWrapper({ children, pageTitle, navbar }) {
       {navbar}
 
       <Container fluid>
+        <BreadcrumbDashboard to={backButtonURL}>Kembali</BreadcrumbDashboard>
         <StyledPageWrapper>{children}</StyledPageWrapper>
       </Container>
     </React.Fragment>

@@ -34,4 +34,15 @@ export default {
   updateMasterAgeCategory(data, queryString = null) {
     return API.put("/web/v1/archery/age-categories/update-by-eo", data, queryString, true);
   },
+
+  /**
+   * @param {int} age_category_id
+   * @param {Object} queryString {}
+   * @returns {Promise} { success, data, errors, message }
+   */
+  archiveMasterAgeCategoryById(age_category_id, queryString) {
+    const data = { age_category_id, is_hide: 1 };
+    const url = "/web/v1/archery/age-categories/update-is-hide-age-by-eo";
+    return API.put(url, data, queryString, true);
+  },
 };

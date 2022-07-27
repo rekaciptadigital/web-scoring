@@ -1,9 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useSubmitArchiveAgeCategory } from "../hooks/submit-archive-age-category";
 
-import { ButtonGhostBlue } from "components/ma";
+import { ButtonGhostBlue, LoadingScreen, AlertSubmitError } from "components/ma";
 import { EditClassCategory } from "./editor-class-category";
 import { ConfirmPrompt } from "./confirm-prompt";
+import { AlertSuccess } from "./alert-success";
 
 import IconEye from "components/ma/icons/mono/eye";
 import IconEdit from "components/ma/icons/mono/edit";
@@ -36,17 +38,9 @@ function ClassCategoryItem({ classCategory, onSuccessSubmit }) {
           )}
 
           <Show when={classCategory.eoId && classCategory.canUpdate}>
-            <ConfirmPrompt
-              renderButton={({ handlePrompt }) => (
-                <ButtonGhostBlue flexible onClick={handlePrompt}>
-                  <IconTrash size="16" />
-                </ButtonGhostBlue>
-              )}
-              reverseButtons
-              messagePrompt={`Yakin akan menghapus kelas "${classCategory.label}"?`}
-              messageDescription=""
-              buttonConfirmLabel="Yakin"
-              onConfirm={() => alert(`Pura-puranya hapus kelas "${classCategory.label}"`)}
+            <ArchiveClassCategory
+              classCategory={classCategory}
+              onSuccessArchive={onSuccessSubmit}
             />
           </Show>
         </ItemActions>
@@ -57,6 +51,35 @@ function ClassCategoryItem({ classCategory, onSuccessSubmit }) {
 
 function Show({ when, children }) {
   return when ? children : null;
+}
+
+function ArchiveClassCategory({ classCategory, onSuccessArchive }) {
+  const { submit, isLoading, isError, errors, isSuccess } = useSubmitArchiveAgeCategory(
+    classCategory.id
+  );
+  return (
+    <React.Fragment>
+      <ConfirmPrompt
+        renderButton={({ handlePrompt }) => (
+          <ButtonGhostBlue flexible onClick={handlePrompt}>
+            <IconTrash size="16" />
+          </ButtonGhostBlue>
+        )}
+        messagePrompt={`Kelas "${classCategory.label}" akan dihapus`}
+        messageDescription="Yakin akan menghapus kelas?"
+        buttonConfirmLabel="Yakin"
+        onConfirm={submit}
+      />
+
+      <LoadingScreen loading={isLoading} />
+      <AlertSubmitError isError={isError} errors={errors} />
+      <AlertSuccess
+        isSuccess={isSuccess}
+        prompt="Berhasil menghapus kelas"
+        onConfirm={onSuccessArchive}
+      />
+    </React.Fragment>
+  );
 }
 
 /* ==================================== */

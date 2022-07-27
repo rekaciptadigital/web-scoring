@@ -7,7 +7,7 @@ function useAgeCategories() {
 
   const fetchAgeCategories = () => {
     const getFunction = () => CategoryService.getMasterAgeCategories();
-    return fetcher.runAsync(getFunction);
+    return fetcher.runAsync(getFunction, { transform });
   };
 
   React.useEffect(() => {
@@ -15,6 +15,10 @@ function useAgeCategories() {
   }, []);
 
   return { ...fetcher, fetchAgeCategories };
+}
+
+function transform(data) {
+  return data.filter((ageCategory) => !ageCategory.isHide);
 }
 
 export { useAgeCategories };

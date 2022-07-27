@@ -22,6 +22,8 @@ import { AlertSuccess } from "./alert-success";
 
 import IconAdd from "components/ma/icons/mono/plus";
 
+import { datetime } from "utils";
+
 function AddClassCategory({ onSuccessSubmit }) {
   const [isOpen, setOpen] = React.useState(false);
   return (
@@ -54,6 +56,23 @@ function EditClassCategory({ ageCategoryId, renderButton, onSuccessSubmit }) {
             onClose={() => setOpen(false)}
             onSuccessSubmit={onSuccessSubmit}
           />
+        </ModalShell>
+      )}
+    </React.Fragment>
+  );
+}
+
+function ViewClassCategory({ ageCategoryId, renderButton }) {
+  const [isOpen, setOpen] = React.useState(false);
+  const onOpen = () => setOpen(true);
+  const handlers = { onOpen };
+  return (
+    <React.Fragment>
+      {renderButton(handlers)}
+
+      {isOpen && (
+        <ModalShell onClose={() => setOpen(false)}>
+          <EditorViewer ageCategoryId={ageCategoryId} onClose={() => setOpen(false)} />
         </ModalShell>
       )}
     </React.Fragment>
@@ -123,6 +142,81 @@ function EditorUpdate({ ageCategoryId, onClose, onSuccessSubmit }) {
         </BottomActions>
         <LoadingScreen loading={isLoadingSubmit} />
         <AlertSubmitError isError={isError} errors={errors} />
+      </AsyncUI>
+    </EditorLayout>
+  );
+}
+
+function EditorViewer({ ageCategoryId, onClose }) {
+  const { data, isLoading } = useAgeCategoryDetail(ageCategoryId);
+  const form = useFormAgeCategory(data);
+  const { label, criteria, ageValidator, asDate, min, max } = form.data;
+  return (
+    <EditorLayout>
+      <h4>Rincian Kelas</h4>
+      <AsyncUI isLoading={isLoading} fallbackUI={<SpinnerDotBlock />}>
+        <Fields>
+          <FieldControl>
+            <span className="field-label">Nama Kelas</span>
+            <h3>{label}</h3>
+          </FieldControl>
+
+          <SplitFields>
+            <FieldControl>
+              <span className="field-label">Kriteria Kelas</span>
+              <span>{_getCriteriaLabel(criteria)}</span>
+            </FieldControl>
+
+            <Show when={criteria === 2}>
+              <FieldControl>
+                <span className="field-label">Ketentuan Usia</span>
+                <span>{_getAgeValidatorLabel(ageValidator)}</span>
+              </FieldControl>
+            </Show>
+          </SplitFields>
+
+          <Show when={criteria === 2}>
+            <Show when={!asDate}>
+              <SplitFields>
+                <Show when={min}>
+                  <FieldControl>
+                    <span className="field-label">Usia Minimum</span>
+                    <span>{min} tahun</span>
+                  </FieldControl>
+                </Show>
+
+                <Show when={max}>
+                  <FieldControl>
+                    <span className="field-label">Usia Maksimum</span>
+                    <span>{max} tahun</span>
+                  </FieldControl>
+                </Show>
+              </SplitFields>
+            </Show>
+
+            <Show when={asDate}>
+              <SplitFields>
+                <Show when={min}>
+                  <FieldControl>
+                    <span className="field-label">Tanggal Lahir Minimum</span>
+                    <span>{datetime.formatFullDateLabel(min)}</span>
+                  </FieldControl>
+                </Show>
+
+                <Show when={max}>
+                  <FieldControl>
+                    <span className="field-label">Tanggal Lahir Maksimum</span>
+                    <span>{datetime.formatFullDateLabel(max)}</span>
+                  </FieldControl>
+                </Show>
+              </SplitFields>
+            </Show>
+          </Show>
+        </Fields>
+
+        <BottomActions>
+          <ButtonBlue onClick={onClose}>Tutup</ButtonBlue>
+        </BottomActions>
       </AsyncUI>
     </EditorLayout>
   );
@@ -343,4 +437,24 @@ const FieldToggle = styled.div`
   margin-bottom: 0.25rem;
 `;
 
-export { AddClassCategory, EditClassCategory };
+/* ================================= */
+// utils
+
+function _getCriteriaLabel(criteria) {
+  const labels = {
+    1: "Umum",
+    2: "Usia",
+  };
+  return labels[criteria] || "Data tidak tersedia";
+}
+
+function _getAgeValidatorLabel(ageValidator) {
+  const labels = {
+    min: "Usia Minimum",
+    max: "Usia Maksimum",
+    range: "Rentang Minimum",
+  };
+  return labels[ageValidator] || "Data tidak tersedia";
+}
+
+export { AddClassCategory, EditClassCategory, ViewClassCategory };

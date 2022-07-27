@@ -17,9 +17,19 @@ function FieldInputText({
   errors,
   isTouched,
   onBlur,
+  focusOnMount,
 }) {
+  const inputRef = React.useRef(null);
   const fieldID = `field-${name}`;
   const handleChange = (ev) => onChange?.(ev.target.value);
+
+  React.useEffect(() => {
+    if (!focusOnMount) {
+      return;
+    }
+    inputRef.current?.focus?.();
+  }, []);
+
   return (
     <FieldInputTextWrapper>
       <label className="field-label" htmlFor={fieldID}>
@@ -27,6 +37,7 @@ function FieldInputText({
         {required && <span className="field-required">*</span>}
       </label>
       <input
+        ref={inputRef}
         id={fieldID}
         className={classnames("field-input-text", { "error-invalid": errors?.length && isTouched })}
         name={name}

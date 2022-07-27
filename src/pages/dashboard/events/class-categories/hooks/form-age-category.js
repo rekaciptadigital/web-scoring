@@ -1,17 +1,27 @@
 import * as React from "react";
+import { datetime } from "utils";
 
-function useFormAgeCategory() {
+function useFormAgeCategory(initialFormValues) {
+  const initialData = initialFormValues || {
+    label: "",
+    criteria: 1,
+    ageValidator: null,
+    asDate: false,
+    min: null,
+    max: null,
+  };
+
   const [form, dispatch] = React.useReducer(formReducer, {
-    data: {
-      label: "",
-      criteria: 1,
-      ageValidator: null,
-      asDate: false,
-      min: null,
-      max: null,
-    },
+    data: initialData,
     errors: null,
   });
+
+  React.useEffect(() => {
+    if (!initialFormValues) {
+      return;
+    }
+    dispatch({ type: "INIT", payload: initialFormValues });
+  }, [initialFormValues]);
 
   const setLabel = (label) => dispatch({ label: label });
   const setCriteria = (criteria) => dispatch({ type: "CHANGE_CRITERIA", payload: criteria });
@@ -27,7 +37,7 @@ function useFormAgeCategory() {
 
 function formReducer(state, action) {
   if (action.type === "INIT") {
-    return { ...state, data: action.payload };
+    return { ...state, data: _makeInitialForm(action.payload) };
   }
 
   if (action.type === "CHANGE_CRITERIA") {
@@ -123,6 +133,75 @@ function formReducer(state, action) {
   }
 
   return state;
+}
+
+function _makeInitialForm(payload) {
+  const isUsia = [
+    !payload.isAge,
+    payload.minAge,
+    payload.maxAge,
+    payload.minDateOfBirth,
+    payload.maxDateOfBirth,
+  ].some((value) => Boolean(value));
+
+  if (!isUsia) {
+    return {
+      label: payload.label,
+      criteria: 1,
+    };
+  }
+
+  const asDate = !payload.isAge;
+  const ageValidator = _getAgeValidatorValue(asDate, payload);
+  const min = _getMinValue(asDate, payload);
+  const max = _getMaxValue(asDate, payload);
+
+  return {
+    label: payload.label,
+    criteria: 2,
+    ageValidator: ageValidator,
+    asDate: asDate,
+    min: min,
+    max: max,
+  };
+}
+
+function _getAgeValidatorValue(asDate, payload) {
+  if (asDate) {
+    return _checkAgeMatrix(payload.minDateOfBirth, payload.maxDateOfBirth);
+  }
+  return _checkAgeMatrix(payload.minAge, payload.maxAge);
+}
+
+function _checkAgeMatrix(min, max) {
+  const matrix = [min, max];
+  const isMin = matrix[0] && !matrix[1];
+  const isMax = !matrix[0] && matrix[1];
+  const isRange = matrix[0] && matrix[1];
+
+  if (isMin) {
+    return "min";
+  }
+  if (isMax) {
+    return "max";
+  }
+  if (isRange) {
+    return "range";
+  }
+}
+
+function _getMinValue(asDate, payload) {
+  if (asDate) {
+    return payload.minDateOfBirth ? datetime.parseServerDatetime(payload.minDateOfBirth) : null;
+  }
+  return payload.minAge || null;
+}
+
+function _getMaxValue(asDate, payload) {
+  if (asDate) {
+    return payload.maxDateOfBirth ? datetime.parseServerDatetime(payload.maxDateOfBirth) : null;
+  }
+  return payload.maxAge || null;
 }
 
 export { useFormAgeCategory };

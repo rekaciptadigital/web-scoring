@@ -25,7 +25,11 @@ function PageClassCategory() {
         {classCategories?.length ? (
           <ClassCategoryListContainer>
             {classCategories.map((classCategory) => (
-              <ClassCategoryItem key={classCategory.id} classCategory={classCategory} />
+              <ClassCategoryItem
+                key={classCategory.id}
+                classCategory={classCategory}
+                onSuccessSubmit={fetchAgeCategories}
+              />
             ))}
           </ClassCategoryListContainer>
         ) : (

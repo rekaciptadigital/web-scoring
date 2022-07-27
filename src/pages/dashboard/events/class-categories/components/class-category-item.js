@@ -2,13 +2,14 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { ButtonGhostBlue } from "components/ma";
+import { EditClassCategory } from "./editor-class-category";
 import { ConfirmPrompt } from "./confirm-prompt";
 
 import IconEye from "components/ma/icons/mono/eye";
 import IconEdit from "components/ma/icons/mono/edit";
 import IconTrash from "components/ma/icons/mono/trash";
 
-function ClassCategoryItem({ classCategory }) {
+function ClassCategoryItem({ classCategory, onSuccessSubmit }) {
   return (
     <ItemWrapper>
       <ItemMain>
@@ -18,17 +19,23 @@ function ClassCategoryItem({ classCategory }) {
         </ItemBody>
 
         <ItemActions>
-          {classCategory.eoId ? (
-            <ButtonGhostBlue flexible>
-              <IconEdit size="16" />
-            </ButtonGhostBlue>
+          {classCategory.eoId && classCategory.canUpdate ? (
+            <EditClassCategory
+              ageCategoryId={classCategory.id}
+              renderButton={({ onOpen }) => (
+                <ButtonGhostBlue flexible onClick={onOpen}>
+                  <IconEdit size="16" />
+                </ButtonGhostBlue>
+              )}
+              onSuccessSubmit={onSuccessSubmit}
+            />
           ) : (
             <ButtonGhostBlue flexible>
               <IconEye size="16" />
             </ButtonGhostBlue>
           )}
 
-          {Boolean(classCategory.eoId) && (
+          <Show when={classCategory.eoId && classCategory.canUpdate}>
             <ConfirmPrompt
               renderButton={({ handlePrompt }) => (
                 <ButtonGhostBlue flexible onClick={handlePrompt}>
@@ -39,13 +46,17 @@ function ClassCategoryItem({ classCategory }) {
               messagePrompt={`Yakin akan menghapus kelas "${classCategory.label}"?`}
               messageDescription=""
               buttonConfirmLabel="Yakin"
-              messageDescription=""
+              onConfirm={() => alert(`Pura-puranya hapus kelas "${classCategory.label}"`)}
             />
-          )}
+          </Show>
         </ItemActions>
       </ItemMain>
     </ItemWrapper>
   );
+}
+
+function Show({ when, children }) {
+  return when ? children : null;
 }
 
 /* ==================================== */

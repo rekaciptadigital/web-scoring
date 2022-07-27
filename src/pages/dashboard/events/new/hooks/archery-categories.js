@@ -1,12 +1,14 @@
 import { useArcheryCategories } from "utils/hooks/archery-categories";
-import { EventsService } from "services";
+import { EventsService, CategoryService } from "services";
 
 function useCompetitionCategories() {
   return useArcheryCategories(EventsService.getEventCompetitionCategories);
 }
 
 function useAgeCategories() {
-  return useArcheryCategories(EventsService.getEventAgeCategories);
+  // List kategori yang muncul di opsi adalah semua kategori default ditambah
+  // yang dibuat oleh user admin itu sendiri
+  return useArcheryCategories(CategoryService.getMasterAgeCategories);
 }
 
 function useDistanceCategories() {

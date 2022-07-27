@@ -2,12 +2,14 @@ import * as React from "react";
 import styled from "styled-components";
 import { useAgeCategories } from "./hooks/age-categories";
 
+import { SpinnerDotBlock } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { AddClassCategory } from "./components/editor-class-category";
 import { ClassCategoryItem } from "./components/class-category-item";
 
 function PageClassCategory() {
-  const { data: classCategories, fetchAgeCategories } = useAgeCategories();
+  const { data: classCategories, isLoading: isFetching, fetchAgeCategories } = useAgeCategories();
+  const isLoading = !classCategories && isFetching;
   return (
     <ContentLayoutWrapper pageTitle="Pengaturan Kelas">
       <ContentHeader>
@@ -22,22 +24,28 @@ function PageClassCategory() {
       </ContentHeader>
 
       <div>
-        {classCategories?.length ? (
-          <ClassCategoryListContainer>
-            {classCategories.map((classCategory) => (
-              <ClassCategoryItem
-                key={classCategory.id}
-                classCategory={classCategory}
-                onSuccessSubmit={fetchAgeCategories}
-              />
-            ))}
-          </ClassCategoryListContainer>
-        ) : (
-          <div>Belum ada data</div>
-        )}
+        <AsyncUI isLoading={isLoading} fallbackUI={<SpinnerDotBlock />}>
+          {classCategories?.length ? (
+            <ClassCategoryListContainer>
+              {classCategories.map((classCategory) => (
+                <ClassCategoryItem
+                  key={classCategory.id}
+                  classCategory={classCategory}
+                  onSuccessSubmit={fetchAgeCategories}
+                />
+              ))}
+            </ClassCategoryListContainer>
+          ) : (
+            <div>Belum ada data</div>
+          )}
+        </AsyncUI>
       </div>
     </ContentLayoutWrapper>
   );
+}
+
+function AsyncUI({ isLoading, children, fallbackUI }) {
+  return isLoading ? fallbackUI : children;
 }
 
 const ContentHeader = styled.div`

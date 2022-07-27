@@ -128,6 +128,7 @@ function EditorUpdate({ ageCategoryId, onClose, onSuccessSubmit }) {
         <BottomActions>
           <ButtonOutlineBlue onClick={onClose}>Batal</ButtonOutlineBlue>
           <ButtonSubmit
+            isEditMode
             isSuccess={isSuccess}
             onSubmit={() =>
               submit(ageCategoryId, {
@@ -376,13 +377,13 @@ function AsyncUI({ isLoading, children, fallbackUI }) {
   return isLoading ? fallbackUI : children;
 }
 
-function ButtonSubmit({ onSubmit, isSuccess, onConfirm }) {
+function ButtonSubmit({ isEditMode, onSubmit, isSuccess, onConfirm }) {
   return (
     <React.Fragment>
       <ButtonBlue onClick={onSubmit}>Simpan</ButtonBlue>
       <AlertSuccess
         isSuccess={isSuccess}
-        description="Berhasil membuat kelas baru"
+        description={isEditMode ? "Berhasil mengubah data kelas" : "Berhasil membuat kelas baru"}
         onConfirm={onConfirm}
       />
     </React.Fragment>

@@ -10,7 +10,7 @@ RUN apk add git
 RUN git config --global url."https://".insteadOf git://
 RUN apk add curl
 #RUN npm cache clean --force
-#yarn add react-is
+RUN yarn add react-is
 
 RUN npm uninstall node-sass --force
 RUN npm i sass --force

@@ -8,6 +8,7 @@ import PageCongratulations from "pages/dashboard/events/new/congratulations";
 import ScoringNew from "pages/dashboard/scoring/new";
 import Dashboard from "../pages/dashboard";
 import PageEventDetailHome from "../pages/dashboard/events/home";
+import PageClassCategory from "pages/dashboard/class-categories";
 import PageEventBudRests from "../pages/dashboard/events/budrests";
 import PageEventBudRestDetail from "../pages/dashboard/events/budrests/detail";
 import PageEventFaqs from "../pages/dashboard/events/faqs";
@@ -33,6 +34,7 @@ import PageEventIdCard from "pages/dashboard/events/id-card";
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
   { path: "/dashboard/profile", component: PageUserProfile },
+  { path: "/dashboard/class-categories", component: PageClassCategory },
   { path: "/dashboard/events", component: ListEvent },
   { path: "/dashboard/event/:event_id/home", component: PageEventDetailHome },
   { path: "/dashboard/event/:event_id/manage", component: EventsNewFullday },

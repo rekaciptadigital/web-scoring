@@ -19,7 +19,14 @@ function useRouteQueryParams() {
     history.replace(`${pathname}?${URLWithParams}`);
   };
 
-  return { eventId, isManageEvent, isCreateEvent, setParamEventId, eventType: qs_event_type };
+  return {
+    eventId,
+    isManageEvent,
+    isCreateEvent,
+    setParamEventId,
+    eventType: qs_event_type,
+    pathname,
+  };
 }
 
 function makeEventIdFromRoute(param_event_id, qs_event_id) {

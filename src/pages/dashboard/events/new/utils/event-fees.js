@@ -29,7 +29,7 @@ function makeStateFees(eventCategories) {
     }
   }
 
-  return {
+  const uiState = {
     registrationFee: feeAmountsList.sort((a, b) => b - a)[0], // ambil harga tertinggi
     isEarlyBird: isEarlyBird,
     earlyBirdEndDate: earlyBirdEndDate,
@@ -41,6 +41,8 @@ function makeStateFees(eventCategories) {
     }),
     earlyBirdByTeam: makeEarlyBirdFeesByTeam(feesByTeamFromServer),
   };
+
+  return uiState;
 }
 
 function makeFeesByTeam(feesFromServer, { isFlatFee, flatFeeAmount }) {
@@ -67,6 +69,10 @@ function computeFeesByTeam(eventCategories) {
     );
   });
 
+  const feeIndividuMix = eventCategories.find((category) => {
+    return category.teamCategoryId.id === "individu_mix";
+  });
+
   const feeTeam = eventCategories.find((category) => {
     return (
       category.teamCategoryId.id === "male_team" || category.teamCategoryId.id === "female_team"
@@ -87,6 +93,16 @@ function computeFeesByTeam(eventCategories) {
         ? parseServerDatetime(feeIndividu?.endDateEarlyBird)
         : undefined,
       earlyBird: feeIndividu?.earlyBird ? Number(feeIndividu?.earlyBird) : "",
+    },
+    {
+      isActive: feeIndividuMix ? Boolean(feeIndividuMix.isShow) : false,
+      teamCategory: "individu_mix",
+      fee: feeIndividuMix?.fee ? Number(feeIndividuMix?.fee) : "",
+      isEarlyBird: Boolean(feeIndividuMix?.isEarlyBird),
+      endDateEarlyBird: feeIndividuMix?.isEarlyBird
+        ? parseServerDatetime(feeIndividuMix?.endDateEarlyBird)
+        : undefined,
+      earlyBird: feeIndividuMix?.earlyBird ? Number(feeIndividuMix?.earlyBird) : "",
     },
     {
       isActive: feeTeam ? Boolean(feeTeam.isShow) : false,

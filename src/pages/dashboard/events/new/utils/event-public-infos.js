@@ -2,7 +2,7 @@ import { eventConfigs } from "constants/index";
 import { filesUtil, stringUtil } from "utils";
 import { parseServerDatetime, formatServerDatetime } from "./datetime";
 
-const { MATCH_TYPES } = eventConfigs;
+const { EVENT_TYPES, MATCH_TYPES } = eventConfigs;
 
 function makeStatePublicInfos(eventDetail) {
   if (!eventDetail) {
@@ -33,7 +33,7 @@ function makeStatePublicInfos(eventDetail) {
   };
 }
 
-async function makePayloadPublicInfos(formData, { eventId, eventType }) {
+async function makePayloadPublicInfos(formData, { eventId, eventType, matchType }) {
   if (!formData) {
     return null;
   }
@@ -41,7 +41,7 @@ async function makePayloadPublicInfos(formData, { eventId, eventType }) {
   const posterImageBase64 = await filesUtil.fileToBase64(formData.poster?.raw);
   const handbookFileBase64 = await filesUtil.fileToBase64(formData.handbook?.raw);
 
-  const payload = {
+  const commonPayload = {
     eventName: formData.eventName,
     eventBanner: posterImageBase64,
     handbook: handbookFileBase64,
@@ -58,12 +58,13 @@ async function makePayloadPublicInfos(formData, { eventId, eventType }) {
   if (!eventId) {
     // Mode create
     return {
-      eventType: eventType,
-      eventCompetition: MATCH_TYPES.TOURNAMENT,
-      ...payload,
+      ...commonPayload,
+      eventType: eventType || EVENT_TYPES.FULLDAY,
+      eventCompetition: matchType || MATCH_TYPES.TOURNAMENT,
     };
   }
-  return payload;
+
+  return commonPayload;
 }
 
 export { makeStatePublicInfos, makePayloadPublicInfos };

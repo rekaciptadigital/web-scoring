@@ -8,6 +8,7 @@ function useRouteQueryParams() {
   const queryStrings = new URLSearchParams(search);
   const qs_event_id = queryStrings.get("event_id");
   const qs_event_type = queryStrings.get("event_type");
+  const qs_match_type = queryStrings.get("match_type");
 
   const eventId = makeEventIdFromRoute(param_event_id, qs_event_id);
   const isManageEvent = Boolean(param_event_id);
@@ -19,7 +20,14 @@ function useRouteQueryParams() {
     history.replace(`${pathname}?${URLWithParams}`);
   };
 
-  return { eventId, isManageEvent, isCreateEvent, setParamEventId, eventType: qs_event_type };
+  return {
+    eventId,
+    isManageEvent,
+    isCreateEvent,
+    setParamEventId,
+    eventType: qs_event_type,
+    matchType: qs_match_type,
+  };
 }
 
 function makeEventIdFromRoute(param_event_id, qs_event_id) {

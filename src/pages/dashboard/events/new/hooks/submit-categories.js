@@ -102,6 +102,7 @@ const getTeam = (teamCategoryId) => {
   const teamByIds = {
     "individu male": "individu",
     "individu female": "individu",
+    individu_mix: "individu_mix",
     male_team: "team",
     female_team: "team",
     mix_team: "mix",

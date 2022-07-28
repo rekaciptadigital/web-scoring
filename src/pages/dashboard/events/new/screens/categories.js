@@ -9,9 +9,10 @@ import { useSubmitCategories } from "../hooks/submit-categories";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Button, ButtonBlue, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
-import { FieldSelectSmall, FieldInputTextSmall } from "../../components/form-fields";
+import { FieldSelectSmall } from "../../components/form-fields";
 import { LoadingScreen } from "../components/loading-screen-portal";
 import { toast } from "../components/processing-toast";
+import { FieldInputQuota } from "./field-input-quota";
 
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
@@ -220,7 +221,7 @@ function CategoriesByCompetition({
                       const isDisabled = !checkIsTeamActive(teamName);
                       return (
                         <div key={quota.teamCategoryId}>
-                          <FieldInputTextSmall
+                          <FieldInputQuota
                             name={`quota-${quota.teamCategoryId}-${detail.key}`}
                             placeholder="kuota"
                             disabled={isDisabled}
@@ -235,7 +236,7 @@ function CategoriesByCompetition({
                             }}
                           >
                             {quota.teamCategoryLabel}
-                          </FieldInputTextSmall>
+                          </FieldInputQuota>
                         </div>
                       );
                     })}
@@ -387,6 +388,7 @@ function getTeamName(teamCategoryId) {
   const teamNames = {
     "individu male": "individu",
     "individu female": "individu",
+    individu_mix: "individu_mix",
     male_team: "team",
     female_team: "team",
     mix_team: "mix",

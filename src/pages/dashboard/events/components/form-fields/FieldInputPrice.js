@@ -7,6 +7,8 @@ import classnames from "classnames";
 const FieldPriceWrapper = styled.div`
   .field-price-label {
     display: inline-block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     width: 100%;
     color: var(--ma-gray-600);
     font-size: 12px;

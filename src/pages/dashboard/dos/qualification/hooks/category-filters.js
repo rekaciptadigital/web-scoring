@@ -234,7 +234,7 @@ function _makeOptionsAgeCategory(
  * Struktur untuk filter yang bawah:
  * [Individu Putra] [Individu Putri] [Beregu Putra] [Beregu Putri] [Beregu Campuran]
  */
- function _makeOptionsGenderCategory(
+function _makeOptionsGenderCategory(
   groupedCategoryDetails,
   activeCompetitionCategory,
   activeAgeCategory,
@@ -248,6 +248,7 @@ function _makeOptionsAgeCategory(
       const labels = {
         "individu male": "Individu Putra",
         "individu female": "Individu Putri",
+        individu_mix: "Individu",
         male_team: "Beregu Putra",
         female_team: "Beregu Putri",
         mix_team: "Beregu Campuran",

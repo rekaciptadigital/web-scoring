@@ -252,6 +252,7 @@ function _makeOptionsGenderCategory(
       const labels = {
         "individu male": "Individu Putra",
         "individu female": "Individu Putri",
+        individu_mix: "Individu",
         male_team: "Beregu Putra",
         female_team: "Beregu Putri",
         mix_team: "Beregu Campuran",

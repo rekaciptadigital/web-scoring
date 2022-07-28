@@ -61,6 +61,10 @@ async function makePayloadPublicInfos(formData, { eventId, eventType, matchType 
       ...commonPayload,
       eventType: eventType || EVENT_TYPES.FULLDAY,
       eventCompetition: matchType || MATCH_TYPES.TOURNAMENT,
+      more_information: formData.extraInfos.map((info) => ({
+        title: info.title,
+        description: info.description,
+      })),
     };
   }
 

@@ -1,4 +1,4 @@
-import { useArcheryCategories } from "utils/hooks/archery-categories";
+import { useArcheryCategories } from "./abstract-archery-categories";
 import { EventsService, CategoryService } from "services";
 
 function useCompetitionCategories() {

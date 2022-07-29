@@ -171,6 +171,7 @@ function EditorForm({
   const { data: schedulesData, fetchSchedules } = schedulesProvider;
   const {
     data: editorFormData,
+    isClean,
     updateField,
     createSchedule,
     removeScheduleItem,
@@ -225,6 +226,8 @@ function EditorForm({
           </ButtonWithConfirmPrompt>
 
           <ButtonWithConfirmPrompt
+            disabled={isClean}
+            title={isClean ? "Data belum ada yang diubah" : undefined}
             customButton={ButtonBlue}
             buttonConfirmLabel="Sudah Yakin"
             onConfirm={handleClickSave}
@@ -448,6 +451,7 @@ const UpdatingStateBlocker = styled.div`
 function ButtonWithConfirmPrompt({
   children,
   disabled,
+  title,
   reverseButtons,
   buttonConfirmLabel,
   onConfirm,
@@ -480,6 +484,7 @@ function ButtonWithConfirmPrompt({
     onClick: () => setShowAlert(true),
     disabled: disabled,
     flexible: flexible,
+    title: title,
   };
 
   return (

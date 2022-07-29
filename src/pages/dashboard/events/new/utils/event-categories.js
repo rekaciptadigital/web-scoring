@@ -119,6 +119,7 @@ function _sortQuotaByTeam(quotaData) {
   const SORTED_TEAM_IDS = [
     "individu male",
     "individu female",
+    "individu_mix",
     "male_team",
     "female_team",
     "mix_team",
@@ -126,7 +127,7 @@ function _sortQuotaByTeam(quotaData) {
 
   const sortedQuotaItems = SORTED_TEAM_IDS.map((teamId) =>
     quotaData.find((quota) => teamId === quota.teamCategoryId)
-  ).filter((quota) => typeof quota !== "undefined");
+  );
 
   return sortedQuotaItems;
 }
@@ -151,6 +152,12 @@ const defaultQuotasData = [
     categoryDetailsId: undefined,
     teamCategoryId: "individu female",
     teamCategoryLabel: "Individu Putri",
+    quota: "",
+  },
+  {
+    categoryDetailsId: undefined,
+    teamCategoryId: "individu_mix",
+    teamCategoryLabel: "Individu (Campuran)",
     quota: "",
   },
   {

@@ -43,7 +43,13 @@ import IconPlus from "components/ma/icons/mono/plus";
 const { EVENT_TYPES } = eventConfigs;
 
 function PageCreateEventFullday() {
-  const { eventId, setParamEventId, isManageEvent, eventType: qsEventType } = useRouteQueryParams();
+  const {
+    eventId,
+    isManageEvent,
+    eventType: qsEventType,
+    matchType: qsMatchType,
+    setParamEventId,
+  } = useRouteQueryParams();
 
   const {
     data: eventDetail,
@@ -55,6 +61,7 @@ function PageCreateEventFullday() {
   const { data: schedules } = schedulesProvider;
 
   const eventType = _checkEventType(eventDetail, qsEventType);
+  const matchType = _checkMatchType(eventDetail, qsMatchType);
   const isTypeMarathon = eventType === EVENT_TYPES.MARATHON;
 
   // Forms
@@ -81,7 +88,11 @@ function PageCreateEventFullday() {
     isLoading: isSubmitingPublicInfos,
     isError: isErrorPublicInfos,
     errors: publicInfosErrors,
-  } = useSubmitPublicInfos({ eventType: eventType, eventId: eventDetail?.id });
+  } = useSubmitPublicInfos({
+    eventType: eventType,
+    matchType: matchType,
+    eventId: eventDetail?.id,
+  });
 
   const {
     submit: submitCategories,
@@ -292,6 +303,10 @@ const SpacedHeaderBar = styled.div`
 
 function _checkEventType(eventDetail, qsEventType) {
   return eventDetail?.eventType || qsEventType || null;
+}
+
+function _checkMatchType(eventDetail, qsMatchType) {
+  return eventDetail?.eventCompetition || qsMatchType || null;
 }
 
 export { PageCreateEventFullday };

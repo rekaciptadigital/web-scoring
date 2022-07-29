@@ -253,6 +253,13 @@ const makeDefaultCategoryData = () => [
           },
           {
             categoryDetailsId: undefined,
+            teamCategoryId: "individu_mix",
+            teamCategoryLabel: "Individu (Campuran)",
+            quota: "",
+            isShow: true,
+          },
+          {
+            categoryDetailsId: undefined,
             teamCategoryId: "male_team",
             teamCategoryLabel: "Beregu Putra",
             quota: "",

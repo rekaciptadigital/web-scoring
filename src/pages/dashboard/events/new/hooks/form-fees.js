@@ -53,7 +53,7 @@ function useFormFees(eventDetail) {
     if (!teamName) {
       return false;
     }
-    const indexByField = { individu: 0, team: 1, mix: 2 };
+    const indexByField = _getIndexByField(state.data.feesByTeam);
     const fieldIndex = indexByField[teamName];
     return state.data.feesByTeam[fieldIndex].isActive;
   };
@@ -67,7 +67,12 @@ function useFormFees(eventDetail) {
   };
 
   const getTeamLabel = (team) => {
-    const labels = { individu: "Individu", team: "Beregu", mix: "Campuran" };
+    const labels = {
+      individu: "Individu",
+      individu_mix: "Individu (Campuran)",
+      team: "Beregu",
+      mix: "Beregu Campuran",
+    };
     return labels[team];
   };
 
@@ -329,12 +334,14 @@ const makeDefaultFeeData = () => ({
 
 const makeDefaultFeesByTeam = () => [
   { team: "individu", isActive: true, amount: "" },
+  { team: "individu_mix", isActive: false, amount: "" },
   { team: "team", isActive: true, amount: "" },
   { team: "mix", isActive: true, amount: "" },
 ];
 
 const makeDefaultEarlyBirdByTeam = () => [
   { team: "individu", isActive: false, amount: "" },
+  { team: "individu_mix", isActive: false, amount: "" },
   { team: "team", isActive: false, amount: "" },
   { team: "mix", isActive: false, amount: "" },
 ];
@@ -344,6 +351,15 @@ const makeDefaultEarlyBirdByTeam = () => [
 
 function computeFormIsEmpty(data) {
   return !data?.length;
+}
+
+function _getIndexByField(feesByTeam) {
+  const indexByField = {};
+  for (const index in feesByTeam) {
+    const fee = feesByTeam[index];
+    indexByField[fee.team] = parseInt(index);
+  }
+  return indexByField;
 }
 
 export { useFormFees };

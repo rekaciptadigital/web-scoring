@@ -239,7 +239,7 @@ const FieldToggleTeamPrices = styled.div`
 
 const TeamFeeInputsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1.75rem;
 `;
 

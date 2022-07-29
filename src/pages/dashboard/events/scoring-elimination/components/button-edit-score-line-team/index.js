@@ -124,8 +124,8 @@ function ModalEditor({
   const isSettled = Boolean(scoringDetails) || (!scoringDetails && isErrorScoringDetail);
   const headerPlayer1 = headerInfo?.teams[0];
   const headerPlayer2 = headerInfo?.teams[1];
-  const player1 = scoringDetails?.[0];
-  const player2 = scoringDetails?.[1];
+  const player1 = _getPlayerDataByIndex(scoringDetails, 0);
+  const player2 = _getPlayerDataByIndex(scoringDetails, 1);
 
   const { value: gridDataPlayer1, setValue: setGridDataPlayer1 } = useGridForm(player1?.scores);
   const { value: gridDataPlayer2, setValue: setGridDataPlayer2 } = useGridForm(player2?.scores);
@@ -221,13 +221,19 @@ function ModalEditor({
 
               <PlayerLabelContainerLeft>
                 <PlayerNameData>
-                  <RankLabel>#{headerPlayer1?.potition || "-"}</RankLabel>
+                  {headerPlayer1?.status === "bye" ? (
+                    <span></span>
+                  ) : (
+                    <RankLabel>#{headerPlayer1?.potition || "-"}</RankLabel>
+                  )}
 
                   <div>
-                    <TeamNameLabel>
+                    <TeamNameLabel
+                      className={classnames({ "label-bye": headerPlayer1?.status === "bye" })}
+                    >
                       {player1?.teamDetail.teamName ||
                         headerPlayer1?.teamName ||
-                        "Nama tim tidak tersedia"}
+                        (headerPlayer1?.status === "bye" ? "Bye" : "Nama tim tidak tersedia")}
                     </TeamNameLabel>
                     {Boolean(player1?.listMember?.length) && (
                       <MembersList>
@@ -241,31 +247,35 @@ function ModalEditor({
               </PlayerLabelContainerLeft>
 
               <HeadToHeadScores>
-                <HeaderScoreInput>
-                  {player1?.scores.isDifferent ? (
-                    <IndicatorIconFloating className="indicator-left indicator-warning">
-                      <IconAlertCircle />
-                    </IndicatorIconFloating>
-                  ) : (
-                    <IndicatorIconFloating className="indicator-left indicator-valid">
-                      <IconCheckOkCircle />
-                    </IndicatorIconFloating>
-                  )}
+                {headerPlayer1?.status === "bye" ? (
+                  <HeaderScoreInput></HeaderScoreInput>
+                ) : (
+                  <HeaderScoreInput>
+                    {player1?.scores.isDifferent ? (
+                      <IndicatorIconFloating className="indicator-left indicator-warning">
+                        <IconAlertCircle />
+                      </IndicatorIconFloating>
+                    ) : (
+                      <IndicatorIconFloating className="indicator-left indicator-valid">
+                        <IconCheckOkCircle />
+                      </IndicatorIconFloating>
+                    )}
 
-                  <ScoreInput
-                    type="text"
-                    placeholder="-"
-                    value={adminTotalP1 || ""}
-                    onChange={(ev) => {
-                      setTotalP1((previousValue) => {
-                        const { value } = ev.target;
-                        const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-                        return validatedNumberValue;
-                      });
-                    }}
-                    onFocus={(ev) => ev.target.select()}
-                  />
-                </HeaderScoreInput>
+                    <ScoreInput
+                      type="text"
+                      placeholder="-"
+                      value={adminTotalP1 || ""}
+                      onChange={(ev) => {
+                        setTotalP1((previousValue) => {
+                          const { value } = ev.target;
+                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
+                          return validatedNumberValue;
+                        });
+                      }}
+                      onFocus={(ev) => ev.target.select()}
+                    />
+                  </HeaderScoreInput>
+                )}
 
                 <HeadToHeadScoreLabels>
                   <ScoreCounter
@@ -289,42 +299,52 @@ function ModalEditor({
                   </ScoreCounter>
                 </HeadToHeadScoreLabels>
 
-                <HeaderScoreInput>
-                  <ScoreInput
-                    type="text"
-                    placeholder="-"
-                    value={adminTotalP2 || ""}
-                    onChange={(ev) => {
-                      setTotalP2((previousValue) => {
-                        const { value } = ev.target;
-                        const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-                        return validatedNumberValue;
-                      });
-                    }}
-                    onFocus={(ev) => ev.target.select()}
-                  />
+                {headerPlayer2?.status === "bye" ? (
+                  <HeaderScoreInput></HeaderScoreInput>
+                ) : (
+                  <HeaderScoreInput>
+                    <ScoreInput
+                      type="text"
+                      placeholder="-"
+                      value={adminTotalP2 || ""}
+                      onChange={(ev) => {
+                        setTotalP2((previousValue) => {
+                          const { value } = ev.target;
+                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
+                          return validatedNumberValue;
+                        });
+                      }}
+                      onFocus={(ev) => ev.target.select()}
+                    />
 
-                  {player2?.scores.isDifferent ? (
-                    <IndicatorIconFloating className="indicator-right indicator-warning">
-                      <IconAlertCircle />
-                    </IndicatorIconFloating>
-                  ) : (
-                    <IndicatorIconFloating className="indicator-right indicator-valid">
-                      <IconCheckOkCircle />
-                    </IndicatorIconFloating>
-                  )}
-                </HeaderScoreInput>
+                    {player2?.scores.isDifferent ? (
+                      <IndicatorIconFloating className="indicator-right indicator-warning">
+                        <IconAlertCircle />
+                      </IndicatorIconFloating>
+                    ) : (
+                      <IndicatorIconFloating className="indicator-right indicator-valid">
+                        <IconCheckOkCircle />
+                      </IndicatorIconFloating>
+                    )}
+                  </HeaderScoreInput>
+                )}
               </HeadToHeadScores>
 
               <PlayerLabelContainerRight>
                 <PlayerNameData>
-                  <RankLabel>#{headerPlayer2?.potition || "-"}</RankLabel>
+                  {headerPlayer2?.status === "bye" ? (
+                    <span></span>
+                  ) : (
+                    <RankLabel>#{headerPlayer2?.potition || "-"}</RankLabel>
+                  )}
 
                   <div>
-                    <TeamNameLabel>
+                    <TeamNameLabel
+                      className={classnames({ "label-bye": headerPlayer2?.status === "bye" })}
+                    >
                       {player2?.teamDetail.teamName ||
                         headerPlayer2?.teamName ||
-                        "Nama tim tidak tersedia"}
+                        (headerPlayer2?.status === "bye" ? "Bye" : "Nama tim tidak tersedia")}
                     </TeamNameLabel>
                     {Boolean(player2?.listMember?.length) && (
                       <MembersList>
@@ -356,38 +376,46 @@ function ModalEditor({
                 scoringDetails={scoringDetails}
                 grid={[gridDataPlayer1?.shot, gridDataPlayer2?.shot]}
               >
-                <div>
-                  <ScoreGridForm
-                    scoringType={player1?.scores.eliminationtScoreType}
-                    gridData={gridDataPlayer1}
-                    onChange={(value) => {
-                      if (player1?.scores.eliminationtScoreType === 1) {
-                        // Itung poin real-time untuk tipe skoring poin
-                        const [valP1, valP2] = _computePoints(value, gridDataPlayer2);
-                        setGridDataPlayer1(valP1);
-                        setGridDataPlayer2(valP2); // opponent
-                      } else {
-                        setGridDataPlayer1(value);
-                      }
-                    }}
-                  />
-                </div>
+                {headerPlayer1?.status === "bye" ? (
+                  <EmptyByeGrid playerIndex={0} />
+                ) : (
+                  <div>
+                    <ScoreGridForm
+                      scoringType={player1?.scores.eliminationtScoreType}
+                      gridData={gridDataPlayer1}
+                      onChange={(value) => {
+                        if (player1?.scores.eliminationtScoreType === 1) {
+                          // Itung poin real-time untuk tipe skoring poin
+                          const [valP1, valP2] = _computePoints(value, gridDataPlayer2);
+                          setGridDataPlayer1(valP1);
+                          setGridDataPlayer2(valP2); // opponent
+                        } else {
+                          setGridDataPlayer1(value);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
 
-                <div>
-                  <ScoreGridFormRight
-                    scoringType={player2?.scores.eliminationtScoreType}
-                    gridData={gridDataPlayer2}
-                    onChange={(value) => {
-                      if (player2?.scores.eliminationtScoreType === 1) {
-                        const [valP2, valP1] = _computePoints(value, gridDataPlayer1);
-                        setGridDataPlayer2(valP2);
-                        setGridDataPlayer1(valP1); // opponent
-                      } else {
-                        setGridDataPlayer2(value);
-                      }
-                    }}
-                  />
-                </div>
+                {headerPlayer2?.status === "bye" ? (
+                  <EmptyByeGrid playerIndex={1} />
+                ) : (
+                  <div>
+                    <ScoreGridFormRight
+                      scoringType={player2?.scores.eliminationtScoreType}
+                      gridData={gridDataPlayer2}
+                      onChange={(value) => {
+                        if (player2?.scores.eliminationtScoreType === 1) {
+                          const [valP2, valP1] = _computePoints(value, gridDataPlayer1);
+                          setGridDataPlayer2(valP2);
+                          setGridDataPlayer1(valP1); // opponent
+                        } else {
+                          setGridDataPlayer2(value);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </InputSwitcherProvider>
             </SplitEditor>
 
@@ -687,6 +715,14 @@ function LoadingBlocker({ isLoading = false }) {
   );
 }
 
+function EmptyByeGrid({ playerIndex = 0 }) {
+  return (
+    <EmptyByeGridWrapper className={classnames({ "bye-player2": playerIndex === 1 })}>
+      Bye
+    </EmptyByeGridWrapper>
+  );
+}
+
 /* ================================== */
 // styles
 
@@ -769,6 +805,10 @@ const TeamNameLabel = styled.span`
   display: block;
   font-weight: 600;
   text-align: left;
+
+  &.label-bye {
+    color: var(--ma-gray-200);
+  }
 `;
 
 const MembersList = styled.ol`
@@ -891,20 +931,50 @@ const LoadingContainer = styled.div`
   background-color: rgba(255, 255, 255, 0.6);
 `;
 
+const EmptyByeGridWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--ma-gray-200);
+  font-size: 1.5rem;
+  font-weight: 600;
+
+  border-right: 1px solid var(--ma-gray-100);
+
+  &.bye-player2 {
+    border-right: none;
+    border-left: 1px solid var(--ma-gray-100);
+  }
+`;
+
 /* =========================== */
 // utils
 
+function _getPlayerDataByIndex(scoringDetails, playerIndex) {
+  const data = scoringDetails?.[playerIndex];
+  if (Array.isArray(data) && !data.length) {
+    return undefined;
+  }
+  return data;
+}
+
 // Nge-update payload detail skor di rambahan & shoot-off
 function _makeMemberScoresPayload({ state, payload }) {
-  const participants = state.map((member, index) => ({
-    participant_id: member?.teamDetail?.participantId,
-    scores: {
-      shot: payload[index].shot.map((rambahan) => ({ score: rambahan })),
-      extraShot: payload[index].extraShot,
-      win: member.scores.win,
-      adminTotal: member.scores.adminTotal,
-    },
-  }));
+  const participants = state.map((member, index) => {
+    if (Array.isArray(member) && !member.length) {
+      // kalah bye, kirim array kosong
+      return [];
+    }
+    return {
+      participant_id: member?.teamDetail?.participantId,
+      scores: {
+        shot: payload[index].shot.map((rambahan) => ({ score: rambahan })),
+        extraShot: payload[index].extraShot,
+        win: member.scores.win,
+        adminTotal: member.scores.adminTotal,
+      },
+    };
+  });
   //coba tanpa type?
   return { type: 2, participants };
 }

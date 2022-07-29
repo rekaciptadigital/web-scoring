@@ -27,6 +27,7 @@ function useRouteQueryParams() {
     setParamEventId,
     eventType: qs_event_type,
     matchType: qs_match_type,
+    pathname,
   };
 }
 

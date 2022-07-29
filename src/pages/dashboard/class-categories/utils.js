@@ -1,5 +1,11 @@
 import { datetime } from "utils";
 
+/**
+ * =======================================================
+ * PUBLICS
+ * =======================================================
+ */
+
 function parseAgeCategoryResponseData(payload) {
   const isUsia = [
     payload.minAge,
@@ -29,6 +35,43 @@ function parseAgeCategoryResponseData(payload) {
     max: max,
   };
 }
+
+function getClassDescription(classCategory) {
+  const parsedData = parseAgeCategoryResponseData(classCategory);
+
+  if (parsedData.criteria === 1) {
+    return "Tidak ada batasan usia";
+  }
+
+  if (parsedData.criteria === 2 && !parsedData.asDate) {
+    const copywritings = {
+      min: `Usia lebih dari ${parsedData.min} tahun`,
+      max: `Usia kurang dari ${parsedData.max} tahun`,
+      range: `Usia ${[parsedData.min, parsedData.max].join(" hingga ")} tahun`,
+    };
+    return copywritings[parsedData.ageValidator] || "Informasi usia tidak tersedia";
+  }
+
+  if (parsedData.criteria === 2 && parsedData.asDate) {
+    const copywritings = {
+      min: `Kelahiran setelah tanggal ${datetime.formatFullDateLabel(parsedData.min)}`,
+      max: `Kelahiran sebelum tanggal ${datetime.formatFullDateLabel(parsedData.max)}`,
+      range: `Kelahiran antara tanggal ${[
+        datetime.formatFullDateLabel(parsedData.min),
+        datetime.formatFullDateLabel(parsedData.max),
+      ].join(" hingga ")}`,
+    };
+    return copywritings[parsedData.ageValidator] || "Informasi tanggal lahir tidak tersedia";
+  }
+
+  return null;
+}
+
+/**
+ * =======================================================
+ * PRIVATES
+ * =======================================================
+ */
 
 function _getAgeValidatorValue(asDate, payload) {
   if (asDate) {
@@ -68,4 +111,4 @@ function _getMaxValue(asDate, payload) {
   return payload.maxAge || null;
 }
 
-export { parseAgeCategoryResponseData };
+export { parseAgeCategoryResponseData, getClassDescription };

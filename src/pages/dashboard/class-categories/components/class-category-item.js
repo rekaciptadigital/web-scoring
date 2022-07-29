@@ -11,8 +11,7 @@ import IconEye from "components/ma/icons/mono/eye";
 import IconEdit from "components/ma/icons/mono/edit";
 import IconTrash from "components/ma/icons/mono/trash";
 
-import { datetime } from "utils";
-import { parseAgeCategoryResponseData } from "../utils";
+import { getClassDescription } from "../utils";
 
 function ClassCategoryItem({ classCategory, onSuccessSubmit }) {
   return (
@@ -91,7 +90,7 @@ function ArchiveClassCategory({ classCategory, onSuccessArchive }) {
 }
 
 function ClassDescription({ classCategory }) {
-  const desc = React.useMemo(() => _getClassDescription(classCategory), [classCategory]);
+  const desc = React.useMemo(() => getClassDescription(classCategory), [classCategory]);
   return <ClassDescriptionWrapper>{desc}</ClassDescriptionWrapper>;
 }
 
@@ -140,39 +139,5 @@ const ClassDescriptionWrapper = styled.div`
 const ItemActions = styled.div`
   padding: 0.75rem;
 `;
-
-/* ==================================== */
-// utils
-
-function _getClassDescription(classCategory) {
-  const parsedData = parseAgeCategoryResponseData(classCategory);
-
-  if (parsedData.criteria === 1) {
-    return "Tidak ada batasan usia";
-  }
-
-  if (parsedData.criteria === 2 && !parsedData.asDate) {
-    const copywritings = {
-      min: `Usia lebih dari ${parsedData.min} tahun`,
-      max: `Usia kurang dari ${parsedData.max} tahun`,
-      range: `Usia ${[parsedData.min, parsedData.max].join(" hingga ")} tahun`,
-    };
-    return copywritings[parsedData.ageValidator] || "Informasi usia tidak tersedia";
-  }
-
-  if (parsedData.criteria === 2 && parsedData.asDate) {
-    const copywritings = {
-      min: `Kelahiran setelah tanggal ${datetime.formatFullDateLabel(parsedData.min)}`,
-      max: `Kelahiran sebelum tanggal ${datetime.formatFullDateLabel(parsedData.max)}`,
-      range: `Kelahiran antara tanggal ${[
-        datetime.formatFullDateLabel(parsedData.min),
-        datetime.formatFullDateLabel(parsedData.max),
-      ].join(" hingga ")}`,
-    };
-    return copywritings[parsedData.ageValidator] || "Informasi tanggal lahir tidak tersedia";
-  }
-
-  return null;
-}
 
 export { ClassCategoryItem };

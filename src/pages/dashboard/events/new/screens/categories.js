@@ -12,6 +12,7 @@ import { Button, ButtonBlue, ButtonOutlineBlue, AlertSubmitError } from "compone
 import { FieldSelectSmall, FieldInputTextSmall } from "../../components/form-fields";
 import { LoadingScreen } from "../components/loading-screen-portal";
 import { toast } from "../components/processing-toast";
+import { FieldSelectClass } from "./field-select-class";
 
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
@@ -189,7 +190,7 @@ function CategoriesByCompetition({
             <ClassGroup>
               <VerticalSpacedBox>
                 <PairedFields>
-                  <FieldSelectSmall
+                  <FieldSelectClass
                     name={`ageCategoryId-${detail.key}`}
                     options={optionsAgeCategories}
                     value={detail.ageCategoryId}
@@ -198,7 +199,7 @@ function CategoriesByCompetition({
                     }}
                   >
                     Kelas
-                  </FieldSelectSmall>
+                  </FieldSelectClass>
 
                   <FieldSelectSmall
                     name={`distanceId-${detail.key}`}

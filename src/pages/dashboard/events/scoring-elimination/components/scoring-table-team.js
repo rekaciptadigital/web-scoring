@@ -105,6 +105,7 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
               !team2?.teamName ||
               !team1?.memberTeam?.length ||
               !team2?.memberTeam?.length;
+            const bothAreBye = row.teams.every((team) => team.status === "wait");
             const hasWinner = row.teams.some((team) => team.win === 1);
             const budrestNumber = _getBudrestNumber(row);
 
@@ -162,7 +163,7 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                 </td>
 
                 <td>
-                  {!noData && (
+                  {(!noData || (!bothAreBye && isBye)) && (
                     <HeadToHeadScoreLabels>
                       <ScoreTotalLabel
                         className={classnames({
@@ -273,11 +274,26 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                         </React.Fragment>
                       ))}
 
-                    <ButtonDownloadScoresheet
-                      disabled={noData}
-                      categoryId={categoryDetailId}
-                      scoring={scoring}
-                    />
+                    {bothAreBye ? (
+                      <ButtonDownloadScoresheet
+                        disabled
+                        categoryId={categoryDetailId}
+                        scoring={scoring}
+                      />
+                    ) : isBye ? (
+                      <React.Fragment>
+                        <ButtonEditScoreTeam
+                          headerInfo={row}
+                          budrestNumber={budrestNumber}
+                          scoring={scoring}
+                          onSuccessSubmit={fetchEliminationMatches}
+                          categoryDetails={categoryDetails}
+                        />
+                        <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
+                      </React.Fragment>
+                    ) : (
+                      <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
+                    )}
                   </HorizontalSpaced>
                 </td>
               </tr>

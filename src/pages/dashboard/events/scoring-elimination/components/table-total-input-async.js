@@ -66,7 +66,7 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
           type="text"
           placeholder="-"
           disabled={disabled || isLoading}
-          value={disabled ? "" : inputValue || ""}
+          value={disabled ? "" : inputValue}
           onChange={(ev) => {
             !isDirty && setDirty(true);
             setInputValue((previousValue) => {

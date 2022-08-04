@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useReportInfos } from "./hooks/report-infos";
 import { useReportParticipants } from "./hooks/download-participants";
-import { useReportRoundups } from "./hooks/download-roundups";
 
 import { SubNavbar } from "../components/submenus-reporting";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -13,7 +12,6 @@ import { toast } from "./components/processing-toast";
 import IconUsersGroup from "components/ma/icons/mono/users-group";
 // TODO: buat finance nanti kalau udah ready
 // import IconMoney from "components/ma/icons/mono/money";
-import IconMedal from "components/ma/icons/mono/medal";
 import IconInfo from "components/ma/icons/mono/info";
 import IconLoading from "./components/icon-loading";
 
@@ -31,12 +29,7 @@ function PageEventReports() {
     errors: errorsParticipants,
   } = useReportParticipants();
 
-  const {
-    downloadRoundups,
-    isLoading: isLoadingRoundups,
-    isError: isErrorRoundups,
-    errors: errorsRoundups,
-  } = useReportRoundups();
+  
 
   const _getIsReportAvailable = (name) => {
     if (!reportInfos.data?.length) {
@@ -70,7 +63,6 @@ function PageEventReports() {
   };
 
   const participantIsAvailable = _getIsReportAvailable("participant");
-  const competitionIsAvailable = _getIsReportAvailable("competition");
   // TODO: finance
 
   return (

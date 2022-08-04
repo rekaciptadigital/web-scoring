@@ -203,26 +203,26 @@ function StatusLabel({ eventDetailData }) {
 
   if (!isEventPublished) {
     return (
-      <InfoGrayBadge>
+      <WarningBadge>
         <span className="icon-info">&#8505;</span>
         <span>Atur Pertandingan</span>
-      </InfoGrayBadge>
+      </WarningBadge>
     );
   }
 
   if (!isQualificationSchedulesSet) {
     return (
-      <InfoGrayBadge>
+      <WarningBadge>
         <span className="icon-info">&#8505;</span>
         <span>Atur Jadwal</span>
-      </InfoGrayBadge>
+      </WarningBadge>
     );
   }
 
   return null;
 }
 
-const InfoGrayBadge = styled.div`
+const WarningBadge = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;

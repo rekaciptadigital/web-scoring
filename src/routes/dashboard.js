@@ -15,6 +15,7 @@ import PageEventFaqs from "../pages/dashboard/events/faqs";
 import PageEventScoringQualification from "pages/dashboard/events/scoring-qualification";
 import PageEventScoringElimination from "pages/dashboard/events/scoring-elimination";
 import PageEventReports from "pages/dashboard/events/reports";
+import PageEventDoc from "pages/dashboard/events/doc";
 import PageEventDetailSchedulingScoring from "pages/dashboard/events/scheduling-scoring";
 import PageConfigEliminationDetail from "pages/dashboard/events/scheduling-scoring/views/manage-elimination-detail";
 import ListCategory from "../pages/dashboard/category";
@@ -30,6 +31,7 @@ import Eliminasi from "../pages/dashboard/eliminasi";
 import PageEventOfficial from "pages/dashboard/events/official";
 import Legacy_PageEventIdCard from "pages/dashboard/events/id-card/_legacy";
 import PageEventIdCard from "pages/dashboard/events/id-card";
+import AllEvent from "pages/dashboard/events/list";
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -44,6 +46,7 @@ const dashboardRoutes = [
   { path: "/dashboard/event/id-card/:event_id", component: Legacy_PageEventIdCard },
   { path: "/dashboard/event/:event_id/id-card", component: PageEventIdCard },
   { path: "/dashboard/event/:event_id/official", component: PageEventOfficial },
+  { path: "/dashboard/event", component: AllEvent },
   {
     path: "/dashboard/event/:event_id/scoring-qualification",
     component: PageEventScoringQualification,
@@ -63,6 +66,7 @@ const dashboardRoutes = [
     component: PageConfigEliminationDetail,
   },
   { path: "/dashboard/event/:event_id/reports", component: PageEventReports, exact: true },
+  { path: "/dashboard/event/:event_id/doc", component: PageEventDoc, exact: true },
   { path: "/dashboard/member/:event_id", component: ListMember },
   { path: "/dashboard/category", component: ListCategory },
   { path: "/dashboard/scoring", component: ListScoring },

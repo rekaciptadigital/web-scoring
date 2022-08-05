@@ -5,7 +5,7 @@ import { EventsService } from "services";
 import EventThumbnailCard from "./EventThumbnailCard";
 
 function makeHomeThumbnailList(initialData, type) {
-  let container = [null, null, null];
+  let container = [null];
   if (!initialData?.length) {
     return container;
   }
@@ -13,8 +13,8 @@ function makeHomeThumbnailList(initialData, type) {
   const lastThreeData = initialData.slice(0, maxBoxIndex);
   switch (type) {
     case "home":
-      lastThreeData.forEach((event, index) => {
-        container[1 + index] = event;
+      lastThreeData.forEach((event) => {
+        container.push(event);
       });
       return container;
     case "all-event":

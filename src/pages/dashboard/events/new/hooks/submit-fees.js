@@ -30,7 +30,6 @@ function useSubmitFees() {
 
 function makePayloadFees(originalCategoryDetails, formData) {
   return {
-    event_id: 22,
     categories: originalCategoryDetails.map((originalDetail) => {
       // Prepare data asli tetap disertakan.
       // Overide nilainya untuk yang diedit.

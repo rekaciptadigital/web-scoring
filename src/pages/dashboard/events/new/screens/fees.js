@@ -13,11 +13,17 @@ function ScreenFees({ form }) {
     updateRegistrationFee,
     updateEarlyBirdFee,
   } = form;
-
   return (
     <div>
       <CardSheet>
         <VerticalSpaceBetween>
+          <FieldToggleTeamPrices>
+            <div>Bebankan biaya payment gateway pada peserta</div>
+            <ToggleSwitch
+              checked={data?.includePaymentGatewayFeeToUser}
+              onChange={(val) => {updateField("includePaymentGatewayFeeToUser",val ? 1 : 0)}}
+            />
+          </FieldToggleTeamPrices>
           <FourColumnsInputsGrid>
             <FieldInputPrice
               name="type-normal"
@@ -246,8 +252,8 @@ const TeamFeeInputsGrid = styled.div`
 /* ============================ */
 
 function ToggleSwitch({ checked, onChange, disabled }) {
-  const handleToggling = () => {
-    onChange?.();
+  const handleToggling = (event) => {
+    onChange?.(event);
   };
 
   return (

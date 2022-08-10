@@ -67,7 +67,25 @@ function PageEventReports() {
     <ContentLayoutWrapper {...pageLayoutProps}>
       <CardList>
         {/* TODO: Report finance, copas di atas kalau udah ready */}
-
+        {/* <CardSheet>
+            <ReportingMediaObject
+            icon={IconMedal}
+            title="Laporan UPP"
+            description="Download laporan PDF untuk UPP"
+            customFooter={
+              <ReportGenerateDateInfo
+                name="competition"
+                reportInfos={reportInfos}
+                isAvailable={competitionIsAvailable}
+              />
+            }
+            downloadDisabled={!competitionIsAvailable}
+            onDownload={_makeDownloadHandler(downloadRoundups)}
+            isLoading={isLoadingRoundups}
+            isError={isErrorRoundups}
+            errors={errorsRoundups}
+          />
+          </CardSheet> */}
         <CardSheet>
           <ReportingMediaObject
             icon={IconMedal}
@@ -86,7 +104,26 @@ function PageEventReports() {
             isError={isErrorRoundups}
             errors={errorsRoundups}
           />
-        </CardSheet>
+          </CardSheet>
+          {/* <CardSheet>
+          <ReportingMediaObject
+            icon={IconMedal}
+            title="Laporan rekapitulasi medali"
+            description="Download laporan rekapitulasi medali"
+            customFooter={
+              <ReportGenerateDateInfo
+                name="competition"
+                reportInfos={reportInfos}
+                isAvailable={competitionIsAvailable}
+              />
+            }
+            downloadDisabled={!competitionIsAvailable}
+            onDownload={_makeDownloadHandler(downloadRoundups)}
+            isLoading={isLoadingRoundups}
+            isError={isErrorRoundups}
+            errors={errorsRoundups}
+          />
+        </CardSheet> */}
       </CardList>
     </ContentLayoutWrapper>
   );

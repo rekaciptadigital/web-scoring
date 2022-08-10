@@ -4,16 +4,25 @@ import { EventsService } from "services";
 
 import EventThumbnailCard from "./EventThumbnailCard";
 
-function makeThumbnailList(initialData) {
-  const container = [null, null, null];
+function makeHomeThumbnailList(initialData, type) {
+  let container = [null];
   if (!initialData?.length) {
     return container;
   }
-  const lastThreeData = initialData.slice(0, 3);
-  lastThreeData.forEach((event, index) => {
-    container[index] = event;
-  });
-  return container;
+  const maxBoxIndex = 2;
+  const lastThreeData = initialData.slice(0, maxBoxIndex);
+  switch (type) {
+    case "home":
+      lastThreeData.forEach((event) => {
+        container.push(event);
+      });
+      return container;
+    case "all-event":
+      return initialData;
+    default:
+      break;
+  }
+  
 }
 
 const EventLoadingIndicator = styled.div`
@@ -31,7 +40,7 @@ const EventLoadingIndicator = styled.div`
   background-color: #ffffff;
 `;
 
-function LatestEventList() {
+function LatestEventList({type}) {
   const [events, setEvents] = React.useState(null);
 
   React.useEffect(() => {
@@ -56,7 +65,7 @@ function LatestEventList() {
   return (
     <EventGrid>
       {events &&
-        makeThumbnailList(events).map((event, index) => {
+        makeHomeThumbnailList(events, type).map((event, index) => {
           return <EventThumbnailCard key={index} event={event} />;
         })}
     </EventGrid>

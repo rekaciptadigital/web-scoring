@@ -1,9 +1,12 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import MetaTags from "react-meta-tags";
 import { Container, Row, Col } from "reactstrap";
 import { LatestEventList, CardUserProfile, CardMenuManageUsers } from "./components";
+
+const hrefToListEvent = `/dashboard/event`;
 
 const Dashboard = () => {
   return (
@@ -31,7 +34,10 @@ const Dashboard = () => {
           <div>{/* TODO: Untuk ke depannya diisi tombol action: misal, ke list event */}</div>
         </div>
 
-        <LatestEventList />
+        <LatestEventList type={"home"} />
+        <Link className="event-link" to={hrefToListEvent}>
+           <h4 style={{ color: "var(--ma-blue)", textAlign: "center", marginTop: 48}} > Lihat Semua Event </h4>
+          </Link>
       </Container>
     </StyledPageWrapper>
   );

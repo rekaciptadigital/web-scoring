@@ -59,6 +59,7 @@ function useSubmitCategories() {
 }
 
 function makePayloadCategories(formData, formFees, eventId) {
+  console.log("Sdwcdiwnci",formFees)
   const flatCategories = [];
   formData.forEach((category) => {
     category.categoryDetails.forEach((detail) => {
@@ -93,6 +94,7 @@ function makePayloadCategories(formData, formFees, eventId) {
   });
 
   return {
+    include_payment_gateway_fee_to_user: formFees.data.includePaymentGatewayFeeToUser,
     event_id: eventId,
     categories: flatCategories,
   };

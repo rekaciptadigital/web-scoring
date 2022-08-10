@@ -327,6 +327,7 @@ const makeDefaultFeeData = () => ({
   isEarlyBird: false,
   earlyBirdEndDate: null,
   earlyBirdFee: "",
+  includePaymentGatewayFeeToUser: 0,
   isFlatFee: true,
   feesByTeam: makeDefaultFeesByTeam(),
   earlyBirdByTeam: makeDefaultEarlyBirdByTeam(),

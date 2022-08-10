@@ -44,7 +44,7 @@ function SubNavbar() {
 
           <li>
             {/* TODO: hapus as="span" kalau mau dipakai */}
-            <NavLinkItem as="span" to={`/dashboard/event/${eventId}/documents`}>
+            <NavLinkItem to={`/dashboard/event/${eventId}/doc`}>
               <span>
                 <IconFile size="16" />
               </span>

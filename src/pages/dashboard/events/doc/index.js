@@ -2,16 +2,16 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useReportInfos } from "./hooks/report-infos";
-import { useReportParticipants } from "./hooks/download-participants";
+import { useReportRoundups } from "./hooks/download-roundups";
+import { SubNavbar } from "../components/submenus-matches";
 
-import { SubNavbar } from "../components/submenus-reporting";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { ButtonDownload } from "./components/button-download";
 import { toast } from "./components/processing-toast";
 
-import IconUsersGroup from "components/ma/icons/mono/users-group";
 // TODO: buat finance nanti kalau udah ready
 // import IconMoney from "components/ma/icons/mono/money";
+import IconMedal from "components/ma/icons/mono/medal";
 import IconInfo from "components/ma/icons/mono/info";
 import IconLoading from "./components/icon-loading";
 
@@ -23,13 +23,11 @@ function PageEventReports() {
   const reportInfos = useReportInfos();
 
   const {
-    downloadParticipants,
-    isLoading: isLoadingParticipants,
-    isError: isErrorParticipants,
-    errors: errorsParticipants,
-  } = useReportParticipants();
-
-  
+    downloadRoundups,
+    isLoading: isLoadingRoundups,
+    isError: isErrorRoundups,
+    errors: errorsRoundups,
+  } = useReportRoundups();
 
   const _getIsReportAvailable = (name) => {
     if (!reportInfos.data?.length) {
@@ -58,34 +56,74 @@ function PageEventReports() {
   };
 
   const pageLayoutProps = {
-    pageTitle: "Laporan Event",
+    pageTitle: "Laporan",
     navbar: <SubNavbar eventId={eventId} />,
   };
 
-  const participantIsAvailable = _getIsReportAvailable("participant");
+  const competitionIsAvailable = _getIsReportAvailable("competition");
   // TODO: finance
 
   return (
     <ContentLayoutWrapper {...pageLayoutProps}>
       <CardList>
-        <CardSheet>
-          <ReportingMediaObject
-            icon={IconUsersGroup}
-            title="Laporan Jumlah Peserta"
-            description="Laporan jumlah peserta yang mengikuti pertandingan"
+        {/* TODO: Report finance, copas di atas kalau udah ready */}
+        {/* <CardSheet>
+            <ReportingMediaObject
+            icon={IconMedal}
+            title="Laporan UPP"
+            description="Download laporan PDF untuk UPP"
             customFooter={
               <ReportGenerateDateInfo
-                name="participant"
+                name="competition"
                 reportInfos={reportInfos}
-                isAvailable={participantIsAvailable}
+                isAvailable={competitionIsAvailable}
               />
             }
-            onDownload={_makeDownloadHandler(downloadParticipants)}
-            isLoading={isLoadingParticipants}
-            isError={isErrorParticipants}
-            errors={errorsParticipants}
+            downloadDisabled={!competitionIsAvailable}
+            onDownload={_makeDownloadHandler(downloadRoundups)}
+            isLoading={isLoadingRoundups}
+            isError={isErrorRoundups}
+            errors={errorsRoundups}
           />
-        </CardSheet>
+          </CardSheet> */}
+        <CardSheet>
+          <ReportingMediaObject
+            icon={IconMedal}
+            title="Laporan Pertandingan"
+            description="Laporan hasil akhir pertandingan"
+            customFooter={
+              <ReportGenerateDateInfo
+                name="competition"
+                reportInfos={reportInfos}
+                isAvailable={competitionIsAvailable}
+              />
+            }
+            downloadDisabled={!competitionIsAvailable}
+            onDownload={_makeDownloadHandler(downloadRoundups)}
+            isLoading={isLoadingRoundups}
+            isError={isErrorRoundups}
+            errors={errorsRoundups}
+          />
+          </CardSheet>
+          {/* <CardSheet>
+          <ReportingMediaObject
+            icon={IconMedal}
+            title="Laporan rekapitulasi medali"
+            description="Download laporan rekapitulasi medali"
+            customFooter={
+              <ReportGenerateDateInfo
+                name="competition"
+                reportInfos={reportInfos}
+                isAvailable={competitionIsAvailable}
+              />
+            }
+            downloadDisabled={!competitionIsAvailable}
+            onDownload={_makeDownloadHandler(downloadRoundups)}
+            isLoading={isLoadingRoundups}
+            isError={isErrorRoundups}
+            errors={errorsRoundups}
+          />
+        </CardSheet> */}
       </CardList>
     </ContentLayoutWrapper>
   );

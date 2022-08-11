@@ -93,6 +93,9 @@ export default {
   getEventRoundupsReport(qs = null) {
     return API.get("/web/v1/archery/events/report-result", qs);
   },
+  getEventMedalReport(qs = null) {
+    return API.get("/web/v1/archery/events/report-medal-club", qs);
+  },
   getEventMemberNew(qs = null) {
     return API.get("/web/v2/members", qs);
   },

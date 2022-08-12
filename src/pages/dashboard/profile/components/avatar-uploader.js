@@ -14,10 +14,6 @@ import IconPictureUpload from "components/ma/icons/mono/picture-upload";
 function AvatarUploader() {
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const { isLoading, submit } = useSubmitAvatar();
-  const reloadTimestamp = React.useRef(_getCurrentTimestamp());
-
-  const { avatar } = userProfile;
-  const avatarURL = _getAvatarURL(avatar, reloadTimestamp.current);
 
   const handleChooseImage = async (ev) => {
     if (!ev.target.files?.[0]) {
@@ -30,7 +26,6 @@ function AvatarUploader() {
     submit(stringAv, {
       onSuccess: () => {
         toast.success("Foto profil diperbarui");
-        reloadTimestamp.current = _getCurrentTimestamp();
       },
       onError: () => {
         toast.error("Gagal memperbarui foto profil");
@@ -45,7 +40,7 @@ function AvatarUploader() {
     onChange: handleChooseImage,
   };
 
-  if (!avatar) {
+  if (!userProfile?.avatar) {
     return (
       <UploaderContainer htmlFor="uploader" title="Upload foto profil">
         <PictureContainer>
@@ -63,7 +58,7 @@ function AvatarUploader() {
   return (
     <UploaderContainer htmlFor="uploader" title="Upload foto profil">
       <PictureContainer>
-        <img className="avatar-profile-picture" src={avatarURL} />
+        <img className="avatar-profile-picture" src={userProfile?.avatar} />
       </PictureContainer>
       <LoadingIndicator isLoading={isLoading} />
       <UploadButton>
@@ -146,21 +141,5 @@ const FileInput = styled.input`
   left: -99999px;
   visibility: hidden;
 `;
-
-/* ============================ */
-// utils
-
-const _getCurrentTimestamp = () => new Date().getTime();
-
-function _getAvatarURL(avatar, reloadTimestamp) {
-  if (!avatar) {
-    return avatar;
-  }
-
-  const segments = avatar.split("#");
-  const params = "?timestamp=" + reloadTimestamp;
-
-  return segments[0] + params + "#" + segments[1];
-}
 
 export { AvatarUploader };

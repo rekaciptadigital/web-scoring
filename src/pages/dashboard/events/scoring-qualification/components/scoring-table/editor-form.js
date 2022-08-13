@@ -16,6 +16,7 @@ import classnames from "classnames";
 function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
   const scoresFromProp = _makeScoresDataFromProp(scoresData);
   const rambahanNumbers = scoresFromProp ? Object.keys(scoresFromProp) : [];
+  const shotsCount = scoresFromProp[rambahanNumbers[0]]?.length || 0;
   const [selectedScore, setSelectedScore] = React.useState(null);
   const { shouldFocusSelector, move, setPosition } = useInputSwitcher(scoresData);
 
@@ -38,9 +39,9 @@ function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
         <ScoresTable className="table table-responsive">
           <thead>
             <tr>
-              <th>End</th>
-              <th colSpan="6">Shot</th>
-              <th>Total</th>
+              <th className="text-center">End</th>
+              <th colSpan={shotsCount}>Shot</th>
+              <th className="text-center">Total</th>
             </tr>
           </thead>
 

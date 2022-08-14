@@ -5,7 +5,7 @@ import { FilterProvider, useFilters } from "./contexts/filters";
 
 import classnames from "classnames";
 
-function ToolbarFilter({ categories, isLoading = false, onChange, leftSideView, rightSideView }) {
+function ToolbarFilter({ categories, isLoading = false, onChange, viewLeft, viewRight }) {
   if (!categories?.length && isLoading) {
     return (
       <ToolbarEmptyCategory>
@@ -24,12 +24,12 @@ function ToolbarFilter({ categories, isLoading = false, onChange, leftSideView, 
 
   return (
     <FilterProvider categories={categories} onChange={onChange}>
-      <FilterControl leftSideView={leftSideView} rightSideView={rightSideView} />
+      <FilterControl viewLeft={viewLeft} viewRight={viewRight} />
     </FilterProvider>
   );
 }
 
-function FilterControl({ leftSideView, rightSideView }) {
+function FilterControl({ viewLeft, viewRight }) {
   const { tabId } = useFilters();
   return (
     <div>
@@ -38,9 +38,9 @@ function FilterControl({ leftSideView, rightSideView }) {
       </ToolbarHeader>
 
       <ToolbarBody key={tabId}>
-        {leftSideView || <DefaultKnobsView />}
+        {viewLeft || <DefaultKnobsView />}
 
-        <div>{rightSideView}</div>
+        <div>{viewRight}</div>
       </ToolbarBody>
     </div>
   );
@@ -65,37 +65,42 @@ function Tabs() {
 }
 
 function DefaultKnobsView() {
-  const {
-    classCategoryId,
-    teamCategoryId,
-    getKnobOptionsByType,
-    setClassCategory,
-    setTeamCategory,
-  } = useFilters();
-
-  const optionsClass = getKnobOptionsByType("classCategory");
-  const optionsTeam = getKnobOptionsByType("teamCategory");
-
   return (
     <KnobGroupLayout>
-      <Knobs
-        label="Kelas"
-        options={optionsClass}
-        activeKnobId={classCategoryId}
-        onChange={(knobId) => setClassCategory(knobId)}
-      />
-      <Knobs
-        label="Jenis Regu"
-        options={optionsTeam}
-        activeKnobId={teamCategoryId}
-        onChange={(knobId) => setTeamCategory(knobId)}
-        shouldHideOption={(option) => {
-          return !option.relatedClasses.some(
-            (parentClassCategory) => parentClassCategory === classCategoryId
-          );
-        }}
-      />
+      <KnobsClassCategories />
+      <KnobsTeamCategories />
     </KnobGroupLayout>
+  );
+}
+
+function KnobsClassCategories() {
+  const { classCategoryId, getKnobOptionsByType, setClassCategory } = useFilters();
+  const optionsClass = getKnobOptionsByType("classCategory");
+  return (
+    <Knobs
+      label="Kelas"
+      options={optionsClass}
+      activeKnobId={classCategoryId}
+      onChange={(knobId) => setClassCategory(knobId)}
+    />
+  );
+}
+
+function KnobsTeamCategories() {
+  const { classCategoryId, teamCategoryId, getKnobOptionsByType, setTeamCategory } = useFilters();
+  const optionsTeam = getKnobOptionsByType("teamCategory");
+  return (
+    <Knobs
+      label="Jenis Regu"
+      options={optionsTeam}
+      activeKnobId={teamCategoryId}
+      onChange={(knobId) => setTeamCategory(knobId)}
+      shouldHideOption={(option) => {
+        return !option.relatedClasses.some(
+          (parentClassCategory) => parentClassCategory === classCategoryId
+        );
+      }}
+    />
   );
 }
 
@@ -296,4 +301,12 @@ const KnobGroupLayout = styled.div`
   }
 `;
 
-export { ToolbarFilter, DefaultKnobsView, Knobs, useFilters };
+export {
+  ToolbarFilter,
+  DefaultKnobsView,
+  KnobGroupLayout,
+  KnobsClassCategories,
+  KnobsTeamCategories,
+  Knobs,
+  useFilters,
+};

@@ -4,16 +4,6 @@ import styled from "styled-components";
 import Header from "./Header";
 import Footer from "./Footer.js";
 
-const StyledLayoutWrapper = styled.div`
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-
-  .main-content {
-    padding-top: var(--ma-header-height);
-  }
-`;
-
 function LayoutDashboardDos({ children }) {
   React.useEffect(() => {
     document.body.setAttribute("data-layout", "horizontal");
@@ -28,5 +18,22 @@ function LayoutDashboardDos({ children }) {
     </StyledLayoutWrapper>
   );
 }
+
+const StyledLayoutWrapper = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .main-content {
+    flex-grow: 1;
+    padding-top: var(--ma-header-height);
+    display: flex;
+    flex-direction: column;
+
+    > * {
+      flex-grow: 1;
+    }
+  }
+`;
 
 export default LayoutDashboardDos;

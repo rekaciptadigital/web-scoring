@@ -7,16 +7,21 @@ import { useScoresheetDownload } from "./hooks/scoresheet-download";
 import { useSessionDownload } from "./hooks/download-session";
 
 import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
-import { SubNavbar } from "../components/submenus-matches";
-import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
+import { PageWrapper } from "components/ma/page-wrapper";
+import { toast } from "components/ma/processing-toast";
+import { SideBar } from "../components/sidebar";
 import { ScoringTable } from "./components/scoring-table";
-import { ProcessingToast, toast } from "./components/processing-toast";
 
 import IconDownload from "components/ma/icons/mono/download";
 
 import classnames from "classnames";
 import { ScoringTeamTable } from "./components/scoring-table/reguTable";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
+
+const pageProps = {
+  pageTitle: "DOS Kualifikasi",
+  sidebar: <SideBar />,
+};
 
 function PageDosQualification() {
   const { event_id, date_event } = useParams();
@@ -59,7 +64,7 @@ function PageDosQualification() {
 
   if (errorFetchingInitialCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
+      <PageWrapper {...pageProps}>
         <ViewWrapper>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
@@ -68,22 +73,20 @@ function PageDosQualification() {
 
           <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
         </ViewWrapper>
-      </ContentLayoutWrapper>
+      </PageWrapper>
     );
   }
 
   if (!isSettledCategories) {
     return (
-      <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
+      <PageWrapper {...pageProps}>
         <SpinnerDotBlock />
-      </ContentLayoutWrapper>
+      </PageWrapper>
     );
   }
 
   return (
-    <ContentLayoutWrapper pageTitle="Dos Kualifikasi" navbar={<SubNavbar />}>
-      <ProcessingToast />
-
+    <PageWrapper {...pageProps}>
       <TabBar>
         <TabButtonList>
           {optionsCompetitionCategory.map((option) => (
@@ -274,7 +277,7 @@ function PageDosQualification() {
           </NoBracketWrapper>
         )}
       </ViewWrapper>
-    </ContentLayoutWrapper>
+    </PageWrapper>
   );
 }
 

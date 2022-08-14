@@ -2,11 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useCategoryDetails } from "./hooks/category-details";
-// TODO:
-// import { useScoresheetDownload } from "./hooks/scoresheet-download";
-// import { useSessionDownload } from "./hooks/download-session";
+import { useSessionDownload } from "./hooks/download-session";
 
-import { SpinnerDotBlock } from "components/ma";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
+import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
+import { toast } from "components/ma/processing-toast";
 import { PageWrapper } from "components/ma/page-wrapper";
 import { SideBar } from "../components/sidebar";
 import {
@@ -18,6 +18,8 @@ import {
 } from "../components/toolbar-filters";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTeamTable } from "./components/scoring-table/reguTable";
+
+import IconDownload from "components/ma/icons/mono/download";
 
 const pageProps = {
   pageTitle: "DOS Kualifikasi",
@@ -36,30 +38,34 @@ function PageDosQualification() {
   } = useCategoryDetails(eventId, date_event);
 
   const [activeCategory, setActiveCategory] = React.useState(null);
-  const isIndividual = activeCategory?.categoryTeam?.toLowerCase?.() !== "team";
-  const sessionCount = activeCategory?.sessionInQualification;
-  const optionsSession = _makeOptionsSessionFromCount(sessionCount);
-
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
   const [session, setSession] = React.useState(0);
+  const { handleDownloadSession } = useSessionDownload(activeCategory?.id);
 
+  // TODO:
   const resetOnChangeCategory = () => {
     setInputSearchQuery("");
   };
+
+  const isIndividual = activeCategory?.categoryTeam?.toLowerCase?.() !== "team";
+  const sessionCount = activeCategory?.sessionInQualification;
+  const optionsSession = _makeOptionsSessionFromCount(sessionCount);
 
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
   if (errorFetchingInitialCategories) {
     return (
       <PageWrapper {...pageProps}>
-        <ViewWrapper>
-          <p>
-            Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
-            teknis lebih lanjut:
-          </p>
+        <CardWrapper>
+          <Content>
+            <p>
+              Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
+              teknis lebih lanjut:
+            </p>
 
-          <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
-        </ViewWrapper>
+            <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
+          </Content>
+        </CardWrapper>
       </PageWrapper>
     );
   }
@@ -74,7 +80,7 @@ function PageDosQualification() {
 
   return (
     <PageWrapper {...pageProps}>
-      <div>
+      <CardWrapper>
         <ToolbarFilter
           categories={categoryDetails}
           isLoading={isLoadingCategories}
@@ -83,16 +89,37 @@ function PageDosQualification() {
             <KnobGroupLayout>
               <KnobsClassCategories />
               <KnobsTeamCategories />
-              <Knobs
-                label="Sesi"
-                options={optionsSession}
-                activeKnobId={session}
-                onChange={(value) => setSession(value)}
-              />
+              {isIndividual && (
+                <Knobs
+                  label="Sesi"
+                  options={optionsSession}
+                  activeKnobId={session}
+                  onChange={(value) => setSession(value)}
+                />
+              )}
             </KnobGroupLayout>
           }
+          viewRight={
+            <ToolbarViewRight
+              isIndividual={isIndividual}
+              sessionOptions={optionsSession}
+              onDownload={(session) => {
+                toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
+                handleDownloadSession(session, {
+                  onSuccess() {
+                    toast.dismiss();
+                    toast.success("Unduhan dimulai");
+                  },
+                  onError() {
+                    toast.dismiss();
+                    toast.success("Gagal memulai unduhan");
+                  },
+                });
+              }}
+            />
+          }
         />
-        <ViewWrapper>
+        <Content>
           {!activeCategory ? (
             <NoBracketWrapper>
               <h4>Data kategori tidak tersedia</h4>
@@ -117,14 +144,63 @@ function PageDosQualification() {
               isTeam={!isIndividual}
             />
           )}
-        </ViewWrapper>
-      </div>
+        </Content>
+      </CardWrapper>
     </PageWrapper>
+  );
+}
+
+function ToolbarViewRight({ isIndividual, sessionOptions, session, onDownload }) {
+  if (isIndividual) {
+    return (
+      <HorizontalSpaced>
+        <MenuSession options={sessionOptions} session={session} onDownload={onDownload} />
+      </HorizontalSpaced>
+    );
+  }
+
+  return (
+    <HorizontalSpaced>
+      <ButtonOutlineBlue onClick={() => onDownload?.()}>
+        <span>
+          <IconDownload size="16" />
+        </span>{" "}
+        <span>Cetak Peringkat</span>
+      </ButtonOutlineBlue>
+    </HorizontalSpaced>
+  );
+}
+
+function MenuSession({ options, onDownload }) {
+  const [isOpen, setOpen] = React.useState(false);
+  return (
+    <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>
+      <DropdownToggle tag="span">
+        <ButtonOutlineBlue>
+          <span>
+            <IconDownload size="16" />
+          </span>{" "}
+          <span>Cetak Peringkat</span>
+        </ButtonOutlineBlue>
+      </DropdownToggle>
+
+      <DropdownMenu className="dropdown-menu-end">
+        {options.map((option) => (
+          <DropdownItem key={option.value} tag="button" onClick={() => onDownload(option.value)}>
+            <span>Laporan {option.label}</span>
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
   );
 }
 
 /* =============================== */
 // styles
+
+const CardWrapper = styled.div`
+  box-shadow: 0 0.75rem 1.5rem rgb(18 38 63 / 3%);
+`;
 
 const NoBracketWrapper = styled.div`
   min-height: 10rem;
@@ -138,7 +214,13 @@ const NoBracketWrapper = styled.div`
   }
 `;
 
-const ViewWrapper = styled.div`
+const HorizontalSpaced = styled.div`
+  > * + * {
+    margin-left: 0.5rem;
+  }
+`;
+
+const Content = styled.div`
   padding: 1.875rem;
   background-color: #ffffff;
 

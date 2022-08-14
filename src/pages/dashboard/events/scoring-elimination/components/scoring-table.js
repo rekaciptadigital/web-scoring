@@ -100,7 +100,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               row.teams.some((team) => team.status === "bye") ||
               (roundNumber === 1 && row.teams.every((team) => !team.name));
             const noData = !player1?.name || !player2?.name;
-            const bothAreBye = row.teams.every((team) => team.status === "wait");
+            const bothAreBye = noData && row.teams.every((team) => team.status === "wait");
             const hasWinner = row.teams.some((team) => team.win === 1);
             const budrestNumber = _getBudrestNumber(row);
 

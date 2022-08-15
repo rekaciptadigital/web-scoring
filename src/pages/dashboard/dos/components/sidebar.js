@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { useParams, NavLink } from "react-router-dom";
 
 import IconScoreboard from "components/ma/icons/mono/scoreboard";
+import IconBranch from "components/ma/icons/mono/branch";
+import IconMedal from "components/ma/icons/mono/medal";
+import IconTrophy from "components/ma/icons/mono/trophy";
 
 function SideBar() {
   const { event_id } = useParams();
@@ -16,6 +19,35 @@ function SideBar() {
                 <IconScoreboard />
               </div>
               <div>Kualifikasi</div>
+            </MenuItem>
+          </li>
+
+          <li>
+            <MenuItem to={`/dashboard/event/${event_id}/dos-elimination`}>
+              <div>
+                <IconBranch />
+              </div>
+              <div>Eliminasi</div>
+            </MenuItem>
+          </li>
+
+          {/* TODO: */}
+          <li>
+            <MenuItem to={`/dashboard/event/${event_id}/dos`}>
+              <div>
+                <IconMedal />
+              </div>
+              <div>Kategori</div>
+            </MenuItem>
+          </li>
+
+          {/* TODO: */}
+          <li>
+            <MenuItem to={`/dashboard/event/${event_id}/dos`}>
+              <div>
+                <IconTrophy />
+              </div>
+              <div>Medali</div>
             </MenuItem>
           </li>
         </MenuWrapper>

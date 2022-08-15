@@ -221,7 +221,7 @@ const HorizontalSpaced = styled.div`
 `;
 
 const Content = styled.div`
-  padding: 1.875rem;
+  padding: 0.5rem 1.875rem;
   background-color: #ffffff;
 
   > * + * {

@@ -3,6 +3,7 @@ import { Route, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { getAuthenticationStore } from "store/slice/authentication";
+import { ErrorBoundary } from "components/ma/error-boundary";
 
 const AuthenticationMiddleware = ({
   component: Component,
@@ -30,7 +31,9 @@ const AuthenticationMiddleware = ({
         }
         return (
           <Layout>
-            <Component {...props} />
+            <ErrorBoundary>
+              <Component {...props} />
+            </ErrorBoundary>
           </Layout>
         );
       }}

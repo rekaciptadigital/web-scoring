@@ -3,13 +3,7 @@ import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
 import { LoadingScreen, SpinnerDotBlock } from "components/ma";
 
-function ScoringTeamTable({
-  categoryDetailId,
-  eliminationParticipantsCount,
-  searchName,
-  isTeam,
-}) {
-  
+function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, searchName, isTeam }) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
@@ -39,11 +33,9 @@ function ScoringTeamTable({
             <thead>
               <tr>
                 <th>Peringkat</th>
-                <th className="name">Nama Tim</th>
-                <th className="name">Nama Klub</th>
-                <SessionStatsColumnHeadingGroup
-                  sessionList={sessionNumbersList}
-                />
+                <th className="name">Tim</th>
+                <th className="name">Klub</th>
+                <SessionStatsColumnHeadingGroup sessionList={sessionNumbersList} />
                 <th></th>
               </tr>
             </thead>
@@ -51,9 +43,7 @@ function ScoringTeamTable({
             <tbody>
               {scoringMembers?.map((row) => {
                 return (
-                  <tr
-                    key={row?.clubId}
-                  >
+                  <tr key={row?.clubId}>
                     <td>
                       {row?.rank || (
                         <GrayedOutText style={{ fontSize: "0.75em" }}>
@@ -81,15 +71,12 @@ function ScoringTeamTable({
             </tbody>
           </MembersTable>
         </div>
-
-        
       </TableContainer>
     </React.Fragment>
   );
 }
 
 function SessionStatsColumnHeadingGroup({ sessionList }) {
-
   if (!sessionList) {
     return (
       <React.Fragment>
@@ -109,14 +96,7 @@ function SessionStatsColumnHeadingGroup({ sessionList }) {
   );
 }
 
-function SessionStatsCellsGroup({
-  sessions,
-  sessionNumbersList,
-  total,
-  totalX,
-  totalXPlusTen,
-}) {
-
+function SessionStatsCellsGroup({ sessions, sessionNumbersList, total, totalX, totalXPlusTen }) {
   if (!sessions) {
     return (
       <React.Fragment>
@@ -140,7 +120,6 @@ function SessionStatsCellsGroup({
     </React.Fragment>
   );
 }
-
 
 function ClubName({ children, clubName }) {
   if (!children && !clubName) {
@@ -208,6 +187,7 @@ const MembersTable = styled.table`
     th {
       color: var(--ma-txt-black);
       font-weight: 600;
+      text-transform: uppercase;
 
       &.name {
         text-align: left;

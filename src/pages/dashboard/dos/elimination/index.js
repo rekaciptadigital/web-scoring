@@ -1,11 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useEventDetail } from "../hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 
 import { SpinnerDotBlock } from "components/ma";
 import { PageWrapper } from "components/ma/page-wrapper";
 import { SideBar } from "../components/sidebar";
+import { PageHeader } from "../components/page-header";
 import { ToolbarFilter } from "../components/toolbar-filters";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 import { ScoringTable } from "./components/scoring-table";
@@ -19,6 +21,7 @@ const pageProps = {
 function PageDosElimination() {
   const { event_id, date_event } = useParams();
   const eventId = parseInt(event_id);
+  const { data: eventDetail } = useEventDetail(eventId);
 
   const {
     isSettled: isSettledCategories,
@@ -59,6 +62,8 @@ function PageDosElimination() {
 
   return (
     <PageWrapper {...pageProps}>
+      <PageHeader eventDetail={eventDetail} subHeading="Eliminasi" />
+
       <CardWrapper>
         <ToolbarFilter
           categories={categoryDetails}

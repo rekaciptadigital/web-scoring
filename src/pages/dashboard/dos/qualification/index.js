@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useEventDetail } from "../hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useSessionDownload } from "./hooks/download-session";
 
@@ -9,6 +10,7 @@ import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { toast } from "components/ma/processing-toast";
 import { PageWrapper } from "components/ma/page-wrapper";
 import { SideBar } from "../components/sidebar";
+import { PageHeader } from "../components/page-header";
 import {
   ToolbarFilter,
   KnobGroupLayout,
@@ -29,6 +31,7 @@ const pageProps = {
 function PageDosQualification() {
   const { event_id, date_event } = useParams();
   const eventId = parseInt(event_id);
+  const { data: eventDetail } = useEventDetail(eventId);
 
   const {
     data: categoryDetails,
@@ -80,6 +83,8 @@ function PageDosQualification() {
 
   return (
     <PageWrapper {...pageProps}>
+      <PageHeader eventDetail={eventDetail} subHeading="Kualifikasi" />
+
       <CardWrapper>
         <ToolbarFilter
           categories={categoryDetails}

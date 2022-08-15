@@ -93,7 +93,7 @@ function PageEventDetailHome() {
 
                   <ButtonOutlineBlue
                     as="a"
-                    href={`/dashboard/event/${event_id}/dos`}
+                    href={`/dashboard/event/${event_id}/dos-qualification`}
                     target="_blank"
                     rel="noreferrer"
                   >

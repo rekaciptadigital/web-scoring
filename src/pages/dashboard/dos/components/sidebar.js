@@ -41,13 +41,12 @@ function SideBar() {
             </MenuItem>
           </li>
 
-          {/* TODO: */}
           <li>
-            <MenuItem to={`/dashboard/event/${event_id}/dos`}>
+            <MenuItem to={`/dashboard/event/${event_id}/dos-medals-by-club`}>
               <div>
                 <IconTrophy />
               </div>
-              <div>Medali</div>
+              <div>Medali Klub</div>
             </MenuItem>
           </li>
         </MenuWrapper>

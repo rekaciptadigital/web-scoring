@@ -27,4 +27,12 @@ export default {
   getCategoryNonAuth(querString = null) {
     return API.get("/web/v1/dashboard-dos/category-details", querString);
   },
+
+  /**
+   * @param {Object} queryString { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getClubRanksByEvent(qs = null) {
+    return API.get("/api/event-ranked/club", qs);
+  },
 };

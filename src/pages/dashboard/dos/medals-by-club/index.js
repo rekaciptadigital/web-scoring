@@ -2,17 +2,17 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useEventDetail } from "../hooks/event-detail";
+import { useLongWait } from "../hooks/long-wait";
 import { useClubRanksByEvent } from "./hooks/club-ranks-by-event";
 
 import { SpinnerDotBlock } from "components/ma";
-import { PageWrapper } from "components/ma/page-wrapper";
-import { SideBar } from "../components/sidebar";
+import { PageWrapper } from "../components/dos-page-wrapper";
 import { PageHeader } from "../components/page-header";
 import { RankingTable } from "./components/ranking-table";
 
 const pageProps = {
-  pageTitle: "DOS Medali Klub",
-  sidebar: <SideBar />,
+  pageTitle: "Medali Klub",
+  subHeading: "Perolehan Medali Klub",
 };
 
 function PageDosMedalsByClub() {
@@ -26,19 +26,9 @@ function PageDosMedalsByClub() {
     errors: errorsRanks,
   } = useClubRanksByEvent(eventId);
 
-  const [isLongWait, setLongWait] = React.useState(false);
+  const isInitialLoading = !clubRanks && isLoadingRanks;
 
-  React.useEffect(() => {
-    if (!clubRanks && isLoadingRanks) {
-      const timer = setTimeout(() => {
-        setLongWait(true);
-      }, 1500);
-
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [clubRanks, isLoadingRanks]);
+  const waitTimeIsExceeded = useLongWait(isInitialLoading, 3000);
 
   if (!clubRanks && isErrorRanks) {
     return (
@@ -57,13 +47,25 @@ function PageDosMedalsByClub() {
     );
   }
 
-  if (!clubRanks && isLoadingRanks) {
+  if (isInitialLoading) {
     return (
       <PageWrapper {...pageProps}>
-        <PageHeader eventDetail={eventDetail} subHeading="Pemerolehan Medali Klub" />
-        <SpinnerDotBlock
-          message={isLongWait && "Sedang mengambil data perolehan medali klub. Tunggu sejenak..."}
-        />
+        <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
+        <CardWrapper>
+          <Content>
+            <SpinnerDotBlock
+              message={
+                waitTimeIsExceeded && (
+                  <p className="text-center">
+                    Menyiapkan data perolehan medali klub memakan waktu lebih lama dari biasanya.
+                    <br />
+                    Mohon tunggu sejenak...
+                  </p>
+                )
+              }
+            />
+          </Content>
+        </CardWrapper>
       </PageWrapper>
     );
   }
@@ -71,7 +73,7 @@ function PageDosMedalsByClub() {
   if (!clubRanks) {
     return (
       <PageWrapper {...pageProps}>
-        <PageHeader eventDetail={eventDetail} subHeading="Pemerolehan Medali Klub" />
+        <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
         <CardWrapper>
           <Content>Tidak ada data</Content>
         </CardWrapper>
@@ -81,8 +83,7 @@ function PageDosMedalsByClub() {
 
   return (
     <PageWrapper {...pageProps}>
-      <PageHeader eventDetail={eventDetail} subHeading="Pemerolehan Medali Klub" />
-
+      <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
       <CardWrapper>
         <Content>
           <RankingTable data={clubRanks} />

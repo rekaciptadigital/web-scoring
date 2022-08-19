@@ -5,8 +5,7 @@ import { useEventDetail } from "../hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 
 import { SpinnerDotBlock } from "components/ma";
-import { PageWrapper } from "components/ma/page-wrapper";
-import { SideBar } from "../components/sidebar";
+import { PageWrapper } from "../components/dos-page-wrapper";
 import { PageHeader } from "../components/page-header";
 import { ToolbarFilter } from "../components/toolbar-filters";
 import { ButtonShowBracket } from "./components/button-show-bracket";
@@ -14,8 +13,7 @@ import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
 
 const pageProps = {
-  pageTitle: "DOS Eliminasi",
-  sidebar: <SideBar />,
+  pageTitle: "Eliminasi",
 };
 
 function PageDosElimination() {
@@ -38,6 +36,7 @@ function PageDosElimination() {
   if (errorFetchingInitialCategories) {
     return (
       <PageWrapper {...pageProps}>
+        <PageHeader eventDetail={eventDetail} subHeading="Eliminasi" />
         <CardWrapper>
           <Content>
             <p>
@@ -55,7 +54,12 @@ function PageDosElimination() {
   if (!isSettledCategories) {
     return (
       <PageWrapper {...pageProps}>
-        <SpinnerDotBlock />
+        <PageHeader eventDetail={eventDetail} subHeading="Eliminasi" />
+        <CardWrapper>
+          <Content>
+            <SpinnerDotBlock />
+          </Content>
+        </CardWrapper>
       </PageWrapper>
     );
   }

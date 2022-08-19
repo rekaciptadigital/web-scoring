@@ -75,7 +75,7 @@ function RankingTable({ data }) {
               </Club>
             </td>
 
-            <td className="name">{row.clubName}</td>
+            <td className="name">{row.clubCity}</td>
             <td>{row.gold}</td>
             <td>{row.silver}</td>
             <td>{row.bronze}</td>

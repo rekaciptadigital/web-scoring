@@ -35,4 +35,12 @@ export default {
   getClubRanksByEvent(qs = null) {
     return API.get("/api/event-ranked/club", qs);
   },
+
+  /**
+   * @param {Object} queryString { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getCategoryWinnersByEvent(qs = null) {
+    return API.get("/api/general/get-winer-participant-by-event-id", qs);
+  },
 };

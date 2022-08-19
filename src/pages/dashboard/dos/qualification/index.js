@@ -8,8 +8,7 @@ import { useSessionDownload } from "./hooks/download-session";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { toast } from "components/ma/processing-toast";
-import { PageWrapper } from "components/ma/page-wrapper";
-import { SideBar } from "../components/sidebar";
+import { PageWrapper } from "../components/dos-page-wrapper";
 import { PageHeader } from "../components/page-header";
 import {
   ToolbarFilter,
@@ -24,8 +23,7 @@ import { ScoringTeamTable } from "./components/scoring-table/reguTable";
 import IconDownload from "components/ma/icons/mono/download";
 
 const pageProps = {
-  pageTitle: "DOS Kualifikasi",
-  sidebar: <SideBar />,
+  pageTitle: "Kualifikasi",
 };
 
 function PageDosQualification() {
@@ -59,6 +57,7 @@ function PageDosQualification() {
   if (errorFetchingInitialCategories) {
     return (
       <PageWrapper {...pageProps}>
+        <PageHeader eventDetail={eventDetail} subHeading="Kualifikasi" />
         <CardWrapper>
           <Content>
             <p>
@@ -76,7 +75,12 @@ function PageDosQualification() {
   if (!isSettledCategories) {
     return (
       <PageWrapper {...pageProps}>
-        <SpinnerDotBlock />
+        <PageHeader eventDetail={eventDetail} subHeading="Kualifikasi" />
+        <CardWrapper>
+          <Content>
+            <SpinnerDotBlock />
+          </Content>
+        </CardWrapper>
       </PageWrapper>
     );
   }

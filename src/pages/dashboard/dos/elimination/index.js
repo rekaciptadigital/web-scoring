@@ -55,7 +55,11 @@ function PageDosElimination() {
     return (
       <PageWrapper {...pageProps}>
         <PageHeader eventDetail={eventDetail} subHeading="Eliminasi" />
-        <SpinnerDotBlock />
+        <CardWrapper>
+          <Content>
+            <SpinnerDotBlock />
+          </Content>
+        </CardWrapper>
       </PageWrapper>
     );
   }

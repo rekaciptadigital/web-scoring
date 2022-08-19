@@ -76,7 +76,11 @@ function PageDosQualification() {
     return (
       <PageWrapper {...pageProps}>
         <PageHeader eventDetail={eventDetail} subHeading="Kualifikasi" />
-        <SpinnerDotBlock />
+        <CardWrapper>
+          <Content>
+            <SpinnerDotBlock />
+          </Content>
+        </CardWrapper>
       </PageWrapper>
     );
   }

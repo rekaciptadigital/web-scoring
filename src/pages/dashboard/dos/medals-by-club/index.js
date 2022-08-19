@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useEventDetail } from "../hooks/event-detail";
+import { useLongWait } from "../hooks/long-wait";
 import { useClubRanksByEvent } from "./hooks/club-ranks-by-event";
 
 import { SpinnerDotBlock } from "components/ma";
@@ -25,19 +26,9 @@ function PageDosMedalsByClub() {
     errors: errorsRanks,
   } = useClubRanksByEvent(eventId);
 
-  const [isLongWait, setLongWait] = React.useState(false);
+  const isInitialLoading = !clubRanks && isLoadingRanks;
 
-  React.useEffect(() => {
-    if (!clubRanks && isLoadingRanks) {
-      const timer = setTimeout(() => {
-        setLongWait(true);
-      }, 1500);
-
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [clubRanks, isLoadingRanks]);
+  const waitTimeIsExceeded = useLongWait(isInitialLoading, 3000);
 
   if (!clubRanks && isErrorRanks) {
     return (
@@ -56,13 +47,25 @@ function PageDosMedalsByClub() {
     );
   }
 
-  if (!clubRanks && isLoadingRanks) {
+  if (isInitialLoading) {
     return (
       <PageWrapper {...pageProps}>
         <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
-        <SpinnerDotBlock
-          message={isLongWait && "Sedang mengambil data perolehan medali klub. Tunggu sejenak..."}
-        />
+        <CardWrapper>
+          <Content>
+            <SpinnerDotBlock
+              message={
+                waitTimeIsExceeded && (
+                  <p className="text-center">
+                    Menyiapkan data perolehan medali klub memakan waktu lebih lama dari biasanya.
+                    <br />
+                    Mohon tunggu sejenak...
+                  </p>
+                )
+              }
+            />
+          </Content>
+        </CardWrapper>
       </PageWrapper>
     );
   }

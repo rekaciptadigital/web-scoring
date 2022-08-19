@@ -5,14 +5,13 @@ import { useEventDetail } from "../hooks/event-detail";
 import { useClubRanksByEvent } from "./hooks/club-ranks-by-event";
 
 import { SpinnerDotBlock } from "components/ma";
-import { PageWrapper } from "components/ma/page-wrapper";
-import { SideBar } from "../components/sidebar";
+import { PageWrapper } from "../components/dos-page-wrapper";
 import { PageHeader } from "../components/page-header";
 import { RankingTable } from "./components/ranking-table";
 
 const pageProps = {
-  pageTitle: "DOS Medali Klub",
-  sidebar: <SideBar />,
+  pageTitle: "Medali Klub",
+  subHeading: "Perolehan Medali Klub",
 };
 
 function PageDosMedalsByClub() {
@@ -60,7 +59,7 @@ function PageDosMedalsByClub() {
   if (!clubRanks && isLoadingRanks) {
     return (
       <PageWrapper {...pageProps}>
-        <PageHeader eventDetail={eventDetail} subHeading="Pemerolehan Medali Klub" />
+        <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
         <SpinnerDotBlock
           message={isLongWait && "Sedang mengambil data perolehan medali klub. Tunggu sejenak..."}
         />
@@ -71,7 +70,7 @@ function PageDosMedalsByClub() {
   if (!clubRanks) {
     return (
       <PageWrapper {...pageProps}>
-        <PageHeader eventDetail={eventDetail} subHeading="Pemerolehan Medali Klub" />
+        <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
         <CardWrapper>
           <Content>Tidak ada data</Content>
         </CardWrapper>
@@ -81,8 +80,7 @@ function PageDosMedalsByClub() {
 
   return (
     <PageWrapper {...pageProps}>
-      <PageHeader eventDetail={eventDetail} subHeading="Pemerolehan Medali Klub" />
-
+      <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
       <CardWrapper>
         <Content>
           <RankingTable data={clubRanks} />

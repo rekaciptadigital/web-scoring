@@ -6,7 +6,9 @@ import IconMedalSilver from "components/ma/icons/fill/medal-silver";
 import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 
 function WinnerBoxView({ title, data }) {
-  if (!data) {
+  const rowsGroupByCategory = React.useMemo(() => _makeRowData(data), [data]);
+
+  if (!rowsGroupByCategory?.length) {
     return (
       <WinnerBox>
         <WinnerTableHeading>{title}</WinnerTableHeading>
@@ -29,24 +31,26 @@ function WinnerBoxView({ title, data }) {
         </thead>
 
         <tbody>
-          {data.map((row, index) => (
-            <tr key={index}>
-              {row.rank === 1 && (
-                <CategoryCell className="name" rowSpan={3}>
-                  {row.categoryLabel}
-                </CategoryCell>
-              )}
+          {rowsGroupByCategory.map((group) => {
+            return group.rows.map((row, index) => (
+              <tr key={index}>
+                {index === 0 && (
+                  <CategoryCell className="name" rowSpan={group.length}>
+                    {row.categoryLabel}
+                  </CategoryCell>
+                )}
 
-              <td>
-                <span title={"Juara " + row.rank}>
-                  <Medal rank={row.rank} />
-                </span>
-              </td>
+                <td>
+                  <span title={"Juara " + row.rank}>
+                    <Medal rank={row.rank} />
+                  </span>
+                </td>
 
-              <td className="name">{row.winnerName}</td>
-              <td className="name">{row.clubName}</td>
-            </tr>
-          ))}
+                <td className="name">{row.winnerName}</td>
+                <td className="name">{row.clubName}</td>
+              </tr>
+            ));
+          })}
         </tbody>
       </WinnerTable>
     </WinnerBox>
@@ -59,7 +63,7 @@ function Medal({ rank }) {
     2: <IconMedalSilver size="20" />,
     3: <IconMedalBronze size="20" />,
   };
-  return medals[rank];
+  return medals[rank] || rank || null;
 }
 
 /* =============================== */
@@ -111,5 +115,28 @@ const WinnerTable = styled.table`
 const CategoryCell = styled.td`
   border-right-width: 1px;
 `;
+
+/* =============================== */
+// utils
+
+function _makeRowData(data) {
+  if (!data?.length) {
+    return [];
+  }
+
+  const groupByCategoryId = {};
+
+  for (const row of data) {
+    groupByCategoryId[row.categoryId] = groupByCategoryId[row.categoryId] || [];
+    groupByCategoryId[row.categoryId].push(row);
+  }
+
+  const groupedRows = Object.keys(groupByCategoryId).map((category) => ({
+    length: groupByCategoryId[category].length,
+    rows: groupByCategoryId[category],
+  }));
+
+  return groupedRows;
+}
 
 export { WinnerBoxView };

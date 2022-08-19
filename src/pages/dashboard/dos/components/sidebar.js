@@ -31,13 +31,12 @@ function SideBar() {
             </MenuItem>
           </li>
 
-          {/* TODO: */}
           <li>
-            <MenuItem to={`/dashboard/event/${event_id}/dos`}>
+            <MenuItem to={`/dashboard/event/${event_id}/dos-winners`}>
               <div>
                 <IconMedal />
               </div>
-              <div>Kategori</div>
+              <div>Pemenang Kategori</div>
             </MenuItem>
           </li>
 

@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useReportInfos } from "./hooks/report-infos";
 import { useReportRoundups } from "./hooks/download-roundups";
+import { useReportUpp } from "./hooks/download-upp";
+import { useReportMedal } from "./hooks/download-medal";
 import { SubNavbar } from "../components/submenus-matches";
 
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -28,6 +30,20 @@ function PageEventReports() {
     isError: isErrorRoundups,
     errors: errorsRoundups,
   } = useReportRoundups();
+
+  const {
+    downloadUpp,
+    isLoading: isLoadingUpp,
+    isError: isErrorUpp,
+    errors: errorsUpp,
+  } = useReportUpp();
+
+  const {
+    downloadMedal,
+    isLoading: isLoadingMedal,
+    isError: isErrorMedal,
+    errors: errorsMedal,
+  } = useReportMedal();
 
   const _getIsReportAvailable = (name) => {
     if (!reportInfos.data?.length) {
@@ -60,14 +76,16 @@ function PageEventReports() {
     navbar: <SubNavbar eventId={eventId} />,
   };
 
+  const uppIsAvailable = _getIsReportAvailable("competition");
   const competitionIsAvailable = _getIsReportAvailable("competition");
+  const medalIsAvailable = _getIsReportAvailable("participant");
   // TODO: finance
 
   return (
     <ContentLayoutWrapper {...pageLayoutProps}>
       <CardList>
         {/* TODO: Report finance, copas di atas kalau udah ready */}
-        {/* <CardSheet>
+        <CardSheet>
             <ReportingMediaObject
             icon={IconMedal}
             title="Laporan UPP"
@@ -76,16 +94,16 @@ function PageEventReports() {
               <ReportGenerateDateInfo
                 name="competition"
                 reportInfos={reportInfos}
-                isAvailable={competitionIsAvailable}
+                isAvailable={uppIsAvailable}
               />
             }
-            downloadDisabled={!competitionIsAvailable}
-            onDownload={_makeDownloadHandler(downloadRoundups)}
-            isLoading={isLoadingRoundups}
-            isError={isErrorRoundups}
-            errors={errorsRoundups}
+            downloadDisabled={!uppIsAvailable}
+            onDownload={_makeDownloadHandler(downloadUpp)}
+            isLoading={isLoadingUpp}
+            isError={isErrorUpp}
+            errors={errorsUpp}
           />
-          </CardSheet> */}
+          </CardSheet>
         <CardSheet>
           <ReportingMediaObject
             icon={IconMedal}
@@ -105,7 +123,7 @@ function PageEventReports() {
             errors={errorsRoundups}
           />
           </CardSheet>
-          {/* <CardSheet>
+          <CardSheet>
           <ReportingMediaObject
             icon={IconMedal}
             title="Laporan rekapitulasi medali"
@@ -114,16 +132,16 @@ function PageEventReports() {
               <ReportGenerateDateInfo
                 name="competition"
                 reportInfos={reportInfos}
-                isAvailable={competitionIsAvailable}
+                isAvailable={medalIsAvailable}
               />
             }
-            downloadDisabled={!competitionIsAvailable}
-            onDownload={_makeDownloadHandler(downloadRoundups)}
-            isLoading={isLoadingRoundups}
-            isError={isErrorRoundups}
-            errors={errorsRoundups}
+            downloadDisabled={!medalIsAvailable}
+            onDownload={_makeDownloadHandler(downloadMedal)}
+            isLoading={isLoadingMedal}
+            isError={isErrorMedal}
+            errors={errorsMedal}
           />
-        </CardSheet> */}
+        </CardSheet>
       </CardList>
     </ContentLayoutWrapper>
   );

@@ -11,7 +11,7 @@ function useSessionDownload(eventCategoryId) {
       return;
     }
 
-    const queryString = { event_category_id: eventCategoryId, session: session };
+    const queryString = { event_category_id: eventCategoryId, session: session || undefined };
     const getFunction = () => {
       return DosService.getQualificationDownloadUrl(queryString);
     };

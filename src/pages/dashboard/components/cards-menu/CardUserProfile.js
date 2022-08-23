@@ -1,9 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-
-import { useSelector, useDispatch } from "react-redux";
-import * as AuthStore from "store/slice/authentication";
-import { AdminService } from "services";
+import { useUserProfile } from "hooks/user-profile";
 
 import { Link } from "react-router-dom";
 import { Card, CardBody } from "reactstrap";
@@ -122,21 +119,7 @@ const CardMenuProfileContainer = styled(Card)`
 `;
 
 function CardUserProfile() {
-  const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
-  const dispatch = useDispatch();
-
-  const avatarURL = _getAvatarURL(userProfile?.avatar);
-
-  React.useEffect(() => {
-    const getUser = async () => {
-      const { data, success } = await AdminService.profile();
-      if (success) {
-        dispatch(AuthStore.profile(data));
-      }
-    };
-    getUser();
-  }, []);
-
+  const { userProfile } = useUserProfile();
   return (
     <CardMenuProfileContainer>
       <CardBody>
@@ -150,7 +133,7 @@ function CardUserProfile() {
           ) : (
             <div className="menu-thumbnail flex-shrink-0">
               <div className="menu-user-avatar">
-                <img className="menu-user-avatar-img" src={avatarURL} />
+                <img className="menu-user-avatar-img" src={userProfile?.avatar} />
               </div>
             </div>
           )}
@@ -178,15 +161,6 @@ function CardUserProfile() {
       </CardBody>
     </CardMenuProfileContainer>
   );
-}
-
-function _getAvatarURL(URL, fallbackURL) {
-  if (!URL) {
-    return fallbackURL;
-  }
-  const segments = URL.split("#");
-  const params = "?timestamp=" + new Date().getTime();
-  return segments[0] + params + "#" + segments[1];
 }
 
 export default CardUserProfile;

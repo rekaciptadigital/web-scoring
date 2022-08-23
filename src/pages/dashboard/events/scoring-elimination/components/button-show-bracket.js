@@ -10,9 +10,13 @@ import {
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
 import { ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
+import { ErrorBoundary } from "components/ma/error-boundary";
 
 import IconBranch from "components/ma/icons/mono/branch";
 import IconX from "components/ma/icons/mono/x";
+import IconMedalGold from "components/ma/icons/fill/medal-gold";
+import IconMedalSilver from "components/ma/icons/fill/medal-silver";
+import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 
 import classnames from "classnames";
 
@@ -45,63 +49,39 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
         <IconBranch size="20" /> Lihat Bagan
       </ButtonYellow>
 
-      {isOpen && (
-        <Modal
-          isOpen
-          size={bracketData.eliminationId || bracketData.eliminationGroupId ? "xl" : "md"}
-          centered
-          backdrop="static"
-          autoFocus
-          toggle={() => setOpen((open) => !open)}
-          onClosed={() => setOpen(false)}
-        >
-          <ModalBody>
-            <BodyWrapper>
-              <TopBar>
-                <EditorCloseButton flexible onClick={() => setOpen(false)}>
-                  <IconX size="16" />
-                </EditorCloseButton>
-              </TopBar>
+      <ErrorBoundary>
+        {isOpen && (
+          <Modal
+            isOpen
+            size={bracketData.eliminationId || bracketData.eliminationGroupId ? "xl" : "md"}
+            centered
+            backdrop="static"
+            autoFocus
+            toggle={() => setOpen((open) => !open)}
+            onClosed={() => setOpen(false)}
+          >
+            <ModalBody>
+              <BodyWrapper>
+                <TopBar>
+                  <EditorCloseButton flexible onClick={() => setOpen(false)}>
+                    <IconX size="16" />
+                  </EditorCloseButton>
+                </TopBar>
 
-              <div>
-                {bracketData.eliminationId ? (
-                  <Scrollable>
-                    <Bracket
-                      rounds={bracketData.rounds || []}
-                      renderSeedComponent={(bracketProps) => (
-                        <SeedBagan
-                          bracketProps={bracketProps}
-                          configs={{
-                            totalRounds: bracketData.rounds.length - 1,
-                            eliminationId: bracketData.eliminationId,
-                          }}
-                        />
-                      )}
-                    />
-                  </Scrollable>
-                ) : bracketData.eliminationGroupId ? (
-                  <Scrollable>
-                    <Bracket
-                      rounds={bracketData.rounds || []}
-                      renderSeedComponent={(bracketProps) => (
-                        <SeedBaganTeam
-                          bracketProps={bracketProps}
-                          configs={{
-                            totalRounds: bracketData.rounds.length - 1,
-                            eliminationId: bracketData.eliminationGroupId,
-                          }}
-                        />
-                      )}
-                    />
-                  </Scrollable>
-                ) : (
-                  <NoBracketAvailable />
-                )}
-              </div>
-            </BodyWrapper>
-          </ModalBody>
-        </Modal>
-      )}
+                <div>
+                  {bracketData.eliminationId || bracketData.eliminationGroupId ? (
+                    <Scrollable>
+                      <EliminationBracket data={bracketData} />
+                    </Scrollable>
+                  ) : (
+                    <NoBracketAvailable />
+                  )}
+                </div>
+              </BodyWrapper>
+            </ModalBody>
+          </Modal>
+        )}
+      </ErrorBoundary>
     </React.Fragment>
   );
 }
@@ -114,21 +94,67 @@ function NoBracketAvailable() {
   );
 }
 
+function EliminationBracket({ data }) {
+  const { hasWinner, winnerIndex } = _checkThirdPlaceHasWinner(data);
+
+  if (data.eliminationId) {
+    return (
+      <Scrollable>
+        <Bracket
+          rounds={data.rounds || []}
+          renderSeedComponent={(bracketProps) => (
+            <SeedBagan
+              bracketProps={bracketProps}
+              configs={{
+                isSettingApplied: !data.updated,
+                totalRounds: data.rounds.length - 1,
+                eliminationId: data.eliminationId,
+                thirdPlaceHasWinner: hasWinner,
+                thirdPlaceWinnerIndex: winnerIndex,
+              }}
+            />
+          )}
+        />
+      </Scrollable>
+    );
+  }
+
+  if (data.eliminationGroupId) {
+    return (
+      <Scrollable>
+        <Bracket
+          rounds={data.rounds || []}
+          renderSeedComponent={(bracketProps) => (
+            <SeedBaganTeam
+              bracketProps={bracketProps}
+              configs={{
+                isSettingApplied: !data.updated,
+                totalRounds: data.rounds.length - 1,
+                eliminationId: data.eliminationGroupId,
+                thirdPlaceHasWinner: hasWinner,
+                thirdPlaceWinnerIndex: winnerIndex,
+              }}
+            />
+          )}
+        />
+      </Scrollable>
+    );
+  }
+
+  return null;
+}
+
 function SeedBagan({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
+  const { totalRounds, isSettingApplied, thirdPlaceHasWinner, thirdPlaceWinnerIndex } = configs;
+  const { isFinalRound, isThirdPlaceRound } = _getRoundPositions({ totalRounds, roundIndex });
   const roundNumber = roundIndex + 1;
 
   const noData = !seed.teams[0]?.name || !seed.teams[1]?.name;
+  const hasWinner = seed.teams.some((team) => team.win === 1);
   const isBye =
     seed.teams.some((team) => team.status === "bye") ||
     (roundNumber === 1 && seed.teams.every((team) => !team.name));
-
-  const isFinalRound =
-    (configs.totalRounds === 4 && roundIndex === 3) ||
-    (configs.totalRounds === 3 && roundIndex === 2);
-  const isThirdPlaceRound =
-    (configs.totalRounds === 4 && roundIndex === 4) ||
-    (configs.totalRounds === 3 && roundIndex === 3);
 
   return (
     <Seed
@@ -140,21 +166,54 @@ function SeedBagan({ bracketProps, configs }) {
     >
       <SeedItem>
         <ItemContainer>
-          {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
-          {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
-          {seed.teams.map((team, index) => (
-            <SeedTeam
-              key={index}
-              title={team.name}
-              className={classnames({
-                "item-active": !noData,
-                "item-winner": !isBye && parseInt(team.win) === 1,
-              })}
-            >
-              <BoxName>{team.name || <ByeLabel isBye={isBye} />}</BoxName>
-              <BoxScore team={team} />
-            </SeedTeam>
-          ))}
+          {seed.teams.map((team, index) => {
+            const isWinner = isSettingApplied && Boolean(team.win) && !isBye;
+            const isThirdPlaceWinner = isThirdPlaceRound && index === thirdPlaceWinnerIndex;
+            return (
+              <SeedTeam
+                key={index}
+                title={team.name}
+                className={classnames({
+                  "item-active": !noData,
+                  "item-winner": (!isBye && parseInt(team.win) === 1) || isThirdPlaceWinner,
+                })}
+              >
+                <BoxNameGroup>
+                  <BoxName title={team.name}>{team.name || <ByeLabel isBye={isBye} />}</BoxName>
+                  {team.club && (
+                    <BoxName title={team.club} className="name-club">
+                      {team.club}
+                    </BoxName>
+                  )}
+                </BoxNameGroup>
+                <BoxScore team={team} />
+
+                {/* ! Hati-hati, logika kondisionalnya ruwet pakai ternary wkwk */}
+                {/* TODO: refaktor jadi komponen (?) */}
+                {isFinalRound && hasWinner ? (
+                  isWinner ? (
+                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                      Medali Emas <IconMedalGold size="20" />
+                    </FinalHeading>
+                  ) : (
+                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                      Medali Perak <IconMedalSilver size="20" />
+                    </FinalHeading>
+                  )
+                ) : isFinalRound && !hasWinner ? (
+                  <FinalHeading>Babak Final</FinalHeading>
+                ) : isThirdPlaceRound && thirdPlaceHasWinner ? (
+                  isThirdPlaceWinner ? (
+                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                      <IconMedalBronze size="20" /> Medali Perunggu
+                    </FinalHeading>
+                  ) : null
+                ) : isThirdPlaceRound && !thirdPlaceHasWinner ? (
+                  <FinalHeading>Perebutan Juara 3</FinalHeading>
+                ) : null}
+              </SeedTeam>
+            );
+          })}
         </ItemContainer>
       </SeedItem>
     </Seed>
@@ -163,6 +222,8 @@ function SeedBagan({ bracketProps, configs }) {
 
 function SeedBaganTeam({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
+  const { totalRounds, isSettingApplied, thirdPlaceHasWinner, thirdPlaceWinnerIndex } = configs;
+  const { isFinalRound, isThirdPlaceRound } = _getRoundPositions({ totalRounds, roundIndex });
   const roundNumber = roundIndex + 1;
 
   // ?: cari pengecekan yang lebih sederhana?
@@ -172,16 +233,11 @@ function SeedBaganTeam({ bracketProps, configs }) {
     !seed.teams[0]?.memberTeam?.length ||
     !seed.teams[1]?.memberTeam?.length;
 
+  const hasWinner = seed.teams.some((team) => team.win === 1);
+
   const isBye =
     seed.teams.some((team) => team.status === "bye") ||
     (roundNumber === 1 && seed.teams.every((team) => !team.teamName));
-
-  const isFinalRound =
-    (configs.totalRounds === 4 && roundIndex === 3) ||
-    (configs.totalRounds === 3 && roundIndex === 2);
-  const isThirdPlaceRound =
-    (configs.totalRounds === 4 && roundIndex === 4) ||
-    (configs.totalRounds === 3 && roundIndex === 3);
 
   return (
     <Seed
@@ -193,21 +249,61 @@ function SeedBaganTeam({ bracketProps, configs }) {
     >
       <SeedItem>
         <ItemContainer>
-          {isFinalRound && <FinalHeading>Medali Emas</FinalHeading>}
-          {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
-          {seed.teams.map((team, index) => (
-            <SeedTeam
-              key={index}
-              title={team.teamName}
-              className={classnames({
-                "item-active": !noData,
-                "item-winner": parseInt(team.win) === 1 && !isBye,
-              })}
-            >
-              <BoxName>{team.teamName || <ByeLabel isBye={isBye} />}</BoxName>
-              <BoxScore team={team} />
-            </SeedTeam>
-          ))}
+          {seed.teams.map((team, index) => {
+            const isWinner = isSettingApplied && Boolean(team.win) && !isBye;
+            const isThirdPlaceWinner = isThirdPlaceRound && index === thirdPlaceWinnerIndex;
+            return (
+              <SeedTeam
+                key={index}
+                title={team.teamName}
+                className={classnames({
+                  "item-active": !noData,
+                  "item-winner": (parseInt(team.win) === 1 && !isBye) || isThirdPlaceWinner,
+                })}
+              >
+                <BoxNameGroup>
+                  <BoxName title={team.teamName}>
+                    {team.teamName || <ByeLabel isBye={isBye} />}
+                  </BoxName>
+                  <MemberList>
+                    {team.memberTeam.map((member, index) => (
+                      <li key={index}>
+                        <span className="member-name" title={member.name}>
+                          <span className="member-number">{index + 1}.</span>
+                          <span>{member.name}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </MemberList>
+                </BoxNameGroup>
+                <BoxScore team={team} />
+
+                {/* ! Hati-hati, logika kondisionalnya ruwet pakai ternary wkwk */}
+                {/* TODO: refaktor jadi komponen (?) */}
+                {isFinalRound && hasWinner ? (
+                  isWinner ? (
+                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                      Medali Emas <IconMedalGold size="20" />
+                    </FinalHeading>
+                  ) : (
+                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                      Medali Perak <IconMedalSilver size="20" />
+                    </FinalHeading>
+                  )
+                ) : isFinalRound && !hasWinner ? (
+                  <FinalHeading>Babak Final</FinalHeading>
+                ) : isThirdPlaceRound && thirdPlaceHasWinner ? (
+                  isThirdPlaceWinner ? (
+                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                      <IconMedalBronze size="20" /> Medali Perunggu
+                    </FinalHeading>
+                  ) : null
+                ) : isThirdPlaceRound && !thirdPlaceHasWinner ? (
+                  <FinalHeading>Perebutan Juara 3</FinalHeading>
+                ) : null}
+              </SeedTeam>
+            );
+          })}
         </ItemContainer>
       </SeedItem>
     </Seed>
@@ -237,15 +333,22 @@ function BoxScore({ team }) {
   return null;
 }
 
+/* ================================== */
+// styles
+
+const BoxNameGroup = styled.span`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+`;
+
 const ByeLabelSpan = styled.span`
   text-align: center;
   vertical-align: middle;
   color: var(--ma-gray-200);
   font-weight: 600;
 `;
-
-/* ================================== */
-// styles
 
 const BodyWrapper = styled.div`
   > * + * {
@@ -306,11 +409,16 @@ const EditorCloseButton = styled.button`
 
 const FinalHeading = styled.h6`
   position: absolute;
-  top: -3.6em;
+  top: -2.5em;
   left: 0;
   right: 0;
   font-weight: 600;
   text-align: center;
+
+  &.final-bottom {
+    top: unset;
+    bottom: -3em;
+  }
 `;
 
 const Seed = styled(RBSeed)`
@@ -345,12 +453,16 @@ const SeedTeam = styled(RBSeedTeam)`
     border-color: var(--ma-blue);
     background-color: #bc8b2c;
     color: #000000;
+
+    .name-club,
+    .member-name {
+      color: var(--ma-text-black);
+    }
   }
 `;
 
 const ItemContainer = styled.div`
   position: relative;
-  max-width: 12.5rem;
 
   > ${SeedTeam} + ${SeedTeam} {
     border-top: none;
@@ -358,9 +470,40 @@ const ItemContainer = styled.div`
 `;
 
 const BoxName = styled.span`
+  max-width: 10rem;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  text-align: left;
+
+  &.name-club {
+    color: var(--ma-gray-500);
+    font-size: 0.7em;
+  }
+`;
+
+const MemberList = styled.ol`
+  margin: 0.5rem 0 0 0;
+  padding-left: 0;
+  list-style: none;
+  text-align: left;
+  font-size: 0.7em;
+
+  .member-name {
+    margin-top: -0.25rem;
+    display: inline-block;
+    max-width: 7.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--ma-gray-500);
+
+    .member-number {
+      display: inline-block;
+      width: 7.5px;
+      margin-right: 0.25rem;
+    }
+  }
 `;
 
 const BoxScoreWrapper = styled.span`
@@ -375,5 +518,107 @@ const BoxScoreWrapper = styled.span`
     background-color: #000000;
   }
 `;
+
+/* ========================= */
+// utils
+
+function _getRoundPositions({ totalRounds, roundIndex }) {
+  const positionByRounds = {
+    5: { finalIndex: 4, thirdPlaceIndex: 5 }, // 32 besar
+    4: { finalIndex: 3, thirdPlaceIndex: 4 }, // 16 besar
+    3: { finalIndex: 2, thirdPlaceIndex: 3 }, // 8 besar
+    2: { finalIndex: 1, thirdPlaceIndex: 2 }, // 4 besar
+  };
+
+  const { finalIndex, thirdPlaceIndex } = positionByRounds[totalRounds] || {};
+  const isFinalRound = roundIndex === finalIndex;
+  const isThirdPlaceRound = roundIndex === thirdPlaceIndex;
+
+  return { isFinalRound, isThirdPlaceRound };
+}
+
+function _checkThirdPlaceHasWinner(data) {
+  const defaultValue = { hasWinner: false, winnerIndex: -1 };
+
+  if (!data) {
+    return defaultValue;
+  }
+
+  const winningStatusByRound = [];
+  for (const index in data.rounds) {
+    const round = data.rounds[index];
+    const previousIndex = parseInt(index) - 1;
+    const previousStatus = previousIndex > -1 ? winningStatusByRound[previousIndex] : true;
+
+    const thisRoundDone = round.seeds.every((seed) => {
+      const thisMatchIsBye = seed.teams.some((team) => team.status === "bye");
+      const thisMatchHasWinner = seed.teams.some((team) => Boolean(team.win));
+      const thisMatchAllWait = seed.teams.every((team) => team.status === "wait");
+      const isDone = thisMatchIsBye || thisMatchHasWinner || (previousStatus && thisMatchAllWait);
+      return isDone;
+    });
+
+    winningStatusByRound.push(thisRoundDone);
+  }
+
+  const thirdPlaceRoundIndex = winningStatusByRound.length - 1;
+  const finalRoundIndex = thirdPlaceRoundIndex - 1;
+  const semiFinalIndex = finalRoundIndex - 1;
+
+  const ongoingIndex = _getOngoingIndex(winningStatusByRound);
+
+  // Belum kelihatan di perebutan juara 3 ada pemenang apa enggak
+  if (ongoingIndex <= semiFinalIndex) {
+    return defaultValue;
+  }
+
+  const thirdPlaceSeed = data.rounds[thirdPlaceRoundIndex].seeds[0];
+  return _checkSeedHasWinner(thirdPlaceSeed);
+}
+
+/**
+ * Yang ongoing harusnya satu round setelah round
+ * yang match-nya udah dapat pemenang semua
+ */
+function _getOngoingIndex(statusByRound) {
+  let foundIndex = 0;
+  const rounds = [...statusByRound];
+  for (const index in rounds) {
+    const status = rounds[index];
+    const lastIndex = statusByRound.length - 1;
+    if (status === true && parseInt(index) < lastIndex) {
+      continue;
+    }
+    foundIndex = parseInt(index);
+    break;
+  }
+  return foundIndex;
+}
+
+function _checkSeedHasWinner(seed) {
+  const hasPlayerName = seed.teams.some((player) => Boolean(player.name));
+  if (hasPlayerName) {
+    const winIndex = seed.teams.findIndex((team) => Boolean(team.win));
+    const playerIndex = seed.teams.findIndex((player) => Boolean(player.name));
+    const foundIndex = winIndex > -1 ? winIndex : playerIndex > -1 ? playerIndex : -1;
+    return {
+      hasWinner: hasPlayerName,
+      winnerIndex: foundIndex,
+    };
+  }
+
+  const hasTeamName = seed.teams.some((team) => Boolean(team.teamName));
+  if (hasTeamName) {
+    const winIndex = seed.teams.findIndex((team) => Boolean(team.win));
+    const teamIndex = seed.teams.findIndex((team) => Boolean(team.teamName));
+    const foundIndex = winIndex > -1 ? winIndex : teamIndex > -1 ? teamIndex : -1;
+    return {
+      hasWinner: hasTeamName,
+      winnerIndex: foundIndex,
+    };
+  }
+
+  return { hasWinner: false, winnerIndex: -1 };
+}
 
 export { ButtonShowBracket };

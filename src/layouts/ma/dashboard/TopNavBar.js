@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import * as AuthStore from "store/slice/authentication";
-import { ArcherService } from "services";
 import { withTranslation } from "react-i18next";
+import { useUserProfile } from "hooks/user-profile";
 import { useLocation as useAdministativeLocation } from "utils/hooks/location";
 
 import {
@@ -23,26 +21,12 @@ import user1 from "assets/images/users/avatar-man.png";
 
 const ProfileMenu = (props) => {
   const { push } = useHistory();
-  const dispatch = useDispatch();
+  const { userProfile } = useUserProfile({ forceFetchOnMount: true });
   useAdministativeLocation();
 
   const [menu, setMenu] = useState(false);
-  const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
   const username = userProfile?.name || "Archer";
   const [confirmLogout, setConfirmLogout] = React.useState(false);
-
-  React.useEffect(() => {
-    if (userProfile) {
-      return;
-    }
-    const getUser = async () => {
-      const { data, success } = await ArcherService.profile();
-      if (success) {
-        dispatch(AuthStore.profile(data));
-      }
-    };
-    getUser();
-  }, []);
 
   const handleShowConfirmLogout = () => setConfirmLogout(true);
   const handleCancelLogout = () => setConfirmLogout(false);
@@ -131,9 +115,7 @@ function _getAvatarURL(URL, fallbackURL) {
   if (!URL) {
     return fallbackURL;
   }
-  const segments = URL.split("#");
-  const params = "?timestamp=" + new Date().getTime();
-  return segments[0] + params + "#" + segments[1];
+  return URL;
 }
 
 export default withTranslation()(ProfileMenu);

@@ -2,41 +2,36 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEliminationBracketTemplate } from "../hooks/elimination-template";
 
-// import { Modal, ModalBody } from "reactstrap";
+import { Modal, ModalBody } from "reactstrap";
 import {
   Bracket,
   Seed as RBSeed,
   SeedItem as RBSeedItem,
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
-import { LoadingScreen } from "components/ma";
+import { ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
 
-// import IconBranch from "components/ma/icons/mono/branch";
-// import IconX from "components/ma/icons/mono/x";
+import IconBranch from "components/ma/icons/mono/branch";
+import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
-function ButtonShowBracket({ categoryDetailId }) {
-  // const [isOpen, setOpen] = React.useState(false);
+function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
+  const [isOpen, setOpen] = React.useState(false);
   const {
     data: bracketData,
     fetchEliminationTemplate,
     isLoading,
-  } = useEliminationBracketTemplate(categoryDetailId);
-
-  React.useEffect(() => {
-    if(categoryDetailId) {
-      fetchEliminationTemplate();
-    }
-  }, [categoryDetailId]);
-
-  console.log(bracketData, 'rata');
+    isError,
+    errors,
+  } = useEliminationBracketTemplate(categoryDetailId, eliminationMemberCount);
 
   return (
     <React.Fragment>
       <LoadingScreen loading={isLoading} />
+      <AlertSubmitError isError={isError} errors={errors} />
 
-      {/* <ButtonYellow
+      <ButtonYellow
         flexible
         title="Lihat Bagan"
         onClick={() => {
@@ -47,29 +42,32 @@ function ButtonShowBracket({ categoryDetailId }) {
           });
         }}
       >
-        <IconBranch size="20" /> Lihat Bagan
-      </ButtonYellow> */}
+        <span>
+          <IconBranch size="16" />
+        </span>
+        <span>Lihat Bagan</span>
+      </ButtonYellow>
 
-      {/* {isOpen && (
+      {isOpen && (
         <Modal
           isOpen
-          size={bracketData.eliminationId ? "xl" : "md"}
+          size={bracketData.eliminationId || bracketData.eliminationGroupId ? "xl" : "md"}
           centered
           backdrop="static"
           autoFocus
           toggle={() => setOpen((open) => !open)}
           onClosed={() => setOpen(false)}
         >
-          <ModalBody> */}
+          <ModalBody>
             <BodyWrapper>
-              {/* <TopBar>
+              <TopBar>
                 <EditorCloseButton flexible onClick={() => setOpen(false)}>
                   <IconX size="16" />
                 </EditorCloseButton>
-              </TopBar> */}
+              </TopBar>
 
               <div>
-              {bracketData?.eliminationId ? (
+                {bracketData.eliminationId ? (
                   <Scrollable>
                     <Bracket
                       rounds={bracketData.rounds || []}
@@ -84,7 +82,7 @@ function ButtonShowBracket({ categoryDetailId }) {
                       )}
                     />
                   </Scrollable>
-                ) : bracketData?.eliminationGroupId ? (
+                ) : bracketData.eliminationGroupId ? (
                   <Scrollable>
                     <Bracket
                       rounds={bracketData.rounds || []}
@@ -104,9 +102,9 @@ function ButtonShowBracket({ categoryDetailId }) {
                 )}
               </div>
             </BodyWrapper>
-          {/* </ModalBody>
+          </ModalBody>
         </Modal>
-      )} */}
+      )}
     </React.Fragment>
   );
 }
@@ -121,9 +119,12 @@ function NoBracketAvailable() {
 
 function SeedBagan({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
+  const roundNumber = roundIndex + 1;
 
-  const noData = !seed.teams[0]?.name || !seed.teams[0]?.name;
-  const isBye = seed.teams.some((team) => team.status === "bye");
+  const noData = !seed.teams[0]?.name || !seed.teams[1]?.name;
+  const isBye =
+    seed.teams.some((team) => team.status === "bye") ||
+    (roundNumber === 1 && seed.teams.every((team) => !team.name));
 
   const isFinalRound =
     (configs.totalRounds === 4 && roundIndex === 3) ||
@@ -147,12 +148,13 @@ function SeedBagan({ bracketProps, configs }) {
           {seed.teams.map((team, index) => (
             <SeedTeam
               key={index}
+              title={team.name}
               className={classnames({
                 "item-active": !noData,
-                "item-winner": parseInt(team.win) === 1 && !isBye,
+                "item-winner": !isBye && parseInt(team.win) === 1,
               })}
             >
-              <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>{team.name || <ByeLabel isBye={isBye} />}</BoxName>
               <BoxScore team={team} />
             </SeedTeam>
           ))}
@@ -222,7 +224,6 @@ function ByeLabel({ isBye }) {
   return <React.Fragment>&ndash;</React.Fragment>;
 }
 
-
 function BoxScore({ team }) {
   if (!team) {
     return null;
@@ -239,9 +240,6 @@ function BoxScore({ team }) {
   return null;
 }
 
-/* ================================== */
-// styles
-
 const ByeLabelSpan = styled.span`
   text-align: center;
   vertical-align: middle;
@@ -249,33 +247,40 @@ const ByeLabelSpan = styled.span`
   font-weight: 600;
 `;
 
+/* ================================== */
+// styles
+
 const BodyWrapper = styled.div`
   > * + * {
     margin-top: 1rem;
   }
 `;
 
-// const ButtonYellow = styled(ButtonBlue)`
-//   &,
-//   &:focus,
-//   &:active {
-//     border-color: var(--ma-secondary);
-//     background-color: var(--ma-secondary);
-//     color: var(--ma-blue);
-//   }
+const ButtonYellow = styled(ButtonBlue)`
+  &,
+  &:focus,
+  &:active {
+    border-color: var(--ma-secondary);
+    background-color: var(--ma-secondary);
+    color: var(--ma-blue);
+  }
 
-//   &:hover {
-//     border-color: #ffcd3a;
-//     background-color: #ffcd3a;
-//     color: var(--ma-blue);
-//   }
-// `;
+  &:hover {
+    border-color: #ffcd3a;
+    background-color: #ffcd3a;
+    color: var(--ma-blue);
+  }
 
-// const TopBar = styled.div`
-//   display: flex;
-//   justify-content: flex-end;
-//   gap: 1rem;
-// `;
+  > * + * {
+    margin-left: 0.5rem;
+  }
+`;
+
+const TopBar = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+`;
 
 const NoBracketWrapper = styled.div`
   min-height: 10rem;
@@ -293,18 +298,18 @@ const Scrollable = styled.div`
   overflow-x: auto;
 `;
 
-// const EditorCloseButton = styled.button`
-//   padding: 0.375rem 0.625rem;
-//   border: none;
-//   background-color: transparent;
-//   color: var(--ma-blue);
+const EditorCloseButton = styled.button`
+  padding: 0.375rem 0.625rem;
+  border: none;
+  background-color: transparent;
+  color: var(--ma-blue);
 
-//   transition: all 0.15s;
+  transition: all 0.15s;
 
-//   &:hover {
-//     box-shadow: 0 0 0 1px var(--ma-gray-200);
-//   }
-// `;
+  &:hover {
+    box-shadow: 0 0 0 1px var(--ma-gray-200);
+  }
+`;
 
 const FinalHeading = styled.h6`
   position: absolute;

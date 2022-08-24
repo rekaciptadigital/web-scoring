@@ -27,6 +27,8 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
     errors,
   } = useEliminationBracketTemplate(categoryDetailId, eliminationMemberCount);
 
+  const eliminationNumber = _getEliminationNumber(bracketData);
+
   return (
     <React.Fragment>
       <LoadingScreen loading={isLoading} />
@@ -60,9 +62,15 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
             <ModalBody>
               <BodyWrapper>
                 <TopBar>
-                  <EditorCloseButton flexible onClick={() => setOpen(false)}>
-                    <IconX size="16" />
-                  </EditorCloseButton>
+                  <div>
+                    {Boolean(eliminationNumber) && <Heading>{eliminationNumber} Besar</Heading>}
+                  </div>
+
+                  <div>
+                    <EditorCloseButton flexible onClick={() => setOpen(false)}>
+                      <IconX size="16" />
+                    </EditorCloseButton>
+                  </div>
                 </TopBar>
 
                 <div>
@@ -136,7 +144,7 @@ function SeedPreview({ bracketProps, configs }) {
         <ItemContainer>
           {isFinalRound && <FinalHeading>Babak Final</FinalHeading>}
           {isThirdPlaceRound && <FinalHeading>Perebutan Juara 3</FinalHeading>}
-          {seed.teams.map((team, index) => (
+          {seed.teams?.map((team, index) => (
             <SeedTeam key={index}>
               <BoxNameGroup>
                 <BoxName title={team.name || team.team}>
@@ -185,7 +193,7 @@ function SeedBagan({ bracketProps, configs }) {
         <ItemContainer>
           {isFinalRound && <FinalHeading>Babak Final</FinalHeading>}
           {isThirdPlaceRound && <FinalHeading>Perebutan Juara 3</FinalHeading>}
-          {seed.teams.map((team, index) => (
+          {seed.teams?.map((team, index) => (
             <SeedTeam key={index}>
               <BoxNameGroup>
                 <BoxName title={team.name || team.teamName}>
@@ -228,8 +236,23 @@ const BodyWrapper = styled.div`
 
 const TopBar = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 1rem;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+
+  > *:nth-child(2) {
+    flex-shrink: 0;
+  }
+`;
+
+const Heading = styled.h5`
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  color: var(--ma-blue);
+  font-weight: 600;
 `;
 
 const Scrollable = styled.div`
@@ -359,6 +382,20 @@ const MemberList = styled.ol`
 
 /* ========================= */
 // utils
+
+function _getEliminationNumber(bracketData) {
+  if (!bracketData) {
+    return 0;
+  }
+
+  const numbersByLength = {
+    6: 32, // besar
+    5: 16, // besar
+    4: 8, // besar
+    3: 4, // besar
+  };
+  return numbersByLength[bracketData.rounds.length];
+}
 
 function _getRoundPositions({ totalRounds, roundIndex }) {
   const positionByRounds = {

@@ -129,7 +129,7 @@ function PageEventScoringElimination() {
             </CategoryFilter>
           </FilterBars>
 
-          <ToolbarRight>
+          <ToolbarRight key={activeCategoryDetail?.categoryDetailId}>
             <HorizontalSpaced>
               <ButtonShowBracket
                 categoryDetailId={activeCategoryDetail?.categoryDetailId}

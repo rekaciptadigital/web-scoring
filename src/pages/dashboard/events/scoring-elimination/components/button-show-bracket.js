@@ -179,48 +179,69 @@ function SeedBagan({ bracketProps, configs }) {
             const isWinner = isSettingApplied && Boolean(team.win) && !isBye;
             const isThirdPlaceWinner = isThirdPlaceRound && index === thirdPlaceWinnerIndex;
             return (
-              <SeedTeam
-                key={index}
-                title={team.name}
-                className={classnames({
-                  "item-active": !noData,
-                  "item-winner": (!isBye && parseInt(team.win) === 1) || isThirdPlaceWinner,
-                })}
-              >
-                <BoxNameGroup>
-                  <BoxName title={team.name}>{team.name || <ByeLabel isBye={isBye} />}</BoxName>
-                  {team.club && (
-                    <BoxName title={team.club} className="name-club">
-                      {team.club}
-                    </BoxName>
-                  )}
-                </BoxNameGroup>
-                <BoxScore team={team} />
+              <SeedWrapper key={index}>
+                <SeedBudrest
+                  className={classnames({
+                    "budrest-odd": index === 0,
+                    "budrest-even": index === 1,
+                  })}
+                  title={team.budrestNumber}
+                >
+                  {team.budrestNumber || <React.Fragment>&ndash;</React.Fragment>}
+                </SeedBudrest>
 
-                {/* ! Hati-hati, logika kondisionalnya ruwet pakai ternary wkwk */}
-                {/* TODO: refaktor jadi komponen (?) */}
-                {isFinalRound && hasWinner ? (
-                  isWinner ? (
-                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
-                      Medali Emas <IconMedalGold size="20" />
-                    </FinalHeading>
+                <SeedTeam
+                  key={index}
+                  title={team.name}
+                  className={classnames({
+                    "item-active": !noData,
+                    "item-winner": (!isBye && parseInt(team.win) === 1) || isThirdPlaceWinner,
+                    "item-even": index === 1,
+                  })}
+                >
+                  <BoxNameGroup>
+                    <BoxName title={team.name}>{team.name || <ByeLabel isBye={isBye} />}</BoxName>
+                    {team.club && (
+                      <BoxName title={team.club} className="name-club">
+                        {team.club}
+                      </BoxName>
+                    )}
+                  </BoxNameGroup>
+                  <BoxScore team={team} />
+
+                  {/* ! Hati-hati, logika kondisionalnya ruwet pakai ternary wkwk */}
+                  {/* TODO: refaktor jadi komponen (?) */}
+                  {isFinalRound && hasWinner ? (
+                    isWinner ? (
+                      <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                        Medali Emas <IconMedalGold size="20" />
+                      </FinalHeading>
+                    ) : (
+                      <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                        Medali Perak <IconMedalSilver size="20" />
+                      </FinalHeading>
+                    )
+                  ) : isFinalRound && !hasWinner ? (
+                    <FinalHeading>Babak Final</FinalHeading>
+                  ) : isThirdPlaceRound && thirdPlaceHasWinner ? (
+                    isThirdPlaceWinner ? (
+                      <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                        <IconMedalBronze size="20" /> Medali Perunggu
+                      </FinalHeading>
+                    ) : null
+                  ) : isThirdPlaceRound && !thirdPlaceHasWinner ? (
+                    <FinalHeading>Perebutan Juara 3</FinalHeading>
+                  ) : null}
+                </SeedTeam>
+
+                <SeedRank>
+                  {team.potition ? (
+                    <React.Fragment>#{team.potition}</React.Fragment>
                   ) : (
-                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
-                      Medali Perak <IconMedalSilver size="20" />
-                    </FinalHeading>
-                  )
-                ) : isFinalRound && !hasWinner ? (
-                  <FinalHeading>Babak Final</FinalHeading>
-                ) : isThirdPlaceRound && thirdPlaceHasWinner ? (
-                  isThirdPlaceWinner ? (
-                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
-                      <IconMedalBronze size="20" /> Medali Perunggu
-                    </FinalHeading>
-                  ) : null
-                ) : isThirdPlaceRound && !thirdPlaceHasWinner ? (
-                  <FinalHeading>Perebutan Juara 3</FinalHeading>
-                ) : null}
-              </SeedTeam>
+                    <React.Fragment>&nbsp;</React.Fragment>
+                  )}
+                </SeedRank>
+              </SeedWrapper>
             );
           })}
         </ItemContainer>
@@ -262,55 +283,75 @@ function SeedBaganTeam({ bracketProps, configs }) {
             const isWinner = isSettingApplied && Boolean(team.win) && !isBye;
             const isThirdPlaceWinner = isThirdPlaceRound && index === thirdPlaceWinnerIndex;
             return (
-              <SeedTeam
-                key={index}
-                title={team.teamName}
-                className={classnames({
-                  "item-active": !noData,
-                  "item-winner": (parseInt(team.win) === 1 && !isBye) || isThirdPlaceWinner,
-                })}
-              >
-                <BoxNameGroup>
-                  <BoxName title={team.teamName}>
-                    {team.teamName || <ByeLabel isBye={isBye} />}
-                  </BoxName>
-                  <MemberList>
-                    {team.memberTeam?.map((member, index) => (
-                      <li key={index}>
-                        <span className="member-name" title={member.name}>
-                          <span className="member-number">{index + 1}.</span>
-                          <span>{member.name}</span>
-                        </span>
-                      </li>
-                    ))}
-                  </MemberList>
-                </BoxNameGroup>
-                <BoxScore team={team} />
+              <SeedWrapper key={index}>
+                <SeedBudrest
+                  className={classnames({
+                    "budrest-odd": index === 0,
+                    "budrest-even": index === 1,
+                  })}
+                  title={team.budrestNumber}
+                >
+                  {team.budrestNumber || <React.Fragment>&ndash;</React.Fragment>}
+                </SeedBudrest>
 
-                {/* ! Hati-hati, logika kondisionalnya ruwet pakai ternary wkwk */}
-                {/* TODO: refaktor jadi komponen (?) */}
-                {isFinalRound && hasWinner ? (
-                  isWinner ? (
-                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
-                      Medali Emas <IconMedalGold size="20" />
-                    </FinalHeading>
+                <SeedTeam
+                  title={team.teamName}
+                  className={classnames({
+                    "item-active": !noData,
+                    "item-winner": (parseInt(team.win) === 1 && !isBye) || isThirdPlaceWinner,
+                    "item-even": index === 1,
+                  })}
+                >
+                  <BoxNameGroup>
+                    <BoxName title={team.teamName}>
+                      {team.teamName || <ByeLabel isBye={isBye} />}
+                    </BoxName>
+                    <MemberList>
+                      {team.memberTeam?.map((member, index) => (
+                        <li key={index}>
+                          <span className="member-name" title={member.name}>
+                            <span className="member-number">{index + 1}.</span>
+                            <span>{member.name}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </MemberList>
+                  </BoxNameGroup>
+                  <BoxScore team={team} />
+
+                  {/* ! Hati-hati, logika kondisionalnya ruwet pakai ternary wkwk */}
+                  {/* TODO: refaktor jadi komponen (?) */}
+                  {isFinalRound && hasWinner ? (
+                    isWinner ? (
+                      <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                        Medali Emas <IconMedalGold size="20" />
+                      </FinalHeading>
+                    ) : (
+                      <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                        Medali Perak <IconMedalSilver size="20" />
+                      </FinalHeading>
+                    )
+                  ) : isFinalRound && !hasWinner ? (
+                    <FinalHeading>Babak Final</FinalHeading>
+                  ) : isThirdPlaceRound && thirdPlaceHasWinner ? (
+                    isThirdPlaceWinner ? (
+                      <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
+                        <IconMedalBronze size="20" /> Medali Perunggu
+                      </FinalHeading>
+                    ) : null
+                  ) : isThirdPlaceRound && !thirdPlaceHasWinner ? (
+                    <FinalHeading>Perebutan Juara 3</FinalHeading>
+                  ) : null}
+                </SeedTeam>
+
+                <SeedRank>
+                  {team.potition ? (
+                    <React.Fragment>#{team.potition}</React.Fragment>
                   ) : (
-                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
-                      Medali Perak <IconMedalSilver size="20" />
-                    </FinalHeading>
-                  )
-                ) : isFinalRound && !hasWinner ? (
-                  <FinalHeading>Babak Final</FinalHeading>
-                ) : isThirdPlaceRound && thirdPlaceHasWinner ? (
-                  isThirdPlaceWinner ? (
-                    <FinalHeading className={classnames({ "final-bottom": index > 0 })}>
-                      <IconMedalBronze size="20" /> Medali Perunggu
-                    </FinalHeading>
-                  ) : null
-                ) : isThirdPlaceRound && !thirdPlaceHasWinner ? (
-                  <FinalHeading>Perebutan Juara 3</FinalHeading>
-                ) : null}
-              </SeedTeam>
+                    <React.Fragment>&nbsp;</React.Fragment>
+                  )}
+                </SeedRank>
+              </SeedWrapper>
             );
           })}
         </ItemContainer>
@@ -456,8 +497,58 @@ const Seed = styled(RBSeed)`
 
 const SeedItem = styled(RBSeedItem)`
   border-radius: 0.5rem;
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  box-shadow: none;
+`;
+
+const SeedWrapper = styled.div`
+  display: flex;
+
+  > *:nth-child(2) {
+    flex-grow: 1;
+    min-width: 10rem;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const SeedBudrest = styled.div`
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 2.5rem;
+  padding: 0.5rem;
   background-color: var(--ma-primary-blue-50);
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: var(--ma-txt-black);
+  font-size: 0.625rem;
+
+  &.budrest-odd {
+    border-top-left-radius: 0.5rem;
+  }
+
+  &.budrest-even {
+    border-bottom-left-radius: 0.5rem;
+  }
+`;
+
+const SeedRank = styled.div`
+  flex-shrink: 0;
+
+  width: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: var(--ma-gray-600);
+  font-size: 0.625rem;
+  vertical-align: middle;
 `;
 
 const SeedTeam = styled(RBSeedTeam)`
@@ -468,6 +559,10 @@ const SeedTeam = styled(RBSeedTeam)`
   background-color: #ffffff;
   color: var(--bs-body-color);
   font-size: var(--bs-body-font-size);
+
+  &.item-even {
+    border-top: none;
+  }
 
   &.item-active {
     border-color: #0d47a1;
@@ -487,10 +582,6 @@ const SeedTeam = styled(RBSeedTeam)`
 
 const ItemContainer = styled.div`
   position: relative;
-
-  > ${SeedTeam} + ${SeedTeam} {
-    border-top: none;
-  }
 `;
 
 const BoxName = styled.span`

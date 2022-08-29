@@ -1,8 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useClubRankingSetting } from "./hooks/club-ranking-settings";
 import { useFormRankingSetting } from "./hooks/form-ranking-settings";
+import { useSubmitClubsRanking } from "./hooks/submit-clubs-ranking";
 
-import { ButtonBlue } from "components/ma";
+import { ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
+import { toast } from "components/ma/processing-toast";
 import { FieldInputTextSmall } from "pages/dashboard/events/components/form-fields";
 import { SelectRadio } from "../../components/select-radio";
 import { FieldSelectCategories } from "./components/field-select-categories";
@@ -19,8 +22,17 @@ function ScreenRules({ eventDetail }) {
 }
 
 function SettingsClubsRanking({ eventDetail }) {
+  // TODO: get data awal, oper ke form untuk initial data
+  const { fetchRankingSetting } = useClubRankingSetting();
   const { isDirty, data, errors, updateField, setType, handleValidation } = useFormRankingSetting();
   const { type, rankingName, categories, medalCountingType } = data;
+
+  const {
+    submit,
+    isLoading: isLoadingSubmit,
+    isError: isErrorSubmit,
+    errors: errorsSubmit,
+  } = useSubmitClubsRanking(eventDetail?.id, data);
 
   const categoryDetails = eventDetail?.eventCategories;
   const optionsCategories = React.useMemo(
@@ -124,7 +136,12 @@ function SettingsClubsRanking({ eventDetail }) {
                     );
                   },
                   onValid: () => {
-                    // TODO: submit
+                    submit({
+                      onSuccess: () => {
+                        toast.success("Pengaturan untuk Pemeringkatan Klub berhasil disimpan");
+                        fetchRankingSetting();
+                      },
+                    });
                   },
                 })
               }
@@ -134,6 +151,9 @@ function SettingsClubsRanking({ eventDetail }) {
           </BottomActions>
         </div>
       </SpacedVertical>
+
+      <LoadingScreen loading={isLoadingSubmit} />
+      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
     </SettingContainer>
   );
 }
@@ -184,10 +204,14 @@ const BottomActions = styled.div`
 // utils
 
 function _makeOptionsCategory(categoryDetails) {
-  const grouped = categoryDetails ? _groupCategory(categoryDetails) : {};
+  if (!categoryDetails?.length) {
+    return [];
+  }
+
+  const grouped = _groupCategory(categoryDetails);
   return Object.keys(grouped).map((value) => ({
     value: value,
-    label: value,
+    label: grouped[value].label,
     data: grouped[value],
   }));
 }
@@ -199,19 +223,20 @@ function _groupCategory(categoryDetails) {
 
   const grouped = {};
   for (const category of categoryDetails) {
-    const competitionCat = category.competitionCategoryId.id;
-    const classCat = category.ageCategoryId.id;
-    const distanceCat = category.distanceId.id;
-    const key = `${competitionCat} - ${classCat} - ${distanceCat}`;
+    const competitionCat = category.competitionCategoryId;
+    const classCat = category.ageCategoryId;
+    const distanceCat = category.distanceId;
+    const key = `${competitionCat.id} - ${classCat.id} - ${distanceCat.id}`;
 
     if (grouped[key]) {
       continue;
     }
 
     grouped[key] = {
-      competitionCategoryId: competitionCat,
-      ageCategoryId: classCat,
-      distanceId: distanceCat,
+      label: `${competitionCat.label} - ${classCat.label} - ${distanceCat.label}`,
+      competitionCategoryId: competitionCat.id,
+      ageCategoryId: classCat.id,
+      distanceId: distanceCat.id,
     };
   }
 

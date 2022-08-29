@@ -23,13 +23,10 @@ function SettingsClubsRanking({ eventDetail }) {
   const { type, rankingName, categories, medalCountingType } = data;
 
   const categoryDetails = eventDetail?.eventCategories;
-  const optionsCategories = React.useMemo(() => {
-    return categoryDetails?.map((cat) => ({
-      value: cat.categoryDetailsId,
-      label: cat.label,
-      data: cat,
-    }));
-  }, [categoryDetails]);
+  const optionsCategories = React.useMemo(
+    () => _makeOptionsCategory(categoryDetails),
+    [categoryDetails]
+  );
 
   return (
     <SettingContainer>
@@ -185,5 +182,40 @@ const BottomActions = styled.div`
 
 /* ============================ */
 // utils
+
+function _makeOptionsCategory(categoryDetails) {
+  const grouped = categoryDetails ? _groupCategory(categoryDetails) : {};
+  return Object.keys(grouped).map((value) => ({
+    value: value,
+    label: value,
+    data: grouped[value],
+  }));
+}
+
+function _groupCategory(categoryDetails) {
+  if (!categoryDetails?.length) {
+    return {};
+  }
+
+  const grouped = {};
+  for (const category of categoryDetails) {
+    const competitionCat = category.competitionCategoryId.id;
+    const classCat = category.ageCategoryId.id;
+    const distanceCat = category.distanceId.id;
+    const key = `${competitionCat} - ${classCat} - ${distanceCat}`;
+
+    if (grouped[key]) {
+      continue;
+    }
+
+    grouped[key] = {
+      competitionCategoryId: competitionCat,
+      ageCategoryId: classCat,
+      distanceId: distanceCat,
+    };
+  }
+
+  return grouped;
+}
 
 export { ScreenRules };

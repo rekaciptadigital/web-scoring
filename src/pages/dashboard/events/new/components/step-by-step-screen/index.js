@@ -51,7 +51,7 @@ const StickyContainer = styled.div`
     > div:nth-child(2) {
       flex-grow: 1;
       flex-shrink: 1;
-      min-width: fit-content;
+      min-width: 0;
     }
   }
 `;

@@ -7,10 +7,13 @@ import { useStepContent } from "./hooks/step-content";
 
 import { ButtonOutlineBlue } from "components/ma";
 
-function StepDisplay({ children }) {
+function StepDisplay({ children, fallbackUI }) {
   const { currentStepId } = useStepScreen();
   const childrenList = React.Children.toArray(children);
   const currentChildById = childrenList.find((child) => child.props.id === currentStepId);
+  if (!currentChildById) {
+    return fallbackUI || <div>Display untuk step ini tidak tersedia</div>;
+  }
   return currentChildById || childrenList[0] || null;
 }
 

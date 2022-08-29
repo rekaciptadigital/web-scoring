@@ -127,7 +127,7 @@ revert:
 
 switch:
   image: node:14
-  stage: revert
+  stage: switch
   before_script:
   - apt-get update -qq
   - apt-get install -qq git

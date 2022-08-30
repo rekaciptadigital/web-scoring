@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.16
+FROM node:lts-alpine3.14
 
 RUN apk update
 RUN apk add git
@@ -14,10 +14,11 @@ CMD mkdir log
 RUN addgroup -g 2000 -S docker
 RUN adduser -S -G docker -u 2001 -s /bin/sh -h myarchery-web docker
 
+RUN npm install -g npm
 RUN npm uninstall node-sass --force
 #RUN npm install node-sass@4.14.1 --legacy-peer-deps
 RUN npm i sass --force
-RUN npm install --global windows-build-tools --legacy-peer-deps
+#RUN npm install --global windows-build-tools --legacy-peer-deps
 #RUN npm install --legacy-peer-deps #--force
 RUN yarn add react-is
 #RUN npm audit fix

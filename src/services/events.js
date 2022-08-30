@@ -113,6 +113,14 @@ export default {
   },
 
   /**
+   * @param {QueryString} qs { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getClubRankingSetting(qs = null) {
+    return API.get("/web/v1/event-club-ranked/get-config", qs);
+  },
+
+  /**
    * @param {Data} data {
    *   event_id,
    *   rating_flag,

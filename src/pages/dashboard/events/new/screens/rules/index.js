@@ -4,7 +4,7 @@ import { useClubRankingSetting } from "./hooks/club-ranking-settings";
 import { useFormRankingSetting } from "./hooks/form-ranking-settings";
 import { useSubmitClubsRanking } from "./hooks/submit-clubs-ranking";
 
-import { ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
+import { ButtonBlue, LoadingScreen, SpinnerDotBlock, AlertSubmitError } from "components/ma";
 import { toast } from "components/ma/processing-toast";
 import { FieldInputTextSmall } from "pages/dashboard/events/components/form-fields";
 import { SelectRadio } from "../../components/select-radio";
@@ -22,9 +22,33 @@ function ScreenRules({ eventDetail }) {
 }
 
 function SettingsClubsRanking({ eventDetail }) {
-  // TODO: get data awal, oper ke form untuk initial data
-  const { fetchRankingSetting } = useClubRankingSetting();
-  const { isDirty, data, errors, updateField, setType, handleValidation } = useFormRankingSetting();
+  const {
+    data: rankingSettings,
+    isLoading,
+    fetchRankingSetting,
+  } = useClubRankingSetting(eventDetail?.id);
+
+  const categoryDetails = eventDetail?.eventCategories;
+  const optionsCategories = React.useMemo(
+    () => _makeOptionsCategory(categoryDetails),
+    [categoryDetails]
+  );
+
+  const optionsCountingTypes = React.useMemo(
+    () => [
+      { value: 1, label: "Digabung" },
+      { value: 2, label: "Dipisah" },
+    ],
+    []
+  );
+
+  const initialValues = React.useMemo(
+    () => _makeFormInitialValues(rankingSettings, { optionsCategories, optionsCountingTypes }),
+    [rankingSettings, optionsCategories, optionsCountingTypes]
+  );
+
+  const { data, errors, updateField, setType, handleValidation } =
+    useFormRankingSetting(initialValues);
   const { type, rankingName, categories, medalCountingType } = data;
 
   const {
@@ -33,12 +57,6 @@ function SettingsClubsRanking({ eventDetail }) {
     isError: isErrorSubmit,
     errors: errorsSubmit,
   } = useSubmitClubsRanking(eventDetail?.id, data);
-
-  const categoryDetails = eventDetail?.eventCategories;
-  const optionsCategories = React.useMemo(
-    () => _makeOptionsCategory(categoryDetails),
-    [categoryDetails]
-  );
 
   return (
     <SettingContainer>
@@ -53,103 +71,104 @@ function SettingsClubsRanking({ eventDetail }) {
           </p>
         </div>
 
-        <div>
-          <SelectRadio
-            options={[
-              { value: 1, label: "Semua Kategori" },
-              { value: 2, label: "Kategori Tertentu" },
-              { value: 3, label: "Gabungan dari Kategori Tertentu (Khusus)" },
-            ]}
-            value={type}
-            onChange={(value) => setType(parseInt(value))}
-          />
-        </div>
-
-        {type > 1 && (
+        {!rankingSettings && isLoading ? (
+          <SpinnerDotBlock />
+        ) : (
           <React.Fragment>
-            {type === 3 && (
-              <div>
-                <FieldInputTextSmall
-                  label="Penamaan Pemeringkatan"
-                  placeholder="Masukkan nama"
-                  required
-                  value={rankingName}
-                  onChange={(ev) => updateField("rankingName", ev.target.value)}
-                  errors={errors.rankingName}
-                  isTouched // prop legacy dari form input bantalan
-                />
-              </div>
+            <div>
+              <SelectRadio
+                options={[
+                  { value: 1, label: "Semua Kategori" },
+                  { value: 2, label: "Kategori Tertentu" },
+                  { value: 3, label: "Gabungan dari Kategori Tertentu (Khusus)" },
+                ]}
+                value={type}
+                onChange={(value) => setType(parseInt(value))}
+              />
+            </div>
+
+            {type > 1 && (
+              <React.Fragment>
+                {type === 3 && (
+                  <div>
+                    <FieldInputTextSmall
+                      label="Penamaan Pemeringkatan"
+                      placeholder="Masukkan nama"
+                      required
+                      value={rankingName}
+                      onChange={(ev) => updateField("rankingName", ev.target.value)}
+                      errors={errors.rankingName}
+                      isTouched // prop legacy dari form input bantalan
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <FieldSelectCategories
+                    label="Kategori"
+                    placeholder="Pilih opsi"
+                    required
+                    options={optionsCategories}
+                    value={categories}
+                    onChange={(value) => updateField("categories", value || [])}
+                    errors={errors.categories}
+                  />
+                  <SubtleFieldNote>
+                    Kategori pemeringkatan klub akan ditampilkan satu-satu sesuai kategori yang
+                    dipilih. Anda dapat memilih lebih dari satu kategori untuk ditampilkan pada menu
+                    &#34;Pemeringkatan Klub&#34;
+                  </SubtleFieldNote>
+                </div>
+
+                <div>
+                  <FieldSelectOption
+                    label="Perhitungan Medali"
+                    placeholder="Pilih opsi"
+                    required
+                    options={optionsCountingTypes}
+                    value={medalCountingType}
+                    onChange={(value) => updateField("medalCountingType", value)}
+                    errors={errors.medalCountingType}
+                  />
+                  <SubtleFieldNote>
+                    Perhitungan medali pada kategori tertentu dapat &#34;digabung&#34; atau
+                    &#34;dipisah&#34;. Dimana &#34;digabung&#34; merupakan jumlah medali dari
+                    kategori yang telah dipilih dan ditotalkan pada &#34;Semua Kategori&#34;.
+                    Sedangkan &#34;dipisah&#34; merupakan medali yang diperoleh dari masing-masing
+                    kategori dan tidak dihitung / digabung pada &#34;Semua Kategori&#34;.
+                  </SubtleFieldNote>
+                </div>
+              </React.Fragment>
             )}
 
             <div>
-              <FieldSelectCategories
-                label="Kategori"
-                placeholder="Pilih opsi"
-                required
-                options={optionsCategories}
-                value={categories}
-                onChange={(value) => updateField("categories", value || [])}
-                errors={errors.categories}
-              />
-              <SubtleFieldNote>
-                Kategori pemeringkatan klub akan ditampilkan satu-satu sesuai kategori yang dipilih.
-                Anda dapat memilih lebih dari satu kategori untuk ditampilkan pada menu
-                &#34;Pemeringkatan Klub&#34;
-              </SubtleFieldNote>
-            </div>
-
-            <div>
-              <FieldSelectOption
-                label="Perhitungan Medali"
-                placeholder="Pilih opsi"
-                required
-                options={[
-                  { value: 1, label: "Digabung" },
-                  { value: 2, label: "Dipisah" },
-                ]}
-                value={medalCountingType}
-                onChange={(value) => updateField("medalCountingType", value)}
-                errors={errors.medalCountingType}
-              />
-              <SubtleFieldNote>
-                Perhitungan medali pada kategori tertentu dapat &#34;digabung&#34; atau
-                &#34;dipisah&#34;. Dimana &#34;digabung&#34; merupakan jumlah medali dari kategori
-                yang telah dipilih dan ditotalkan pada &#34;Semua Kategori&#34;. Sedangkan
-                &#34;dipisah&#34; merupakan medali yang diperoleh dari masing-masing kategori dan
-                tidak dihitung / digabung pada &#34;Semua Kategori&#34;.
-              </SubtleFieldNote>
+              <BottomActions>
+                <ButtonBlue
+                  onClick={() =>
+                    handleValidation({
+                      onInvalid: (errors) => {
+                        // TODO: ke depan bisa kasih toast untuk display pesan error
+                        Object.values(errors).forEach((error) =>
+                          error.forEach((message) => console.error(message))
+                        );
+                      },
+                      onValid: () => {
+                        submit({
+                          onSuccess: () => {
+                            toast.success("Pengaturan untuk Pemeringkatan Klub berhasil disimpan");
+                            fetchRankingSetting();
+                          },
+                        });
+                      },
+                    })
+                  }
+                >
+                  Simpan
+                </ButtonBlue>
+              </BottomActions>
             </div>
           </React.Fragment>
         )}
-
-        <div>
-          <BottomActions>
-            <ButtonBlue
-              title={!isDirty && "Ubah pengaturan untuk menyimpan"}
-              disabled={!isDirty}
-              onClick={() =>
-                handleValidation({
-                  onInvalid: (errors) => {
-                    // TODO: ke depan bisa kasih toast untuk display pesan error
-                    Object.values(errors).forEach((error) =>
-                      error.forEach((message) => console.error(message))
-                    );
-                  },
-                  onValid: () => {
-                    submit({
-                      onSuccess: () => {
-                        toast.success("Pengaturan untuk Pemeringkatan Klub berhasil disimpan");
-                        fetchRankingSetting();
-                      },
-                    });
-                  },
-                })
-              }
-            >
-              Simpan
-            </ButtonBlue>
-          </BottomActions>
-        </div>
       </SpacedVertical>
 
       <LoadingScreen loading={isLoadingSubmit} />
@@ -241,6 +260,39 @@ function _groupCategory(categoryDetails) {
   }
 
   return grouped;
+}
+
+function _makeFormInitialValues(rankingSettings, { optionsCategories, optionsCountingTypes }) {
+  if (!rankingSettings) {
+    return {
+      type: 1,
+      rankingName: "",
+      categories: [],
+      medalCountingType: null,
+    };
+  }
+
+  return {
+    type: rankingSettings.type || 1,
+    rankingName: rankingSettings.groupCategoryName || "",
+    categories: _checkCategoriesValue(optionsCategories, rankingSettings.listCategory) || [],
+    medalCountingType:
+      optionsCountingTypes.find((option) => option.value === rankingSettings.rulesRatingClub) ||
+      null,
+  };
+}
+
+function _checkCategoriesValue(optionsCategories, values) {
+  const foundCategories = [];
+  values.forEach((cat) => {
+    const competitionCat = cat.competitionCategoryId;
+    const classCat = cat.ageCategoryId;
+    const distanceCat = cat.distanceId;
+    const value = `${competitionCat} - ${classCat} - ${distanceCat}`;
+    const found = optionsCategories.find((option) => option.value === value);
+    found && foundCategories.push(found);
+  });
+  return foundCategories;
 }
 
 export { ScreenRules };

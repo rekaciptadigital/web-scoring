@@ -15,7 +15,8 @@ RUN addgroup -g 2000 -S docker
 RUN adduser -S -G docker -u 2001 -s /bin/sh -h myarchery-web docker
 
 RUN npm uninstall node-sass --force
-RUN npm i sass --force
+RUN npm install node-sass@4.14.1
+#RUN npm i sass --force
 RUN npm install --legacy-peer-deps #--force
 RUN yarn add react-is
 #RUN npm audit fix

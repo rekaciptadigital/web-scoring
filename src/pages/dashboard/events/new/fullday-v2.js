@@ -31,6 +31,7 @@ import { LoadingScreen } from "./components/loading-screen-portal";
 import { ScreenPublicInfos } from "./screens/public-infos";
 import { ScreenFees } from "./screens/fees";
 import { ScreenCategories } from "./screens/categories";
+import { ScreenRules } from "./screens/rules";
 import { ScreenSchedules } from "./screens/schedules";
 import { ScreenSchedulesMarathon } from "./screens/schedules-marathon";
 import { ScreenFinish } from "./screens/finish";
@@ -76,13 +77,15 @@ function PageCreateEventFullday() {
     categoryDetails: categories,
   });
 
-  const lastUnlockedStep = computeLastUnlockedStep([
-    formPublicInfos.isEmpty,
-    formFees.isEmpty,
-    formCategories.isEmpty,
-    formSchedules.isEmpty,
-    !formSchedules.isEmpty,
-  ]);
+  const lastUnlockedStep = computeLastUnlockedStep({
+    1: formPublicInfos.isEmpty,
+    2: formFees.isEmpty,
+    3: formCategories.isEmpty,
+    // TODO:
+    4: false,
+    5: formSchedules.isEmpty,
+    6: !formSchedules.isEmpty,
+  });
 
   // Submit functions
   const {
@@ -121,6 +124,7 @@ function PageCreateEventFullday() {
           <StepItem id={stepId.INFO_UMUM}>Informasi Umum</StepItem>
           <StepItem id={stepId.BIAYA}>Biaya Registrasi</StepItem>
           <StepItem id={stepId.KATEGORI}>Kategori Lomba</StepItem>
+          <StepItem id={stepId.PERATURAN}>Aturan Pertandingan</StepItem>
           <StepItem id={stepId.JADWAL_KUALIFIKASI}>Jadwal Pertandingan</StepItem>
           <StepItem id={stepId.SELESAI}>Selesai</StepItem>
         </StepListIndicator>
@@ -251,6 +255,28 @@ function PageCreateEventFullday() {
                 }}
               >
                 Simpan
+              </ButtonSave>
+            </StepFooterActions>
+          </StepContent>
+
+          <StepContent id={stepId.PERATURAN}>
+            <StepHeader>
+              <h2>Aturan Pertandingan</h2>
+              <p>Atur aturan pertandingan event Anda</p>
+            </StepHeader>
+
+            <StepBody>
+              <ScreenRules eventDetail={eventDetail} />
+            </StepBody>
+
+            <StepFooterActions>
+              <ButtonSave
+                onSubmit={({ next }) => {
+                  // TODO: next kalau valid / sudah simpan data
+                  next();
+                }}
+              >
+                Selanjutnya
               </ButtonSave>
             </StepFooterActions>
           </StepContent>

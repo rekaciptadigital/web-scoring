@@ -2,21 +2,27 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
 
-import { SpinnerDotBlock } from "components/ma";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
+import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
+import { useFilters } from "components/ma/toolbar-filters";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreTeam } from "./button-edit-score-line-team";
 import { ButtonSetWinner, ButtonCancelWinner } from "./button-set-winner";
 import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 
+import IconDownload from "components/ma/icons/mono/download";
+import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
+import IconMenu from "components/ma/icons/mono/menu";
 
 import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracket.png";
 
 import classnames from "classnames";
 
-function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
+function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
+  const { categoryDetail: categoryDetails } = useFilters();
   const { isError, data, fetchEliminationMatches } = useEliminationMatches(
     categoryDetailId,
     eliminationMemberCounts
@@ -57,248 +63,64 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
   // Happy path
   const tabLabels = _getTabLabels(data.rounds);
   const currentRows = data.rounds[selectedTab]?.seeds || [];
+  const roundNumber = selectedTab + 1;
   const thTotalLabel = _getTotalLabel(categoryDetails);
 
   return (
     <SectionTableContainer>
-      <StagesTabs
-        labels={tabLabels}
-        currentTab={selectedTab}
-        onChange={(index) => setSelectedTab(index)}
-      />
+      <TableViewToolbar>
+        <StagesTabs
+          labels={tabLabels}
+          currentTab={selectedTab}
+          onChange={(index) => setSelectedTab(index)}
+        />
+        <div>
+          <ActionMenus
+            label="Scoresheet"
+            displayAsButtonList
+            options={[
+              { label: "Cetak Scoresheet Kosong", onClick: () => alert("download") },
+              { label: "Unduh Semua Scoresheet", onClick: () => alert("download") },
+            ]}
+          />
+        </div>
+      </TableViewToolbar>
 
       <MembersTable className="table table-responsive">
         <thead>
           <tr>
-            <th>Bantalan</th>
+            <th>
+              <BudrestColumnIconWrapper>
+                <IconBudrest />
+              </BudrestColumnIconWrapper>
+            </th>
             <th>Tim</th>
             <ThTotal>{thTotalLabel}</ThTotal>
             <th></th>
             <ThTotal>{thTotalLabel}</ThTotal>
             <th>Tim</th>
+            <th>
+              <BudrestColumnIconWrapper>
+                <IconBudrest />
+              </BudrestColumnIconWrapper>
+            </th>
             <th></th>
           </tr>
         </thead>
 
         <tbody key={selectedTab}>
-          {currentRows.map((row, index) => {
-            const team1 = row.teams[0];
-            const team2 = row.teams[1];
-
-            const roundNumber = selectedTab + 1;
-            const matchNumber = index + 1;
-
-            const code = `2-${data?.eliminationGroupId}-${matchNumber}-${roundNumber}-t`;
-
-            const scoring = {
-              code: code,
-              elimination_id: data?.eliminationGroupId,
-              round: roundNumber,
-              match: matchNumber,
-            };
-
-            const isBye =
-              row.teams.some((team) => team.status === "bye") ||
-              (roundNumber === 1 && row.teams.every((team) => !team.teamName));
-            const noData =
-              !team1?.teamName ||
-              !team2?.teamName ||
-              !team1?.memberTeam?.length ||
-              !team2?.memberTeam?.length;
-            const bothAreBye = row.teams.every((team) => team.status === "wait");
-            const hasWinner = row.teams.some((team) => team.win === 1);
-            const budrestNumber = _getBudrestNumber(row);
-
-            return (
-              <tr key={index}>
-                <td>
-                  {isBye || noData || hasWinner ? (
-                    <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
-                  ) : (
-                    <BudrestInputAsync
-                      categoryId={categoryDetailId}
-                      playerDetail={team1 || team2}
-                      disabled={hasWinner || noData}
-                      scoring={scoring}
-                      onSuccess={fetchEliminationMatches}
-                    />
-                  )}
-                </td>
-
-                <td>
-                  <PlayerLabelContainerLeft>
-                    <PlayerNameData>
-                      {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
-                      <div>
-                        <TeamNameLabel>
-                          {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
-                        </TeamNameLabel>
-                        {Boolean(team1?.memberTeam?.length) && (
-                          <MembersList>
-                            {team1.memberTeam.map((member) => (
-                              <li key={member.memberId}>{member.name}</li>
-                            ))}
-                          </MembersList>
-                        )}
-                      </div>
-                    </PlayerNameData>
-                  </PlayerLabelContainerLeft>
-                </td>
-
-                <td>
-                  {!noData && !hasWinner ? (
-                    <InlineScoreInput>
-                      <ValidationIndicator position="left" isValid={team1?.isDifferent !== 1} />
-                      <TotalInputAsync
-                        categoryId={categoryDetailId}
-                        playerDetail={team1}
-                        disabled={hasWinner || !team1?.teamName}
-                        scoring={scoring}
-                        onSuccess={fetchEliminationMatches}
-                      />
-                    </InlineScoreInput>
-                  ) : (
-                    <NoArcherWrapper>-</NoArcherWrapper>
-                  )}
-                </td>
-
-                <td>
-                  {(!noData || (!bothAreBye && isBye)) && (
-                    <HeadToHeadScoreLabels>
-                      <ScoreTotalLabel
-                        className={classnames({
-                          "score-label-higher":
-                            team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
-                        })}
-                      >
-                        {team1?.adminTotal || 0}
-                      </ScoreTotalLabel>
-
-                      <span>&ndash;</span>
-
-                      <ScoreTotalLabel
-                        className={classnames({
-                          "score-label-higher":
-                            team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
-                        })}
-                      >
-                        {team2?.adminTotal || 0}
-                      </ScoreTotalLabel>
-                    </HeadToHeadScoreLabels>
-                  )}
-                </td>
-
-                <td>
-                  {!noData && !hasWinner ? (
-                    <InlineScoreInput>
-                      <TotalInputAsync
-                        categoryId={categoryDetailId}
-                        playerDetail={team2}
-                        disabled={hasWinner || !team2?.teamName}
-                        scoring={scoring}
-                        onSuccess={fetchEliminationMatches}
-                      />
-                      <ValidationIndicator position="right" isValid={team2?.isDifferent !== 1} />
-                    </InlineScoreInput>
-                  ) : (
-                    <NoArcherWrapper>-</NoArcherWrapper>
-                  )}
-                </td>
-
-                <td>
-                  <PlayerLabelContainerRight>
-                    <PlayerNameData>
-                      {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
-                      <div>
-                        <TeamNameLabel>
-                          {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
-                        </TeamNameLabel>
-                        {Boolean(team2?.memberTeam?.length) && (
-                          <MembersList>
-                            {team2.memberTeam.map((member) => (
-                              <li key={member.memberId}>{member.name}</li>
-                            ))}
-                          </MembersList>
-                        )}
-                      </div>
-                    </PlayerNameData>
-                  </PlayerLabelContainerRight>
-                </td>
-
-                <td>
-                  <HorizontalSpaced>
-                    {!isBye &&
-                      (!hasWinner ? (
-                        <React.Fragment>
-                          <ButtonSetWinner
-                            title={
-                              hasWinner
-                                ? "Pemenang telah ditentukan"
-                                : "Tentukan pemenang untuk match ini"
-                            }
-                            disabled={noData}
-                            categoryId={categoryDetailId}
-                            scoring={scoring}
-                            onSuccess={fetchEliminationMatches}
-                          >
-                            Tentukan
-                          </ButtonSetWinner>
-
-                          <ButtonEditScoreTeam
-                            disabled={noData}
-                            headerInfo={row}
-                            budrestNumber={budrestNumber}
-                            scoring={scoring}
-                            onSuccessSubmit={fetchEliminationMatches}
-                            categoryDetails={categoryDetails}
-                          />
-                        </React.Fragment>
-                      ) : (
-                        <React.Fragment>
-                          <ButtonCancelWinner
-                            title="Batalkan pemenang untuk mengubah skor kembali"
-                            scoring={scoring}
-                            categoryId={categoryDetailId}
-                            onSuccess={fetchEliminationMatches}
-                          />
-
-                          <ButtonEditScoreTeam
-                            disabled={noData}
-                            viewMode
-                            headerInfo={row}
-                            budrestNumber={budrestNumber}
-                            scoring={scoring}
-                            onSuccessSubmit={fetchEliminationMatches}
-                            categoryDetails={categoryDetails}
-                          />
-                        </React.Fragment>
-                      ))}
-
-                    {bothAreBye ? (
-                      <ButtonDownloadScoresheet
-                        disabled
-                        categoryId={categoryDetailId}
-                        scoring={scoring}
-                      />
-                    ) : isBye ? (
-                      <React.Fragment>
-                        <ButtonEditScoreTeam
-                          headerInfo={row}
-                          budrestNumber={budrestNumber}
-                          scoring={scoring}
-                          onSuccessSubmit={fetchEliminationMatches}
-                          categoryDetails={categoryDetails}
-                        />
-                        <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
-                      </React.Fragment>
-                    ) : (
-                      <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
-                    )}
-                  </HorizontalSpaced>
-                </td>
-              </tr>
-            );
-          })}
+          {currentRows.map((row, index) => (
+            <MatchRow
+              key={index}
+              categoryDetailId={categoryDetailId}
+              categoryDetails={categoryDetails}
+              bracket={data}
+              row={row}
+              roundNumber={roundNumber}
+              matchNumber={index + 1}
+              fetchEliminationMatches={fetchEliminationMatches}
+            />
+          ))}
         </tbody>
       </MembersTable>
     </SectionTableContainer>
@@ -321,6 +143,284 @@ function StagesTabs({ labels, currentTab, onChange }) {
         ))}
       </StageTabsList>
     </StagesBarContainer>
+  );
+}
+
+function ActionMenus({ label = "", options = [], displayAsButtonList = false }) {
+  const [isOpen, setOpen] = React.useState(false);
+
+  if (displayAsButtonList) {
+    return (
+      <ButtonList>
+        {options?.map((option, index) => (
+          <ButtonOutlineBlue key={option.value || index} tag="button" onClick={option.onClick}>
+            <DropdownTriggerWrapper>
+              <span>{option.label}</span>
+            </DropdownTriggerWrapper>
+          </ButtonOutlineBlue>
+        ))}
+      </ButtonList>
+    );
+  }
+
+  return (
+    <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>
+      <DropdownToggle tag="span">
+        <ButtonOutlineBlue>
+          <DropdownTriggerWrapper>
+            <span>{label}</span>
+            <span>
+              <IconMenu size="16" />
+            </span>
+          </DropdownTriggerWrapper>
+        </ButtonOutlineBlue>
+      </DropdownToggle>
+
+      <DropdownMenu className="dropdown-menu-end">
+        {options?.map((option, index) => (
+          <DropdownItem key={option.value || index} tag="button" onClick={option.onClick}>
+            <DropdownItemWrapper>
+              <span>{option.label}</span>
+              <span>
+                <IconDownload size="16" />
+              </span>
+            </DropdownItemWrapper>
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
+function MatchRow({
+  categoryDetailId,
+  categoryDetails,
+  row,
+  fetchEliminationMatches,
+  bracket,
+  roundNumber,
+  matchNumber,
+}) {
+  const team1 = row.teams[0];
+  const team2 = row.teams[1];
+
+  const code = `2-${bracket?.eliminationGroupId}-${matchNumber}-${roundNumber}-t`;
+
+  const scoring = {
+    code: code,
+    elimination_id: bracket?.eliminationGroupId,
+    round: roundNumber,
+    match: matchNumber,
+  };
+
+  const isBye =
+    row.teams.some((team) => team.status === "bye") ||
+    (roundNumber === 1 && row.teams.every((team) => !team.teamName));
+  const noData =
+    !team1?.teamName ||
+    !team2?.teamName ||
+    !team1?.memberTeam?.length ||
+    !team2?.memberTeam?.length;
+  const bothAreBye = row.teams.every((team) => team.status === "wait");
+  const hasWinner = row.teams.some((team) => team.win === 1);
+  const budrestNumber = _getBudrestNumber(row);
+
+  return (
+    <tr>
+      <td>
+        {isBye || noData || hasWinner ? (
+          <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
+        ) : (
+          <BudrestInputAsync
+            categoryId={categoryDetailId}
+            playerDetail={team1 || team2}
+            disabled={hasWinner || noData}
+            scoring={scoring}
+            onSuccess={fetchEliminationMatches}
+          />
+        )}
+      </td>
+
+      <td>
+        <PlayerLabelContainerLeft>
+          <PlayerNameData>
+            {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
+            <div>
+              <TeamNameLabel>
+                {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+              </TeamNameLabel>
+              {Boolean(team1?.memberTeam?.length) && (
+                <MembersList>
+                  {team1.memberTeam.map((member) => (
+                    <li key={member.memberId}>{member.name}</li>
+                  ))}
+                </MembersList>
+              )}
+            </div>
+          </PlayerNameData>
+        </PlayerLabelContainerLeft>
+      </td>
+
+      <td>
+        {!noData && !hasWinner ? (
+          <InlineScoreInput>
+            <ValidationIndicator position="left" isValid={team1?.isDifferent !== 1} />
+            <TotalInputAsync
+              categoryId={categoryDetailId}
+              playerDetail={team1}
+              disabled={hasWinner || !team1?.teamName}
+              scoring={scoring}
+              onSuccess={fetchEliminationMatches}
+            />
+          </InlineScoreInput>
+        ) : (
+          <NoArcherWrapper>-</NoArcherWrapper>
+        )}
+      </td>
+
+      <td>
+        {(!noData || (!bothAreBye && isBye)) && (
+          <HeadToHeadScoreLabels>
+            <ScoreTotalLabel
+              className={classnames({
+                "score-label-higher":
+                  team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
+              })}
+            >
+              {team1?.adminTotal || 0}
+            </ScoreTotalLabel>
+
+            <span>&ndash;</span>
+
+            <ScoreTotalLabel
+              className={classnames({
+                "score-label-higher":
+                  team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
+              })}
+            >
+              {team2?.adminTotal || 0}
+            </ScoreTotalLabel>
+          </HeadToHeadScoreLabels>
+        )}
+      </td>
+
+      <td>
+        {!noData && !hasWinner ? (
+          <InlineScoreInput>
+            <TotalInputAsync
+              categoryId={categoryDetailId}
+              playerDetail={team2}
+              disabled={hasWinner || !team2?.teamName}
+              scoring={scoring}
+              onSuccess={fetchEliminationMatches}
+            />
+            <ValidationIndicator position="right" isValid={team2?.isDifferent !== 1} />
+          </InlineScoreInput>
+        ) : (
+          <NoArcherWrapper>-</NoArcherWrapper>
+        )}
+      </td>
+
+      <td>
+        <PlayerLabelContainerRight>
+          <PlayerNameData>
+            {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
+            <div>
+              <TeamNameLabel>
+                {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+              </TeamNameLabel>
+              {Boolean(team2?.memberTeam?.length) && (
+                <MembersList>
+                  {team2.memberTeam.map((member) => (
+                    <li key={member.memberId}>{member.name}</li>
+                  ))}
+                </MembersList>
+              )}
+            </div>
+          </PlayerNameData>
+        </PlayerLabelContainerRight>
+      </td>
+
+      <td>
+        {isBye || noData || hasWinner ? (
+          <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
+        ) : (
+          <BudrestInputAsync
+            categoryId={categoryDetailId}
+            playerDetail={team1 || team2}
+            disabled={hasWinner || noData}
+            scoring={scoring}
+            onSuccess={fetchEliminationMatches}
+          />
+        )}
+      </td>
+
+      <td>
+        <HorizontalSpaced>
+          {!isBye &&
+            (!hasWinner ? (
+              <React.Fragment>
+                <ButtonSetWinner
+                  title={
+                    hasWinner ? "Pemenang telah ditentukan" : "Tentukan pemenang untuk match ini"
+                  }
+                  disabled={noData}
+                  categoryId={categoryDetailId}
+                  scoring={scoring}
+                  onSuccess={fetchEliminationMatches}
+                >
+                  Tentukan
+                </ButtonSetWinner>
+
+                <ButtonEditScoreTeam
+                  disabled={noData}
+                  headerInfo={row}
+                  budrestNumber={budrestNumber}
+                  scoring={scoring}
+                  onSuccessSubmit={fetchEliminationMatches}
+                  categoryDetails={categoryDetails}
+                />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <ButtonCancelWinner
+                  title="Batalkan pemenang untuk mengubah skor kembali"
+                  scoring={scoring}
+                  categoryId={categoryDetailId}
+                  onSuccess={fetchEliminationMatches}
+                />
+
+                <ButtonEditScoreTeam
+                  disabled={noData}
+                  viewMode
+                  headerInfo={row}
+                  budrestNumber={budrestNumber}
+                  scoring={scoring}
+                  onSuccessSubmit={fetchEliminationMatches}
+                  categoryDetails={categoryDetails}
+                />
+              </React.Fragment>
+            ))}
+
+          {bothAreBye ? (
+            <ButtonDownloadScoresheet disabled categoryId={categoryDetailId} scoring={scoring} />
+          ) : isBye ? (
+            <React.Fragment>
+              <ButtonEditScoreTeam
+                headerInfo={row}
+                budrestNumber={budrestNumber}
+                scoring={scoring}
+                onSuccessSubmit={fetchEliminationMatches}
+                categoryDetails={categoryDetails}
+              />
+              <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
+            </React.Fragment>
+          ) : (
+            <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
+          )}
+        </HorizontalSpaced>
+      </td>
+    </tr>
   );
 }
 
@@ -361,6 +461,58 @@ function ValidationIndicator({ position, isValid }) {
 
 const SectionTableContainer = styled.section`
   background-color: #ffffff;
+`;
+
+const TableViewToolbar = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+
+  > *:nth-child(2) {
+    flex-shrink: 0;
+    padding: 0 1.5rem;
+  }
+`;
+
+const ButtonList = styled.div`
+  > * + * {
+    margin-left: 0.5rem;
+  }
+`;
+
+const DropdownTriggerWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+  > *:nth-child(2) {
+    flex-shrink: 0;
+  }
+`;
+
+const DropdownItemWrapper = styled.div`
+  min-width: 10rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+  > *:nth-child(2) {
+    flex-shrink: 0;
+    color: var(--ma-blue);
+  }
 `;
 
 const ThTotal = styled.th`
@@ -533,6 +685,10 @@ const MembersTable = styled.table`
   td {
     cursor: auto;
   }
+`;
+
+const BudrestColumnIconWrapper = styled.span`
+  color: var(--ma-red);
 `;
 
 const PlayerLabelContainerLeft = styled.div`

@@ -47,7 +47,7 @@ function SettingsClubsRanking({ eventDetail }) {
     [rankingSettings, optionsCategories, optionsCountingTypes]
   );
 
-  const { isDirty, data, errors, updateField, setType, handleValidation } =
+  const { data, isDirty, errors, updateField, setType, handleValidation } =
     useFormRankingSetting(initialValues);
   const { type, rankingName, categories, medalCountingType } = data;
 
@@ -276,7 +276,7 @@ function _makeFormInitialValues(rankingSettings, { optionsCategories, optionsCou
 
   return {
     type: rankingSettings.type || 1,
-    rankingName: rankingSettings.rankingName || "",
+    rankingName: rankingSettings.groupCategoryName || "",
     categories: _checkCategoriesValue(optionsCategories, rankingSettings.listCategory) || [],
     medalCountingType:
       optionsCountingTypes.find((option) => option.value === rankingSettings.rulesRatingClub) ||

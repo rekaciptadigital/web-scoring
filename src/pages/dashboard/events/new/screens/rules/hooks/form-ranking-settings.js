@@ -8,7 +8,7 @@ function useFormRankingSetting(
     medalCountingType: null,
   }
 ) {
-  const reservedInitialValues = React.useRef(initialValues);
+  const reservedInitialValues = React.useRef({ [initialValues.type]: initialValues });
   const [state, dispatch] = React.useReducer(
     (state, action) => {
       if (action.type === "INIT") {
@@ -28,9 +28,10 @@ function useFormRankingSetting(
           data: {
             ...state.data,
             type: action.payload,
-            rankingName: reservedInitialValues.current.rankingName,
-            categories: reservedInitialValues.current.categories,
-            medalCountingType: reservedInitialValues.current.medalCountingType,
+            rankingName: reservedInitialValues.current[action.payload]?.rankingName || "",
+            categories: reservedInitialValues.current[action.payload]?.categories || [],
+            medalCountingType:
+              reservedInitialValues.current[action.payload]?.medalCountingType || null,
           },
         };
       }
@@ -51,7 +52,7 @@ function useFormRankingSetting(
     if (!initialValues) {
       return;
     }
-    reservedInitialValues.current = initialValues;
+    reservedInitialValues.current = { [initialValues.type]: initialValues };
     dispatch({ type: "INIT", payload: initialValues });
   }, [initialValues]);
 
@@ -70,6 +71,15 @@ function useFormRankingSetting(
   };
 
   const setType = (value) => {
+    reservedInitialValues.current = {
+      ...reservedInitialValues.current,
+      [value]: {
+        type: value === 1 ? "" : value,
+        rankingName: reservedInitialValues.current[value]?.rankingName || "",
+        categories: reservedInitialValues.current[value]?.categories || [],
+        medalCountingType: reservedInitialValues.current[value]?.medalCountingType || null,
+      },
+    };
     dispatch({ type: "CHANGE_RANKING_TYPE", payload: value });
   };
 
@@ -108,19 +118,28 @@ function useFormRankingSetting(
 }
 
 function _checkFormDirty(initialValues, data) {
-  if (initialValues.rankingName !== data.rankingName) {
+  const initialValuesByType = initialValues[data.type];
+  if (!initialValuesByType) {
+    return false;
+  }
+
+  if (data.type === 1 && initialValuesByType.type !== data.type) {
     return true;
   }
 
-  if (initialValues.medalCountingType?.value !== data.medalCountingType?.value) {
+  if (initialValuesByType.rankingName !== data.rankingName) {
     return true;
   }
 
-  if (initialValues.categories.length !== data.categories.length) {
+  if (initialValuesByType.medalCountingType?.value !== data.medalCountingType?.value) {
     return true;
   }
 
-  const sortedCategoriesInitial = initialValues.categories.map((c) => c.value).sort();
+  if (initialValuesByType.categories.length !== data.categories.length) {
+    return true;
+  }
+
+  const sortedCategoriesInitial = initialValuesByType.categories.map((c) => c.value).sort();
   const sortedCategories = data.categories.map((c) => c.value).sort();
   if (sortedCategories.some((value, index) => value !== sortedCategoriesInitial[index])) {
     return true;

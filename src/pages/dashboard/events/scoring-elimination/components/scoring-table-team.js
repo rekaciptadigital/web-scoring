@@ -651,12 +651,12 @@ function _getBudrestNumber(row) {
 }
 
 function _getTotalLabel(categoryDetails) {
-  if (!categoryDetails?.originalCategoryDetail?.competitionCategoryId) {
+  if (!categoryDetails?.competitionCategoryId) {
     return "Total";
   }
   const TYPE_POINT = "Total Set Poin";
   const TYPE_ACCUMULATION = "Total Skor";
-  return categoryDetails.originalCategoryDetail.competitionCategoryId.toLowerCase() === "compound"
+  return categoryDetails.competitionCategoryId.toLowerCase() === "compound"
     ? TYPE_ACCUMULATION
     : TYPE_POINT;
 }

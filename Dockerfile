@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.9
+FROM node:lts-alpine3.14
 
 RUN apk update
 RUN apk add git

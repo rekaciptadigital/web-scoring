@@ -22,7 +22,7 @@ function ContentLayoutWrapper({
       {before}
 
       <StyledPageWrapper>
-        <Container fluid>
+        <Container>
           <BreadcrumbDashboard to={breadcrumbLink || "#"}>
             {breadcrumbText || ""}
           </BreadcrumbDashboard>

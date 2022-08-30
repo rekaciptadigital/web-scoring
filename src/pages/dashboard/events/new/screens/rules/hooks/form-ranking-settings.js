@@ -11,6 +11,10 @@ function useFormRankingSetting(
   const reservedInitialValues = React.useRef(initialValues);
   const [state, dispatch] = React.useReducer(
     (state, action) => {
+      if (action.type === "INIT") {
+        return { ...state, data: action.payload, errors: {} };
+      }
+
       if (action.type === "CHANGE_FIELD") {
         return { ...state, data: { ...state.data, [action.field]: action.payload } };
       }
@@ -42,6 +46,14 @@ function useFormRankingSetting(
       errors: {},
     }
   );
+
+  React.useEffect(() => {
+    if (!initialValues) {
+      return;
+    }
+    reservedInitialValues.current = initialValues;
+    dispatch({ type: "INIT", payload: initialValues });
+  }, [initialValues]);
 
   const isDirty = React.useMemo(
     () => _checkFormDirty(reservedInitialValues.current, state.data),

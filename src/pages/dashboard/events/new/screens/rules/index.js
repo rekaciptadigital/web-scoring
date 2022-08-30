@@ -47,7 +47,7 @@ function SettingsClubsRanking({ eventDetail }) {
     [rankingSettings, optionsCategories, optionsCountingTypes]
   );
 
-  const { data, isDirty, errors, updateField, setType, handleValidation } =
+  const { data, errors, updateField, setType, handleValidation } =
     useFormRankingSetting(initialValues);
   const { type, rankingName, categories, medalCountingType } = data;
 
@@ -144,8 +144,6 @@ function SettingsClubsRanking({ eventDetail }) {
             <div>
               <BottomActions>
                 <ButtonBlue
-                  title={!isDirty && "Ubah pengaturan untuk menyimpan"}
-                  disabled={!isDirty}
                   onClick={() =>
                     handleValidation({
                       onInvalid: (errors) => {

@@ -243,26 +243,17 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                         </React.Fragment>
                       ))}
 
-                    {bothAreBye ? (
-                      <ButtonDownloadScoresheet
-                        disabled
-                        categoryId={categoryDetailId}
+                    {isBye && (
+                      <ButtonEditScoreLine
+                        headerInfo={row}
+                        budrestNumber={budrestNumber}
                         scoring={scoring}
+                        onSuccessSubmit={fetchEliminationMatches}
+                        categoryDetails={categoryDetails}
                       />
-                    ) : isBye ? (
-                      <React.Fragment>
-                        <ButtonEditScoreLine
-                          headerInfo={row}
-                          budrestNumber={budrestNumber}
-                          scoring={scoring}
-                          onSuccessSubmit={fetchEliminationMatches}
-                          categoryDetails={categoryDetails}
-                        />
-                        <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
-                      </React.Fragment>
-                    ) : (
-                      <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
                     )}
+
+                    <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
                   </HorizontalSpaced>
                 </td>
               </tr>

@@ -1,6 +1,5 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
 import { useTeamMembers } from "./hooks/team-members";
 import { useSubmitTeamMember } from "./hooks/submit-member";
 
@@ -14,7 +13,7 @@ import IconX from "components/ma/icons/mono/x";
 
 import { misc } from "utils";
 
-function EditMember({ teamName, teamMember, onSuccess }) {
+function EditMember({ categoryId, teamName, teamMember, onSuccess }) {
   const [isOpen, setOpen] = React.useState(false);
   return (
     <React.Fragment>
@@ -23,6 +22,7 @@ function EditMember({ teamName, teamMember, onSuccess }) {
       </ButtonEditMember>
       {isOpen && (
         <ModalEditor
+          categoryId={categoryId}
           teamName={teamName}
           teamMember={teamMember}
           toggle={() => setOpen((open) => !open)}
@@ -34,18 +34,26 @@ function EditMember({ teamName, teamMember, onSuccess }) {
   );
 }
 
-function ModalEditor({ teamName, teamMember, onClose, toggle, onSuccess }) {
-  const { event_id } = useParams();
-  const eventId = parseInt(event_id);
-  const { data: teamMembers, isLoading } = useTeamMembers(eventId);
+function ModalEditor({ categoryId, teamName, teamMember, onClose, toggle, onSuccess }) {
+  const { data: teamMembers, isLoading } = useTeamMembers({
+    categoryId,
+    participantId: teamMember.participantId,
+  });
+
   const [member, setMember] = React.useState(null);
   const [formErrors, setFormErrors] = React.useState({});
+
   const {
     submit,
     isLoading: isLoadingSubmit,
     isError: isErrorSubmit,
     errors: errorsSubmit,
-  } = useSubmitTeamMember({ member });
+  } = useSubmitTeamMember({
+    memberId: teamMember.id,
+    targetMemberId: member?.value,
+    participantId: teamMember.participantId,
+    categoryId: categoryId,
+  });
 
   const handleValidation = ({ onValid, onInvalid }) => {
     const errors = {};
@@ -61,7 +69,7 @@ function ModalEditor({ teamName, teamMember, onClose, toggle, onSuccess }) {
     }
   };
 
-  const options = [{ value: 1, label: "Sang Tampan dan Pemberani" }];
+  const options = React.useMemo(() => _makeOptionsMember(teamMembers), [teamMembers]);
 
   return (
     <Modal isOpen toggle={toggle} centered>
@@ -210,5 +218,19 @@ const MessageError = styled.span`
   color: var(--ma-text-negative);
   font-size: 0.625rem;
 `;
+
+/* ========================= */
+// utils
+
+function _makeOptionsMember(teamMembers) {
+  if (!teamMembers?.length) {
+    return [];
+  }
+  return teamMembers.map((member) => ({
+    value: member.memberId,
+    label: member.name,
+    data: member,
+  }));
+}
 
 export { EditMember };

@@ -60,6 +60,7 @@ function ScoringTableTeam({
                         {row.teams?.map((teamMember, index) => (
                           <MemberItem
                             key={index}
+                            categoryId={categoryDetailId}
                             teamName={row.team}
                             teamMember={teamMember}
                             isLocked={isLocked}
@@ -88,14 +89,19 @@ function ScoringTableTeam({
   );
 }
 
-function MemberItem({ teamName, teamMember, isLocked, onSuccess }) {
+function MemberItem({ categoryId, teamName, teamMember, isLocked, onSuccess }) {
   return (
     <li>
       <MemberItemWrapper>
         <span>{teamMember.name}</span>
         {isLocked && (
           <span>
-            <EditMember teamName={teamName} teamMember={teamMember} onSuccess={onSuccess} />
+            <EditMember
+              categoryId={categoryId}
+              teamName={teamName}
+              teamMember={teamMember}
+              onSuccess={onSuccess}
+            />
           </span>
         )}
       </MemberItemWrapper>

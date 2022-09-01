@@ -32,6 +32,7 @@ import PageEventOfficial from "pages/dashboard/events/official";
 import Legacy_PageEventIdCard from "pages/dashboard/events/id-card/_legacy";
 import PageEventIdCard from "pages/dashboard/events/id-card";
 import AllEvent from "pages/dashboard/events/list";
+import PageManageUser from "pages/dashboard/manage-user";
 
 const dashboardRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -80,6 +81,8 @@ const dashboardRoutes = [
   { path: "/dashboard/events/new/prepare", component: PreWizard },
   { path: "/dashboard/events/new/prepublish", component: PagePrePublish },
   { path: "/dashboard/events/new/congratulations", component: PageCongratulations },
+
+  { path: "/dashboard/manage-user", component: PageManageUser },
 
   // this route should be at the end of all other routes
   { path: "/dashboard/events/new", component: EventsNew },

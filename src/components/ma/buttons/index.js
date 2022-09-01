@@ -154,6 +154,9 @@ function ButtonSmallOutlineBlue(props) {
 function ButtonOutlineRed(props) {
   return <ButtonBase color="outline-red" {...props} />;
 }
+// function ButtonSecondaryBlue(props) {
+//   return <ButtonBase color="secondary-blue" {...props} />;
+// }
 
 const ButtonBlueOutline = styled(BSButton)`
   &,
@@ -164,6 +167,38 @@ const ButtonBlueOutline = styled(BSButton)`
     border-radius: 2rem;
     color: var(--ma-blue) !important;
     box-shadow: none;
+  }
+
+  &:hover {
+    background-color: var(--ma-blue);
+    color: #ffffff !important;
+  }
+`;
+
+const ButtonSecondaryBlue = styled(BSButton)`
+  &,
+  &:focus,
+  &:active {
+    background-color: #E7EDF6;
+    border: solid 2px var(--ma-blue);
+    border-radius: 0.5rem;
+    color: #0D47A1 !important;
+    box-shadow: none;
+  }
+
+  &:hover {
+    background-color: var(--ma-blue);
+    color: #ffffff !important;
+  }
+`;
+
+const ButtonTransparancy = styled(BSButton)`
+  &,
+  &:focus,
+  &:active {
+    background-color: #FFFFFF;
+    color: rgba(73, 80, 87, 0.54) !important;
+    border: none;
   }
 
   &:hover {
@@ -183,4 +218,6 @@ export {
   ButtonSmallBlue,
   ButtonSmallOutlineBlue,
   ButtonOutlineRed,
+  ButtonSecondaryBlue,
+  ButtonTransparancy
 };

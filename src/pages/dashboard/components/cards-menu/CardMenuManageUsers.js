@@ -110,7 +110,7 @@ function CardMenuManageUsers() {
         <p>Mengatur pengguna seperti manager event</p>
 
         <div className="float-end">
-          <Link className="menu-link" to="#">
+          <Link className="menu-link" to="/dashboard/manage-user">
             <i className="bx bx-right-arrow-alt fs-3" style={{ color: "var(--ma-blue)" }} />
           </Link>
         </div>

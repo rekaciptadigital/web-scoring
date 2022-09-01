@@ -2,7 +2,7 @@ import * as React from "react";
 import { useFetcher } from "hooks/alt-fetcher";
 import { GeneralService } from "services";
 
-function useClubRanksByEvent({ eventId, type, params }) {
+function useRankingCategories(eventId) {
   const fetcher = useFetcher();
 
   React.useEffect(() => {
@@ -11,11 +11,11 @@ function useClubRanksByEvent({ eventId, type, params }) {
     }
 
     fetcher.runAsync(() => {
-      return GeneralService.getClubRanksByEvent({ event_id: eventId, type, ...params });
+      return GeneralService.getClubRankingCategories({ event_id: eventId });
     });
-  }, [eventId, type, params]);
+  }, [eventId]);
 
   return fetcher;
 }
 
-export { useClubRanksByEvent };
+export { useRankingCategories };

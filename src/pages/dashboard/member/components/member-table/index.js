@@ -8,6 +8,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { SpinnerDotBlock, ButtonBlue, Button, ButtonOutlineBlue } from "components/ma";
 
 import logoUpdate from "assets/images/myachery/update-category.png";
+import { AlertSubmitError } from "components/ma";
 
 function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatus }) {
   const {
@@ -27,6 +28,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
   const [idParticipant, setIdParticipant] = React.useState(0);
   const [categoryId, setCategoryId] = React.useState(0);
   const [isUpdateCategory, setIsUpdateCategory] = React.useState(false);
+  const [isResponse, setResponse] = React.useState([false,""]);
 
   const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
 
@@ -45,6 +47,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
 
   const onCancel = () => {
     setIsOpenAlert(false);
+    setResponse([false,""]);
   };
 
   const onUpdateCategory = async () => {
@@ -57,6 +60,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
       setIsUpdateCategory(true);
     }
     console.info(errors);
+    setResponse([true,message])
   };
 
   const onBackToList = () => {
@@ -231,7 +235,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
                         className="px-2 py-1"
                         style={{ backgroundColor: "#AEDDC2", borderRadius: "25px" }}
                       >
-                        Sisa kuota 0 dari {catagory.quota}
+                        Sisa kuota {catagory.quota - catagory.countUserBooking}
                       </span>
                     </div>
                   </div>
@@ -267,6 +271,9 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
           </div>
         </div>
       </SweetAlert>
+
+      <AlertSubmitError isError={isResponse[0]} errors={isResponse[1]} />  
+
     </React.Fragment>
   );
 }

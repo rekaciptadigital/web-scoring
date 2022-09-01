@@ -8,6 +8,7 @@ import { useClubRanksByEvent } from "./hooks/club-ranks-by-event";
 
 import { SpinnerDotBlock } from "components/ma";
 import { PageWrapper } from "../components/dos-page-wrapper";
+import { Knobs } from "../components/toolbar-filters";
 import { PageHeader } from "../components/page-header";
 import { RankingTable } from "./components/ranking-table";
 
@@ -21,6 +22,7 @@ function PageDosMedalsByClub() {
   const eventId = parseInt(event_id);
   const { data: eventDetail } = useEventDetail(eventId);
   const { data: categories, isInitialLoading } = useRankingCategories(eventId);
+  const [activeMenu, setActivemenu] = React.useState(0);
 
   if (isInitialLoading) {
     return (
@@ -49,16 +51,36 @@ function PageDosMedalsByClub() {
   return (
     <PageWrapper {...pageProps}>
       <PageHeader eventDetail={eventDetail} subHeading={pageProps.subHeading} />
-      <VerticalSpace>
-        {categories.map((category, index) => (
-          <RankingView key={index} eventId={eventId} label={category.label} category={category} />
-        ))}
-      </VerticalSpace>
+      <CardWrapper>
+        <Content>
+          <VerticalSpace>
+            <TabsLayout>
+              <Knobs
+                label="Pemeringkatan"
+                labelIsHidden
+                knobButtonStyle={{ textTransform: "capitalize" }}
+                options={categories.map((category, index) => ({
+                  value: index,
+                  label: category.label,
+                }))}
+                activeKnobId={activeMenu}
+                onChange={setActivemenu}
+              />
+            </TabsLayout>
+
+            <RankingView
+              key={"ranking-" + activeMenu}
+              eventId={eventId}
+              category={categories[activeMenu]}
+            />
+          </VerticalSpace>
+        </Content>
+      </CardWrapper>
     </PageWrapper>
   );
 }
 
-function RankingView({ eventId, label, category }) {
+function RankingView({ eventId, category }) {
   const {
     data: clubRanks,
     isInitialLoading,
@@ -74,58 +96,53 @@ function RankingView({ eventId, label, category }) {
 
   if (isInitialLoading) {
     return (
-      <CardWrapper>
-        <Content>
-          <TabelHeading>{label}</TabelHeading>
-          <SpinnerDotBlock
-            message={
-              waitTimeIsExceeded && (
-                <p className="text-center">
-                  Menyiapkan data perolehan medali klub memakan waktu lebih lama dari biasanya.
-                  <br />
-                  Mohon tunggu sejenak...
-                </p>
-              )
-            }
-          />
-        </Content>
-      </CardWrapper>
+      <div>
+        <TabelHeading>{category.label}</TabelHeading>
+        <SpinnerDotBlock
+          message={
+            waitTimeIsExceeded && (
+              <p className="text-center">
+                Menyiapkan data perolehan medali klub memakan waktu lebih lama dari biasanya.
+                <br />
+                Mohon tunggu sejenak...
+              </p>
+            )
+          }
+        />
+      </div>
     );
   }
 
   if (!clubRanks && isErrorRanks) {
     return (
-      <CardWrapper>
-        <Content>
+      <div>
+        <TabelHeading>{category.label}</TabelHeading>
+        <div>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
             teknis lebih lanjut:
           </p>
 
           <pre>{JSON.stringify(errorsRanks)}</pre>
-        </Content>
-      </CardWrapper>
+        </div>
+      </div>
     );
   }
 
   if (!clubRanks) {
     return (
-      <CardWrapper>
-        <Content>
-          <TabelHeading>{label}</TabelHeading>
-          <div>Tidak ada data</div>
-        </Content>
-      </CardWrapper>
+      <div>
+        <TabelHeading>{category.label}</TabelHeading>
+        <div>Tidak ada data</div>
+      </div>
     );
   }
 
   return (
-    <CardWrapper>
-      <Content>
-        <TabelHeading>{label}</TabelHeading>
-        <RankingTable data={clubRanks} />
-      </Content>
-    </CardWrapper>
+    <div>
+      <TabelHeading>{category.label}</TabelHeading>
+      <RankingTable data={clubRanks} />
+    </div>
   );
 }
 
@@ -145,6 +162,16 @@ const VerticalSpace = styled.div`
 const Content = styled.div`
   padding: 1.5rem;
   background-color: #ffffff;
+`;
+
+const TabsLayout = styled.div`
+  > * {
+    display: block;
+
+    > * + * {
+      margin-top: 0.5rem;
+    }
+  }
 `;
 
 const TabelHeading = styled.h5`

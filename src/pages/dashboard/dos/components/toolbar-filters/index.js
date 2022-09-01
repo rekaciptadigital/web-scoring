@@ -106,11 +106,13 @@ function KnobsTeamCategories() {
 
 function Knobs({
   label = "Label",
+  labelIsHidden = false,
   options,
   activeKnobId,
   onChange,
   shouldDisableOption,
   shouldHideOption,
+  knobButtonStyle,
 }) {
   const getActiveClassName = (value) => {
     const isActive = value === activeKnobId;
@@ -118,7 +120,7 @@ function Knobs({
   };
   return (
     <KnobWrapper>
-      <KnobLabel>{label}:</KnobLabel>
+      {!labelIsHidden && <KnobLabel>{label}:</KnobLabel>}
       <KnobList>
         {options?.length > 0 ? (
           options
@@ -129,6 +131,7 @@ function Knobs({
               <li key={index}>
                 <ButtonKnobItem
                   className={getActiveClassName(option.value)}
+                  style={knobButtonStyle}
                   onClick={() => onChange?.(option.value)}
                   disabled={
                     typeof shouldDisableOption === "function"

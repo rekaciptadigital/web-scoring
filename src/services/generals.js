@@ -32,6 +32,14 @@ export default {
    * @param {Object} queryString { event_id }
    * @returns {Promise} { success, data, errors, message }
    */
+  getClubRankingCategories(queryString = null) {
+    return API.get("/api/general/get-list-tab-category-by-event-id", queryString);
+  },
+
+  /**
+   * @param {Object} queryString { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
   getClubRanksByEvent(qs = null) {
     return API.get("/api/event-ranked/club", qs);
   },

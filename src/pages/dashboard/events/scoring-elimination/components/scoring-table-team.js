@@ -2,20 +2,19 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
 
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
-import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
+import { SpinnerDotBlock } from "components/ma";
 import { useFilters } from "components/ma/toolbar-filters";
+import { TableViewToolbar } from "./table-view-toolbar";
+import { ScoresheetMenus } from "./scoresheet-menus";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreTeam } from "./button-edit-score-line-team";
 import { ButtonSetWinner, ButtonCancelWinner } from "./button-set-winner";
 import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 
-import IconDownload from "components/ma/icons/mono/download";
 import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
-import IconMenu from "components/ma/icons/mono/menu";
 
 import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracket.png";
 
@@ -27,10 +26,12 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
     categoryDetailId,
     eliminationMemberCounts
   );
-
   const [selectedTab, setSelectedTab] = React.useState(0);
-  const isSettled = Boolean(data) || (!data && isError);
 
+  const isSettled = Boolean(data || (!data && isError));
+  const currentRows = isSettled ? data.rounds[selectedTab]?.seeds : [];
+
+  // TODO: kapan-kapan ganti `!isSettled` jadi pakai `isInitialLoading` dari fetcher
   if (!isSettled) {
     return (
       <SectionTableContainer>
@@ -60,31 +61,25 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
     );
   }
 
-  // Happy path
-  const tabLabels = _getTabLabels(data.rounds);
-  const currentRows = data.rounds[selectedTab]?.seeds || [];
-  const roundNumber = selectedTab + 1;
-  const thTotalLabel = _getTotalLabel(categoryDetails);
-
   return (
     <SectionTableContainer>
-      <TableViewToolbar>
-        <StagesTabs
-          labels={tabLabels}
-          currentTab={selectedTab}
-          onChange={(index) => setSelectedTab(index)}
-        />
-        <div>
-          <ActionMenus
-            label="Scoresheet"
-            displayAsButtonList
-            options={[
-              { label: "Cetak Scoresheet Kosong", onClick: () => alert("download") },
-              { label: "Unduh Semua Scoresheet", onClick: () => alert("download") },
-            ]}
-          />
-        </div>
-      </TableViewToolbar>
+      <TableViewToolbar
+        rounds={data.rounds}
+        selectedTab={selectedTab}
+        onChangeTab={(index) => setSelectedTab(index)}
+        viewRight={
+          <div>
+            <ScoresheetMenus
+              label="Scoresheet"
+              displayAsButtonList
+              options={[
+                { label: "Cetak Scoresheet Kosong", onClick: () => alert("download") },
+                { label: "Unduh Semua Scoresheet", onClick: () => alert("download") },
+              ]}
+            />
+          </div>
+        }
+      />
 
       <MembersTable className="table table-responsive">
         <thead>
@@ -95,9 +90,9 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
               </BudrestColumnIconWrapper>
             </th>
             <th>Tim</th>
-            <ThTotal>{thTotalLabel}</ThTotal>
+            <ThTotal>{_getTotalLabel(categoryDetails)}</ThTotal>
             <th></th>
-            <ThTotal>{thTotalLabel}</ThTotal>
+            <ThTotal>{_getTotalLabel(categoryDetails)}</ThTotal>
             <th>Tim</th>
             <th>
               <BudrestColumnIconWrapper>
@@ -116,7 +111,7 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
               categoryDetails={categoryDetails}
               bracket={data}
               row={row}
-              roundNumber={roundNumber}
+              roundNumber={selectedTab + 1}
               matchNumber={index + 1}
               fetchEliminationMatches={fetchEliminationMatches}
             />
@@ -124,71 +119,6 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
         </tbody>
       </MembersTable>
     </SectionTableContainer>
-  );
-}
-
-function StagesTabs({ labels, currentTab, onChange }) {
-  return (
-    <StagesBarContainer>
-      <StageTabsList>
-        {labels.map((label, index) => (
-          <li key={label}>
-            <StageTabButton
-              className={classnames({ "session-tab-active": index === currentTab })}
-              onClick={() => onChange(index)}
-            >
-              <span>{label}</span>
-            </StageTabButton>
-          </li>
-        ))}
-      </StageTabsList>
-    </StagesBarContainer>
-  );
-}
-
-function ActionMenus({ label = "", options = [], displayAsButtonList = false }) {
-  const [isOpen, setOpen] = React.useState(false);
-
-  if (displayAsButtonList) {
-    return (
-      <ButtonList>
-        {options?.map((option, index) => (
-          <ButtonOutlineBlue key={option.value || index} tag="button" onClick={option.onClick}>
-            <DropdownTriggerWrapper>
-              <span>{option.label}</span>
-            </DropdownTriggerWrapper>
-          </ButtonOutlineBlue>
-        ))}
-      </ButtonList>
-    );
-  }
-
-  return (
-    <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>
-      <DropdownToggle tag="span">
-        <ButtonOutlineBlue>
-          <DropdownTriggerWrapper>
-            <span>{label}</span>
-            <span>
-              <IconMenu size="16" />
-            </span>
-          </DropdownTriggerWrapper>
-        </ButtonOutlineBlue>
-      </DropdownToggle>
-
-      <DropdownMenu className="dropdown-menu-end">
-        {options?.map((option, index) => (
-          <DropdownItem key={option.value || index} tag="button" onClick={option.onClick}>
-            <DropdownItemWrapper>
-              <span>{option.label}</span>
-              <span>
-                <IconDownload size="16" />
-              </span>
-            </DropdownItemWrapper>
-          </DropdownItem>
-        ))}
-      </DropdownMenu>
-    </Dropdown>
   );
 }
 
@@ -458,58 +388,6 @@ const SectionTableContainer = styled.section`
   background-color: #ffffff;
 `;
 
-const TableViewToolbar = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  justify-content: space-between;
-  align-items: center;
-
-  > *:nth-child(1) {
-    flex-grow: 1;
-  }
-
-  > *:nth-child(2) {
-    flex-shrink: 0;
-    padding: 0 1.5rem;
-  }
-`;
-
-const ButtonList = styled.div`
-  > * + * {
-    margin-left: 0.5rem;
-  }
-`;
-
-const DropdownTriggerWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-
-  > *:nth-child(1) {
-    flex-grow: 1;
-  }
-  > *:nth-child(2) {
-    flex-shrink: 0;
-  }
-`;
-
-const DropdownItemWrapper = styled.div`
-  min-width: 10rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-
-  > *:nth-child(1) {
-    flex-grow: 1;
-  }
-  > *:nth-child(2) {
-    flex-shrink: 0;
-    color: var(--ma-blue);
-  }
-`;
-
 const ThTotal = styled.th`
   white-space: nowrap;
 `;
@@ -593,69 +471,6 @@ const EmptyStateHeading = styled.h4`
 
 const EmptyStateDescription = styled.p`
   color: var(--ma-gray-600);
-`;
-
-const StagesBarContainer = styled.div`
-  padding: 1rem;
-`;
-
-const StageTabsList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const StageTabButton = styled.button`
-  display: block;
-  border: none;
-  padding: 0 0.5rem;
-  background-color: transparent;
-
-  min-width: 6rem;
-  color: var(--ma-gray-400);
-  font-size: 0.875rem;
-  font-weight: 600;
-
-  transition: all 0.15s;
-
-  > span {
-    display: block;
-    position: relative;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0.25rem 0;
-
-    &::before {
-      content: " ";
-      position: absolute;
-      height: 2px;
-      top: 0;
-      left: 0;
-      width: 1.5rem;
-      background-color: transparent;
-      transition: all 0.3s;
-      transform: scaleX(0);
-      transform-origin: left;
-    }
-  }
-
-  &:hover {
-    color: var(--ma-blue);
-  }
-
-  &.session-tab-active {
-    color: var(--ma-blue);
-
-    > span {
-      &::before {
-        background-color: #90aad4;
-        transform: scaleX(1);
-      }
-    }
-  }
 `;
 
 const MembersTable = styled.table`
@@ -753,34 +568,6 @@ const ScoreTotalLabel = styled.span`
 
 /* =========================== */
 // utils
-
-const tabLabels = {
-  16: "32 Besar",
-  8: "16 Besar",
-  4: "8 Besar",
-  2: "Semi-Final",
-};
-
-function _getTabLabels(bracketTemplate) {
-  if (!bracketTemplate) {
-    return [];
-  }
-
-  let finalHasTaken = false;
-  const labels = bracketTemplate.map((round) => {
-    const matchCount = round.seeds.length;
-    if (matchCount > 1) {
-      return tabLabels[matchCount];
-    }
-    if (!finalHasTaken) {
-      finalHasTaken = true;
-      return "Final";
-    }
-    return "3rd Place";
-  });
-
-  return labels;
-}
 
 function _getBudrestNumber(row) {
   if (!row?.teams?.length) {

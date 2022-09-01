@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
 
 import { SpinnerDotBlock } from "components/ma";
+import { TableViewToolbar } from "./table-view-toolbar";
+import { ScoresheetMenus } from "./scoresheet-menus";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreLine } from "./button-edit-score-line";
@@ -24,6 +26,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
 
   const [selectedTab, setSelectedTab] = React.useState(0);
   const isSettled = Boolean(data) || (!data && isError);
+  const currentRows = isSettled ? data.rounds[selectedTab]?.seeds : [];
 
   if (!isSettled) {
     return (
@@ -54,17 +57,24 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
     );
   }
 
-  // Happy path
-  const tabLabels = _getTabLabels(data.rounds);
-  const currentRows = data.rounds[selectedTab]?.seeds || [];
-  const thTotalLabel = _getTotalLabel(categoryDetails);
-
   return (
     <SectionTableContainer>
-      <StagesTabs
-        labels={tabLabels}
-        currentTab={selectedTab}
-        onChange={(index) => setSelectedTab(index)}
+      <TableViewToolbar
+        rounds={data.rounds}
+        selectedTab={selectedTab}
+        onChangeTab={(index) => setSelectedTab(index)}
+        viewRight={
+          <div>
+            <ScoresheetMenus
+              label="Scoresheet"
+              displayAsButtonList
+              options={[
+                { label: "Cetak Scoresheet Kosong", onClick: () => alert("download") },
+                { label: "Unduh Semua Scoresheet", onClick: () => alert("download") },
+              ]}
+            />
+          </div>
+        }
       />
 
       <MembersTable className="table table-responsive">
@@ -72,9 +82,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
           <tr>
             <th>Bantalan</th>
             <th>Nama Peserta</th>
-            <ThTotal>{thTotalLabel}</ThTotal>
+            <ThTotal>{_getTotalLabel(categoryDetails)}</ThTotal>
             <th></th>
-            <ThTotal>{thTotalLabel}</ThTotal>
+            <ThTotal>{_getTotalLabel(categoryDetails)}</ThTotal>
             <th>Nama Peserta</th>
             <th></th>
           </tr>
@@ -265,25 +275,6 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
   );
 }
 
-function StagesTabs({ labels, currentTab, onChange }) {
-  return (
-    <StagesBarContainer>
-      <StageTabsList>
-        {labels.map((label, index) => (
-          <li key={label}>
-            <StageTabButton
-              className={classnames({ "session-tab-active": index === currentTab })}
-              onClick={() => onChange(index)}
-            >
-              <span>{label}</span>
-            </StageTabButton>
-          </li>
-        ))}
-      </StageTabsList>
-    </StagesBarContainer>
-  );
-}
-
 function NoArcherLabel({ isBye }) {
   if (isBye) {
     return <NoArcherWrapper>&#171; bye &#187;</NoArcherWrapper>;
@@ -408,69 +399,6 @@ const EmptyStateDescription = styled.p`
   color: var(--ma-gray-600);
 `;
 
-const StagesBarContainer = styled.div`
-  padding: 1rem;
-`;
-
-const StageTabsList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const StageTabButton = styled.button`
-  display: block;
-  border: none;
-  padding: 0 0.5rem;
-  background-color: transparent;
-
-  min-width: 6rem;
-  color: var(--ma-gray-400);
-  font-size: 0.875rem;
-  font-weight: 600;
-
-  transition: all 0.15s;
-
-  > span {
-    display: block;
-    position: relative;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0.25rem 0;
-
-    &::before {
-      content: " ";
-      position: absolute;
-      height: 2px;
-      top: 0;
-      left: 0;
-      width: 1.5rem;
-      background-color: transparent;
-      transition: all 0.3s;
-      transform: scaleX(0);
-      transform-origin: left;
-    }
-  }
-
-  &:hover {
-    color: var(--ma-blue);
-  }
-
-  &.session-tab-active {
-    color: var(--ma-blue);
-
-    > span {
-      &::before {
-        background-color: #90aad4;
-        transform: scaleX(1);
-      }
-    }
-  }
-`;
-
 const MembersTable = styled.table`
   --indicator-space-margin: 3rem;
   text-align: center;
@@ -553,34 +481,6 @@ const ScoreTotalLabel = styled.span`
 
 /* =========================== */
 // utils
-
-const tabLabels = {
-  16: "32 Besar",
-  8: "16 Besar",
-  4: "8 Besar",
-  2: "Semi-Final",
-};
-
-function _getTabLabels(bracketTemplate) {
-  if (!bracketTemplate) {
-    return [];
-  }
-
-  let finalHasTaken = false;
-  const labels = bracketTemplate.map((round) => {
-    const matchCount = round.seeds.length;
-    if (matchCount > 1) {
-      return tabLabels[matchCount];
-    }
-    if (!finalHasTaken) {
-      finalHasTaken = true;
-      return "Final";
-    }
-    return "3rd Place";
-  });
-
-  return labels;
-}
 
 function _getBudrestNumber(row) {
   if (!row?.teams?.length) {

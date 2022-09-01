@@ -13,7 +13,7 @@ import IconX from "components/ma/icons/mono/x";
 
 import { misc } from "utils";
 
-function EditMember({ categoryId, teamName, teamMember, onSuccess }) {
+function EditMember({ categoryId, participantId, teamName, teamMember, onSuccess }) {
   const [isOpen, setOpen] = React.useState(false);
   return (
     <React.Fragment>
@@ -23,6 +23,7 @@ function EditMember({ categoryId, teamName, teamMember, onSuccess }) {
       {isOpen && (
         <ModalEditor
           categoryId={categoryId}
+          participantId={participantId}
           teamName={teamName}
           teamMember={teamMember}
           toggle={() => setOpen((open) => !open)}
@@ -34,10 +35,10 @@ function EditMember({ categoryId, teamName, teamMember, onSuccess }) {
   );
 }
 
-function ModalEditor({ categoryId, teamName, teamMember, onClose, toggle, onSuccess }) {
+function ModalEditor({ categoryId, participantId,teamName, teamMember, onClose, toggle, onSuccess }) {
   const { data: teamMembers, isLoading } = useTeamMembers({
     categoryId,
-    participantId: teamMember.participantId,
+    participantId: participantId,
   });
 
   const [member, setMember] = React.useState(null);
@@ -51,7 +52,7 @@ function ModalEditor({ categoryId, teamName, teamMember, onClose, toggle, onSucc
   } = useSubmitTeamMember({
     memberId: teamMember.id,
     targetMemberId: member?.value,
-    participantId: teamMember.participantId,
+    participantId: participantId,
     categoryId: categoryId,
   });
 

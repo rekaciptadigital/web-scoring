@@ -58,9 +58,11 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
     if (message === "Success") {
       console.log("Update success");
       setIsUpdateCategory(true);
+      setResponse([false,''])
+    }else{
+      setResponse([true,message])
     }
     console.info(errors);
-    setResponse([true,message])
   };
 
   const onBackToList = () => {

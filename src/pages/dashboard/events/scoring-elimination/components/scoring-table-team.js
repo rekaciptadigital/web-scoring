@@ -402,22 +402,17 @@ function MatchRow({
               </React.Fragment>
             ))}
 
-          {bothAreBye ? (
-            <ButtonDownloadScoresheet disabled categoryId={categoryDetailId} scoring={scoring} />
-          ) : isBye ? (
-            <React.Fragment>
-              <ButtonEditScoreTeam
-                headerInfo={row}
-                budrestNumber={budrestNumber}
-                scoring={scoring}
-                onSuccessSubmit={fetchEliminationMatches}
-                categoryDetails={categoryDetails}
-              />
-              <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
-            </React.Fragment>
-          ) : (
-            <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
+          {isBye && (
+            <ButtonEditScoreTeam
+              headerInfo={row}
+              budrestNumber={budrestNumber}
+              scoring={scoring}
+              onSuccessSubmit={fetchEliminationMatches}
+              categoryDetails={categoryDetails}
+            />
           )}
+
+          <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
         </HorizontalSpaced>
       </td>
     </tr>

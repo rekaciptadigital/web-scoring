@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
+import { useDownloadBlankScoresheet } from "../hooks/download-blank-scoresheet";
 import { useDownloadScoresheetByRound } from "../hooks/download-scoresheet-by-round";
 
 import { SpinnerDotBlock } from "components/ma";
@@ -21,7 +22,6 @@ import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracket.png";
 
 import classnames from "classnames";
-import { misc } from "utils";
 
 function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
   const { categoryDetail: categoryDetails } = useFilters();
@@ -41,11 +41,7 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
     round: roundNumber,
   });
 
-  // mock
-  const downloadBlank = async ({ onSuccess }) => {
-    await misc.sleep(750);
-    onSuccess?.();
-  };
+  const { download: downloadBlank } = useDownloadBlankScoresheet({ categoryId: categoryDetailId });
 
   // TODO: kapan-kapan ganti `!isSettled` jadi pakai `isInitialLoading` dari fetcher
   if (!isSettled) {
@@ -96,7 +92,11 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
                     downloadBlank({
                       onSuccess: () => {
                         toast.dismiss();
-                        toast.success("TEST: Unduhan dimulai");
+                        toast.success("Unduhan dimulai");
+                      },
+                      onError: () => {
+                        toast.dismiss();
+                        toast.error("Gagal memulai unduhan");
                       },
                     });
                   },
@@ -109,6 +109,10 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
                       onSuccess: () => {
                         toast.dismiss();
                         toast.success("Unduhan dimulai");
+                      },
+                      onError: () => {
+                        toast.dismiss();
+                        toast.error("Gagal memulai unduhan");
                       },
                     });
                   },

@@ -279,6 +279,7 @@ function PageEventScoringQualification() {
             <ScoringTableTeam
               key={_makeTableKeyByCategory(activeCategoryDetail)}
               categoryDetailId={activeCategoryDetail?.categoryDetailId}
+              isLocked={Boolean(!activeCategoryDetail || activeCategoryDetail?.eliminationLock)}
               searchName={inputSearchQuery}
               onChangeParticipantPresence={resetOnChangeCategory}
               eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}
@@ -287,7 +288,7 @@ function PageEventScoringQualification() {
             <ScoringTable
               key={_makeTableKeyByCategory(activeCategoryDetail)}
               categoryDetailId={activeCategoryDetail?.categoryDetailId}
-              isLocked={!activeCategoryDetail || activeCategoryDetail?.eliminationLock}
+              isLocked={Boolean(!activeCategoryDetail || activeCategoryDetail?.eliminationLock)}
               searchName={inputSearchQuery}
               onChangeParticipantPresence={resetOnChangeCategory}
               eliminationParticipantsCount={activeCategoryDetail?.defaultEliminationCount}

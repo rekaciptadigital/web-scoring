@@ -3,13 +3,20 @@ import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
 
 import { SpinnerDotBlock } from "components/ma";
+import { EditMember } from "./edit-member";
 
-function ScoringTableTeam({ categoryDetailId, eliminationParticipantsCount, searchName }) {
+function ScoringTableTeam({
+  categoryDetailId,
+  isLocked,
+  eliminationParticipantsCount,
+  searchName,
+}) {
   // TODO: refaktor param jadi objek konfig
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
+    fetchScoringMembers,
   } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, true); // isTeam === true
 
   const isSettledScoringMembers =
@@ -34,8 +41,8 @@ function ScoringTableTeam({ categoryDetailId, eliminationParticipantsCount, sear
               <th className="name">Nama Tim</th>
               <th className="name">Klub</th>
               <th className="stats">Total</th>
-              <th className="stats">X</th>
               <th className="stats">X+10</th>
+              <th className="stats">X</th>
               <th></th>
             </tr>
           </thead>
@@ -51,7 +58,15 @@ function ScoringTableTeam({ categoryDetailId, eliminationParticipantsCount, sear
                     {row.teams?.length ? (
                       <MembersList>
                         {row.teams?.map((teamMember, index) => (
-                          <li key={index}>{teamMember.name}</li>
+                          <MemberItem
+                            key={index}
+                            participantId={row.participantId}
+                            categoryId={categoryDetailId}
+                            teamName={row.team}
+                            teamMember={teamMember}
+                            isLocked={isLocked}
+                            onSuccess={fetchScoringMembers}
+                          />
                         ))}
                       </MembersList>
                     ) : (
@@ -64,14 +79,35 @@ function ScoringTableTeam({ categoryDetailId, eliminationParticipantsCount, sear
                   <ClubName>{row.clubName || "Club On"}</ClubName>
                 </td>
                 <td className="stats">{row.total || 0}</td>
-                <td className="stats">{row.totalX || 0}</td>
                 <td className="stats">{row.totalXPlusTen || 0}</td>
+                <td className="stats">{row.totalX || 0}</td>
               </tr>
             ))}
           </tbody>
         </MembersTable>
       </div>
     </TableContainer>
+  );
+}
+
+function MemberItem({ participantId, categoryId, teamName, teamMember, isLocked, onSuccess }) {
+  return (
+    <li>
+      <MemberItemWrapper>
+        <span>{teamMember.name}</span>
+        {isLocked && (
+          <span>
+            <EditMember
+              participantId={participantId}
+              categoryId={categoryId}
+              teamName={teamName}
+              teamMember={teamMember}
+              onSuccess={onSuccess}
+            />
+          </span>
+        )}
+      </MemberItemWrapper>
+    </li>
   );
 }
 
@@ -175,6 +211,11 @@ const MembersList = styled.ol`
   padding-left: 1rem;
   text-align: left;
   font-size: 0.625rem;
+`;
+
+const MemberItemWrapper = styled.div`
+  display: flex;
+  gap: 0.25rem;
 `;
 
 const LoadingContainer = styled.div`

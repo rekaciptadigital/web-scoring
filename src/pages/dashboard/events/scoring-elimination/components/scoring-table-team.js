@@ -1,8 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
+import { useDownloadScoresheetByRound } from "../hooks/download-scoresheet-by-round";
 
 import { SpinnerDotBlock } from "components/ma";
+import { toast } from "components/ma/processing-toast";
 import { useFilters } from "components/ma/toolbar-filters";
 import { TableViewToolbar } from "./table-view-toolbar";
 import { ScoresheetMenus } from "./scoresheet-menus";
@@ -19,6 +21,7 @@ import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracket.png";
 
 import classnames from "classnames";
+import { misc } from "utils";
 
 function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
   const { categoryDetail: categoryDetails } = useFilters();
@@ -30,6 +33,19 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
 
   const isSettled = Boolean(data || (!data && isError));
   const currentRows = isSettled ? data.rounds[selectedTab]?.seeds : [];
+  const roundNumber = selectedTab + 1;
+
+  const { download: downloadByRound } = useDownloadScoresheetByRound({
+    categoryId: categoryDetailId,
+    eliminationId: data?.eliminationGroupId,
+    round: roundNumber,
+  });
+
+  // mock
+  const downloadBlank = async ({ onSuccess }) => {
+    await misc.sleep(750);
+    onSuccess?.();
+  };
 
   // TODO: kapan-kapan ganti `!isSettled` jadi pakai `isInitialLoading` dari fetcher
   if (!isSettled) {
@@ -73,8 +89,30 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
               label="Scoresheet"
               displayAsButtonList
               options={[
-                { label: "Cetak Scoresheet Kosong", onClick: () => alert("download") },
-                { label: "Unduh Semua Scoresheet", onClick: () => alert("download") },
+                {
+                  label: "Cetak Scoresheet Kosong",
+                  onClick: () => {
+                    toast.loading("Sedang menyiapkan file scoresheet...");
+                    downloadBlank({
+                      onSuccess: () => {
+                        toast.dismiss();
+                        toast.success("TEST: Unduhan dimulai");
+                      },
+                    });
+                  },
+                },
+                {
+                  label: "Unduh Semua Scoresheet",
+                  onClick: () => {
+                    toast.loading("Sedang menyiapkan file scoresheet...");
+                    downloadByRound({
+                      onSuccess: () => {
+                        toast.dismiss();
+                        toast.success("Unduhan dimulai");
+                      },
+                    });
+                  },
+                },
               ]}
             />
           </div>
@@ -111,7 +149,7 @@ function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
               categoryDetails={categoryDetails}
               bracket={data}
               row={row}
-              roundNumber={selectedTab + 1}
+              roundNumber={roundNumber}
               matchNumber={index + 1}
               fetchEliminationMatches={fetchEliminationMatches}
             />

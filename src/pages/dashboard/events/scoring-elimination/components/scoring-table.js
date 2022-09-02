@@ -1,8 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
+import { useDownloadScoresheetByRound } from "../hooks/download-scoresheet-by-round";
 
 import { SpinnerDotBlock } from "components/ma";
+import { toast } from "components/ma/processing-toast";
 import { TableViewToolbar } from "./table-view-toolbar";
 import { ScoresheetMenus } from "./scoresheet-menus";
 import { BudrestInputAsync } from "./table-budrest-input-async";
@@ -18,6 +20,7 @@ import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracket.png";
 
 import classnames from "classnames";
+import { misc } from "utils";
 
 function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
   const { isError, data, fetchEliminationMatches } = useEliminationMatches(
@@ -28,6 +31,19 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
   const [selectedTab, setSelectedTab] = React.useState(0);
   const isSettled = Boolean(data) || (!data && isError);
   const currentRows = isSettled ? data.rounds[selectedTab]?.seeds : [];
+  const roundNumber = selectedTab + 1;
+
+  const { download: downloadByRound } = useDownloadScoresheetByRound({
+    categoryId: categoryDetailId,
+    eliminationId: data?.eliminationId,
+    round: roundNumber,
+  });
+
+  // mock
+  const downloadBlank = async ({ onSuccess }) => {
+    await misc.sleep(750);
+    onSuccess?.();
+  };
 
   if (!isSettled) {
     return (
@@ -70,8 +86,30 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               label="Scoresheet"
               displayAsButtonList
               options={[
-                { label: "Cetak Scoresheet Kosong", onClick: () => alert("download") },
-                { label: "Unduh Semua Scoresheet", onClick: () => alert("download") },
+                {
+                  label: "Cetak Scoresheet Kosong",
+                  onClick: () => {
+                    toast.loading("Sedang menyiapkan file scoresheet...");
+                    downloadBlank({
+                      onSuccess: () => {
+                        toast.dismiss();
+                        toast.success("TEST: Unduhan dimulai");
+                      },
+                    });
+                  },
+                },
+                {
+                  label: "Unduh Semua Scoresheet",
+                  onClick: () => {
+                    toast.loading("Sedang menyiapkan file scoresheet...");
+                    downloadByRound({
+                      onSuccess: () => {
+                        toast.dismiss();
+                        toast.success("Unduhan dimulai");
+                      },
+                    });
+                  },
+                },
               ]}
             />
           </div>
@@ -108,7 +146,7 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               categoryDetails={categoryDetails}
               bracket={data}
               row={row}
-              roundNumber={selectedTab + 1}
+              roundNumber={roundNumber}
               matchNumber={index + 1}
               fetchEliminationMatches={fetchEliminationMatches}
             />

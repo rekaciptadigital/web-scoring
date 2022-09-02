@@ -81,8 +81,8 @@ function SessionStatsColumnHeadingGroup({ sessionList }) {
     return (
       <React.Fragment>
         <th className="stats">Total</th>
-        <th className="stats">X</th>
         <th className="stats">X+10</th>
+        <th className="stats">X</th>
       </React.Fragment>
     );
   }
@@ -90,8 +90,8 @@ function SessionStatsColumnHeadingGroup({ sessionList }) {
   return (
     <React.Fragment>
       <th className="stats">Total</th>
-      <th className="stats">X</th>
       <th className="stats">X+10</th>
+      <th className="stats">X</th>
     </React.Fragment>
   );
 }
@@ -101,8 +101,8 @@ function SessionStatsCellsGroup({ sessions, sessionNumbersList, total, totalX, t
     return (
       <React.Fragment>
         <td className="stats">{total}</td>
-        <td className="stats">{totalX}</td>
         <td className="stats">{totalXPlusTen}</td>
+        <td className="stats">{totalX}</td>
       </React.Fragment>
     );
   }
@@ -115,8 +115,8 @@ function SessionStatsCellsGroup({ sessions, sessionNumbersList, total, totalX, t
         </td>
       ))}
       <td className="stats">{total}</td>
-      <td className="stats">{totalX}</td>
       <td className="stats">{totalXPlusTen}</td>
+      <td className="stats">{totalX}</td>
     </React.Fragment>
   );
 }

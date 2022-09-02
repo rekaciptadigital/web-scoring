@@ -76,8 +76,8 @@ function ScoringTable() {
                 <th className="text-uppercase">Klub</th>
                 <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
                 {sessionNumber === 0 && <th className="text-uppercase">Total</th>}
-                <th className="text-uppercase">X</th>
                 <th className="text-uppercase">X+10</th>
+                <th className="text-uppercase">X</th>
               </tr>
             </thead>
 
@@ -128,8 +128,8 @@ function ScoringTable() {
                 <th className="text-uppercase">Klub</th>
                 <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
                 <th className="text-uppercase">Total</th>
-                <th className="text-uppercase">X</th>
                 <th className="text-uppercase">X+10</th>
+                <th className="text-uppercase">X</th>
               </tr>
             </thead>
 
@@ -166,8 +166,8 @@ function ScoringTable() {
 
                     <td>{scoring.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
                     <td>{scoring.total}</td>
-                    <td>{scoring.totalX}</td>
                     <td>{scoring.totalXPlusTen}</td>
+                    <td>{scoring.totalX}</td>
                   </tr>
                 ))
               )}

@@ -41,8 +41,8 @@ function ScoringTableTeam({
               <th className="name">Nama Tim</th>
               <th className="name">Klub</th>
               <th className="stats">Total</th>
-              <th className="stats">X</th>
               <th className="stats">X+10</th>
+              <th className="stats">X</th>
               <th></th>
             </tr>
           </thead>
@@ -79,8 +79,8 @@ function ScoringTableTeam({
                   <ClubName>{row.clubName || "Club On"}</ClubName>
                 </td>
                 <td className="stats">{row.total || 0}</td>
-                <td className="stats">{row.totalX || 0}</td>
                 <td className="stats">{row.totalXPlusTen || 0}</td>
+                <td className="stats">{row.totalX || 0}</td>
               </tr>
             ))}
           </tbody>

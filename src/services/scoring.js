@@ -20,6 +20,14 @@ export default {
   },
 
   /**
+   * @param {Object} queryString { category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getBlankScoresheetEliminationUrl(qs) {
+    return API.get("/web/v1/archery-score-sheet/download-empty-score-sheet-elimination", qs);
+  },
+
+  /**
    * @param {Object} queryString { event_elimination_id, round, category_id }
    * @returns {Promise} { success, data, errors, message }
    */

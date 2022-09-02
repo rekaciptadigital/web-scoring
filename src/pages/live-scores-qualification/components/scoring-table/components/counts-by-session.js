@@ -17,8 +17,8 @@ function CountsBySession({ scoring }) {
   return (
     <React.Fragment>
       <td>{scoring.total}</td>
-      <td>{scoring.totalX}</td>
       <td>{scoring.totalXPlusTen}</td>
+      <td>{scoring.totalX}</td>
     </React.Fragment>
   );
 }

@@ -14,7 +14,6 @@ import {
   ButtonBlue,
   // ButtonOutlineBlue,
   // ButtonGhostBlue,
-  ButtonSecondaryBlue,
   ButtonTransparancy
 } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -33,6 +32,7 @@ import IconXCircle from "components/ma/icons/mono/x-circle";
 
 function PageManageUser() {
   const [isAlertOpen, setAlertOpen] = React.useState(false);
+  const [isActive, setActive] = React.useState(1);
   // const {
   //   // submit,
   //   isLoading: isSubmiting,
@@ -55,6 +55,10 @@ function PageManageUser() {
     setAlertOpen(false);
   };
 
+  const handleButton = (key) => {
+    setActive(key);
+  }
+
   return (
     <ContentLayoutWrapper pageTitle="Manajemen Pengelola">
       <ProcessingToast />
@@ -74,9 +78,11 @@ function PageManageUser() {
 
         <Row>
           <Col>
-            <ButtonSecondaryBlue>Semua</ButtonSecondaryBlue>
-            <ButtonTransparancy>Pengelola Data</ButtonTransparancy>
-            <ButtonTransparancy>Scorer</ButtonTransparancy>
+            <FilterList>
+              <li><FilterItemButton onClick={() => handleButton(1)} className={isActive == 1 ? "" : 'filter-item-active'}>Semua</FilterItemButton></li>
+              <li><FilterItemButton onClick={() => handleButton(2)} className={isActive == 2 ? "" : 'filter-item-active'}>Pengelola Data</FilterItemButton></li>
+              <li><FilterItemButton onClick={() => handleButton(3)} className={isActive == 3 ? '' : 'filter-item-active'}>Scorer</FilterItemButton></li>
+            </FilterList>
           </Col>
           <Col>
             <div className="d-flex justify-content-end" style={{ position: "relative", gap: "0.5rem" }}>
@@ -147,8 +153,6 @@ function PageManageUser() {
           </form>
         </div>
       </SweetAlert>
-
-
     </ContentLayoutWrapper>
   );
 }
@@ -202,5 +206,76 @@ const FormInput = styled.div`
       margin-top: 0.75rem;
     }
 `;
+
+const FilterList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+`;
+
+const FilterItemButton = styled.button`
+  transition: all 0.15s;
+
+  &,
+  &:active,
+  &:focus,
+  &:focus-visible {
+    padding: 0.5rem 0.75rem;
+    color: var(--ma-blue-400);
+
+    background-color: #E7EDF6;
+    border: solid 2px var(--ma-blue);
+    border-radius: 0.5rem;
+    color: #0D47A1 !important;
+    box-shadow: none;
+
+    &.filter-item-active {
+      background-color: #FFFFFF;
+      color: rgba(73, 80, 87, 0.54) !important;
+      border: none;
+    }
+  }
+
+  &:hover {
+    background-color: var(--ma-blue);
+    color: #ffffff !important;
+  }
+`;
+
+// const ButtonSecondaryBlue = styled(BSButton)`
+//   &,
+//   &:focus,
+//   &:active {
+//     background-color: #E7EDF6;
+//     border: solid 2px var(--ma-blue);
+//     border-radius: 0.5rem;
+//     color: #0D47A1 !important;
+//     box-shadow: none;
+//   }
+
+//   &:hover {
+//     background-color: var(--ma-blue);
+//     color: #ffffff !important;
+//   }
+// `;
+
+// const ButtonTransparancy = styled(BSButton)`
+//   &,
+//   &:focus,
+//   &:active {
+//     background-color: #FFFFFF;
+//     color: rgba(73, 80, 87, 0.54) !important;
+//     border: none;
+//   }
+
+//   &:hover {
+//     background-color: var(--ma-blue);
+//     color: #ffffff !important;
+//   }
+// `;
 
 export default PageManageUser;

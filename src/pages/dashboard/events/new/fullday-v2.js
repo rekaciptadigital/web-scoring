@@ -120,7 +120,7 @@ function PageCreateEventFullday() {
       <AlertSubmitError isError={isErrorCategories} errors={categoriesErrors} />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
-        <StepListIndicator title="Pertandingan">
+        <StepListIndicator title="Pertandingan" excluded={matchType === 'Selection' ? [stepId.PERATURAN] : undefined}>
           <StepItem id={stepId.INFO_UMUM}>Informasi Umum</StepItem>
           <StepItem id={stepId.BIAYA}>Biaya Registrasi</StepItem>
           <StepItem id={stepId.KATEGORI}>Kategori Lomba</StepItem>

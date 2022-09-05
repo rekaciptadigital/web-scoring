@@ -21,6 +21,7 @@ import classnames from "classnames";
 function ScoringTable({
   categoryDetailId,
   isLocked,
+  isSelectionType,
   eliminationParticipantsCount,
   onChangeParticipantPresence,
   searchName,
@@ -154,6 +155,7 @@ function ScoringTable({
                 <th className="name">Nama Peserta</th>
                 <th className="name">Nama Klub</th>
                 <SessionStatsColumnHeadingGroup
+                  isSelectionType={isSelectionType}
                   collapsed={isEditorOpen}
                   sessionList={sessionNumbersList}
                 />
@@ -207,6 +209,9 @@ function ScoringTable({
                       total={row.total}
                       totalX={row.totalX}
                       totalXPlusTen={row.totalXPlusTen}
+                      isSelectionType={isSelectionType}
+                      totalArrow={row.totalArrow}
+                      totalIrat={row.totalIrat}
                     />
 
                     <td>
@@ -272,67 +277,72 @@ function BudrestColumn() {
   );
 }
 
-function SessionStatsColumnHeadingGroup({ collapsed, sessionList }) {
+function SessionStatsColumnHeadingGroup({ isSelectionType, collapsed, sessionList }) {
   if (collapsed) {
     return <th className="stats">Total</th>;
   }
 
-  if (!sessionList) {
-    return (
-      <React.Fragment>
-        <th className="stats">Total</th>
-        <th className="stats">X+10</th>
-        <th className="stats">X</th>
-      </React.Fragment>
-    );
-  }
-
   return (
     <React.Fragment>
-      {sessionList.map((sessionNumber) => (
+      {sessionList?.map((sessionNumber) => (
         <th key={sessionNumber} className="stats">
           Sesi {sessionNumber}
         </th>
       ))}
+
       <th className="stats">Total</th>
-      <th className="stats">X+10</th>
-      <th className="stats">X</th>
+
+      {!isSelectionType ? (
+        <React.Fragment>
+          <th className="stats">X+10</th>
+          <th className="stats">X</th>
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          <th className="stats">Jumlah Arrow</th>
+          <th className="stats">IRAT</th>
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 }
 
 function SessionStatsCellsGroup({
+  isSelectionType,
   collapsed,
   sessions,
   sessionNumbersList,
   total,
   totalX,
   totalXPlusTen,
+  totalArrow,
+  totalIrat,
 }) {
   if (collapsed) {
     return <td className="stats">{total}</td>;
   }
 
-  if (!sessions) {
-    return (
-      <React.Fragment>
-        <td className="stats">{total}</td>
-        <td className="stats">{totalXPlusTen}</td>
-        <td className="stats">{totalX}</td>
-      </React.Fragment>
-    );
-  }
-
   return (
     <React.Fragment>
-      {sessionNumbersList.map((sessionNumber) => (
+      {sessionNumbersList?.map((sessionNumber) => (
         <td key={sessionNumber} className="stats">
           {<span>{sessions[sessionNumber]?.total}</span> || <GrayedOutText>&ndash;</GrayedOutText>}
         </td>
       ))}
+
       <td className="stats">{total}</td>
-      <td className="stats">{totalXPlusTen}</td>
-      <td className="stats">{totalX}</td>
+
+      {!isSelectionType ? (
+        <React.Fragment>
+          <td className="stats">{totalXPlusTen}</td>
+          <td className="stats">{totalX}</td>
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          <td className="stats">{totalArrow}</td>
+          <td className="stats">{totalIrat}</td>
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 }

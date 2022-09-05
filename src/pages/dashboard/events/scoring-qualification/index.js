@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useEventDetail } from "./hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
 import { useSubmitEliminationCount } from "./hooks/submit-elimination-count";
@@ -41,6 +42,14 @@ function _getSelectedFromValue(countValue) {
 function PageEventScoringQualification() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
+
+  const {
+    data: eventDetail,
+    isInitialLoading: isInitialLoadingEventDetail,
+    errors: errorsEventDetail,
+  } = useEventDetail(eventId);
+
+  const isSelectionType = eventDetail?.eventCompetition === "Selection";
 
   const {
     data: categoryDetails,
@@ -85,9 +94,10 @@ function PageEventScoringQualification() {
     setInputSearchQuery("");
   };
 
-  const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
+  const errorFetchingData =
+    (!categoryDetails && errorsCategoryDetail) || (!eventDetail && errorsEventDetail);
 
-  if (errorFetchingInitialCategories) {
+  if (errorFetchingData) {
     return (
       <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
         <ViewWrapper>
@@ -102,7 +112,7 @@ function PageEventScoringQualification() {
     );
   }
 
-  if (!isSettledCategories) {
+  if (!isSettledCategories || isInitialLoadingEventDetail) {
     return (
       <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
         <SpinnerDotBlock />
@@ -288,6 +298,7 @@ function PageEventScoringQualification() {
             <ScoringTable
               key={_makeTableKeyByCategory(activeCategoryDetail)}
               categoryDetailId={activeCategoryDetail?.categoryDetailId}
+              isSelectionType={isSelectionType}
               isLocked={Boolean(!activeCategoryDetail || activeCategoryDetail?.eliminationLock)}
               searchName={inputSearchQuery}
               onChangeParticipantPresence={resetOnChangeCategory}

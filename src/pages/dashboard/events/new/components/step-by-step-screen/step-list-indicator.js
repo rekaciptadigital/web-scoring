@@ -2,12 +2,12 @@ import * as React from "react";
 import styled from "styled-components";
 import { useStepScreen } from "./hooks/step-screen";
 
-function StepListIndicator({ children, title, excluded = [] }) {
+function StepListIndicator({ children, title }) {
   const { registerStepContent } = useStepScreen();
 
-  const childrenItemsList = React.Children.toArray(children).filter((item) => {
-    return !excluded.find((id) => (id === item.props.id))
-  })
+  const childrenItemsList = React.useMemo(() => {
+    return React.Children.toArray(children);
+  }, [children]);
 
   React.useEffect(() => {
     if (!childrenItemsList?.length) {

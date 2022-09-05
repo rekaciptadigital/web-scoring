@@ -19,7 +19,7 @@ function useDownloadBlankScoresheet({ categoryId }) {
         onSuccess: async (data) => {
           customOptions.onSuccess?.();
           await misc.sleep(450);
-          urlUtil.openUrlOnNewTab(data.fileName);
+          urlUtil.openUrlOnNewTab(data);
         },
       };
 

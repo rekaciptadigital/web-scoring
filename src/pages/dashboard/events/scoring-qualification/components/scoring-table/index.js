@@ -253,6 +253,7 @@ function ScoringTable({
 
         <ScoreEditor
           key={`${categoryDetailId}-${activeRow?.member.id}`}
+          isSelectionType={isSelectionType}
           isLocked={isLocked}
           isOpen={isEditorOpen}
           memberId={activeRow?.member.id}

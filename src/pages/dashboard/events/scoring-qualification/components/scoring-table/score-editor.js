@@ -17,6 +17,7 @@ import classnames from "classnames";
  * Komponen yang kerja beneran di bawah: `<ScoreEditorControl />`
  */
 function ScoreEditor({
+  isSelectionType,
   isLocked,
   isOpen = false,
   memberId,
@@ -33,6 +34,7 @@ function ScoreEditor({
   }
 
   const controlProps = {
+    isSelectionType,
     isLocked,
     memberId,
     sessionNumbersList,
@@ -52,6 +54,7 @@ function ScoreEditor({
 }
 
 function ScoreEditorControl({
+  isSelectionType,
   isLocked,
   memberId,
   sessionNumbersList,
@@ -191,6 +194,7 @@ function ScoreEditorControl({
         {sessionNumbersList ? (
           <EditorHeaderContent>
             <SessionTabList
+              isSelectionType={isSelectionType}
               sessions={sessionNumbersList}
               hasShootOff={hasShootOff}
               currentSession={sessionNumber}
@@ -253,7 +257,7 @@ function ScoreEditorControl({
   );
 }
 
-function SessionTabList({ sessions, hasShootOff, currentSession = 1, onChange }) {
+function SessionTabList({ isSelectionType, sessions, hasShootOff, currentSession = 1, onChange }) {
   const _checkIsTabActive = (sessionNumber) => {
     return parseInt(sessionNumber) === parseInt(currentSession);
   };
@@ -291,19 +295,21 @@ function SessionTabList({ sessions, hasShootOff, currentSession = 1, onChange })
       ))}
 
       {/* Tab spesial shoot off */}
-      <li>
-        <SessionTabButton
-          title={!hasShootOff ? "Shoot Off tidak diberlakukan" : undefined}
-          disabled={isShootOffActive || !hasShootOff}
-          className={classnames({
-            "session-tab-active": isShootOffActive,
-            "shootoff-tab-disabled": !hasShootOff,
-          })}
-          onClick={() => onChange?.(11)}
-        >
-          S-Off
-        </SessionTabButton>
-      </li>
+      {!isSelectionType && (
+        <li>
+          <SessionTabButton
+            title={!hasShootOff ? "Shoot Off tidak diberlakukan" : undefined}
+            disabled={isShootOffActive || !hasShootOff}
+            className={classnames({
+              "session-tab-active": isShootOffActive,
+              "shootoff-tab-disabled": !hasShootOff,
+            })}
+            onClick={() => onChange?.(11)}
+          >
+            S-Off
+          </SessionTabButton>
+        </li>
+      )}
     </SessionTabListContainer>
   );
 }

@@ -14,6 +14,7 @@ CMD mkdir log
 RUN addgroup -g 2000 -S docker
 RUN adduser -S -G docker -u 2001 -s /bin/sh -h myarchery-web docker
 
+RUN npm install -g node-gyp
 RUN npm install -g npm
 RUN npm uninstall node-sass --force
 #RUN npm install node-sass@4.14.1 --legacy-peer-deps

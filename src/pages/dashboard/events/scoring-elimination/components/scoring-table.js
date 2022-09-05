@@ -198,9 +198,10 @@ function MatchRow({
         ) : (
           <BudrestInputAsync
             categoryId={categoryDetailId}
-            playerDetail={player1 || player2}
+            playerDetail={player1}
             disabled={hasWinner || noData}
             scoring={scoring}
+            memberId={player1?.id}
             onSuccess={fetchEliminationMatches}
           />
         )}
@@ -289,9 +290,10 @@ function MatchRow({
       ) : (
         <BudrestInputAsync
           categoryId={categoryDetailId}
-          playerDetail={player1 || player2}
+          playerDetail={player2}
           disabled={hasWinner || noData}
           scoring={scoring}
+          memberId={player2?.id}
           onSuccess={fetchEliminationMatches}
         />
       )}

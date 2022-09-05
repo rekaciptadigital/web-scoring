@@ -64,8 +64,15 @@ export default {
   },
 
   /**
-   *
-   * @param {Object} queryString  { category_id, elimination_id, round, match, budrest_number }
+   * @param {Object} queryString {
+   *   category_id,
+   *   elimination_id,
+   *   round,
+   *   match,
+   *   budrest_number,
+   *   participant_id,
+   *   member_id
+   * }
    * @returns {Promise} { success, data, errors, message }
    */
   saveBudrestElimination(data = null) {

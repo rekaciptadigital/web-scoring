@@ -94,6 +94,7 @@ const initialData = {
   eventDateStart: null,
   eventDateEnd: null,
   extraInfos: [],
+  isPrivate: null,
 };
 
 /* ================================= */

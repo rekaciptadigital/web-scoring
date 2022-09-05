@@ -9,7 +9,7 @@ function makeStatePublicInfos(eventDetail) {
     return null;
   }
 
-  const { publicInformation, moreInformation } = eventDetail;
+  const { isPrivate, publicInformation, moreInformation } = eventDetail;
 
   return {
     eventName: publicInformation.eventName,
@@ -30,6 +30,7 @@ function makeStatePublicInfos(eventDetail) {
       ...info,
       key: stringUtil.createRandom(),
     })),
+    isPrivate: isPrivate
   };
 }
 
@@ -53,6 +54,7 @@ async function makePayloadPublicInfos(formData, { eventId, eventType, matchType 
     eventEndRegister: formatServerDatetime(formData.registrationDateEnd),
     eventStart: formatServerDatetime(formData.eventDateStart),
     eventEnd: formatServerDatetime(formData.eventDateEnd),
+    isPrivate: formData.isPrivate
   };
 
   if (!eventId) {

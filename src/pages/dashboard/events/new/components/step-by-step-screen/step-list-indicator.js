@@ -2,23 +2,26 @@ import * as React from "react";
 import styled from "styled-components";
 import { useStepScreen } from "./hooks/step-screen";
 
-function StepListIndicator({ children, title }) {
+function StepListIndicator({ children, title, excluded = [] }) {
   const { registerStepContent } = useStepScreen();
 
-  const childrenItemsList = React.Children.toArray(children);
+  const childrenItemsList = React.Children.toArray(children).filter((item) => {
+    return !excluded.find((id) => (id === item.props.id))
+  })
 
   React.useEffect(() => {
-    if (!children) {
+    if (!childrenItemsList?.length) {
       return;
     }
 
     const stepsData = childrenItemsList.map((child, index) => ({
       sequence: index + 1,
       stepId: child.props.id,
+      index: index,
     }));
 
     registerStepContent(stepsData);
-  }, []);
+  }, [childrenItemsList]);
 
   return (
     <StyledListIndicator>

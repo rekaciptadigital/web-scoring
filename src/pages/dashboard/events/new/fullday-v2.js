@@ -120,7 +120,7 @@ function PageCreateEventFullday() {
       <AlertSubmitError isError={isErrorCategories} errors={categoriesErrors} />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
-        <StepListIndicator title="Pertandingan">
+        <StepListIndicator title="Pertandingan" excluded={matchType === 'Selection' ? [stepId.PERATURAN] : undefined}>
           <StepItem id={stepId.INFO_UMUM}>Informasi Umum</StepItem>
           <StepItem id={stepId.BIAYA}>Biaya Registrasi</StepItem>
           <StepItem id={stepId.KATEGORI}>Kategori Lomba</StepItem>
@@ -144,7 +144,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitPublicInfos(formPublicInfos.data, {
@@ -176,7 +176,7 @@ function PageCreateEventFullday() {
               <ScreenFees eventDetail={eventDetail} form={formFees} />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   if (!eventDetail?.eventCategories?.length) {
@@ -239,7 +239,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitCategories(formCategories.data, formFees, {
@@ -269,7 +269,7 @@ function PageCreateEventFullday() {
               <ScreenRules eventDetail={eventDetail} />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   // TODO: next kalau valid / sudah simpan data
@@ -305,7 +305,7 @@ function PageCreateEventFullday() {
               )}
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 disabled={formSchedules.isEmpty}
                 onSubmit={({ next }) => {

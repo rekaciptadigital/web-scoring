@@ -25,6 +25,7 @@ RUN npm rebuild node-sass
 RUN npm install --legacy-peer-deps #--force
 RUN yarn add react-is
 #RUN npm audit fix
+RUN npx browserslist@latest --update-db
 RUN npm run build
 
 RUN rm -f config/.env

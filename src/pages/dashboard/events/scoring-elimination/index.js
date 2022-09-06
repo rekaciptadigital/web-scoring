@@ -1,27 +1,25 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useEventDetail } from "../scoring-qualification/hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
 
 import { SpinnerDotBlock } from "components/ma";
-import { SubNavbar } from "../components/submenus-matches";
-import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
-import { ProcessingToast } from "./components/processing-toast";
+import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
 
 import classnames from "classnames";
 
-const propsContentWrapper = {
-  pageTitle: "Skoring Eliminasi",
-  navbar: <SubNavbar />,
-};
-
 function PageEventScoringElimination() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
+  const { data: eventDetail } = useEventDetail(eventId);
+
+  const isSelectionType = eventDetail?.eventCompetition === "Selection";
+  const pageProps = { pageTitle: "Skoring Eliminasi", isSelectionType: isSelectionType };
 
   const {
     isSettled: isSettledCategories,
@@ -44,7 +42,7 @@ function PageEventScoringElimination() {
 
   if (errorFetchingInitialCategories) {
     return (
-      <ContentLayoutWrapper {...propsContentWrapper}>
+      <ScoringPageWrapper {...pageProps}>
         <ViewWrapper>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
@@ -53,23 +51,21 @@ function PageEventScoringElimination() {
 
           <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
         </ViewWrapper>
-      </ContentLayoutWrapper>
+      </ScoringPageWrapper>
     );
   }
 
   // TODO: loading ganti ketika belum settle filter, enggak lagi ke fetch detail
   if (!isSettledCategories) {
     return (
-      <ContentLayoutWrapper {...propsContentWrapper}>
+      <ScoringPageWrapper {...pageProps}>
         <SpinnerDotBlock />
-      </ContentLayoutWrapper>
+      </ScoringPageWrapper>
     );
   }
 
   return (
-    <ContentLayoutWrapper {...propsContentWrapper}>
-      <ProcessingToast />
-
+    <ScoringPageWrapper {...pageProps}>
       <TabBar>
         <TabButtonList>
           {optionsCompetitionCategory.map((option) => (
@@ -156,7 +152,7 @@ function PageEventScoringElimination() {
             eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
           />
         ))}
-    </ContentLayoutWrapper>
+    </ScoringPageWrapper>
   );
 }
 

@@ -8,49 +8,69 @@ import IconHome from "components/ma/icons/mono/home";
 import IconBudRest from "components/ma/icons/mono/bud-rest";
 import IconFile from "components/ma/icons/mono/file";
 
-function SubNavbar() {
+const _makeMenus = (eventId, isSelectionType) => {
+  const commonMenus = [
+    {
+      url: `/dashboard/event/${eventId}/home`,
+      label: "Dashboard",
+      icon: IconHome,
+    },
+    {
+      url: `/dashboard/event/${eventId}/scoring-qualification`,
+      label: "Skoring Kualifikasi",
+      icon: IconBudRest,
+    },
+  ];
+
+  if (!isSelectionType) {
+    return [
+      ...commonMenus,
+      {
+        url: `/dashboard/event/${eventId}/scoring-elimination`,
+        label: "Skoring Eliminasi",
+        icon: IconBudRest,
+      },
+      {
+        url: `/dashboard/event/${eventId}/doc`,
+        label: "Dokumen",
+        icon: IconFile,
+      },
+    ];
+  }
+  return [
+    ...commonMenus,
+    {
+      url: `/dashboard/event/${eventId}/scoring-elimination`,
+      label: "Skoring Eliminasi - Selection",
+      icon: IconBudRest,
+    },
+    {
+      url: `/dashboard/event/${eventId}/selection-result`,
+      label: "Hasil Akhir",
+      icon: IconFile,
+    },
+  ];
+};
+
+function SubNavbar({ isSelectionType }) {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
+  const menuItems = _makeMenus(eventId, isSelectionType);
+
   return (
     <StyledSubNavbar>
       <Container fluid>
         <ul className="subnavbar">
-          <li>
-            <NavLinkItem to={`/dashboard/event/${eventId}/home`}>
-              <span>
-                <IconHome size="16" />
-              </span>
-              <span>Dashboard</span>
-            </NavLinkItem>
-          </li>
-
-          <li>
-            <NavLinkItem to={`/dashboard/event/${eventId}/scoring-qualification`}>
-              <span>
-                <IconBudRest size="16" />
-              </span>
-              <span>Skoring Kualifikasi</span>
-            </NavLinkItem>
-          </li>
-
-          <li>
-            <NavLinkItem to={`/dashboard/event/${eventId}/scoring-elimination`}>
-              <span>
-                <IconBudRest size="16" />
-              </span>
-              <span>Skoring Eliminasi</span>
-            </NavLinkItem>
-          </li>
-
-          <li>
-            {/* TODO: hapus as="span" kalau mau dipakai */}
-            <NavLinkItem to={`/dashboard/event/${eventId}/doc`}>
-              <span>
-                <IconFile size="16" />
-              </span>
-              <span>Dokumen</span>
-            </NavLinkItem>
-          </li>
+          {menuItems.map((menu, index) => (
+            <li key={index}>
+              <NavLinkItem to={menu.url}>
+                <span>
+                  <menu.icon size="16" />
+                </span>
+                <span>{menu.label}</span>
+              </NavLinkItem>
+            </li>
+          ))}
         </ul>
       </Container>
     </StyledSubNavbar>

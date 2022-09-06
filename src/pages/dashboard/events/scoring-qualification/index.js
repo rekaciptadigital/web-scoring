@@ -10,12 +10,11 @@ import { useScoresheetDownload } from "./hooks/scoresheet-download";
 
 import Select from "react-select";
 import { SpinnerDotBlock, ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
-import { SubNavbar } from "../components/submenus-matches";
-import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
+import { toast } from "components/ma/processing-toast";
+import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
 import { SearchBox } from "./components/search-box";
-import { toast } from "./components/processing-toast";
 import { ButtonDownloadScoresheet } from "./components/button-download-scoresheet";
 import { ButtonConfirmPrompt } from "./components/button-confirm-prompt";
 import { ButtonCancelBracket } from "./components/button-cancel-bracket";
@@ -42,14 +41,14 @@ function _getSelectedFromValue(countValue) {
 function PageEventScoringQualification() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
-
   const {
     data: eventDetail,
-    isInitialLoading: isInitialLoadingEventDetail,
+    isLoading: isInitialLoadingEventDetail,
     errors: errorsEventDetail,
   } = useEventDetail(eventId);
 
   const isSelectionType = eventDetail?.eventCompetition === "Selection";
+  const pageProps = { pageTitle: "Skoring Kualifikasi", isSelectionType: isSelectionType };
 
   const {
     data: categoryDetails,
@@ -99,7 +98,7 @@ function PageEventScoringQualification() {
 
   if (errorFetchingData) {
     return (
-      <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
+      <ScoringPageWrapper {...pageProps}>
         <ViewWrapper>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
@@ -108,20 +107,20 @@ function PageEventScoringQualification() {
 
           <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
         </ViewWrapper>
-      </ContentLayoutWrapper>
+      </ScoringPageWrapper>
     );
   }
 
   if (!isSettledCategories || isInitialLoadingEventDetail) {
     return (
-      <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
+      <ScoringPageWrapper {...pageProps}>
         <SpinnerDotBlock />
-      </ContentLayoutWrapper>
+      </ScoringPageWrapper>
     );
   }
 
   return (
-    <ContentLayoutWrapper pageTitle="Skoring Kualifikasi" navbar={<SubNavbar />}>
+    <ScoringPageWrapper {...pageProps}>
       <LoadingScreen loading={isLoadingSubmitCount || isLoadingSubmitElimination} />
       <AlertSubmitError isError={isErrorSubmitCount} errors={errorsSubmitCount} />
       <AlertSubmitError isError={isErrorSubmitElimination} errors={errorsSubmitElimination} />
@@ -306,7 +305,7 @@ function PageEventScoringQualification() {
             />
           ))}
       </ViewWrapper>
-    </ContentLayoutWrapper>
+    </ScoringPageWrapper>
   );
 }
 

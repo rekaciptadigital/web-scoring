@@ -8,7 +8,8 @@ function useScoringMembers(
   categoryDetailId,
   inputSearchQuery,
   eliminationParticipantsCount,
-  isTeam = false
+  isTeam = false,
+  scoreType
 ) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
@@ -19,6 +20,7 @@ function useScoringMembers(
         event_category_id: categoryDetailId,
         name: debouncedSearchQuery || undefined,
         elimination_template: eliminationParticipantsCount,
+        score_type: scoreType,
       });
     };
     fetcher.runAsync(getFunction, {

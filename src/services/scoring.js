@@ -30,12 +30,11 @@ export default {
   // V2
 
   /**
-   * @param {Object} queryString { event_category_id, name, elimination_template }
+   * @param {Object} queryString { event_category_id, name?, elimination_template?, score_type? }
    * @returns {Promise} { success, data, errors, message }
    */
-  getQualificationScoringMembersV2({ event_category_id, name = "", elimination_template }) {
-    const queryString = { event_category_id, name: name || undefined, elimination_template };
-    return API.get("/web/v2/scorer-qualification", queryString);
+  getQualificationScoringMembersV2(qs) {
+    return API.get("/web/v2/scorer-qualification", qs);
   },
 
   /**

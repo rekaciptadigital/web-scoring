@@ -28,6 +28,7 @@ function ScoringTable({
 }) {
   const { event_id } = useParams();
   const eventId = event_id;
+  const scoreType = isSelectionType ? 3 : undefined;
 
   const {
     data: scoringMembers,
@@ -36,7 +37,13 @@ function ScoringTable({
     isError: isErrorScoringMembers,
     getSessionNumbersList,
     fetchScoringMembers,
-  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount);
+  } = useScoringMembers(
+    categoryDetailId,
+    searchName,
+    eliminationParticipantsCount,
+    false, // bukan beregu
+    scoreType
+  );
   const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
 
   const { submitParticipantPresence, isLoading: isLoadingCheckPresence } = useParticipantPresence();

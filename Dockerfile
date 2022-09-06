@@ -22,7 +22,7 @@ RUN npm install -g npm
 RUN npm rebuild node-sass
 #RUN npm i sass --force
 #RUN npm install --global windows-build-tools --legacy-peer-deps
-#RUN npm install --legacy-peer-deps #--force
+RUN npm install --legacy-peer-deps #--force
 RUN yarn add react-is
 #RUN npm audit fix
 RUN npm run build

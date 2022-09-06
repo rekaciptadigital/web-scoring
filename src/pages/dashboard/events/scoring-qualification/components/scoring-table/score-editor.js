@@ -4,6 +4,7 @@ import { useScoringDetail } from "../../hooks/scoring-details";
 import { useSubmitScore } from "../../hooks/submit-score";
 
 import { AlertSubmitError } from "components/ma";
+import { toast } from "components/ma/processing-toast";
 import { EditorForm } from "./editor-form";
 import { EditorFormShootOff } from "./editor-form-shootoff";
 import { ConfirmPrompt } from "../confirm-prompt";
@@ -67,7 +68,7 @@ function ScoreEditorControl({
 }) {
   const [sessionNumber, setSessionNumber] = React.useState(1);
 
-  const code = _makeQualificationCode(memberId, sessionNumber);
+  const code = _makeQualificationCode(memberId, sessionNumber, isSelectionType);
   const { data: scoreDetail, isLoading: isLoadingScore } = useScoringDetail(code);
   const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
   const {
@@ -132,11 +133,13 @@ function ScoreEditorControl({
       const payload = { code: code, shoot_scores: formShootOffValue };
       submitScore(payload, {
         onSuccess() {
+          toast.success("Berhasil simpan skor");
           resetFormShootOff();
           setSessionNumber(targetSessionNumber);
           onSaveSuccess?.();
         },
         onError() {
+          toast.error("Gagal menyimpan skor");
           // TODO: prompt retry / switch without saving anyway
         },
       });
@@ -152,11 +155,13 @@ function ScoreEditorControl({
       const payload = { code: code, shoot_scores: formValues };
       submitScore(payload, {
         onSuccess() {
+          toast.success("Berhasil simpan skor");
           resetForm();
           setSessionNumber(targetSessionNumber);
           onSaveSuccess?.();
         },
         onError() {
+          toast.error("Gagal menyimpan skor");
           // TODO: prompt retry / switch without saving anyway
         },
       });
@@ -169,8 +174,13 @@ function ScoreEditorControl({
       const payload = { code: code, shoot_scores: formShootOffValue };
       submitScore(payload, {
         onSuccess() {
+          toast.success("Berhasil simpan skor");
           onClose?.();
           onSaveSuccess?.();
+        },
+        onError() {
+          toast.error("Gagal menyimpan skor");
+          // TODO: prompt retry / switch without saving anyway
         },
       });
 
@@ -181,8 +191,13 @@ function ScoreEditorControl({
     const payload = { code: code, shoot_scores: formValues };
     submitScore(payload, {
       onSuccess() {
+        toast.success("Berhasil simpan skor");
         onClose?.();
         onSaveSuccess?.();
+      },
+      onError() {
+        toast.error("Gagal menyimpan skor");
+        // TODO: prompt retry / switch without saving anyway
       },
     });
   };
@@ -531,11 +546,15 @@ function useFormShootOff(scoreDetail) {
 /* =============================== */
 // utils
 
-function _makeQualificationCode(memberId, sessionNumber) {
+const TYPE_QUALIFICATION = 1;
+const TYPE_QUALIFICATION_SELECTION = 3;
+
+function _makeQualificationCode(memberId, sessionNumber, isSelectionType) {
   if (!memberId || !sessionNumber) {
     return null;
   }
-  return `1-${memberId}-${sessionNumber}`;
+  const typeNumber = isSelectionType ? TYPE_QUALIFICATION_SELECTION : TYPE_QUALIFICATION;
+  return `${typeNumber}-${memberId}-${sessionNumber}`;
 }
 
 export { ScoreEditor };

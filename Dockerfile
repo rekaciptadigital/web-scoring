@@ -4,6 +4,7 @@ RUN apk update
 RUN apk add git
 RUN git config --global url."https://".insteadOf git://
 RUN apk add curl
+RUN sudo apt-get install -y python2
 #RUN npm cache clean --force
 
 CMD mkdir myarchery-web-admin

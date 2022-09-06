@@ -17,9 +17,10 @@ RUN adduser -S -G docker -u 2001 -s /bin/sh -h myarchery-web docker
 
 RUN npm install -g node-gyp
 RUN npm install -g npm
-RUN npm uninstall node-sass --force
+#RUN npm uninstall node-sass --force
 #RUN npm install node-sass@4.14.1 --legacy-peer-deps
-RUN npm i sass --force
+RUN npm rebuild node-sass
+#RUN npm i sass --force
 #RUN npm install --global windows-build-tools --legacy-peer-deps
 #RUN npm install --legacy-peer-deps #--force
 RUN yarn add react-is

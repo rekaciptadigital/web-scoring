@@ -12,6 +12,14 @@ export default {
   },
 
   /**
+   * @param {Object} qs { event_category_id, session }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getScoresheetSelectionDownloadUrl(qs) {
+    return API.get("/web/v1/archery-score-sheet/download-qualification-selection", qs);
+  },
+
+  /**
    * @param {Object} queryString { event_elimination_id, category_id, round, match }
    * @returns {Promise} { success, data, errors, message }
    */

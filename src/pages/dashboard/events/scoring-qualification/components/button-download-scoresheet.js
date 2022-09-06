@@ -6,7 +6,12 @@ import { ButtonOutlineBlue } from "components/ma";
 
 import IconDownload from "components/ma/icons/mono/download";
 
-function ButtonDownloadScoresheet({ disabled, sessionCount, onDownload }) {
+function ButtonDownloadScoresheet({
+  buttonLabel = "Unduh Dokumen",
+  disabled,
+  sessionCount,
+  onDownload,
+}) {
   const [isOpen, setOpen] = React.useState(false);
 
   const sessionNumbers = React.useMemo(() => {
@@ -25,7 +30,7 @@ function ButtonDownloadScoresheet({ disabled, sessionCount, onDownload }) {
         <span>
           <IconDownload size="16" />
         </span>{" "}
-        <span>Unduh Dokumen</span>
+        <span>{buttonLabel}</span>
       </ButtonOutlineBlue>
     );
   }
@@ -37,7 +42,7 @@ function ButtonDownloadScoresheet({ disabled, sessionCount, onDownload }) {
           <span>
             <IconDownload size="16" />
           </span>{" "}
-          <span>Unduh Dokumen</span>
+          <span>{buttonLabel}</span>
         </ButtonOutlineBlue>
       </DropdownToggle>
 

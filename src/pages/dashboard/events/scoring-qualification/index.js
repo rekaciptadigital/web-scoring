@@ -6,6 +6,7 @@ import { useCategoryDetails } from "./hooks/category-details";
 import { useSubmitEliminationCount } from "./hooks/submit-elimination-count";
 import { useSubmitEliminationConfig } from "./hooks/submit-elimination-config";
 import { useScoresheetDownload } from "./hooks/scoresheet-download";
+import { useScoresheetDownloadSelection } from "./hooks/scoresheet-download-selection";
 
 import Select from "react-select";
 import { SpinnerDotBlock, ButtonBlue, LoadingScreen, AlertSubmitError } from "components/ma";
@@ -73,6 +74,11 @@ function PageEventScoringQualification() {
   } = useSubmitEliminationConfig(activeCategory?.id);
 
   const { download } = useScoresheetDownload(activeCategory?.id);
+  const {
+    download: downloadSelection,
+    isError: isErrorDownloadSelection,
+    errors: errorsDownloadSelection,
+  } = useScoresheetDownloadSelection(activeCategory?.id);
 
   const resetOnChangeCategory = () => {
     setLocalCountNumber(null);
@@ -109,12 +115,33 @@ function PageEventScoringQualification() {
       <LoadingScreen loading={isLoadingSubmitCount || isLoadingSubmitElimination} />
       <AlertSubmitError isError={isErrorSubmitCount} errors={errorsSubmitCount} />
       <AlertSubmitError isError={isErrorSubmitElimination} errors={errorsSubmitElimination} />
+      <AlertSubmitError isError={isErrorDownloadSelection} errors={errorsDownloadSelection} />
 
       <ToolbarFilter
         categories={categoryDetails}
         onChange={(data) => setActiveCategory(data?.categoryDetail)}
         viewRight={
-          isSelectionType ? null : (
+          isSelectionType ? (
+            <div key={activeCategory?.id}>
+              <ButtonDownloadScoresheet
+                buttonLabel="Unduh Scoresheet"
+                sessionCount={activeCategory?.sessionInQualification}
+                disabled={!isIndividual}
+                onDownload={(sessionNumber) => {
+                  toast.loading("Sedang menyiapkan file scoresheet...");
+                  downloadSelection(sessionNumber, {
+                    onSuccess: () => {
+                      toast.dismiss();
+                    },
+                    onError: () => {
+                      toast.dismiss();
+                      toast.error("Gagal memulai unduhan");
+                    },
+                  });
+                }}
+              />
+            </div>
+          ) : (
             <ToolbarRight key={activeCategory?.id}>
               <HorizontalSpaced>
                 <SelectEliminationCounts>

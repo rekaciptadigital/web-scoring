@@ -93,20 +93,27 @@ function KnobsClassCategories() {
   );
 }
 
-function KnobsTeamCategories() {
+function KnobsTeamCategories({ shouldHideOption }) {
   const { classCategoryId, teamCategoryId, getKnobOptionsByType, setTeamCategory } = useFilters();
   const optionsTeam = getKnobOptionsByType("teamCategory");
+
+  const handleHideOption = React.useCallback(
+    (option) => {
+      const hasNoParentClassCategory = !option.relatedClasses.some(
+        (parentClassCategory) => parentClassCategory === classCategoryId
+      );
+      return hasNoParentClassCategory || shouldHideOption?.(option);
+    },
+    [shouldHideOption, classCategoryId]
+  );
+
   return (
     <Knobs
       label="Jenis Regu"
       options={optionsTeam}
       activeKnobId={teamCategoryId}
       onChange={(knobId) => setTeamCategory(knobId)}
-      shouldHideOption={(option) => {
-        return !option.relatedClasses.some(
-          (parentClassCategory) => parentClassCategory === classCategoryId
-        );
-      }}
+      shouldHideOption={handleHideOption}
     />
   );
 }

@@ -70,6 +70,14 @@ export default {
   },
 
   /**
+   * @param {Object} qs { event_category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getEliminationSelectionScoringMembersV2(qs) {
+    return API.get("/web/v2/scorer-elimination-selection", qs);
+  },
+
+  /**
    *
    * @param {Object} queryString { event_id, participant_id, is_present }
    * @returns {Promise} { success, data, errors, message }

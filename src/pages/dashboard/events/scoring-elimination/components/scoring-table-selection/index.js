@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useScoringMembers } from "../../hooks/scoring-members";
+import { useScoringSelection } from "../../hooks/scoring-selection";
 import { useScoreEditor } from "../../hooks/score-editor";
 import { useSubmitScore } from "../../hooks/submit-score";
 
@@ -18,7 +18,6 @@ function ScoringTableSelection({
   isLocked,
   isSelectionType,
   eliminationParticipantsCount,
-  searchName,
 }) {
   const scoreType = 4;
 
@@ -29,9 +28,9 @@ function ScoringTableSelection({
     isError: isErrorScoringMembers,
     getSessionNumbersList,
     fetchScoringMembers,
-  } = useScoringMembers(
+  } = useScoringSelection(
     categoryDetailId,
-    searchName,
+    "",
     eliminationParticipantsCount,
     false, // bukan beregu
     scoreType

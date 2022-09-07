@@ -12,8 +12,8 @@ WORKDIR myarchery-web-admin
 COPY . /myarchery-web-admin
 CMD mkdir log
 
-RUN addgroup -g 2000 -S docker
-RUN adduser -S -G docker -u 2001 -s /bin/sh -h myarchery-web docker
+#RUN addgroup -g 2000 -S docker
+#RUN adduser -S -G docker -u 2001 -s /bin/sh -h myarchery-web docker
 
 RUN npm install -g node-gyp
 RUN npm install -g npm

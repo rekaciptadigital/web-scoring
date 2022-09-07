@@ -30,6 +30,7 @@ RUN npm run build
 
 RUN rm -f config/.env
 
+CMD serve -s build
 #CMD npm start >> /root/log/stdout.log 2>> /root/log/stderr.log
 
 #USER docker

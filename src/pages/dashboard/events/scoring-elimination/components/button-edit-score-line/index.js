@@ -159,7 +159,7 @@ function ModalEditor({
     isError: isErrorSubmitingTotalP1,
     errors: errorsSubmitingTotalP1,
   } = useSubmitAdminTotal({
-    categoryId: categoryDetails.categoryDetailId,
+    categoryId: categoryDetails.id,
     memberId: player1?.participant.member.id,
     eliminationId: scoring?.elimination_id,
     round: scoring.round,
@@ -172,7 +172,7 @@ function ModalEditor({
     isError: isErrorSubmitingTotalP2,
     errors: errorsSubmitingTotalP2,
   } = useSubmitAdminTotal({
-    categoryId: categoryDetails.categoryDetailId,
+    categoryId: categoryDetails.id,
     memberId: player2?.participant.member.id,
     eliminationId: scoring?.elimination_id,
     round: scoring.round,
@@ -345,13 +345,12 @@ function ModalEditor({
             <CategoryLabel>
               <div>{categoryDetails?.teamCategoryLabel}</div>
               <div>
-                <IconBow size="16" />{" "}
-                {categoryDetails?.originalCategoryDetail.competitionCategoryId}{" "}
-                {categoryDetails?.originalCategoryDetail.ageCategoryId}
+                <IconBow size="16" /> {categoryDetails?.competitionCategoryId}{" "}
+                {categoryDetails?.ageCategoryId}
               </div>
               <div>
                 <IconDistance size="16" />{" "}
-                {_getDistanceCategoryLabel(categoryDetails?.originalCategoryDetail.classCategory)}
+                {_getDistanceCategoryLabel(categoryDetails?.classCategory)}
               </div>
             </CategoryLabel>
 
@@ -634,12 +633,11 @@ function ModalEditorViewer({ headerInfo, budrestNumber, onClose, scoring, catego
           <CategoryLabel>
             <div>{categoryDetails?.teamCategoryLabel}</div>
             <div>
-              <IconBow size="16" /> {categoryDetails?.originalCategoryDetail.competitionCategoryId}{" "}
-              {categoryDetails?.originalCategoryDetail.ageCategoryId}
+              <IconBow size="16" /> {categoryDetails?.competitionCategoryId}{" "}
+              {categoryDetails?.ageCategoryId}
             </div>
             <div>
-              <IconDistance size="16" />{" "}
-              {_getDistanceCategoryLabel(categoryDetails?.originalCategoryDetail.classCategory)}
+              <IconDistance size="16" /> {_getDistanceCategoryLabel(categoryDetails?.classCategory)}
             </div>
           </CategoryLabel>
 

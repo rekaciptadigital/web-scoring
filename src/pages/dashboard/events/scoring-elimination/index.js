@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useEventDetail } from "../scoring-qualification/hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
-import { useCategoriesWithFilters } from "./hooks/category-filters";
 import { useDownloadScoresheetSelection } from "./hooks/download-scoresheet-selection";
 
 import { SpinnerDotBlock } from "components/ma";
@@ -16,8 +15,6 @@ import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
 import { ScoringTableSelection } from "./components/scoring-table-selection";
 
-import classnames from "classnames";
-
 function PageEventScoringElimination() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
@@ -28,24 +25,15 @@ function PageEventScoringElimination() {
 
   const {
     isSettled: isSettledCategories,
+    isLoading: isLoadingCategories,
     data: categoryDetails,
     errors: errorsCategoryDetail,
   } = useCategoryDetails(eventId);
 
   const [activeCategory, setActiveCategory] = React.useState(null);
+  const isIndividual = activeCategory?.categoryTeam?.toLowerCase?.() === "individual";
 
   const { download } = useDownloadScoresheetSelection(activeCategory?.id);
-
-  const {
-    activeCompetitionCategory,
-    activeCategoryDetail,
-    optionsCompetitionCategory,
-    optionsAgeCategory,
-    optionsGenderCategory,
-    selectOptionCompetitionCategory,
-    selectOptionAgeCategory,
-    selectOptionGenderCategory,
-  } = useCategoriesWithFilters(categoryDetails);
 
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
@@ -83,9 +71,11 @@ function PageEventScoringElimination() {
             <div>
               <MenuDownloadScoresheet
                 buttonLabel="Unduh Scoresheet"
-                sessionCount={activeCategory?.sessionInEliminationSelection}
+                sessionCount={
+                  activeCategory ? Number(activeCategory?.sessionInEliminationSelection) : 0
+                }
                 onDownload={(session) => {
-                  toast.success("Sedang memproses unduhan...");
+                  toast.loading("Sedang memproses unduhan...");
                   download(session, {
                     onSuccess() {
                       toast.dismiss();
@@ -119,92 +109,36 @@ function PageEventScoringElimination() {
 
   return (
     <ScoringPageWrapper {...pageProps}>
-      <TabBar>
-        <TabButtonList>
-          {optionsCompetitionCategory.map((option) => (
-            <li key={option.competitionCategory}>
-              <TabButton
-                className={classnames({ "tab-active": option.isActive })}
-                onClick={() => selectOptionCompetitionCategory(option.competitionCategory)}
-              >
-                {option.competitionCategory}
-              </TabButton>
-            </li>
+      <ToolbarFilter
+        categories={categoryDetails}
+        isLoading={isLoadingCategories}
+        onChange={(data) => setActiveCategory(data?.categoryDetail)}
+        viewRight={
+          <div key={activeCategory?.id}>
+            <ButtonShowBracket
+              categoryDetailId={activeCategory?.id}
+              eliminationMemberCount={activeCategory?.defaultEliminationCount}
+            />
+          </div>
+        }
+      >
+        {activeCategory &&
+          (isIndividual ? (
+            <ScoringTable
+              key={"elimination-" + activeCategory?.id}
+              categoryDetailId={activeCategory?.id}
+              categoryDetails={activeCategory}
+              eliminationMemberCounts={activeCategory?.defaultEliminationCount}
+            />
+          ) : (
+            <ScoringTableTeam
+              key={"elimination-" + activeCategory?.id}
+              categoryDetailId={activeCategory?.id}
+              categoryDetails={activeCategory}
+              eliminationMemberCounts={activeCategory?.defaultEliminationCount}
+            />
           ))}
-        </TabButtonList>
-      </TabBar>
-
-      <ViewWrapper>
-        <ToolbarTop>
-          <FilterBars>
-            <CategoryFilter>
-              <FilterLabel>Kelas:</FilterLabel>
-              <FilterList key={activeCompetitionCategory}>
-                {optionsAgeCategory?.length > 0 ? (
-                  optionsAgeCategory.map((option) => (
-                    <li key={option.ageCategory}>
-                      <FilterItemButton
-                        className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => selectOptionAgeCategory(option.ageCategory)}
-                      >
-                        {option.ageCategory}
-                      </FilterItemButton>
-                    </li>
-                  ))
-                ) : (
-                  <li>Tidak tersedia filter kelas</li>
-                )}
-              </FilterList>
-            </CategoryFilter>
-
-            <CategoryFilter>
-              <FilterLabel>Jenis Regu:</FilterLabel>
-              <FilterList key={activeCompetitionCategory}>
-                {optionsGenderCategory?.length > 0 ? (
-                  optionsGenderCategory.map((option) => (
-                    <li key={option.genderCategory}>
-                      <FilterItemButton
-                        className={classnames({ "filter-item-active": option.isActive })}
-                        onClick={() => selectOptionGenderCategory(option.genderCategory)}
-                      >
-                        {option.genderCategoryLabel}
-                      </FilterItemButton>
-                    </li>
-                  ))
-                ) : (
-                  <li>Tidak tersedia filter jenis regu</li>
-                )}
-              </FilterList>
-            </CategoryFilter>
-          </FilterBars>
-
-          <ToolbarRight key={activeCategoryDetail?.categoryDetailId}>
-            <HorizontalSpaced>
-              <ButtonShowBracket
-                categoryDetailId={activeCategoryDetail?.categoryDetailId}
-                eliminationMemberCount={activeCategoryDetail?.defaultEliminationCount}
-              />
-            </HorizontalSpaced>
-          </ToolbarRight>
-        </ToolbarTop>
-      </ViewWrapper>
-
-      {activeCategoryDetail &&
-        (activeCategoryDetail.isTeam ? (
-          <ScoringTableTeam
-            key={activeCategoryDetail?.categoryDetailId}
-            categoryDetailId={activeCategoryDetail?.categoryDetailId}
-            categoryDetails={activeCategoryDetail}
-            eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
-          />
-        ) : (
-          <ScoringTable
-            key={activeCategoryDetail?.categoryDetailId}
-            categoryDetailId={activeCategoryDetail?.categoryDetailId}
-            categoryDetails={activeCategoryDetail}
-            eliminationMemberCounts={activeCategoryDetail?.defaultEliminationCount}
-          />
-        ))}
+      </ToolbarFilter>
     </ScoringPageWrapper>
   );
 }
@@ -218,152 +152,6 @@ const ViewWrapper = styled.div`
 
   > * + * {
     margin-top: 1.875rem;
-  }
-`;
-
-const TabBar = styled.div`
-  margin-bottom: 0.25rem;
-  background-color: #ffffff;
-`;
-
-const TabButtonList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-
-  > * {
-    flex-grow: 1;
-  }
-`;
-
-const TabButton = styled.button`
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  background-color: #ffffff;
-  color: var(--ma-blue);
-  font-weight: 500;
-
-  position: relative;
-
-  &::after {
-    content: " ";
-    display: block;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 5px;
-
-    transform: scaleX(0);
-    transition: all 0.2s;
-  }
-
-  &:hover {
-    &::after {
-      background-color: var(--ma-yellow);
-      transform: scaleX(1);
-    }
-  }
-
-  &.tab-active {
-    &::after {
-      background-color: var(--ma-yellow);
-      transform: scaleX(1);
-    }
-  }
-`;
-
-const ToolbarTop = styled.div`
-  display: flex;
-  gap: 1.5rem;
-
-  > *:nth-child(1) {
-    flex-grow: 1;
-  }
-
-  > *:nth-child(2) {
-    flex-shrink: 0;
-    margin-top: auto;
-  }
-`;
-
-const FilterBars = styled.div`
-  > * + * {
-    margin-top: 0.5rem;
-  }
-`;
-
-const ToolbarRight = styled.div`
-  > * + * {
-    margin-top: 0.75rem;
-  }
-`;
-
-const HorizontalSpaced = styled.div`
-  display: flex;
-  gap: 0.5rem;
-
-  > * {
-    flex-grow: 1;
-  }
-`;
-
-const CategoryFilter = styled.div`
-  display: flex;
-  align-items: center;
-
-  > *:nth-child(1) {
-    flex-shrink: 0;
-    min-width: 6.25rem;
-  }
-
-  > *:nth-child(2) {
-    flex-grow: 1;
-  }
-`;
-
-const FilterLabel = styled.div`
-  color: var(--ma-txt-black);
-  font-weight: 600;
-`;
-
-const FilterList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-`;
-
-const FilterItemButton = styled.button`
-  transition: all 0.15s;
-
-  &,
-  &:active,
-  &:focus,
-  &:focus-visible {
-    padding: 0.25rem 0.5rem;
-    border: solid 1px var(--ma-blue-400);
-    border-radius: 0.5rem;
-    background-color: transparent;
-
-    color: var(--ma-blue-400);
-    font-weight: 600;
-
-    &.filter-item-active {
-      background-color: var(--ma-primary-blue-50);
-      border-color: var(--ma-blue);
-      box-shadow: 0 0 0 1px var(--ma-blue);
-      color: var(--ma-blue);
-    }
-  }
-
-  &:hover {
-    background-color: var(--ma-primary-blue-50);
   }
 `;
 

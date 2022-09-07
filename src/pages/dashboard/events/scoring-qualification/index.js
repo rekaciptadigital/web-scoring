@@ -13,6 +13,7 @@ import { SpinnerDotBlock, ButtonBlue, LoadingScreen, AlertSubmitError } from "co
 import { toast } from "components/ma/processing-toast";
 import { ToolbarFilter } from "components/ma/toolbar-filters";
 import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
+import { SelectionKnobsView } from "../components/selection-knobs-view";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
 import { SearchBox } from "./components/search-box";
@@ -120,6 +121,7 @@ function PageEventScoringQualification() {
       <ToolbarFilter
         categories={categoryDetails}
         onChange={(data) => setActiveCategory(data?.categoryDetail)}
+        viewLeft={isSelectionType ? <SelectionKnobsView /> : undefined}
         viewRight={
           isSelectionType ? (
             <div key={activeCategory?.id}>

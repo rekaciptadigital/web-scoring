@@ -9,6 +9,7 @@ import { SpinnerDotBlock } from "components/ma";
 import { ToolbarFilter } from "components/ma/toolbar-filters";
 import { toast } from "components/ma/processing-toast";
 import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
+import { SelectionKnobsView } from "../components/selection-knobs-view";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 import { MenuDownloadScoresheet } from "./components/menu-download-scoresheet";
 import { ScoringTable } from "./components/scoring-table";
@@ -67,6 +68,7 @@ function PageEventScoringElimination() {
         <ToolbarFilter
           categories={categoryDetails}
           onChange={(data) => setActiveCategory(data?.categoryDetail)}
+          viewLeft={<SelectionKnobsView />}
           viewRight={
             <div>
               <MenuDownloadScoresheet

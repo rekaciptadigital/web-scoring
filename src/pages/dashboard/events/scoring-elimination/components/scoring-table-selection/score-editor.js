@@ -187,7 +187,7 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
   if (!sessions) {
     return (
       <SessionTabListContainer>
-        <li>Data sesi tidak tersedia</li>
+        <li>Data sesi eliminasi tidak tersedia</li>
       </SessionTabListContainer>
     );
   }
@@ -201,7 +201,7 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
             className={classnames({ "session-tab-active": _checkIsTabActive(sessionNumber) })}
             onClick={() => onChange?.(parseInt(sessionNumber))}
           >
-            Sesi {sessionNumber}
+            Eli-{sessionNumber}
           </SessionTabButton>
         </li>
       ))}

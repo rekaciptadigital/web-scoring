@@ -119,4 +119,12 @@ export default {
   saveScorePermanent(data = null) {
     return API.post("/web/v2/scorer-elimination/set-save-permanent", data, null, true);
   },
+
+  /**
+   * @param {Object} qs { event_category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getSelectionResult(qs) {
+    return API.get("/web/v2/all-result-selection-score", qs);
+  },
 };

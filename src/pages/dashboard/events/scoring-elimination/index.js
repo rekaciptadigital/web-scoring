@@ -4,12 +4,17 @@ import { useParams } from "react-router-dom";
 import { useEventDetail } from "../scoring-qualification/hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesWithFilters } from "./hooks/category-filters";
+import { useDownloadScoresheetSelection } from "./hooks/download-scoresheet-selection";
 
 import { SpinnerDotBlock } from "components/ma";
+import { ToolbarFilter } from "components/ma/toolbar-filters";
+import { toast } from "components/ma/processing-toast";
 import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
 import { ButtonShowBracket } from "./components/button-show-bracket";
+import { MenuDownloadScoresheet } from "./components/menu-download-scoresheet";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
+import { ScoringTableSelection } from "./components/scoring-table-selection";
 
 import classnames from "classnames";
 
@@ -26,6 +31,10 @@ function PageEventScoringElimination() {
     data: categoryDetails,
     errors: errorsCategoryDetail,
   } = useCategoryDetails(eventId);
+
+  const [activeCategory, setActiveCategory] = React.useState(null);
+
+  const { download } = useDownloadScoresheetSelection(activeCategory?.id);
 
   const {
     activeCompetitionCategory,
@@ -60,6 +69,50 @@ function PageEventScoringElimination() {
     return (
       <ScoringPageWrapper {...pageProps}>
         <SpinnerDotBlock />
+      </ScoringPageWrapper>
+    );
+  }
+
+  if (isSelectionType) {
+    return (
+      <ScoringPageWrapper {...pageProps}>
+        <ToolbarFilter
+          categories={categoryDetails}
+          onChange={(data) => setActiveCategory(data?.categoryDetail)}
+          viewRight={
+            <div>
+              <MenuDownloadScoresheet
+                buttonLabel="Unduh Scoresheet"
+                sessionCount={activeCategory?.sessionInEliminationSelection}
+                onDownload={(session) => {
+                  toast.success("Sedang memproses unduhan...");
+                  download(session, {
+                    onSuccess() {
+                      toast.dismiss();
+                      toast.success("Memulai unduhan...");
+                    },
+                    onError() {
+                      toast.dismiss();
+                      toast.error("Gagal memulai unduhan");
+                    },
+                  });
+                }}
+              />
+            </div>
+          }
+        />
+
+        <ViewWrapper>
+          {activeCategory && (
+            <ScoringTableSelection
+              key={"selection-" + activeCategory?.id}
+              categoryDetailId={activeCategory?.id}
+              isSelectionType={isSelectionType}
+              isLocked={Boolean(!activeCategory || activeCategory?.eliminationLock)}
+              eliminationParticipantsCount={activeCategory?.defaultEliminationCount}
+            />
+          )}
+        </ViewWrapper>
       </ScoringPageWrapper>
     );
   }

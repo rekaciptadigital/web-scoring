@@ -20,16 +20,16 @@ const _makeMenus = (eventId, isSelectionType) => {
       label: "Skoring Kualifikasi",
       icon: IconBudRest,
     },
+    {
+      url: `/dashboard/event/${eventId}/scoring-elimination`,
+      label: "Skoring Eliminasi",
+      icon: IconBudRest,
+    },
   ];
 
   if (!isSelectionType) {
     return [
       ...commonMenus,
-      {
-        url: `/dashboard/event/${eventId}/scoring-elimination`,
-        label: "Skoring Eliminasi",
-        icon: IconBudRest,
-      },
       {
         url: `/dashboard/event/${eventId}/doc`,
         label: "Dokumen",
@@ -39,11 +39,6 @@ const _makeMenus = (eventId, isSelectionType) => {
   }
   return [
     ...commonMenus,
-    {
-      url: `/dashboard/event/${eventId}/scoring-elimination`,
-      label: "Skoring Eliminasi - Selection",
-      icon: IconBudRest,
-    },
     {
       url: `/dashboard/event/${eventId}/selection-result`,
       label: "Hasil Akhir",

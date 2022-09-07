@@ -1,34 +1,26 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
 import { useScoringMembers } from "../../hooks/scoring-members";
 import { useScoreEditor } from "../../hooks/score-editor";
-import { useParticipantPresence } from "../../hooks/participant-presence";
 import { useSubmitScore } from "../../hooks/submit-score";
-import { toast } from "../processing-toast";
 
-import { LoadingScreen, SpinnerDotBlock, AlertConfirmAction } from "components/ma";
-import { Checkbox } from "../../../components/form-fields";
+import { SpinnerDotBlock } from "components/ma";
 import { ScoreEditor } from "./score-editor";
 
 import IconChevronLeft from "components/ma/icons/mono/chevron-left";
 import IconChevronRight from "components/ma/icons/mono/chevron-right";
-import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconMedal from "components/ma/icons/fill/medal-gold";
 import classnames from "classnames";
 
-function ScoringTable({
+function ScoringTableSelection({
   categoryDetailId,
   isLocked,
   isSelectionType,
   eliminationParticipantsCount,
-  onChangeParticipantPresence,
   searchName,
 }) {
-  const { event_id } = useParams();
-  const eventId = event_id;
-  const scoreType = isSelectionType ? 3 : undefined;
+  const scoreType = 4;
 
   const {
     data: scoringMembers,
@@ -46,8 +38,6 @@ function ScoringTable({
   );
   const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
 
-  const { submitParticipantPresence, isLoading: isLoadingCheckPresence } = useParticipantPresence();
-
   const {
     isEditorOpen,
     activeRow,
@@ -61,7 +51,6 @@ function ScoringTable({
   const { submitScore, isLoading: isSaving } = useSubmitScore();
 
   const sessionNumbersList = getSessionNumbersList();
-  const shouldActiveRowRenderShootoff = [1, 2].indexOf(parseInt(activeRow?.haveShootOff)) >= 0;
 
   const _getParamEliminationTemplate = (count) => {
     if (editorValue.sessionNumber !== 11) {
@@ -115,26 +104,6 @@ function ScoringTable({
     });
   };
 
-  const checkPresenceByRow = (row) => {
-    const params = {
-      eventId,
-      participantId: row.member.participantId,
-      isPresent: row.member.isPresent ? 0 : 1,
-    };
-
-    submitParticipantPresence(params, {
-      onSuccess() {
-        const message = row.member.isPresent
-          ? "Peserta tidak diikutkan dalam eliminasi"
-          : "Peserta diikutkan dalam eliminasi";
-
-        toast.success(message);
-        onChangeParticipantPresence?.();
-        fetchScoringMembers();
-      },
-    });
-  };
-
   if (!isSettledScoringMembers) {
     return <SpinnerDotBlock />;
   }
@@ -145,8 +114,6 @@ function ScoringTable({
 
   return (
     <React.Fragment>
-      <LoadingScreen loading={isLoadingCheckPresence} />
-
       <TableContainer>
         <div>
           <LoadingBlocker isLoading={isLoadingScoringMembers} />
@@ -172,18 +139,6 @@ function ScoringTable({
 
             <tbody>
               {scoringMembers?.map((row) => {
-                const shouldRenderShootoffWarning = [1, 2].indexOf(parseInt(row.haveShootOff)) >= 0;
-                const getCheckboxTitleText = (row) => {
-                  if (!isLocked) {
-                    return row.member.isPresent
-                      ? "Hapus centang untuk tidak mengikutkan dalam eliminasi"
-                      : "Centang untuk mengikutkan dalam eliminasi";
-                  }
-                  if (isLocked)
-                    return row.member.isPresent
-                      ? "Peserta diikutkan dalam pemeringkatan eliminasi"
-                      : "Peserta tidak diikutkan dalam pemeringkatan eliminasi";
-                };
                 return (
                   <tr
                     key={row.member.id}
@@ -223,21 +178,6 @@ function ScoringTable({
 
                     <td>
                       <CellExpander>
-                        {shouldRenderShootoffWarning && (
-                          <WarningIconWrapper title="Peringkat terbawah memiliki skor yang sama">
-                            <IconAlertCircle />
-                          </WarningIconWrapper>
-                        )}
-
-                        {!isSelectionType && (
-                          <CheckboxWithPrompt
-                            disabled={isLocked || isEditorOpen}
-                            checked={row.member.isPresent}
-                            onChange={() => checkPresenceByRow(row)}
-                            title={getCheckboxTitleText(row)}
-                          />
-                        )}
-
                         {checkIsRowActive(row.member.id) ? (
                           <ExpanderButton flexible onClick={handleCollapseEditor}>
                             <IconChevronLeft size="16" />
@@ -268,7 +208,6 @@ function ScoringTable({
           memberId={activeRow?.member.id}
           sessionNumbersList={sessionNumbersList}
           scoreTotal={activeRow?.total}
-          hasShootOff={shouldActiveRowRenderShootoff}
           isLoading={isSaving}
           onChange={updateEditorValue}
           onSaveSuccess={fetchScoringMembers}
@@ -296,7 +235,7 @@ function SessionStatsColumnHeadingGroup({ isSelectionType, collapsed, sessionLis
     <React.Fragment>
       {sessionList?.map((sessionNumber) => (
         <th key={sessionNumber} className="stats">
-          Sesi {sessionNumber}
+          Eli-{sessionNumber}
         </th>
       ))}
 
@@ -369,40 +308,6 @@ function ClubName({ children, clubName }) {
     return <GrayedOutText>&ndash;</GrayedOutText>;
   }
   return children || clubName;
-}
-
-function CheckboxWithPrompt({ checked, onChange, title, disabled }) {
-  const [showPrompt, setShowPrompt] = React.useState(false);
-  return (
-    <CheckboxWrapper title={title}>
-      <Checkbox
-        disabled={disabled}
-        checked={checked}
-        onChange={() => {
-          if (checked) {
-            setShowPrompt(true);
-          } else {
-            onChange?.();
-          }
-        }}
-      />
-
-      <AlertConfirmAction
-        shouldConfirm={showPrompt}
-        labelConfirm="Yakin"
-        onConfirm={() => {
-          setShowPrompt(false);
-          onChange?.();
-        }}
-        labelCancel="Batal"
-        onClose={() => setShowPrompt(false)}
-      >
-        Peserta akan tidak dihitung dalam pemeringkatan eliminasi.
-        <br />
-        Yakin?
-      </AlertConfirmAction>
-    </CheckboxWrapper>
-  );
 }
 
 function LoadingBlocker({ isLoading = true }) {
@@ -532,17 +437,6 @@ const ExpanderButton = styled.button`
   }
 `;
 
-const WarningIconWrapper = styled.span`
-  color: var(--ma-yellow);
-`;
-
-const CheckboxWrapper = styled.span`
-  .rc-checkbox-disabled,
-  .rc-checkbox-disabled .rc-checkbox-input {
-    cursor: default;
-  }
-`;
-
 const LoadingContainer = styled.div`
   position: absolute;
   z-index: 100;
@@ -553,4 +447,4 @@ const LoadingContainer = styled.div`
   background-color: rgba(255, 255, 255, 0.6);
 `;
 
-export { ScoringTable };
+export { ScoringTableSelection };

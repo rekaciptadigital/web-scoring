@@ -28,6 +28,14 @@ export default {
   },
 
   /**
+   * @param {Object} qs { event_category_id, session }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getScoresheetEliminationSelectionDownloadUrl(qs) {
+    return API.get("/web/v1/archery-score-sheet/download-elimination-selection", qs);
+  },
+
+  /**
    * @param {Object} queryString  { elimination_id, category_id, round, match }
    * @returns {Promise} { success, data, errors, message }
    */

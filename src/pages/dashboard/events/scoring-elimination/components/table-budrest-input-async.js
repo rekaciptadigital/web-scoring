@@ -7,7 +7,15 @@ import { toast } from "./processing-toast";
 
 import IconLoading from "./icon-loading";
 
-function BudrestInputAsync({ categoryId, playerDetail, disabled, scoring, onSuccess }) {
+function BudrestInputAsync({
+  categoryId,
+  playerDetail,
+  disabled,
+  scoring,
+  participantId,
+  memberId,
+  onSuccess,
+}) {
   const inputRef = React.useRef(null);
   const [isDirty, setDirty] = React.useState(false);
   const previousValue = React.useRef(null);
@@ -18,6 +26,8 @@ function BudrestInputAsync({ categoryId, playerDetail, disabled, scoring, onSucc
     eliminationId: scoring.elimination_id,
     round: scoring.round,
     match: scoring.match,
+    participantId: participantId,
+    memberId: memberId,
   });
 
   React.useEffect(() => {
@@ -51,7 +61,7 @@ function BudrestInputAsync({ categoryId, playerDetail, disabled, scoring, onSucc
           toast.error("Gagal menyimpan total");
         },
       });
-    }, 1100);
+    }, 1750);
 
     return () => clearTimeout(debounceTimer);
   }, [inputValue]);

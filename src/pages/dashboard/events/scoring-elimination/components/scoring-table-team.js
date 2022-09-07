@@ -1,14 +1,21 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useEliminationMatches } from "../hooks/elimination-matches";
+import { useDownloadBlankScoresheet } from "../hooks/download-blank-scoresheet";
+import { useDownloadScoresheetByRound } from "../hooks/download-scoresheet-by-round";
 
 import { SpinnerDotBlock } from "components/ma";
+import { toast } from "components/ma/processing-toast";
+import { useFilters } from "components/ma/toolbar-filters";
+import { TableViewToolbar } from "./table-view-toolbar";
+import { ScoresheetMenus } from "./scoresheet-menus";
 import { BudrestInputAsync } from "./table-budrest-input-async";
 import { TotalInputAsync } from "./table-total-input-async";
 import { ButtonEditScoreTeam } from "./button-edit-score-line-team";
 import { ButtonSetWinner, ButtonCancelWinner } from "./button-set-winner";
 import { ButtonDownloadScoresheet } from "./button-download-scoresheet";
 
+import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconAlertCircle from "components/ma/icons/mono/alert-circle";
 import IconCheckOkCircle from "components/ma/icons/mono/check-ok-circle.js";
 
@@ -16,15 +23,27 @@ import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracke
 
 import classnames from "classnames";
 
-function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
+function ScoringTableTeam({ categoryDetailId, eliminationMemberCounts }) {
+  const { categoryDetail: categoryDetails } = useFilters();
   const { isError, data, fetchEliminationMatches } = useEliminationMatches(
     categoryDetailId,
     eliminationMemberCounts
   );
-
   const [selectedTab, setSelectedTab] = React.useState(0);
-  const isSettled = Boolean(data) || (!data && isError);
 
+  const isSettled = Boolean(data || (!data && isError));
+  const currentRows = isSettled ? data.rounds[selectedTab]?.seeds : [];
+  const roundNumber = selectedTab + 1;
+
+  const { download: downloadByRound } = useDownloadScoresheetByRound({
+    categoryId: categoryDetailId,
+    eliminationId: data?.eliminationGroupId,
+    round: roundNumber,
+  });
+
+  const { download: downloadBlank } = useDownloadBlankScoresheet({ categoryId: categoryDetailId });
+
+  // TODO: kapan-kapan ganti `!isSettled` jadi pakai `isInitialLoading` dari fetcher
   if (!isSettled) {
     return (
       <SectionTableContainer>
@@ -54,264 +73,323 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
     );
   }
 
-  // Happy path
-  const tabLabels = _getTabLabels(data.rounds);
-  const currentRows = data.rounds[selectedTab]?.seeds || [];
-  const thTotalLabel = _getTotalLabel(categoryDetails);
-
   return (
     <SectionTableContainer>
-      <StagesTabs
-        labels={tabLabels}
-        currentTab={selectedTab}
-        onChange={(index) => setSelectedTab(index)}
+      <TableViewToolbar
+        rounds={data.rounds}
+        selectedTab={selectedTab}
+        onChangeTab={(index) => setSelectedTab(index)}
+        viewRight={
+          <div>
+            <ScoresheetMenus
+              label="Scoresheet"
+              displayAsButtonList
+              options={[
+                {
+                  label: "Cetak Scoresheet Kosong",
+                  onClick: () => {
+                    toast.loading("Sedang menyiapkan file scoresheet...");
+                    downloadBlank({
+                      onSuccess: () => {
+                        toast.dismiss();
+                        toast.success("Unduhan dimulai");
+                      },
+                      onError: () => {
+                        toast.dismiss();
+                        toast.error("Gagal memulai unduhan");
+                      },
+                    });
+                  },
+                },
+                {
+                  label: "Unduh Semua Scoresheet",
+                  onClick: () => {
+                    toast.loading("Sedang menyiapkan file scoresheet...");
+                    downloadByRound({
+                      onSuccess: () => {
+                        toast.dismiss();
+                        toast.success("Unduhan dimulai");
+                      },
+                      onError: () => {
+                        toast.dismiss();
+                        toast.error("Gagal memulai unduhan");
+                      },
+                    });
+                  },
+                },
+              ]}
+            />
+          </div>
+        }
       />
 
       <MembersTable className="table table-responsive">
         <thead>
           <tr>
-            <th>Bantalan</th>
+            <th>
+              <BudrestColumnIconWrapper>
+                <IconBudrest />
+              </BudrestColumnIconWrapper>
+            </th>
             <th>Tim</th>
-            <ThTotal>{thTotalLabel}</ThTotal>
+            <ThTotal>{_getTotalLabel(categoryDetails)}</ThTotal>
             <th></th>
-            <ThTotal>{thTotalLabel}</ThTotal>
+            <ThTotal>{_getTotalLabel(categoryDetails)}</ThTotal>
             <th>Tim</th>
+            <th>
+              <BudrestColumnIconWrapper>
+                <IconBudrest />
+              </BudrestColumnIconWrapper>
+            </th>
             <th></th>
           </tr>
         </thead>
 
         <tbody key={selectedTab}>
-          {currentRows.map((row, index) => {
-            const team1 = row.teams[0];
-            const team2 = row.teams[1];
-
-            const roundNumber = selectedTab + 1;
-            const matchNumber = index + 1;
-
-            const code = `2-${data?.eliminationGroupId}-${matchNumber}-${roundNumber}-t`;
-
-            const scoring = {
-              code: code,
-              elimination_id: data?.eliminationGroupId,
-              round: roundNumber,
-              match: matchNumber,
-            };
-
-            const isBye =
-              row.teams.some((team) => team.status === "bye") ||
-              (roundNumber === 1 && row.teams.every((team) => !team.teamName));
-            const noData =
-              !team1?.teamName ||
-              !team2?.teamName ||
-              !team1?.memberTeam?.length ||
-              !team2?.memberTeam?.length;
-            const bothAreBye = row.teams.every((team) => team.status === "wait");
-            const hasWinner = row.teams.some((team) => team.win === 1);
-            const budrestNumber = _getBudrestNumber(row);
-
-            return (
-              <tr key={index}>
-                <td>
-                  {isBye || noData || hasWinner ? (
-                    <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
-                  ) : (
-                    <BudrestInputAsync
-                      categoryId={categoryDetailId}
-                      playerDetail={team1 || team2}
-                      disabled={hasWinner || noData}
-                      scoring={scoring}
-                      onSuccess={fetchEliminationMatches}
-                    />
-                  )}
-                </td>
-
-                <td>
-                  <PlayerLabelContainerLeft>
-                    <PlayerNameData>
-                      {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
-                      <div>
-                        <TeamNameLabel>
-                          {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
-                        </TeamNameLabel>
-                        {Boolean(team1?.memberTeam?.length) && (
-                          <MembersList>
-                            {team1.memberTeam.map((member) => (
-                              <li key={member.memberId}>{member.name}</li>
-                            ))}
-                          </MembersList>
-                        )}
-                      </div>
-                    </PlayerNameData>
-                  </PlayerLabelContainerLeft>
-                </td>
-
-                <td>
-                  {!noData && !hasWinner ? (
-                    <InlineScoreInput>
-                      <ValidationIndicator position="left" isValid={team1?.isDifferent !== 1} />
-                      <TotalInputAsync
-                        categoryId={categoryDetailId}
-                        playerDetail={team1}
-                        disabled={hasWinner || !team1?.teamName}
-                        scoring={scoring}
-                        onSuccess={fetchEliminationMatches}
-                      />
-                    </InlineScoreInput>
-                  ) : (
-                    <NoArcherWrapper>-</NoArcherWrapper>
-                  )}
-                </td>
-
-                <td>
-                  {(!noData || (!bothAreBye && isBye)) && (
-                    <HeadToHeadScoreLabels>
-                      <ScoreTotalLabel
-                        className={classnames({
-                          "score-label-higher":
-                            team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
-                        })}
-                      >
-                        {team1?.adminTotal || 0}
-                      </ScoreTotalLabel>
-
-                      <span>&ndash;</span>
-
-                      <ScoreTotalLabel
-                        className={classnames({
-                          "score-label-higher":
-                            team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
-                        })}
-                      >
-                        {team2?.adminTotal || 0}
-                      </ScoreTotalLabel>
-                    </HeadToHeadScoreLabels>
-                  )}
-                </td>
-
-                <td>
-                  {!noData && !hasWinner ? (
-                    <InlineScoreInput>
-                      <TotalInputAsync
-                        categoryId={categoryDetailId}
-                        playerDetail={team2}
-                        disabled={hasWinner || !team2?.teamName}
-                        scoring={scoring}
-                        onSuccess={fetchEliminationMatches}
-                      />
-                      <ValidationIndicator position="right" isValid={team2?.isDifferent !== 1} />
-                    </InlineScoreInput>
-                  ) : (
-                    <NoArcherWrapper>-</NoArcherWrapper>
-                  )}
-                </td>
-
-                <td>
-                  <PlayerLabelContainerRight>
-                    <PlayerNameData>
-                      {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
-                      <div>
-                        <TeamNameLabel>
-                          {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
-                        </TeamNameLabel>
-                        {Boolean(team2?.memberTeam?.length) && (
-                          <MembersList>
-                            {team2.memberTeam.map((member) => (
-                              <li key={member.memberId}>{member.name}</li>
-                            ))}
-                          </MembersList>
-                        )}
-                      </div>
-                    </PlayerNameData>
-                  </PlayerLabelContainerRight>
-                </td>
-
-                <td>
-                  <HorizontalSpaced>
-                    {!isBye &&
-                      (!hasWinner ? (
-                        <React.Fragment>
-                          <ButtonSetWinner
-                            title={
-                              hasWinner
-                                ? "Pemenang telah ditentukan"
-                                : "Tentukan pemenang untuk match ini"
-                            }
-                            disabled={noData}
-                            categoryId={categoryDetailId}
-                            scoring={scoring}
-                            onSuccess={fetchEliminationMatches}
-                          >
-                            Tentukan
-                          </ButtonSetWinner>
-
-                          <ButtonEditScoreTeam
-                            disabled={noData}
-                            headerInfo={row}
-                            budrestNumber={budrestNumber}
-                            scoring={scoring}
-                            onSuccessSubmit={fetchEliminationMatches}
-                            categoryDetails={categoryDetails}
-                          />
-                        </React.Fragment>
-                      ) : (
-                        <React.Fragment>
-                          <ButtonCancelWinner
-                            title="Batalkan pemenang untuk mengubah skor kembali"
-                            scoring={scoring}
-                            categoryId={categoryDetailId}
-                            onSuccess={fetchEliminationMatches}
-                          />
-
-                          <ButtonEditScoreTeam
-                            disabled={noData}
-                            viewMode
-                            headerInfo={row}
-                            budrestNumber={budrestNumber}
-                            scoring={scoring}
-                            onSuccessSubmit={fetchEliminationMatches}
-                            categoryDetails={categoryDetails}
-                          />
-                        </React.Fragment>
-                      ))}
-
-                    {isBye && (
-                      <ButtonEditScoreTeam
-                        headerInfo={row}
-                        budrestNumber={budrestNumber}
-                        scoring={scoring}
-                        onSuccessSubmit={fetchEliminationMatches}
-                        categoryDetails={categoryDetails}
-                      />
-                    )}
-
-                    <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
-                  </HorizontalSpaced>
-                </td>
-              </tr>
-            );
-          })}
+          {currentRows.map((row, index) => (
+            <MatchRow
+              key={index}
+              categoryDetailId={categoryDetailId}
+              categoryDetails={categoryDetails}
+              bracket={data}
+              row={row}
+              roundNumber={roundNumber}
+              matchNumber={index + 1}
+              fetchEliminationMatches={fetchEliminationMatches}
+            />
+          ))}
         </tbody>
       </MembersTable>
     </SectionTableContainer>
   );
 }
 
-function StagesTabs({ labels, currentTab, onChange }) {
+function MatchRow({
+  categoryDetailId,
+  categoryDetails,
+  row,
+  fetchEliminationMatches,
+  bracket,
+  roundNumber,
+  matchNumber,
+}) {
+  const team1 = row.teams[0];
+  const team2 = row.teams[1];
+
+  const code = `2-${bracket?.eliminationGroupId}-${matchNumber}-${roundNumber}-t`;
+
+  const scoring = {
+    code: code,
+    elimination_id: bracket?.eliminationGroupId,
+    round: roundNumber,
+    match: matchNumber,
+  };
+
+  const isBye =
+    row.teams.some((team) => team.status === "bye") ||
+    (roundNumber === 1 && row.teams.every((team) => !team.teamName));
+  const noData =
+    !team1?.teamName ||
+    !team2?.teamName ||
+    !team1?.memberTeam?.length ||
+    !team2?.memberTeam?.length;
+  const bothAreBye = row.teams.every((team) => team.status === "wait");
+  const hasWinner = row.teams.some((team) => team.win === 1);
+  const budrestNumber = _getBudrestNumber(row);
+
   return (
-    <StagesBarContainer>
-      <StageTabsList>
-        {labels.map((label, index) => (
-          <li key={label}>
-            <StageTabButton
-              className={classnames({ "session-tab-active": index === currentTab })}
-              onClick={() => onChange(index)}
+    <tr>
+      <td>
+        {isBye || noData || hasWinner ? (
+          <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
+        ) : (
+          <BudrestInputAsync
+            categoryId={categoryDetailId}
+            playerDetail={team1}
+            disabled={hasWinner || noData}
+            scoring={scoring}
+            participantId={team1?.participantId}
+            onSuccess={fetchEliminationMatches}
+          />
+        )}
+      </td>
+
+      <td>
+        <PlayerLabelContainerLeft>
+          <PlayerNameData>
+            {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
+            <div>
+              <TeamNameLabel>
+                {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+              </TeamNameLabel>
+              {Boolean(team1?.memberTeam?.length) && (
+                <MembersList>
+                  {team1.memberTeam.map((member) => (
+                    <li key={member.memberId}>{member.name}</li>
+                  ))}
+                </MembersList>
+              )}
+            </div>
+          </PlayerNameData>
+        </PlayerLabelContainerLeft>
+      </td>
+
+      <td>
+        {!noData && !hasWinner ? (
+          <InlineScoreInput>
+            <ValidationIndicator position="left" isValid={team1?.isDifferent !== 1} />
+            <TotalInputAsync
+              categoryId={categoryDetailId}
+              playerDetail={team1}
+              disabled={hasWinner || !team1?.teamName}
+              scoring={scoring}
+              onSuccess={fetchEliminationMatches}
+            />
+          </InlineScoreInput>
+        ) : (
+          <NoArcherWrapper>-</NoArcherWrapper>
+        )}
+      </td>
+
+      <td>
+        {(!noData || (!bothAreBye && isBye)) && (
+          <HeadToHeadScoreLabels>
+            <ScoreTotalLabel
+              className={classnames({
+                "score-label-higher":
+                  team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
+              })}
             >
-              <span>{label}</span>
-            </StageTabButton>
-          </li>
-        ))}
-      </StageTabsList>
-    </StagesBarContainer>
+              {team1?.adminTotal || 0}
+            </ScoreTotalLabel>
+
+            <span>&ndash;</span>
+
+            <ScoreTotalLabel
+              className={classnames({
+                "score-label-higher":
+                  team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
+              })}
+            >
+              {team2?.adminTotal || 0}
+            </ScoreTotalLabel>
+          </HeadToHeadScoreLabels>
+        )}
+      </td>
+
+      <td>
+        {!noData && !hasWinner ? (
+          <InlineScoreInput>
+            <TotalInputAsync
+              categoryId={categoryDetailId}
+              playerDetail={team2}
+              disabled={hasWinner || !team2?.teamName}
+              scoring={scoring}
+              onSuccess={fetchEliminationMatches}
+            />
+            <ValidationIndicator position="right" isValid={team2?.isDifferent !== 1} />
+          </InlineScoreInput>
+        ) : (
+          <NoArcherWrapper>-</NoArcherWrapper>
+        )}
+      </td>
+
+      <td>
+        <PlayerLabelContainerRight>
+          <PlayerNameData>
+            {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
+            <div>
+              <TeamNameLabel>
+                {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+              </TeamNameLabel>
+              {Boolean(team2?.memberTeam?.length) && (
+                <MembersList>
+                  {team2.memberTeam.map((member) => (
+                    <li key={member.memberId}>{member.name}</li>
+                  ))}
+                </MembersList>
+              )}
+            </div>
+          </PlayerNameData>
+        </PlayerLabelContainerRight>
+      </td>
+
+      <td>
+        {isBye || noData || hasWinner ? (
+          <BudrestNumberLabel>{budrestNumber}</BudrestNumberLabel>
+        ) : (
+          <BudrestInputAsync
+            categoryId={categoryDetailId}
+            playerDetail={team2}
+            disabled={hasWinner || noData}
+            scoring={scoring}
+            participantId={team2?.participantId}
+            onSuccess={fetchEliminationMatches}
+          />
+        )}
+      </td>
+
+      <td>
+        <HorizontalSpaced>
+          {!isBye &&
+            (!hasWinner ? (
+              <React.Fragment>
+                <ButtonSetWinner
+                  title={
+                    hasWinner ? "Pemenang telah ditentukan" : "Tentukan pemenang untuk match ini"
+                  }
+                  disabled={noData}
+                  categoryId={categoryDetailId}
+                  scoring={scoring}
+                  onSuccess={fetchEliminationMatches}
+                >
+                  Tentukan
+                </ButtonSetWinner>
+
+                <ButtonEditScoreTeam
+                  disabled={noData}
+                  headerInfo={row}
+                  budrestNumber={budrestNumber}
+                  scoring={scoring}
+                  onSuccessSubmit={fetchEliminationMatches}
+                  categoryDetails={categoryDetails}
+                />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <ButtonCancelWinner
+                  title="Batalkan pemenang untuk mengubah skor kembali"
+                  scoring={scoring}
+                  categoryId={categoryDetailId}
+                  onSuccess={fetchEliminationMatches}
+                />
+
+                <ButtonEditScoreTeam
+                  disabled={noData}
+                  viewMode
+                  headerInfo={row}
+                  budrestNumber={budrestNumber}
+                  scoring={scoring}
+                  onSuccessSubmit={fetchEliminationMatches}
+                  categoryDetails={categoryDetails}
+                />
+              </React.Fragment>
+            ))}
+
+          {isBye && (
+            <ButtonEditScoreTeam
+              headerInfo={row}
+              budrestNumber={budrestNumber}
+              scoring={scoring}
+              onSuccessSubmit={fetchEliminationMatches}
+              categoryDetails={categoryDetails}
+            />
+          )}
+
+          <ButtonDownloadScoresheet categoryId={categoryDetailId} scoring={scoring} />
+        </HorizontalSpaced>
+      </td>
+    </tr>
   );
 }
 
@@ -439,69 +517,6 @@ const EmptyStateDescription = styled.p`
   color: var(--ma-gray-600);
 `;
 
-const StagesBarContainer = styled.div`
-  padding: 1rem;
-`;
-
-const StageTabsList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const StageTabButton = styled.button`
-  display: block;
-  border: none;
-  padding: 0 0.5rem;
-  background-color: transparent;
-
-  min-width: 6rem;
-  color: var(--ma-gray-400);
-  font-size: 0.875rem;
-  font-weight: 600;
-
-  transition: all 0.15s;
-
-  > span {
-    display: block;
-    position: relative;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0.25rem 0;
-
-    &::before {
-      content: " ";
-      position: absolute;
-      height: 2px;
-      top: 0;
-      left: 0;
-      width: 1.5rem;
-      background-color: transparent;
-      transition: all 0.3s;
-      transform: scaleX(0);
-      transform-origin: left;
-    }
-  }
-
-  &:hover {
-    color: var(--ma-blue);
-  }
-
-  &.session-tab-active {
-    color: var(--ma-blue);
-
-    > span {
-      &::before {
-        background-color: #90aad4;
-        transform: scaleX(1);
-      }
-    }
-  }
-`;
-
 const MembersTable = styled.table`
   --indicator-space-margin: 3rem;
   text-align: center;
@@ -524,6 +539,10 @@ const MembersTable = styled.table`
   td {
     cursor: auto;
   }
+`;
+
+const BudrestColumnIconWrapper = styled.span`
+  color: var(--ma-red);
 `;
 
 const PlayerLabelContainerLeft = styled.div`
@@ -594,34 +613,6 @@ const ScoreTotalLabel = styled.span`
 /* =========================== */
 // utils
 
-const tabLabels = {
-  16: "32 Besar",
-  8: "16 Besar",
-  4: "8 Besar",
-  2: "Semi-Final",
-};
-
-function _getTabLabels(bracketTemplate) {
-  if (!bracketTemplate) {
-    return [];
-  }
-
-  let finalHasTaken = false;
-  const labels = bracketTemplate.map((round) => {
-    const matchCount = round.seeds.length;
-    if (matchCount > 1) {
-      return tabLabels[matchCount];
-    }
-    if (!finalHasTaken) {
-      finalHasTaken = true;
-      return "Final";
-    }
-    return "3rd Place";
-  });
-
-  return labels;
-}
-
 function _getBudrestNumber(row) {
   if (!row?.teams?.length) {
     return "-";
@@ -642,12 +633,12 @@ function _getBudrestNumber(row) {
 }
 
 function _getTotalLabel(categoryDetails) {
-  if (!categoryDetails?.originalCategoryDetail?.competitionCategoryId) {
+  if (!categoryDetails?.competitionCategoryId) {
     return "Total";
   }
   const TYPE_POINT = "Total Set Poin";
   const TYPE_ACCUMULATION = "Total Skor";
-  return categoryDetails.originalCategoryDetail.competitionCategoryId.toLowerCase() === "compound"
+  return categoryDetails.competitionCategoryId.toLowerCase() === "compound"
     ? TYPE_ACCUMULATION
     : TYPE_POINT;
 }

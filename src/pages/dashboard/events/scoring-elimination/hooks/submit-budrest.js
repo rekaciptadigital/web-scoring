@@ -1,7 +1,7 @@
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { ScoringService } from "services";
 
-function useSubmitBudrest({ categoryId, eliminationId, round, match }) {
+function useSubmitBudrest({ categoryId, eliminationId, round, match, participantId, memberId }) {
   const fetcher = useFetcher();
 
   const submitBudrest = (budrestNumberValue, options = {}) => {
@@ -12,6 +12,8 @@ function useSubmitBudrest({ categoryId, eliminationId, round, match }) {
         round: round,
         match: match,
         budrest_number: budrestNumberValue,
+        participant_id: participantId,
+        member_id: memberId,
       });
     };
     fetcher.runAsync(postFunction, options);

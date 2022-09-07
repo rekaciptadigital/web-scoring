@@ -20,6 +20,22 @@ export default {
   },
 
   /**
+   * @param {Object} queryString { category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getBlankScoresheetEliminationUrl(qs) {
+    return API.get("/web/v1/archery-score-sheet/download-empty-score-sheet-elimination", qs);
+  },
+
+  /**
+   * @param {Object} queryString { event_elimination_id, round, category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getScoresheetEliminationDownloadUrlByRound(qs) {
+    return API.get("/web/v1/archery-score-sheet/bulk-score-sheet-elimination", qs);
+  },
+
+  /**
    * @param {Object} queryString  { elimination_id, category_id, round, match }
    * @returns {Promise} { success, data, errors, message }
    */
@@ -48,8 +64,15 @@ export default {
   },
 
   /**
-   *
-   * @param {Object} queryString  { category_id, elimination_id, round, match, budrest_number }
+   * @param {Object} queryString {
+   *   category_id,
+   *   elimination_id,
+   *   round,
+   *   match,
+   *   budrest_number,
+   *   participant_id,
+   *   member_id
+   * }
    * @returns {Promise} { success, data, errors, message }
    */
   saveBudrestElimination(data = null) {

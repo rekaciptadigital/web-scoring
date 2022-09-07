@@ -18,7 +18,6 @@ function ScoringTableSelection({
   isLocked,
   isSelectionType,
   eliminationParticipantsCount,
-  searchName,
 }) {
   const scoreType = 4;
 
@@ -31,7 +30,7 @@ function ScoringTableSelection({
     fetchScoringMembers,
   } = useScoringMembers(
     categoryDetailId,
-    searchName,
+    "",
     eliminationParticipantsCount,
     false, // bukan beregu
     scoreType

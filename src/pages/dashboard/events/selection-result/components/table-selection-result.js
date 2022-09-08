@@ -39,34 +39,37 @@ function TableSelectionResult({ categoryDetailId }) {
             </thead>
 
             <tbody>
-              {resultRows?.map((row) => (
-                <tr key={row.member.id}>
-                  <td>
-                    {row.rank || (
-                      <GrayedOutText style={{ fontSize: "0.75em" }}>
-                        belum
-                        <br />
-                        ada data
-                      </GrayedOutText>
-                    )}
-                  </td>
+              {resultRows?.map((row, index) => {
+                const rankNumber = index + 1;
+                return (
+                  <tr key={row.member.id}>
+                    <td>
+                      {rankNumber || (
+                        <GrayedOutText style={{ fontSize: "0.75em" }}>
+                          belum
+                          <br />
+                          ada data
+                        </GrayedOutText>
+                      )}
+                    </td>
 
-                  <td className="name">{row.member.name}</td>
-                  <td className="name">
-                    <ClubName>{row.clubName}</ClubName>
-                  </td>
+                    <td className="name">{row.member.name}</td>
+                    <td className="name">
+                      <ClubName>{row.clubName}</ClubName>
+                    </td>
 
-                  <SessionStatsCellsGroup
-                    sessionNumbersList={sessionNumbersList}
-                    sessionEliminationList={sessionEliminationNumbersList}
-                    sessions={row.sessions}
-                    sessionsElimination={row.sessionsEliminationSelection}
-                    total={row.total}
-                    totalArrow={row.totalArrow}
-                    totalIrat={row.totalIrat}
-                  />
-                </tr>
-              ))}
+                    <SessionStatsCellsGroup
+                      sessionNumbersList={sessionNumbersList}
+                      sessionEliminationList={sessionEliminationNumbersList}
+                      sessions={row.qualification.sessions}
+                      sessionsElimination={row.elimination.sessions}
+                      totalQual={row.qualification.total}
+                      totalEli={row.elimination.total}
+                      totalIrat={row.allTotalIrat}
+                    />
+                  </tr>
+                );
+              })}
             </tbody>
           </MembersTable>
         </TableContainer>
@@ -105,14 +108,15 @@ function SessionStatsColumnHeadingGroup({ sessionList, sessionEliminationList })
         </th>
       ))}
 
+      <th className="stats">Total-Kual</th>
+
       {sessionEliminationList?.map((eliminasiNumber) => (
         <th key={eliminasiNumber} className="stats">
           Eli-{eliminasiNumber}
         </th>
       ))}
 
-      <th className="stats">Total</th>
-      <th className="stats">Jumlah Arrow</th>
+      <th className="stats">Total-Eli</th>
       <th className="stats">IRAT</th>
     </React.Fragment>
   );
@@ -121,10 +125,10 @@ function SessionStatsColumnHeadingGroup({ sessionList, sessionEliminationList })
 function SessionStatsCellsGroup({
   sessions,
   sessionNumbersList,
+  totalQual,
   sessionsElimination,
   sessionEliminationList,
-  total,
-  totalArrow,
+  totalEli,
   totalIrat,
 }) {
   return (
@@ -135,6 +139,8 @@ function SessionStatsCellsGroup({
         </td>
       ))}
 
+      <td className="stats total">{totalQual}</td>
+
       {sessionEliminationList?.map((eliminationNumber) => (
         <td key={eliminationNumber} className="stats">
           {<span>{sessionsElimination[eliminationNumber]?.total}</span> || (
@@ -143,8 +149,7 @@ function SessionStatsCellsGroup({
         </td>
       ))}
 
-      <td className="stats">{total}</td>
-      <td className="stats">{totalArrow}</td>
+      <td className="stats total">{totalEli}</td>
       <td className="stats">{totalIrat}</td>
     </React.Fragment>
   );
@@ -233,7 +238,6 @@ const MembersTable = styled.table`
   }
 
   tbody td {
-    padding: 0.125rem 0.125rem;
     vertical-align: middle;
 
     &.name {
@@ -242,6 +246,10 @@ const MembersTable = styled.table`
 
     &.stats {
       text-align: right;
+    }
+
+    &.total {
+      background-color: var(--ma-gray-50);
     }
   }
 

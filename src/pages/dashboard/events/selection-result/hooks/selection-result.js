@@ -2,7 +2,7 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { ScoringService } from "services";
 
-function useSelectionResult(categoryDetailId) {
+function useSelectionResult({ categoryDetailId, standing }) {
   const fetcher = useFetcher();
 
   const { sessionNumbersList, sessionEliminationNumbersList } = useSessionsLists(fetcher.data);
@@ -12,11 +12,14 @@ function useSelectionResult(categoryDetailId) {
       return;
     }
     const getFunction = () => {
-      const qs = { event_category_id: categoryDetailId };
+      const qs = {
+        event_category_id: categoryDetailId,
+        standings_type: standing || undefined,
+      };
       return ScoringService.getSelectionResult(qs);
     };
     fetcher.runAsync(getFunction);
-  }, [categoryDetailId]);
+  }, [categoryDetailId, standing]);
 
   return {
     ...fetcher,
@@ -36,11 +39,14 @@ function useSessionsLists(data) {
       return lists;
     }
 
-    lists.sessionNumbersList = Object.keys(data[0].qualification.sessions)
+    const qualification = data[0].qualification?.sessions || data[0].sessions || {};
+    const elimination = data[0].elimination?.sessions || data[0].sessions || {};
+
+    lists.sessionNumbersList = Object.keys(qualification)
       .map((key) => parseInt(key))
       .filter((sessionNumber) => sessionNumber !== 11);
 
-    lists.sessionEliminationNumbersList = Object.keys(data[0].elimination.sessions)
+    lists.sessionEliminationNumbersList = Object.keys(elimination)
       .map((key) => parseInt(key))
       .filter((sessionNumber) => sessionNumber !== 11);
 

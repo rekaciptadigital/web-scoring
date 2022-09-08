@@ -27,24 +27,24 @@ function useSelectionResult(categoryDetailId) {
 
 function useSessionsLists(data) {
   const numbersData = React.useMemo(() => {
-    const data = {
+    const lists = {
       sessionNumbersList: null,
       sessionEliminationNumbersList: null,
     };
 
     if (!data?.length) {
-      return data;
+      return lists;
     }
 
-    data.sessionNumbersList = Object.keys(data[0].sessions)
+    lists.sessionNumbersList = Object.keys(data[0].qualification.sessions)
       .map((key) => parseInt(key))
       .filter((sessionNumber) => sessionNumber !== 11);
 
-    data.sessionEliminationNumbersList = Object.keys(data[0].sessionsEliminationSelection)
+    lists.sessionEliminationNumbersList = Object.keys(data[0].elimination.sessions)
       .map((key) => parseInt(key))
       .filter((sessionNumber) => sessionNumber !== 11);
 
-    return data;
+    return lists;
   }, [data]);
 
   return numbersData;

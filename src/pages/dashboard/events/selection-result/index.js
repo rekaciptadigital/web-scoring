@@ -8,7 +8,7 @@ import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
 import { toast } from "components/ma/processing-toast";
 import { ToolbarFilter } from "components/ma/toolbar-filters";
 import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
-import { SelectionKnobsView } from "../components/selection-knobs-view";
+import { SelectionKnobsView } from "./components/selection-knobs-view";
 import { TableSelectionResult } from "./components/table-selection-result";
 
 import IconDownload from "components/ma/icons/mono/download";
@@ -26,6 +26,8 @@ function PageEventSelectionResult() {
   } = useCategoryDetails(eventId);
 
   const [activeCategory, setActiveCategory] = React.useState(null);
+  const [standingValue, setStandingValue] = React.useState(3);
+
   const isSelectionType = eventDetail?.eventCompetition === "Selection";
   const pageProps = { pageTitle: "Hasil Akhir Seleksi", isSelectionType: isSelectionType };
 
@@ -39,7 +41,9 @@ function PageEventSelectionResult() {
         <ToolbarFilter
           categories={categoryDetails}
           onChange={(data) => setActiveCategory(data.categoryDetail)}
-          viewLeft={<SelectionKnobsView />}
+          viewLeft={
+            <SelectionKnobsView standingValue={standingValue} onChangeStanding={setStandingValue} />
+          }
           viewRight={
             <div>
               <ButtonOutlineBlue
@@ -58,7 +62,11 @@ function PageEventSelectionResult() {
         />
 
         <ViewWrapper>
-          <TableSelectionResult key={activeCategory?.id} categoryDetailId={activeCategory?.id} />
+          <TableSelectionResult
+            key={activeCategory?.id + "-" + standingValue}
+            categoryDetailId={activeCategory?.id}
+            standing={standingValue}
+          />
         </ViewWrapper>
       </AsyncViewWrapper>
     </ScoringPageWrapper>

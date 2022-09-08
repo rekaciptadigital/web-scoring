@@ -6,7 +6,7 @@ import { SpinnerDotBlock, AlertSubmitError } from "components/ma";
 
 import IconMedal from "components/ma/icons/fill/medal-gold";
 
-function TableSelectionResult({ categoryDetailId }) {
+function TableSelectionResult({ categoryDetailId, standing }) {
   const {
     data: resultRows,
     isInitialLoading,
@@ -14,7 +14,7 @@ function TableSelectionResult({ categoryDetailId }) {
     errors,
     sessionNumbersList,
     sessionEliminationNumbersList,
-  } = useSelectionResult(categoryDetailId);
+  } = useSelectionResult({ categoryDetailId, standing });
 
   return (
     <AsyncViewWrapper isLoading={isInitialLoading} isError={isError} errors={errors}>
@@ -32,6 +32,7 @@ function TableSelectionResult({ categoryDetailId }) {
                 <th className="name">Klub</th>
 
                 <SessionStatsColumnHeadingGroup
+                  standing={standing}
                   sessionList={sessionNumbersList}
                   sessionEliminationList={sessionEliminationNumbersList}
                 />
@@ -59,13 +60,14 @@ function TableSelectionResult({ categoryDetailId }) {
                     </td>
 
                     <SessionStatsCellsGroup
+                      standing={standing}
                       sessionNumbersList={sessionNumbersList}
                       sessionEliminationList={sessionEliminationNumbersList}
-                      sessions={row.qualification.sessions}
-                      sessionsElimination={row.elimination.sessions}
-                      totalQual={row.qualification.total}
-                      totalEli={row.elimination.total}
-                      totalIrat={row.allTotalIrat}
+                      sessions={row.qualification?.sessions || row.sessions}
+                      sessionsElimination={row.elimination?.sessions || row.sessions}
+                      totalQual={row.qualification?.total || row.total}
+                      totalEli={row.elimination?.total || row.total}
+                      totalIrat={row.allTotalIrat || row.totalIrat}
                     />
                   </tr>
                 );
@@ -99,30 +101,33 @@ function AsyncViewWrapper({ children, isLoading, isError, errors }) {
   return children;
 }
 
-function SessionStatsColumnHeadingGroup({ sessionList, sessionEliminationList }) {
+function SessionStatsColumnHeadingGroup({ standing, sessionList, sessionEliminationList }) {
   return (
     <React.Fragment>
-      {sessionList?.map((sessionNumber) => (
-        <th key={sessionNumber} className="stats">
-          Sesi {sessionNumber}
-        </th>
-      ))}
+      {(standing === 3 || standing === 0) &&
+        sessionList?.map((sessionNumber) => (
+          <th key={sessionNumber} className="stats">
+            Sesi {sessionNumber}
+          </th>
+        ))}
 
-      <th className="stats">Total-Kual</th>
+      {standing === 0 && <th className="stats">Total-Kual</th>}
 
-      {sessionEliminationList?.map((eliminasiNumber) => (
-        <th key={eliminasiNumber} className="stats">
-          Eli-{eliminasiNumber}
-        </th>
-      ))}
+      {(standing === 4 || standing === 0) &&
+        sessionEliminationList?.map((eliminasiNumber) => (
+          <th key={eliminasiNumber} className="stats">
+            Eli-{eliminasiNumber}
+          </th>
+        ))}
 
-      <th className="stats">Total-Eli</th>
+      <th className="stats">{standing === 0 ? "Total-Eli" : "Total"}</th>
       <th className="stats">IRAT</th>
     </React.Fragment>
   );
 }
 
 function SessionStatsCellsGroup({
+  standing,
   sessions,
   sessionNumbersList,
   totalQual,
@@ -133,24 +138,28 @@ function SessionStatsCellsGroup({
 }) {
   return (
     <React.Fragment>
-      {sessionNumbersList?.map((sessionNumber) => (
-        <td key={sessionNumber} className="stats">
-          {<span>{sessions[sessionNumber]?.total}</span> || <GrayedOutText>&ndash;</GrayedOutText>}
-        </td>
-      ))}
+      {(standing === 3 || standing === 0) &&
+        sessionNumbersList?.map((sessionNumber) => (
+          <td key={sessionNumber} className="stats">
+            {<span>{sessions[sessionNumber]?.total}</span> || (
+              <GrayedOutText>&ndash;</GrayedOutText>
+            )}
+          </td>
+        ))}
 
-      <td className="stats total">{totalQual}</td>
+      {standing === 0 && <td className="stats total">{totalQual}</td>}
 
-      {sessionEliminationList?.map((eliminationNumber) => (
-        <td key={eliminationNumber} className="stats">
-          {<span>{sessionsElimination[eliminationNumber]?.total}</span> || (
-            <GrayedOutText>&ndash;</GrayedOutText>
-          )}
-        </td>
-      ))}
+      {(standing === 4 || standing === 0) &&
+        sessionEliminationList?.map((eliminationNumber) => (
+          <td key={eliminationNumber} className="stats">
+            {<span>{sessionsElimination[eliminationNumber]?.total}</span> || (
+              <GrayedOutText>&ndash;</GrayedOutText>
+            )}
+          </td>
+        ))}
 
       <td className="stats total">{totalEli}</td>
-      <td className="stats">{totalIrat}</td>
+      <td className="stats irat">{totalIrat}</td>
     </React.Fragment>
   );
 }
@@ -250,6 +259,11 @@ const MembersTable = styled.table`
 
     &.total {
       background-color: var(--ma-gray-50);
+    }
+
+    &.irat {
+      font-weight: 600;
+      color: var(--ma-txt-black);
     }
   }
 

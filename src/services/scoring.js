@@ -52,6 +52,14 @@ export default {
   },
 
   /**
+   * @param {Object} qs { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getSelectionResultDownloadUrl(qs) {
+    return API.get("/web/v2/events/download-selection-report", qs);
+  },
+
+  /**
    * @param {Object} queryString  { elimination_id, category_id, round, match }
    * @returns {Promise} { success, data, errors, message }
    */

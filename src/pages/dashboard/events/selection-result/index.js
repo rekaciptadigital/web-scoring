@@ -3,8 +3,9 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useEventDetail } from "../scoring-qualification/hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
+import { useDownloadSelectionResult } from "./hooks/download-selection-result";
 
-import { SpinnerDotBlock, ButtonOutlineBlue } from "components/ma";
+import { SpinnerDotBlock, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
 import { toast } from "components/ma/processing-toast";
 import { ToolbarFilter } from "components/ma/toolbar-filters";
 import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
@@ -31,6 +32,12 @@ function PageEventSelectionResult() {
   const isSelectionType = eventDetail?.eventCompetition === "Selection";
   const pageProps = { pageTitle: "Hasil Akhir Seleksi", isSelectionType: isSelectionType };
 
+  const {
+    download,
+    isError: isErrorDownload,
+    errors: errorsDownload,
+  } = useDownloadSelectionResult(eventId);
+
   return (
     <ScoringPageWrapper {...pageProps}>
       <AsyncViewWrapper
@@ -49,10 +56,16 @@ function PageEventSelectionResult() {
               <ButtonOutlineBlue
                 onClick={() => {
                   toast.loading("Sedang menyiapkan file unduhan...");
-                  setTimeout(() => {
-                    toast.dismiss();
-                    toast.success("Memulai unduhan (coming soon)");
-                  }, 1000);
+                  download({
+                    onSuccess() {
+                      toast.dismiss();
+                      toast.success("Memulai unduhan");
+                    },
+                    onError() {
+                      toast.dismiss();
+                      toast.error("Gagal memulai unduhan");
+                    },
+                  });
                 }}
               >
                 <IconDownload size="16" /> Unduh Hasil
@@ -69,6 +82,8 @@ function PageEventSelectionResult() {
           />
         </ViewWrapper>
       </AsyncViewWrapper>
+
+      <AlertSubmitError isError={isErrorDownload} errors={errorsDownload} />
     </ScoringPageWrapper>
   );
 }

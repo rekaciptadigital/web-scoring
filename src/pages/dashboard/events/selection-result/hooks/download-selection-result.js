@@ -14,8 +14,7 @@ function useDownloadSelectionResult(eventId) {
       ...customOptions,
       onSuccess: (data) => {
         customOptions.onSuccess?.(data);
-        const url = data?.fileName || data || "";
-        urlUtil.openUrlOnNewTab(url);
+        urlUtil.openUrlOnNewTab(data?.filePath);
       },
     };
     fetcher.runAsync(getFunction, options);

@@ -13,10 +13,11 @@ import {
   FieldInputDate,
   FieldInputTime,
 } from "../../components/form-fields";
+import { EventLogoUploader } from "../components/event-logo-uploader";
 
 import { setHours, setMinutes, getMinutes, getHours } from "date-fns";
 
-function ScreenPublicInfos({ form, isPreparing }) {
+function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing }) {
   const {
     data,
     updateField,
@@ -51,28 +52,33 @@ function ScreenPublicInfos({ form, isPreparing }) {
             <PosterImagePicker image={data.poster} onChange={handlePickBannerChange} />
 
             <hr />
-            <h3>Detail Event</h3>
-            <VerticalSpaceBetween>
-              <FieldInputText
-                required
-                name="eventName"
-                placeholder="Masukkan nama event"
-                value={data.eventName}
-                onChange={(value) => updateField("eventName", value)}
-              >
-                Nama Event
-              </FieldInputText>
+            <h3 className="mb-3">Detail Event</h3>
 
-              <FieldTextArea
-                name="description"
-                placeholder="Masukkan deskripsi singkat"
-                rows="8"
-                value={data.description}
-                onChange={(value) => updateField("description", value)}
-              >
-                Deskripsi <span className="">&#40;Opsional&#41;</span>
-              </FieldTextArea>
-            </VerticalSpaceBetween>
+            <MediaObject>
+              <EventLogoUploader eventDetail={eventDetail} onSuccess={fetchEventDetail} />
+
+              <VerticalSpaceBetween>
+                <FieldInputText
+                  required
+                  name="eventName"
+                  placeholder="Masukkan nama event"
+                  value={data.eventName}
+                  onChange={(value) => updateField("eventName", value)}
+                >
+                  Nama Event
+                </FieldInputText>
+
+                <FieldTextArea
+                  name="description"
+                  placeholder="Masukkan deskripsi singkat"
+                  rows="8"
+                  value={data.description}
+                  onChange={(value) => updateField("description", value)}
+                >
+                  Deskripsi <span className="">&#40;Opsional&#41;</span>
+                </FieldTextArea>
+              </VerticalSpaceBetween>
+            </MediaObject>
 
             <hr />
             <h3 className="mt-4 mb-3">Waktu dan Tempat</h3>
@@ -307,6 +313,19 @@ const SplitFields = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
+`;
+
+const MediaObject = styled.div`
+  display: flex;
+  justify-content: flex-start;
+
+  > *:nth-child(1) {
+    flex-shrink: 0;
+  }
+
+  > *:nth-child(2) {
+    flex-grow: 1;
+  }
 `;
 
 const VerticalSpaceBetween = styled.div`

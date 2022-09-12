@@ -139,6 +139,7 @@ function PageCreateEventFullday() {
             <StepBody>
               <ScreenPublicInfos
                 eventDetail={eventDetail}
+                fetchEventDetail={fetchEventDetail}
                 form={formPublicInfos}
                 isPreparing={isPreparingEvent}
               />

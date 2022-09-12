@@ -59,7 +59,7 @@ function FilterProvider({ children, categories, onChange }) {
 
   React.useEffect(() => {
     onChange?.(_getActiveStates(state, categoryDetails));
-  }, [state]);
+  }, [onChange, state, categoryDetails]);
 
   const setTabId = (tabId) => {
     dispatch({ type: "CHANGE_TAB_ID", payload: tabId });

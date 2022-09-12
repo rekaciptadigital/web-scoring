@@ -58,9 +58,13 @@ const StyledBody = styled.div`
 
 /* ======================================== */
 
-function StepFooterActions({ children, backButtonLabel = "Sebelumnya" }) {
+function StepFooterActions({ children, backButtonLabel = "Sebelumnya", mathTpe  }) {
   const { id } = useStepContent();
+  // const { getSequenceNumberById, gotoPreviousStep,gotoStep } = useStepScreen();
   const { getSequenceNumberById, gotoPreviousStep } = useStepScreen();
+
+  const tes = mathTpe;
+  console.log(tes)
 
   const isFirstStep = getSequenceNumberById(id) === 1;
 

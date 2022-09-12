@@ -93,31 +93,40 @@ function KnobsClassCategories() {
   );
 }
 
-function KnobsTeamCategories() {
+function KnobsTeamCategories({ shouldHideOption }) {
   const { classCategoryId, teamCategoryId, getKnobOptionsByType, setTeamCategory } = useFilters();
   const optionsTeam = getKnobOptionsByType("teamCategory");
+
+  const handleHideOption = React.useCallback(
+    (option) => {
+      const hasNoParentClassCategory = !option.relatedClasses.some(
+        (parentClassCategory) => parentClassCategory === classCategoryId
+      );
+      return hasNoParentClassCategory || shouldHideOption?.(option);
+    },
+    [shouldHideOption, classCategoryId]
+  );
+
   return (
     <Knobs
       label="Jenis Regu"
       options={optionsTeam}
       activeKnobId={teamCategoryId}
       onChange={(knobId) => setTeamCategory(knobId)}
-      shouldHideOption={(option) => {
-        return !option.relatedClasses.some(
-          (parentClassCategory) => parentClassCategory === classCategoryId
-        );
-      }}
+      shouldHideOption={handleHideOption}
     />
   );
 }
 
 function Knobs({
   label = "Label",
+  labelIsHidden = false,
   options,
   activeKnobId,
   onChange,
   shouldDisableOption,
   shouldHideOption,
+  knobButtonStyle,
 }) {
   const getActiveClassName = (value) => {
     const isActive = value === activeKnobId;
@@ -125,7 +134,7 @@ function Knobs({
   };
   return (
     <KnobWrapper>
-      <KnobLabel>{label}:</KnobLabel>
+      {!labelIsHidden && <KnobLabel>{label}:</KnobLabel>}
       <KnobList>
         {options?.length > 0 ? (
           options
@@ -136,6 +145,7 @@ function Knobs({
               <li key={index}>
                 <ButtonKnobItem
                   className={getActiveClassName(option.value)}
+                  style={knobButtonStyle}
                   onClick={() => onChange?.(option.value)}
                   disabled={
                     typeof shouldDisableOption === "function"

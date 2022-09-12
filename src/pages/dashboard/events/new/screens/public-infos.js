@@ -16,6 +16,7 @@ import {
 import { EventLogoUploader } from "../components/event-logo-uploader";
 
 import { setHours, setMinutes, getMinutes, getHours } from "date-fns";
+import Switch from "react-switch";
 
 function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing }) {
   const {
@@ -53,6 +54,15 @@ function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing })
 
             <hr />
             <h3 className="mb-3">Detail Event</h3>
+
+            <EarlyBirdActivationBar>
+              <div>Aktifkan Event Private</div>
+              <ToggleSwitch
+                checked={data.isPrivate ? 1 : 0}
+                onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
+              />
+            </EarlyBirdActivationBar>
+            <HelpDesk>Event private tidak akan ditampilkan di landing page myarchery</HelpDesk>
 
             <MediaObject>
               <EventLogoUploader eventDetail={eventDetail} onSuccess={fetchEventDetail} />
@@ -339,6 +349,52 @@ const PairedDateTimeFields = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 1.5rem 1rem;
 `;
+
+const EarlyBirdActivationBar = styled.div`
+  min-height: 3rem;
+  padding: 0.5rem;
+  padding-left: 1.25rem;
+  border-radius: 0.5rem;
+  background-color: var(--ma-gray-50);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const HelpDesk = styled.div`
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  margin-bottom: 20px;
+`;
+
+/* ========================================== */
+
+function ToggleSwitch({ checked, onChange, disabled }) {
+  const handleToggling = (event) => {
+    onChange?.(event);
+  };
+
+  return (
+    <Switch
+      disabled={disabled}
+      checked={Boolean(checked)}
+      onChange={handleToggling}
+      offColor="#eeeeee"
+      onColor="#B4C6E2"
+      onHandleColor="#0d47a1"
+      height={16}
+      width={40}
+      handleDiameter={24}
+      uncheckedIcon={false}
+      checkedIcon={false}
+      boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+    />
+  );
+}
 
 /* ========================================== */
 

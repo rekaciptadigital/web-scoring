@@ -6,6 +6,7 @@ const EVENT_TYPES = {
 const MATCH_TYPES = {
   TOURNAMENT: "Tournament",
   GAMES: "Games",
+  SELEKSI: "Selection"
 };
 
 const PUBLICATION_TYPES = {

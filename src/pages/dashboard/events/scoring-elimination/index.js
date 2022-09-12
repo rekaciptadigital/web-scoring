@@ -1,25 +1,28 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useEventDetail } from "../scoring-qualification/hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
+import { useDownloadScoresheetSelection } from "./hooks/download-scoresheet-selection";
 
 import { SpinnerDotBlock } from "components/ma";
 import { ToolbarFilter } from "components/ma/toolbar-filters";
-import { SubNavbar } from "../components/submenus-matches";
-import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
-import { ProcessingToast } from "./components/processing-toast";
+import { toast } from "components/ma/processing-toast";
+import { ScoringPageWrapper } from "../components/scoring-page-wrapper";
+import { SelectionKnobsView } from "../components/selection-knobs-view";
 import { ButtonShowBracket } from "./components/button-show-bracket";
+import { MenuDownloadScoresheet } from "./components/menu-download-scoresheet";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
-
-const propsContentWrapper = {
-  pageTitle: "Skoring Eliminasi",
-  navbar: <SubNavbar />,
-};
+import { ScoringTableSelection } from "./components/scoring-table-selection";
 
 function PageEventScoringElimination() {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
+  const { data: eventDetail } = useEventDetail(eventId);
+
+  const isSelectionType = eventDetail?.eventCompetition === "Selection";
+  const pageProps = { pageTitle: "Skoring Eliminasi", isSelectionType: isSelectionType };
 
   const {
     isSettled: isSettledCategories,
@@ -31,11 +34,13 @@ function PageEventScoringElimination() {
   const [activeCategory, setActiveCategory] = React.useState(null);
   const isIndividual = activeCategory?.categoryTeam?.toLowerCase?.() === "individual";
 
+  const { download } = useDownloadScoresheetSelection(activeCategory?.id);
+
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
   if (errorFetchingInitialCategories) {
     return (
-      <ContentLayoutWrapper {...propsContentWrapper}>
+      <ScoringPageWrapper {...pageProps}>
         <ViewWrapper>
           <p>
             Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
@@ -44,23 +49,68 @@ function PageEventScoringElimination() {
 
           <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
         </ViewWrapper>
-      </ContentLayoutWrapper>
+      </ScoringPageWrapper>
     );
   }
 
   // TODO: loading ganti ketika belum settle filter, enggak lagi ke fetch detail
   if (!isSettledCategories) {
     return (
-      <ContentLayoutWrapper {...propsContentWrapper}>
+      <ScoringPageWrapper {...pageProps}>
         <SpinnerDotBlock />
-      </ContentLayoutWrapper>
+      </ScoringPageWrapper>
+    );
+  }
+
+  if (isSelectionType) {
+    return (
+      <ScoringPageWrapper {...pageProps}>
+        <ToolbarFilter
+          categories={categoryDetails}
+          onChange={(data) => setActiveCategory(data?.categoryDetail)}
+          viewLeft={<SelectionKnobsView />}
+          viewRight={
+            <div>
+              <MenuDownloadScoresheet
+                buttonLabel="Unduh Scoresheet"
+                sessionCount={
+                  activeCategory ? Number(activeCategory?.sessionInEliminationSelection) : 0
+                }
+                onDownload={(session) => {
+                  toast.loading("Sedang memproses unduhan...");
+                  download(session, {
+                    onSuccess() {
+                      toast.dismiss();
+                      toast.success("Memulai unduhan...");
+                    },
+                    onError() {
+                      toast.dismiss();
+                      toast.error("Gagal memulai unduhan");
+                    },
+                  });
+                }}
+              />
+            </div>
+          }
+        />
+
+        <ViewWrapper>
+          {activeCategory && (
+            <ScoringTableSelection
+              key={"selection-" + activeCategory?.id}
+              categoryDetailId={activeCategory?.id}
+              isSelectionType={isSelectionType}
+              isLocked={Boolean(!activeCategory || activeCategory?.eliminationLock)}
+              eliminationParticipantsCount={activeCategory?.defaultEliminationCount}
+            />
+          )}
+        </ViewWrapper>
+      </ScoringPageWrapper>
     );
   }
 
   return (
-    <ContentLayoutWrapper {...propsContentWrapper}>
-      <ProcessingToast />
-
+    <ScoringPageWrapper {...pageProps}>
       <ToolbarFilter
         categories={categoryDetails}
         isLoading={isLoadingCategories}
@@ -91,7 +141,7 @@ function PageEventScoringElimination() {
             />
           ))}
       </ToolbarFilter>
-    </ContentLayoutWrapper>
+    </ScoringPageWrapper>
   );
 }
 

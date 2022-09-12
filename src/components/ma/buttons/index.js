@@ -94,66 +94,90 @@ const variantStyles = {
   // TODO: button link (?)
 };
 
-function ButtonBase({ corner, block, color, style, flexible = false, ...props }) {
-  const withPx = (number) => {
-    return number ? `${number}px` : undefined;
-  };
+const ButtonBase = React.forwardRef(
+  ({ corner, block, color, style, flexible = false, ...props }, ref) => {
+    const withPx = (number) => {
+      return number ? `${number}px` : undefined;
+    };
 
-  const propsNew = {
-    ...props,
-    style: {
-      ...variantStyles[color],
-      "--button-corner": withPx(corner),
-      ...style,
-    },
-  };
+    const propsNew = {
+      ...props,
+      style: {
+        ...variantStyles[color],
+        "--button-corner": withPx(corner),
+        ...style,
+      },
+    };
 
-  if (flexible) {
-    propsNew.style = { ...propsNew.style, "--button-width": 0, whiteSpace: "nowrap" };
+    if (flexible) {
+      propsNew.style = { ...propsNew.style, "--button-width": 0, whiteSpace: "nowrap" };
+    }
+
+    if (block) {
+      propsNew.style = { ...propsNew.style, "--button-width": "100%" };
+    }
+
+    return <ButtonWrapper ref={ref} {...propsNew} />;
   }
+);
 
-  if (block) {
-    propsNew.style = { ...propsNew.style, "--button-width": "100%" };
-  }
+ButtonBase.displayName = "ButtonBase";
 
-  return <ButtonWrapper {...propsNew} />;
-}
+const Button = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} {...props} />;
+});
 
-function Button(props) {
-  return <ButtonBase {...props} />;
-}
+Button.displayName = "Button";
 
-function ButtonBlue(props) {
-  return <ButtonBase color="blue" {...props} />;
-}
+const ButtonBlue = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} color="blue" {...props} />;
+});
 
-function ButtonRed(props) {
-  return <ButtonBase color="red" {...props} />;
-}
+ButtonBlue.displayName = "ButtonBlue";
 
-function ButtonOutline(props) {
-  return <ButtonBase color="outline" {...props} />;
-}
+const ButtonRed = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} color="red" {...props} />;
+});
 
-function ButtonOutlineBlue(props) {
-  return <ButtonBase color="outline-blue" {...props} />;
-}
+ButtonRed.displayName = "ButtonRed";
 
-function ButtonGhostBlue(props) {
-  return <ButtonBase color="ghost-blue" {...props} />;
-}
+const ButtonOutline = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} color="outline" {...props} />;
+});
 
-function ButtonSmallBlue(props) {
-  return <ButtonBase color="blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
-}
+ButtonOutline.displayName = "ButtonOutline";
 
-function ButtonSmallOutlineBlue(props) {
-  return <ButtonBase color="outline-blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
-}
+const ButtonOutlineBlue = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} color="outline-blue" {...props} />;
+});
 
-function ButtonOutlineRed(props) {
-  return <ButtonBase color="outline-red" {...props} />;
-}
+ButtonOutlineBlue.displayName = "ButtonOutlineBlue";
+
+const ButtonGhostBlue = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} color="ghost-blue" {...props} />;
+});
+
+ButtonGhostBlue.displayName = "ButtonGhostBlue";
+
+const ButtonSmallBlue = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} color="blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />;
+});
+
+ButtonSmallBlue.displayName = "ButtonSmallBlue";
+
+const ButtonSmallOutlineBlue = React.forwardRef((props, ref) => {
+  return (
+    <ButtonBase ref={ref} color="outline-blue" {...props} style={{ padding: "0.2rem 0.5rem" }} />
+  );
+});
+
+ButtonSmallOutlineBlue.displayName = "ButtonSmallOutlineBlue";
+
+const ButtonOutlineRed = React.forwardRef((props, ref) => {
+  return <ButtonBase ref={ref} color="outline-red" {...props} />;
+});
+
+ButtonOutlineRed.displayName = "ButtonOutlineRed";
 
 const ButtonBlueOutline = styled(BSButton)`
   &,

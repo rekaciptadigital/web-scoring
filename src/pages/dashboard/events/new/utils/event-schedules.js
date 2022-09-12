@@ -45,7 +45,8 @@ function makeDefaultForm(eventDetail) {
  * 1. ketika semua tanggal sudah punya data qualification time ada (happy path)
  * 2. ketika cuma ada 1 record atau sebagian tanggal yang terisi data....... (?)
  */
-function makeStateSchedules(eventDetail, schedules) {
+function makeStateSchedules(eventDetail, schedules, categories) {
+  const categoriesById = _makeCategoriesById(categories);
   let eventStartDate = null;
   let eventEndDate = null;
   let numberOfDays = 1;
@@ -90,6 +91,7 @@ function makeStateSchedules(eventDetail, schedules) {
             categoryDetail: {
               value: schedule.categoryDetailId,
               label: schedule.categoryDetailLabel,
+              data: categoriesById.get(schedule.categoryDetailId),
             },
             idQualificationTime: schedule.idQualificationTime,
             eventStartDatetime: parseServerDatetime(schedule.eventStartDatetime),
@@ -249,6 +251,23 @@ function _arrayToObject(schedules, targetKeyName) {
   });
 
   return structuredObject;
+}
+
+function _makeCategoriesById(categories) {
+  const grouped = {};
+  const instance = {
+    get: (id) => grouped[id],
+  };
+
+  if (!categories?.length) {
+    return instance;
+  }
+
+  for (const category of categories) {
+    grouped[category.id] = category;
+  }
+
+  return instance;
 }
 
 export { makeDefaultForm, makeStateSchedules, makeDefaultFormMarathon, makeStateSchedulesMarathon };

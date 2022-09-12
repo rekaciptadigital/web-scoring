@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useScheduleEditorForm } from "../hooks/form-submit-editor-schedule";
 import { toast } from "../components/processing-toast";
 
+import DatePicker from "react-datepicker";
 import SweetAlert from "react-bootstrap-sweetalert";
 import {
   Button,
@@ -19,10 +20,13 @@ import {
 import { LoadingScreen } from "../components/loading-screen-portal";
 
 import IconPlus from "components/ma/icons/mono/plus";
+import IconArrowExchange from "components/ma/icons/mono/arrow-exchange";
 import IconTrash from "components/ma/icons/mono/trash";
 import illustrationAlert from "assets/images/events/alert-publication.svg";
 
 import classnames from "classnames";
+import id from "date-fns/locale/id";
+import { datetime } from "utils";
 
 function ScreenSchedules({ eventDetail, categories, formSchedules, schedulesProvider }) {
   const [indexActiveEditor, setIndexActiveEditor] = React.useState(-1);
@@ -149,6 +153,15 @@ function EditorDisplay({ sessionsByDate, schedulesProvider }) {
                 <IconPlus size="13" />
               </Button>
 
+              <ScheduleDatePicker
+                disabled
+                title={
+                  session.categoryDetail.data?.totalParticipant
+                    ? session.categoryDetail.data?.totalParticipant + " orang peserta"
+                    : "Belum ada peserta"
+                }
+              />
+
               <Button flexible disabled>
                 <IconTrash size="13" />
               </Button>
@@ -267,7 +280,8 @@ function EditorForm({
                         disabled={isDisabled}
                         value={session.eventStartDatetime}
                         onChange={(value) => {
-                          updateField(session.key, "eventStartDatetime", value);
+                          const datetime = _addTimeToTargetDate(value, session.eventStartDatetime);
+                          updateField(session.key, "eventStartDatetime", datetime);
                         }}
                       />
                       <span>&ndash;</span>
@@ -275,7 +289,8 @@ function EditorForm({
                         disabled={isDisabled}
                         value={session.eventEndDatetime}
                         onChange={(value) => {
-                          updateField(session.key, "eventEndDatetime", value);
+                          const datetime = _addTimeToTargetDate(value, session.eventEndDatetime);
+                          updateField(session.key, "eventEndDatetime", datetime);
                         }}
                       />
                     </TimeRangeBox>
@@ -290,6 +305,29 @@ function EditorForm({
                   >
                     <IconPlus size="13" />
                   </Button>
+
+                  <ScheduleDatePicker
+                    disabled={!session.categoryDetail.data?.totalParticipant}
+                    title={
+                      session.categoryDetail.data?.totalParticipant
+                        ? `${
+                            session.categoryDetail.data?.totalParticipant
+                          } orang peserta (diatur tanggal ${datetime.formatFullDateLabel(
+                            session.eventStartDatetime
+                          )})`
+                        : "Belum ada peserta"
+                    }
+                    minDate={eventDetail?.publicInformation.eventStart}
+                    maxDate={eventDetail?.publicInformation.eventEnd}
+                    value={session.eventStartDatetime}
+                    onChange={(date) => {
+                      const datetimeStart = _addTimeToTargetDate(session.eventStartDatetime, date);
+                      const datetimeEnd = _addTimeToTargetDate(session.eventEndDatetime, date);
+
+                      updateField(session.key, "eventStartDatetime", datetimeStart);
+                      updateField(session.key, "eventEndDatetime", datetimeEnd);
+                    }}
+                  />
 
                   <ButtonWithConfirmPrompt
                     flexible
@@ -313,6 +351,38 @@ function EditorForm({
     </React.Fragment>
   );
 }
+
+function ScheduleDatePicker({ value, onChange, title, disabled, minDate, maxDate }) {
+  if (disabled) {
+    return (
+      <Button flexible disabled title={title}>
+        <IconArrowExchange size="13" />
+      </Button>
+    );
+  }
+
+  return (
+    <SchedulePickerWrapeer title={title}>
+      <DatePicker
+        selected={value}
+        onChange={onChange}
+        customInput={<PickerTrigger />}
+        locale={id}
+        showPopperArrow={false}
+        minDate={datetime.parseServerDatetime(minDate) || undefined}
+        maxDate={datetime.parseServerDatetime(maxDate) || undefined}
+      />
+    </SchedulePickerWrapeer>
+  );
+}
+
+const PickerTrigger = React.forwardRef(({ onClick }, ref) => (
+  <Button ref={ref} flexible onClick={onClick}>
+    <IconArrowExchange size="13" />
+  </Button>
+));
+
+PickerTrigger.displayName = "PickerTrigger";
 
 /* ======================================== */
 
@@ -339,9 +409,8 @@ const VerticalSpacedBoxLoose = styled.div`
 `;
 
 const HorizontalSpacedButtonGroups = styled.div`
-  > * + * {
-    margin-left: 0.5rem;
-  }
+  display: flex;
+  gap: 0.5rem;
 `;
 
 const SpacedHeader = styled.div`
@@ -444,6 +513,14 @@ const UpdatingStateBlocker = styled.div`
   align-items: center;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.75);
+`;
+
+const SchedulePickerWrapeer = styled.div`
+  display: inline-block;
+
+  .react-datepicker-wrapper {
+    width: initial !important;
+  }
 `;
 
 /* ==================================== */
@@ -570,6 +647,13 @@ function filterUnselected(categoryOptions, { initialSessions, editorSessions, se
   });
 
   return resultOptions;
+}
+
+function _addTimeToTargetDate(valueDatetime, targetDatetime) {
+  const timeString = datetime.formatServerDatetime(valueDatetime)?.split?.(" ")[1];
+  const dateString = datetime.formatServerDatetime(targetDatetime)?.split?.(" ")[0];
+  const resultDatetime = datetime.parseServerDatetime(`${dateString} ${timeString}`);
+  return resultDatetime;
 }
 
 export { ScreenSchedules };

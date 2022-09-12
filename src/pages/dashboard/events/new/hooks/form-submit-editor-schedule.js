@@ -2,9 +2,9 @@ import * as React from "react";
 import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EventsService } from "services";
 
-import { getHours, getMinutes, addHours } from "date-fns";
+import { addHours } from "date-fns";
 import stringUtil from "utils/stringUtil";
-import { formatServerDate } from "../utils/datetime";
+import { datetime } from "utils";
 
 function useScheduleEditorForm(initialValues, eventId) {
   const cleanValues = React.useRef(initialValues);
@@ -151,14 +151,8 @@ function makePayloadScheduleForm(eventId, editorFormdata, cleanValues) {
         const values = {
           qualification_time_id: session.idQualificationTime, // kalau create, `undefined`
           category_detail_id: session.categoryDetail?.value,
-          event_start_datetime: setScheduleDateFromInput(
-            editorFormdata.sessionDate,
-            session.eventStartDatetime
-          ),
-          event_end_datetime: setScheduleDateFromInput(
-            editorFormdata.sessionDate,
-            session.eventEndDatetime
-          ),
+          event_start_datetime: datetime.formatServerDatetime(session.eventStartDatetime),
+          event_end_datetime: datetime.formatServerDatetime(session.eventEndDatetime),
         };
 
         // value delete
@@ -171,13 +165,6 @@ function makePayloadScheduleForm(eventId, editorFormdata, cleanValues) {
       })
       .filter((session) => Boolean(session)),
   };
-}
-
-function setScheduleDateFromInput(sessionDate, inputDate) {
-  const date = formatServerDate(sessionDate);
-  const hours = inputDate ? getHours(inputDate) : "00";
-  const minutes = inputDate ? getMinutes(inputDate) : "00";
-  return `${date} ${hours}:${minutes}:00`;
 }
 
 function _checkIfScheduleDataClean(currentCleanValue, session) {

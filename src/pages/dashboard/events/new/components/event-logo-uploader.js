@@ -14,7 +14,7 @@ function EventLogoUploader({ eventDetail, onSuccess }) {
       <UploaderWrapper>
         <AsyncPhotoUploader
           title="Upload foto profil"
-          imageSrc={eventDetail?.publicInformation.eventLogo}
+          imageSrc={eventDetail?.publicInformation.logo}
           isLoading={isLoading}
           onSubmit={(base64) =>
             submit(base64, {

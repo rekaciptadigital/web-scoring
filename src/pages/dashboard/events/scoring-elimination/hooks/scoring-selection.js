@@ -4,23 +4,19 @@ import { ScoringService } from "services";
 
 const DEBOUNCE_TIMER_MS = 650;
 
-function useScoringMembers(
+function useScoringSelection(
   categoryDetailId,
   inputSearchQuery,
   eliminationParticipantsCount,
-  isTeam = false,
-  scoreType
+  isTeam = false
 ) {
   const fetcher = useFetcher();
   const [debouncedSearchQuery, setDebouncedInputSearchQuery] = React.useState("");
 
   const fetchScoringMembers = () => {
     const getFunction = () => {
-      return ScoringService.getQualificationScoringMembersV2({
+      return ScoringService.getEliminationSelectionScoringMembersV2({
         event_category_id: categoryDetailId,
-        name: debouncedSearchQuery || undefined,
-        elimination_template: eliminationParticipantsCount,
-        score_type: scoreType,
       });
     };
     fetcher.runAsync(getFunction, {
@@ -74,4 +70,4 @@ function mapIsPresent(initialScoringMembers, isTeam = false) {
   }));
 }
 
-export { useScoringMembers };
+export { useScoringSelection };

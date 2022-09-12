@@ -6,7 +6,7 @@ import { ButtonOutlineBlue } from "components/ma";
 
 import IconDownload from "components/ma/icons/mono/download";
 
-function ButtonDownloadScoresheet({
+function MenuDownloadScoresheet({
   buttonLabel = "Unduh Dokumen",
   disabled,
   sessionCount,
@@ -59,7 +59,7 @@ function ButtonDownloadScoresheet({
           sessionNumbers.map((sessionNumber) => (
             <DropdownItem key={sessionNumber} onClick={() => onDownload?.(sessionNumber)}>
               <ItemActionWrapper>
-                <span>Scoresheet Sesi {sessionNumber}</span>
+                <span>Scoresheet Eli-{sessionNumber}</span>
                 <span>
                   <IconDownload size="16" />
                 </span>
@@ -90,4 +90,4 @@ const ItemActionWrapper = styled.div`
   }
 `;
 
-export { ButtonDownloadScoresheet };
+export { MenuDownloadScoresheet };

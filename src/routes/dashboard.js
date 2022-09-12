@@ -14,6 +14,7 @@ import PageEventBudRestDetail from "../pages/dashboard/events/budrests/detail";
 import PageEventFaqs from "../pages/dashboard/events/faqs";
 import PageEventScoringQualification from "pages/dashboard/events/scoring-qualification";
 import PageEventScoringElimination from "pages/dashboard/events/scoring-elimination";
+import PageEventSelectionResult from "pages/dashboard/events/selection-result";
 import PageEventReports from "pages/dashboard/events/reports";
 import PageEventDoc from "pages/dashboard/events/doc";
 import PageEventDetailSchedulingScoring from "pages/dashboard/events/scheduling-scoring";
@@ -55,6 +56,8 @@ const dashboardRoutes = [
     path: "/dashboard/event/:event_id/scoring-elimination",
     component: PageEventScoringElimination,
   },
+  { path: "/dashboard/event/:event_id/selection-result", component: PageEventSelectionResult },
+
   // TODO: hapus ketika nanti udah gak dipakai/diakses
   {
     path: "/dashboard/event/:event_id/scheduling-scoring",

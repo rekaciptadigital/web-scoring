@@ -34,6 +34,11 @@ export default function Step2({ eventType, matchType, onChange }) {
                 <OptionDescription>Event panahan bebas</OptionDescription>
               </OptionCard>
             </OptionComingSoon>
+
+            <OptionCard name={NAME_OPTION} value={MATCH_TYPES.SELEKSI} className="mt-3">
+              <OptionTitle>Seleksi</OptionTitle>
+              <OptionDescription>Event seleksi archer</OptionDescription>
+            </OptionCard>
           </React.Fragment>
         ) : eventType === EVENT_TYPES.MARATHON ? (
           <React.Fragment>

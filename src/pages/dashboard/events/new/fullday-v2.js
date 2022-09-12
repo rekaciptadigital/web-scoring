@@ -66,6 +66,7 @@ function PageCreateEventFullday() {
   const eventType = _checkEventType(eventDetail, qsEventType);
   const matchType = _checkMatchType(eventDetail, qsMatchType);
   const isTypeMarathon = eventType === EVENT_TYPES.MARATHON;
+  const isTypeSelection = matchType === "Selection";
 
   // Forms
   const formPublicInfos = useFormPublicInfos(eventDetail);
@@ -77,15 +78,24 @@ function PageCreateEventFullday() {
     categoryDetails: categories,
   });
 
-  const lastUnlockedStep = computeLastUnlockedStep({
-    1: formPublicInfos.isEmpty,
-    2: formFees.isEmpty,
-    3: formCategories.isEmpty,
-    // TODO:
-    4: false,
-    5: formSchedules.isEmpty,
-    6: !formSchedules.isEmpty,
-  });
+  const emptyFormSequenceByStep = isTypeSelection
+    ? {
+        1: formPublicInfos.isEmpty,
+        2: formFees.isEmpty,
+        3: formCategories.isEmpty,
+        4: formSchedules.isEmpty,
+        5: !formSchedules.isEmpty,
+      }
+    : {
+        1: formPublicInfos.isEmpty,
+        2: formFees.isEmpty,
+        3: formCategories.isEmpty,
+        4: false,
+        5: formSchedules.isEmpty,
+        6: !formSchedules.isEmpty,
+      };
+
+  const lastUnlockedStep = computeLastUnlockedStep(emptyFormSequenceByStep);
 
   // Submit functions
   const {
@@ -124,7 +134,7 @@ function PageCreateEventFullday() {
           <StepItem id={stepId.INFO_UMUM}>Informasi Umum</StepItem>
           <StepItem id={stepId.BIAYA}>Biaya Registrasi</StepItem>
           <StepItem id={stepId.KATEGORI}>Kategori Lomba</StepItem>
-          <StepItem id={stepId.PERATURAN}>Aturan Pertandingan</StepItem>
+          {!isTypeSelection && <StepItem id={stepId.PERATURAN}>Aturan Pertandingan</StepItem>}
           <StepItem id={stepId.JADWAL_KUALIFIKASI}>Jadwal Pertandingan</StepItem>
           <StepItem id={stepId.SELESAI}>Selesai</StepItem>
         </StepListIndicator>
@@ -144,7 +154,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitPublicInfos(formPublicInfos.data, {
@@ -176,7 +186,7 @@ function PageCreateEventFullday() {
               <ScreenFees eventDetail={eventDetail} form={formFees} />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   if (!eventDetail?.eventCategories?.length) {
@@ -239,7 +249,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitCategories(formCategories.data, formFees, {
@@ -269,7 +279,7 @@ function PageCreateEventFullday() {
               <ScreenRules eventDetail={eventDetail} />
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 onSubmit={({ next }) => {
                   // TODO: next kalau valid / sudah simpan data
@@ -305,7 +315,7 @@ function PageCreateEventFullday() {
               )}
             </StepBody>
 
-            <StepFooterActions>
+            <StepFooterActions mathTpe={matchType}>
               <ButtonSave
                 disabled={formSchedules.isEmpty}
                 onSubmit={({ next }) => {

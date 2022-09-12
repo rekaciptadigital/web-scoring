@@ -55,7 +55,11 @@ function formReducer(state, action) {
             action.payload.schedules,
             action.payload.eventDetail
           )
-        : makeStateSchedules(action.payload.eventDetail, action.payload.schedules);
+        : makeStateSchedules(
+            action.payload.eventDetail,
+            action.payload.schedules,
+            action.payload.categoryDetails
+          );
       return { ...state, data, isEmpty: !action.payload.schedules.length };
     }
 

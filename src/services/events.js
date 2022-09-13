@@ -134,6 +134,15 @@ export default {
   },
 
   /**
+   * @param {Data} data { logo }
+   * @param {QueryString} data { event_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  addLogo(data, qs) {
+    return API.post("/web/v1/archery/events/add-logo-event", data, qs, true);
+  },
+
+  /**
    * v2
    */
   storeEventDetailV2(data) {
@@ -163,8 +172,22 @@ export default {
   /**
    * ID Card
    */
-  getDownloadIdCard({ event_id, type, team_category_id, age_category_id, competition_category_id, distance_id }) {
-    const qs = { event_id,  type, team_category_id, age_category_id, competition_category_id, distance_id };
+  getDownloadIdCard({
+    event_id,
+    type,
+    team_category_id,
+    age_category_id,
+    competition_category_id,
+    distance_id,
+  }) {
+    const qs = {
+      event_id,
+      type,
+      team_category_id,
+      age_category_id,
+      competition_category_id,
+      distance_id,
+    };
     return API.get("/web/v2/id-card/download-by-category", qs);
   },
 };

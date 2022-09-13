@@ -13,11 +13,12 @@ import {
   FieldInputDate,
   FieldInputTime,
 } from "../../components/form-fields";
+import { EventLogoUploader } from "../components/event-logo-uploader";
 
 import { setHours, setMinutes, getMinutes, getHours } from "date-fns";
 import Switch from "react-switch";
 
-function ScreenPublicInfos({ form, isPreparing }) {
+function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing }) {
   const {
     data,
     updateField,
@@ -52,37 +53,41 @@ function ScreenPublicInfos({ form, isPreparing }) {
             <PosterImagePicker image={data.poster} onChange={handlePickBannerChange} />
 
             <hr />
-            <h3>Detail Event</h3>
+            <h3 className="mb-3">Detail Event</h3>
             <EarlyBirdActivationBar>
               <div>Aktifkan Event Private</div>
               <ToggleSwitch
                 checked={data.isPrivate ? 1 : 0}
-                onChange={(val) => updateField("isPrivate",val ? 1 : 0)}
+                onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
               />
             </EarlyBirdActivationBar>
             <HelpDesk>Event private tidak akan ditampilkan di landing page myarchery</HelpDesk>
 
-            <VerticalSpaceBetween>
-              <FieldInputText
-                required
-                name="eventName"
-                placeholder="Masukkan nama event"
-                value={data.eventName}
-                onChange={(value) => updateField("eventName", value)}
-              >
-                Nama Event
-              </FieldInputText>
+            <MediaObject>
+              <EventLogoUploader eventDetail={eventDetail} onSuccess={fetchEventDetail} />
 
-              <FieldTextArea
-                name="description"
-                placeholder="Masukkan deskripsi singkat"
-                rows="8"
-                value={data.description}
-                onChange={(value) => updateField("description", value)}
-              >
-                Deskripsi <span className="">&#40;Opsional&#41;</span>
-              </FieldTextArea>
-            </VerticalSpaceBetween>
+              <VerticalSpaceBetween>
+                <FieldInputText
+                  required
+                  name="eventName"
+                  placeholder="Masukkan nama event"
+                  value={data.eventName}
+                  onChange={(value) => updateField("eventName", value)}
+                >
+                  Nama Event
+                </FieldInputText>
+
+                <FieldTextArea
+                  name="description"
+                  placeholder="Masukkan deskripsi singkat"
+                  rows="8"
+                  value={data.description}
+                  onChange={(value) => updateField("description", value)}
+                >
+                  Deskripsi <span className="">&#40;Opsional&#41;</span>
+                </FieldTextArea>
+              </VerticalSpaceBetween>
+            </MediaObject>
 
             <hr />
             <h3 className="mt-4 mb-3">Waktu dan Tempat</h3>
@@ -319,6 +324,19 @@ const SplitFields = styled.div`
   gap: 1.5rem;
 `;
 
+const MediaObject = styled.div`
+  display: flex;
+  justify-content: flex-start;
+
+  > *:nth-child(1) {
+    flex-shrink: 0;
+  }
+
+  > *:nth-child(2) {
+    flex-grow: 1;
+  }
+`;
+
 const VerticalSpaceBetween = styled.div`
   > * + * {
     margin-top: 1rem;
@@ -344,7 +362,7 @@ const EarlyBirdActivationBar = styled.div`
 `;
 
 const HelpDesk = styled.div`
-  font-family: 'Inter';
+  font-family: "Inter";
   font-style: normal;
   font-weight: 400;
   font-size: 10px;

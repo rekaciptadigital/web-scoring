@@ -25,6 +25,7 @@ import IconTrash from "components/ma/icons/mono/trash";
 import illustrationAlert from "assets/images/events/alert-publication.svg";
 
 import classnames from "classnames";
+import { isSameDay } from "date-fns";
 import id from "date-fns/locale/id";
 import { datetime } from "utils";
 
@@ -39,7 +40,8 @@ function ScreenSchedules({ eventDetail, categories, formSchedules, schedulesProv
     <CardSheet>
       <VerticalSpacedBox>
         <NoticeBarInfo>
-          Jadwal hanya bisa diubah bila belum terdapat peserta terdaftar
+          Jadwal tidak bisa dihapus jika sudah ada peserta. Anda tetap masih bisa merubah jadwal
+          meski sudah ada pendaftar.
         </NoticeBarInfo>
 
         <VerticalSpacedBoxLoose>
@@ -149,20 +151,13 @@ function EditorDisplay({ sessionsByDate, schedulesProvider }) {
             </SessionDetailInput>
 
             <HorizontalSpacedButtonGroups>
-              <Button flexible disabled>
+              <Button flexible disabled title="Tambah jadwal">
                 <IconPlus size="13" />
               </Button>
 
-              <ScheduleDatePicker
-                disabled
-                title={
-                  session.categoryDetail.data?.totalParticipant
-                    ? session.categoryDetail.data?.totalParticipant + " orang peserta"
-                    : "Belum ada peserta"
-                }
-              />
+              <ScheduleDatePicker disabled title="Ubah jadwal" />
 
-              <Button flexible disabled>
+              <Button flexible disabled title="Hapus jadwal">
                 <IconTrash size="13" />
               </Button>
             </HorizontalSpacedButtonGroups>
@@ -300,6 +295,7 @@ function EditorForm({
                 <HorizontalSpacedButtonGroups>
                   <Button
                     flexible
+                    title="Tambah jadwal"
                     disabled={isButtonAddDisabled}
                     onClick={() => createSchedule(filteredOptionsCategories[0])}
                   >
@@ -308,15 +304,10 @@ function EditorForm({
 
                   <ScheduleDatePicker
                     disabled={!session.categoryDetail.data?.totalParticipant}
-                    title={
-                      session.categoryDetail.data?.totalParticipant
-                        ? `${
-                            session.categoryDetail.data?.totalParticipant
-                          } orang peserta (diatur tanggal ${datetime.formatFullDateLabel(
-                            session.eventStartDatetime
-                          )})`
-                        : "Belum ada peserta"
-                    }
+                    title="Ubah jadwal"
+                    titleOnDirty={`Tanggal diubah menjadi ${datetime.formatFullDateLabel(
+                      session.eventStartDatetime
+                    )}`}
                     minDate={eventDetail?.publicInformation.eventStart}
                     maxDate={eventDetail?.publicInformation.eventEnd}
                     value={session.eventStartDatetime}
@@ -331,6 +322,7 @@ function EditorForm({
 
                   <ButtonWithConfirmPrompt
                     flexible
+                    title="Hapus jadwal"
                     disabled={isDisabled || showOnlySessions.length <= 1}
                     buttonConfirmLabel="Hapus"
                     onConfirm={() => removeScheduleItem(session.key)}
@@ -352,7 +344,10 @@ function EditorForm({
   );
 }
 
-function ScheduleDatePicker({ value, onChange, title, disabled, minDate, maxDate }) {
+function ScheduleDatePicker({ value, onChange, title, titleOnDirty, disabled, minDate, maxDate }) {
+  const isDirty = useDirtyValueChecker(value);
+  const computedTitle = titleOnDirty && isDirty ? titleOnDirty : title;
+
   if (disabled) {
     return (
       <Button flexible disabled title={title}>
@@ -362,7 +357,7 @@ function ScheduleDatePicker({ value, onChange, title, disabled, minDate, maxDate
   }
 
   return (
-    <SchedulePickerWrapeer title={title}>
+    <SchedulePickerWrapeer title={computedTitle}>
       <DatePicker
         selected={value}
         onChange={onChange}
@@ -383,6 +378,18 @@ const PickerTrigger = React.forwardRef(({ onClick }, ref) => (
 ));
 
 PickerTrigger.displayName = "PickerTrigger";
+
+function useDirtyValueChecker(value) {
+  const cleanValue = React.useRef(value);
+  const isDirty = React.useMemo(() => !isSameDay(cleanValue.current, value), [value]);
+
+  React.useEffect(() => {
+    if (value) return;
+    cleanValue.current = value;
+  }, [value]);
+
+  return isDirty;
+}
 
 /* ======================================== */
 

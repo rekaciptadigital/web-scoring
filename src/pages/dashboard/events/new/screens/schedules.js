@@ -130,7 +130,7 @@ function EditorDisplay({ sessionsByDate, schedulesProvider }) {
         {sessionsByDate.sessions.map((session) => (
           <CategoryDetailItem key={session.key}>
             <SessionDetailInput>
-              <div>
+              <div title={session.categoryDetail?.label}>
                 <FieldSelectSmall
                   label="Kategori"
                   placeholder="Pilih kategori"
@@ -254,7 +254,7 @@ function EditorForm({
             showOnlySessions.map((session) => (
               <CategoryDetailItem key={session.key}>
                 <SessionDetailInput>
-                  <div>
+                  <div title={session.categoryDetail?.label}>
                     <FieldSelectSmall
                       label="Kategori"
                       placeholder="Pilih kategori"

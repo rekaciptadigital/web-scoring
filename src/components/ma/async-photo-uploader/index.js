@@ -7,7 +7,7 @@ import IconPictureUpload from "components/ma/icons/mono/picture-upload";
 
 import { filesUtil } from "utils";
 
-function AsyncPhotoUploader({ title, imageSrc, onSubmit, isLoading }) {
+function AsyncPhotoUploader({ title, placeholder = "Unggah foto", imageSrc, onSubmit, isLoading }) {
   const handleChooseImage = async (ev) => {
     if (!ev.target.files?.[0]) {
       return;
@@ -36,7 +36,7 @@ function AsyncPhotoUploader({ title, imageSrc, onSubmit, isLoading }) {
           <span>
             <IconPictureUpload size="49" />
           </span>
-          <span>Unggah foto</span>
+          <span>{placeholder}</span>
         </PictureContainer>
 
         <LoadingIndicator isLoading={isLoading} />

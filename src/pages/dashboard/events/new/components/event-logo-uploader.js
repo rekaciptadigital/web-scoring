@@ -14,6 +14,7 @@ function EventLogoUploader({ eventDetail, onSuccess }) {
       <UploaderWrapper>
         <AsyncPhotoUploader
           title="Upload foto profil"
+          placeholder="Unggah logo"
           imageSrc={eventDetail?.publicInformation.logo}
           isLoading={isLoading}
           onSubmit={(base64) =>
@@ -23,7 +24,7 @@ function EventLogoUploader({ eventDetail, onSuccess }) {
                 onSuccess?.();
               },
               onError: () => {
-                toast.error("Gagal memperbarui logo event ");
+                toast.error("Gagal memperbarui logo event");
               },
             })
           }

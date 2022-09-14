@@ -64,7 +64,12 @@ function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing })
             <HelpDesk>Event private tidak akan ditampilkan di landing page myarchery</HelpDesk>
 
             <MediaObject>
-              <EventLogoUploader eventDetail={eventDetail} onSuccess={fetchEventDetail} />
+              <EventLogoUploader
+                eventDetail={eventDetail}
+                previewImage={data.logoImage?.preview}
+                onChange={(image) => updateField("logoImage", image)}
+                onSuccess={fetchEventDetail}
+              />
 
               <VerticalSpaceBetween>
                 <FieldInputText

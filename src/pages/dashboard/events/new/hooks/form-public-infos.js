@@ -99,6 +99,10 @@ const initialData = {
 
 /* ================================= */
 
+/**
+ * Buat `action.type` baru kalau update state-nya bergantung pada data state lainnya.
+ * Kalau untuk update field biasa saja, cukup pakai type `FIELD_CHANGE` aja.
+ */
 function formReducer(state, action) {
   switch (action.type) {
     case "INIT_FORM": {
@@ -109,7 +113,7 @@ function formReducer(state, action) {
           isEmpty: computeFormIsEmpty(action.payload),
         };
       }
-      return { ...state, data: initialData, isEmpty: true };
+      return { ...state, data: { ...initialData }, isEmpty: true };
     }
 
     case "FIELD_CHANGE": {

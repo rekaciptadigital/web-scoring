@@ -10,6 +10,7 @@ import { useFormFees } from "./hooks/form-fees";
 import { useFormCategories } from "./hooks/form-categories";
 import { useFormSchedules } from "./hooks/form-schedules";
 import { useSubmitPublicInfos } from "./hooks/submit-public-infos";
+import { useSubmitEventLogo } from "./hooks/submit-event-logo";
 import { useSubmitCategories } from "./hooks/submit-categories";
 
 import { AlertSubmitError, ButtonOutlineBlue } from "components/ma";
@@ -110,13 +111,20 @@ function PageCreateEventFullday() {
   });
 
   const {
+    submit: submitLogo,
+    isLoading: isLoadingLogo,
+    isError: isErrorLogo,
+    errors: errorsLogo,
+  } = useSubmitEventLogo(eventDetail?.id);
+
+  const {
     submit: submitCategories,
     isLoading: isSubmitingCategories,
     isError: isErrorCategories,
     errors: categoriesErrors,
   } = useSubmitCategories();
 
-  const isLoadingSubmit = isSubmitingPublicInfos || isSubmitingCategories;
+  const isLoadingSubmit = isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories;
 
   return (
     <ContentLayoutWrapper
@@ -127,6 +135,7 @@ function PageCreateEventFullday() {
       <ProcessingToast />
       <LoadingScreen loading={isLoadingSubmit} />
       <AlertSubmitError isError={isErrorPublicInfos} errors={publicInfosErrors} />
+      <AlertSubmitError isError={isErrorLogo} errors={errorsLogo} />
       <AlertSubmitError isError={isErrorCategories} errors={categoriesErrors} />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
@@ -157,19 +166,56 @@ function PageCreateEventFullday() {
 
             <StepFooterActions mathTpe={matchType}>
               <ButtonSave
-                onSubmit={({ next }) => {
-                  submitPublicInfos(formPublicInfos.data, {
-                    onSuccess(data) {
-                      toast.success("Informasi umum event berhasil disimpan");
-                      const isCreateMode = !eventDetail?.id || !eventId;
-                      if (isCreateMode) {
-                        setParamEventId(data.id);
+                onSubmit={async ({ next }) => {
+                  // Maafkan kerumitan ini wkwk. Ini karena ada 2 endpoint API yang
+                  // harus di-hit sekaligus ketika klik tombol simpan, tanpa terjadi
+                  // race condition.
+                  const isCreateMode = !eventDetail?.id || !eventId;
+                  let tempEventId = undefined;
+
+                  try {
+                    await new Promise((resolve, reject) => {
+                      submitPublicInfos(formPublicInfos.data, {
+                        onSuccess(data) {
+                          tempEventId = data.id;
+                          resolve();
+                        },
+                        onError() {
+                          reject();
+                        },
+                      });
+                    });
+
+                    const SUCCESS_MESSAGE = "Informasi umum event berhasil disimpan";
+
+                    // 1
+                    if (!isCreateMode) {
+                      toast.success(SUCCESS_MESSAGE);
+                      fetchEventDetail();
+                      return;
+                    }
+
+                    // 2
+                    if (!formPublicInfos.data.logoImage?.base64) {
+                      toast.success(SUCCESS_MESSAGE);
+                      setParamEventId(tempEventId); // set event id di sini akan otomatis trigger fetch event detail
+                      next();
+                      return;
+                    }
+
+                    // 3
+                    submitLogo(formPublicInfos.data.logoImage?.base64, {
+                      eventId: tempEventId,
+                      onSuccess() {
+                        toast.success(SUCCESS_MESSAGE);
+                        setParamEventId(tempEventId); // set event id di sini akan otomatis trigger fetch event detail
                         next();
-                      } else {
-                        fetchEventDetail();
-                      }
-                    },
-                  });
+                      },
+                    });
+                  } catch (err) {
+                    toast.error("Terjadi kesalahan");
+                    console.error(err);
+                  }
                 }}
               >
                 Simpan

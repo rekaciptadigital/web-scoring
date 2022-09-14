@@ -6,27 +6,32 @@ import { AlertSubmitError } from "components/ma";
 import { AsyncPhotoUploader } from "components/ma/async-photo-uploader";
 import { toast } from "./processing-toast";
 
-function EventLogoUploader({ eventDetail, onSuccess }) {
+function EventLogoUploader({ eventDetail, previewImage, onChange, onSuccess }) {
   const { submit, isLoading, isError, errors } = useSubmitEventLogo(eventDetail?.id);
-
+  const isPossiblyCreateMode = !eventDetail?.id;
   return (
     <MediaObjectWrapper>
       <UploaderWrapper>
         <AsyncPhotoUploader
           title="Upload foto profil"
           placeholder="Unggah logo"
-          imageSrc={eventDetail?.publicInformation.logo}
+          imageSrc={eventDetail?.publicInformation.logo || previewImage}
           isLoading={isLoading}
-          onSubmit={(base64) =>
-            submit(base64, {
-              onSuccess: () => {
-                toast.success("Logo event berhasil diperbarui");
-                onSuccess?.();
-              },
-              onError: () => {
-                toast.error("Gagal memperbarui logo event");
-              },
-            })
+          onChange={onChange}
+          onSubmit={
+            isPossiblyCreateMode
+              ? undefined
+              : (base64) => {
+                  submit(base64, {
+                    onSuccess: () => {
+                      toast.success("Logo event berhasil diperbarui");
+                      onSuccess?.();
+                    },
+                    onError: () => {
+                      toast.error("Gagal memperbarui logo event");
+                    },
+                  });
+                }
           }
         />
       </UploaderWrapper>

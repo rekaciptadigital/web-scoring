@@ -7,13 +7,27 @@ import IconPictureUpload from "components/ma/icons/mono/picture-upload";
 
 import { filesUtil } from "utils";
 
-function AsyncPhotoUploader({ title, placeholder = "Unggah foto", imageSrc, onSubmit, isLoading }) {
+function AsyncPhotoUploader({
+  title,
+  placeholder = "Unggah foto",
+  imageSrc,
+  onChange,
+  onSubmit,
+  isLoading,
+}) {
   const handleChooseImage = async (ev) => {
     if (!ev.target.files?.[0]) {
       return;
     }
+
     const imageRawData = ev.target.files[0];
     const imageBase64 = await filesUtil.fileToBase64(imageRawData);
+
+    onChange?.({
+      raw: imageRawData,
+      preview: URL.createObjectURL(imageRawData),
+      base64: imageBase64,
+    });
     onSubmit?.(imageBase64);
   };
 

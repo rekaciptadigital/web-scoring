@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useScheduleEditorForm } from "../hooks/form-submit-editor-schedule";
 import { toast } from "../components/processing-toast";
 
+import DatePicker from "react-datepicker";
 import SweetAlert from "react-bootstrap-sweetalert";
 import {
   Button,
@@ -19,10 +20,14 @@ import {
 import { LoadingScreen } from "../components/loading-screen-portal";
 
 import IconPlus from "components/ma/icons/mono/plus";
+import IconArrowExchange from "components/ma/icons/mono/arrow-exchange";
 import IconTrash from "components/ma/icons/mono/trash";
 import illustrationAlert from "assets/images/events/alert-publication.svg";
 
 import classnames from "classnames";
+import { isSameDay } from "date-fns";
+import id from "date-fns/locale/id";
+import { datetime } from "utils";
 
 function ScreenSchedules({ eventDetail, categories, formSchedules, schedulesProvider }) {
   const [indexActiveEditor, setIndexActiveEditor] = React.useState(-1);
@@ -35,7 +40,8 @@ function ScreenSchedules({ eventDetail, categories, formSchedules, schedulesProv
     <CardSheet>
       <VerticalSpacedBox>
         <NoticeBarInfo>
-          Jadwal hanya bisa diubah bila belum terdapat peserta terdaftar
+          Jadwal tidak bisa dihapus jika sudah ada peserta. Anda tetap masih bisa merubah jadwal
+          meski sudah ada pendaftar.
         </NoticeBarInfo>
 
         <VerticalSpacedBoxLoose>
@@ -124,7 +130,7 @@ function EditorDisplay({ sessionsByDate, schedulesProvider }) {
         {sessionsByDate.sessions.map((session) => (
           <CategoryDetailItem key={session.key}>
             <SessionDetailInput>
-              <div>
+              <div title={session.categoryDetail?.label}>
                 <FieldSelectSmall
                   label="Kategori"
                   placeholder="Pilih kategori"
@@ -145,11 +151,13 @@ function EditorDisplay({ sessionsByDate, schedulesProvider }) {
             </SessionDetailInput>
 
             <HorizontalSpacedButtonGroups>
-              <Button flexible disabled>
+              <Button flexible disabled title="Tambah jadwal">
                 <IconPlus size="13" />
               </Button>
 
-              <Button flexible disabled>
+              <ScheduleDatePicker disabled title="Ubah jadwal" />
+
+              <Button flexible disabled title="Hapus jadwal">
                 <IconTrash size="13" />
               </Button>
             </HorizontalSpacedButtonGroups>
@@ -246,7 +254,7 @@ function EditorForm({
             showOnlySessions.map((session) => (
               <CategoryDetailItem key={session.key}>
                 <SessionDetailInput>
-                  <div>
+                  <div title={session.categoryDetail?.label}>
                     <FieldSelectSmall
                       label="Kategori"
                       placeholder="Pilih kategori"
@@ -267,7 +275,8 @@ function EditorForm({
                         disabled={isDisabled}
                         value={session.eventStartDatetime}
                         onChange={(value) => {
-                          updateField(session.key, "eventStartDatetime", value);
+                          const datetime = _addTimeToTargetDate(value, session.eventStartDatetime);
+                          updateField(session.key, "eventStartDatetime", datetime);
                         }}
                       />
                       <span>&ndash;</span>
@@ -275,7 +284,8 @@ function EditorForm({
                         disabled={isDisabled}
                         value={session.eventEndDatetime}
                         onChange={(value) => {
-                          updateField(session.key, "eventEndDatetime", value);
+                          const datetime = _addTimeToTargetDate(value, session.eventEndDatetime);
+                          updateField(session.key, "eventEndDatetime", datetime);
                         }}
                       />
                     </TimeRangeBox>
@@ -285,14 +295,34 @@ function EditorForm({
                 <HorizontalSpacedButtonGroups>
                   <Button
                     flexible
+                    title="Tambah jadwal"
                     disabled={isButtonAddDisabled}
                     onClick={() => createSchedule(filteredOptionsCategories[0])}
                   >
                     <IconPlus size="13" />
                   </Button>
 
+                  <ScheduleDatePicker
+                    disabled={!session.categoryDetail.data?.totalParticipant}
+                    title="Ubah jadwal"
+                    titleOnDirty={`Tanggal diubah menjadi ${datetime.formatFullDateLabel(
+                      session.eventStartDatetime
+                    )}`}
+                    minDate={eventDetail?.publicInformation.eventStart}
+                    maxDate={eventDetail?.publicInformation.eventEnd}
+                    value={session.eventStartDatetime}
+                    onChange={(date) => {
+                      const datetimeStart = _addTimeToTargetDate(session.eventStartDatetime, date);
+                      const datetimeEnd = _addTimeToTargetDate(session.eventEndDatetime, date);
+
+                      updateField(session.key, "eventStartDatetime", datetimeStart);
+                      updateField(session.key, "eventEndDatetime", datetimeEnd);
+                    }}
+                  />
+
                   <ButtonWithConfirmPrompt
                     flexible
+                    title="Hapus jadwal"
                     disabled={isDisabled || showOnlySessions.length <= 1}
                     buttonConfirmLabel="Hapus"
                     onConfirm={() => removeScheduleItem(session.key)}
@@ -312,6 +342,53 @@ function EditorForm({
       </CategoryList>
     </React.Fragment>
   );
+}
+
+function ScheduleDatePicker({ value, onChange, title, titleOnDirty, disabled, minDate, maxDate }) {
+  const isDirty = useDirtyValueChecker(value);
+  const computedTitle = titleOnDirty && isDirty ? titleOnDirty : title;
+
+  if (disabled) {
+    return (
+      <Button flexible disabled title={title}>
+        <IconArrowExchange size="13" />
+      </Button>
+    );
+  }
+
+  return (
+    <SchedulePickerWrapeer title={computedTitle}>
+      <DatePicker
+        selected={value}
+        onChange={onChange}
+        customInput={<PickerTrigger />}
+        locale={id}
+        showPopperArrow={false}
+        minDate={datetime.parseServerDatetime(minDate) || undefined}
+        maxDate={datetime.parseServerDatetime(maxDate) || undefined}
+      />
+    </SchedulePickerWrapeer>
+  );
+}
+
+const PickerTrigger = React.forwardRef(({ onClick }, ref) => (
+  <Button ref={ref} flexible onClick={onClick}>
+    <IconArrowExchange size="13" />
+  </Button>
+));
+
+PickerTrigger.displayName = "PickerTrigger";
+
+function useDirtyValueChecker(value) {
+  const cleanValue = React.useRef(value);
+  const isDirty = React.useMemo(() => !isSameDay(cleanValue.current, value), [value]);
+
+  React.useEffect(() => {
+    if (value) return;
+    cleanValue.current = value;
+  }, [value]);
+
+  return isDirty;
 }
 
 /* ======================================== */
@@ -339,9 +416,8 @@ const VerticalSpacedBoxLoose = styled.div`
 `;
 
 const HorizontalSpacedButtonGroups = styled.div`
-  > * + * {
-    margin-left: 0.5rem;
-  }
+  display: flex;
+  gap: 0.5rem;
 `;
 
 const SpacedHeader = styled.div`
@@ -444,6 +520,14 @@ const UpdatingStateBlocker = styled.div`
   align-items: center;
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.75);
+`;
+
+const SchedulePickerWrapeer = styled.div`
+  display: inline-block;
+
+  .react-datepicker-wrapper {
+    width: initial !important;
+  }
 `;
 
 /* ==================================== */
@@ -570,6 +654,13 @@ function filterUnselected(categoryOptions, { initialSessions, editorSessions, se
   });
 
   return resultOptions;
+}
+
+function _addTimeToTargetDate(valueDatetime, targetDatetime) {
+  const timeString = datetime.formatServerDatetime(valueDatetime)?.split?.(" ")[1];
+  const dateString = datetime.formatServerDatetime(targetDatetime)?.split?.(" ")[0];
+  const resultDatetime = datetime.parseServerDatetime(`${dateString} ${timeString}`);
+  return resultDatetime;
 }
 
 export { ScreenSchedules };

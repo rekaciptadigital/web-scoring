@@ -63,6 +63,18 @@ function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing })
             </EarlyBirdActivationBar>
             <HelpDesk>Event private tidak akan ditampilkan di landing page myarchery</HelpDesk>
 
+            <EarlyBirdActivationBar>
+              <div>Aktifkan Event Private</div>
+              <ToggleSwitch
+                checked={data.isPrivate ? 1 : 0}
+                onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
+              />
+            </EarlyBirdActivationBar>
+
+            <HelpDesk className="mt-2 mb-4">
+              Event private tidak akan ditampilkan di landing page myarchery
+            </HelpDesk>
+
             <MediaObject>
               <EventLogoUploader
                 eventDetail={eventDetail}

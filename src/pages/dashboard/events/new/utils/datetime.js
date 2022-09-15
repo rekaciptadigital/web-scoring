@@ -1,8 +1,12 @@
-import { parseISO, format } from "date-fns";
+import { parseISO, format, isValid } from "date-fns";
 
 function parseServerDatetime(dateString) {
   try {
-    return parseISO(dateString);
+    const date = parseISO(dateString);
+    if (isValid(date)) {
+      return date;
+    }
+    throw new Error(date);
   } catch {
     return null;
   }

@@ -32,6 +32,7 @@ import { LoadingScreen } from "./components/loading-screen-portal";
 import { ScreenPublicInfos } from "./screens/public-infos";
 import { ScreenFees } from "./screens/fees";
 import { ScreenCategories } from "./screens/categories";
+import { ScreenRegistrationSchedules } from "./screens/registration-schedules";
 import { ScreenRules } from "./screens/rules";
 import { ScreenSchedules } from "./screens/schedules";
 import { ScreenSchedulesMarathon } from "./screens/schedules-marathon";
@@ -84,16 +85,18 @@ function PageCreateEventFullday() {
         1: formPublicInfos.isEmpty,
         2: formFees.isEmpty,
         3: formCategories.isEmpty,
-        4: formSchedules.isEmpty,
-        5: !formSchedules.isEmpty,
+        4: false,
+        5: formSchedules.isEmpty,
+        6: !formSchedules.isEmpty,
       }
     : {
         1: formPublicInfos.isEmpty,
         2: formFees.isEmpty,
         3: formCategories.isEmpty,
         4: false,
-        5: formSchedules.isEmpty,
-        6: !formSchedules.isEmpty,
+        5: false,
+        6: formSchedules.isEmpty,
+        7: !formSchedules.isEmpty,
       };
 
   const lastUnlockedStep = computeLastUnlockedStep(emptyFormSequenceByStep);
@@ -143,6 +146,7 @@ function PageCreateEventFullday() {
           <StepItem id={stepId.INFO_UMUM}>Informasi Umum</StepItem>
           <StepItem id={stepId.BIAYA}>Biaya Registrasi</StepItem>
           <StepItem id={stepId.KATEGORI}>Kategori Lomba</StepItem>
+          <StepItem id={stepId.JADWAL_REGISTRASI}>Informasi Pendaftaran</StepItem>
           {!isTypeSelection && <StepItem id={stepId.PERATURAN}>Aturan Pertandingan</StepItem>}
           <StepItem id={stepId.JADWAL_KUALIFIKASI}>Jadwal Pertandingan</StepItem>
           <StepItem id={stepId.SELESAI}>Selesai</StepItem>
@@ -164,7 +168,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={async ({ next }) => {
                   // Maafkan kerumitan ini wkwk. Ini karena ada 2 endpoint API yang
@@ -233,7 +237,7 @@ function PageCreateEventFullday() {
               <ScreenFees eventDetail={eventDetail} form={formFees} />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
                   if (!eventDetail?.eventCategories?.length) {
@@ -296,7 +300,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitCategories(formCategories.data, formFees, {
@@ -316,6 +320,21 @@ function PageCreateEventFullday() {
             </StepFooterActions>
           </StepContent>
 
+          <StepContent id={stepId.JADWAL_REGISTRASI}>
+            <StepHeader>
+              <SpacedHeaderBar>
+                <div>
+                  <h2>Informasi Pendaftaran</h2>
+                  <p>...info, info!</p>
+                </div>
+              </SpacedHeaderBar>
+            </StepHeader>
+
+            <StepBody>
+              <ScreenRegistrationSchedules eventDetail={eventDetail} />
+            </StepBody>
+          </StepContent>
+
           <StepContent id={stepId.PERATURAN}>
             <StepHeader>
               <h2>Aturan Pertandingan</h2>
@@ -326,7 +345,7 @@ function PageCreateEventFullday() {
               <ScreenRules eventDetail={eventDetail} />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
                   // TODO: next kalau valid / sudah simpan data
@@ -362,7 +381,7 @@ function PageCreateEventFullday() {
               )}
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 disabled={formSchedules.isEmpty}
                 onSubmit={({ next }) => {

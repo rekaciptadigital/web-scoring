@@ -25,12 +25,12 @@ RUN npm install --legacy-peer-deps #--force
 RUN yarn add react-is
 #RUN npm audit fix
 RUN npx browserslist@latest --update-db
-RUN npm run build
-RUN npm install -g serve
+#RUN npm run build
+#RUN npm install -g serve
 
-RUN rm -f config/.env
+RUN rm -f .env
 
-CMD serve -s build
+#CMD serve -s build
 
 #CMD npm start >> /root/log/stdout.log 2>> /root/log/stderr.log
 

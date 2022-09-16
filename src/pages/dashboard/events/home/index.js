@@ -12,10 +12,13 @@ import CardMenuWithButton from "../components/CardMenuWithButton";
 import IconCopy from "components/ma/icons/mono/copy";
 import IconInfo from "components/ma/icons/mono/info";
 import IconCheck from "components/ma/icons/fill/check";
+import { users } from "pages/dashboard/events/home/utils/icon-svgs";
+
 
 import { eventMenus } from "./utils/menus";
 import { target, fileText } from "./utils/icon-svgs";
 import { ButtonOutlineBlue } from "components/ma";
+
 
 function PageEventDetailHome() {
   const { event_id } = useParams();
@@ -176,6 +179,15 @@ function PageEventDetailHome() {
                   description: "Master e-sertifikat",
                 }}
                 href={`/dashboard/certificate/new?event_id=${event_id}`}
+              />
+
+              <CardMenu
+                menu={{
+                  icon: users,
+                  title: "Users",
+                  description: "Mengatur pengguna pengelola event",
+                }}
+                href={`/dashboard/manage-user/${event_id}`}
               />
             </MenuGridWrapper>
           </React.Fragment>

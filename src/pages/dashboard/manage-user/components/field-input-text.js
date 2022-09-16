@@ -9,7 +9,7 @@ function FieldInputText({
   required,
   name,
   placeholder,
-  value = "",
+  value,
   onChange,
   disabled,
   errors,
@@ -35,7 +35,7 @@ function FieldInputText({
         type={type}
         name={name}
         value={value}
-        onChange={(ev) => onChange?.(ev.target.value)}
+        onChange={onChange}
         placeholder={placeholder}
         disabled={disabled}
         readOnly={readOnly}

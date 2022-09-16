@@ -15,3 +15,4 @@ export { default as FAQService } from "./faq";
 export { default as OfficialService } from "./official";
 export { default as IdCardService } from "./id-card";
 export { default as DosService } from "./dos";
+export { default as ManageUserService } from "./manage-user";

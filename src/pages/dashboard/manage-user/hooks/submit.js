@@ -3,7 +3,7 @@ import { useFetcher } from "utils/hooks/alt-fetcher";
 import { AdminService } from "services";
 import * as AuthStore from "store/slice/authentication";
 
-function useSubmitProfile(userProfile, values) {
+function useSubmitUser(userProfile, values) {
   const fetcher = useFetcher();
   const fetcherProfile = useFetcher();
   const dispatch = useDispatch();
@@ -44,4 +44,4 @@ function useSubmitProfile(userProfile, values) {
   return { ...fetcher, submit };
 }
 
-export { useSubmitProfile };
+export { useSubmitUser };

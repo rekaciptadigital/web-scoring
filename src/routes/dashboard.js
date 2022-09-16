@@ -82,7 +82,7 @@ const dashboardRoutes = [
   { path: "/dashboard/events/new/prepublish", component: PagePrePublish },
   { path: "/dashboard/events/new/congratulations", component: PageCongratulations },
 
-  { path: "/dashboard/manage-user", component: PageManageUser },
+  { path: "/dashboard/manage-user/:event_id", component: PageManageUser },
 
   // this route should be at the end of all other routes
   { path: "/dashboard/events/new", component: EventsNew },

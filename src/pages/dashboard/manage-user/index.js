@@ -1,158 +1,321 @@
 import * as React from "react";
-// import { Link } from "react-router-dom";
 import styled from "styled-components";
-// import { useSelector } from "react-redux";
-// import * as AuthStore from "store/slice/authentication";
-// import { useProfileForm } from "./hooks/profile-form";
-// import { useSubmitProfile } from "./hooks/submit-profile";
-// import { usePasswordForm } from "./hooks/password-form";
-// import { useSubmitPassword } from "./hooks/submit-password";
+import { useParams } from "react-router";
+import { Modal, ModalBody } from "reactstrap";
+import { Col, Row } from "reactstrap";
 
 import {
-  // AlertSubmitError,
-  // LoadingScreen,
+  AlertSubmitError,
+  LoadingScreen,
   ButtonBlue,
   // ButtonOutlineBlue,
   // ButtonGhostBlue,
-  ButtonTransparancy
+  ButtonOutlineRed,
+  ButtonTransparancy,
+  AlertConfirmAction,
 } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
 import { Breadcrumb } from "./components/breadcrumb";
-// import { AvatarUploader } from "./components/avatar-uploader";
 import { ProcessingToast } from "./components/processing-toast";
 import { FieldInputText } from "./components/field-input-text";
-// import { FieldSelectProvince } from "./components/field-select-province";
-// import { FieldSelectCity } from "./components/field-select-city";
-// import { AlertSuccess } from "./components/alert-success";
-import { Col, Row } from "reactstrap";
+import { AlertSuccess } from "./components/alert-success";
 import DataEmpty from "./components/dataempty";
 import UserTable from "./components/list-user";
-import SweetAlert from "react-bootstrap-sweetalert";
 import IconXCircle from "components/ma/icons/mono/x-circle";
+import { SelectInput } from "components";
+import TriangeAlert from "assets/images/triangle-alert.png";
+
+import { ManageUserService } from "services";
 
 function PageManageUser() {
-  const [isAlertOpen, setAlertOpen] = React.useState(false);
-  const [isActive, setActive] = React.useState(1);
-  // const {
-  //   // submit,
-  //   isLoading: isSubmiting,
-  //   isError,
-  //   errors,
-  //   isSuccess,
-  // } = useSubmitProfile(userProfile, values);
+  const { event_id } = useParams();
 
-  // const handleSubmit = (ev) => {
-  //   ev.preventDefault();
-  //   submit();
-  // };
+  // const [isActive, setActive] = React.useState(1);
+  const [select, setSelect] = React.useState({ value: 5, label: "Pengolah Data" });
+  const [isError, setError] = React.useState({ error: false, message: {} });
+  const [isValid, setValid] = React.useState(false);
+  const [isSucces, setSucces] = React.useState([false, ""]);
+  const [listAdmin, setAdmin] = React.useState();
+  const [isLoading, setLoading] = React.useState();
+  const [isOpen, setOpen] = React.useState(false);
+  const [isDetail, setDetail] = React.useState(false);
+  const [detailData, setDataDetail] = React.useState({ admin_id: null, event_id: event_id });
+  const [isConfirm, setConfirm] = React.useState(false);
 
-  const onConfirm = () => {
-    setAlertOpen(true)
-  }
-
-  const onCancel = () => {
-    console.log('click');
-    setAlertOpen(false);
+  const initialValue = {
+    email: null,
+    name: null,
+    phone_number: null,
+    role_id: 5,
+    event_id: event_id,
   };
 
-  const handleButton = (key) => {
-    setActive(key);
-  }
+  const [values, setValue] = React.useState(initialValue);
+
+  const handeValueChange = (e) => {
+    setValid(false);
+    const { name, value } = e.target;
+    if (name == "email") {
+      const cekMail = ManageUserService.cekEmail({ event_id: event_id, email: value });
+      cekMail.then(function (result) {
+        if (result.message == "Failed" || result.message == "email ini sudah terdaftar") {
+          setValid(true);
+        }
+        if (result.message == "Success") {
+          setValue((prevState) => ({
+            ...prevState,
+            name: result?.data?.name,
+            phone_number: result?.data?.phoneNumber,
+          }));
+        }
+      });
+    }
+    setValue((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    console.log(values);
+  };
+
+  React.useEffect(() => {
+    ManageUserService.listAdmin({ event_id: event_id }).then((result) => {
+      setAdmin(result.data);
+    });
+  }, [isSucces]);
+
+  const onConfirm = () => {
+    setLoading(true);
+    const InviteAdmin = ManageUserService.inviteAdmin(values);
+    InviteAdmin.then(function (result) {
+      if (result.message === "Failed") {
+        setError({ error: true, message: result.errors });
+      }
+      if (result.message === "Success") {
+        setSucces([true, "User telah berhasil ditambahkan ke dalam sistem"]);
+        setValue(initialValue);
+        setOpen(false);
+      }
+      setLoading(false);
+    });
+  };
+
+  const handleChange = ({ key, value }) => {
+    setValue((prevState) => ({
+      ...prevState,
+      [key]: value.value,
+    }));
+    setSelect({ value: value.value, label: value.label });
+  };
+
+  const handleAddPengelola = () => {
+    setOpen(true);
+  };
+
+  const confirmError = () => {
+    setError({ error: false, message: {} });
+  };
+
+  const hadnleConfirmDelet = () => {
+    setLoading(true);
+    const removeAdmin = ManageUserService.removeAdmin({
+      event_id: event_id,
+      admin_id: detailData.id,
+    });
+    removeAdmin.then((ress) => {
+      if (ress.message === "Success") {
+        setSucces([true, "User telah berhasil dihapus dari sistem"]);
+        setDetail(false);
+      }
+      setLoading(false);
+    });
+  };
 
   return (
     <ContentLayoutWrapper pageTitle="Manajemen Pengelola">
       <ProcessingToast />
-      {/* <LoadingScreen loading={isSubmiting} /> */}
-      {/* <AlertSubmitError isError={isError} errors={errors} /> */}
-      {/* <AlertSuccess
-        isSuccess={isSuccess}
-        buttonLabel="Kembali"
-        description="Profil Anda berhasil diperbarui"
-      /> */}
+      <LoadingScreen loading={isLoading} />
+      <AlertSubmitError isError={isError.error} errors={isError.message} onConfirm={confirmError} />
+      <AlertSuccess
+        isSuccess={isSucces[0]}
+        buttonLabel="Kembali ke Management User"
+        description={isSucces[1]}
+        onConfirm={() => setSucces([false, ""])}
+      />
       <div>
         <Breadcrumb label="Dashboard" to="/dashboard" />
       </div>
 
       <CardSheet>
-        <CardTitle>Manajemen Pengelola</CardTitle>
-
         <Row>
           <Col>
-            <FilterList>
-              <li><FilterItemButton onClick={() => handleButton(1)} className={isActive == 1 ? "" : 'filter-item-active'}>Semua</FilterItemButton></li>
-              <li><FilterItemButton onClick={() => handleButton(2)} className={isActive == 2 ? "" : 'filter-item-active'}>Pengelola Data</FilterItemButton></li>
-              <li><FilterItemButton onClick={() => handleButton(3)} className={isActive == 3 ? '' : 'filter-item-active'}>Scorer</FilterItemButton></li>
-            </FilterList>
+            <CardTitle>Manajemen Pengelola</CardTitle>
           </Col>
           <Col>
-            <div className="d-flex justify-content-end" style={{ position: "relative", gap: "0.5rem" }}>
-              <ButtonBlue onClick={onConfirm}>Tambah Pengelola</ButtonBlue>
+            <div
+              className="d-flex justify-content-end"
+              style={{ position: "relative", gap: "0.5rem" }}
+            >
+              <ButtonBlue onClick={handleAddPengelola}>Tambah Pengelola</ButtonBlue>
             </div>
           </Col>
         </Row>
-        <UserTable />
-        <DataEmpty />
+        {listAdmin?.length > 0 ? (
+          <UserTable
+            setOpen={setDetail}
+            data={listAdmin}
+            detailData={setDataDetail}
+            event_id={event_id}
+          />
+        ) : (
+          <DataEmpty />
+        )}
       </CardSheet>
 
-      <SweetAlert
-        show={isAlertOpen}
-        title=""
-        onConfirm={() => { }}
-        custom
-        style={{ width: 900, borderRadius: "1.25rem" }}
-        customButtons={
-          <span className="d-flex justify-content-end" style={{ gap: "0.5rem", width: "100%" }}>
-            <ButtonBlue onClick={onCancel}>Simpan</ButtonBlue>
-          </span>
-        }
+      <Modal
+        isOpen={isOpen}
+        size="lg"
+        centered
+        backdrop="static"
+        autoFocus
+        toggle={() => setOpen((open) => !open)}
+        onClosed={() => setOpen(false)}
       >
-        <div style={{ textAlign: "start" }}>
-          <Row>
-            <Col>
-              <h2>Tambah Pengelola</h2>
-              <span>Lengkapi data user dibawah ini</span>
-            </Col>
-            <Col>
-              <span className="d-flex justify-content-end">
-                <ButtonTransparancy onClick={onCancel}><IconXCircle /></ButtonTransparancy>
-              </span>
-            </Col>
-          </Row>
+        <ModalBody>
+          <div style={{ textAlign: "start" }}>
+            <Row>
+              <Col>
+                <h2>Tambah Pengelola</h2>
+                <span>Lengkapi data user dibawah ini</span>
+              </Col>
+              <Col>
+                <span className="d-flex justify-content-end">
+                  <ButtonTransparancy onClick={() => setOpen(false)}>
+                    <IconXCircle />
+                  </ButtonTransparancy>
+                </span>
+              </Col>
+            </Row>
+          </div>
+          <div style={{ height: "350px", textAlign: "left" }}>
+            <form>
+              <FormInput>
+                <FieldInputText
+                  label="Email"
+                  name="email"
+                  placeholder="Cari email"
+                  type="text"
+                  required
+                  value={values?.email}
+                  errors={true}
+                  onChange={handeValueChange}
+                />
+                {isValid && <ValidEmail>Email sudah terpdaftar</ValidEmail>}
+                <FieldInputText
+                  label="Nama Lengkap"
+                  name="name"
+                  placeholder="Masukkan nama lengkap"
+                  required
+                  value={values?.name}
+                  onChange={handeValueChange}
+                />
+                <FieldInputText
+                  label="Nomor Telepon"
+                  name="phone_number"
+                  placeholder="Masukkan nomor telepon"
+                  required
+                  type="number"
+                  value={values?.phone_number}
+                  onChange={handeValueChange}
+                />
+                <SelectInput
+                  label="Status User"
+                  name="role_id"
+                  value={select}
+                  options={[
+                    { id: 6, value: 6, label: "Pengolah Data" },
+                    { id: 5, value: 5, label: "Scorer" },
+                  ]}
+                  onChange={handleChange}
+                />
+              </FormInput>
+            </form>
+          </div>
+          <span className="d-flex justify-content-end" style={{ gap: "0.5rem", width: "100%" }}>
+            <ButtonBlue onClick={onConfirm} disabled={isValid}>
+              Simpan
+            </ButtonBlue>
+          </span>
+        </ModalBody>
+      </Modal>
 
-        </div>
-        <div style={{ height: "300px", textAlign: 'left' }}>
-          <form>
-            <FormInput>
-              <FieldInputText
-                label="Email"
-                name="email"
-                placeholder="Cari email"
-                required
-              />
-              <FieldInputText
-                label="Nama Lengkap"
-                name="name"
-                placeholder="Masukkan nama lengkap"
-                required
-              />
-              <FieldInputText
-                label="Nomor Telepon"
-                name="no_telepon"
-                placeholder="Masukkan nomor telepon"
-                required
-                type="number"
-              />
-              <FieldInputText
-                label="Status User"
-                name="status"
-                placeholder="Masukkan nama penyelenggara"
-                readOnly
-                value="Pengolah Data"
-              />
-            </FormInput>
-          </form>
-        </div>
-      </SweetAlert>
+      <Modal
+        isOpen={isDetail}
+        size="lg"
+        centered
+        backdrop="static"
+        autoFocus
+        toggle={() => setDetail((open) => !open)}
+        onClosed={() => setDetail(false)}
+      >
+        <ModalBody>
+          <div style={{ textAlign: "start" }}>
+            <Row>
+              <Col>
+                <h2>Detail User</h2>
+                <span>Berikut adalah data user</span>
+              </Col>
+              <Col>
+                <span className="d-flex justify-content-end">
+                  <ButtonTransparancy onClick={() => setDetail(false)}>
+                    <IconXCircle />
+                  </ButtonTransparancy>
+                </span>
+              </Col>
+            </Row>
+          </div>
+          <div style={{ height: "250px", textAlign: "left" }}>
+            <table className="table">
+              <tbody>
+                <tr>
+                  <th width="150px">Email</th>
+                  <th width="30px">:</th>
+                  <td>{detailData?.email}</td>
+                </tr>
+                <tr>
+                  <th>Nama Lengkap</th>
+                  <th>:</th>
+                  <td>{detailData?.name}</td>
+                </tr>
+                <tr>
+                  <th>Nomor Telepon</th>
+                  <th>:</th>
+                  <td>{detailData?.phoneNumber}</td>
+                </tr>
+                <tr>
+                  <th>Status User</th>
+                  <th>:</th>
+                  <td>{detailData?.roleName}</td>
+                </tr>
+              </tbody>
+            </table>
+            <span className="d-flex justify-content-end">
+              <ButtonOutlineRed onClick={() => setConfirm(true)}>Hapus Pengelola</ButtonOutlineRed>
+            </span>
+          </div>
+        </ModalBody>
+      </Modal>
+
+      <AlertConfirmAction
+        shouldConfirm={isConfirm}
+        onConfirm={hadnleConfirmDelet}
+        onClose={() => setConfirm(false)}
+        labelCancel="Tidak, kembali"
+        labelConfirm="Ya, hapus"
+      >
+        <img src={TriangeAlert} />
+        <h2>Perhatian !</h2>
+        Apakah Anda yakin akan menghapus user dari sistem?
+      </AlertConfirmAction>
     </ContentLayoutWrapper>
   );
 }
@@ -177,105 +340,25 @@ const CardSheet = styled.div`
       `;
 
 const CardTitle = styled.div`
-      font-family: 'Inter';
-      font-style: normal;
-      font-weight: 700;
-      font-size: 28px;
-      line-height: 36px;
-      margin-bottom: 30px;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 36px;
+  margin-bottom: 30px;
 `;
-
-// const EditorDisplay = styled.div`
-//   display: flex;
-//   gap: 1rem;
-//   align-items: flex-end;
-
-//   > *:nth-child(1) {
-//     flex-grow: 1;
-//   }
-
-//   > *:nth-child(2) {
-//     flex-shrink: 0;
-//   }
-// `;
 
 const FormInput = styled.div`
-    margin-top: 10px;  
+  margin-top: 10px;
 
-    > * + * {
-      margin-top: 0.75rem;
-    }
-`;
-
-const FilterList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-`;
-
-const FilterItemButton = styled.button`
-  transition: all 0.15s;
-
-  &,
-  &:active,
-  &:focus,
-  &:focus-visible {
-    padding: 0.5rem 0.75rem;
-    color: var(--ma-blue-400);
-
-    background-color: #E7EDF6;
-    border: solid 2px var(--ma-blue);
-    border-radius: 0.5rem;
-    color: #0D47A1 !important;
-    box-shadow: none;
-
-    &.filter-item-active {
-      background-color: #FFFFFF;
-      color: rgba(73, 80, 87, 0.54) !important;
-      border: none;
-    }
-  }
-
-  &:hover {
-    background-color: var(--ma-blue);
-    color: #ffffff !important;
+  > * + * {
+    margin-top: 0.75rem;
   }
 `;
 
-// const ButtonSecondaryBlue = styled(BSButton)`
-//   &,
-//   &:focus,
-//   &:active {
-//     background-color: #E7EDF6;
-//     border: solid 2px var(--ma-blue);
-//     border-radius: 0.5rem;
-//     color: #0D47A1 !important;
-//     box-shadow: none;
-//   }
-
-//   &:hover {
-//     background-color: var(--ma-blue);
-//     color: #ffffff !important;
-//   }
-// `;
-
-// const ButtonTransparancy = styled(BSButton)`
-//   &,
-//   &:focus,
-//   &:active {
-//     background-color: #FFFFFF;
-//     color: rgba(73, 80, 87, 0.54) !important;
-//     border: none;
-//   }
-
-//   &:hover {
-//     background-color: var(--ma-blue);
-//     color: #ffffff !important;
-//   }
-// `;
+const ValidEmail = styled.span`
+  color: var(--ma-red);
+  font-size: 12px;
+`;
 
 export default PageManageUser;

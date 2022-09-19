@@ -22,7 +22,6 @@ import { AlertSuccess } from "./components/alert-success";
 import DataEmpty from "./components/dataempty";
 import UserTable from "./components/list-user";
 import IconXCircle from "components/ma/icons/mono/x-circle";
-import { SelectInput } from "components";
 import TriangeAlert from "assets/images/triangle-alert.png";
 
 import { ManageUserService } from "services";
@@ -30,8 +29,6 @@ import { ManageUserService } from "services";
 function PageManageUser() {
   const { event_id } = useParams();
 
-  // const [isActive, setActive] = React.useState(1);
-  const [select, setSelect] = React.useState({ value: 5, label: "Pengolah Data" });
   const [isError, setError] = React.useState({ error: false, message: {} });
   const [isValid, setValid] = React.useState(false);
   const [isSucces, setSucces] = React.useState([false, ""]);
@@ -74,7 +71,6 @@ function PageManageUser() {
       ...prevState,
       [name]: value,
     }));
-    console.log(values);
   };
 
   React.useEffect(() => {
@@ -99,13 +95,13 @@ function PageManageUser() {
     });
   };
 
-  const handleChange = ({ key, value }) => {
-    setValue((prevState) => ({
-      ...prevState,
-      [key]: value.value,
-    }));
-    setSelect({ value: value.value, label: value.label });
-  };
+  // const handleChange = ({ key, value }) => {
+  //   setValue((prevState) => ({
+  //     ...prevState,
+  //     [key]: value.value,
+  //   }));
+  //   setSelect({ value: value.value, label: value.label });
+  // };
 
   const handleAddPengelola = () => {
     setOpen(true);
@@ -227,16 +223,11 @@ function PageManageUser() {
                   value={values?.phone_number}
                   onChange={handeValueChange}
                 />
-                <SelectInput
+                <FieldInputText
                   label="Status User"
-                  name="role_id"
-                  value={select}
-                  options={[
-                    { id: 6, value: 6, label: "Pengolah Data" },
-                    { id: 5, value: 5, label: "Scorer" },
-                  ]}
-                  onChange={handleChange}
-                />
+                  value="Pengolah Data"
+                  disabled={true}
+                 />
               </FormInput>
             </form>
           </div>

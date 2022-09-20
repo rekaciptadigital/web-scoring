@@ -2,6 +2,8 @@ import * as React from "react";
 import { useParams, Link } from "react-router-dom";
 import styled from "styled-components";
 import { EventsService } from "services";
+import { useSelector } from "react-redux";
+import * as AuthStore from "store/slice/authentication";
 
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
@@ -24,8 +26,11 @@ function PageEventDetailHome() {
   const { event_id } = useParams();
   const [eventDetail, setEventDetail] = React.useState(null);
   const [isQualificationSchedulesSet, setIsQualificationSchedulesSet] = React.useState(false);
+  const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
 
   const isEventPublished = Boolean(eventDetail?.publicInformation.eventStatus);
+
+  const roles = userProfile.role.role.id;
 
   const renderManageEventMenuBadge = () => {
     if (!isEventPublished) {
@@ -127,14 +132,20 @@ function PageEventDetailHome() {
                 menu={eventMenus[1]}
                 href={eventMenus[1].computeLink(event_id)}
                 badge={renderManageEventMenuBadge()}
+                disabled={roles == 4 ? false : true}
               />
-              <CardMenu menu={eventMenus[8]} href={`/dashboard/event/${event_id}/budrests`} />
+              <CardMenu
+                menu={eventMenus[8]}
+                href={`/dashboard/event/${event_id}/budrests`}
+                disabled={roles == 4 ? false : true}
+              />
 
               <CardMenuWithButton
                 eventDetail={eventDetail}
                 spanLabel={"Peserta Individu : " + eventDetail?.totalParticipantIndividual}
                 menu={eventMenus[2]}
                 href={`/dashboard/member/${event_id}?type=individual`}
+                disabled={roles == 4 ? false : true}
               />
 
               <CardMenuWithButton
@@ -143,6 +154,7 @@ function PageEventDetailHome() {
                 menu={eventMenus[3]}
                 spanLabel={"Peserta Beregu : " + eventDetail?.totalParticipantTeam}
                 href={`/dashboard/member/${event_id}?type=team`}
+                disabled={roles == 4 ? false : true}
               />
 
               <CardMenu
@@ -170,6 +182,7 @@ function PageEventDetailHome() {
                   description: "Laporan jumlah peserta, laporan keuangan, laporan pertandingan",
                 }}
                 href={`/dashboard/event/${event_id}/reports`}
+                disabled={roles == 4 ? false : true}
               />
 
               <CardMenu
@@ -179,16 +192,19 @@ function PageEventDetailHome() {
                   description: "Master e-sertifikat",
                 }}
                 href={`/dashboard/certificate/new?event_id=${event_id}`}
+                disabled={roles == 4 ? false : true}
               />
 
-              <CardMenu
-                menu={{
-                  icon: users,
-                  title: "Users",
-                  description: "Mengatur pengguna pengelola event",
-                }}
-                href={`/dashboard/manage-user/${event_id}`}
-              />
+              {roles == 4 && (
+                <CardMenu
+                  menu={{
+                    icon: users,
+                    title: "Users",
+                    description: "Mengatur pengguna pengelola event",
+                  }}
+                  href={`/dashboard/manage-user/${event_id}`}
+                />
+              )}
             </MenuGridWrapper>
           </React.Fragment>
         ) : (

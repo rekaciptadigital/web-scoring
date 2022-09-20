@@ -8,6 +8,7 @@ import { useQualificationSchedules } from "./hooks/qualification-schedules";
 import { useFormPublicInfos } from "./hooks/form-public-infos";
 import { useFormFees } from "./hooks/form-fees";
 import { useFormCategories } from "./hooks/form-categories";
+import { useFormRegistrationDates } from "./hooks/form-registration-dates";
 import { useFormSchedules } from "./hooks/form-schedules";
 import { useSubmitPublicInfos } from "./hooks/submit-public-infos";
 import { useSubmitEventLogo } from "./hooks/submit-event-logo";
@@ -32,7 +33,7 @@ import { LoadingScreen } from "./components/loading-screen-portal";
 import { ScreenPublicInfos } from "./screens/public-infos";
 import { ScreenFees } from "./screens/fees";
 import { ScreenCategories } from "./screens/categories";
-import { ScreenRegistrationSchedules } from "./screens/registration-schedules";
+import { ScreenRegistrationDates } from "./screens/registration-dates";
 import { ScreenRules } from "./screens/rules";
 import { ScreenSchedules } from "./screens/schedules";
 import { ScreenSchedulesMarathon } from "./screens/schedules-marathon";
@@ -74,6 +75,7 @@ function PageCreateEventFullday() {
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
+  const formRegistrationDates = useFormRegistrationDates(eventDetail?.eventCategories, undefined);
   const formSchedules = useFormSchedules(schedules, {
     eventType,
     eventDetail,
@@ -325,13 +327,13 @@ function PageCreateEventFullday() {
               <SpacedHeaderBar>
                 <div>
                   <h2>Informasi Pendaftaran</h2>
-                  <p>...info, info!</p>
+                  <p>Pengaturan informasi pendaftaran untuk event Anda</p>
                 </div>
               </SpacedHeaderBar>
             </StepHeader>
 
             <StepBody>
-              <ScreenRegistrationSchedules eventDetail={eventDetail} />
+              <ScreenRegistrationDates form={formRegistrationDates} />
             </StepBody>
           </StepContent>
 

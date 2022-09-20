@@ -11,15 +11,20 @@ function FieldInputDateRange({
   required,
   minDate,
   maxDate,
+  disabled,
 }) {
+  const handleChange = (action) => {
+    onChange?.({ ...daterange, ...action });
+  };
   return (
     <PairedDateTimeFields>
       <FieldInputDateSmall
         label={labelStart}
         placeholder="HH/BB/TTTT"
         required={required}
+        disabled={disabled}
         value={daterange?.start}
-        onChange={onChange}
+        onChange={(date) => handleChange({ start: date })}
         minDate={minDate}
         maxDate={maxDate}
         // date range configs
@@ -32,8 +37,9 @@ function FieldInputDateRange({
         label={labelEnd}
         placeholder="HH/BB/TTTT"
         required={required}
+        disabled={disabled}
         value={daterange?.end}
-        onChange={onChange}
+        onChange={(date) => handleChange({ end: date })}
         minDate={minDate}
         maxDate={maxDate}
         // date range configs

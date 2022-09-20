@@ -5,26 +5,21 @@ import { Button } from "components/ma";
 import { FieldInputDateTimeRange } from "../components/field-input-datetime-range";
 import { FieldSettingToggleBar } from "../components/field-setting-toggle-bar";
 import { FieldSelectOption } from "./field-select-option";
+import { FieldSelectMulti } from "./field-select-multi";
 import { FieldInputDateRange } from "../components/field-input-date-range";
 
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
 
-function ScreenRegistrationSchedules({
-  eventDetail,
-  // categories,
-  // formSchedules,
-  // schedulesProvider,
-}) {
-  eventDetail;
+function ScreenRegistrationDates({ form }) {
+  const { data: configForm, toggleActiveSetting } = form;
+
   // ubah ke action dari reducer-nya
   const [testDatetimeRange, setTestDatetimeRange] = React.useState({ start: null, end: null });
   const [testDatetimeRangeEvent, setTestDatetimeRangeEvent] = React.useState({
     start: null,
     end: null,
   });
-
-  const [isSpecialSettingActive, setSpecialSettingActive] = React.useState(false);
 
   return (
     <CardSheet>
@@ -61,23 +56,24 @@ function ScreenRegistrationSchedules({
               <FieldSettingToggleBar
                 label="Tetapkan Tanggal Pendaftaran Khusus"
                 title={
-                  isSpecialSettingActive &&
-                  `Anda dapat membuat tanggal pendaftaran yang berbeda untuk individu, beregu, dan beregu campuran.`
+                  configForm.isActive
+                    ? `Anda dapat membuat tanggal pendaftaran yang berbeda untuk individu, beregu, dan beregu campuran.`
+                    : undefined
                 }
                 info={
-                  !isSpecialSettingActive && (
+                  !configForm.isActive ? (
                     <React.Fragment>
                       Anda dapat membuat tanggal pendaftaran yang berbeda untuk individu, beregu,
                       dan beregu campuran.
                     </React.Fragment>
-                  )
+                  ) : undefined
                 }
-                on={isSpecialSettingActive}
-                onChange={() => setSpecialSettingActive((on) => !on)}
+                on={configForm.isActive}
+                onChange={toggleActiveSetting}
               />
             </VerticalSpaceBetween>
 
-            {isSpecialSettingActive && <ScheduleGroupList />}
+            {configForm.isActive && <ScheduleGroupList form={form} />}
           </VerticalSpaceLoose>
         </Section>
       </VerticalSpaceLoose>
@@ -85,25 +81,56 @@ function ScreenRegistrationSchedules({
   );
 }
 
-function ScheduleGroupList() {
-  const [count, setCount] = React.useState(1);
-  const items = [...new Array(count)].map((item, index) => index + 1);
+function ScheduleGroupList({ form }) {
+  const {
+    data,
+    optionsTeamCategory,
+    setTeamCategory,
+    setDateRange,
+    addConfig,
+    removeConfig,
+    toggleConfigByCategories,
+    getOptionsCategoriesByTeam,
+    setSpecialCategories,
+  } = form;
+
+  const hasEmptyTeam = data.configs.some((config) => !config.team?.value);
+
   return (
     <VerticalSpaceLoose>
-      {items.map((id) => (
-        <Group key={id}>
-          <SpecialScheduleEditor />
+      {data.configs.map((configItemForm, configIndex) => (
+        <Group key={configItemForm.key}>
+          <SpecialScheduleEditor
+            form={configItemForm}
+            optionsTeamCategory={optionsTeamCategory}
+            onChangeTeamCategory={(option) => setTeamCategory(configIndex, option)}
+            onChangeDateRange={(range) => setDateRange(configIndex, range)}
+            onToggleConfigByCategories={() => toggleConfigByCategories(configIndex)}
+            onChangeSpecialCategories={(options) => setSpecialCategories(configIndex, options)}
+            getOptionsCategoriesByTeam={getOptionsCategoriesByTeam}
+          />
 
           <GroupAction>
             <Button
               flexible
-              onClick={() => setCount((count) => (count > 1 ? count - 1 : count))}
-              disabled={count <= 1}
+              disabled={data.configs.length <= 1}
+              onClick={() => removeConfig(configIndex)}
             >
               <IconTrash size="12" />
             </Button>
 
-            <Button flexible onClick={() => setCount((count) => count + 1)} disabled={count >= 3}>
+            <Button
+              flexible
+              disabled={!optionsTeamCategory.length || hasEmptyTeam}
+              onClick={addConfig}
+              title={
+                !optionsTeamCategory.length
+                  ? "Semua regu sudah diatur"
+                  : hasEmptyTeam
+                  ? "Tidak dapat menambah ketika belum pilih regu untuk bagian ini"
+                  : undefined
+              }
+            >
               <IconPlus size="12" />
             </Button>
           </GroupAction>
@@ -113,18 +140,48 @@ function ScheduleGroupList() {
   );
 }
 
-function SpecialScheduleEditor() {
-  const [isSpecialCategoriesActive, setSpecialCategoriesActive] = React.useState(false);
+function SpecialScheduleEditor({
+  form = {
+    key: "",
+    team: null,
+    registrationDateStart: null,
+    registrationDateEnd: null,
+    isSpecialActive: false,
+    categories: [],
+  },
+  optionsTeamCategory,
+  onChangeTeamCategory,
+  onChangeDateRange,
+  onToggleConfigByCategories,
+  onChangeSpecialCategories,
+  getOptionsCategoriesByTeam,
+}) {
+  const optionsCategories = React.useMemo(
+    () => getOptionsCategoriesByTeam(form.team?.value),
+    [getOptionsCategoriesByTeam, form.team?.value]
+  );
+
   return (
     <InnerGroup>
       <VerticalSpaceLoose>
         <VerticalSpaceBetween>
           <EditorHeader>
-            <FieldSelectOption
-              label="Jenis Regu"
-              name="team-category"
-              placeholder="Pilih jenis regu"
-            />
+            {!form.team ? (
+              <FieldSelectOption
+                label="Jenis Regu"
+                required
+                name="team-category"
+                placeholder="Pilih jenis regu"
+                options={optionsTeamCategory}
+                value={form.team}
+                onChange={onChangeTeamCategory}
+              />
+            ) : (
+              <div>
+                <p>Jenis Regu</p>
+                <h5>{form.team.label}</h5>
+              </div>
+            )}
           </EditorHeader>
 
           <FieldInputDateRange
@@ -132,20 +189,31 @@ function SpecialScheduleEditor() {
             labelEnd="Tutup Pendaftaran"
             required
             daterange={{
-              start: new Date("2022-09-10"),
-              end: new Date(),
+              start: form.registrationDateStart,
+              end: form.registrationDateEnd,
             }}
+            onChange={onChangeDateRange}
+            disabled={form.isSpecialActive}
           />
         </VerticalSpaceBetween>
 
         <FieldSettingToggleBar
-          label="Tetapkan Kategori Tertentu"
+          label={
+            form.team ? (
+              "Tetapkan Kategori Tertentu"
+            ) : (
+              <React.Fragment>
+                Isi <strong>Jenis Regu</strong> untuk mengatur kategori tertentu
+              </React.Fragment>
+            )
+          }
           title={
-            isSpecialCategoriesActive &&
-            `Pengaturan ini dapat membuat tanggal pendaftaran yang berbeda untuk satu kategori. Namun, jika tidak diaktifkan maka akan otomatis diterapkan untuk semua kategori (individu putra dan putri). Untuk kategori yang tidak dipilih pada menu ini, maka akan otomatis mengikuti "tanggal event" yang telah Anda atur di menu bagian atas.`
+            form.isSpecialActive
+              ? `Pengaturan ini dapat membuat tanggal pendaftaran yang berbeda untuk satu kategori. Namun, jika tidak diaktifkan maka akan otomatis diterapkan untuk semua kategori (individu putra dan putri). Untuk kategori yang tidak dipilih pada menu ini, maka akan otomatis mengikuti "tanggal event" yang telah Anda atur di menu bagian atas.`
+              : undefined
           }
           info={
-            !isSpecialCategoriesActive && (
+            !form.isSpecialActive ? (
               <React.Fragment>
                 Pengaturan ini dapat membuat tanggal pendaftaran yang berbeda untuk satu kategori.
                 Namun, jika tidak diaktifkan maka akan otomatis diterapkan untuk semua kategori
@@ -153,18 +221,23 @@ function SpecialScheduleEditor() {
                 akan otomatis mengikuti &quot;tanggal event&quot; yang telah Anda atur di menu
                 bagian atas.
               </React.Fragment>
-            )
+            ) : undefined
           }
-          on={isSpecialCategoriesActive}
-          onChange={() => setSpecialCategoriesActive((on) => !on)}
+          on={form.isSpecialActive}
+          onChange={() => onToggleConfigByCategories()}
+          disabled={!form.team}
         />
 
-        {isSpecialCategoriesActive && (
+        {form.isSpecialActive && (
           <PairedFields>
-            <FieldSelectOption
+            <FieldSelectMulti
               label="Kategori"
               name="category-details"
               placeholder="Pilih kategori"
+              isClearable={false}
+              options={optionsCategories}
+              value={form.categories}
+              onChange={onChangeSpecialCategories}
             />
 
             <FieldInputDateRange
@@ -172,9 +245,10 @@ function SpecialScheduleEditor() {
               labelEnd="Tutup Pendaftaran"
               required
               daterange={{
-                start: new Date("2022-09-10"),
-                end: new Date(),
+                start: form.registrationDateStart,
+                end: form.registrationDateEnd,
               }}
+              onChange={onChangeDateRange}
             />
           </PairedFields>
         )}
@@ -183,7 +257,8 @@ function SpecialScheduleEditor() {
   );
 }
 
-/* ======================================== */
+/* ======================== */
+// styles
 
 const CardSheet = styled.div`
   margin-bottom: 24px;
@@ -255,4 +330,4 @@ const PairedFields = styled.div`
   gap: 1.5rem 1rem;
 `;
 
-export { ScreenRegistrationSchedules };
+export { ScreenRegistrationDates };

@@ -1,9 +1,21 @@
 import * as React from "react";
 import styled from "styled-components";
-
 import Switch from "react-switch";
-
 import { stringUtil } from "utils";
+
+function CollapsibleDebug({ children }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <Section>
+      <FieldSettingToggleBar
+        label={open ? "Hide" : "Debug"}
+        on={open}
+        onChange={() => setOpen((on) => !on)}
+      />
+      {open && <pre>{JSON.stringify(children, null, 2)}</pre>}
+    </Section>
+  );
+}
 
 function FieldSettingToggleBar({ label, title, name, on, onChange, info, disabled }) {
   const fieldId = useFieldId(name);
@@ -43,8 +55,14 @@ function ToggleSwitch({ name, checked, onChange, disabled }) {
   );
 }
 
-/* ========================== */
+/* ===================== */
 // styles
+
+const Section = styled.div`
+  padding: 1.25rem;
+  border: 1px solid var(--ma-gray-200);
+  border-radius: 0.5rem;
+`;
 
 const FieldBar = styled.div`
   display: flex;
@@ -79,4 +97,4 @@ function useFieldId(name) {
   }, [name]);
 }
 
-export { FieldSettingToggleBar };
+export { CollapsibleDebug };

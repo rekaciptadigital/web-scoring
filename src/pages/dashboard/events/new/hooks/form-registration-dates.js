@@ -106,7 +106,10 @@ function useFormRegistrationDates(categories, configs) {
         }
 
         case actionType.TOGGLE_CONFIG_BY_CATEGORIES: {
-          const fieldMutation = (state) => ({ isSpecialActive: !state.isSpecialActive });
+          const fieldMutation = (state) => ({
+            isSpecialActive: !state.isSpecialActive,
+            categories: [],
+          });
           return _getUpdatedStateConfigItem(state, action.configIndex, fieldMutation);
         }
 
@@ -143,6 +146,10 @@ function useFormRegistrationDates(categories, configs) {
     () => _makeOptionsTeamCategory(categoriesByTeamId, state.data.configs),
     [categoriesByTeamId, state?.data.configs]
   );
+
+  const initForm = () => {
+    dispatch({ type: actionType.INIT_FORM, payload: initialValues });
+  };
 
   /**
    * Init/reset state form
@@ -218,6 +225,7 @@ function useFormRegistrationDates(categories, configs) {
   return {
     categoriesByTeamId,
     data: state.data,
+    initForm,
     toggleActiveSetting,
     optionsTeamCategory,
     setTeamCategory,

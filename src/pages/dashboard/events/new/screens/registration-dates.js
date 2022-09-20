@@ -12,7 +12,7 @@ import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
 
 function ScreenRegistrationDates({ form }) {
-  const { data: configForm, toggleActiveSetting } = form;
+  const { data: configForm, toggleActiveSetting, initForm } = form;
 
   // ubah ke action dari reducer-nya
   const [testDatetimeRange, setTestDatetimeRange] = React.useState({ start: null, end: null });
@@ -20,6 +20,11 @@ function ScreenRegistrationDates({ form }) {
     start: null,
     end: null,
   });
+
+  // Reset form tiap meninggalkan screen step ini
+  React.useEffect(() => {
+    return () => initForm();
+  }, []);
 
   return (
     <CardSheet>
@@ -73,7 +78,7 @@ function ScreenRegistrationDates({ form }) {
               />
             </VerticalSpaceBetween>
 
-            {configForm.isActive && <ScheduleGroupList form={form} />}
+            {configForm.isActive && <ConfigGroupList form={form} />}
           </VerticalSpaceLoose>
         </Section>
       </VerticalSpaceLoose>
@@ -81,7 +86,7 @@ function ScreenRegistrationDates({ form }) {
   );
 }
 
-function ScheduleGroupList({ form }) {
+function ConfigGroupList({ form }) {
   const {
     data,
     optionsTeamCategory,
@@ -100,14 +105,14 @@ function ScheduleGroupList({ form }) {
     <VerticalSpaceLoose>
       {data.configs.map((configItemForm, configIndex) => (
         <Group key={configItemForm.key}>
-          <SpecialScheduleEditor
+          <ConfigEditor
             form={configItemForm}
             optionsTeamCategory={optionsTeamCategory}
             onChangeTeamCategory={(option) => setTeamCategory(configIndex, option)}
             onChangeDateRange={(range) => setDateRange(configIndex, range)}
             onToggleConfigByCategories={() => toggleConfigByCategories(configIndex)}
             onChangeSpecialCategories={(options) => setSpecialCategories(configIndex, options)}
-            getOptionsCategoriesByTeam={getOptionsCategoriesByTeam}
+            optionsCategoriesByTeam={getOptionsCategoriesByTeam(configItemForm.team?.value)}
           />
 
           <GroupAction>
@@ -140,7 +145,7 @@ function ScheduleGroupList({ form }) {
   );
 }
 
-function SpecialScheduleEditor({
+function ConfigEditor({
   form = {
     key: "",
     team: null,
@@ -154,13 +159,8 @@ function SpecialScheduleEditor({
   onChangeDateRange,
   onToggleConfigByCategories,
   onChangeSpecialCategories,
-  getOptionsCategoriesByTeam,
+  optionsCategoriesByTeam,
 }) {
-  const optionsCategories = React.useMemo(
-    () => getOptionsCategoriesByTeam(form.team?.value),
-    [getOptionsCategoriesByTeam, form.team?.value]
-  );
-
   return (
     <InnerGroup>
       <VerticalSpaceLoose>
@@ -235,7 +235,7 @@ function SpecialScheduleEditor({
               name="category-details"
               placeholder="Pilih kategori"
               isClearable={false}
-              options={optionsCategories}
+              options={optionsCategoriesByTeam}
               value={form.categories}
               onChange={onChangeSpecialCategories}
             />

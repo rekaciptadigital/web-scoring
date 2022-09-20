@@ -1,0 +1,11 @@
+table {
+    margin-top: 10px;
+}
+
+table > thead {
+    background-color:#E7EDF6;
+}
+
+table > thead > th {
+    padding: 10px;
+}

@@ -43,7 +43,7 @@ function PageManageUser() {
     email: null,
     name: null,
     phone_number: null,
-    role_id: 5,
+    role_id: 6,
     event_id: event_id,
   };
 
@@ -94,14 +94,6 @@ function PageManageUser() {
       setLoading(false);
     });
   };
-
-  // const handleChange = ({ key, value }) => {
-  //   setValue((prevState) => ({
-  //     ...prevState,
-  //     [key]: value.value,
-  //   }));
-  //   setSelect({ value: value.value, label: value.label });
-  // };
 
   const handleAddPengelola = () => {
     setOpen(true);

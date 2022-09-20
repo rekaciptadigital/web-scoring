@@ -197,7 +197,7 @@ function PageManageUser() {
                   errors={true}
                   onChange={handeValueChange}
                 />
-                {isValid && <ValidEmail>Email sudah terpdaftar</ValidEmail>}
+                {isValid && <ValidEmail>Email sudah terdaftar</ValidEmail>}
                 <FieldInputText
                   label="Nama Lengkap"
                   name="name"

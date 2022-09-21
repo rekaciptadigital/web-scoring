@@ -133,8 +133,12 @@ function PageCreateEventFullday() {
     errors: categoriesErrors,
   } = useSubmitCategories();
 
-  const { submit: submitRegistrationDates, isLoading: isSubmitRegistrationDates } =
-    useSubmitRegistrationDates(eventDetail?.id, formRegistrationDates.data);
+  const {
+    submit: submitRegistrationDates,
+    isLoading: isSubmitRegistrationDates,
+    isError: isErrorRegistrationDates,
+    errors: errorsRegistrationDates,
+  } = useSubmitRegistrationDates(eventDetail?.id, formRegistrationDates.data);
 
   const isLoadingSubmit =
     isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates;
@@ -150,6 +154,7 @@ function PageCreateEventFullday() {
       <AlertSubmitError isError={isErrorPublicInfos} errors={publicInfosErrors} />
       <AlertSubmitError isError={isErrorLogo} errors={errorsLogo} />
       <AlertSubmitError isError={isErrorCategories} errors={categoriesErrors} />
+      <AlertSubmitError isError={isErrorRegistrationDates} errors={errorsRegistrationDates} />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
         <StepListIndicator title="Pertandingan">

@@ -186,6 +186,7 @@ function ConfigEditor({
   onRemoveCategoryConfig,
   onChangeDateRangeCategory,
 }) {
+  const hasEmptyCategories = form.categories.some((config) => !config.categories?.length);
   return (
     <InnerGroup>
       <VerticalSpaceLoose>
@@ -286,7 +287,7 @@ function ConfigEditor({
                   <Button
                     flexible
                     onClick={() => onAddCategoryConfig?.(itemIndex)}
-                    disabled={!optionsCategoryPair?.length}
+                    disabled={!optionsCategoryPair?.length || hasEmptyCategories}
                     title={!optionsCategoryPair?.length ? "Semua kategori telah diatur" : undefined}
                   >
                     <IconPlus size="12" />

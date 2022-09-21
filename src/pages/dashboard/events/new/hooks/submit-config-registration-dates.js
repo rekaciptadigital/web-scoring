@@ -15,24 +15,23 @@ function useSubmitRegistrationDates(eventId, formData) {
       default_datetime_end_register: formData.registrationDateEnd
         ? datetime.formatServerDatetime(formData.registrationDateEnd)
         : undefined,
+      is_active_config: 0,
     };
 
     if (formData.isActive) {
       payload = {
         ...payload,
+        is_active_config: 1,
         list_config: formData.configs?.map((config) => {
-          const dateStart = config.registrationDateStart
-            ? datetime.formatServerDatetime(config.registrationDateStart)
-            : undefined;
-
-          const dateEnd = config.registrationDateEnd
-            ? datetime.formatServerDatetime(config.registrationDateEnd)
-            : undefined;
+          const dateStart = config.start ? datetime.formatServerDatetime(config.start) : undefined;
+          const dateEnd = config.end ? datetime.formatServerDatetime(config.end) : undefined;
 
           const configPayload = {
-            team_category_id: config.team?.value,
-            date_time_start_register: dateStart,
-            date_time_end_register: dateEnd,
+            config_type: config.team?.value,
+            date_time_start_register_config: dateStart,
+            date_time_end_register_config: dateEnd,
+            is_deleted: 0, // TODO: handle kondisionalnya kalau sudah ada API get
+            // config_id: ??, // TODO: handle kondisionalnya kalau sudah ada API get
           };
 
           if (!config.isSpecialActive) {
@@ -45,14 +44,7 @@ function useSubmitRegistrationDates(eventId, formData) {
           return {
             ...configPayload,
             is_have_special_category: 1,
-
-            special_category:
-              config.categories?.map((category) => ({
-                category_id: category?.value,
-                // is_deleted: 0, // TODO:
-                date_time_start_register: dateStart,
-                date_time_end_register: dateEnd,
-              })) || [],
+            special_category: _makePayloadSpecialCategory(config.categories),
           };
         }),
       };
@@ -63,6 +55,33 @@ function useSubmitRegistrationDates(eventId, formData) {
   };
 
   return { ...fetcher, submit };
+}
+
+/* ======================== */
+// utils
+
+function _makePayloadSpecialCategory(categories) {
+  const payload = [];
+  // Deal with it, this the truth.
+  // Here comes, nested loops!
+  for (const item of categories) {
+    for (const pair of item.categories) {
+      for (const category of pair.categories) {
+        const payloadItem = {
+          category_id: category.id,
+          date_time_start_register_special_category: item.start
+            ? datetime.formatServerDatetime(item.start)
+            : undefined,
+          date_time_end_register_special_category: item.end
+            ? datetime.formatServerDatetime(item.end)
+            : undefined,
+          is_deleted: 0, // TODO: handle kondisionalnya kalau sudah ada API get
+        };
+        payload.push(payloadItem);
+      }
+    }
+  }
+  return payload;
 }
 
 export { useSubmitRegistrationDates };

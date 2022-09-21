@@ -9,7 +9,7 @@ import { toast } from "components/ma/processing-toast";
 import { FieldInputTextSmall } from "pages/dashboard/events/components/form-fields";
 import { SelectRadio } from "../../components/select-radio";
 import { FieldSelectCategories } from "./components/field-select-categories";
-import { FieldSelectOption } from "./components/field-select-option";
+import { FieldSelectOption } from "../field-select-option";
 
 function ScreenRules({ eventDetail }) {
   return (

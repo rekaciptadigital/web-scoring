@@ -9,15 +9,10 @@ import { parseServerDatetime, formatServerDate } from "../utils/datetime";
  * Dipakai ketika sama sekali belum ada data schedule/qualification time-nya
  */
 function makeDefaultForm(eventDetail) {
-  let eventStartDate = null;
-  let eventEndDate = null;
-  let numberOfDays = 1;
-
-  if (eventDetail) {
-    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
-    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
-    numberOfDays = differenceInDays(eventEndDate, eventStartDate) + 1;
-  }
+  let eventStartDate = parseServerDatetime(eventDetail?.publicInformation.eventStart);
+  let eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  let numberOfDays =
+    eventStartDate && eventEndDate ? differenceInDays(eventEndDate, eventStartDate) + 1 : 1;
 
   let currentSessionDate = eventStartDate ? subDays(eventStartDate, 1) : null;
   return [...new Array(numberOfDays)].reduce((data) => {
@@ -47,15 +42,10 @@ function makeDefaultForm(eventDetail) {
  */
 function makeStateSchedules(eventDetail, schedules, categories) {
   const categoriesById = _makeCategoriesById(categories);
-  let eventStartDate = null;
-  let eventEndDate = null;
-  let numberOfDays = 1;
-
-  if (eventDetail) {
-    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
-    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
-    numberOfDays = differenceInDays(eventEndDate, eventStartDate) + 1;
-  }
+  let eventStartDate = parseServerDatetime(eventDetail?.publicInformation.eventStart);
+  let eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  let numberOfDays =
+    eventStartDate && eventEndDate ? differenceInDays(eventEndDate, eventStartDate) + 1 : 1;
 
   let currentSessionDate = eventStartDate ? subDays(eventStartDate, 1) : null;
   const formDataGrouped = [...new Array(numberOfDays)].reduce((data) => {
@@ -127,6 +117,7 @@ function makeStateSchedules(eventDetail, schedules, categories) {
 /* ================================ */
 // MARATHON
 
+// TODO: perbaiki logic untuk set event start & end date di bawah
 function makeDefaultFormMarathon(categoryDetails, eventDetail) {
   let eventStartDate = null;
   let eventEndDate = null;
@@ -168,6 +159,7 @@ function makeDefaultFormMarathon(categoryDetails, eventDetail) {
   return formState;
 }
 
+// TODO: perbaiki logic untuk set event start & end date di bawah
 function makeStateSchedulesMarathon(categoryDetails, schedules, eventDetail) {
   let eventStartDate = null;
   let eventEndDate = null;

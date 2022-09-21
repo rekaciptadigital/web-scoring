@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { SelectSetting } from "../../../components/select-settings";
+import { SelectSetting } from "../components/select-settings";
 
 import { stringUtil } from "utils";
 

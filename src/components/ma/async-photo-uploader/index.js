@@ -5,6 +5,7 @@ import { LoadingIndicator } from "./loading-indicator";
 
 import IconPictureUpload from "components/ma/icons/mono/picture-upload";
 
+import classnames from "classnames";
 import { filesUtil } from "utils";
 
 function AsyncPhotoUploader({
@@ -14,6 +15,8 @@ function AsyncPhotoUploader({
   onChange,
   onSubmit,
   isLoading,
+  disabled,
+  disabledPlaceholder = "Tidak ada foto",
 }) {
   const handleChooseImage = async (ev) => {
     if (!ev.target.files?.[0]) {
@@ -34,28 +37,36 @@ function AsyncPhotoUploader({
   const containerProps = {
     htmlFor: "uploader",
     title: title,
+    className: classnames({ "upload-disabled": Boolean(disabled) }),
   };
 
   const inputProps = {
     type: "file",
     accept: "image/jpg,image/jpeg,image/png",
     id: "uploader",
-    onChange: handleChooseImage,
+    onChange: !disabled ? handleChooseImage : undefined,
   };
 
   if (!imageSrc) {
     return (
       <UploaderContainer {...containerProps}>
-        <PictureContainer>
-          <span>
-            <IconPictureUpload size="49" />
-          </span>
-          <span>{placeholder}</span>
-        </PictureContainer>
+        {disabled ? (
+          <PictureContainer>
+            <span>{disabledPlaceholder}</span>
+          </PictureContainer>
+        ) : (
+          <React.Fragment>
+            <PictureContainer>
+              <span>
+                <IconPictureUpload size="49" />
+              </span>
+              <span>{placeholder}</span>
+            </PictureContainer>
 
-        <LoadingIndicator isLoading={isLoading} />
-
-        <FileInput {...inputProps} />
+            <LoadingIndicator isLoading={isLoading} />
+            <FileInput {...inputProps} />
+          </React.Fragment>
+        )}
       </UploaderContainer>
     );
   }
@@ -66,13 +77,17 @@ function AsyncPhotoUploader({
         <img className="avatar-profile-picture" src={imageSrc} />
       </PictureContainer>
 
-      <LoadingIndicator isLoading={isLoading} />
+      {!disabled && (
+        <React.Fragment>
+          <LoadingIndicator isLoading={isLoading} />
 
-      <UploadButton>
-        <IconPictureUpload />
-      </UploadButton>
+          <UploadButton>
+            <IconPictureUpload />
+          </UploadButton>
 
-      <FileInput {...inputProps} />
+          <FileInput {...inputProps} />
+        </React.Fragment>
+      )}
     </UploaderContainer>
   );
 }
@@ -116,6 +131,10 @@ const UploaderContainer = styled.label`
   &:hover ${UploadButton} {
     transform: translateY(-1px);
     box-shadow: inset 0 0 0 2px var(--ma-gray-200), 0 0.25rem 0.5rem rgb(18 38 63 / 15%);
+  }
+
+  &.upload-disabled {
+    cursor: initial;
   }
 `;
 

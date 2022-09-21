@@ -3,14 +3,17 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useRouteQueryParams } from "./hooks/route-params";
 import { useEventDetail } from "./hooks/event-detail";
+import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesQualification } from "./hooks/qualification-categories";
 import { useQualificationSchedules } from "./hooks/qualification-schedules";
 import { useFormPublicInfos } from "./hooks/form-public-infos";
 import { useFormFees } from "./hooks/form-fees";
 import { useFormCategories } from "./hooks/form-categories";
+import { useFormRegistrationDates } from "./hooks/form-registration-dates";
 import { useFormSchedules } from "./hooks/form-schedules";
 import { useSubmitPublicInfos } from "./hooks/submit-public-infos";
 import { useSubmitEventLogo } from "./hooks/submit-event-logo";
+import { useSubmitRegistrationDates } from "./hooks/submit-config-registration-dates";
 import { useSubmitCategories } from "./hooks/submit-categories";
 
 import { AlertSubmitError, ButtonOutlineBlue } from "components/ma";
@@ -32,6 +35,7 @@ import { LoadingScreen } from "./components/loading-screen-portal";
 import { ScreenPublicInfos } from "./screens/public-infos";
 import { ScreenFees } from "./screens/fees";
 import { ScreenCategories } from "./screens/categories";
+import { ScreenRegistrationDates } from "./screens/registration-dates";
 import { ScreenRules } from "./screens/rules";
 import { ScreenSchedules } from "./screens/schedules";
 import { ScreenSchedulesMarathon } from "./screens/schedules-marathon";
@@ -60,6 +64,7 @@ function PageCreateEventFullday() {
     isPreparing: isPreparingEvent,
     fetchEventDetail,
   } = useEventDetail(eventId);
+  const { data: categoryDetails } = useCategoryDetails(eventId);
   const { data: categories } = useCategoriesQualification(eventDetail);
   const schedulesProvider = useQualificationSchedules(eventDetail);
   const { data: schedules } = schedulesProvider;
@@ -73,6 +78,8 @@ function PageCreateEventFullday() {
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
+  // TODO: oper konfig existing ke form untuk dihitung jadi initial values
+  const formRegistrationDates = useFormRegistrationDates(categoryDetails, undefined);
   const formSchedules = useFormSchedules(schedules, {
     eventType,
     eventDetail,
@@ -84,16 +91,18 @@ function PageCreateEventFullday() {
         1: formPublicInfos.isEmpty,
         2: formFees.isEmpty,
         3: formCategories.isEmpty,
-        4: formSchedules.isEmpty,
-        5: !formSchedules.isEmpty,
+        4: false,
+        5: formSchedules.isEmpty,
+        6: !formSchedules.isEmpty,
       }
     : {
         1: formPublicInfos.isEmpty,
         2: formFees.isEmpty,
         3: formCategories.isEmpty,
         4: false,
-        5: formSchedules.isEmpty,
-        6: !formSchedules.isEmpty,
+        5: false,
+        6: formSchedules.isEmpty,
+        7: !formSchedules.isEmpty,
       };
 
   const lastUnlockedStep = computeLastUnlockedStep(emptyFormSequenceByStep);
@@ -124,7 +133,15 @@ function PageCreateEventFullday() {
     errors: categoriesErrors,
   } = useSubmitCategories();
 
-  const isLoadingSubmit = isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories;
+  const {
+    submit: submitRegistrationDates,
+    isLoading: isSubmitRegistrationDates,
+    isError: isErrorRegistrationDates,
+    errors: errorsRegistrationDates,
+  } = useSubmitRegistrationDates(eventDetail?.id, formRegistrationDates.data);
+
+  const isLoadingSubmit =
+    isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates;
 
   return (
     <ContentLayoutWrapper
@@ -137,12 +154,14 @@ function PageCreateEventFullday() {
       <AlertSubmitError isError={isErrorPublicInfos} errors={publicInfosErrors} />
       <AlertSubmitError isError={isErrorLogo} errors={errorsLogo} />
       <AlertSubmitError isError={isErrorCategories} errors={categoriesErrors} />
+      <AlertSubmitError isError={isErrorRegistrationDates} errors={errorsRegistrationDates} />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
         <StepListIndicator title="Pertandingan">
           <StepItem id={stepId.INFO_UMUM}>Informasi Umum</StepItem>
           <StepItem id={stepId.BIAYA}>Biaya Registrasi</StepItem>
           <StepItem id={stepId.KATEGORI}>Kategori Lomba</StepItem>
+          <StepItem id={stepId.JADWAL_REGISTRASI}>Informasi Pendaftaran</StepItem>
           {!isTypeSelection && <StepItem id={stepId.PERATURAN}>Aturan Pertandingan</StepItem>}
           <StepItem id={stepId.JADWAL_KUALIFIKASI}>Jadwal Pertandingan</StepItem>
           <StepItem id={stepId.SELESAI}>Selesai</StepItem>
@@ -164,7 +183,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={async ({ next }) => {
                   // Maafkan kerumitan ini wkwk. Ini karena ada 2 endpoint API yang
@@ -233,7 +252,7 @@ function PageCreateEventFullday() {
               <ScreenFees eventDetail={eventDetail} form={formFees} />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
                   if (!eventDetail?.eventCategories?.length) {
@@ -296,7 +315,7 @@ function PageCreateEventFullday() {
               />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
                   submitCategories(formCategories.data, formFees, {
@@ -316,6 +335,36 @@ function PageCreateEventFullday() {
             </StepFooterActions>
           </StepContent>
 
+          <StepContent id={stepId.JADWAL_REGISTRASI}>
+            <StepHeader>
+              <SpacedHeaderBar>
+                <div>
+                  <h2>Informasi Pendaftaran</h2>
+                  <p>Pengaturan informasi pendaftaran untuk event Anda</p>
+                </div>
+              </SpacedHeaderBar>
+            </StepHeader>
+
+            <StepBody>
+              <ScreenRegistrationDates form={formRegistrationDates} />
+            </StepBody>
+
+            <StepFooterActions>
+              <ButtonSave
+                onSubmit={() => {
+                  submitRegistrationDates({
+                    onSuccess() {
+                      toast.success("Berhasil simpan pengaturan tanggal pendaftaran");
+                      // TODO: next kalau pertama, stay kalau edit
+                    },
+                  });
+                }}
+              >
+                Simpan
+              </ButtonSave>
+            </StepFooterActions>
+          </StepContent>
+
           <StepContent id={stepId.PERATURAN}>
             <StepHeader>
               <h2>Aturan Pertandingan</h2>
@@ -326,7 +375,7 @@ function PageCreateEventFullday() {
               <ScreenRules eventDetail={eventDetail} />
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
                   // TODO: next kalau valid / sudah simpan data
@@ -362,7 +411,7 @@ function PageCreateEventFullday() {
               )}
             </StepBody>
 
-            <StepFooterActions mathTpe={matchType}>
+            <StepFooterActions>
               <ButtonSave
                 disabled={formSchedules.isEmpty}
                 onSubmit={({ next }) => {

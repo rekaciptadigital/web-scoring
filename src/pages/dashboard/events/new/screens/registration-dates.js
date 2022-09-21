@@ -12,14 +12,17 @@ import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
 
 function ScreenRegistrationDates({ form }) {
-  const { data: configForm, toggleActiveSetting, initForm } = form;
+  const { data: configForm, toggleActiveSetting, initForm, updateFields } = form;
 
-  // ubah ke action dari reducer-nya
-  const [testDatetimeRange, setTestDatetimeRange] = React.useState({ start: null, end: null });
-  const [testDatetimeRangeEvent, setTestDatetimeRangeEvent] = React.useState({
-    start: null,
-    end: null,
-  });
+  const rangeRegistration = {
+    start: configForm.registrationDateStart,
+    end: configForm.registrationDateEnd,
+  };
+
+  const rangeEvent = {
+    start: configForm.eventDateStart,
+    end: configForm.eventDateEnd,
+  };
 
   // Reset form tiap meninggalkan screen step ini
   React.useEffect(() => {
@@ -37,8 +40,13 @@ function ScreenRegistrationDates({ form }) {
               labelStart={{ date: "Mulai Pendaftaran", time: "Jam Buka" }}
               labelEnd={{ date: "Tutup Pendaftaran", time: "Jam Tutup" }}
               required
-              value={testDatetimeRange}
-              onChange={setTestDatetimeRange}
+              value={rangeRegistration}
+              onChange={(range) => {
+                updateFields({
+                  registrationDateStart: range.start,
+                  registrationDateEnd: range.end,
+                });
+              }}
               minDatetime={new Date()}
             />
 
@@ -46,9 +54,14 @@ function ScreenRegistrationDates({ form }) {
               labelStart={{ date: "Mulai Lomba", time: "Jam Mulai" }}
               labelEnd={{ date: "Akhir Lomba", time: "Jam Akhir" }}
               required
-              value={testDatetimeRangeEvent}
-              onChange={setTestDatetimeRangeEvent}
-              minDatetime={testDatetimeRange.end || new Date()}
+              value={rangeEvent}
+              onChange={(range) => {
+                updateFields({
+                  eventDateStart: range.start,
+                  eventDateEnd: range.end,
+                });
+              }}
+              minDatetime={rangeRegistration.end || new Date()}
             />
           </VerticalSpaceBetween>
         </Section>
@@ -187,7 +200,7 @@ function ConfigEditor({
           <FieldInputDateRange
             labelStart="Mulai Pendaftaran"
             labelEnd="Tutup Pendaftaran"
-            required
+            required={!form.isSpecialActive}
             daterange={{
               start: form.registrationDateStart,
               end: form.registrationDateEnd,
@@ -233,6 +246,7 @@ function ConfigEditor({
             <FieldSelectMulti
               label="Kategori"
               name="category-details"
+              required
               placeholder="Pilih kategori"
               isClearable={false}
               options={optionsCategoriesByTeam}

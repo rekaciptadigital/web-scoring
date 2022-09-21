@@ -12,6 +12,7 @@ import { useFormRegistrationDates } from "./hooks/form-registration-dates";
 import { useFormSchedules } from "./hooks/form-schedules";
 import { useSubmitPublicInfos } from "./hooks/submit-public-infos";
 import { useSubmitEventLogo } from "./hooks/submit-event-logo";
+import { useSubmitRegistrationDates } from "./hooks/submit-config-registration-dates";
 import { useSubmitCategories } from "./hooks/submit-categories";
 
 import { AlertSubmitError, ButtonOutlineBlue } from "components/ma";
@@ -129,7 +130,11 @@ function PageCreateEventFullday() {
     errors: categoriesErrors,
   } = useSubmitCategories();
 
-  const isLoadingSubmit = isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories;
+  const { submit: submitRegistrationDates, isLoading: isSubmitRegistrationDates } =
+    useSubmitRegistrationDates(eventDetail?.id, formRegistrationDates.data);
+
+  const isLoadingSubmit =
+    isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates;
 
   return (
     <ContentLayoutWrapper
@@ -335,6 +340,21 @@ function PageCreateEventFullday() {
             <StepBody>
               <ScreenRegistrationDates form={formRegistrationDates} />
             </StepBody>
+
+            <StepFooterActions>
+              <ButtonSave
+                onSubmit={({ next }) => {
+                  submitRegistrationDates({
+                    onSuccess() {
+                      toast.success("Berhasil simpan pengaturan tanggal pendaftaran");
+                      next();
+                    },
+                  });
+                }}
+              >
+                Simpan
+              </ButtonSave>
+            </StepFooterActions>
           </StepContent>
 
           <StepContent id={stepId.PERATURAN}>

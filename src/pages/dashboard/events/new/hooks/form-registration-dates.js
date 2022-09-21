@@ -1,11 +1,11 @@
 import * as React from "react";
 
-import teamcategories from "constants/team-categories";
 import { stringUtil } from "utils";
 
 // Untuk reducer
 const actionType = {
   INIT_FORM: "INIT_FORM",
+  CHANGE_FIELD: "CHANGE_FIELD",
   TOGGLE_ACTIVATE: "TOGGLE_ACTIVATE",
   ADD_CONFIG_ITEM: "ADD_CONFIG_ITEM",
   REMOVE_CONFIG_ITEM: "REMOVE_CONFIG_ITEM",
@@ -39,6 +39,10 @@ function useFormRegistrationDates(categories, configs) {
     if (!configs) {
       const emptyConfigItem = _makeDefaultConfigItem();
       return {
+        registrationDateStart: null,
+        registrationDateEnd: null,
+        eventDateStart: null,
+        eventDateEnd: null,
         isActive: false,
         configs: [emptyConfigItem],
       };
@@ -47,6 +51,10 @@ function useFormRegistrationDates(categories, configs) {
     // TODO: map data respon API konfig tanggal registrasi ke struktur form
     // ...
     return {
+      registrationDateStart: null,
+      registrationDateEnd: null,
+      eventDateStart: null,
+      eventDateEnd: null,
       isActive: true,
       configs: [
         // TODO
@@ -61,12 +69,26 @@ function useFormRegistrationDates(categories, configs) {
           return { data: action.payload || initialValues };
         }
 
+        case actionType.CHANGE_FIELD: {
+          return {
+            ...state,
+            data: { ...state.data, ...action.payload },
+          };
+        }
+
         case actionType.TOGGLE_ACTIVATE: {
           return {
             ...state,
             data: {
               ...initialValues,
+              registrationDateStart: state.data.registrationDateStart || null,
+              registrationDateEnd: state.data.registrationDateEnd || null,
               isActive: !state.data.isActive,
+              configs: initialValues?.configs?.map((config) => ({
+                ...config,
+                registrationDateStart: state.data.registrationDateStart,
+                registrationDateEnd: state.data.registrationDateEnd,
+              })),
             },
           };
         }
@@ -151,6 +173,20 @@ function useFormRegistrationDates(categories, configs) {
     dispatch({ type: actionType.INIT_FORM, payload: initialValues });
   };
 
+  const updateField = (field, value) => {
+    dispatch({
+      type: actionType.CHANGE_FIELD,
+      payload: { [field]: value },
+    });
+  };
+
+  const updateFields = (action) => {
+    dispatch({
+      type: actionType.CHANGE_FIELD,
+      payload: action,
+    });
+  };
+
   /**
    * Init/reset state form
    */
@@ -226,6 +262,8 @@ function useFormRegistrationDates(categories, configs) {
     categoriesByTeamId,
     data: state.data,
     initForm,
+    updateField,
+    updateFields,
     toggleActiveSetting,
     optionsTeamCategory,
     setTeamCategory,

@@ -6,38 +6,51 @@ import { stringUtil } from "utils";
 const actionType = {
   INIT_FORM: "INIT_FORM",
   CHANGE_FIELD: "CHANGE_FIELD",
+
   TOGGLE_ACTIVATE: "TOGGLE_ACTIVATE",
   ADD_CONFIG_ITEM: "ADD_CONFIG_ITEM",
   REMOVE_CONFIG_ITEM: "REMOVE_CONFIG_ITEM",
-  NORMALIZE_EXCESS_CONFIGS: "NORMALIZE_EXCESS_CONFIGS",
+  NORMALIZE_EXCESS_CONFIGS: "NORMALIZE_EXCESS_CONFIGS", // TODO:
   CHANGE_TEAM_CATEGORY: "CHANGE_TEAM_CATEGORY",
   CHANGE_DATE_RANGE: "CHANGE_DATE_RANGE",
+
   TOGGLE_CONFIG_BY_CATEGORIES: "TOGGLE_CONFIG_BY_CATEGORIES",
+  ADD_CATEGORY_CONFIG_ITEM: "ADD_CATEGORY_CONFIG_ITEM",
+  REMOVE_CATEGORY_CONFIG_ITEM: "REMOVE_CATEGORY_CONFIG_ITEM",
   CHANGE_SPECIAL_CATEGORIES: "CHANGE_SPECIAL_CATEGORIES",
+  CHANGE_DATE_RANGE_CATEGORY: "CHANGE_DATE_RANGE_CATEGORY",
 };
 
-const _makeDefaultConfigItem = () => ({
+const _makeEmptyConfigItem = () => ({
   key: "regist-date-group-" + stringUtil.createRandom(),
   team: null,
-  registrationDateStart: null,
-  registrationDateEnd: null,
+  start: null,
+  end: null,
   isSpecialActive: false,
+  categories: [_makeEmptyCategoryConfigItem()],
+});
+
+const _makeEmptyCategoryConfigItem = () => ({
+  key: "category-config-" + stringUtil.createRandom(),
   categories: [],
+  start: null,
+  end: null,
 });
 
 /**
- * Headless component untuk form konfig jadwal khusus.
+ * Headless UI untuk form konfig jadwal khusus.
  * Panggil di komponen Page utama, implemen UI & handler action
  * di komponen anaknya.
+ * https://www.merrickchristensen.com/articles/headless-user-interface-components/
  * @param {Array} categories
  * @param {Object} configs
  */
 function useFormRegistrationDates(categories, configs) {
-  const categoriesByTeamId = React.useMemo(() => _groupByTeamCategory(categories), [categories]);
+  const categoriesByGroupId = React.useMemo(() => _groupByTeamCategory(categories), [categories]);
 
   const initialValues = React.useMemo(() => {
     if (!configs) {
-      const emptyConfigItem = _makeDefaultConfigItem();
+      const emptyConfigItem = _makeEmptyConfigItem();
       return {
         registrationDateStart: null,
         registrationDateEnd: null,
@@ -60,7 +73,7 @@ function useFormRegistrationDates(categories, configs) {
         // TODO
       ],
     };
-  }, [configs, categoriesByTeamId]);
+  }, [configs, categoriesByGroupId]);
 
   const [state, dispatch] = React.useReducer(
     (state, action) => {
@@ -80,21 +93,15 @@ function useFormRegistrationDates(categories, configs) {
           return {
             ...state,
             data: {
-              ...initialValues,
-              registrationDateStart: state.data.registrationDateStart || null,
-              registrationDateEnd: state.data.registrationDateEnd || null,
+              ...state.data,
               isActive: !state.data.isActive,
-              configs: initialValues?.configs?.map((config) => ({
-                ...config,
-                registrationDateStart: state.data.registrationDateStart,
-                registrationDateEnd: state.data.registrationDateEnd,
-              })),
+              configs: initialValues?.configs,
             },
           };
         }
 
         case actionType.ADD_CONFIG_ITEM: {
-          const newEmptyConfigItem = _makeDefaultConfigItem();
+          const newEmptyConfigItem = _makeEmptyConfigItem();
           return {
             ...state,
             data: {
@@ -105,11 +112,14 @@ function useFormRegistrationDates(categories, configs) {
         }
 
         case actionType.REMOVE_CONFIG_ITEM: {
+          const mutatedConfigs = state.data.configs.filter(
+            (item, index) => index !== action.configIndex
+          );
           return {
             ...state,
             data: {
               ...state.data,
-              configs: state.data.configs.filter((item, index) => index !== action.configIndex),
+              configs: mutatedConfigs.length ? mutatedConfigs : [_makeEmptyConfigItem],
             },
           };
         }
@@ -121,8 +131,8 @@ function useFormRegistrationDates(categories, configs) {
 
         case actionType.CHANGE_DATE_RANGE: {
           const fieldMutation = {
-            registrationDateStart: action.payload.start,
-            registrationDateEnd: action.payload.end,
+            start: action.payload.start,
+            end: action.payload.end,
           };
           return _getUpdatedStateConfigItem(state, action.configIndex, fieldMutation);
         }
@@ -130,14 +140,58 @@ function useFormRegistrationDates(categories, configs) {
         case actionType.TOGGLE_CONFIG_BY_CATEGORIES: {
           const fieldMutation = (state) => ({
             isSpecialActive: !state.isSpecialActive,
-            categories: [],
+            categories: [_makeEmptyCategoryConfigItem()],
           });
           return _getUpdatedStateConfigItem(state, action.configIndex, fieldMutation);
         }
 
+        case actionType.ADD_CATEGORY_CONFIG_ITEM: {
+          const fieldMutation = (state) => ({
+            ...state,
+            categories: [...state.categories, _makeEmptyCategoryConfigItem()],
+          });
+          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
+        }
+
+        case actionType.REMOVE_CATEGORY_CONFIG_ITEM: {
+          const fieldMutation = (state) => {
+            const mutatedlist = state.categories.filter((_, index) => index !== action.index.child);
+            return {
+              ...state,
+              categories: mutatedlist.length ? mutatedlist : [_makeEmptyCategoryConfigItem()],
+            };
+          };
+          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
+        }
+
         case actionType.CHANGE_SPECIAL_CATEGORIES: {
-          const fieldMutation = { categories: action.payload || [] };
-          return _getUpdatedStateConfigItem(state, action.configIndex, fieldMutation);
+          const fieldMutation = (state) => ({
+            ...state,
+            categories: state.categories.map((item, index) => {
+              return index !== action.index.child
+                ? item
+                : {
+                    ...item,
+                    categories: action.payload || [],
+                  };
+            }),
+          });
+          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
+        }
+
+        case actionType.CHANGE_DATE_RANGE_CATEGORY: {
+          const fieldMutation = (state) => ({
+            ...state,
+            categories: state.categories.map((item, index) => {
+              return index !== action.index.child
+                ? item
+                : {
+                    ...item,
+                    ...action.payload,
+                  };
+            }),
+          });
+          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
         }
 
         default: {
@@ -165,8 +219,8 @@ function useFormRegistrationDates(categories, configs) {
    * Hanya tampil option yang belum dipilih aja.
    */
   const optionsTeamCategory = React.useMemo(
-    () => _makeOptionsTeamCategory(categoriesByTeamId, state.data.configs),
-    [categoriesByTeamId, state?.data.configs]
+    () => _makeOptionsCategoryGroup(categoriesByGroupId, state.data.configs),
+    [categoriesByGroupId, state.data.configs]
   );
 
   const initForm = () => {
@@ -236,30 +290,70 @@ function useFormRegistrationDates(categories, configs) {
     });
   };
 
-  const getOptionsCategoriesByTeam = React.useCallback(
-    (teamCategoryId) => {
-      const categories = categoriesByTeamId?.[teamCategoryId]?.categories;
-      if (!categories) {
+  const addCategoryConfig = (parentIndex, childIndex) => {
+    dispatch({
+      type: actionType.ADD_CATEGORY_CONFIG_ITEM,
+      index: { parent: parentIndex, child: childIndex },
+    });
+  };
+
+  const removeCategoryConfig = (parentIndex, childIndex) => {
+    dispatch({
+      type: actionType.REMOVE_CATEGORY_CONFIG_ITEM,
+      index: { parent: parentIndex, child: childIndex },
+    });
+  };
+
+  const getOptionsCategoryPairByGroupId = React.useCallback(
+    (groupId, configIndex) => {
+      if (
+        !groupId ||
+        typeof configIndex === "undefined" ||
+        !categoriesByGroupId?.[groupId]?.categories
+      ) {
         return [];
       }
-      return categories.map((category) => ({
-        value: category.categoryDetailsId,
-        label: category.label,
-      }));
+
+      const alreadyUsedPairIds = [];
+      for (const item of state.data.configs[configIndex].categories) {
+        for (const pair of item.categories) {
+          alreadyUsedPairIds.push(pair.value);
+        }
+      }
+      const initialOptions = categoriesByGroupId[groupId].categories;
+      const availableOptions = initialOptions.filter(
+        (option) => alreadyUsedPairIds.indexOf(option.value) < 0
+      );
+
+      return availableOptions;
     },
-    [categoriesByTeamId]
+    [categoriesByGroupId, state.data.configs]
   );
 
-  const setSpecialCategories = (configIndex, value) => {
+  const setSpecialCategories = (configIndex, childIndex, value) => {
     dispatch({
       type: actionType.CHANGE_SPECIAL_CATEGORIES,
-      configIndex: configIndex,
+      index: { parent: configIndex, child: childIndex },
       payload: value,
     });
   };
 
+  /**
+   * Date range untuk kategori khusus
+   * @param {int} configIndex
+   * @param {int} childIndex
+   * @param {Range} range { start, end }
+   */
+  const setDateRangeCategory = (configIndex, childIndex, range) => {
+    dispatch({
+      type: actionType.CHANGE_DATE_RANGE_CATEGORY,
+      index: { parent: configIndex, child: childIndex },
+      payload: range,
+    });
+  };
+
   return {
-    categoriesByTeamId,
+    categoriesByTeamId: categoriesByGroupId,
     data: state.data,
     initForm,
     updateField,
@@ -271,8 +365,11 @@ function useFormRegistrationDates(categories, configs) {
     addConfig,
     removeConfig,
     toggleConfigByCategories,
-    getOptionsCategoriesByTeam,
+    addCategoryConfig,
+    removeCategoryConfig,
+    getOptionsCategoryPairByGroupId,
     setSpecialCategories,
+    setDateRangeCategory,
   };
 }
 
@@ -312,56 +409,82 @@ function _groupByTeamCategory(categories) {
     return null;
   }
 
+  /**
+   * Bikin struktur data kayak gini:
+   * {
+   *   [groupId]: {
+   *     value: groupId,
+   *     label: "group label"
+   *     categories: [
+   *       {
+   *         value: "pair label"
+   *         label: "pair label"
+   *         categories: [
+   *           { ...categoryDetail },
+   *         ]
+   *       }
+   *     ]
+   *   },
+   *   ...
+   * }
+   */
   const group = {};
-  const defaultGetDataTeamCategory = (data) => ({
-    id: data.teamCategoryId.id,
-    label: data.teamCategoryId.label,
-  });
-
   for (const category of categories) {
-    const teamCategory = defaultGetDataTeamCategory(category);
-    if (!group[teamCategory.id]) {
-      const defaultGroup = {
-        teamCategoryId: teamCategory.id,
-        teamCategoryLabel: teamCategory.label,
-        counterStart: {},
-        counterEnd: {},
+    const groupIdsByTeam = {
+      "individu male": 1,
+      "individu female": 1,
+      individu_mix: 2,
+      male_team: 3,
+      female_team: 3,
+      mix_team: 4,
+    };
+    const groupLabels = {
+      1: "Individu",
+      2: "Individu (Campuran)",
+      3: "Beregu",
+      4: "Beregu Campuran",
+    };
+    const groupId = groupIdsByTeam[category.teamCategoryId];
+
+    if (!group[groupId]) {
+      const defaultGroupData = {
+        value: groupId,
+        label: groupLabels[groupId],
+        categories: {},
+      };
+      group[groupId] = defaultGroupData;
+    }
+
+    const pairId = `${category.competitionCategoryId} - ${category.classCategory}`;
+
+    if (!group[groupId].categories[pairId]) {
+      group[groupId].categories[pairId] = {
+        value: pairId,
+        label: pairId,
         categories: [],
       };
-      group[teamCategory.id] = defaultGroup;
     }
 
-    group[teamCategory.id].categories.push(category);
-
-    if (!category.startRegistration || !category.endRegistration) {
-      continue;
-    }
-
-    group[teamCategory.id].counterStart[category.startRegistration] =
-      (group[teamCategory.id].counterStart[category.startRegistration] || 0) + 1;
-    group[teamCategory.id].counterEnd[category.endRegistration] =
-      (group[teamCategory.id].counterEnd[category.endRegistration] || 0) + 1;
+    group[groupId].categories[pairId].categories.push(category);
   }
 
-  const sorted = {};
-  for (const id of teamcategories.TEAM_IDS_IN_FIXED_ORDER) {
-    if (!group[id]) continue;
-    sorted[id] = group[id];
+  // handle struktur pasangan kategori (tanpa gender)
+  for (const groupId in group) {
+    group[groupId].categories = Object.values(group[groupId].categories);
   }
 
-  return sorted;
+  return group;
 }
 
-function _makeOptionsTeamCategory(grouped, configsState) {
+function _makeOptionsCategoryGroup(grouped, configsState) {
   if (!grouped) {
     return [];
   }
 
   const initialOption = Object.values(grouped).map((group) => ({
-    value: group.teamCategoryId,
-    label: teamcategories.TEAM_LABELS[group.teamCategoryId],
+    value: group.value,
+    label: group.label,
   }));
-
   const alreadySelectedTeamIds = configsState?.map((config) => config.team?.value) || [];
   const availableOptions = initialOption.filter(
     (option) => alreadySelectedTeamIds.indexOf(option.value) < 0

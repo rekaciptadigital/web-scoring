@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useRouteQueryParams } from "./hooks/route-params";
 import { useEventDetail } from "./hooks/event-detail";
+import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesQualification } from "./hooks/qualification-categories";
 import { useQualificationSchedules } from "./hooks/qualification-schedules";
 import { useFormPublicInfos } from "./hooks/form-public-infos";
@@ -63,6 +64,7 @@ function PageCreateEventFullday() {
     isPreparing: isPreparingEvent,
     fetchEventDetail,
   } = useEventDetail(eventId);
+  const { data: categoryDetails } = useCategoryDetails(eventId);
   const { data: categories } = useCategoriesQualification(eventDetail);
   const schedulesProvider = useQualificationSchedules(eventDetail);
   const { data: schedules } = schedulesProvider;
@@ -76,7 +78,8 @@ function PageCreateEventFullday() {
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
-  const formRegistrationDates = useFormRegistrationDates(eventDetail?.eventCategories, undefined);
+  // TODO: oper konfig existing ke form untuk dihitung jadi initial values
+  const formRegistrationDates = useFormRegistrationDates(categoryDetails, undefined);
   const formSchedules = useFormSchedules(schedules, {
     eventType,
     eventDetail,
@@ -343,11 +346,11 @@ function PageCreateEventFullday() {
 
             <StepFooterActions>
               <ButtonSave
-                onSubmit={({ next }) => {
+                onSubmit={() => {
                   submitRegistrationDates({
                     onSuccess() {
                       toast.success("Berhasil simpan pengaturan tanggal pendaftaran");
-                      next();
+                      // TODO: next kalau pertama, stay kalau edit
                     },
                   });
                 }}

@@ -108,8 +108,11 @@ function ConfigGroupList({ form }) {
     addConfig,
     removeConfig,
     toggleConfigByCategories,
-    getOptionsCategoriesByTeam,
+    addCategoryConfig,
+    removeCategoryConfig,
+    getOptionsCategoryPairByGroupId,
     setSpecialCategories,
+    setDateRangeCategory,
   } = form;
 
   const hasEmptyTeam = data.configs.some((config) => !config.team?.value);
@@ -124,16 +127,22 @@ function ConfigGroupList({ form }) {
             onChangeTeamCategory={(option) => setTeamCategory(configIndex, option)}
             onChangeDateRange={(range) => setDateRange(configIndex, range)}
             onToggleConfigByCategories={() => toggleConfigByCategories(configIndex)}
-            onChangeSpecialCategories={(options) => setSpecialCategories(configIndex, options)}
-            optionsCategoriesByTeam={getOptionsCategoriesByTeam(configItemForm.team?.value)}
+            onAddCategoryConfig={() => addCategoryConfig(configIndex)}
+            onRemoveCategoryConfig={(childIndex) => removeCategoryConfig(configIndex, childIndex)}
+            optionsCategoryPair={getOptionsCategoryPairByGroupId(
+              configItemForm.team?.value,
+              configIndex
+            )}
+            onChangeSpecialCategories={(childIndex, options) => {
+              setSpecialCategories(configIndex, childIndex, options);
+            }}
+            onChangeDateRangeCategory={(childIndex, range) => {
+              setDateRangeCategory(configIndex, childIndex, range);
+            }}
           />
 
           <GroupAction>
-            <Button
-              flexible
-              disabled={data.configs.length <= 1}
-              onClick={() => removeConfig(configIndex)}
-            >
+            <Button flexible onClick={() => removeConfig(configIndex)}>
               <IconTrash size="12" />
             </Button>
 
@@ -162,8 +171,8 @@ function ConfigEditor({
   form = {
     key: "",
     team: null,
-    registrationDateStart: null,
-    registrationDateEnd: null,
+    start: null,
+    end: null,
     isSpecialActive: false,
     categories: [],
   },
@@ -172,7 +181,10 @@ function ConfigEditor({
   onChangeDateRange,
   onToggleConfigByCategories,
   onChangeSpecialCategories,
-  optionsCategoriesByTeam,
+  optionsCategoryPair,
+  onAddCategoryConfig,
+  onRemoveCategoryConfig,
+  onChangeDateRangeCategory,
 }) {
   return (
     <InnerGroup>
@@ -201,10 +213,7 @@ function ConfigEditor({
             labelStart="Mulai Pendaftaran"
             labelEnd="Tutup Pendaftaran"
             required={!form.isSpecialActive}
-            daterange={{
-              start: form.registrationDateStart,
-              end: form.registrationDateEnd,
-            }}
+            daterange={!form.isSpecialActive ? { start: form.start, end: form.end } : undefined}
             onChange={onChangeDateRange}
             disabled={form.isSpecialActive}
           />
@@ -237,34 +246,55 @@ function ConfigEditor({
             ) : undefined
           }
           on={form.isSpecialActive}
-          onChange={() => onToggleConfigByCategories()}
+          onChange={() => onToggleConfigByCategories?.()}
           disabled={!form.team}
         />
 
         {form.isSpecialActive && (
-          <PairedFields>
-            <FieldSelectMulti
-              label="Kategori"
-              name="category-details"
-              required
-              placeholder="Pilih kategori"
-              isClearable={false}
-              options={optionsCategoriesByTeam}
-              value={form.categories}
-              onChange={onChangeSpecialCategories}
-            />
+          <VerticalSpaceLoose>
+            {form.categories.map((item, itemIndex) => (
+              <GroupCategoryEditor key={item.key}>
+                <PairedFields>
+                  <FieldSelectMulti
+                    label="Kategori"
+                    name="category-details"
+                    required
+                    placeholder="Pilih kategori"
+                    isClearable={false}
+                    options={optionsCategoryPair}
+                    value={item.categories}
+                    onChange={(option) => onChangeSpecialCategories?.(itemIndex, option)}
+                  />
 
-            <FieldInputDateRange
-              labelStart="Mulai Pendaftaran"
-              labelEnd="Tutup Pendaftaran"
-              required
-              daterange={{
-                start: form.registrationDateStart,
-                end: form.registrationDateEnd,
-              }}
-              onChange={onChangeDateRange}
-            />
-          </PairedFields>
+                  <FieldInputDateRange
+                    labelStart="Mulai Pendaftaran"
+                    labelEnd="Tutup Pendaftaran"
+                    required
+                    daterange={{
+                      start: item.start,
+                      end: item.end,
+                    }}
+                    onChange={(range) => onChangeDateRangeCategory?.(itemIndex, range)}
+                  />
+                </PairedFields>
+
+                <GroupAction>
+                  <Button flexible onClick={() => onRemoveCategoryConfig?.(itemIndex)}>
+                    <IconTrash size="12" />
+                  </Button>
+
+                  <Button
+                    flexible
+                    onClick={() => onAddCategoryConfig?.(itemIndex)}
+                    disabled={!optionsCategoryPair?.length}
+                    title={!optionsCategoryPair?.length ? "Semua kategori telah diatur" : undefined}
+                  >
+                    <IconPlus size="12" />
+                  </Button>
+                </GroupAction>
+              </GroupCategoryEditor>
+            ))}
+          </VerticalSpaceLoose>
         )}
       </VerticalSpaceLoose>
     </InnerGroup>
@@ -336,6 +366,19 @@ const EditorHeader = styled.div`
   display: grid;
   grid-template-columns: 2fr 3fr;
   gap: 1.5rem 1rem;
+`;
+
+const GroupCategoryEditor = styled.div`
+  display: flex;
+  gap: 0.5rem;
+
+  > *:nth-child(1) {
+    flex-grow: 1;
+  }
+
+  > *:nth-child(2) {
+    flex-shrink: 1;
+  }
 `;
 
 const PairedFields = styled.div`

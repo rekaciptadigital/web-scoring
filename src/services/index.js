@@ -16,3 +16,4 @@ export { default as OfficialService } from "./official";
 export { default as IdCardService } from "./id-card";
 export { default as DosService } from "./dos";
 export { default as ParticipantService } from "./participant";
+export { default as ManageUserService } from "./manage-user";

@@ -54,6 +54,7 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
                 <ButtonDownloadIdCard
                   buttonLabel="Unduh No. Bantalan Peserta"
                   sessionCount={3}
+                  disabled={!isSubmitAllowed}
                 />
               </div>
             </SpacedHeaderLeft>

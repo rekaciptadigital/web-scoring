@@ -20,9 +20,15 @@ function PageEventBudRests() {
   return (
     <ContentLayoutWrapper pageTitle="Pengaturan Bantalan" navbar={<SubNavbar eventId={eventId} />}>
       <CardSheet>
-        <span className="d-flex justify-content-end" style={{ marginBottom: "20px" }}>
-          <ButtonDownloadIdCard buttonLabel="Unduh No. Bantalan Peserta" sessionCount={3} />
-        </span>
+        {Boolean(budrestSettings?.length) && (
+          <span className="d-flex justify-content-end" style={{ marginBottom: "20px" }}>
+            <ButtonDownloadIdCard
+              buttonLabel="Unduh No. Bantalan Peserta"
+              sessionCount={3}
+              disabled={!budrestSettings}
+            />
+          </span>
+        )}
         <VerticalSpacedBox>
           {Boolean(budrestSettings?.length) && (
             <NoticeBarInfo>Pengaturan aktif apabila pendaftaran lomba telah ditutup</NoticeBarInfo>

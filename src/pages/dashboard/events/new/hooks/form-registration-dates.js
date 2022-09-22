@@ -53,7 +53,10 @@ const _makeEmptyCategoryConfigItem = () => ({
  * @param {Object} existingConfigs
  */
 function useFormRegistrationDates(categories, existingConfigs) {
-  const categoriesByGroupId = React.useMemo(() => _groupByTeamCategory(categories), [categories]);
+  const categoriesByGroupId = React.useMemo(
+    () => _groupCategoryByTeamGroup(categories),
+    [categories]
+  );
 
   const initialValues = React.useMemo(() => {
     if (!existingConfigs || !categoriesByGroupId) {
@@ -257,7 +260,7 @@ function useFormRegistrationDates(categories, existingConfigs) {
   );
 
   // Init ulang form-nya tiap refetch kategori/event detail atau konfig.
-  // `initialValues` nilai memo turunan dari `configs` & `categoriesByTeamId` di atas
+  // `initialValues` nilai memo turunan dari `configs` & `categoriesByGroupId` di atas
   React.useEffect(() => {
     if (!initialValues) {
       return;
@@ -404,7 +407,7 @@ function useFormRegistrationDates(categories, existingConfigs) {
   };
 
   return {
-    categoriesByTeamId: categoriesByGroupId,
+    categoriesByGroupId,
     data: state.data,
     initForm,
     updateField,
@@ -455,7 +458,7 @@ function _getUpdatedStateConfigItem(state, configIndex, mutation) {
   return updatedState;
 }
 
-function _groupByTeamCategory(categories) {
+function _groupCategoryByTeamGroup(categories) {
   if (!categories?.length) {
     return null;
   }

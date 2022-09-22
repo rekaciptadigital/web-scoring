@@ -5,6 +5,7 @@ import { useRouteQueryParams } from "./hooks/route-params";
 import { useEventDetail } from "./hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 import { useCategoriesQualification } from "./hooks/qualification-categories";
+import { useConfigRegistrationDates } from "./hooks/config-registration-dates";
 import { useQualificationSchedules } from "./hooks/qualification-schedules";
 import { useFormPublicInfos } from "./hooks/form-public-infos";
 import { useFormFees } from "./hooks/form-fees";
@@ -67,6 +68,7 @@ function PageCreateEventFullday() {
   const { data: categoryDetails } = useCategoryDetails(eventId);
   const { data: categories } = useCategoriesQualification(eventDetail);
   const schedulesProvider = useQualificationSchedules(eventDetail);
+  const { data: configRegistrationDates } = useConfigRegistrationDates(eventId);
   const { data: schedules } = schedulesProvider;
 
   const eventType = _checkEventType(eventDetail, qsEventType);
@@ -78,8 +80,7 @@ function PageCreateEventFullday() {
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
-  // TODO: oper konfig existing ke form untuk dihitung jadi initial values
-  const formRegistrationDates = useFormRegistrationDates(categoryDetails, undefined);
+  const formRegistrationDates = useFormRegistrationDates(categoryDetails, configRegistrationDates);
   const formSchedules = useFormSchedules(schedules, {
     eventType,
     eventDetail,
@@ -354,7 +355,7 @@ function PageCreateEventFullday() {
                 onSubmit={() => {
                   submitRegistrationDates({
                     onSuccess() {
-                      toast.success("Berhasil simpan pengaturan tanggal pendaftaran");
+                      toast.success("Berhasil menyimpan informasi pendaftaran");
                       // TODO: next kalau pertama, stay kalau edit
                     },
                   });

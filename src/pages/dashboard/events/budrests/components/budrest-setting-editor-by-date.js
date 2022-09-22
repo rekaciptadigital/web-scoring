@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useParams, useHistory, Link } from "react-router-dom";
 import { useFormBudrestSettings } from "../hooks/form-budrest-settings";
 import { useSubmitBudrestSettings } from "../hooks/submit-budrest-settings";
+import { ButtonDownloadIdCard } from "../hooks/button-download-id-card";
 
 import { ButtonBlue, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
 import { LoadingScreen } from "../../new/components/loading-screen-portal";
@@ -49,6 +50,12 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
                 disabled
                 value={settingsByDate.date}
               />
+              <div style={{ marginTop: "24px" }}>
+                <ButtonDownloadIdCard
+                  buttonLabel="Unduh No. Bantalan Peserta"
+                  sessionCount={3}
+                />
+              </div>
             </SpacedHeaderLeft>
 
             <HorizontalSpacedButtonGroups>
@@ -207,8 +214,8 @@ const SpacedHeaderLeft = styled.div`
   gap: 1rem;
 
   > * {
-    max-width: 10rem;
-    flex: 1;
+    max-width: 13rem;
+    // flex: 1;
   }
 `;
 

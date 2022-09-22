@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { useBudrestSettings } from "./hooks/budrest-settings";
+import { ButtonDownloadIdCard } from "./hooks/button-download-id-card";
 
 import { NoticeBarInfo } from "components/ma";
 import { SubNavbar } from "../components/submenus-settings";
@@ -19,6 +20,9 @@ function PageEventBudRests() {
   return (
     <ContentLayoutWrapper pageTitle="Pengaturan Bantalan" navbar={<SubNavbar eventId={eventId} />}>
       <CardSheet>
+        <span className="d-flex justify-content-end" style={{ marginBottom: "20px" }}>
+          <ButtonDownloadIdCard buttonLabel="Unduh No. Bantalan Peserta" sessionCount={3} />
+        </span>
         <VerticalSpacedBox>
           {Boolean(budrestSettings?.length) && (
             <NoticeBarInfo>Pengaturan aktif apabila pendaftaran lomba telah ditutup</NoticeBarInfo>

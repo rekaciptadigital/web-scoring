@@ -30,8 +30,6 @@ function useSubmitRegistrationDates(eventId, formData) {
             config_type: config.team?.value,
             date_time_start_register_config: dateStart,
             date_time_end_register_config: dateEnd,
-            is_deleted: 0, // TODO: handle kondisionalnya kalau sudah ada API get
-            // config_id: ??, // TODO: handle kondisionalnya kalau sudah ada API get
           };
 
           if (!config.isSpecialActive) {
@@ -44,7 +42,7 @@ function useSubmitRegistrationDates(eventId, formData) {
           return {
             ...configPayload,
             is_have_special_category: 1,
-            special_category: _makePayloadSpecialCategory(config.categories),
+            special_category: _makePayloadConfigCategories(config.categories),
           };
         }),
       };
@@ -60,28 +58,28 @@ function useSubmitRegistrationDates(eventId, formData) {
 /* ======================== */
 // utils
 
-function _makePayloadSpecialCategory(categories) {
-  const payload = [];
-  // Deal with it, this the truth.
-  // Here comes, nested loops!
-  for (const item of categories) {
+function _makePayloadConfigCategories(categories) {
+  const payload = categories?.map((item) => {
+    const payloadCategories = [];
     for (const pair of item.categories) {
       for (const category of pair.categories) {
-        const payloadItem = {
+        payloadCategories.push({
           category_id: category.id,
-          date_time_start_register_special_category: item.start
-            ? datetime.formatServerDatetime(item.start)
-            : undefined,
-          date_time_end_register_special_category: item.end
-            ? datetime.formatServerDatetime(item.end)
-            : undefined,
-          is_deleted: 0, // TODO: handle kondisionalnya kalau sudah ada API get
-        };
-        payload.push(payloadItem);
+        });
       }
     }
-  }
-  return payload;
+
+    const start = item.start ? datetime.formatServerDatetime(item.start) : undefined;
+    const end = item.end ? datetime.formatServerDatetime(item.end) : undefined;
+
+    return {
+      date_time_start_register_special_category: start,
+      date_time_end_register_special_category: end,
+      list_category: payloadCategories,
+    };
+  });
+
+  return payload || [];
 }
 
 export { useSubmitRegistrationDates };

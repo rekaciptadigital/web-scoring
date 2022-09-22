@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { stringUtil } from "utils";
+import { stringUtil, datetime } from "utils";
 
 // Untuk reducer
 const actionType = {
@@ -19,6 +19,13 @@ const actionType = {
   REMOVE_CATEGORY_CONFIG_ITEM: "REMOVE_CATEGORY_CONFIG_ITEM",
   CHANGE_SPECIAL_CATEGORIES: "CHANGE_SPECIAL_CATEGORIES",
   CHANGE_DATE_RANGE_CATEGORY: "CHANGE_DATE_RANGE_CATEGORY",
+};
+
+const groupLabelsById = {
+  1: "Individu",
+  2: "Individu (Campuran)",
+  3: "Beregu",
+  4: "Beregu Campuran",
 };
 
 const _makeEmptyConfigItem = () => ({
@@ -42,38 +49,86 @@ const _makeEmptyCategoryConfigItem = () => ({
  * Panggil di komponen Page utama, implemen UI & handler action
  * di komponen anaknya.
  * https://www.merrickchristensen.com/articles/headless-user-interface-components/
- * @param {Array} categories
- * @param {Object} configs
+ * @param {Array} categories categoriDetail
+ * @param {Object} existingConfigs
  */
-function useFormRegistrationDates(categories, configs) {
-  const categoriesByGroupId = React.useMemo(() => _groupByTeamCategory(categories), [categories]);
+function useFormRegistrationDates(categories, existingConfigs) {
+  const categoriesByGroupId = React.useMemo(
+    () => _groupCategoryByTeamGroup(categories),
+    [categories]
+  );
 
   const initialValues = React.useMemo(() => {
-    if (!configs) {
-      const emptyConfigItem = _makeEmptyConfigItem();
+    if (!existingConfigs || !categoriesByGroupId) {
       return {
         registrationDateStart: null,
         registrationDateEnd: null,
         eventDateStart: null,
         eventDateEnd: null,
         isActive: false,
-        configs: [emptyConfigItem],
+        configs: [_makeEmptyConfigItem()],
       };
     }
 
-    // TODO: map data respon API konfig tanggal registrasi ke struktur form
-    // ...
-    return {
-      registrationDateStart: null,
-      registrationDateEnd: null,
-      eventDateStart: null,
-      eventDateEnd: null,
-      isActive: true,
-      configs: [
-        // TODO
-      ],
+    const { parseServerDatetime } = datetime;
+
+    const isConfigEnabled = Boolean(existingConfigs.enableConfig);
+    const start = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.start);
+    const end = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.end);
+
+    const values = {
+      registrationDateStart: start || null,
+      registrationDateEnd: end || null,
+      eventDateStart: null, // TODO: cek, belum ada di respon
+      eventDateEnd: null, // TODO: cek, belum ada di respon
+      isActive: isConfigEnabled,
     };
-  }, [configs, categoriesByGroupId]);
+
+    if (!isConfigEnabled) {
+      return values;
+    }
+
+    return {
+      ...values,
+      configs: existingConfigs.listConfig.map((config) => {
+        const hasSomeSpecialConfigs = Boolean(config.listSpecialConfig?.length);
+        const isSpecialActive = Boolean(config.isHaveSpecial) && hasSomeSpecialConfigs;
+
+        const configValues = {
+          ..._makeEmptyConfigItem(), // <- memastikan struktur datanya konsisten (untuk yang gak dioveride di bawahnya)
+          configId: config.id,
+          team: config.configType
+            ? {
+                value: config.configType,
+                label: groupLabelsById[config.configType],
+              }
+            : null,
+          start: parseServerDatetime(config.datetimeStartRegister),
+          end: parseServerDatetime(config.datetimeEndRegister),
+          isSpecialActive: isSpecialActive,
+        };
+
+        if (!isSpecialActive) {
+          return configValues;
+        }
+
+        return {
+          ...configValues,
+          categories:
+            config.listSpecialConfig?.map((config) => ({
+              ..._makeEmptyCategoryConfigItem(),
+              configId: config.id,
+              categories: _makeInitialValueCategoryPairs(
+                config.categories,
+                categoriesByGroupId[configValues.team.value]?.categories
+              ),
+              start: parseServerDatetime(config.datetimeStartRegister),
+              end: parseServerDatetime(config.datetimeEndRegister),
+            })) || [],
+        };
+      }),
+    };
+  }, [existingConfigs, categoriesByGroupId]);
 
   const [state, dispatch] = React.useReducer(
     (state, action) => {
@@ -95,18 +150,17 @@ function useFormRegistrationDates(categories, configs) {
             data: {
               ...state.data,
               isActive: !state.data.isActive,
-              configs: initialValues?.configs,
+              configs: initialValues?.configs || [_makeEmptyConfigItem()],
             },
           };
         }
 
         case actionType.ADD_CONFIG_ITEM: {
-          const newEmptyConfigItem = _makeEmptyConfigItem();
           return {
             ...state,
             data: {
               ...state.data,
-              configs: [...state.data.configs, newEmptyConfigItem],
+              configs: [...state.data.configs, _makeEmptyConfigItem()],
             },
           };
         }
@@ -119,7 +173,7 @@ function useFormRegistrationDates(categories, configs) {
             ...state,
             data: {
               ...state.data,
-              configs: mutatedConfigs.length ? mutatedConfigs : [_makeEmptyConfigItem],
+              configs: mutatedConfigs.length ? mutatedConfigs : [_makeEmptyConfigItem()],
             },
           };
         }
@@ -206,7 +260,7 @@ function useFormRegistrationDates(categories, configs) {
   );
 
   // Init ulang form-nya tiap refetch kategori/event detail atau konfig.
-  // `initialValues` nilai memo turunan dari `configs` & `categoriesByTeamId` di atas
+  // `initialValues` nilai memo turunan dari `configs` & `categoriesByGroupId` di atas
   React.useEffect(() => {
     if (!initialValues) {
       return;
@@ -353,7 +407,7 @@ function useFormRegistrationDates(categories, configs) {
   };
 
   return {
-    categoriesByTeamId: categoriesByGroupId,
+    categoriesByGroupId,
     data: state.data,
     initForm,
     updateField,
@@ -381,7 +435,7 @@ function useFormRegistrationDates(categories, configs) {
  * Tujuannya sama kayak immer, tapi gini aja biar simpel.
  * @param {*} state
  * @param {int} configIndex
- * @param {Object} mutation { [field]: value }
+ * @param {Object|function} mutation `{ [field]: value }` atau fungsi `(state) => ({ ...state, [field]: value })`
  * @returns {*} updated state
  */
 function _getUpdatedStateConfigItem(state, configIndex, mutation) {
@@ -404,7 +458,7 @@ function _getUpdatedStateConfigItem(state, configIndex, mutation) {
   return updatedState;
 }
 
-function _groupByTeamCategory(categories) {
+function _groupCategoryByTeamGroup(categories) {
   if (!categories?.length) {
     return null;
   }
@@ -438,18 +492,12 @@ function _groupByTeamCategory(categories) {
       female_team: 3,
       mix_team: 4,
     };
-    const groupLabels = {
-      1: "Individu",
-      2: "Individu (Campuran)",
-      3: "Beregu",
-      4: "Beregu Campuran",
-    };
     const groupId = groupIdsByTeam[category.teamCategoryId];
 
     if (!group[groupId]) {
       const defaultGroupData = {
         value: groupId,
-        label: groupLabels[groupId],
+        label: groupLabelsById[groupId],
         categories: {},
       };
       group[groupId] = defaultGroupData;
@@ -491,6 +539,40 @@ function _makeOptionsCategoryGroup(grouped, configsState) {
   );
 
   return availableOptions;
+}
+
+function _makeInitialValueCategoryPairs(configCategories, optionsPairs) {
+  if (!configCategories?.length) {
+    return [];
+  }
+
+  const uniquePairIds = new Set();
+  for (const category of configCategories) {
+    const pairId = _getPairId(category);
+    if (!pairId) {
+      continue;
+    }
+    !uniquePairIds.has(pairId) && uniquePairIds.add(pairId);
+  }
+
+  const valueCategoryPairs = [...uniquePairIds].map((pairId) => {
+    return optionsPairs.find((option) => option?.value === pairId);
+  });
+
+  return valueCategoryPairs;
+}
+
+function _getPairId(category) {
+  const segments = category.label?.split(" - ")?.slice(0, 3);
+  if (!segments?.length) {
+    return;
+  }
+
+  // aneh banget nama labelnya dibolak-balik
+  const ageCateg = `${segments[1]}`;
+  const classCateg = `${segments[0]} - ${segments[2]}`;
+  const id = `${ageCateg} - ${classCateg}`;
+  return id;
 }
 
 export { useFormRegistrationDates };

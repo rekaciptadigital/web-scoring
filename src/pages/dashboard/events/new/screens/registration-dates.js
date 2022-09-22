@@ -115,7 +115,7 @@ function ConfigGroupList({ form }) {
     setDateRangeCategory,
   } = form;
 
-  const hasEmptyTeam = data.configs.some((config) => !config.team?.value);
+  const hasEmptyTeam = data.configs?.some((config) => !config.team?.value) || false;
 
   return (
     <VerticalSpaceLoose>

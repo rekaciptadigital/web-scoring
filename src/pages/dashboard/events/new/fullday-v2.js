@@ -68,7 +68,8 @@ function PageCreateEventFullday() {
   const { data: categoryDetails } = useCategoryDetails(eventId);
   const { data: categories } = useCategoriesQualification(eventDetail);
   const schedulesProvider = useQualificationSchedules(eventDetail);
-  const { data: configRegistrationDates } = useConfigRegistrationDates(eventId);
+  const { data: configRegistrationDates, fetch: fetchConfigRegistrationDates } =
+    useConfigRegistrationDates(eventId);
   const { data: schedules } = schedulesProvider;
 
   const eventType = _checkEventType(eventDetail, qsEventType);
@@ -356,6 +357,7 @@ function PageCreateEventFullday() {
                   submitRegistrationDates({
                     onSuccess() {
                       toast.success("Berhasil menyimpan informasi pendaftaran");
+                      fetchConfigRegistrationDates();
                       // TODO: next kalau pertama, stay kalau edit
                     },
                   });

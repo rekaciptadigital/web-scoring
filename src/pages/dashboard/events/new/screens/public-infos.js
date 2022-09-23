@@ -10,23 +10,13 @@ import {
   FieldTextArea,
   FieldSelectCity,
   FieldSelectRadio,
-  FieldInputDate,
-  FieldInputTime,
 } from "../../components/form-fields";
 import { EventLogoUploader } from "../components/event-logo-uploader";
 
-import { setHours, setMinutes, getMinutes, getHours } from "date-fns";
 import Switch from "react-switch";
 
 function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing }) {
-  const {
-    data,
-    updateField,
-    updateRegistrationStart,
-    updateRegistrationEnd,
-    updateEventStart,
-    updateEventEnd,
-  } = form;
+  const { data, updateField } = form;
 
   const handlePickBannerChange = (ev) => {
     if (!ev.target.files?.[0]) {
@@ -140,139 +130,6 @@ function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing })
                   </FieldSelectCity>
                 </div>
               </SplitFields>
-
-              <SplitFields>
-                <PairedDateTimeFields>
-                  <FieldInputDate
-                    placeholder="DD/MM/YYYY"
-                    name="registrationDateStart"
-                    required
-                    minDate={new Date()}
-                    value={data.registrationDateStart}
-                    onChange={updateRegistrationStart}
-                  >
-                    Mulai Pendaftaran
-                  </FieldInputDate>
-
-                  <FieldInputTime
-                    placeholder="00:00"
-                    name="registrationTimeStart"
-                    required
-                    minTime={setHours(setMinutes(data.registrationDateStart, 0), 0)}
-                    maxTime={setHours(setMinutes(data.registrationDateStart, 59), 23)}
-                    value={data.registrationDateStart}
-                    onChange={updateRegistrationStart}
-                  >
-                    Jam Buka
-                  </FieldInputTime>
-                </PairedDateTimeFields>
-
-                <PairedDateTimeFields>
-                  <FieldInputDate
-                    placeholder="DD/MM/YYYY"
-                    name="registrationDateEnd"
-                    required
-                    minDate={data.registrationDateStart || new Date()}
-                    value={data.registrationDateEnd}
-                    onChange={updateRegistrationEnd}
-                  >
-                    Tutup Pendaftaran
-                  </FieldInputDate>
-
-                  <FieldInputTime
-                    placeholder="00:00"
-                    name="registrationTimeEnd"
-                    required
-                    minTime={
-                      setHours(setMinutes(data.registrationDateEnd, 0), 0) >
-                      data.registrationDateStart
-                        ? setHours(setMinutes(data.registrationDateEnd, 0), 0)
-                        : setHours(
-                            setMinutes(
-                              data.registrationDateStart,
-                              getMinutes(data.registrationDateStart)
-                            ),
-                            getHours(data.registrationDateStart)
-                          )
-                    }
-                    maxTime={setHours(setMinutes(data.registrationDateEnd, 59), 23)}
-                    value={data.registrationDateEnd}
-                    onChange={updateRegistrationEnd}
-                  >
-                    Jam Tutup
-                  </FieldInputTime>
-                </PairedDateTimeFields>
-              </SplitFields>
-
-              <SplitFields>
-                <PairedDateTimeFields>
-                  <FieldInputDate
-                    placeholder="DD/MM/YYYY"
-                    name="eventDateStart"
-                    required
-                    minDate={data.registrationDateEnd || data.registrationDateStart || new Date()}
-                    value={data.eventDateStart}
-                    onChange={updateEventStart}
-                  >
-                    Mulai Lomba
-                  </FieldInputDate>
-
-                  <FieldInputTime
-                    placeholder="00:00"
-                    name="eventTimeStart"
-                    required
-                    minTime={setHours(
-                      setMinutes(data.eventDateStart || data.registrationDateEnd, 0),
-                      0
-                    )}
-                    maxTime={setHours(
-                      setMinutes(data.eventDateStart || data.registrationDateEnd, 59),
-                      23
-                    )}
-                    value={data.eventDateStart}
-                    onChange={updateEventStart}
-                  >
-                    Jam Mulai
-                  </FieldInputTime>
-                </PairedDateTimeFields>
-
-                <PairedDateTimeFields>
-                  <FieldInputDate
-                    placeholder="DD/MM/YYYY"
-                    name="eventDateEnd"
-                    required
-                    minDate={
-                      data.eventDateStart ||
-                      data.registrationDateEnd ||
-                      data.registrationDateStart ||
-                      new Date()
-                    }
-                    value={data.eventDateEnd}
-                    onChange={updateEventEnd}
-                  >
-                    Akhir Lomba
-                  </FieldInputDate>
-
-                  <FieldInputTime
-                    placeholder="00:00"
-                    name="eventTimeEnd"
-                    required
-                    minTime={
-                      setHours(setMinutes(data.eventDateEnd, 0), 0) > data.eventDateStart
-                        ? setHours(setMinutes(data.eventDateEnd, 0), 0)
-                        : setHours(
-                            setMinutes(data.eventDateStart, getMinutes(data.eventDateStart)),
-                            getHours(data.eventDateStart)
-                          )
-                    }
-                    maxTime={setHours(setMinutes(data.eventDateEnd, 59), 23)}
-                    value={data.eventDateEnd}
-                    onChange={updateEventEnd}
-                  >
-                    Jam Akhir
-                  </FieldInputTime>
-                </PairedDateTimeFields>
-              </SplitFields>
             </VerticalSpaceBetween>
 
             <hr />
@@ -349,12 +206,6 @@ const VerticalSpaceBetween = styled.div`
   > * + * {
     margin-top: 1rem;
   }
-`;
-
-const PairedDateTimeFields = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 1.5rem 1rem;
 `;
 
 const EarlyBirdActivationBar = styled.div`

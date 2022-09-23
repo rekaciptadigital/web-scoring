@@ -353,12 +353,13 @@ function PageCreateEventFullday() {
 
             <StepFooterActions>
               <ButtonSave
-                onSubmit={() => {
+                onSubmit={({ next }) => {
                   submitRegistrationDates({
                     onSuccess() {
                       toast.success("Berhasil menyimpan informasi pendaftaran");
                       fetchConfigRegistrationDates();
-                      // TODO: next kalau pertama, stay kalau edit
+
+                      formRegistrationDates.isFirstTimeCreatingConfig && next();
                     },
                   });
                 }}

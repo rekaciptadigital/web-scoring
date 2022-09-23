@@ -84,16 +84,16 @@ function useFormRegistrationDates(categories, existingConfigs) {
     const { parseServerDatetime } = datetime;
 
     const isConfigEnabled = Boolean(existingConfigs.enableConfig);
-    const start = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.start);
-    const end = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.end);
+    const defaultStart = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.start);
+    const defaultEnd = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.end);
     const eventStart = parseServerDatetime(existingConfigs.scheduleEvent?.start);
     const eventEnd = parseServerDatetime(existingConfigs.scheduleEvent?.end);
 
     const values = {
-      registrationDateStart: start || null,
-      registrationDateEnd: end || null,
-      eventDateStart: eventStart || null,
-      eventDateEnd: eventEnd || null,
+      registrationDateStart: defaultStart,
+      registrationDateEnd: defaultEnd,
+      eventDateStart: eventStart,
+      eventDateEnd: eventEnd,
       isActive: isConfigEnabled,
     };
 
@@ -108,17 +108,24 @@ function useFormRegistrationDates(categories, existingConfigs) {
         const isSpecialActive = Boolean(config.isHaveSpecial) && hasSomeSpecialConfigs;
 
         const configValues = {
-          ..._makeEmptyConfigItem(), // <- memastikan struktur datanya konsisten (untuk yang gak dioveride di bawahnya)
-          configId: config.id,
-          team: config.configType
-            ? {
-                value: config.configType,
-                label: groupLabelsById[config.configType],
-              }
-            : null,
-          start: parseServerDatetime(config.datetimeStartRegister),
-          end: parseServerDatetime(config.datetimeEndRegister),
-          isSpecialActive: isSpecialActive,
+          ..._makeEmptyConfigItem({
+            configId: config.id,
+            team: config.configType
+              ? {
+                  value: config.configType,
+                  label: groupLabelsById[config.configType],
+                }
+              : null,
+            start: parseServerDatetime(config.datetimeStartRegister) || defaultStart,
+            end: parseServerDatetime(config.datetimeEndRegister) || defaultEnd,
+            isSpecialActive: isSpecialActive,
+          }),
+          categories: [
+            _makeEmptyCategoryConfigItem({
+              start: defaultStart,
+              end: defaultEnd,
+            }),
+          ],
         };
 
         if (!isSpecialActive) {
@@ -127,9 +134,8 @@ function useFormRegistrationDates(categories, existingConfigs) {
 
         return {
           ...configValues,
-          categories:
-            config.listSpecialConfig?.map((config) => ({
-              ..._makeEmptyCategoryConfigItem(),
+          categories: config.listSpecialConfig?.map((config) => {
+            return _makeEmptyCategoryConfigItem({
               configId: config.id,
               categories: _makeInitialValueCategoryPairs(
                 config.categories,
@@ -137,7 +143,8 @@ function useFormRegistrationDates(categories, existingConfigs) {
               ),
               start: parseServerDatetime(config.datetimeStartRegister),
               end: parseServerDatetime(config.datetimeEndRegister),
-            })) || [],
+            });
+          }),
         };
       }),
     };

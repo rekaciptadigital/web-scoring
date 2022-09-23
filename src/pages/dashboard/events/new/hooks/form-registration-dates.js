@@ -55,6 +55,15 @@ const _makeEmptyCategoryConfigItem = (defaultValues = {}) => ({
  * @param {Object} existingConfigs
  */
 function useFormRegistrationDates(categories, existingConfigs) {
+  const isFirstTimeCreatingConfig = React.useMemo(() => {
+    return (
+      !existingConfigs?.defaultDatetimeRegister?.start ||
+      !existingConfigs.defaultDatetimeRegister?.end ||
+      !existingConfigs.scheduleEvent?.start ||
+      !existingConfigs.scheduleEvent?.end
+    );
+  }, [existingConfigs]);
+
   const categoriesByGroupId = React.useMemo(
     () => _groupCategoryByTeamGroup(categories),
     [categories]
@@ -459,6 +468,7 @@ function useFormRegistrationDates(categories, existingConfigs) {
   };
 
   return {
+    isFirstTimeCreatingConfig,
     categoriesByGroupId,
     data: state.data,
     initForm,

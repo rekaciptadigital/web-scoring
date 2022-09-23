@@ -75,12 +75,14 @@ function useFormRegistrationDates(categories, existingConfigs) {
     const isConfigEnabled = Boolean(existingConfigs.enableConfig);
     const start = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.start);
     const end = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.end);
+    const eventStart = parseServerDatetime(existingConfigs.scheduleEvent?.start);
+    const eventEnd = parseServerDatetime(existingConfigs.scheduleEvent?.end);
 
     const values = {
       registrationDateStart: start || null,
       registrationDateEnd: end || null,
-      eventDateStart: null, // TODO: cek, belum ada di respon
-      eventDateEnd: null, // TODO: cek, belum ada di respon
+      eventDateStart: eventStart || null,
+      eventDateEnd: eventEnd || null,
       isActive: isConfigEnabled,
     };
 

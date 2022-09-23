@@ -15,6 +15,8 @@ function useSubmitRegistrationDates(eventId, formData) {
       default_datetime_end_register: formData.registrationDateEnd
         ? datetime.formatServerDatetime(formData.registrationDateEnd)
         : undefined,
+      schedule_start_event: datetime.formatServerDatetime(formData.eventDateStart),
+      schedule_end_event: datetime.formatServerDatetime(formData.eventDateEnd),
       is_active_config: 0,
     };
 

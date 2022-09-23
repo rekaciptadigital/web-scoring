@@ -2,6 +2,7 @@ import { useFetcher } from "hooks/alt-fetcher";
 import { EventsService } from "services";
 
 import { datetime } from "utils";
+import { syncTimeTo } from "../utils";
 
 function useSubmitRegistrationDates(eventId, formData) {
   const fetcher = useFetcher();
@@ -25,8 +26,12 @@ function useSubmitRegistrationDates(eventId, formData) {
         ...payload,
         is_active_config: 1,
         list_config: formData.configs?.map((config) => {
-          const dateStart = config.start ? datetime.formatServerDatetime(config.start) : undefined;
-          const dateEnd = config.end ? datetime.formatServerDatetime(config.end) : undefined;
+          const dateStart = datetime.formatServerDatetime(
+            syncTimeTo(config.start, formData.registrationDateStart)
+          );
+          const dateEnd = datetime.formatServerDatetime(
+            syncTimeTo(config.end, formData.registrationDateEnd)
+          );
 
           const configPayload = {
             config_type: config.team?.value,
@@ -44,7 +49,10 @@ function useSubmitRegistrationDates(eventId, formData) {
           return {
             ...configPayload,
             is_have_special_category: 1,
-            special_category: _makePayloadConfigCategories(config.categories),
+            special_category: _makePayloadConfigCategories(config.categories, {
+              start: formData.registrationDateStart,
+              end: formData.registrationDateEnd,
+            }),
           };
         }),
       };
@@ -60,7 +68,7 @@ function useSubmitRegistrationDates(eventId, formData) {
 /* ======================== */
 // utils
 
-function _makePayloadConfigCategories(categories) {
+function _makePayloadConfigCategories(categories, refDate) {
   const payload = categories?.map((item) => {
     const payloadCategories = [];
     for (const pair of item.categories) {
@@ -71,8 +79,8 @@ function _makePayloadConfigCategories(categories) {
       }
     }
 
-    const start = item.start ? datetime.formatServerDatetime(item.start) : undefined;
-    const end = item.end ? datetime.formatServerDatetime(item.end) : undefined;
+    const start = datetime.formatServerDatetime(syncTimeTo(item.start, refDate.start));
+    const end = datetime.formatServerDatetime(syncTimeTo(item.end, refDate.end));
 
     return {
       date_time_start_register_special_category: start,

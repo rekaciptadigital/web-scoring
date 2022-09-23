@@ -28,20 +28,22 @@ const groupLabelsById = {
   4: "Beregu Campuran",
 };
 
-const _makeEmptyConfigItem = () => ({
+const _makeEmptyConfigItem = (defaultValues = {}) => ({
   key: "regist-date-group-" + stringUtil.createRandom(),
   team: null,
   start: null,
   end: null,
   isSpecialActive: false,
   categories: [_makeEmptyCategoryConfigItem()],
+  ...defaultValues,
 });
 
-const _makeEmptyCategoryConfigItem = () => ({
+const _makeEmptyCategoryConfigItem = (defaultValues = {}) => ({
   key: "category-config-" + stringUtil.createRandom(),
   categories: [],
   start: null,
   end: null,
+  ...defaultValues,
 });
 
 /**
@@ -152,7 +154,12 @@ function useFormRegistrationDates(categories, existingConfigs) {
             data: {
               ...state.data,
               isActive: !state.data.isActive,
-              configs: initialValues?.configs || [_makeEmptyConfigItem()],
+              configs: initialValues?.configs || [
+                _makeEmptyConfigItem({
+                  start: state.data.registrationDateStart,
+                  end: state.data.registrationDateEnd,
+                }),
+              ],
             },
           };
         }
@@ -162,7 +169,13 @@ function useFormRegistrationDates(categories, existingConfigs) {
             ...state,
             data: {
               ...state.data,
-              configs: [...state.data.configs, _makeEmptyConfigItem()],
+              configs: [
+                ...state.data.configs,
+                _makeEmptyConfigItem({
+                  start: state.data.registrationDateStart,
+                  end: state.data.registrationDateEnd,
+                }),
+              ],
             },
           };
         }
@@ -175,14 +188,21 @@ function useFormRegistrationDates(categories, existingConfigs) {
             ...state,
             data: {
               ...state.data,
-              configs: mutatedConfigs.length ? mutatedConfigs : [_makeEmptyConfigItem()],
+              configs: mutatedConfigs.length
+                ? mutatedConfigs
+                : [
+                    _makeEmptyConfigItem({
+                      start: state.data.registrationDateStart,
+                      end: state.data.registrationDateEnd,
+                    }),
+                  ],
             },
           };
         }
 
         case actionType.CHANGE_TEAM_CATEGORY: {
           const fieldMutation = { team: action.payload };
-          return _getUpdatedStateConfigItem(state, action.configIndex, fieldMutation);
+          return _getStateUpdatedConfigItem(state, action.configIndex, fieldMutation);
         }
 
         case actionType.CHANGE_DATE_RANGE: {
@@ -190,34 +210,64 @@ function useFormRegistrationDates(categories, existingConfigs) {
             start: action.payload.start,
             end: action.payload.end,
           };
-          return _getUpdatedStateConfigItem(state, action.configIndex, fieldMutation);
+          return _getStateUpdatedConfigItem(state, action.configIndex, fieldMutation);
         }
 
         case actionType.TOGGLE_CONFIG_BY_CATEGORIES: {
+          const { registrationDateStart } = state.data;
+          const { registrationDateEnd } = state.data;
+
           const fieldMutation = (state) => ({
             isSpecialActive: !state.isSpecialActive,
-            categories: [_makeEmptyCategoryConfigItem()],
+            categories: initialValues?.configs[action.configIndex]?.categories || [
+              _makeEmptyCategoryConfigItem({
+                start: registrationDateStart,
+                end: registrationDateEnd,
+              }),
+            ],
           });
-          return _getUpdatedStateConfigItem(state, action.configIndex, fieldMutation);
+
+          return _getStateUpdatedConfigItem(state, action.configIndex, fieldMutation);
         }
 
         case actionType.ADD_CATEGORY_CONFIG_ITEM: {
+          const { registrationDateStart } = state.data;
+          const { registrationDateEnd } = state.data;
+
           const fieldMutation = (state) => ({
             ...state,
-            categories: [...state.categories, _makeEmptyCategoryConfigItem()],
+            categories: [
+              ...state.categories,
+              _makeEmptyCategoryConfigItem({
+                start: registrationDateStart,
+                end: registrationDateEnd,
+              }),
+            ],
           });
-          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
+
+          return _getStateUpdatedConfigItem(state, action.index.parent, fieldMutation);
         }
 
         case actionType.REMOVE_CATEGORY_CONFIG_ITEM: {
+          const { registrationDateStart } = state.data;
+          const { registrationDateEnd } = state.data;
+
           const fieldMutation = (state) => {
             const mutatedlist = state.categories.filter((_, index) => index !== action.index.child);
             return {
               ...state,
-              categories: mutatedlist.length ? mutatedlist : [_makeEmptyCategoryConfigItem()],
+              categories: mutatedlist.length
+                ? mutatedlist
+                : [
+                    _makeEmptyCategoryConfigItem({
+                      start: registrationDateStart,
+                      end: registrationDateEnd,
+                    }),
+                  ],
             };
           };
-          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
+
+          return _getStateUpdatedConfigItem(state, action.index.parent, fieldMutation);
         }
 
         case actionType.CHANGE_SPECIAL_CATEGORIES: {
@@ -232,7 +282,7 @@ function useFormRegistrationDates(categories, existingConfigs) {
                   };
             }),
           });
-          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
+          return _getStateUpdatedConfigItem(state, action.index.parent, fieldMutation);
         }
 
         case actionType.CHANGE_DATE_RANGE_CATEGORY: {
@@ -247,7 +297,7 @@ function useFormRegistrationDates(categories, existingConfigs) {
                   };
             }),
           });
-          return _getUpdatedStateConfigItem(state, action.index.parent, fieldMutation);
+          return _getStateUpdatedConfigItem(state, action.index.parent, fieldMutation);
         }
 
         default: {
@@ -440,7 +490,7 @@ function useFormRegistrationDates(categories, existingConfigs) {
  * @param {Object|function} mutation `{ [field]: value }` atau fungsi `(state) => ({ ...state, [field]: value })`
  * @returns {*} updated state
  */
-function _getUpdatedStateConfigItem(state, configIndex, mutation) {
+function _getStateUpdatedConfigItem(state, configIndex, mutation) {
   const updatedState = {
     ...state,
     data: {

@@ -56,12 +56,20 @@ const _makeEmptyCategoryConfigItem = (defaultValues = {}) => ({
  */
 function useFormRegistrationDates(categories, existingConfigs) {
   const isFirstTimeCreatingConfig = React.useMemo(() => {
-    return (
-      !existingConfigs?.defaultDatetimeRegister?.start ||
-      !existingConfigs.defaultDatetimeRegister?.end ||
-      !existingConfigs.scheduleEvent?.start ||
-      !existingConfigs.scheduleEvent?.end
-    );
+    // Sama backend di-define sebagai "0000-00-00 00:00:00"
+    // kalau belum diisi tanggalnya
+    const invalidDateValues = ["0000-00-00 00:00:00", undefined, false];
+    for (const value of [
+      existingConfigs?.defaultDatetimeRegister?.start,
+      existingConfigs?.defaultDatetimeRegister?.end,
+      existingConfigs?.scheduleEvent?.start,
+      existingConfigs?.scheduleEvent?.end,
+    ]) {
+      if (invalidDateValues.indexOf(value) < 0) {
+        continue;
+      }
+      return true;
+    }
   }, [existingConfigs]);
 
   /**

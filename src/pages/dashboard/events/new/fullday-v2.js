@@ -93,7 +93,7 @@ function PageCreateEventFullday() {
         1: formPublicInfos.isEmpty,
         2: formFees.isEmpty,
         3: formCategories.isEmpty,
-        4: false,
+        4: formRegistrationDates.isFirstTimeCreatingConfig,
         5: formSchedules.isEmpty,
         6: !formSchedules.isEmpty,
       }
@@ -101,8 +101,8 @@ function PageCreateEventFullday() {
         1: formPublicInfos.isEmpty,
         2: formFees.isEmpty,
         3: formCategories.isEmpty,
-        4: false,
-        5: false,
+        4: formRegistrationDates.isFirstTimeCreatingConfig,
+        5: false, // selalu unlock apapun nilainya (sifatnya gak wajib diset)
         6: formSchedules.isEmpty,
         7: !formSchedules.isEmpty,
       };

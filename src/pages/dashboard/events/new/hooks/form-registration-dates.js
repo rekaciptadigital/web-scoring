@@ -64,11 +64,23 @@ function useFormRegistrationDates(categories, existingConfigs) {
     );
   }, [existingConfigs]);
 
+  /**
+   * Dipakai untuk bikin struktur data option untuk "Jenis Regu"
+   * dan option "kategori" untuk konfig jadwal khusus.
+   * Note: pencet F12 di definisi const nya untuk lihat dimana
+   * aja datanya direferensikan.
+   */
   const categoriesByGroupId = React.useMemo(
     () => _groupCategoryByTeamGroup(categories),
     [categories]
   );
 
+  /**
+   * Nilai awal untuk form ketika pertama kali dirender. Nilai awal ini akan
+   * dihitung ulang ketika list category detail di-get ulang, seperti ketika
+   * (1) config di sini berhasil disimpan, atau ketika (2) data category
+   * detail diubah/disimpan di step sebelumnya.
+   */
   const initialValues = React.useMemo(() => {
     if (!existingConfigs || !categoriesByGroupId) {
       return {
@@ -88,6 +100,17 @@ function useFormRegistrationDates(categories, existingConfigs) {
     const defaultEnd = parseServerDatetime(existingConfigs.defaultDatetimeRegister?.end);
     const eventStart = parseServerDatetime(existingConfigs.scheduleEvent?.start);
     const eventEnd = parseServerDatetime(existingConfigs.scheduleEvent?.end);
+    const defaultEmptyConfigs = [
+      {
+        ..._makeEmptyConfigItem({ start: defaultStart, end: defaultEnd }),
+        categories: [
+          _makeEmptyCategoryConfigItem({
+            start: defaultStart,
+            end: defaultEnd,
+          }),
+        ],
+      },
+    ];
 
     const values = {
       registrationDateStart: defaultStart,
@@ -95,6 +118,8 @@ function useFormRegistrationDates(categories, existingConfigs) {
       eventDateStart: eventStart,
       eventDateEnd: eventEnd,
       isActive: isConfigEnabled,
+      // config default diset dulu buat "placeholder" biar gak error
+      configs: defaultEmptyConfigs,
     };
 
     if (!isConfigEnabled) {
@@ -235,7 +260,7 @@ function useFormRegistrationDates(categories, existingConfigs) {
 
           const fieldMutation = (state) => ({
             isSpecialActive: !state.isSpecialActive,
-            categories: initialValues?.configs[action.configIndex]?.categories || [
+            categories: initialValues?.configs?.[action.configIndex]?.categories || [
               _makeEmptyCategoryConfigItem({
                 start: registrationDateStart,
                 end: registrationDateEnd,
@@ -527,6 +552,11 @@ function _getStateUpdatedConfigItem(state, configIndex, mutation) {
   return updatedState;
 }
 
+/**
+ * Melakukan pengelompokkan data list category details menurut
+ * "tipe" regu: 1 | 2 | 3 | 4
+ * (lihat definisi `const groupLabelsById`)
+ */
 function _groupCategoryByTeamGroup(categories) {
   if (!categories?.length) {
     return null;
@@ -637,7 +667,7 @@ function _getPairId(category) {
     return;
   }
 
-  // aneh banget nama labelnya dibolak-balik
+  // aneh banget nama labelnya dari API dibolak-balik
   const ageCateg = `${segments[1]}`;
   const classCateg = `${segments[0]} - ${segments[2]}`;
   const id = `${ageCateg} - ${classCateg}`;

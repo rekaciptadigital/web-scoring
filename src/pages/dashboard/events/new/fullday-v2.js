@@ -65,8 +65,8 @@ function PageCreateEventFullday() {
     isPreparing: isPreparingEvent,
     fetchEventDetail,
   } = useEventDetail(eventId);
-  const { data: categoryDetails } = useCategoryDetails(eventId);
-  const { data: categories } = useCategoriesQualification(eventDetail);
+  const { data: categoryDetails, fetch: fetchCategoryDetails } = useCategoryDetails(eventId);
+  const { data: categoriesQualification } = useCategoriesQualification(eventDetail);
   const schedulesProvider = useQualificationSchedules(eventDetail);
   const { data: configRegistrationDates, fetch: fetchConfigRegistrationDates } =
     useConfigRegistrationDates(eventId);
@@ -85,7 +85,7 @@ function PageCreateEventFullday() {
   const formSchedules = useFormSchedules(schedules, {
     eventType,
     eventDetail,
-    categoryDetails: categories,
+    categoryDetails: categoriesQualification,
   });
 
   const emptyFormSequenceByStep = isTypeSelection
@@ -270,6 +270,7 @@ function PageCreateEventFullday() {
                     onSuccess() {
                       toast.success("Berhasil menyimpan biaya registrasi");
                       fetchEventDetail();
+                      fetchCategoryDetails();
                     },
                   });
                 }}
@@ -324,6 +325,7 @@ function PageCreateEventFullday() {
                     eventId,
                     onSuccess() {
                       fetchEventDetail();
+                      fetchCategoryDetails();
                       toast.success("Berhasil menyimpan kategori");
                       if (formCategories.isEmpty) {
                         next();
@@ -401,14 +403,14 @@ function PageCreateEventFullday() {
               {!isTypeMarathon ? (
                 <ScreenSchedules
                   eventDetail={eventDetail}
-                  categories={categories}
+                  categories={categoriesQualification}
                   formSchedules={formSchedules}
                   schedulesProvider={schedulesProvider}
                 />
               ) : (
                 <ScreenSchedulesMarathon
                   eventDetail={eventDetail}
-                  categories={categories}
+                  categories={categoriesQualification}
                   formSchedules={formSchedules}
                   onSuccessSubmit={schedulesProvider.fetchSchedules}
                 />

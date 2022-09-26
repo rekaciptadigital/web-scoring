@@ -303,7 +303,7 @@ function EditorForm({
                   </Button>
 
                   <ScheduleDatePicker
-                    disabled={!session.categoryDetail.data?.totalParticipant}
+                    disabled={!session.categoryDetail?.data?.totalParticipant}
                     title="Ubah jadwal"
                     titleOnDirty={`Tanggal diubah menjadi ${datetime.formatFullDateLabel(
                       session.eventStartDatetime

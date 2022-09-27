@@ -14,6 +14,7 @@ function FieldInputDateTimeColumns({
   timeName,
   timePlaceholder = "00:00",
   required,
+  disabled,
   minDate,
   maxDate,
   minTime,
@@ -31,6 +32,7 @@ function FieldInputDateTimeColumns({
         name={dateName}
         id={dateName}
         required={required}
+        disabled={disabled}
         value={datetime}
         onChange={onChange}
         minDate={minDate}
@@ -47,6 +49,7 @@ function FieldInputDateTimeColumns({
         name={timeName}
         id={timeName}
         required={required}
+        disabled={disabled}
         minTime={minTime}
         maxTime={maxTime}
         value={datetime}

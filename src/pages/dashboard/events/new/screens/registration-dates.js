@@ -6,7 +6,6 @@ import { FieldInputDateTimeRange } from "../components/field-input-datetime-rang
 import { FieldSettingToggleBar } from "../components/field-setting-toggle-bar";
 import { FieldSelectOption } from "./field-select-option";
 import { FieldSelectMulti } from "./field-select-multi";
-import { FieldInputDateRange } from "../components/field-input-date-range";
 
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
@@ -210,13 +209,13 @@ function ConfigEditor({
             )}
           </EditorHeader>
 
-          <FieldInputDateRange
-            labelStart="Mulai Pendaftaran"
-            labelEnd="Tutup Pendaftaran"
+          <FieldInputDateTimeRange
+            labelStart={{ date: "Mulai Pendaftaran", time: "Jam Buka" }}
+            labelEnd={{ date: "Tutup Pendaftaran", time: "Jam Tutup" }}
             required={!form.isSpecialActive}
-            daterange={!form.isSpecialActive ? { start: form.start, end: form.end } : undefined}
-            onChange={onChangeDateRange}
             disabled={form.isSpecialActive}
+            value={!form.isSpecialActive ? { start: form.start, end: form.end } : undefined}
+            onChange={onChangeDateRange}
           />
         </VerticalSpaceBetween>
 
@@ -255,7 +254,7 @@ function ConfigEditor({
           <VerticalSpaceLoose>
             {form.categories.map((item, itemIndex) => (
               <GroupCategoryEditor key={item.key}>
-                <PairedFields>
+                <VerticalSpaceBetween>
                   <FieldSelectMulti
                     label="Kategori"
                     name="category-details"
@@ -267,17 +266,14 @@ function ConfigEditor({
                     onChange={(option) => onChangeSpecialCategories?.(itemIndex, option)}
                   />
 
-                  <FieldInputDateRange
-                    labelStart="Mulai Pendaftaran"
-                    labelEnd="Tutup Pendaftaran"
+                  <FieldInputDateTimeRange
+                    labelStart={{ date: "Mulai Pendaftaran", time: "Jam Buka" }}
+                    labelEnd={{ date: "Tutup Pendaftaran", time: "Jam Tutup" }}
                     required
-                    daterange={{
-                      start: item.start,
-                      end: item.end,
-                    }}
+                    value={{ start: item.start, end: item.end }}
                     onChange={(range) => onChangeDateRangeCategory?.(itemIndex, range)}
                   />
-                </PairedFields>
+                </VerticalSpaceBetween>
 
                 <GroupAction>
                   <Button flexible onClick={() => onRemoveCategoryConfig?.(itemIndex)}>
@@ -380,12 +376,6 @@ const GroupCategoryEditor = styled.div`
   > *:nth-child(2) {
     flex-shrink: 1;
   }
-`;
-
-const PairedFields = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 1.5rem 1rem;
 `;
 
 export { ScreenRegistrationDates };

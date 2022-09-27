@@ -11,6 +11,7 @@ function FieldInputDateTimeRange({
   value = { start: null, end: null },
   onChange,
   required,
+  disabled,
   minDatetime,
 }) {
   const handleChange = (action) => {
@@ -24,6 +25,7 @@ function FieldInputDateTimeRange({
         dateLabel={labelStart.date}
         timeLabel={labelStart.time}
         required={required}
+        disabled={disabled}
         datetime={value.start}
         onChange={(datetime) => handleChange({ start: datetime })}
         /* date range configs */
@@ -38,6 +40,7 @@ function FieldInputDateTimeRange({
         dateLabel={labelEnd.date}
         timeLabel={labelEnd.time}
         required={required}
+        disabled={disabled}
         datetime={value.end}
         onChange={(datetime) => handleChange({ end: datetime })}
         /* date range configs */
@@ -58,7 +61,7 @@ function FieldInputDateTimeRange({
 
 const SplitFields = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.5rem;
 `;
 

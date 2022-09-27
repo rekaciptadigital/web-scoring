@@ -75,6 +75,7 @@ const EventItemCardWrapper = styled.div`
     overflow-y: hidden;
 
     .event-icon {
+      display: flex;
       margin-bottom: 1rem;
     }
 
@@ -152,6 +153,7 @@ function EventItemCard({ event }) {
       <div className="event-body">
         <div className="event-icon">
           <Panah size={28} color="#afafaf" />
+          <Publish className="publikasi"><p>Publikasi</p></Publish>
         </div>
         <h4 className="event-title">
           {eventDetailData?.publicInformation.eventName || "Nama Event tidak tersedia"}
@@ -244,6 +246,42 @@ const WarningBadge = styled.div`
     font-size: 15px;
     font-style: italic;
   }
+`;
+
+const Publish = styled.div`
+  box-sizing: border-box;
+  border-radius: 24px;
+
+  height: 23px;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  /* identical to box height */
+
+  /* Gray/500 */
+
+  color: #757575;
+  margin-left: 10px;
+
+  padding-top : 3px;
+  padding-right : 10px;
+  padding-left : 10px;
+
+  text-align: center;
+
+  &.draft {
+    color: #757575;
+    border: 1px solid #757575;
+  }
+
+  &.publikasi {
+    border: 1px solid #05944F;
+    color: #05944F;
+  }
+
 `;
 
 export default EventItemCard;

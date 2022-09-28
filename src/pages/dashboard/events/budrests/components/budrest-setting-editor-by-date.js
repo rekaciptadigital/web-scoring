@@ -10,8 +10,9 @@ import { LoadingScreen } from "../../new/components/loading-screen-portal";
 import { FieldInputDateSmall, FieldInputTextSmall } from "../../components/form-fields";
 import { DisplayTextSmall } from "./display-text-small";
 import { ButtonConfirmPrompt } from "./button-confirm-prompt";
-
+import { ProcessingToast, toast } from "components/ma/processing-toast";
 import { formatServerDate } from "../../new/utils/datetime";
+import { useIdcardDownloadBudrest } from "../hooks/download-idcard-budrest";
 
 function BudrestSettingEditorByDate({ settingsByDate }) {
   const history = useHistory();
@@ -36,10 +37,17 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
     errors: errorsSubmit,
   } = useSubmitBudrestSettings(formSettings, eventId);
 
+  const {
+    download: downloadIDCard,
+    isError: isErrorDownloadIDCard,
+    errors: errorsDownloadIDCard,
+  } = useIdcardDownloadBudrest(eventId);
+
   return (
     <React.Fragment>
       <LoadingScreen loading={isSubmiting} />
       <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
+      <AlertSubmitError isError={isErrorDownloadIDCard} errors={errorsDownloadIDCard} />
 
       <DayGroup>
         <VerticalSpacedBox>
@@ -55,6 +63,18 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
                   buttonLabel="Unduh No. Bantalan Peserta"
                   sessionCount={3}
                   disabled={!isSubmitAllowed}
+                  onDownload={(type) => {
+                    toast.loading("Sedang menyiapkan file data...");
+                    downloadIDCard(dateString, type, {
+                      onSuccess: () => {
+                        toast.dismiss();
+                      },
+                      onError: () => {
+                        toast.dismiss();
+                        toast.error("Gagal memulai unduhan");
+                      },
+                    });
+                  }}
                 />
               </div>
             </SpacedHeaderLeft>
@@ -180,6 +200,7 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
           </DetailList>
         </VerticalSpacedBox>
       </DayGroup>
+      <ProcessingToast/>
     </React.Fragment>
   );
 }

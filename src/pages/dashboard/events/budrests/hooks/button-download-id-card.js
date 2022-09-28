@@ -32,8 +32,6 @@ function ButtonDownloadIdCard({
     );
   }
 
-  console.log(sessionNumbers);
-
   return (
     <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>
       <DropdownToggle tag="div">
@@ -52,18 +50,8 @@ function ButtonDownloadIdCard({
             </ItemActionWrapper>
           </DropdownItem>
         ) : (
-          // sessionNumbers.map((sessionNumber) => (
-          //   <DropdownItem key={sessionNumber} onClick={() => onDownload?.(sessionNumber)}>
-          //     <ItemActionWrapper>
-          //       <span>Scoresheet Sesi {sessionNumber}</span>
-          //       <span>
-          //         <IconDownload size="16" />
-          //       </span>
-          //     </ItemActionWrapper>
-          //   </DropdownItem>
-          // ))
           <div>
-            <DropdownItem key={1} onClick={() => onDownload?.(sessionNumber)}>
+            <DropdownItem key={1} onClick={() => onDownload?.('club')}>
               <ItemActionWrapper>
                 <span>Unduh Berdasarkan Klub</span>
                 <span>
@@ -71,7 +59,7 @@ function ButtonDownloadIdCard({
                 </span>
               </ItemActionWrapper>
             </DropdownItem>
-            <DropdownItem key={2} onClick={() => onDownload?.(sessionNumber)}>
+            <DropdownItem key={2} onClick={() => onDownload?.('category')}>
               <ItemActionWrapper>
                 <span>Unduh Berdasarkan Kategori</span>
                 <span>
@@ -79,7 +67,7 @@ function ButtonDownloadIdCard({
                 </span>
               </ItemActionWrapper>
             </DropdownItem>
-            <DropdownItem key={3} onClick={() => onDownload?.(sessionNumber)}>
+            <DropdownItem key={3} onClick={() => onDownload?.('budrest')}>
               <ItemActionWrapper>
                 <span>Unduh Berdasarkan Urutan No. Bantalan</span>
                 <span>

@@ -71,8 +71,13 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
             !isDirty && setDirty(true);
             setInputValue((previousValue) => {
               const { value } = ev.target;
-              const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-              return validatedNumberValue;
+              if (!value) {
+                return "";
+              }
+              if (isNaN(value)) {
+                return previousValue;
+              }
+              return Number(value);
             });
           }}
           onFocus={(ev) => ev.target.select()}

@@ -23,7 +23,7 @@ function PageEventBudRests() {
         {Boolean(budrestSettings?.length) && (
           <span className="d-flex justify-content-end" style={{ marginBottom: "20px" }}>
             <ButtonDownloadIdCard
-              buttonLabel="Unduh No. Bantalan Peserta"
+              buttonLabel="Unduh Semua No. Bantalan Peserta"
               sessionCount={3}
               disabled={!budrestSettings}
             />

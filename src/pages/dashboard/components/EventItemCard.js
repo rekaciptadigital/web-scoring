@@ -6,7 +6,8 @@ import { Link } from "react-router-dom";
 import Calendar from "components/icons/Calendar";
 import MapPin from "components/icons/MapPin";
 import Panah from "components/icons/Panah";
-import IconMoreVertical from "components/ma/icons/fill/more-vertical";
+// import IconMoreVertical from "components/ma/icons/fill/more-vertical";
+import { ButtonMoreMenu } from "../hooks/more-menu";
 
 const formatDate = (datetimeString) => {
   // YYYY-MM-DD
@@ -73,7 +74,7 @@ const EventItemCardWrapper = styled.div`
   transition: all 0.4s;
 
   .event-body {
-    overflow-y: hidden;
+    // overflow-y: hidden;
 
     .event-icon {
       display: flex;
@@ -112,14 +113,14 @@ const EventItemCardWrapper = styled.div`
       flex: 1 0 100%;
     }
 
-    .event-link::before {
-      content: " ";
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    }
+    // .event-link::before {
+    //   content: " ";
+    //   position: absolute;
+    //   top: 0;
+    //   right: 0;
+    //   bottom: 0;
+    //   left: 0;
+    // }
   }
 
   &:hover {
@@ -133,6 +134,8 @@ function EventItemCard({ event }) {
     data: null,
     errors: null,
   });
+
+  console.log(event);
 
   const eventDetailData = eventDetail.data;
   const hrefToEventHome = event?.id ? `/dashboard/event/${event.id}/home` : "#";
@@ -155,11 +158,11 @@ function EventItemCard({ event }) {
       <div className="event-body">
         <div className="event-icon">
           <Panah size={28} color="#afafaf" />
-          <Publish className="publikasi">
-            <p>Terpublikasi</p>
+          <Publish className={event.status ? "publikasi" : "draft"}>
+            <p>{event.status ? "Terpublikasi" : "Draft"}</p>
           </Publish>
-          <div style={{ marginLeft : "auto" }}>
-            <IconMoreVertical />
+          <div style={{ marginLeft: "auto", zIndex: "1000" }}>
+            <ButtonMoreMenu event={event.status}/>
           </div>
         </div>
         <h4 className="event-title">

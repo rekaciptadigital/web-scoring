@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import Calendar from "components/icons/Calendar";
 import MapPin from "components/icons/MapPin";
 import Panah from "components/icons/Panah";
+import IconMoreVertical from "components/ma/icons/fill/more-vertical";
 
 const formatDate = (datetimeString) => {
   // YYYY-MM-DD
@@ -76,6 +77,7 @@ const EventItemCardWrapper = styled.div`
 
     .event-icon {
       display: flex;
+      // justify-content: flex-end;
       margin-bottom: 1rem;
     }
 
@@ -153,7 +155,12 @@ function EventItemCard({ event }) {
       <div className="event-body">
         <div className="event-icon">
           <Panah size={28} color="#afafaf" />
-          <Publish className="publikasi"><p>Publikasi</p></Publish>
+          <Publish className="publikasi">
+            <p>Terpublikasi</p>
+          </Publish>
+          <div style={{ marginLeft : "auto" }}>
+            <IconMoreVertical />
+          </div>
         </div>
         <h4 className="event-title">
           {eventDetailData?.publicInformation.eventName || "Nama Event tidak tersedia"}
@@ -266,9 +273,9 @@ const Publish = styled.div`
   color: #757575;
   margin-left: 10px;
 
-  padding-top : 3px;
-  padding-right : 10px;
-  padding-left : 10px;
+  padding-top: 3px;
+  padding-right: 10px;
+  padding-left: 10px;
 
   text-align: center;
 
@@ -278,10 +285,9 @@ const Publish = styled.div`
   }
 
   &.publikasi {
-    border: 1px solid #05944F;
-    color: #05944F;
+    border: 1px solid #05944f;
+    color: #05944f;
   }
-
 `;
 
 export default EventItemCard;

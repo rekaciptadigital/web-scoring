@@ -1,6 +1,7 @@
-import { differenceInDays, addDays, subDays } from "date-fns";
-import stringUtil from "utils/stringUtil";
-import { parseServerDatetime, formatServerDate } from "../utils/datetime";
+import { differenceInDays, addDays, subDays, addHours } from "date-fns";
+import { datetime, stringUtil } from "utils";
+
+const { parseServerDatetime, formatServerDate } = datetime;
 
 /* ================================ */
 // FULLDAY
@@ -9,19 +10,19 @@ import { parseServerDatetime, formatServerDate } from "../utils/datetime";
  * Dipakai ketika sama sekali belum ada data schedule/qualification time-nya
  */
 function makeDefaultForm(eventDetail) {
-  let eventStartDate = null;
-  let eventEndDate = null;
-  let numberOfDays = 1;
-
-  if (eventDetail) {
-    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
-    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
-    numberOfDays = differenceInDays(eventEndDate, eventStartDate) + 1;
-  }
+  const eventStartDate = parseServerDatetime(eventDetail?.publicInformation.eventStart);
+  const eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  const numberOfDays =
+    eventStartDate && eventEndDate ? differenceInDays(eventEndDate, eventStartDate) + 1 : 1;
 
   let currentSessionDate = eventStartDate ? subDays(eventStartDate, 1) : null;
   return [...new Array(numberOfDays)].reduce((data) => {
     currentSessionDate = currentSessionDate ? addDays(currentSessionDate, 1) : null;
+
+    if (!currentSessionDate) {
+      return data;
+    }
+
     return [
       ...data,
       {
@@ -32,8 +33,12 @@ function makeDefaultForm(eventDetail) {
             key: stringUtil.createRandom(),
             categoryDetail: null, // { value: "", label: "" },
             idQualificationTime: undefined,
-            eventStartDatetime: eventStartDate,
-            eventEndDatetime: eventStartDate,
+            // Hati-hati nama dari backend bisa membingungkan.
+            // *Event* (start/end) datetime ini maksudnya datetime untuk jadwal kualifikasi,
+            // bukan tanggal event.
+            // API POST minta nama key payload-nya ini
+            eventStartDatetime: currentSessionDate,
+            eventEndDatetime: addHours(currentSessionDate, 1),
           },
         ],
       },
@@ -47,15 +52,10 @@ function makeDefaultForm(eventDetail) {
  */
 function makeStateSchedules(eventDetail, schedules, categories) {
   const categoriesById = _makeCategoriesById(categories);
-  let eventStartDate = null;
-  let eventEndDate = null;
-  let numberOfDays = 1;
-
-  if (eventDetail) {
-    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
-    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
-    numberOfDays = differenceInDays(eventEndDate, eventStartDate) + 1;
-  }
+  const eventStartDate = parseServerDatetime(eventDetail?.publicInformation.eventStart);
+  const eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
+  const numberOfDays =
+    eventStartDate && eventEndDate ? differenceInDays(eventEndDate, eventStartDate) + 1 : 1;
 
   let currentSessionDate = eventStartDate ? subDays(eventStartDate, 1) : null;
   const formDataGrouped = [...new Array(numberOfDays)].reduce((data) => {
@@ -114,8 +114,8 @@ function makeStateSchedules(eventDetail, schedules, categories) {
           key: stringUtil.createRandom(),
           categoryDetail: null, // { value: "", label: "" },
           idQualificationTime: undefined,
-          eventStartDatetime: eventStartDate,
-          eventEndDatetime: eventStartDate,
+          eventStartDatetime: day.sessionDate,
+          eventEndDatetime: addHours(day.sessionDate, 1),
         },
       ],
     };
@@ -128,13 +128,8 @@ function makeStateSchedules(eventDetail, schedules, categories) {
 // MARATHON
 
 function makeDefaultFormMarathon(categoryDetails, eventDetail) {
-  let eventStartDate = null;
-  let eventEndDate = null;
-
-  if (eventDetail) {
-    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
-    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
-  }
+  const eventStartDate = parseServerDatetime(eventDetail?.publicInformation.eventStart);
+  const eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
 
   const groupedCategories = _groupByCompetitionId(categoryDetails);
   const competitionIds = groupedCategories ? Object.keys(groupedCategories) : [];
@@ -169,13 +164,8 @@ function makeDefaultFormMarathon(categoryDetails, eventDetail) {
 }
 
 function makeStateSchedulesMarathon(categoryDetails, schedules, eventDetail) {
-  let eventStartDate = null;
-  let eventEndDate = null;
-
-  if (eventDetail) {
-    eventStartDate = parseServerDatetime(eventDetail.publicInformation.eventStart);
-    eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
-  }
+  const eventStartDate = parseServerDatetime(eventDetail?.publicInformation.eventStart);
+  const eventEndDate = parseServerDatetime(eventDetail?.publicInformation.eventEnd);
 
   const structuredSchedules = _arrayToObject(schedules, "categoryDetailId");
   const groupedCategories = _groupByCompetitionId(categoryDetails);

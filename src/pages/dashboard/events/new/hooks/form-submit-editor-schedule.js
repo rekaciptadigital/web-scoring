@@ -3,15 +3,14 @@ import { useFetcher } from "utils/hooks/alt-fetcher";
 import { EventsService } from "services";
 
 import { addHours } from "date-fns";
-import stringUtil from "utils/stringUtil";
-import { datetime } from "utils";
+import { stringUtil, datetime } from "utils";
+import { syncTimeTo } from "../../new/utils/datetime";
 
 function useScheduleEditorForm(initialValues, eventId) {
   const cleanValues = React.useRef(initialValues);
   const [state, dispatch] = React.useReducer(editorReducer, {
     data: initialValues,
-    // status: "uninitialized",
-    // errors: {},
+    // errors: {}, // <- dipake untuk validasi kalau nanti butuh
   });
 
   const { data: submitData, ...formFetcher } = useFetcher();
@@ -143,6 +142,8 @@ function makePayloadScheduleForm(eventId, editorFormdata, cleanValues) {
         const currentCleanValue = cleanValues.sessions[index];
         const isClean = _checkIfScheduleDataClean(currentCleanValue, session);
 
+        // Tanggal yang nggak diedit (clean) diabaikan dari payload,
+        // biar gak dikirim karena bisa error di backend di "kondisi tertentu"
         if (isClean) {
           return undefined;
         }
@@ -151,8 +152,12 @@ function makePayloadScheduleForm(eventId, editorFormdata, cleanValues) {
         const values = {
           qualification_time_id: session.idQualificationTime, // kalau create, `undefined`
           category_detail_id: session.categoryDetail?.value,
-          event_start_datetime: datetime.formatServerDatetime(session.eventStartDatetime),
-          event_end_datetime: datetime.formatServerDatetime(session.eventEndDatetime),
+          event_start_datetime: datetime.formatServerDatetime(
+            syncTimeTo(editorFormdata.sessionDate, session.eventStartDatetime)
+          ),
+          event_end_datetime: datetime.formatServerDatetime(
+            syncTimeTo(editorFormdata.sessionDate, session.eventEndDatetime)
+          ),
         };
 
         // value delete

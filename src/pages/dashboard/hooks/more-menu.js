@@ -86,7 +86,8 @@ function ButtonMoreMenu({ event, fetchEventDetail }) {
         labelCancel="Tidak, kembali"
       >
         <img src={imgIllustration} alt="gambar" width="250px" style={{ marginBottom: "30px" }} />
-        <h5>Apakah anda yakin Event Ini Akan menghapus event ini ?</h5>
+        <h5>Apakah Anda yakin Akang Menghapus Event ?</h5>
+        <p>Draft event akan terhapus. Anda dapat membuat event baru dengan klik tombol “+”.</p>
       </AlertConfirmAction>
 
       <AlertSuccess
@@ -106,7 +107,7 @@ function ButtonMoreMenu({ event, fetchEventDetail }) {
           <IconMoreVertical />
         </DropdownToggle>
 
-        <DropdownMenu right>
+        <DropdownMenu className="dropdown-menu-end">
           <DropdownItem onClick={() => setConfirm(true)}>
             <ItemActionWrapper>
               <span>

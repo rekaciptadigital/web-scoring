@@ -359,6 +359,9 @@ function PageCreateEventFullday() {
                   submitRegistrationDates({
                     onSuccess() {
                       toast.success("Berhasil menyimpan informasi pendaftaran");
+                      // Event detail juga perlu di-GET ulang karena data untuk jadwal kualifikasi
+                      // diambil dari data tanggal lomba dari event detail
+                      fetchEventDetail();
                       fetchConfigRegistrationDates();
 
                       formRegistrationDates.isFirstTimeCreatingConfig && next();

@@ -18,6 +18,11 @@ function makeDefaultForm(eventDetail) {
   let currentSessionDate = eventStartDate ? subDays(eventStartDate, 1) : null;
   return [...new Array(numberOfDays)].reduce((data) => {
     currentSessionDate = currentSessionDate ? addDays(currentSessionDate, 1) : null;
+
+    if (!currentSessionDate) {
+      return data;
+    }
+
     return [
       ...data,
       {

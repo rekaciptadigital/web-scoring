@@ -74,7 +74,7 @@ const EventItemCardWrapper = styled.div`
   transition: all 0.4s;
 
   .event-body {
-    // overflow-y: hidden;
+    overflow: "hidden";
 
     .event-icon {
       display: flex;
@@ -135,21 +135,20 @@ function EventItemCard({ event }) {
     errors: null,
   });
 
-  console.log(event);
-
   const eventDetailData = eventDetail.data;
   const hrefToEventHome = event?.id ? `/dashboard/event/${event.id}/home` : "#";
 
+  const getEventDetail = async () => {
+    setEventDetail((state) => ({ ...state, status: "loading", errors: null }));
+    const result = await EventsService.getEventDetailById({ id: event.id });
+    if (result.success) {
+      setEventDetail((state) => ({ ...state, status: "success", data: result.data }));
+    } else {
+      setEventDetail((state) => ({ ...state, status: "error", errors: result.errors }));
+    }
+  };
+
   React.useEffect(() => {
-    const getEventDetail = async () => {
-      setEventDetail((state) => ({ ...state, status: "loading", errors: null }));
-      const result = await EventsService.getEventDetailById({ id: event.id });
-      if (result.success) {
-        setEventDetail((state) => ({ ...state, status: "success", data: result.data }));
-      } else {
-        setEventDetail((state) => ({ ...state, status: "error", errors: result.errors }));
-      }
-    };
     getEventDetail();
   }, []);
 
@@ -158,11 +157,13 @@ function EventItemCard({ event }) {
       <div className="event-body">
         <div className="event-icon">
           <Panah size={28} color="#afafaf" />
-          <Publish className={event.status ? "publikasi" : "draft"}>
-            <p>{event.status ? "Terpublikasi" : "Draft"}</p>
+          <Publish
+            className={eventDetailData?.publicInformation.eventStatus ? "publikasi" : "draft"}
+          >
+            <p>{eventDetailData?.publicInformation.eventStatus ? "Terpublikasi" : "Draft"}</p>
           </Publish>
-          <div style={{ marginLeft: "auto", zIndex: "1000" }}>
-            <ButtonMoreMenu event={event.status}/>
+          <div style={{ marginLeft: "auto" }}>
+            <ButtonMoreMenu event={eventDetailData} fetchEventDetail={getEventDetail} />
           </div>
         </div>
         <h4 className="event-title">

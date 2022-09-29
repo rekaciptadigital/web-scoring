@@ -4,9 +4,9 @@ import { EventsService } from "services";
 function useSubmitPublish(eventDetail) {
   const fetcher = useFetcher();
 
-  const sendPublish = async ({ onSuccess: consumerSuccessHandler }) => {
+  const sendPublish = async (setStatus, { onSuccess: consumerSuccessHandler }) => {
     const postFunction = () => {
-      return EventsService.setPublished({ status: 1 }, { id: eventDetail?.id });
+      return EventsService.setPublished({ status: setStatus }, { id: eventDetail?.id });
     };
 
     fetcher.runAsync(postFunction, {

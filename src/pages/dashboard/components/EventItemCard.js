@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import Calendar from "components/icons/Calendar";
 import MapPin from "components/icons/MapPin";
 import Panah from "components/icons/Panah";
+// import IconMoreVertical from "components/ma/icons/fill/more-vertical";
+import { ButtonMoreMenu } from "../hooks/more-menu";
 
 const formatDate = (datetimeString) => {
   // YYYY-MM-DD
@@ -72,9 +74,11 @@ const EventItemCardWrapper = styled.div`
   transition: all 0.4s;
 
   .event-body {
-    overflow-y: hidden;
+    overflow: "hidden";
 
     .event-icon {
+      display: flex;
+      // justify-content: flex-end;
       margin-bottom: 1rem;
     }
 
@@ -109,14 +113,14 @@ const EventItemCardWrapper = styled.div`
       flex: 1 0 100%;
     }
 
-    .event-link::before {
-      content: " ";
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    }
+    // .event-link::before {
+    //   content: " ";
+    //   position: absolute;
+    //   top: 0;
+    //   right: 0;
+    //   bottom: 0;
+    //   left: 0;
+    // }
   }
 
   &:hover {
@@ -134,16 +138,17 @@ function EventItemCard({ event }) {
   const eventDetailData = eventDetail.data;
   const hrefToEventHome = event?.id ? `/dashboard/event/${event.id}/home` : "#";
 
+  const getEventDetail = async () => {
+    setEventDetail((state) => ({ ...state, status: "loading", errors: null }));
+    const result = await EventsService.getEventDetailById({ id: event.id });
+    if (result.success) {
+      setEventDetail((state) => ({ ...state, status: "success", data: result.data }));
+    } else {
+      setEventDetail((state) => ({ ...state, status: "error", errors: result.errors }));
+    }
+  };
+
   React.useEffect(() => {
-    const getEventDetail = async () => {
-      setEventDetail((state) => ({ ...state, status: "loading", errors: null }));
-      const result = await EventsService.getEventDetailById({ id: event.id });
-      if (result.success) {
-        setEventDetail((state) => ({ ...state, status: "success", data: result.data }));
-      } else {
-        setEventDetail((state) => ({ ...state, status: "error", errors: result.errors }));
-      }
-    };
     getEventDetail();
   }, []);
 
@@ -152,6 +157,14 @@ function EventItemCard({ event }) {
       <div className="event-body">
         <div className="event-icon">
           <Panah size={28} color="#afafaf" />
+          <Publish
+            className={eventDetailData?.publicInformation.eventStatus ? "publikasi" : "draft"}
+          >
+            <p>{eventDetailData?.publicInformation.eventStatus ? "Terpublikasi" : "Draft"}</p>
+          </Publish>
+          <div style={{ marginLeft: "auto" }}>
+            <ButtonMoreMenu event={eventDetailData} fetchEventDetail={getEventDetail} />
+          </div>
         </div>
         <h4 className="event-title">
           {eventDetailData?.publicInformation.eventName || "Nama Event tidak tersedia"}
@@ -243,6 +256,41 @@ const WarningBadge = styled.div`
     color: var(--ma-gray-400);
     font-size: 15px;
     font-style: italic;
+  }
+`;
+
+const Publish = styled.div`
+  box-sizing: border-box;
+  border-radius: 24px;
+
+  height: 23px;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  /* identical to box height */
+
+  /* Gray/500 */
+
+  color: #757575;
+  margin-left: 10px;
+
+  padding-top: 3px;
+  padding-right: 10px;
+  padding-left: 10px;
+
+  text-align: center;
+
+  &.draft {
+    color: #757575;
+    border: 1px solid #757575;
+  }
+
+  &.publikasi {
+    border: 1px solid #05944f;
+    color: #05944f;
   }
 `;
 

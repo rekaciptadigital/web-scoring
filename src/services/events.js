@@ -196,4 +196,8 @@ export default {
     };
     return API.get("/web/v2/id-card/download-by-category", qs);
   },
+
+  deleteEvent(qs) {
+    return API.deleteByParams("/web/v1/archery/events/delete-event", qs);
+  },
 };

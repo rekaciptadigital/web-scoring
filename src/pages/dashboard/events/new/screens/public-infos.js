@@ -1,9 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useSubmitExtraInfo } from "../hooks/submit-extra-info";
 
 import { Modal, ModalBody } from "reactstrap";
 import SweetAlert from "react-bootstrap-sweetalert";
-import { Button, ButtonBlue, ButtonOutlineBlue } from "components/ma";
+import { Button, ButtonBlue, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
 import PosterImagePicker from "../../components/PosterImagePicker";
 import {
   FieldInputText,
@@ -13,6 +14,7 @@ import {
   FieldInputDate,
   FieldInputTime,
 } from "../../components/form-fields";
+import { toast } from "../components/processing-toast";
 import { EventLogoUploader } from "../components/event-logo-uploader";
 
 import { setHours, setMinutes, getMinutes, getHours } from "date-fns";
@@ -302,7 +304,11 @@ function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing })
               </div>
 
               <div>
-                <ExtraInfos form={form} />
+                <ExtraInfos
+                  eventId={eventDetail?.id}
+                  form={form}
+                  onSaveSuccess={fetchEventDetail}
+                />
               </div>
             </VerticalSpaceBetween>
           </React.Fragment>
@@ -405,12 +411,14 @@ function ToggleSwitch({ checked, onChange, disabled }) {
 
 /* ========================================== */
 
-function ExtraInfos({ form }) {
+function ExtraInfos({ eventId, form, onSaveSuccess }) {
   const { data, addExtraInfoItem, updateExtraInfoItem, removeExtraInfoItem } = form;
 
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
+
+  const { add, update, remove } = useSubmitExtraInfo(eventId);
 
   const handleModalAddInfoShow = () => setShowAddExtraInfo(true);
   const handleModalAddInfoClose = () => setShowAddExtraInfo(false);
@@ -418,9 +426,70 @@ function ExtraInfos({ form }) {
   const handleModalEditInfoOpen = (key) => setKeyExtraInfoEdited(key);
   const handleModalEditInfoClose = () => setKeyExtraInfoEdited(null);
 
+  const handleSaveAdd = async (item) => {
+    if (!eventId) {
+      addExtraInfoItem(item);
+    } else {
+      toast.loading("Menyimpan informasi event...");
+      await new Promise((resolve, reject) => {
+        add.submit(item, {
+          onSuccess: () => {
+            onSaveSuccess?.();
+            toast.dismiss();
+            toast.success("Informasi event tersimpan");
+            resolve();
+          },
+          onError: () => {
+            toast.dismiss();
+            toast.error("Gagal menyimpan informasi event");
+            reject();
+          },
+        });
+      });
+    }
+  };
+
+  const handleSaveUpdate = async (item) => {
+    if (!eventId) {
+      updateExtraInfoItem(item);
+    } else {
+      toast.loading("Menyimpan perbaruan informasi event...");
+      await new Promise((resolve, reject) => {
+        update.submit(item, {
+          onSuccess: () => {
+            onSaveSuccess?.();
+            toast.dismiss();
+            toast.success("Informasi event diperbarui");
+            resolve();
+          },
+          onError: () => {
+            toast.dismiss();
+            toast.error("Gagal memperbarui informasi event");
+            reject();
+          },
+        });
+      });
+    }
+  };
+
   const handleRemoveInformation = (targetInfo) => {
-    removeExtraInfoItem(targetInfo.key);
-    setKeyExtraInfoRemoved(null);
+    if (!eventId) {
+      removeExtraInfoItem(targetInfo.key);
+      setKeyExtraInfoRemoved(null);
+    } else {
+      toast.loading("Menghapus informasi event...");
+      remove.submit(targetInfo.id, {
+        onSuccess: () => {
+          onSaveSuccess?.();
+          toast.dismiss();
+          toast.success("Informasi event tersimpan");
+        },
+        onError: () => {
+          toast.dismiss();
+          toast.error("Gagal menyimpan informasi event");
+        },
+      });
+    }
   };
 
   return (
@@ -431,7 +500,7 @@ function ExtraInfos({ form }) {
 
       <ModalExtraInfoEditor
         showEditor={shouldShowAddExtraInfo}
-        onSave={addExtraInfoItem}
+        onSave={handleSaveAdd}
         onClose={handleModalAddInfoClose}
       />
 
@@ -453,7 +522,7 @@ function ExtraInfos({ form }) {
               <ModalExtraInfoEditor
                 showEditor={keyExtraInfoEdited === info.key}
                 infoData={info}
-                onSave={updateExtraInfoItem}
+                onSave={handleSaveUpdate}
                 onClose={handleModalEditInfoClose}
               />
             </div>
@@ -475,6 +544,10 @@ function ExtraInfos({ form }) {
           </ExtraInfoItem>
         ))}
       </div>
+
+      <AlertSubmitError isError={add.isError} errors={add.errors} />
+      <AlertSubmitError isError={update.isError} errors={update.errors} />
+      <AlertSubmitError isError={remove.isError} errors={remove.errors} />
     </React.Fragment>
   );
 }
@@ -540,16 +613,23 @@ function ExtraInfoEditor({ infoData, onSave, onClose }) {
     onClose?.();
   };
 
-  const handleClickSave = () => {
+  const handleClickSave = async () => {
     if (!shouldSubmitAllowed()) {
       return;
     }
-    onSave?.({
-      key: infoData?.key,
-      title: title,
-      description: description,
-    });
-    handleCloseModal();
+
+    try {
+      await onSave?.({
+        key: infoData?.key,
+        title: title,
+        description: description,
+      });
+      handleCloseModal();
+    } catch (err) {
+      // supaya gak close modal kalau gagal simpan
+      // bisa ulang klik simpan tampa kehilangan data
+      console.error("Gagal menyimpan info");
+    }
   };
 
   return (

@@ -4,7 +4,7 @@ import { EventsService } from "services";
 
 import { addHours } from "date-fns";
 import { stringUtil, datetime } from "utils";
-import { syncTimeTo } from "../../new/utils";
+import { syncTimeTo } from "../../new/utils/datetime";
 
 function useScheduleEditorForm(initialValues, eventId) {
   const cleanValues = React.useRef(initialValues);

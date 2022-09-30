@@ -10,6 +10,7 @@ function AlertConfirmAction({
   onClose,
   labelCancel = "Batal",
   labelConfirm = "Konfirmasi",
+  width = '520px',
 }) {
   const [isAlertOpen, setAlertOpen] = React.useState(false);
 
@@ -38,7 +39,7 @@ function AlertConfirmAction({
         title=""
         custom
         btnSize="md"
-        style={{ padding: "30px 40px", width: "520px" }}
+        style={{ padding: "30px 40px", width : {width} }}
         onConfirm={handleConfirm}
         customButtons={
           <span className="d-flex justify-content-center" style={{ gap: "0.5rem" }}>

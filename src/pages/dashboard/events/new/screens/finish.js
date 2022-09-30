@@ -3,11 +3,14 @@ import styled from "styled-components";
 import { useSubmitPublish } from "../hooks/submit-publish";
 import { toast } from "../components/processing-toast";
 
-import { ButtonBlue, AlertSubmitError } from "components/ma";
+import { ButtonBlue, AlertSubmitError, ButtonOutlineBlue, AlertConfirmAction } from "components/ma";
 import { LoadingScreen } from "../components/loading-screen-portal";
 
 import IconCheck from "components/ma/icons/fill/check";
 import imageIllustration from "assets/images/events/create-event-event-ready.png";
+import imgIllustration from "assets/images/Illustration.png";
+import { AlertSuccess } from "pages/dashboard/class-categories/components/alert-success";
+// import { AlertSuccess } from "pages/authentication/register/components/alert-registration-success";
 
 function ScreenFinish({ eventDetail, fetchEventDetail }) {
   const {
@@ -19,10 +22,37 @@ function ScreenFinish({ eventDetail, fetchEventDetail }) {
 
   const isPublished = Boolean(eventDetail?.publicInformation.eventStatus);
 
+  const [isConfirm, setConfirm] = React.useState(false);
+  const [isSuccess, setSucces] = React.useState(false);
+
   return (
     <React.Fragment>
       <LoadingScreen loading={isLoadingPublish} />
       <AlertSubmitError isError={isErrorPublish} errors={errorsPublish} />
+      <AlertSuccess
+        isSuccess={isSuccess}
+        buttonLabel="Kembali ke dashboard"
+        prompt="Berhasil"
+        description="Event telah menjadi draft"
+      />
+      <AlertConfirmAction
+        shouldConfirm={isConfirm}
+        onClose={() => setConfirm(false)}
+        onConfirm={() => {
+          sendPublish(0, {
+            onSuccess() {
+              fetchEventDetail();
+              setSucces(true);
+            },
+          });
+        }}
+        labelConfirm="Ya, jadikan draft"
+        labelCancel="Tidak, kembali"
+      >
+        <img src={imgIllustration} alt="gambar" width="250px" style={{ marginBottom: "30px" }} />
+        <h5>Apakah anda yakin Event Ini Akan dijadikan Draft?</h5>
+        <p>Event akan dijadikan draft, Anda masih dapat mempublikasikan event ini nanti</p>
+      </AlertConfirmAction>
 
       <CardSheet>
         <Illustration />
@@ -41,11 +71,14 @@ function ScreenFinish({ eventDetail, fetchEventDetail }) {
                 <React.Fragment>
                   <IconCheck />
                   <ButtonBlue disabled>Terpublikasi</ButtonBlue>
+                  <ButtonOutlineBlue onClick={() => setConfirm(true)}>
+                    Jadikan Draft
+                  </ButtonOutlineBlue>
                 </React.Fragment>
               ) : (
                 <ButtonBlue
                   onClick={() => {
-                    sendPublish({
+                    sendPublish(1, {
                       onSuccess() {
                         fetchEventDetail();
                         toast.success("Terpublikasi!");

@@ -6,6 +6,7 @@ import { FieldInputDateWrapper } from "./styles";
 
 import id from "date-fns/locale/id";
 import classnames from "classnames";
+import { stringUtil } from "utils";
 
 function FieldInputDateSmall({
   children,
@@ -20,8 +21,13 @@ function FieldInputDateSmall({
   warnings,
   minDate,
   maxDate,
+  selectsStart,
+  selectsEnd,
+  startDate,
+  endDate,
 }) {
-  const fieldID = name ? `field-input-${name}` : undefined;
+  const { defaultDateId } = useDefaultIDs();
+  const fieldID = name ? `field-input-${name}` : defaultDateId;
 
   return (
     <FieldInputDateWrapper>
@@ -46,9 +52,24 @@ function FieldInputDateSmall({
         disabled={disabled}
         minDate={minDate}
         maxDate={maxDate}
+        selectsStart={selectsStart}
+        selectsEnd={selectsEnd}
+        startDate={startDate}
+        endDate={endDate}
+        showPopperArrow={false}
       />
     </FieldInputDateWrapper>
   );
+}
+
+function useDefaultIDs() {
+  return React.useMemo(() => {
+    const code = stringUtil.createRandom();
+    return {
+      defaultDateId: `field-date-${code}`,
+      defaultTimeId: `field-time-${code}`,
+    };
+  }, []);
 }
 
 export default FieldInputDateSmall;

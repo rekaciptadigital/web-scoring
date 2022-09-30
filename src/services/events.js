@@ -99,6 +99,12 @@ export default {
   getEventMedalReport(qs = null) {
     return API.get("/web/v1/archery/events/report-medal-club", qs);
   },
+  getConfigCategoryRegister(qs = null) {
+    return API.get("/web/v1/archery/config-category-register", qs);
+  },
+  setConfigCategoryRegister(data, qs = null) {
+    return API.post("/web/v1/archery/config-category-register", data, qs, true);
+  },
   getEventMemberNew(qs = null) {
     return API.get("/web/v2/members", qs);
   },

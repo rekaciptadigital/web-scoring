@@ -43,14 +43,16 @@ const EventLoadingIndicator = styled.div`
 function LatestEventList({type}) {
   const [events, setEvents] = React.useState(null);
 
+  const getEvent = async () => {
+    setEvents(null);
+    const { success, data } = await EventsService.get();
+    if (success) {
+      const eventsData = data.map((event) => event.event);
+      setEvents(eventsData);
+    }
+  };
+
   React.useEffect(() => {
-    const getEvent = async () => {
-      const { success, data } = await EventsService.get();
-      if (success) {
-        const eventsData = data.map((event) => event.event);
-        setEvents(eventsData);
-      }
-    };
     getEvent();
   }, []);
 
@@ -66,7 +68,7 @@ function LatestEventList({type}) {
     <EventGrid>
       {events &&
         makeHomeThumbnailList(events, type).map((event, index) => {
-          return <EventThumbnailCard key={index} event={event} />;
+          return <EventThumbnailCard key={index} event={event} getEvent={getEvent}/>;
         })}
     </EventGrid>
   );

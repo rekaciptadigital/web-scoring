@@ -13,7 +13,7 @@ function EventLogoUploader({ eventDetail, previewImage, onChange, onSuccess }) {
     <MediaObjectWrapper>
       <UploaderWrapper>
         <AsyncPhotoUploader
-          title="Upload foto profil"
+          title="Unggah logo event"
           placeholder="Unggah logo"
           imageSrc={eventDetail?.publicInformation.logo || previewImage}
           isLoading={isLoading}
@@ -37,7 +37,7 @@ function EventLogoUploader({ eventDetail, previewImage, onChange, onSuccess }) {
       </UploaderWrapper>
 
       <UploadInstruction>
-        Unggah foto Anda dengan ukuran 4x3, min. besar file 500kb, format PNG/JPEG untuk keperluan
+        Unggah logo event dengan ukuran 4x3, min. besar file 500kb, format PNG/JPEG untuk keperluan
         scoresheet, bagan, laporan, dan ID Card.
       </UploadInstruction>
 

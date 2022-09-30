@@ -4,8 +4,10 @@ import DatePicker from "react-datepicker";
 
 import { FieldInputTimeWrapper } from "./styles";
 
+import { getHours, getMinutes, setHours, setMinutes } from "date-fns";
 import id from "date-fns/locale/id";
 import classnames from "classnames";
+import { stringUtil } from "utils";
 
 function FieldInputTimeSmall({
   children,
@@ -19,8 +21,11 @@ function FieldInputTimeSmall({
   disabled,
   errors,
   warnings,
+  minTime,
+  maxTime,
 }) {
-  const fieldID = name ? `field-input-${name}` : undefined;
+  const { defaultTimeId } = useDefaultIDs();
+  const fieldID = name ? `field-time-${name}` : defaultTimeId;
 
   return (
     <FieldInputTimeWrapper>
@@ -30,6 +35,7 @@ function FieldInputTimeSmall({
           {required && <span className="field-required">*</span>}
         </label>
       )}
+
       <DatePicker
         className={classnames("field-input-time", {
           "error-invalid": errors?.length,
@@ -38,7 +44,15 @@ function FieldInputTimeSmall({
         id={fieldID}
         name={name}
         selected={value}
-        onChange={(date) => onChange?.(date)}
+        onChange={(date) => {
+          // Untuk menyamakan tanggal sesuai dari value yang dikasih prop
+          // Kalau enggak dihandle, dia akan fallback ke objek `new Date()`
+          const sourceMinutes = getMinutes(date);
+          const sourceHours = getHours(date);
+          const normalizedMinutes = setMinutes(value, sourceMinutes);
+          const normalizedDateTime = setHours(normalizedMinutes, sourceHours);
+          onChange?.(normalizedDateTime);
+        }}
         placeholderText={placeholder}
         locale={id}
         timeFormat="H:mm"
@@ -48,9 +62,22 @@ function FieldInputTimeSmall({
         showTimeSelect
         showTimeSelectOnly
         disabled={disabled}
+        showPopperArrow={false}
+        minTime={minTime}
+        maxTime={maxTime}
       />
     </FieldInputTimeWrapper>
   );
+}
+
+function useDefaultIDs() {
+  return React.useMemo(() => {
+    const code = stringUtil.createRandom();
+    return {
+      defaultDateId: `field-date-${code}`,
+      defaultTimeId: `field-time-${code}`,
+    };
+  }, []);
 }
 
 export default FieldInputTimeSmall;

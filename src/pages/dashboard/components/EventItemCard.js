@@ -128,7 +128,7 @@ const EventItemCardWrapper = styled.div`
   }
 `;
 
-function EventItemCard({ event }) {
+function EventItemCard({ event, getEvent }) {
   const [eventDetail, setEventDetail] = React.useState({
     status: "idle",
     data: null,
@@ -163,7 +163,7 @@ function EventItemCard({ event }) {
             <p>{eventDetailData?.publicInformation.eventStatus ? "Terpublikasi" : "Draft"}</p>
           </Publish>
           <div style={{ marginLeft: "auto" }}>
-            <ButtonMoreMenu event={eventDetailData} fetchEventDetail={getEventDetail} />
+            <ButtonMoreMenu event={eventDetailData} fetchEventDetail={getEventDetail} getEvent={getEvent}/>
           </div>
         </div>
         <h4 className="event-title">

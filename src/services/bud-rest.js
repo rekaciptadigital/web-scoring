@@ -71,7 +71,7 @@ export default {
    * @returns {Promise} { success, data, errors, message }
    */
   getDownloadIDCardByCategory(queryString = null) {
-    return API.get("/web/v2/bud-rest/download-idcard-by-category-per-day", queryString);
+    return API.get("/web/v2/bud-rest/download-idcard-by-category", queryString);
   },
   
   /**
@@ -80,7 +80,7 @@ export default {
    * @returns {Promise} { success, data, errors, message }
    */
   getDownloadIDCardByBudrest(queryString = null) {
-    return API.get("/web/v2/bud-rest/download-idcard-by-budrest-per-day", queryString);
+    return API.get("/web/v2/bud-rest/download-idcard-by-budrest", queryString);
   },
 
   /**
@@ -89,6 +89,6 @@ export default {
    * @returns {Promise} { success, data, errors, message }
    */
   getDownloadIDCardByClub(queryString = null) {
-    return API.get("/web/v2/bud-rest/download-idcard-by-club-per-day", queryString);
+    return API.get("/web/v2/bud-rest/download-idcard-by-club", queryString);
   },
 };

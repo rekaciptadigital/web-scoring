@@ -64,4 +64,31 @@ export default {
   getDownloadMembersBudrestByDate(queryString = null) {
     return API.get("/web/v2/schedule-full-day/download-budrest", queryString);
   },
+
+  /**
+   *
+   * @param {Object} queryString { event_id, date }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getDownloadIDCardByCategory(queryString = null) {
+    return API.get("/web/v2/bud-rest/download-idcard-by-category", queryString);
+  },
+  
+  /**
+   *
+   * @param {Object} queryString { event_id, date }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getDownloadIDCardByBudrest(queryString = null) {
+    return API.get("/web/v2/bud-rest/download-idcard-by-budrest", queryString);
+  },
+
+  /**
+   *
+   * @param {Object} queryString { event_id, date }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getDownloadIDCardByClub(queryString = null) {
+    return API.get("/web/v2/bud-rest/download-idcard-by-club", queryString);
+  },
 };

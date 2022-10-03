@@ -10,7 +10,7 @@ import { LoadingScreen } from "../../new/components/loading-screen-portal";
 import { FieldInputDateSmall, FieldInputTextSmall } from "../../components/form-fields";
 import { DisplayTextSmall } from "./display-text-small";
 import { ButtonConfirmPrompt } from "./button-confirm-prompt";
-import { ProcessingToast, toast } from "components/ma/processing-toast";
+import { toast } from "components/ma/processing-toast";
 import { formatServerDate } from "../../new/utils/datetime";
 import { useIdcardDownloadBudrest } from "../hooks/download-idcard-budrest";
 
@@ -200,7 +200,6 @@ function BudrestSettingEditorByDate({ settingsByDate }) {
           </DetailList>
         </VerticalSpacedBox>
       </DayGroup>
-      <ProcessingToast/>
     </React.Fragment>
   );
 }

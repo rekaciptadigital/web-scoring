@@ -6,32 +6,31 @@ import { urlUtil } from "utils";
 function useIdcardDownloadBudrest(event_id) {
   const fetcher = useFetcher();
 
-  const download = async (date, type ,customOptions) => {
+  const download = async (date, type, customOptions) => {
+    let param = null;
+
     if (!date) {
-      return;
+      param = {
+        event_id: event_id,
+      };
+    } else {
+      param = {
+        event_id: event_id,
+        date: date,
+      };
     }
 
     const getFunction = () => {
-
-      if(type == 'category'){
-        return BudRestService.getDownloadIDCardByCategory({
-          event_id: event_id,
-          date: date
-        });
+      if (type == "category") {
+        return BudRestService.getDownloadIDCardByCategory(param);
       }
 
-      if(type == 'budrest'){
-        return BudRestService.getDownloadIDCardByBudrest({
-          event_id: event_id,
-          date: date
-        });
+      if (type == "budrest") {
+        return BudRestService.getDownloadIDCardByBudrest(param);
       }
 
-      if(type == 'club'){
-        return BudRestService.getDownloadIDCardByClub({
-          event_id: event_id,
-          date: date
-        });
+      if (type == "club") {
+        return BudRestService.getDownloadIDCardByClub(param);
       }
     };
 

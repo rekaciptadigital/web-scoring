@@ -62,6 +62,7 @@ function FieldInputText({
   onChange,
   errors,
   disabled,
+  type="text"
 }) {
   const fieldID = name ? `field-input-${name}` : undefined;
 
@@ -85,6 +86,7 @@ function FieldInputText({
         value={value}
         onChange={handleChange}
         disabled={disabled}
+        type={type}
       />
     </FieldInputTextWrapper>
   );

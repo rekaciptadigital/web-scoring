@@ -47,7 +47,76 @@ function SettingShootTheBoard({ eventDetail }) {
     [categoryDetails]
   );
 
-  const [data, setData] = React.useState([{ data: 'rules' }])
+  const dataShootRule = {
+    sesi: 0,
+    rambahan: 0,
+    child_bow: 0,
+    category: []
+  };
+
+  const initialData = {
+    event_id: eventDetail.id,
+    acvite_setting: 0,
+    implement_all: 0,
+    shoot_rule: [dataShootRule]
+  }
+
+  const [dataOption, setDataOption] = React.useState(optionsCategories);
+  const [dataForm, setFormData] = React.useState(initialData);
+
+  // const [selected, setSelected] = React.useState([]);
+
+  const handleSelect = (value, index) => {
+    let categories = dataForm.shoot_rule[index].category.length;
+    if (categories < value.length || categories === 0) {
+      const shoot_rule = dataForm.shoot_rule.map((field, i) => {
+        if (i == index) {
+          const category = [...field.category, value[value.length - 1]];
+          return { ...field, category }
+        }
+        return field
+      });
+
+      setFormData({
+        ...dataForm,
+        shoot_rule
+      });
+
+      value.map((val) => {
+        setDataOption(dataOption.filter((el) => el !== val));
+      })
+
+    } else {
+      let shoot_rule = dataForm.shoot_rule;
+      shoot_rule[index].category = value;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        shoot_rule: shoot_rule
+      }));
+
+      value.map((val) => {
+        setDataOption([...dataOption, val]);
+      })
+    }
+
+  }
+
+  const handleAdd = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      shoot_rule: [...prevData.shoot_rule, dataShootRule]
+    }));
+  }
+
+  const handleDelete = (index) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      shoot_rule: [...prevData.shoot_rule.filter((el, i) => i !== index)]
+    }));
+  }
+
+  console.log(dataForm);
 
   return (
     <SettingContainer>
@@ -59,10 +128,15 @@ function SettingShootTheBoard({ eventDetail }) {
           </p>
         </div>
         <EarlyBirdActivationBar>
-          <div>Aktifkan Event Private</div>
+          <div>Aktifkan Pengaturan Menembak Custom</div>
           <ToggleSwitch
-          // checked={data.isPrivate ? 1 : 0}
-          // onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
+            checked={dataForm.acvite_setting}
+            onChange={(val) => {
+              setFormData((prevState) => ({
+                ...prevState,
+                acvite_setting: val ? 1 : 0
+              }));
+            }}
           />
         </EarlyBirdActivationBar>
         <Section>
@@ -70,34 +144,42 @@ function SettingShootTheBoard({ eventDetail }) {
             <EarlyBirdActivationBar>
               <div>Terapkan ke semua kategori</div>
               <ToggleSwitch
-              // checked={data.isPrivate ? 1 : 0}
-              // onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
+                checked={dataForm?.implement_all ? 1 : 0}
+                onChange={(val) => {
+                  setFormData((prevState) => ({
+                    ...prevState,
+                    implement_all: val ? 1 : 0
+                  }));
+                }}
+                disabled={!dataForm?.acvite_setting}
               />
             </EarlyBirdActivationBar>
-            {data.map((rule, index) => (
+            {dataForm.shoot_rule.map((rule, index) => (
               <CategoryBlock key={index}>
                 <Section>
                   <SettingContentContainer>
                     <h5>Aturan Menembak</h5>
                     <FourColumnsInputsGrid>
-                      <FieldSelect options={numberKategori}><LabelRules>Jumlah Segi per Kategori</LabelRules></FieldSelect>
-                      <FieldSelect options={numberRambahan}><LabelRules>Jumlah Rambahan</LabelRules></FieldSelect>
-                      <FieldSelect options={numberRambahan}><LabelRules>Jumlah Anak Panah per-Rambahan</LabelRules></FieldSelect>
+                      <FieldSelect onChange='' disabled={dataForm?.implement_all || !dataForm?.acvite_setting} options={numberKategori}><LabelRules>Jumlah Segi per Kategori</LabelRules></FieldSelect>
+                      <FieldSelect disabled={dataForm?.implement_all || !dataForm?.acvite_setting} options={numberRambahan}><LabelRules>Jumlah Rambahan</LabelRules></FieldSelect>
+                      <FieldSelect disabled={dataForm?.implement_all || !dataForm?.acvite_setting} options={numberRambahan}><LabelRules>Jumlah Anak Panah per-Rambahan</LabelRules></FieldSelect>
                     </FourColumnsInputsGrid>
                     <FieldSelectCategories
                       label="Kategori"
                       placeholder="Pilih opsi"
                       required
-                      options={optionsCategories}
-                    // value={categories}
-                    // onChange={(value) => updateField("categories", value || [])}
-                    // errors={errors.categories}
+                      options={dataOption}
+                      value={rule?.category}
+                      onChange={(value) => handleSelect(value ?? [], index)}
+                      // errors={errors.categories}
+                      disabled={dataForm?.implement_all || !dataForm?.acvite_setting}
                     />
                   </SettingContentContainer>
                 </Section>
                 <div style={{ marginTop: '20px' }}>
-                  <Button flexible onClick={() => setData([...data, { data: 'rules' }])}><IconPlus size={12} /></Button><br />
-                  <Button flexible onClick={() => setData(data.filter((el, i) => i !== index))}><IconTrash size={12} /></Button>
+                  <Button disabled={dataForm?.implement_all || !dataForm?.acvite_setting} flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
+                  {/* <Button disabled={dataForm?.implement_all || !dataForm?.acvite_setting} flexible onClick={() => setData(data.filter((el, i) => i !== index))}><IconTrash size={12} /></Button> */}
+                  <Button disabled={dataForm?.implement_all || !dataForm?.acvite_setting} flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
                 </div>
               </CategoryBlock>
             ))}

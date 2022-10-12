@@ -25,9 +25,7 @@ function ButtonMoreMenu({ event, fetchEventDetail, getEvent }) {
   const [isSuccess, setSucces] = React.useState(false);
   const [isSuccessDelete, setSuccesDelete] = React.useState(false);
   const [isErrorEvent, setErrorEvent] = React.useState(true);
-
-  console.log(isErrorEvent)
-
+  
   const {
     sendPublish,
     isLoading: isLoadingPublish,

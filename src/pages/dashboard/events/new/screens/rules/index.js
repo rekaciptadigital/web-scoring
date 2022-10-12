@@ -5,6 +5,7 @@ import Switch from "react-switch";
 import { useClubRankingSetting } from "./hooks/club-ranking-settings";
 import { useFormRankingSetting } from "./hooks/form-ranking-settings";
 import { useSubmitClubsRanking } from "./hooks/submit-clubs-ranking";
+import { useShootRuleSetting } from "./hooks/shoot-rule-settings";
 
 import { ButtonBlue, LoadingScreen, SpinnerDotBlock, AlertSubmitError, Button } from "components/ma";
 import { toast } from "components/ma/processing-toast";
@@ -33,6 +34,16 @@ function ScreenRules({ eventDetail }) {
 
 function SettingShootTheBoard({ eventDetail }) {
 
+  const {
+    data: shootSettings,
+    isLoading,
+    isError: isErrorFetch,
+    errors: errorsFetch,
+    // fetchRankingSetting,
+  } = useShootRuleSetting(eventDetail?.id);
+
+  console.log(shootSettings);
+
   const numberKategori = [...new Array(6)].map((item, index) => {
     return { label: index + 1, value: index + 1 }
   })
@@ -48,6 +59,7 @@ function SettingShootTheBoard({ eventDetail }) {
   );
 
   const dataShootRule = {
+    implementAll: 0,
     sesi: 0,
     rambahan: 0,
     child_bow: 0,
@@ -56,20 +68,17 @@ function SettingShootTheBoard({ eventDetail }) {
 
   const initialData = {
     event_id: eventDetail.id,
-    acvite_setting: 0,
-    implement_all: 0,
-    shoot_rule: [dataShootRule]
+    activeSetting: null,
+    shootRule: [dataShootRule]
   }
 
   const [dataOption, setDataOption] = React.useState(optionsCategories);
   const [dataForm, setFormData] = React.useState(initialData);
 
-  // const [selected, setSelected] = React.useState([]);
-
   const handleSelect = (value, index) => {
-    let categories = dataForm.shoot_rule[index].category.length;
+    let categories = dataForm.shootRule[index].category.length;
     if (categories < value.length || categories === 0) {
-      const shoot_rule = dataForm.shoot_rule.map((field, i) => {
+      const shootRule = dataForm.shootRule.map((field, i) => {
         if (i == index) {
           const category = [...field.category, value[value.length - 1]];
           return { ...field, category }
@@ -79,7 +88,7 @@ function SettingShootTheBoard({ eventDetail }) {
 
       setFormData({
         ...dataForm,
-        shoot_rule
+        shootRule
       });
 
       value.map((val) => {
@@ -87,12 +96,12 @@ function SettingShootTheBoard({ eventDetail }) {
       })
 
     } else {
-      let shoot_rule = dataForm.shoot_rule;
-      shoot_rule[index].category = value;
+      let shootRule = dataForm.shootRule;
+      shootRule[index].category = value;
 
       setFormData((prevData) => ({
         ...prevData,
-        shoot_rule: shoot_rule
+        shootRule: shootRule
       }));
 
       value.map((val) => {
@@ -105,16 +114,32 @@ function SettingShootTheBoard({ eventDetail }) {
   const handleAdd = () => {
     setFormData((prevData) => ({
       ...prevData,
-      shoot_rule: [...prevData.shoot_rule, dataShootRule]
+      shootRule: [...prevData.shootRule, dataShootRule]
     }));
   }
 
   const handleDelete = (index) => {
     setFormData((prevData) => ({
       ...prevData,
-      shoot_rule: [...prevData.shoot_rule.filter((el, i) => i !== index)]
+      shootRule: [...prevData.shootRule.filter((el, i) => i !== index)]
     }));
   }
+
+  const handleImplemen = (value, index) => {
+    const val = dataForm.shootRule;
+    val[index].implementAll = value ? 1 : 0;
+
+    setFormData((prevState) => ({
+      ...prevState,
+      shootRule: val
+    }));
+  }
+
+  // React.useEffect(() => {
+  //   if (!isLoading) {
+  //     setFormData(shootSettings);
+  //   }
+  // }, [isLoading]);
 
   console.log(dataForm);
 
@@ -124,70 +149,67 @@ function SettingShootTheBoard({ eventDetail }) {
         <div>
           <h5>Aturan Menembak Perpani</h5>
           <p>
-            Aturan dasar pertandingan panahan dari Perpani, yaitu setiap 1 sesi terdiri dari 6 rambahan dan tiap rambahan terdiri dari 7 anak panah. Anda dapat membuat aturan pertandingan yang berbeda dengan mengaktifkan pengaturan dibawah ini.
+            Aturan dasar pertandingan panahan dari Perpani, yaitu setiap 1 sesi terdiri dari 6 rambahan dan tiap rambahan terdiri dari 6 anak panah. Anda dapat membuat aturan pertandingan yang berbeda dengan mengaktifkan pengaturan dibawah ini.
           </p>
         </div>
         <EarlyBirdActivationBar>
           <div>Aktifkan Pengaturan Menembak Custom</div>
           <ToggleSwitch
-            checked={dataForm.acvite_setting}
+            checked={dataForm?.activeSetting}
             onChange={(val) => {
               setFormData((prevState) => ({
                 ...prevState,
-                acvite_setting: val ? 1 : 0
+                activeSetting: val ? 1 : 0
               }));
             }}
           />
         </EarlyBirdActivationBar>
-        <Section>
-          <SettingContentContainer>
-            <EarlyBirdActivationBar>
-              <div>Terapkan ke semua kategori</div>
-              <ToggleSwitch
-                checked={dataForm?.implement_all ? 1 : 0}
-                onChange={(val) => {
-                  setFormData((prevState) => ({
-                    ...prevState,
-                    implement_all: val ? 1 : 0
-                  }));
-                }}
-                disabled={!dataForm?.acvite_setting}
-              />
-            </EarlyBirdActivationBar>
-            {dataForm.shoot_rule.map((rule, index) => (
-              <CategoryBlock key={index}>
-                <Section>
-                  <SettingContentContainer>
-                    <h5>Aturan Menembak</h5>
-                    <FourColumnsInputsGrid>
-                      <FieldSelect onChange='' disabled={dataForm?.implement_all || !dataForm?.acvite_setting} options={numberKategori}><LabelRules>Jumlah Segi per Kategori</LabelRules></FieldSelect>
-                      <FieldSelect disabled={dataForm?.implement_all || !dataForm?.acvite_setting} options={numberRambahan}><LabelRules>Jumlah Rambahan</LabelRules></FieldSelect>
-                      <FieldSelect disabled={dataForm?.implement_all || !dataForm?.acvite_setting} options={numberRambahan}><LabelRules>Jumlah Anak Panah per-Rambahan</LabelRules></FieldSelect>
-                    </FourColumnsInputsGrid>
-                    <FieldSelectCategories
-                      label="Kategori"
-                      placeholder="Pilih opsi"
-                      required
-                      options={dataOption}
-                      value={rule?.category}
-                      onChange={(value) => handleSelect(value ?? [], index)}
-                      // errors={errors.categories}
-                      disabled={dataForm?.implement_all || !dataForm?.acvite_setting}
-                    />
-                  </SettingContentContainer>
-                </Section>
-                <div style={{ marginTop: '20px' }}>
-                  <Button disabled={dataForm?.implement_all || !dataForm?.acvite_setting} flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
-                  {/* <Button disabled={dataForm?.implement_all || !dataForm?.acvite_setting} flexible onClick={() => setData(data.filter((el, i) => i !== index))}><IconTrash size={12} /></Button> */}
-                  <Button disabled={dataForm?.implement_all || !dataForm?.acvite_setting} flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
-                </div>
-              </CategoryBlock>
-            ))}
-
-
-          </SettingContentContainer>
-        </Section>
+        {dataForm?.activeSetting ? (
+          <Section>
+            <SettingContentContainer>
+              {dataForm?.shootRule.map((rule, index) => (
+                <CategoryBlock key={index}>
+                  <Section>
+                    <SettingContentContainer>
+                      <h5>Aturan Menembak</h5>
+                      <FourColumnsInputsGrid>
+                        <FieldSelect options={numberKategori}><LabelRules>Jumlah Sesi per Kategori</LabelRules></FieldSelect>
+                        <FieldSelect options={numberRambahan}><LabelRules>Jumlah Rambahan</LabelRules></FieldSelect>
+                        <FieldSelect options={numberRambahan}><LabelRules>Jumlah Anak Panah per-Rambahan</LabelRules></FieldSelect>
+                      </FourColumnsInputsGrid>
+                      <EarlyBirdActivationBar>
+                        <div>Terapkan ke kategori tertentu</div>
+                        <ToggleSwitch
+                          checked={rule?.implementAll ? 1 : 0}
+                          onChange={(val) => handleImplemen(val, index)}
+                        />
+                      </EarlyBirdActivationBar>
+                      {rule.implementAll ?
+                        <FieldSelectCategories
+                          label="Kategori"
+                          placeholder="Pilih opsi"
+                          required
+                          options={dataOption}
+                          value={rule?.category}
+                          onChange={(value) => handleSelect(value ?? [], index)}
+                        />
+                        : undefined}
+                    </SettingContentContainer>
+                  </Section>
+                  <div style={{ marginTop: '20px' }}>
+                    <Button flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
+                    {/* <Button disabled={dataForm?.implementAll || !dataForm?.activeSetting} flexible onClick={() => setData(data.filter((el, i) => i !== index))}><IconTrash size={12} /></Button> */}
+                    <Button flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
+                  </div>
+                </CategoryBlock>
+              ))}
+            </SettingContentContainer>
+          </Section>) : undefined
+        }
       </SpacedVertical>
+
+      <LoadingScreen loading={isLoading} />
+      <AlertSubmitError isError={isErrorFetch} errors={errorsFetch} />
     </SettingContainer >
   )
 }

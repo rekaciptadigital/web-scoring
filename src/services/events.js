@@ -200,4 +200,8 @@ export default {
   deleteEvent(qs) {
     return API.deleteByParams("/web/v1/archery/events/delete-event", qs);
   },
+
+  getShootRuleSetting(qs = null) {
+    return API.get("/web/v1/aturan-pertandingan/get-config-aturan-pertandingan", qs);
+  },
 };

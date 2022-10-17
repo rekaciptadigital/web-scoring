@@ -204,4 +204,8 @@ export default {
   getShootRuleSetting(qs = null) {
     return API.get("/web/v1/aturan-pertandingan/get-config-aturan-pertandingan", qs);
   },
+
+  storeSetConfigShootRule(data) {
+    return API.post("/web/v1/aturan-pertandingan/set-config-aturan-pertandingan", data, null, true);
+  },
 };

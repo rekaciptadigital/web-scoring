@@ -15,6 +15,7 @@ import { FieldSelectCategories } from "./components/field-select-categories";
 import { FieldSelectOption } from "../field-select-option";
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
+import { useSubmitRuleSetting } from "./hooks/submit-rule-shoot-setting";
 
 function ScreenRules({ eventDetail }) {
   return (
@@ -39,10 +40,8 @@ function SettingShootTheBoard({ eventDetail }) {
     isLoading,
     isError: isErrorFetch,
     errors: errorsFetch,
-    // fetchRankingSetting,
+    fetchRuleShootSetting,
   } = useShootRuleSetting(eventDetail?.id);
-
-  console.log(shootSettings);
 
   const numberKategori = [...new Array(6)].map((item, index) => {
     return { label: index + 1, value: index + 1 }
@@ -59,43 +58,59 @@ function SettingShootTheBoard({ eventDetail }) {
   );
 
   const dataShootRule = {
-    implementAll: 0,
-    sesi: 0,
-    rambahan: 0,
-    child_bow: 0,
+    session: null,
+    rambahan: null,
+    child_bow: null,
     category: []
   };
 
   const initialData = {
     event_id: eventDetail.id,
     activeSetting: null,
+    implementAll: 1,
     shootRule: [dataShootRule]
   }
 
   const [dataOption, setDataOption] = React.useState(optionsCategories);
   const [dataForm, setFormData] = React.useState(initialData);
 
+  const {
+    submit,
+    isLoading: isLoadingSubmit,
+    isError: isErrorSubmit,
+    errors: errorsSubmit,
+  } = useSubmitRuleSetting(eventDetail?.id, dataForm);
+
+
   const handleSelect = (value, index) => {
+
     let categories = dataForm.shootRule[index].category.length;
     if (categories < value.length || categories === 0) {
-      const shootRule = dataForm.shootRule.map((field, i) => {
-        if (i == index) {
-          const category = [...field.category, value[value.length - 1]];
-          return { ...field, category }
-        }
-        return field
-      });
+      if (dataForm.shootRule[index].session >= value.length) {
+        const shootRule = dataForm.shootRule.map((field, i) => {
+          if (i == index) {
+            const category = [...field.category, value[value.length - 1]];
+            return { ...field, category }
+          }
+          return field
+        });
 
-      setFormData({
-        ...dataForm,
-        shootRule
-      });
+        setFormData({
+          ...dataForm,
+          shootRule
+        });
 
-      value.map((val) => {
-        setDataOption(dataOption.filter((el) => el !== val));
-      })
+        value.map((val) => {
+          setDataOption(dataOption.filter((el) => el !== val));
+        })
+      }
 
     } else {
+
+      dataForm.shootRule[index].category.map((val) => {
+        setDataOption([...dataOption, val]);
+      });
+
       let shootRule = dataForm.shootRule;
       shootRule[index].category = value;
 
@@ -103,12 +118,7 @@ function SettingShootTheBoard({ eventDetail }) {
         ...prevData,
         shootRule: shootRule
       }));
-
-      value.map((val) => {
-        setDataOption([...dataOption, val]);
-      })
     }
-
   }
 
   const handleAdd = () => {
@@ -119,29 +129,75 @@ function SettingShootTheBoard({ eventDetail }) {
   }
 
   const handleDelete = (index) => {
+
+    let tempCategory = dataOption;
+    dataForm.shootRule[index].category.map((val) => {
+      tempCategory.push(val);
+    });
+
+    setDataOption(tempCategory);
+
     setFormData((prevData) => ({
       ...prevData,
       shootRule: [...prevData.shootRule.filter((el, i) => i !== index)]
     }));
+
   }
 
-  const handleImplemen = (value, index) => {
-    const val = dataForm.shootRule;
-    val[index].implementAll = value ? 1 : 0;
+  const handleImplemen = (value) => {
+    if (dataForm?.shootRule.length === 1) {
+      setFormData((prevState) => ({
+        ...prevState,
+        implementAll: value ? 0 : 1
+      }));
+    }
+  }
 
-    setFormData((prevState) => ({
-      ...prevState,
-      shootRule: val
+  const handleSelectRule = (name, event, index) => {
+    let shootRule = dataForm.shootRule;
+    shootRule[index][name] = event.value;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      shootRule: shootRule
     }));
+
   }
 
-  // React.useEffect(() => {
-  //   if (!isLoading) {
-  //     setFormData(shootSettings);
-  //   }
-  // }, [isLoading]);
+  React.useEffect(() => {
+    if (shootSettings) {
+      console.log('fetch data');
+      const optionCategory = shootSettings?.implementAll ? [{
+        session: shootSettings?.session,
+        rambahan: shootSettings?.rambahan,
+        child_bow: shootSettings?.childBow,
+        category: []
+      }] : _makeShootRule(shootSettings, optionsCategories);
+      console.log(optionCategory);
+      setFormData({
+        event_id: eventDetail.id,
+        activeSetting: shootSettings?.activeSetting,
+        implementAll: shootSettings?.implementAll,
+        shootRule: optionCategory
+      });
+
+      if (!shootSettings?.implementAll) {
+        let tempCategory = []
+        optionCategory?.map((option) => {
+          option?.category.map((val) => {
+            tempCategory.push(val)
+          });
+        });
+
+        setDataOption(dataOption.filter((el) => !tempCategory.includes(el)));
+      }
+
+    }
+  }, [shootSettings]);
 
   console.log(dataForm);
+  console.log(shootSettings);
+  console.log(dataOption);
 
   return (
     <SettingContainer>
@@ -167,24 +223,24 @@ function SettingShootTheBoard({ eventDetail }) {
         {dataForm?.activeSetting ? (
           <Section>
             <SettingContentContainer>
-              {dataForm?.shootRule.map((rule, index) => (
+              {dataForm?.shootRule?.map((rule, index) => (
                 <CategoryBlock key={index}>
                   <Section>
                     <SettingContentContainer>
                       <h5>Aturan Menembak</h5>
                       <FourColumnsInputsGrid>
-                        <FieldSelect options={numberKategori}><LabelRules>Jumlah Sesi per Kategori</LabelRules></FieldSelect>
-                        <FieldSelect options={numberRambahan}><LabelRules>Jumlah Rambahan</LabelRules></FieldSelect>
-                        <FieldSelect options={numberRambahan}><LabelRules>Jumlah Anak Panah per-Rambahan</LabelRules></FieldSelect>
+                        <FieldSelect value={{ label: rule.session, value: rule.session }} onChange={(event) => handleSelectRule('session', event, index)} options={numberKategori}><LabelRules>Jumlah Sesi per Kategori</LabelRules></FieldSelect>
+                        <FieldSelect value={{ label: rule.rambahan, value: rule.rambahan }} onChange={(event) => handleSelectRule('rambahan', event, index)} options={numberRambahan}><LabelRules>Jumlah Rambahan</LabelRules></FieldSelect>
+                        <FieldSelect value={{ label: rule.child_bow, value: rule.child_bow }} onChange={(event) => handleSelectRule('child_bow', event, index)} options={numberRambahan}><LabelRules>Jumlah Anak Panah per-Rambahan</LabelRules></FieldSelect>
                       </FourColumnsInputsGrid>
                       <EarlyBirdActivationBar>
                         <div>Terapkan ke kategori tertentu</div>
                         <ToggleSwitch
-                          checked={rule?.implementAll ? 1 : 0}
-                          onChange={(val) => handleImplemen(val, index)}
+                          checked={dataForm?.implementAll ? 0 : 1}
+                          onChange={(val) => handleImplemen(val)}
                         />
                       </EarlyBirdActivationBar>
-                      {rule.implementAll ?
+                      {!dataForm?.implementAll ?
                         <FieldSelectCategories
                           label="Kategori"
                           placeholder="Pilih opsi"
@@ -197,19 +253,30 @@ function SettingShootTheBoard({ eventDetail }) {
                     </SettingContentContainer>
                   </Section>
                   <div style={{ marginTop: '20px' }}>
-                    <Button flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
-                    {/* <Button disabled={dataForm?.implementAll || !dataForm?.activeSetting} flexible onClick={() => setData(data.filter((el, i) => i !== index))}><IconTrash size={12} /></Button> */}
-                    <Button flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
+                    <Button disabled={dataForm?.implementAll ? true : false} flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
+                    <Button disabled={index === 0 ? true : false} flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
                   </div>
                 </CategoryBlock>
               ))}
             </SettingContentContainer>
           </Section>) : undefined
         }
+
+        <BottomActions>
+          <ButtonBlue onClick={() => submit({
+            onSuccess: () => {
+              toast.success("Data telah tersimpan");
+              fetchRuleShootSetting();
+            },
+          })}>
+            Simpan
+          </ButtonBlue>
+        </BottomActions>
       </SpacedVertical>
 
-      <LoadingScreen loading={isLoading} />
+      <LoadingScreen loading={isLoading || isLoadingSubmit} />
       <AlertSubmitError isError={isErrorFetch} errors={errorsFetch} />
+      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
     </SettingContainer >
   )
 }
@@ -643,6 +710,31 @@ function ToggleSwitch({ checked, onChange, disabled }) {
       boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
     />
   );
+}
+
+function _makeShootRule(value, optionsCategories) {
+
+  const makeShootRule = (option) => ({
+    session: option.session,
+    rambahan: option.rambahan,
+    child_bow: option.arrow,
+    category: _checkCategoriesValue(optionsCategories, option.categories) || [],
+  });
+
+  switch (value.implementAll) {
+    case 0: {
+      return value.shootRule.map(makeShootRule);
+    }
+
+    case 1: {
+      return {
+        session: value.session,
+        rambahan: value.rambahan,
+        child_bow: value.childBow,
+        category: [],
+      };
+    }
+  }
 }
 
 export { ScreenRules };

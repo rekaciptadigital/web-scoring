@@ -33,8 +33,6 @@ const ListEvent = () => {
     getEvent()
   }, [])
   
-  console.log(listEvent)
-
   return (
     <React.Fragment>
       <div className="page-content">

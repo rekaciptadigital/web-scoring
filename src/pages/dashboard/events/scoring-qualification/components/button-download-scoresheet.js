@@ -67,6 +67,14 @@ function ButtonDownloadScoresheet({
             </DropdownItem>
           ))
         )}
+        <DropdownItem onClick={() => onDownload?.('qualification')}>
+          <ItemActionWrapper>
+            <span>Pemeringkatan</span>
+            <span>
+              <IconDownload size="16" />
+            </span>
+          </ItemActionWrapper>
+        </DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );

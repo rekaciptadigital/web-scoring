@@ -135,4 +135,20 @@ export default {
   getSelectionResult(qs) {
     return API.get("/web/v2/all-result-selection-score", qs);
   },
+
+  /**
+   * @param {Object} qs { event_id, event_category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getDownloadBaganElimination(qs) {
+    return API.get("/web/v1/archery/events/GetDownloadBaganElimination", qs);
+  },
+
+  /**
+   * @param {Object} qs { event_id, event_category_id }
+   * @returns {Promise} { success, data, errors, message }
+   */
+  getDownloadQualifficationRank(qs) {
+    return API.get("/web/v1/archery/events/report-list-qualification-rank-by-category-id", qs);
+  },
 };

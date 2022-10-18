@@ -166,14 +166,12 @@ function SettingShootTheBoard({ eventDetail }) {
 
   React.useEffect(() => {
     if (shootSettings) {
-      console.log('fetch data');
       const optionCategory = shootSettings?.implementAll ? [{
         session: shootSettings?.session,
         rambahan: shootSettings?.rambahan,
         child_bow: shootSettings?.childBow,
         category: []
       }] : _makeShootRule(shootSettings, optionsCategories);
-      console.log(optionCategory);
       setFormData({
         event_id: eventDetail.id,
         activeSetting: shootSettings?.activeSetting,
@@ -194,10 +192,6 @@ function SettingShootTheBoard({ eventDetail }) {
 
     }
   }, [shootSettings]);
-
-  console.log(dataForm);
-  console.log(shootSettings);
-  console.log(dataOption);
 
   return (
     <SettingContainer>
@@ -240,6 +234,9 @@ function SettingShootTheBoard({ eventDetail }) {
                           onChange={(val) => handleImplemen(val)}
                         />
                       </EarlyBirdActivationBar>
+                      <HelpDesk className="mt-2 mb-4">
+                        Apabila Anda mengaktifkan fitur ini maka aturan menembak hanya akan berlaku pada kategori tertentu yang Anda pilih.
+                      </HelpDesk>
                       {!dataForm?.implementAll ?
                         <FieldSelectCategories
                           label="Kategori"
@@ -610,7 +607,15 @@ const LabelRules = styled.span`
   font-weight: 400;
   font-size: 12px;
   line-height: 140%;
+`;
 
+const HelpDesk = styled.div`
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  margin-bottom: 20px;
 `;
 
 /* ============================ */

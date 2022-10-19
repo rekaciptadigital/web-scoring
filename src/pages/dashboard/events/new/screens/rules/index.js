@@ -17,17 +17,17 @@ import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
 import { useSubmitRuleSetting } from "./hooks/submit-rule-shoot-setting";
 
-function ScreenRules({ eventDetail }) {
+function ScreenRules({ eventDetail, setTriggerRule }) {
   return (
     <CardSheet>
       <Section>
-        <SettingShootTheBoard eventDetail={eventDetail} />
+        <SettingShootTheBoard eventDetail={eventDetail} setTriggerRule={setTriggerRule} />
       </Section>
       <Section>
         <SettingTargetFace eventDetail={eventDetail} />
       </Section>
       <Section>
-        <SettingsClubsRanking eventDetail={eventDetail} />
+        <SettingsClubsRanking eventDetail={eventDetail} setTriggerRule={setTriggerRule} />
       </Section>
     </CardSheet>
   );
@@ -77,7 +77,7 @@ function SettingShootTheBoard({ eventDetail }) {
   const {
     submit,
     isLoading: isLoadingSubmit,
-    isError: isErrorSubmit,
+    // isError: isErrorSubmit,
     errors: errorsSubmit,
   } = useSubmitRuleSetting(eventDetail?.id, dataForm);
 
@@ -162,6 +162,17 @@ function SettingShootTheBoard({ eventDetail }) {
       shootRule: shootRule
     }));
 
+  }
+
+  if (setTriggerRule.submitRule) {
+    submit({
+      onSuccess: () => {
+        fetchRuleShootSetting();
+      },
+      onError: () => {
+        setSubmitErrorRule({ isError: true, error: errorsSubmit })
+      }
+    });
   }
 
   React.useEffect(() => {
@@ -273,7 +284,7 @@ function SettingShootTheBoard({ eventDetail }) {
 
       <LoadingScreen loading={isLoading || isLoadingSubmit} />
       <AlertSubmitError isError={isErrorFetch} errors={errorsFetch} />
-      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
+      {/* <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} /> */}
     </SettingContainer >
   )
 }

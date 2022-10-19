@@ -145,6 +145,12 @@ function PageCreateEventFullday() {
   const isLoadingSubmit =
     isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates;
 
+  const [submitRule, setSubmitRule] = React.useState(false);
+  const [submitErrorRule, setSubmitErrorRule] = React.useState({ isError: false, error: null });
+  // const [submitSucessRule, setSubmitSucessRule] = React.useState(false);
+
+  const setTriggerRule = { submitRule, setSubmitRule, submitErrorRule, setSubmitErrorRule };
+
   return (
     <ContentLayoutWrapper
       pageTitle="Buat Event Baru"
@@ -381,13 +387,14 @@ function PageCreateEventFullday() {
             </StepHeader>
 
             <StepBody>
-              <ScreenRules eventDetail={eventDetail} />
+              <ScreenRules eventDetail={eventDetail} setTriggerRule={setTriggerRule} />
             </StepBody>
 
             <StepFooterActions>
               <ButtonSave
                 onSubmit={({ next }) => {
                   // TODO: next kalau valid / sudah simpan data
+                  // setSubmitRule
                   next();
                 }}
               >

@@ -64,6 +64,7 @@ function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
                           name={`shot-score-${rambahanIndex}-${shotIndex}`}
                           value={scoreItem}
                           onChange={(value) => {
+                            if(value === "-") value = "";
                             handleSelectScore({
                               rambahan: rambahanIndex,
                               shot: shotIndex,
@@ -276,7 +277,7 @@ function _convertScoreValueType(inputValue) {
 function _sumRambahanTotal(list) {
   const _sumReducer = (total, inputValue) => {
     const value = _convertScoreValueType(inputValue);
-    if (!inputValue || value === "m") {
+    if (!inputValue || value === "m" || value === "-") {
       return total;
     }
     if (value === "x") {

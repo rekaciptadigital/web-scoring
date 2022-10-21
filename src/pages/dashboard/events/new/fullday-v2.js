@@ -16,6 +16,11 @@ import { useSubmitPublicInfos } from "./hooks/submit-public-infos";
 import { useSubmitEventLogo } from "./hooks/submit-event-logo";
 import { useSubmitRegistrationDates } from "./hooks/submit-config-registration-dates";
 import { useSubmitCategories } from "./hooks/submit-categories";
+import { useSubmitRuleSetting } from "./screens/rules/hooks/submit-rule-shoot-setting";
+import { useFormRule } from "./hooks/form-rule";
+import { useShootRuleSetting } from "./screens/rules/hooks/shoot-rule-settings";
+import { useSubmitClubsRanking } from "./screens/rules/hooks/submit-clubs-ranking";
+import { useClubRankingSetting } from "./screens/rules/hooks/club-ranking-settings";
 
 import { AlertSubmitError, ButtonOutlineBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -71,6 +76,8 @@ function PageCreateEventFullday() {
   const { data: configRegistrationDates, fetch: fetchConfigRegistrationDates } =
     useConfigRegistrationDates(eventId);
   const { data: schedules } = schedulesProvider;
+  const { data: shootSettings, fetchRuleShootSetting } = useShootRuleSetting(eventId);
+  const { data: rankingSettings, fetchRankingSetting } = useClubRankingSetting(eventId);
 
   const eventType = _checkEventType(eventDetail, qsEventType);
   const matchType = _checkMatchType(eventDetail, qsMatchType);
@@ -87,25 +94,26 @@ function PageCreateEventFullday() {
     eventDetail,
     categoryDetails: categoriesQualification,
   });
+  const formRule = useFormRule({ eventDetail, rankingSettings });
 
   const emptyFormSequenceByStep = isTypeSelection
     ? {
-        1: formPublicInfos.isEmpty,
-        2: formFees.isEmpty,
-        3: formCategories.isEmpty,
-        4: formRegistrationDates.isFirstTimeCreatingConfig,
-        5: formSchedules.isEmpty,
-        6: !formSchedules.isEmpty,
-      }
+      1: formPublicInfos.isEmpty,
+      2: formFees.isEmpty,
+      3: formCategories.isEmpty,
+      4: formRegistrationDates.isFirstTimeCreatingConfig,
+      5: formSchedules.isEmpty,
+      6: !formSchedules.isEmpty,
+    }
     : {
-        1: formPublicInfos.isEmpty,
-        2: formFees.isEmpty,
-        3: formCategories.isEmpty,
-        4: formRegistrationDates.isFirstTimeCreatingConfig,
-        5: false, // selalu unlock apapun nilainya (sifatnya gak wajib diset)
-        6: formSchedules.isEmpty,
-        7: !formSchedules.isEmpty,
-      };
+      1: formPublicInfos.isEmpty,
+      2: formFees.isEmpty,
+      3: formCategories.isEmpty,
+      4: formRegistrationDates.isFirstTimeCreatingConfig,
+      5: false, // selalu unlock apapun nilainya (sifatnya gak wajib diset)
+      6: formSchedules.isEmpty,
+      7: !formSchedules.isEmpty,
+    };
 
   const lastUnlockedStep = computeLastUnlockedStep(emptyFormSequenceByStep);
 
@@ -142,8 +150,22 @@ function PageCreateEventFullday() {
     errors: errorsRegistrationDates,
   } = useSubmitRegistrationDates(eventDetail?.id, formRegistrationDates.data);
 
+  const {
+    submit: submitRuleSetting,
+    isLoading: isLoadingSubmitRule,
+    isError: isErrorSubmitRule,
+    errors: errorsSubmitRule,
+  } = useSubmitRuleSetting(eventDetail?.id, formRule.submitRule);
+
+  const {
+    submit : submitClubRank,
+    isLoading: isLoadingSubmitClubRank,
+    isError: isErrorSubmitClubRank,
+    errors: errorsSubmitClubRank,
+  } = useSubmitClubsRanking(eventDetail?.id, formRule.formPemeringkatan);
+
   const isLoadingSubmit =
-    isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates;
+    isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates || isLoadingSubmitRule || isLoadingSubmitClubRank;
 
   return (
     <ContentLayoutWrapper
@@ -157,6 +179,8 @@ function PageCreateEventFullday() {
       <AlertSubmitError isError={isErrorLogo} errors={errorsLogo} />
       <AlertSubmitError isError={isErrorCategories} errors={categoriesErrors} />
       <AlertSubmitError isError={isErrorRegistrationDates} errors={errorsRegistrationDates} />
+      <AlertSubmitError isError={isErrorSubmitRule} errors={errorsSubmitRule} />
+      <AlertSubmitError isError={isErrorSubmitClubRank} errors={errorsSubmitClubRank} />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
         <StepListIndicator title="Pertandingan">
@@ -381,17 +405,46 @@ function PageCreateEventFullday() {
             </StepHeader>
 
             <StepBody>
-              <ScreenRules eventDetail={eventDetail} />
+              <ScreenRules
+                eventDetail={eventDetail}
+                form={formRule}
+                shootSetting={shootSettings}
+                rankingSettings={rankingSettings}
+              />
             </StepBody>
 
             <StepFooterActions>
               <ButtonSave
-                onSubmit={({ next }) => {
+                onSubmit={() => {
                   // TODO: next kalau valid / sudah simpan data
-                  next();
+                  submitRuleSetting({
+                    onSuccess: () => {
+                      toast.success("Data telah tersimpan");
+                      fetchRuleShootSetting();
+                    },
+                  });
+
+                  formRule.handleValidation({
+                    onInvalid: (errors) => {
+                      // TODO: ke depan bisa kasih toast untuk display pesan error
+                      toast.error("Terjadi kesalahan saat menyimpan aturan pertandingan club");
+                      Object.values(errors).forEach((error) =>
+                        error.forEach((message) => console.error(message))
+                      );
+                    },
+                    onValid: () => {
+                      submitClubRank({
+                        onSuccess: () => {
+                          toast.success("Pengaturan untuk Pemeringkatan Klub berhasil disimpan");
+                          fetchRankingSetting();
+                        },
+                      });
+                    },
+                  })
+                  // next();
                 }}
               >
-                Selanjutnya
+                Simpan
               </ButtonSave>
             </StepFooterActions>
           </StepContent>

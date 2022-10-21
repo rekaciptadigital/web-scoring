@@ -212,7 +212,7 @@ function _sumTotalShootOffScores(shootOffScoresList) {
 
   const _sumReducer = (total, inputValue) => {
     const value = _convertScoreValueType(inputValue.score);
-    if (!inputValue.score || value === "m") {
+    if (!inputValue.score || value === "m" || value === "-") {
       return total;
     }
     if (value === "x") {

@@ -2,46 +2,35 @@ import * as React from "react";
 import styled from "styled-components";
 import Switch from "react-switch";
 
-import { useClubRankingSetting } from "./hooks/club-ranking-settings";
 import { useFormRankingSetting } from "./hooks/form-ranking-settings";
-import { useSubmitClubsRanking } from "./hooks/submit-clubs-ranking";
-import { useShootRuleSetting } from "./hooks/shoot-rule-settings";
 
-import { ButtonBlue, LoadingScreen, SpinnerDotBlock, AlertSubmitError, Button } from "components/ma";
-import { toast } from "components/ma/processing-toast";
+import { SpinnerDotBlock, Button } from "components/ma";
 import { FieldInputText, FieldInputTextSmall, FieldSelect } from "pages/dashboard/events/components/form-fields";
 import { SelectRadio } from "../../components/select-radio";
 import { FieldSelectCategories } from "./components/field-select-categories";
 import { FieldSelectOption } from "../field-select-option";
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
-import { useSubmitRuleSetting } from "./hooks/submit-rule-shoot-setting";
+import { useSubmitFormRuleSetting } from "./hooks/form-rule-shoot-setting";
+import { useSubmitFormClubRank } from "./hooks/form-club-ranking";
 
-function ScreenRules({ eventDetail, setTriggerRule }) {
+function ScreenRules({ eventDetail, form, shootSetting, rankingSettings }) {
   return (
     <CardSheet>
       <Section>
-        <SettingShootTheBoard eventDetail={eventDetail} setTriggerRule={setTriggerRule} />
+        <SettingShootTheBoard eventDetail={eventDetail} form={form} shootSettings={shootSetting} />
       </Section>
       <Section>
         <SettingTargetFace eventDetail={eventDetail} />
       </Section>
       <Section>
-        <SettingsClubsRanking eventDetail={eventDetail} setTriggerRule={setTriggerRule} />
+        <SettingsClubsRanking eventDetail={eventDetail} form={form} rankingSettings={rankingSettings} />
       </Section>
     </CardSheet>
   );
 }
 
-function SettingShootTheBoard({ eventDetail }) {
-
-  const {
-    data: shootSettings,
-    isLoading,
-    isError: isErrorFetch,
-    errors: errorsFetch,
-    fetchRuleShootSetting,
-  } = useShootRuleSetting(eventDetail?.id);
+function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
 
   const numberKategori = [...new Array(6)].map((item, index) => {
     return { label: index + 1, value: index + 1 }
@@ -74,13 +63,7 @@ function SettingShootTheBoard({ eventDetail }) {
   const [dataOption, setDataOption] = React.useState(optionsCategories);
   const [dataForm, setFormData] = React.useState(initialData);
 
-  const {
-    submit,
-    isLoading: isLoadingSubmit,
-    // isError: isErrorSubmit,
-    errors: errorsSubmit,
-  } = useSubmitRuleSetting(eventDetail?.id, dataForm);
-
+  useSubmitFormRuleSetting(dataForm, form.setSubmitRule);
 
   const handleSelect = (value, index) => {
 
@@ -162,17 +145,6 @@ function SettingShootTheBoard({ eventDetail }) {
       shootRule: shootRule
     }));
 
-  }
-
-  if (setTriggerRule.submitRule) {
-    submit({
-      onSuccess: () => {
-        fetchRuleShootSetting();
-      },
-      onError: () => {
-        setSubmitErrorRule({ isError: true, error: errorsSubmit })
-      }
-    });
   }
 
   React.useEffect(() => {
@@ -270,20 +242,8 @@ function SettingShootTheBoard({ eventDetail }) {
           </Section>) : undefined
         }
 
-        <BottomActions>
-          <ButtonBlue onClick={() => submit({
-            onSuccess: () => {
-              toast.success("Data telah tersimpan");
-              fetchRuleShootSetting();
-            },
-          })}>
-            Simpan
-          </ButtonBlue>
-        </BottomActions>
       </SpacedVertical>
-
-      <LoadingScreen loading={isLoading || isLoadingSubmit} />
-      <AlertSubmitError isError={isErrorFetch} errors={errorsFetch} />
+      {/* <AlertSubmitError isError={isErrorFetch} errors={errorsFetch} /> */}
       {/* <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} /> */}
     </SettingContainer >
   )
@@ -368,12 +328,12 @@ function SettingTargetFace({ eventDetail }) {
   )
 }
 
-function SettingsClubsRanking({ eventDetail }) {
-  const {
-    data: rankingSettings,
-    isLoading,
-    fetchRankingSetting,
-  } = useClubRankingSetting(eventDetail?.id);
+function SettingsClubsRanking({ eventDetail, form, rankingSettings }) {
+  // const {
+  //   data: rankingSettings,
+  //   isLoading,
+  //   fetchRankingSetting,
+  // } = useClubRankingSetting(eventDetail?.id);
 
   const categoryDetails = eventDetail?.eventCategories;
   const optionsCategories = React.useMemo(
@@ -394,16 +354,11 @@ function SettingsClubsRanking({ eventDetail }) {
     [rankingSettings, optionsCategories, optionsCountingTypes]
   );
 
-  const { data, errors, updateField, setType, handleValidation } =
-    useFormRankingSetting(initialValues);
+  const { data, errors, updateField, setType } = useFormRankingSetting(initialValues);
+  
   const { type, rankingName, categories, medalCountingType } = data;
 
-  const {
-    submit,
-    isLoading: isLoadingSubmit,
-    isError: isErrorSubmit,
-    errors: errorsSubmit,
-  } = useSubmitClubsRanking(eventDetail?.id, data);
+  useSubmitFormClubRank(data, form.setFormPemeringkatan);
 
   return (
     <SettingContainer>
@@ -488,38 +443,9 @@ function SettingsClubsRanking({ eventDetail }) {
               </React.Fragment>
             )}
 
-            <div>
-              <BottomActions>
-                <ButtonBlue
-                  onClick={() =>
-                    handleValidation({
-                      onInvalid: (errors) => {
-                        // TODO: ke depan bisa kasih toast untuk display pesan error
-                        Object.values(errors).forEach((error) =>
-                          error.forEach((message) => console.error(message))
-                        );
-                      },
-                      onValid: () => {
-                        submit({
-                          onSuccess: () => {
-                            toast.success("Pengaturan untuk Pemeringkatan Klub berhasil disimpan");
-                            fetchRankingSetting();
-                          },
-                        });
-                      },
-                    })
-                  }
-                >
-                  Simpan
-                </ButtonBlue>
-              </BottomActions>
-            </div>
           </React.Fragment>
         )}
       </SpacedVertical>
-
-      <LoadingScreen loading={isLoadingSubmit} />
-      <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} />
     </SettingContainer>
   );
 }
@@ -566,12 +492,6 @@ const SubtleFieldNote = styled.div`
   margin-top: 0.5rem;
   color: var(--ma-gray-600);
   font-size: 0.9em;
-`;
-
-const BottomActions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
 `;
 
 const EarlyBirdActivationBar = styled.div`

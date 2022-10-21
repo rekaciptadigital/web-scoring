@@ -251,7 +251,7 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
 
 function SettingTargetFace({ eventDetail }) {
 
-  const numberKategori = [...new Array(12)].map((item, index) => {
+  const numberKategori = [...new Array(6)].map((item, index) => {
     return { label: index + 1, value: index + 1 }
   })
 
@@ -265,7 +265,135 @@ function SettingTargetFace({ eventDetail }) {
     [categoryDetails]
   );
 
-  const [data, setData] = React.useState([{ data: 'rules' }])
+  const dataShootRule = {
+    session: null,
+    rambahan: null,
+    child_bow: null,
+    category: []
+  };
+
+  const initialData = {
+    event_id: eventDetail.id,
+    activeSetting: null,
+    implementAll: 1,
+    shootRule: [dataShootRule]
+  }
+
+  const [dataOption, setDataOption] = React.useState(optionsCategories);
+  const [dataForm, setFormData] = React.useState(initialData);
+
+  useSubmitFormRuleSetting(dataForm, form.setSubmitRule);
+
+  const handleSelect = (value, index) => {
+
+    let categories = dataForm.shootRule[index].category.length;
+    if (categories < value.length || categories === 0) {
+      if (dataForm.shootRule[index].session >= value.length) {
+        const shootRule = dataForm.shootRule.map((field, i) => {
+          if (i == index) {
+            const category = [...field.category, value[value.length - 1]];
+            return { ...field, category }
+          }
+          return field
+        });
+
+        setFormData({
+          ...dataForm,
+          shootRule
+        });
+
+        value.map((val) => {
+          setDataOption(dataOption.filter((el) => el !== val));
+        })
+      }
+
+    } else {
+
+      dataForm.shootRule[index].category.map((val) => {
+        setDataOption([...dataOption, val]);
+      });
+
+      let shootRule = dataForm.shootRule;
+      shootRule[index].category = value;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        shootRule: shootRule
+      }));
+    }
+  }
+
+  const handleAdd = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      shootRule: [...prevData.shootRule, dataShootRule]
+    }));
+  }
+
+  const handleDelete = (index) => {
+
+    let tempCategory = dataOption;
+    dataForm.shootRule[index].category.map((val) => {
+      tempCategory.push(val);
+    });
+
+    setDataOption(tempCategory);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      shootRule: [...prevData.shootRule.filter((el, i) => i !== index)]
+    }));
+
+  }
+
+  const handleImplemen = (value) => {
+    if (dataForm?.shootRule.length === 1) {
+      setFormData((prevState) => ({
+        ...prevState,
+        implementAll: value ? 0 : 1
+      }));
+    }
+  }
+
+  const handleSelectRule = (name, event, index) => {
+    let shootRule = dataForm.shootRule;
+    shootRule[index][name] = event.value;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      shootRule: shootRule
+    }));
+
+  }
+
+  React.useEffect(() => {
+    if (shootSettings) {
+      const optionCategory = shootSettings?.implementAll ? [{
+        session: shootSettings?.session,
+        rambahan: shootSettings?.rambahan,
+        child_bow: shootSettings?.childBow,
+        category: []
+      }] : _makeShootRule(shootSettings, optionsCategories);
+      setFormData({
+        event_id: eventDetail.id,
+        activeSetting: shootSettings?.activeSetting,
+        implementAll: shootSettings?.implementAll,
+        shootRule: optionCategory
+      });
+
+      if (!shootSettings?.implementAll) {
+        let tempCategory = []
+        optionCategory?.map((option) => {
+          option?.category.map((val) => {
+            tempCategory.push(val)
+          });
+        });
+
+        setDataOption(dataOption.filter((el) => !tempCategory.includes(el)));
+      }
+
+    }
+  }, [shootSettings]);
 
   return (
     <SettingContainer>
@@ -314,8 +442,8 @@ function SettingTargetFace({ eventDetail }) {
                   </SettingContentContainer>
                 </Section>
                 <div style={{ marginTop: '20px' }}>
-                  <Button flexible onClick={() => setData([...data, { data: 'rules' }])}><IconPlus size={12} /></Button><br />
-                  <Button flexible onClick={() => setData(data.filter((el, i) => i !== index))}><IconTrash size={12} /></Button>
+                  <Button disabled={dataForm?.implementAll ? true : false} flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
+                  <Button disabled={index === 0 ? true : false} flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
                 </div>
               </CategoryBlock>
             ))}

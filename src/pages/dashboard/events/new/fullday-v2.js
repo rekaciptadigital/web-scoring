@@ -163,6 +163,13 @@ function PageCreateEventFullday() {
     isError: isErrorSubmitClubRank,
     errors: errorsSubmitClubRank,
   } = useSubmitClubsRanking(eventDetail?.id, formRule.formPemeringkatan);
+  
+  const {
+    submit : submitClubRank,
+    isLoading: isLoadingSubmitClubRank,
+    isError: isErrorSubmitClubRank,
+    errors: errorsSubmitClubRank,
+  } = useSubmitClubsRanking(eventDetail?.id, formRule.formPemeringkatan);
 
   const isLoadingSubmit =
     isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates || isLoadingSubmitRule || isLoadingSubmitClubRank;

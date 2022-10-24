@@ -21,6 +21,7 @@ import { useFormRule } from "./hooks/form-rule";
 import { useShootRuleSetting } from "./screens/rules/hooks/shoot-rule-settings";
 import { useSubmitClubsRanking } from "./screens/rules/hooks/submit-clubs-ranking";
 import { useClubRankingSetting } from "./screens/rules/hooks/club-ranking-settings";
+import { useFaceTargetSetting } from "./screens/rules/hooks/face-target-settings";
 
 import { AlertSubmitError, ButtonOutlineBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -77,6 +78,10 @@ function PageCreateEventFullday() {
     useConfigRegistrationDates(eventId);
   const { data: schedules } = schedulesProvider;
   const { data: shootSettings, fetchRuleShootSetting } = useShootRuleSetting(eventId);
+  const { 
+    data: targetfacegSettings, 
+    // fetchTargetFaceSetting 
+  } = useFaceTargetSetting(eventId);
   const { data: rankingSettings, fetchRankingSetting } = useClubRankingSetting(eventId);
 
   const eventType = _checkEventType(eventDetail, qsEventType);
@@ -157,13 +162,6 @@ function PageCreateEventFullday() {
     errors: errorsSubmitRule,
   } = useSubmitRuleSetting(eventDetail?.id, formRule.submitRule);
 
-  const {
-    submit : submitClubRank,
-    isLoading: isLoadingSubmitClubRank,
-    isError: isErrorSubmitClubRank,
-    errors: errorsSubmitClubRank,
-  } = useSubmitClubsRanking(eventDetail?.id, formRule.formPemeringkatan);
-  
   const {
     submit : submitClubRank,
     isLoading: isLoadingSubmitClubRank,
@@ -417,6 +415,7 @@ function PageCreateEventFullday() {
                 form={formRule}
                 shootSetting={shootSettings}
                 rankingSettings={rankingSettings}
+                targetfacegSettings={targetfacegSettings}
               />
             </StepBody>
 

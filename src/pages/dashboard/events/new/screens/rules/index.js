@@ -14,14 +14,14 @@ import IconTrash from "components/ma/icons/mono/trash";
 import { useSubmitFormRuleSetting } from "./hooks/form-rule-shoot-setting";
 import { useSubmitFormClubRank } from "./hooks/form-club-ranking";
 
-function ScreenRules({ eventDetail, form, shootSetting, rankingSettings }) {
+function ScreenRules({ eventDetail, form, shootSetting, rankingSettings, targetfacegSettings }) {
   return (
     <CardSheet>
       <Section>
         <SettingShootTheBoard eventDetail={eventDetail} form={form} shootSettings={shootSetting} />
       </Section>
       <Section>
-        <SettingTargetFace eventDetail={eventDetail} />
+        <SettingTargetFace eventDetail={eventDetail} form={form} targetfacegSettings={targetfacegSettings} />
       </Section>
       <Section>
         <SettingsClubsRanking eventDetail={eventDetail} form={form} rankingSettings={rankingSettings} />
@@ -249,7 +249,7 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
   )
 }
 
-function SettingTargetFace({ eventDetail }) {
+function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
 
   const numberKategori = [...new Array(6)].map((item, index) => {
     return { label: index + 1, value: index + 1 }
@@ -284,44 +284,44 @@ function SettingTargetFace({ eventDetail }) {
 
   useSubmitFormRuleSetting(dataForm, form.setSubmitRule);
 
-  const handleSelect = (value, index) => {
+  // const handleSelect = (value, index) => {
 
-    let categories = dataForm.shootRule[index].category.length;
-    if (categories < value.length || categories === 0) {
-      if (dataForm.shootRule[index].session >= value.length) {
-        const shootRule = dataForm.shootRule.map((field, i) => {
-          if (i == index) {
-            const category = [...field.category, value[value.length - 1]];
-            return { ...field, category }
-          }
-          return field
-        });
+  //   let categories = dataForm.shootRule[index].category.length;
+  //   if (categories < value.length || categories === 0) {
+  //     if (dataForm.shootRule[index].session >= value.length) {
+  //       const shootRule = dataForm.shootRule.map((field, i) => {
+  //         if (i == index) {
+  //           const category = [...field.category, value[value.length - 1]];
+  //           return { ...field, category }
+  //         }
+  //         return field
+  //       });
 
-        setFormData({
-          ...dataForm,
-          shootRule
-        });
+  //       setFormData({
+  //         ...dataForm,
+  //         shootRule
+  //       });
 
-        value.map((val) => {
-          setDataOption(dataOption.filter((el) => el !== val));
-        })
-      }
+  //       value.map((val) => {
+  //         setDataOption(dataOption.filter((el) => el !== val));
+  //       })
+  //     }
 
-    } else {
+  //   } else {
 
-      dataForm.shootRule[index].category.map((val) => {
-        setDataOption([...dataOption, val]);
-      });
+  //     dataForm.shootRule[index].category.map((val) => {
+  //       setDataOption([...dataOption, val]);
+  //     });
 
-      let shootRule = dataForm.shootRule;
-      shootRule[index].category = value;
+  //     let shootRule = dataForm.shootRule;
+  //     shootRule[index].category = value;
 
-      setFormData((prevData) => ({
-        ...prevData,
-        shootRule: shootRule
-      }));
-    }
-  }
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       shootRule: shootRule
+  //     }));
+  //   }
+  // }
 
   const handleAdd = () => {
     setFormData((prevData) => ({
@@ -346,28 +346,28 @@ function SettingTargetFace({ eventDetail }) {
 
   }
 
-  const handleImplemen = (value) => {
-    if (dataForm?.shootRule.length === 1) {
-      setFormData((prevState) => ({
-        ...prevState,
-        implementAll: value ? 0 : 1
-      }));
-    }
-  }
+  // const handleImplemen = (value) => {
+  //   if (dataForm?.shootRule.length === 1) {
+  //     setFormData((prevState) => ({
+  //       ...prevState,
+  //       implementAll: value ? 0 : 1
+  //     }));
+  //   }
+  // }
 
-  const handleSelectRule = (name, event, index) => {
-    let shootRule = dataForm.shootRule;
-    shootRule[index][name] = event.value;
+  // const handleSelectRule = (name, event, index) => {
+  //   let shootRule = dataForm.shootRule;
+  //   shootRule[index][name] = event.value;
 
-    setFormData((prevData) => ({
-      ...prevData,
-      shootRule: shootRule
-    }));
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     shootRule: shootRule
+  //   }));
 
-  }
+  // }
 
   React.useEffect(() => {
-    if (shootSettings) {
+    if (targetfacegSettings) {
       const optionCategory = shootSettings?.implementAll ? [{
         session: shootSettings?.session,
         rambahan: shootSettings?.rambahan,
@@ -426,7 +426,7 @@ function SettingTargetFace({ eventDetail }) {
                   <SettingContentContainer>
                     <h5>Aturan Target Face</h5>
                     <FourColumnsInputsGrid>
-                      <FieldSelect options={numberKategori}><LabelRules>Jumlah Ring pada Target Face</LabelRules></FieldSelect>
+                      <FieldSelect value={{ label: rule.session, value: rule.session }} options={numberKategori}><LabelRules>Jumlah Ring pada Target Face</LabelRules></FieldSelect>
                       <FieldInputText type="number" placeholder="Masukkan angka"><LabelRules>Nilai Skor Tertinggi</LabelRules></FieldInputText>
                       <FieldSelect options={numberRambahan}><LabelRules>Nilai Skor “X”</LabelRules></FieldSelect>
                     </FourColumnsInputsGrid>
@@ -483,7 +483,7 @@ function SettingsClubsRanking({ eventDetail, form, rankingSettings }) {
   );
 
   const { data, errors, updateField, setType } = useFormRankingSetting(initialValues);
-  
+
   const { type, rankingName, categories, medalCountingType } = data;
 
   useSubmitFormClubRank(data, form.setFormPemeringkatan);

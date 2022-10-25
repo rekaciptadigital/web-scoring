@@ -251,14 +251,6 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
 
 function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
 
-  const numberKategori = [...new Array(6)].map((item, index) => {
-    return { label: index + 1, value: index + 1 }
-  })
-
-  const numberRambahan = [...new Array(12)].map((item, index) => {
-    return { label: index + 1, value: index + 1 }
-  })
-
   const categoryDetails = eventDetail?.eventCategories;
   const optionsCategories = React.useMemo(
     () => _makeOptionsCategory(categoryDetails),
@@ -266,23 +258,32 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
   );
 
   const dataShootRule = {
-    session: null,
-    rambahan: null,
-    child_bow: null,
+    highest_score: 0,
+    score_x: 0,
     category: []
   };
 
   const initialData = {
     event_id: eventDetail.id,
-    activeSetting: null,
+    activeSetting: 0,
     implementAll: 1,
-    shootRule: [dataShootRule]
+    categories_config: [dataShootRule]
   }
 
   const [dataOption, setDataOption] = React.useState(optionsCategories);
   const [dataForm, setFormData] = React.useState(initialData);
 
   useSubmitFormRuleSetting(dataForm, form.setSubmitRule);
+
+  const numberRambahan = (number) => {
+    console.log(number);
+
+    const numbers = [...new Array(number)].map((item, index) => {
+      return { label: index + 1, value: index + 1 }
+    });
+
+    return numbers;
+  }
 
   // const handleSelect = (value, index) => {
 
@@ -326,14 +327,14 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
   const handleAdd = () => {
     setFormData((prevData) => ({
       ...prevData,
-      shootRule: [...prevData.shootRule, dataShootRule]
+      categories_config: [...prevData.categories_config, dataShootRule]
     }));
   }
 
   const handleDelete = (index) => {
 
     let tempCategory = dataOption;
-    dataForm.shootRule[index].category.map((val) => {
+    dataForm.categories_config[index].category.map((val) => {
       tempCategory.push(val);
     });
 
@@ -341,7 +342,7 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
 
     setFormData((prevData) => ({
       ...prevData,
-      shootRule: [...prevData.shootRule.filter((el, i) => i !== index)]
+      categories_config: [...prevData.categories_config.filter((el, i) => i !== index)]
     }));
 
   }
@@ -355,33 +356,32 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
   //   }
   // }
 
-  // const handleSelectRule = (name, event, index) => {
-  //   let shootRule = dataForm.shootRule;
-  //   shootRule[index][name] = event.value;
+  const handleSelectRule = (event, name, index) => {
+    let categories_config = dataForm.categories_config;
+    categories_config[index][name] = event.value;
 
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     shootRule: shootRule
-  //   }));
+    setFormData((prevData) => ({
+      ...prevData,
+      categories_config: categories_config
+    }));
 
-  // }
+  }
 
   React.useEffect(() => {
     if (targetfacegSettings) {
-      const optionCategory = shootSettings?.implementAll ? [{
-        session: shootSettings?.session,
-        rambahan: shootSettings?.rambahan,
-        child_bow: shootSettings?.childBow,
+      const optionCategory = targetfacegSettings?.implementAll ? [{
+        highest_score: targetfacegSettings?.highestScore,
+        score_x: targetfacegSettings?.scoreX,
         category: []
-      }] : _makeShootRule(shootSettings, optionsCategories);
+      }] : _makeShootRule(targetfacegSettings, optionsCategories);
       setFormData({
         event_id: eventDetail.id,
-        activeSetting: shootSettings?.activeSetting,
-        implementAll: shootSettings?.implementAll,
-        shootRule: optionCategory
+        activeSetting: targetfacegSettings?.activeSetting,
+        implementAll: targetfacegSettings?.implementAll,
+        categories_config: optionCategory
       });
 
-      if (!shootSettings?.implementAll) {
+      if (!targetfacegSettings?.implementAll) {
         let tempCategory = []
         optionCategory?.map((option) => {
           option?.category.map((val) => {
@@ -393,7 +393,10 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
       }
 
     }
-  }, [shootSettings]);
+  }, [targetfacegSettings]);
+
+  console.log(targetfacegSettings);
+  console.log(dataForm);
 
   return (
     <SettingContainer>
@@ -407,50 +410,58 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
         <EarlyBirdActivationBar>
           <div>Aktifkan Pengaturan Target Face Custom</div>
           <ToggleSwitch
-          // checked={data.isPrivate ? 1 : 0}
-          // onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
+            checked={dataForm?.activeSetting}
+            onChange={(val) => {
+              setFormData((prevState) => ({
+                ...prevState,
+                activeSetting: val ? 1 : 0
+              }));
+            }}
           />
         </EarlyBirdActivationBar>
-        <Section>
-          <SettingContentContainer>
-            <EarlyBirdActivationBar>
-              <div>Terapkan ke semua kategori</div>
-              <ToggleSwitch
-              // checked={data.isPrivate ? 1 : 0}
-              // onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
-              />
-            </EarlyBirdActivationBar>
-            {data.map((rule, index) => (
-              <CategoryBlock key={index}>
-                <Section>
-                  <SettingContentContainer>
-                    <h5>Aturan Target Face</h5>
-                    <FourColumnsInputsGrid>
-                      <FieldSelect value={{ label: rule.session, value: rule.session }} options={numberKategori}><LabelRules>Jumlah Ring pada Target Face</LabelRules></FieldSelect>
-                      <FieldInputText type="number" placeholder="Masukkan angka"><LabelRules>Nilai Skor Tertinggi</LabelRules></FieldInputText>
-                      <FieldSelect options={numberRambahan}><LabelRules>Nilai Skor “X”</LabelRules></FieldSelect>
-                    </FourColumnsInputsGrid>
-                    <FieldSelectCategories
-                      label="Kategori"
-                      placeholder="Pilih opsi"
-                      required
-                      options={optionsCategories}
-                    // value={categories}
-                    // onChange={(value) => updateField("categories", value || [])}
-                    // errors={errors.categories}
-                    />
-                  </SettingContentContainer>
-                </Section>
-                <div style={{ marginTop: '20px' }}>
-                  <Button disabled={dataForm?.implementAll ? true : false} flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
-                  <Button disabled={index === 0 ? true : false} flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
-                </div>
-              </CategoryBlock>
-            ))}
-
-
-          </SettingContentContainer>
-        </Section>
+        {dataForm?.activeSetting ? (
+          <Section>
+            <SettingContentContainer>
+              {dataForm.categories_config?.map((rule, index) => (
+                <CategoryBlock key={index}>
+                  <Section>
+                    <SettingContentContainer>
+                      <h5>Aturan Menembak</h5>
+                      <SecondColumnsInputsGrid>
+                        <FieldInputText onChange={(value) => handleSelectRule(value, 'highest_score', index)} type="number" placeholder="Masukkan angka" value={rule.highest_score}><LabelRules>Nilai Skor Tertinggi</LabelRules></FieldInputText>
+                        <FieldSelect value={{ label: rule.score_x, value: rule.score_x }} onChange={(event) => handleSelectRule('score_x', event, index)} options={numberRambahan(rule.highest_score)}><LabelRules>Nilai Skor X</LabelRules></FieldSelect>
+                      </SecondColumnsInputsGrid>
+                      <EarlyBirdActivationBar>
+                        <div>Terapkan ke kategori tertentu</div>
+                        <ToggleSwitch
+                          checked={dataForm?.implementAll ? 0 : 1}
+                          onChange={(val) => handleImplemen(val)}
+                        />
+                      </EarlyBirdActivationBar>
+                      <HelpDesk className="mt-2 mb-4">
+                        Apabila Anda mengaktifkan fitur ini maka aturan menembak hanya akan berlaku pada kategori tertentu yang Anda pilih.
+                      </HelpDesk>
+                      {!dataForm?.implementAll ?
+                        <FieldSelectCategories
+                          label="Kategori"
+                          placeholder="Pilih opsi"
+                          required
+                          options={dataOption}
+                          value={rule?.category}
+                          onChange={(value) => handleSelect(value ?? [], index)}
+                        />
+                        : undefined}
+                    </SettingContentContainer>
+                  </Section>
+                  <div style={{ marginTop: '20px' }}>
+                    <Button disabled={dataForm?.implementAll ? true : false} flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
+                    <Button disabled={index === 0 ? true : false} flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
+                  </div>
+                </CategoryBlock>
+              ))}
+            </SettingContentContainer>
+          </Section>) : undefined
+        }
       </SpacedVertical>
     </SettingContainer >
   )
@@ -637,6 +648,13 @@ const EarlyBirdActivationBar = styled.div`
 const FourColumnsInputsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-top: 20px;
+`;
+
+const SecondColumnsInputsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
   margin-top: 20px;
 `;

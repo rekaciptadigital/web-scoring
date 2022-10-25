@@ -4,13 +4,17 @@ import { useParams } from "react-router-dom";
 import { useEventDetail } from "../hooks/event-detail";
 import { useCategoryDetails } from "./hooks/category-details";
 
-import { SpinnerDotBlock } from "components/ma";
+import { AlertSubmitError, ButtonOutlineBlue, SpinnerDotBlock } from "components/ma";
+import { toast } from "components/ma/processing-toast";
+import IconDownload from "components/ma/icons/mono/download";
+
 import { PageWrapper } from "../components/dos-page-wrapper";
 import { PageHeader } from "../components/page-header";
 import { ToolbarFilter } from "../components/toolbar-filters";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 import { ScoringTable } from "./components/scoring-table";
 import { ScoringTableTeam } from "./components/scoring-table-team";
+import { useDownloadBaganElimination } from "pages/dashboard/events/scoring-elimination/hooks/download-bagan-elimination";
 
 const pageProps = {
   pageTitle: "Eliminasi",
@@ -30,6 +34,12 @@ function PageDosElimination() {
 
   const [activeCategory, setActiveCategory] = React.useState(null);
   const isIndividual = activeCategory?.categoryTeam?.toLowerCase?.() !== "team";
+
+  const {
+    download: downloadBagan,
+    errors: errorDonwloadBagan,
+    isError: isErrorDownloadBagan
+  } = useDownloadBaganElimination(eventId, activeCategory?.id);
 
   const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
 
@@ -75,6 +85,24 @@ function PageDosElimination() {
           onChange={(value) => setActiveCategory(value?.categoryDetail)}
           viewRight={
             <div>
+              <ButtonOutlineBlue style={{ marginRight: '10px' }} onClick={() => {
+                toast.loading("Sedang memproses unduhan...");
+                downloadBagan({
+                  onSuccess() {
+                    toast.dismiss();
+                    toast.success("Memulai unduhan...");
+                  },
+                  onError() {
+                    toast.dismiss();
+                    toast.error("Gagal memulai unduhan");
+                  },
+                });
+              }}>
+                <span>
+                  <IconDownload size="16" />
+                </span>{" "}
+                <span>Cetak Bagan</span>
+              </ButtonOutlineBlue>
               <ButtonShowBracket categoryDetailId={activeCategory?.id} />
             </div>
           }
@@ -102,6 +130,7 @@ function PageDosElimination() {
           )}
         </Content>
       </CardWrapper>
+      <AlertSubmitError isError={isErrorDownloadBagan} errors={errorDonwloadBagan} />
     </PageWrapper>
   );
 }

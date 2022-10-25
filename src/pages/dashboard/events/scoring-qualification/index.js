@@ -23,6 +23,7 @@ import { ButtonCancelBracket } from "./components/button-cancel-bracket";
 import { ButtonShowBracket } from "./components/button-show-bracket";
 
 import IconCheck from "components/ma/icons/fill/check";
+import { useQualificationDownload } from "./hooks/qualification-download";
 
 const optionsParticipantsCount = [
   { value: 4, label: "4 Besar" },
@@ -75,6 +76,8 @@ function PageEventScoringQualification() {
   } = useSubmitEliminationConfig(activeCategory?.id);
 
   const { download } = useScoresheetDownload(activeCategory?.id);
+  const { download: downloadQualification } = useQualificationDownload(eventId, activeCategory?.id);
+
   const {
     download: downloadSelection,
     isError: isErrorDownloadSelection,
@@ -130,16 +133,28 @@ function PageEventScoringQualification() {
                 sessionCount={activeCategory?.sessionInQualification}
                 disabled={!isIndividual}
                 onDownload={(sessionNumber) => {
-                  toast.loading("Sedang menyiapkan file scoresheet...");
-                  downloadSelection(sessionNumber, {
-                    onSuccess: () => {
-                      toast.dismiss();
-                    },
-                    onError: () => {
-                      toast.dismiss();
-                      toast.error("Gagal memulai unduhan");
-                    },
-                  });
+                  toast.loading("Sedang menyiapkan file...");
+                  if (sessionNumber == 'qualification') {
+                    downloadQualification({
+                      onSuccess: () => {
+                        toast.dismiss();
+                      },
+                      onError: () => {
+                        toast.dismiss();
+                        toast.error("Gagal memulai unduhan");
+                      },
+                    });
+                  } else {
+                    downloadSelection(sessionNumber, {
+                      onSuccess: () => {
+                        toast.dismiss();
+                      },
+                      onError: () => {
+                        toast.dismiss();
+                        toast.error("Gagal memulai unduhan");
+                      },
+                    });
+                  }
                 }}
               />
             </div>
@@ -198,13 +213,25 @@ function PageEventScoringQualification() {
                   sessionCount={activeCategory?.sessionInQualification}
                   disabled={!isIndividual}
                   onDownload={(sessionNumber) => {
-                    toast.loading("Sedang menyiapkan dokumen scoresheet...");
-                    const options = {
-                      onSuccess: () => {
-                        toast.dismiss();
-                      },
-                    };
-                    download(sessionNumber, options);
+                    toast.loading("Sedang menyiapkan dokumen...");
+                    if (sessionNumber === 'qualification') {
+                      downloadQualification({
+                        onSuccess: () => {
+                          toast.dismiss();
+                        },
+                        onError: () => {
+                          toast.dismiss();
+                          toast.error("Gagal memulai unduhan");
+                        },
+                      });
+                    } else {
+                      const options = {
+                        onSuccess: () => {
+                          toast.dismiss();
+                        },
+                      };
+                      download(sessionNumber, options);
+                    }
                   }}
                 />
 

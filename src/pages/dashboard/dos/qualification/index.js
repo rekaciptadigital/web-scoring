@@ -21,6 +21,7 @@ import { ScoringTable } from "./components/scoring-table";
 import { ScoringTeamTable } from "./components/scoring-table/reguTable";
 
 import IconDownload from "components/ma/icons/mono/download";
+import { useQualificationDownload } from "pages/dashboard/events/scoring-qualification/hooks/qualification-download";
 
 const pageProps = {
   pageTitle: "Kualifikasi",
@@ -42,6 +43,7 @@ function PageDosQualification() {
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
   const [session, setSession] = React.useState(0);
   const { handleDownloadSession } = useSessionDownload(activeCategory?.id);
+  const { download: downloadQualification } = useQualificationDownload(eventId, activeCategory?.id);
 
   // TODO:
   const resetOnChangeCategory = () => {
@@ -114,16 +116,28 @@ function PageDosQualification() {
               sessionOptions={optionsSession}
               onDownload={(session) => {
                 toast.loading("Sedang menyiapkan dokumen kualifikasi DOS...");
-                handleDownloadSession(session, {
-                  onSuccess() {
-                    toast.dismiss();
-                    toast.success("Unduhan dimulai");
-                  },
-                  onError() {
-                    toast.dismiss();
-                    toast.success("Gagal memulai unduhan");
-                  },
-                });
+                if (session === 'qualification') {
+                  downloadQualification({
+                    onSuccess: () => {
+                      toast.dismiss();
+                    },
+                    onError: () => {
+                      toast.dismiss();
+                      toast.error("Gagal memulai unduhan");
+                    },
+                  });
+                } else {
+                  handleDownloadSession(session, {
+                    onSuccess() {
+                      toast.dismiss();
+                      toast.success("Unduhan dimulai");
+                    },
+                    onError() {
+                      toast.dismiss();
+                      toast.success("Gagal memulai unduhan");
+                    },
+                  });
+                }
               }}
             />
           }
@@ -168,14 +182,29 @@ function ToolbarViewRight({ isIndividual, sessionOptions, session, onDownload })
     );
   }
 
+  const [isOpen, setOpen] = React.useState(false);
+
   return (
     <HorizontalSpaced>
-      <ButtonOutlineBlue onClick={() => onDownload?.()}>
-        <span>
-          <IconDownload size="16" />
-        </span>{" "}
-        <span>Cetak Peringkat</span>
-      </ButtonOutlineBlue>
+      <Dropdown isOpen={isOpen} toggle={() => setOpen((open) => !open)}>
+        <DropdownToggle tag="span">
+          <ButtonOutlineBlue>
+            <span>
+              <IconDownload size="16" />
+            </span>{" "}
+            <span>Cetak Peringkat</span>
+          </ButtonOutlineBlue>
+        </DropdownToggle>
+
+        <DropdownMenu className="dropdown-menu-end">
+          <DropdownItem tag="button" onClick={() => onDownload?.()}>
+            <span>Laporan Sesi</span>
+          </DropdownItem>
+          <DropdownItem tag="button" onClick={() => onDownload('qualification')}>
+            <span>Pemeringkatan</span>
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
     </HorizontalSpaced>
   );
 }
@@ -199,6 +228,9 @@ function MenuSession({ options, onDownload }) {
             <span>Laporan {option.label}</span>
           </DropdownItem>
         ))}
+        <DropdownItem tag="button" onClick={() => onDownload('qualification')}>
+          <span>Pemeringkatan</span>
+        </DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );

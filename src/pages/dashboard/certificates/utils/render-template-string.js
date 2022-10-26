@@ -32,8 +32,10 @@ function renderTemplateString(editorData) {
         position: absolute;
         left: 0px;
         right: 0px;
-        width: ${fieldMaxWidth}px;
-        text-align: right;
+        // width: ${fieldMaxWidth}px;
+        // text-align: right;
+        text-align: center;
+
       }
 
       .qr-code-container {
@@ -89,10 +91,10 @@ const renderCssBackgroundImage = (editorData) => {
 };
 
 function renderCssField(name, data = {}) {
-  const { x, y, offsetWidth, fontFamily, fontWeight, fontSize, color } = data;
-  const editorObject = { x, offsetWidth };
-  const templateObject = { offsetWidth: fieldMaxWidth };
-  const rightAlignedX = _getRightAlignedX(editorObject, templateObject);
+  const { y, fontFamily, fontWeight, fontSize, color } = data;
+  // const editorObject = { x, offsetWidth };
+  // const templateObject = { offsetWidth: fieldMaxWidth };
+  // const rightAlignedX = _getRightAlignedX(editorObject, templateObject);
 
   const computeColor = () => (color ? `color: ${color};` : "");
   const computeFontWeight = () => fontWeight || "normal";
@@ -100,7 +102,6 @@ function renderCssField(name, data = {}) {
   return `
       #field-${name} {
         top: ${y}px;
-        left: ${rightAlignedX}px;
         ${computeColor()}
         font-family: ${fontFamily};
         font-size: ${fontSize}px;
@@ -130,9 +131,9 @@ function renderQrCode() {
     </div>`;
 }
 
-function _getRightAlignedX(editorObject, templateObject) {
-  const delta = templateObject.offsetWidth - editorObject.offsetWidth;
-  return editorObject.x - delta;
-}
+// function _getRightAlignedX(editorObject, templateObject) {
+//   const delta = templateObject.offsetWidth - editorObject.offsetWidth;
+//   return editorObject.x - delta;
+// }
 
 export { renderTemplateString };

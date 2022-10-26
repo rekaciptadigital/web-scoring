@@ -23,7 +23,6 @@ export default function EditorFieldText({
   onChange,
   selected,
   setEditorDirty,
-  canvasScale,
 }) {
   const divRef = React.useRef(null);
   const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
@@ -31,7 +30,9 @@ export default function EditorFieldText({
   const [activeStrokeDashArray, setActiveStrokeDashArray] = React.useState(
     boundingStroke.idle.dashArray
   );
-  const { x, y, fontFamily, fontSize, color, fontWeight } = data;
+  const { y, fontFamily, fontSize, color, fontWeight } = data;
+
+  const translatePosition = { x: 0, y };
 
   React.useLayoutEffect(() => {
     // Perubahan data yang memengaruhi width DOM perlu diupdate di sini,
@@ -43,7 +44,7 @@ export default function EditorFieldText({
 
   React.useEffect(() => {
     setEditorDirty?.();
-  }, [x, y, fontSize, fontFamily, fontWeight, color]);
+  }, [y, fontSize, fontFamily, fontWeight, color]);
 
   const highlightOnMouseOver = () => {
     setActiveStrokeColor(boundingStroke.highlighted.color);
@@ -60,18 +61,20 @@ export default function EditorFieldText({
   };
 
   const handleDragStop = (translation) => {
-    const data = {
-      x: Math.ceil(translation.x),
-      y: Math.ceil(translation.y),
-      offsetWidth: currentOffsetWidth,
-    };
-    onChange?.(data);
+    onChange?.({ y: translation.y });
+    // const data = {
+    //   x: Math.ceil(translation.x),
+    //   y: Math.ceil(translation.y),
+    //   offsetWidth: currentOffsetWidth,
+    // };
+    // onChange?.(data);
   };
 
   return (
     <Draggable
-      scale={canvasScale}
-      position={{ x, y }}
+      axis="y"
+      scale={0.5}
+      position={translatePosition}
       onStart={() => handleDrag()}
       onStop={(ev, position) => handleDragStop(position)}
     >
@@ -80,7 +83,7 @@ export default function EditorFieldText({
         style={{
           position: "absolute",
           top: 0,
-          left: 0,
+          left: 1280 / 2 - currentOffsetWidth / 2 || 0,
           fontSize: fontSize || 60,
           color: color || undefined,
           fontFamily: fontFamily || undefined,

@@ -208,4 +208,12 @@ export default {
   storeSetConfigShootRule(data) {
     return API.post("/web/v1/aturan-pertandingan/set-config-aturan-pertandingan", data, null, true);
   },
+
+  getTargetFaceSetting(qs = null) {
+    return API.get("/web/v1/config-target-face/get-config-target-face", qs);
+  },
+
+  storeSetConfigFaceRule(data) {
+    return API.post("/web/v1/config-target-face/set-config-target-face", data, null, true);
+  },
 };

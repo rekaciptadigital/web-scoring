@@ -13,15 +13,16 @@ import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
 import { useSubmitFormRuleSetting } from "./hooks/form-rule-shoot-setting";
 import { useSubmitFormClubRank } from "./hooks/form-club-ranking";
+import { useSubmitFormRuleFaceSetting } from "./hooks/form-rule-face-setting";
 
-function ScreenRules({ eventDetail, form, shootSetting, rankingSettings }) {
+function ScreenRules({ eventDetail, form, shootSetting, rankingSettings, targetfacegSettings }) {
   return (
     <CardSheet>
       <Section>
         <SettingShootTheBoard eventDetail={eventDetail} form={form} shootSettings={shootSetting} />
       </Section>
       <Section>
-        <SettingTargetFace eventDetail={eventDetail} />
+        <SettingTargetFace eventDetail={eventDetail} form={form} targetfacegSettings={targetfacegSettings} />
       </Section>
       <Section>
         <SettingsClubsRanking eventDetail={eventDetail} form={form} rankingSettings={rankingSettings} />
@@ -249,15 +250,7 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
   )
 }
 
-function SettingTargetFace({ eventDetail }) {
-
-  const numberKategori = [...new Array(12)].map((item, index) => {
-    return { label: index + 1, value: index + 1 }
-  })
-
-  const numberRambahan = [...new Array(12)].map((item, index) => {
-    return { label: index + 1, value: index + 1 }
-  })
+function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
 
   const categoryDetails = eventDetail?.eventCategories;
   const optionsCategories = React.useMemo(
@@ -265,7 +258,153 @@ function SettingTargetFace({ eventDetail }) {
     [categoryDetails]
   );
 
-  const [data, setData] = React.useState([{ data: 'rules' }])
+  const dataShootRule = {
+    highest_score: 0,
+    score_x: 0,
+    category: [],
+    optionX : [],
+  };
+
+  const initialData = {
+    event_id: eventDetail.id,
+    activeSetting: 0,
+    implementAll: 1,
+    categories_config: [dataShootRule]
+  }
+
+  const [dataOption, setDataOption] = React.useState(optionsCategories);
+  const [dataForm, setFormData] = React.useState(initialData);
+  // const [numberRambahan, setnumberRambahan] = React.useState(null);
+  
+  const numberRambahan = (number) => {
+    console.log(number);
+    const tempnumberRambahan = [...new Array(number)].map((item, index) => {
+        return { label: index + 1, value: index + 1 }
+    });
+    console.log(tempnumberRambahan);
+    return tempnumberRambahan;
+  }
+
+  useSubmitFormRuleFaceSetting(dataForm, form.setSubmitRuleFace);
+
+  const handleSelect = (value, index) => {
+
+    let categories = dataForm.categories_config[index].category.length;
+    if (categories < value.length || categories === 0) {
+      const categories_config = dataForm.categories_config.map((field, i) => {
+        if (i == index) {
+          const category = [...field.category, value[value.length - 1]];
+          return { ...field, category }
+        }
+        return field
+      });
+
+      setFormData({
+        ...dataForm,
+        categories_config
+      });
+
+      value.map((val) => {
+        setDataOption(dataOption.filter((el) => el !== val));
+      });
+
+    } else {
+
+      dataForm.categories_config[index].category.map((val) => {
+        setDataOption([...dataOption, val]);
+      });
+
+      let categories_config = dataForm.categories_config;
+      categories_config[index].category = value;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        categories_config: categories_config
+      }));
+    }
+  }
+
+  const handleAdd = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      categories_config: [...prevData.categories_config, dataShootRule]
+    }));
+  }
+
+  const handleDelete = (index) => {
+
+    let tempCategory = dataOption;
+    dataForm.categories_config[index].category.map((val) => {
+      tempCategory.push(val);
+    });
+
+    setDataOption(tempCategory);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      categories_config: [...prevData.categories_config.filter((el, i) => i !== index)]
+    }));
+
+  }
+
+  const handleImplemen = (value) => {
+    if (dataForm?.categories_config.length === 1) {
+      setFormData((prevState) => ({
+        ...prevState,
+        implementAll: value ? 0 : 1
+      }));
+    }
+  }
+
+  const handleSelectRule = (name, event, index) => {
+    let tempcategories_config = dataForm.categories_config;
+    if(name === 'highest_score'){
+      tempcategories_config[index][name] = event;
+      tempcategories_config[index].score_x = parseInt(event);
+      tempcategories_config[index].optionX = numberRambahan(parseInt(event));
+    }else{
+      tempcategories_config[index][name] = event.value;
+      tempcategories_config[index].optionX = dataForm.categories_config[index].optionX;
+    }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      categories_config: tempcategories_config
+    }));
+
+  }
+
+  React.useEffect(() => {
+    if (targetfacegSettings) {
+      const optionCategory = targetfacegSettings?.implementAll ? [{
+        highest_score: targetfacegSettings?.highestScore,
+        score_x: targetfacegSettings?.scoreX,
+        category: [],
+        optionX : numberRambahan(targetfacegSettings?.highestScore)
+      }] : _makeFaceRule(targetfacegSettings, optionsCategories);
+      setFormData({
+        event_id: eventDetail.id,
+        activeSetting: targetfacegSettings?.activeSetting,
+        implementAll: targetfacegSettings?.implementAll,
+        categories_config: optionCategory
+      });
+
+      if (!targetfacegSettings?.implementAll) {
+        let tempCategory = []
+        optionCategory?.map((option) => {
+          option?.category.map((val) => {
+            tempCategory.push(val)
+          });
+        });
+
+        setDataOption(dataOption.filter((el) => !tempCategory.includes(el)));
+      }
+
+    }
+  }, [targetfacegSettings]);
+
+  // console.log(targetfacegSettings);
+  console.log(dataForm);
 
   return (
     <SettingContainer>
@@ -279,50 +418,58 @@ function SettingTargetFace({ eventDetail }) {
         <EarlyBirdActivationBar>
           <div>Aktifkan Pengaturan Target Face Custom</div>
           <ToggleSwitch
-          // checked={data.isPrivate ? 1 : 0}
-          // onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
+            checked={dataForm?.activeSetting}
+            onChange={(val) => {
+              setFormData((prevState) => ({
+                ...prevState,
+                activeSetting: val ? 1 : 0
+              }));
+            }}
           />
         </EarlyBirdActivationBar>
-        <Section>
-          <SettingContentContainer>
-            <EarlyBirdActivationBar>
-              <div>Terapkan ke semua kategori</div>
-              <ToggleSwitch
-              // checked={data.isPrivate ? 1 : 0}
-              // onChange={(val) => updateField("isPrivate", val ? 1 : 0)}
-              />
-            </EarlyBirdActivationBar>
-            {data.map((rule, index) => (
-              <CategoryBlock key={index}>
-                <Section>
-                  <SettingContentContainer>
-                    <h5>Aturan Target Face</h5>
-                    <FourColumnsInputsGrid>
-                      <FieldSelect options={numberKategori}><LabelRules>Jumlah Ring pada Target Face</LabelRules></FieldSelect>
-                      <FieldInputText type="number" placeholder="Masukkan angka"><LabelRules>Nilai Skor Tertinggi</LabelRules></FieldInputText>
-                      <FieldSelect options={numberRambahan}><LabelRules>Nilai Skor “X”</LabelRules></FieldSelect>
-                    </FourColumnsInputsGrid>
-                    <FieldSelectCategories
-                      label="Kategori"
-                      placeholder="Pilih opsi"
-                      required
-                      options={optionsCategories}
-                    // value={categories}
-                    // onChange={(value) => updateField("categories", value || [])}
-                    // errors={errors.categories}
-                    />
-                  </SettingContentContainer>
-                </Section>
-                <div style={{ marginTop: '20px' }}>
-                  <Button flexible onClick={() => setData([...data, { data: 'rules' }])}><IconPlus size={12} /></Button><br />
-                  <Button flexible onClick={() => setData(data.filter((el, i) => i !== index))}><IconTrash size={12} /></Button>
-                </div>
-              </CategoryBlock>
-            ))}
-
-
-          </SettingContentContainer>
-        </Section>
+        {dataForm?.activeSetting ? (
+          <Section>
+            <SettingContentContainer>
+              {dataForm.categories_config?.map((rule, index) => (
+                <CategoryBlock key={index}>
+                  <Section>
+                    <SettingContentContainer>
+                      <h5>Aturan Menembak</h5>
+                      <SecondColumnsInputsGrid>
+                        <FieldInputText onChange={(value) => handleSelectRule('highest_score', value, index)} type="number" placeholder="Masukkan angka" value={rule.highest_score}><LabelRules>Nilai Skor Tertinggi</LabelRules></FieldInputText>
+                        <FieldSelect value={{ label: rule.score_x, value: rule.score_x }} onChange={(event) => handleSelectRule('score_x', event, index)} options={rule.optionX}><LabelRules>Nilai Skor X</LabelRules></FieldSelect>
+                      </SecondColumnsInputsGrid>
+                      <EarlyBirdActivationBar>
+                        <div>Terapkan ke kategori tertentu</div>
+                        <ToggleSwitch
+                          checked={dataForm?.implementAll ? 0 : 1}
+                          onChange={(val) => handleImplemen(val)}
+                        />
+                      </EarlyBirdActivationBar>
+                      <HelpDesk className="mt-2 mb-4">
+                        Apabila Anda mengaktifkan fitur ini maka aturan menembak hanya akan berlaku pada kategori tertentu yang Anda pilih.
+                      </HelpDesk>
+                      {!dataForm?.implementAll ?
+                        <FieldSelectCategories
+                          label="Kategori"
+                          placeholder="Pilih opsi"
+                          required
+                          options={dataOption}
+                          value={rule?.category}
+                          onChange={(value) => handleSelect(value ?? [], index)}
+                        />
+                        : undefined}
+                    </SettingContentContainer>
+                  </Section>
+                  <div style={{ marginTop: '20px' }}>
+                    <Button disabled={dataForm?.implementAll ? true : false} flexible onClick={handleAdd}><IconPlus size={12} /></Button><br />
+                    <Button disabled={index === 0 ? true : false} flexible onClick={() => handleDelete(index)}><IconTrash size={12} /></Button>
+                  </div>
+                </CategoryBlock>
+              ))}
+            </SettingContentContainer>
+          </Section>) : undefined
+        }
       </SpacedVertical>
     </SettingContainer >
   )
@@ -355,7 +502,7 @@ function SettingsClubsRanking({ eventDetail, form, rankingSettings }) {
   );
 
   const { data, errors, updateField, setType } = useFormRankingSetting(initialValues);
-  
+
   const { type, rankingName, categories, medalCountingType } = data;
 
   useSubmitFormClubRank(data, form.setFormPemeringkatan);
@@ -509,6 +656,13 @@ const EarlyBirdActivationBar = styled.div`
 const FourColumnsInputsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-top: 20px;
+`;
+
+const SecondColumnsInputsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
   margin-top: 20px;
 `;
@@ -667,6 +821,29 @@ function _makeShootRule(value, optionsCategories) {
         session: value.session,
         rambahan: value.rambahan,
         child_bow: value.childBow,
+        category: [],
+      };
+    }
+  }
+}
+
+function _makeFaceRule(value, optionsCategories) {
+
+  const makeShootRule = (option) => ({
+    highest_score: option.highestScore,
+    score_x: option.scoreX,
+    category: _checkCategoriesValue(optionsCategories, option.categories) || [],
+  });
+
+  switch (value.implementAll) {
+    case 0: {
+      return value.categoriesConfig.map(makeShootRule);
+    }
+
+    case 1: {
+      return {
+        highest_score: value.highestScore,
+        score_x: value.scoreX,
         category: [],
       };
     }

@@ -3,6 +3,7 @@ import { useFormRankingSetting } from "../screens/rules/hooks/form-ranking-setti
 
 function useFormRule({ eventDetail, rankingSettings }) {
   const [submitRule, setSubmitRule] = React.useState(null);
+  const [submitRuleFace, setSubmitRuleFace] = React.useState(null);
   const [formPemeringkatan, setFormPemeringkatan] = React.useState(null);
 
   const categoryDetails = eventDetail?.eventCategories;
@@ -29,6 +30,8 @@ function useFormRule({ eventDetail, rankingSettings }) {
   return {
     submitRule,
     setSubmitRule,
+    submitRuleFace,
+    setSubmitRuleFace,
     formPemeringkatan,
     setFormPemeringkatan,
     handleValidation

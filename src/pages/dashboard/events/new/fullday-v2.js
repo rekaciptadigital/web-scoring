@@ -22,6 +22,7 @@ import { useShootRuleSetting } from "./screens/rules/hooks/shoot-rule-settings";
 import { useSubmitClubsRanking } from "./screens/rules/hooks/submit-clubs-ranking";
 import { useClubRankingSetting } from "./screens/rules/hooks/club-ranking-settings";
 import { useFaceTargetSetting } from "./screens/rules/hooks/face-target-settings";
+import { useSubmitRuleFaceSetting } from "./screens/rules/hooks/submit-rule-face-setting";
 
 import { AlertSubmitError, ButtonOutlineBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -78,10 +79,7 @@ function PageCreateEventFullday() {
     useConfigRegistrationDates(eventId);
   const { data: schedules } = schedulesProvider;
   const { data: shootSettings, fetchRuleShootSetting } = useShootRuleSetting(eventId);
-  const { 
-    data: targetfacegSettings, 
-    // fetchTargetFaceSetting 
-  } = useFaceTargetSetting(eventId);
+  const { data: targetfacegSettings, fetchTargetFaceSetting } = useFaceTargetSetting(eventId);
   const { data: rankingSettings, fetchRankingSetting } = useClubRankingSetting(eventId);
 
   const eventType = _checkEventType(eventDetail, qsEventType);
@@ -161,6 +159,13 @@ function PageCreateEventFullday() {
     isError: isErrorSubmitRule,
     errors: errorsSubmitRule,
   } = useSubmitRuleSetting(eventDetail?.id, formRule.submitRule);
+  
+  const {
+    submit: submitFaceRuleSetting,
+    isLoading: isLoadingSubmitRuleFace,
+    isError: isErrorSubmitRuleFace,
+    errors: errorsSubmitRuleFace,
+  } = useSubmitRuleFaceSetting(eventDetail?.id, formRule.submitRuleFace);
 
   const {
     submit : submitClubRank,
@@ -170,7 +175,7 @@ function PageCreateEventFullday() {
   } = useSubmitClubsRanking(eventDetail?.id, formRule.formPemeringkatan);
 
   const isLoadingSubmit =
-    isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates || isLoadingSubmitRule || isLoadingSubmitClubRank;
+    isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates || isLoadingSubmitRule || isLoadingSubmitClubRank || isLoadingSubmitRuleFace;
 
   return (
     <ContentLayoutWrapper
@@ -186,6 +191,7 @@ function PageCreateEventFullday() {
       <AlertSubmitError isError={isErrorRegistrationDates} errors={errorsRegistrationDates} />
       <AlertSubmitError isError={isErrorSubmitRule} errors={errorsSubmitRule} />
       <AlertSubmitError isError={isErrorSubmitClubRank} errors={errorsSubmitClubRank} />
+      <AlertSubmitError isError={isErrorSubmitRuleFace} errors={errorsSubmitRuleFace} />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
         <StepListIndicator title="Pertandingan">
@@ -427,6 +433,13 @@ function PageCreateEventFullday() {
                     onSuccess: () => {
                       toast.success("Data telah tersimpan");
                       fetchRuleShootSetting();
+                    },
+                  });
+
+                  submitFaceRuleSetting({
+                    onSuccess: () => {
+                      toast.success("Data Aturan tersimpan");
+                      fetchTargetFaceSetting();
                     },
                   });
 

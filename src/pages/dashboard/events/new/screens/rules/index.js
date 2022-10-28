@@ -13,6 +13,7 @@ import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
 import { useSubmitFormRuleSetting } from "./hooks/form-rule-shoot-setting";
 import { useSubmitFormClubRank } from "./hooks/form-club-ranking";
+import { useSubmitFormRuleFaceSetting } from "./hooks/form-rule-face-setting";
 
 function ScreenRules({ eventDetail, form, shootSetting, rankingSettings, targetfacegSettings }) {
   return (
@@ -260,7 +261,8 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
   const dataShootRule = {
     highest_score: 0,
     score_x: 0,
-    category: []
+    category: [],
+    optionX : [],
   };
 
   const initialData = {
@@ -272,57 +274,55 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
 
   const [dataOption, setDataOption] = React.useState(optionsCategories);
   const [dataForm, setFormData] = React.useState(initialData);
-
-  useSubmitFormRuleSetting(dataForm, form.setSubmitRule);
-
+  // const [numberRambahan, setnumberRambahan] = React.useState(null);
+  
   const numberRambahan = (number) => {
     console.log(number);
-
-    const numbers = [...new Array(number)].map((item, index) => {
-      return { label: index + 1, value: index + 1 }
+    const tempnumberRambahan = [...new Array(number)].map((item, index) => {
+        return { label: index + 1, value: index + 1 }
     });
-
-    return numbers;
+    console.log(tempnumberRambahan);
+    return tempnumberRambahan;
   }
 
-  // const handleSelect = (value, index) => {
+  useSubmitFormRuleFaceSetting(dataForm, form.setSubmitRuleFace);
 
-  //   let categories = dataForm.shootRule[index].category.length;
-  //   if (categories < value.length || categories === 0) {
-  //     if (dataForm.shootRule[index].session >= value.length) {
-  //       const shootRule = dataForm.shootRule.map((field, i) => {
-  //         if (i == index) {
-  //           const category = [...field.category, value[value.length - 1]];
-  //           return { ...field, category }
-  //         }
-  //         return field
-  //       });
+  const handleSelect = (value, index) => {
 
-  //       setFormData({
-  //         ...dataForm,
-  //         shootRule
-  //       });
+    let categories = dataForm.categories_config[index].category.length;
+    if (categories < value.length || categories === 0) {
+      const categories_config = dataForm.categories_config.map((field, i) => {
+        if (i == index) {
+          const category = [...field.category, value[value.length - 1]];
+          return { ...field, category }
+        }
+        return field
+      });
 
-  //       value.map((val) => {
-  //         setDataOption(dataOption.filter((el) => el !== val));
-  //       })
-  //     }
+      setFormData({
+        ...dataForm,
+        categories_config
+      });
 
-  //   } else {
+      value.map((val) => {
+        setDataOption(dataOption.filter((el) => el !== val));
+      });
 
-  //     dataForm.shootRule[index].category.map((val) => {
-  //       setDataOption([...dataOption, val]);
-  //     });
+    } else {
 
-  //     let shootRule = dataForm.shootRule;
-  //     shootRule[index].category = value;
+      dataForm.categories_config[index].category.map((val) => {
+        setDataOption([...dataOption, val]);
+      });
 
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       shootRule: shootRule
-  //     }));
-  //   }
-  // }
+      let categories_config = dataForm.categories_config;
+      categories_config[index].category = value;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        categories_config: categories_config
+      }));
+    }
+  }
 
   const handleAdd = () => {
     setFormData((prevData) => ({
@@ -347,22 +347,29 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
 
   }
 
-  // const handleImplemen = (value) => {
-  //   if (dataForm?.shootRule.length === 1) {
-  //     setFormData((prevState) => ({
-  //       ...prevState,
-  //       implementAll: value ? 0 : 1
-  //     }));
-  //   }
-  // }
+  const handleImplemen = (value) => {
+    if (dataForm?.categories_config.length === 1) {
+      setFormData((prevState) => ({
+        ...prevState,
+        implementAll: value ? 0 : 1
+      }));
+    }
+  }
 
-  const handleSelectRule = (event, name, index) => {
-    let categories_config = dataForm.categories_config;
-    categories_config[index][name] = event.value;
+  const handleSelectRule = (name, event, index) => {
+    let tempcategories_config = dataForm.categories_config;
+    if(name === 'highest_score'){
+      tempcategories_config[index][name] = event;
+      tempcategories_config[index].score_x = parseInt(event);
+      tempcategories_config[index].optionX = numberRambahan(parseInt(event));
+    }else{
+      tempcategories_config[index][name] = event.value;
+      tempcategories_config[index].optionX = dataForm.categories_config[index].optionX;
+    }
 
     setFormData((prevData) => ({
       ...prevData,
-      categories_config: categories_config
+      categories_config: tempcategories_config
     }));
 
   }
@@ -372,8 +379,9 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
       const optionCategory = targetfacegSettings?.implementAll ? [{
         highest_score: targetfacegSettings?.highestScore,
         score_x: targetfacegSettings?.scoreX,
-        category: []
-      }] : _makeShootRule(targetfacegSettings, optionsCategories);
+        category: [],
+        optionX : numberRambahan(targetfacegSettings?.highestScore)
+      }] : _makeFaceRule(targetfacegSettings, optionsCategories);
       setFormData({
         event_id: eventDetail.id,
         activeSetting: targetfacegSettings?.activeSetting,
@@ -395,7 +403,7 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
     }
   }, [targetfacegSettings]);
 
-  console.log(targetfacegSettings);
+  // console.log(targetfacegSettings);
   console.log(dataForm);
 
   return (
@@ -428,8 +436,8 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
                     <SettingContentContainer>
                       <h5>Aturan Menembak</h5>
                       <SecondColumnsInputsGrid>
-                        <FieldInputText onChange={(value) => handleSelectRule(value, 'highest_score', index)} type="number" placeholder="Masukkan angka" value={rule.highest_score}><LabelRules>Nilai Skor Tertinggi</LabelRules></FieldInputText>
-                        <FieldSelect value={{ label: rule.score_x, value: rule.score_x }} onChange={(event) => handleSelectRule('score_x', event, index)} options={numberRambahan(rule.highest_score)}><LabelRules>Nilai Skor X</LabelRules></FieldSelect>
+                        <FieldInputText onChange={(value) => handleSelectRule('highest_score', value, index)} type="number" placeholder="Masukkan angka" value={rule.highest_score}><LabelRules>Nilai Skor Tertinggi</LabelRules></FieldInputText>
+                        <FieldSelect value={{ label: rule.score_x, value: rule.score_x }} onChange={(event) => handleSelectRule('score_x', event, index)} options={rule.optionX}><LabelRules>Nilai Skor X</LabelRules></FieldSelect>
                       </SecondColumnsInputsGrid>
                       <EarlyBirdActivationBar>
                         <div>Terapkan ke kategori tertentu</div>
@@ -813,6 +821,29 @@ function _makeShootRule(value, optionsCategories) {
         session: value.session,
         rambahan: value.rambahan,
         child_bow: value.childBow,
+        category: [],
+      };
+    }
+  }
+}
+
+function _makeFaceRule(value, optionsCategories) {
+
+  const makeShootRule = (option) => ({
+    highest_score: option.highestScore,
+    score_x: option.scoreX,
+    category: _checkCategoriesValue(optionsCategories, option.categories) || [],
+  });
+
+  switch (value.implementAll) {
+    case 0: {
+      return value.categoriesConfig.map(makeShootRule);
+    }
+
+    case 1: {
+      return {
+        highest_score: value.highestScore,
+        score_x: value.scoreX,
         category: [],
       };
     }

@@ -33,11 +33,11 @@ function ScreenRules({ eventDetail, form, shootSetting, rankingSettings, targetf
 
 function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
 
-  const numberKategori = [...new Array(6)].map((item, index) => {
+  const numberKategori = [3,4,5,6].map((item, index) => {
     return { label: index + 1, value: index + 1 }
   })
 
-  const numberRambahan = [...new Array(12)].map((item, index) => {
+  const numberRambahan = [3,4,5,6,7,8,9,10,11,12].map((item, index) => {
     return { label: index + 1, value: index + 1 }
   })
 

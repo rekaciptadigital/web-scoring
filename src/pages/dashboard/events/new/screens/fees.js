@@ -5,6 +5,7 @@ import Switch from "react-switch";
 import { FieldInputPrice, FieldInputDate, Checkbox } from "../../components/form-fields";
 
 function ScreenFees({ form }) {
+  let fee = false;
   const {
     data,
     updateField,
@@ -17,13 +18,14 @@ function ScreenFees({ form }) {
     <div>
       <CardSheet>
         <VerticalSpaceBetween>
-          <FieldToggleTeamPrices>
+          {/* nyalakan biaya payment gateway */}
+          {fee ? <FieldToggleTeamPrices>
             <div>Bebankan biaya payment gateway pada peserta</div>
             <ToggleSwitch
               checked={data?.includePaymentGatewayFeeToUser}
               onChange={(val) => {updateField("includePaymentGatewayFeeToUser",val ? 1 : 0)}}
             />
-          </FieldToggleTeamPrices>
+          </FieldToggleTeamPrices> : null}
           <FourColumnsInputsGrid>
             <FieldInputPrice
               name="type-normal"

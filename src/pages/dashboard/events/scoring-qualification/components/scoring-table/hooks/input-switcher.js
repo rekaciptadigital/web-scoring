@@ -89,7 +89,7 @@ function switcherReducer(state, action) {
       // pojok kanan bawah, balik pojok kiri atas
       targetY = 0;
       targetX = 0;
-    } else if (x >= 5) {
+    } else if (x >= (state.size.x - 1)) {
       // pindah rambahan
       targetY = y + 1;
       targetX = 0;

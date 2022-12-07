@@ -200,4 +200,20 @@ export default {
   deleteEvent(qs) {
     return API.deleteByParams("/web/v1/archery/events/delete-event", qs);
   },
+
+  getShootRuleSetting(qs = null) {
+    return API.get("/web/v1/aturan-pertandingan/get-config-aturan-pertandingan", qs);
+  },
+
+  storeSetConfigShootRule(data) {
+    return API.post("/web/v1/aturan-pertandingan/set-config-aturan-pertandingan", data, null, true);
+  },
+
+  getTargetFaceSetting(qs = null) {
+    return API.get("/web/v1/config-target-face/get-config-target-face", qs);
+  },
+
+  storeSetConfigFaceRule(data) {
+    return API.post("/web/v1/config-target-face/set-config-target-face", data, null, true);
+  },
 };

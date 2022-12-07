@@ -65,6 +65,8 @@ function FieldSelect({
   value,
   onChange,
   errors,
+  disabled,
+  isMulti=false
 }) {
   return (
     <FieldSelectWrapper>
@@ -73,12 +75,14 @@ function FieldSelect({
         {required && <span className="field-required">*</span>}
       </label>
       <Select
+        isMulti={isMulti}
         styles={computeCustomStylesWithValidation(errors)}
         name={name}
         placeholder={placeholder}
         options={options}
         value={value}
         onChange={onChange}
+        isDisabled={disabled}
       />
     </FieldSelectWrapper>
   );

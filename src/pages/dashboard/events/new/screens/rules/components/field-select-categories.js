@@ -17,6 +17,7 @@ function FieldSelectCategories({
   disabled,
   errors,
 }) {
+  console.log("options:", options);
   const fieldID = `field-${name}`;
   const title = label || undefined;
   return (

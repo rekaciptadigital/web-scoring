@@ -54,7 +54,7 @@ function ScreenRules({
 }
 
 function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
-  const numberKategori = [3, 4, 5, 6].map((item) => {
+  const numberKategori = [2, 3, 4, 5, 6].map((item) => {
     return { label: item, value: item };
   });
 

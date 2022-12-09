@@ -264,12 +264,17 @@ function ModalEditor({
                     <ScoreInput
                       type="text"
                       placeholder="-"
-                      value={adminTotalP1 || ""}
+                      value={adminTotalP1}
                       onChange={(ev) => {
                         setTotalP1((previousValue) => {
                           const { value } = ev.target;
-                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-                          return validatedNumberValue;
+                          if (!value) {
+                            return "";
+                          }
+                          if (isNaN(value)) {
+                            return previousValue;
+                          }
+                          return Number(value);
                         });
                       }}
                       onFocus={(ev) => ev.target.select()}
@@ -306,12 +311,17 @@ function ModalEditor({
                     <ScoreInput
                       type="text"
                       placeholder="-"
-                      value={adminTotalP2 || ""}
+                      value={adminTotalP2}
                       onChange={(ev) => {
                         setTotalP2((previousValue) => {
                           const { value } = ev.target;
-                          const validatedNumberValue = isNaN(value) ? previousValue : Number(value);
-                          return validatedNumberValue;
+                          if (!value) {
+                            return "";
+                          }
+                          if (isNaN(value)) {
+                            return previousValue;
+                          }
+                          return Number(value);
                         });
                       }}
                       onFocus={(ev) => ev.target.select()}

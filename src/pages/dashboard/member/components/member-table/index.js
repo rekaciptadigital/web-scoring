@@ -13,6 +13,7 @@ import {
 } from "components/ma";
 
 import logoUpdate from "assets/images/myachery/update-category.png";
+import { AlertSubmitError } from "components/ma";
 
 function MemberTable({
   categoryDetail,
@@ -38,6 +39,7 @@ function MemberTable({
   const [idParticipant, setIdParticipant] = React.useState(0);
   const [categoryId, setCategoryId] = React.useState(0);
   const [isUpdateCategory, setIsUpdateCategory] = React.useState(false);
+  const [isResponse, setResponse] = React.useState([false,""]);
 
   const isSettledScoringMembers =
     scoringMembers || (!scoringMembers && isErrorScoringMembers);
@@ -57,6 +59,7 @@ function MemberTable({
 
   const onCancel = () => {
     setIsOpenAlert(false);
+    setResponse([false,""]);
   };
 
   const onUpdateCategory = async () => {
@@ -66,6 +69,9 @@ function MemberTable({
     });
     if (message === "Success") {
       setIsUpdateCategory(true);
+      setResponse([false,''])
+    }else{
+      setResponse([true,message])
     }
     console.info(errors);
   };
@@ -257,7 +263,7 @@ function MemberTable({
                           borderRadius: "25px",
                         }}
                       >
-                        Sisa kuota 0 dari {catagory.quota}
+                        Sisa kuota {catagory.quota - catagory.countUserBooking}
                       </span>
                     </div>
                   </div>
@@ -298,6 +304,9 @@ function MemberTable({
           </div>
         </div>
       </SweetAlert>
+
+      <AlertSubmitError isError={isResponse[0]} errors={isResponse[1]} />  
+
     </React.Fragment>
   );
 }

@@ -38,3 +38,4 @@ RUN rm -f /myarchery-web-admin/package-lock.json
 
 #USER docker
 #RUN whoami
+

@@ -30,6 +30,7 @@ RUN npx browserslist@latest --update-db
 #RUN npm install -g serve
 
 RUN rm -f .env
+RUN rm -f package-lock.json
 
 #CMD serve -s build
 

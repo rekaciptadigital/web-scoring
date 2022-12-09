@@ -30,7 +30,7 @@ RUN npx browserslist@latest --update-db
 #RUN npm install -g serve
 
 RUN rm -f .env
-RUN rm -f package-lock.json
+RUN rm -f /myarchery-web-admin/package-lock.json
 
 #CMD serve -s build
 

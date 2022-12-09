@@ -35,7 +35,10 @@ export function StepInfoUmum({
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
   const [keyExtraInfoRemoved, setKeyExtraInfoRemoved] = React.useState(null);
   const [filePDF, setFilePDF] = React.useState(null);
-  const [removingStatus, setRemovingStatus] = React.useState({ status: "idle", errors: null });
+  const [removingStatus, setRemovingStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
 
   const isLoading = savingStatus.status === "loading";
   const isRemovingInfo = removingStatus.status === "loading";
@@ -89,20 +92,26 @@ export function StepInfoUmum({
   };
 
   const handleRemoveInformation = async (targetInfo) => {
-    setRemovingStatus((state) => ({ ...state, status: "loading", errors: null }));
+    setRemovingStatus((state) => ({
+      ...state,
+      status: "loading",
+      errors: null,
+    }));
     setKeyExtraInfoRemoved(null);
     const result = await EventsService.deleteMoreInfos({ id: targetInfo.id });
     if (result.success) {
       setRemovingStatus((state) => ({ ...state, status: "success" }));
       onSaveSuccess?.();
     } else {
-      setRemovingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      setRemovingStatus((state) => ({
+        ...state,
+        status: "error",
+        errors: result.errors,
+      }));
     }
   };
 
   console.info(shouldShowAddExtraInfo);
-  // console.log(filePDF);
-  // console.log(eventData)
 
   return (
     <FormSheet>
@@ -174,7 +183,10 @@ export function StepInfoUmum({
               ]}
               value={
                 eventData?.locationType
-                  ? { label: eventData.locationType, value: eventData.locationType }
+                  ? {
+                      label: eventData.locationType,
+                      value: eventData.locationType,
+                    }
                   : undefined
               }
               onChange={handleLocationTypeChange}
@@ -210,7 +222,10 @@ export function StepInfoUmum({
                 value={eventData.registrationDateStart}
                 onChange={(value) => {
                   !isFormDirty && setFormDirty(true);
-                  updateEventData({ type: "REGISTRATION_START", payload: value });
+                  updateEventData({
+                    type: "REGISTRATION_START",
+                    payload: value,
+                  });
                 }}
                 errors={validationErrors.registrationDateStart}
                 disabled={!editIsAllowed}
@@ -224,12 +239,21 @@ export function StepInfoUmum({
                 placeholder="00:00"
                 name="registrationTimeStart"
                 required
-                minTime={setHours(setMinutes(eventData.registrationDateStart, 0), 0)}
-                maxTime={setHours(setMinutes(eventData.registrationDateStart, 59), 23)}
+                minTime={setHours(
+                  setMinutes(eventData.registrationDateStart, 0),
+                  0
+                )}
+                maxTime={setHours(
+                  setMinutes(eventData.registrationDateStart, 59),
+                  23
+                )}
                 value={eventData.registrationDateStart}
                 onChange={(value) => {
                   !isFormDirty && setFormDirty(true);
-                  updateEventData({ type: "REGISTRATION_START", payload: value });
+                  updateEventData({
+                    type: "REGISTRATION_START",
+                    payload: value,
+                  });
                 }}
                 errors={validationErrors.registrationDateStart}
                 disabled={!editIsAllowed}
@@ -271,7 +295,10 @@ export function StepInfoUmum({
                     ? setHours(setMinutes(eventData.registrationDateEnd, 0), 0)
                     : eventData.registrationDateStart
                 }
-                maxTime={setHours(setMinutes(eventData.registrationDateEnd, 59), 23)}
+                maxTime={setHours(
+                  setMinutes(eventData.registrationDateEnd, 59),
+                  23
+                )}
                 value={eventData.registrationDateEnd}
                 onChange={(value) => {
                   !isFormDirty && setFormDirty(true);
@@ -295,7 +322,10 @@ export function StepInfoUmum({
                 placeholder="DD/MM/YYYY"
                 name="eventDateStart"
                 required
-                minDate={eventData.registrationDateEnd || eventData.registrationDateStart}
+                minDate={
+                  eventData.registrationDateEnd ||
+                  eventData.registrationDateStart
+                }
                 value={eventData.eventDateStart}
                 onChange={(value) => {
                   !isFormDirty && setFormDirty(true);
@@ -314,11 +344,17 @@ export function StepInfoUmum({
                 name="eventTimeStart"
                 required
                 minTime={setHours(
-                  setMinutes(eventData.eventDateStart || eventData.registrationDateEnd, 0),
+                  setMinutes(
+                    eventData.eventDateStart || eventData.registrationDateEnd,
+                    0
+                  ),
                   0
                 )}
                 maxTime={setHours(
-                  setMinutes(eventData.eventDateStart || eventData.registrationDateEnd, 59),
+                  setMinutes(
+                    eventData.eventDateStart || eventData.registrationDateEnd,
+                    59
+                  ),
                   23
                 )}
                 value={eventData.eventDateStart}
@@ -365,7 +401,8 @@ export function StepInfoUmum({
                 name="eventTimeEnd"
                 required
                 minTime={
-                  setHours(setMinutes(eventData.eventDateEnd, 0), 0) > eventData.eventDateStart
+                  setHours(setMinutes(eventData.eventDateEnd, 0), 0) >
+                  eventData.eventDateStart
                     ? setHours(setMinutes(eventData.eventDateEnd, 0), 0)
                     : eventData.eventDateStart
                 }
@@ -410,7 +447,12 @@ export function StepInfoUmum({
           accept="application/pdf"
           type="file"
           id="file"
-          style={{ opacity: "0", position: "absolute", width: "100%", cursor: "pointer" }}
+          style={{
+            opacity: "0",
+            position: "absolute",
+            width: "100%",
+            cursor: "pointer",
+          }}
           onChange={(e) => {
             setFilePDF(e.target.files[0]);
             handleHandbookChange(e.target.files[0]);
@@ -424,7 +466,11 @@ export function StepInfoUmum({
           className="pt-2"
         >
           <label htmlFor="file">
-            {filePDF ? filePDF?.name : <span className="bx bx-upload"> Upload THB</span>}
+            {filePDF ? (
+              filePDF?.name
+            ) : (
+              <span className="bx bx-upload"> Upload THB</span>
+            )}
           </label>
         </div>
       </div>
@@ -442,7 +488,9 @@ export function StepInfoUmum({
             <div className="info-body">
               <div className="info-body-content">
                 <h5>{info.title || "Judul tidak tersedia"}</h5>
-                <p className="mb-0">{info.description || "Konten tidak tersedia"}</p>
+                <p className="mb-0">
+                  {info.description || "Konten tidak tersedia"}
+                </p>
               </div>
 
               <div>
@@ -450,7 +498,9 @@ export function StepInfoUmum({
                   className={classnames("info-button-edit", {
                     "info-button-edit-disabled": !editIsAllowed,
                   })}
-                  onClick={() => editIsAllowed && handleModalEditInfoOpen(info.key)}
+                  onClick={() =>
+                    editIsAllowed && handleModalEditInfoOpen(info.key)
+                  }
                 >
                   &#10097;
                 </a>
@@ -498,8 +548,13 @@ function ModalExtraInfoEditor({ showEditor, ...props }) {
 
 function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
   const [title, setTitle] = React.useState(infoData?.title || "");
-  const [description, setDescription] = React.useState(infoData?.description || "");
-  const [savingStatus, setSavingStatus] = React.useState({ status: "idle", errors: null });
+  const [description, setDescription] = React.useState(
+    infoData?.description || ""
+  );
+  const [savingStatus, setSavingStatus] = React.useState({
+    status: "idle",
+    errors: null,
+  });
 
   const initialTitle = React.useRef(title);
   const initialDescription = React.useRef(description);
@@ -509,7 +564,9 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
 
   const shouldSubmitAllowed = () => {
     const isRequiredAll = title && description;
-    const isEdited = title !== initialTitle.current || description !== initialDescription.current;
+    const isEdited =
+      title !== initialTitle.current ||
+      description !== initialDescription.current;
     return isRequiredAll && isEdited;
   };
 
@@ -526,7 +583,11 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
 
     if (isEditMode) {
       // UPDATE DATA
-      setSavingStatus((state) => ({ ...state, status: "loading", errors: null }));
+      setSavingStatus((state) => ({
+        ...state,
+        status: "loading",
+        errors: null,
+      }));
 
       const payload = {
         event_id: infoData.eventId,
@@ -534,17 +595,27 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
         description: description,
       };
 
-      const result = await EventsService.updateMoreInfos(payload, { id: infoData.id });
+      const result = await EventsService.updateMoreInfos(payload, {
+        id: infoData.id,
+      });
       if (result.success) {
         setSavingStatus((state) => ({ ...state, status: "success" }));
         onSaveSuccess?.();
         handleCloseModal();
       } else {
-        setSavingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+        setSavingStatus((state) => ({
+          ...state,
+          status: "error",
+          errors: result.errors,
+        }));
       }
     } else {
       // ADD NEW DATA
-      setSavingStatus((state) => ({ ...state, status: "loading", errors: null }));
+      setSavingStatus((state) => ({
+        ...state,
+        status: "loading",
+        errors: null,
+      }));
 
       const payload = {
         event_id: eventId,
@@ -552,13 +623,19 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
         description: description,
       };
 
-      const result = await EventsService.storeMoreInfos(payload, { id: eventId });
+      const result = await EventsService.storeMoreInfos(payload, {
+        id: eventId,
+      });
       if (result.success) {
         setSavingStatus((state) => ({ ...state, status: "success" }));
         onSaveSuccess?.();
         handleCloseModal();
       } else {
-        setSavingStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+        setSavingStatus((state) => ({
+          ...state,
+          status: "error",
+          errors: result.errors,
+        }));
       }
     }
   };
@@ -594,11 +671,20 @@ function ExtraInfoEditor({ eventId, infoData, onSaveSuccess, onClose }) {
           </FieldTextArea>
         </div>
 
-        <div className="mt-4 d-flex justify-content-end" style={{ gap: "0.5rem" }}>
-          <Button style={{ color: "var(--ma-blue)" }} onClick={handleCloseModal}>
+        <div
+          className="mt-4 d-flex justify-content-end"
+          style={{ gap: "0.5rem" }}
+        >
+          <Button
+            style={{ color: "var(--ma-blue)" }}
+            onClick={handleCloseModal}
+          >
             Batal
           </Button>
-          <ButtonBlue onClick={handleClickSave} disabled={!shouldSubmitAllowed()}>
+          <ButtonBlue
+            onClick={handleClickSave}
+            disabled={!shouldSubmitAllowed()}
+          >
             Simpan
           </ButtonBlue>
         </div>
@@ -614,7 +700,10 @@ function AlertDeleteInfo({ showAlert, onConfirm, onCancel }) {
     <SweetAlert
       show={showAlert}
       title={
-        <i className="bx bx-trash font-size-18 align-middle" style={{ color: "var(--ma-red)" }} />
+        <i
+          className="bx bx-trash font-size-18 align-middle"
+          style={{ color: "var(--ma-red)" }}
+        />
       }
       custom
       btnSize="md"

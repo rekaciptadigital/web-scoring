@@ -82,28 +82,26 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
     shootRule: [dataShootRule],
   };
 
-  const [dataOption, setDataOption] = React.useState(optionsCategories);
+  const [dataOption, setDataOption] = React.useState([]);
   const [dataForm, setFormData] = React.useState(initialData);
+  const [originOption, setOriginOption] = React.useState(optionsCategories);
 
   useSubmitFormRuleSetting(dataForm, form.setSubmitRule);
 
   const handleSelect = (value, index) => {
-    const shootRule = dataForm.shootRule.map((field, i) => {
-      if (i == index) {
-        const category = [...field.category, value[value.length - 1]];
-        return { ...field, category };
-      }
-      return field;
-    });
-
+    let shootRule = dataForm.shootRule;
+    shootRule[index].category = value;
     setFormData({
       ...dataForm,
-      shootRule,
+      value,
     });
-
-    value.map((val) => {
-      setDataOption(dataOption.filter((el) => el !== val));
-    });
+    if (value.length < 1) {
+      setDataOption(originOption);
+    } else {
+      value.map((val) => {
+        setDataOption(originOption.filter((el) => el !== val));
+      });
+    }
   };
 
   const handleAdd = () => {
@@ -118,6 +116,7 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
     dataForm.shootRule[index].category.map((val) => {
       tempCategory.push(val);
     });
+    v;
 
     setDataOption(tempCategory);
 
@@ -177,6 +176,11 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
       }
     }
   }, [shootSettings]);
+
+  React.useEffect(() => {
+    setDataOption(optionsCategories);
+    setOriginOption(optionsCategories);
+  }, [optionsCategories]);
 
   return (
     <SettingContainer>
@@ -323,11 +327,9 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
   // const [numberRambahan, setnumberRambahan] = React.useState(null);
 
   const numberRambahan = (number) => {
-    console.log(number);
     const tempnumberRambahan = [...new Array(number)].map((item, index) => {
       return { label: index + 1, value: index + 1 };
     });
-    console.log(tempnumberRambahan);
     return tempnumberRambahan;
   };
 
@@ -448,9 +450,6 @@ function SettingTargetFace({ eventDetail, form, targetfacegSettings }) {
       }
     }
   }, [targetfacegSettings]);
-
-  // console.log(targetfacegSettings);
-  console.log(dataForm);
 
   return (
     <SettingContainer>

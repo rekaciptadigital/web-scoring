@@ -32,7 +32,6 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
 
   const handlerFileInputChange = (e) => {
     let go = e.target.files[0];
-    console.log(e.target.files[0]);
     getBase64(e.target.files[0])
       .then((result) => {
         go["base64"] = result;
@@ -98,7 +97,12 @@ export const EventFormStep1 = ({ onFormFieldChange, formData }) => {
             />
           </Col>
           <Col lg={6}>
-            <TextInput label="Kota" name="city" value={formData.city} onChange={handleChange} />
+            <TextInput
+              label="Kota"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+            />
           </Col>
           <Col lg={6}>
             <div className="d-flex h-100 align-items-center">

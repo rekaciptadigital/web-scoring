@@ -5,12 +5,23 @@ import { useScoringMembers } from "../../hooks/scoring-members";
 
 import { Row, Col } from "reactstrap";
 import SweetAlert from "react-bootstrap-sweetalert";
-import { SpinnerDotBlock, ButtonBlue, Button, ButtonOutlineBlue } from "components/ma";
+import {
+  SpinnerDotBlock,
+  ButtonBlue,
+  Button,
+  ButtonOutlineBlue,
+} from "components/ma";
 
 import logoUpdate from "assets/images/myachery/update-category.png";
 import { AlertSubmitError } from "components/ma";
 
-function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatus }) {
+function MemberTable({
+  categoryDetail,
+  searchName,
+  eventId,
+  isTeam,
+  paymentStatus,
+}) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
@@ -30,7 +41,8 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
   const [isUpdateCategory, setIsUpdateCategory] = React.useState(false);
   const [isResponse, setResponse] = React.useState([false,""]);
 
-  const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
+  const isSettledScoringMembers =
+    scoringMembers || (!scoringMembers && isErrorScoringMembers);
 
   const onConfirm = async (participantId) => {
     const { message, errors, data } = await EventsService.getAccessCategories({
@@ -56,7 +68,6 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
       category_id: categoryId,
     });
     if (message === "Success") {
-      console.log("Update success");
       setIsUpdateCategory(true);
       setResponse([false,''])
     }else{
@@ -79,7 +90,10 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
       <React.Fragment>
         <EmptyMembers>
           <div>
-            Tidak ada peserta {paymentStatus === 1 || paymentStatus === 0 ? "di kategori ini" : ""}
+            Tidak ada peserta{" "}
+            {paymentStatus === 1 || paymentStatus === 0
+              ? "di kategori ini"
+              : ""}
           </div>
           <LoadingBlocker isLoading={isLoadingScoringMembers} />
         </EmptyMembers>
@@ -182,7 +196,9 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
                           Atur Kategori
                         </ButtonOutlineBlue>
                       ) : (
-                        <ButtonOutlineBlue disabled>Atur Kategori</ButtonOutlineBlue>
+                        <ButtonOutlineBlue disabled>
+                          Atur Kategori
+                        </ButtonOutlineBlue>
                       )}
                     </td>
                   )}
@@ -200,7 +216,10 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
         custom
         style={{ width: 1100, borderRadius: "1.25rem" }}
         customButtons={
-          <span className="d-flex justify-content-end" style={{ gap: "0.5rem", width: "100%" }}>
+          <span
+            className="d-flex justify-content-end"
+            style={{ gap: "0.5rem", width: "100%" }}
+          >
             <Button onClick={onCancel} style={{ color: "var(--ma-blue)" }}>
               Batal
             </Button>
@@ -213,7 +232,9 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
           <br />
           <span>Silakan pilih salah satu kategori lomba</span>
         </div>
-        <div style={{ height: "500px", overflowY: "auto", overflowX: "hidden" }}>
+        <div
+          style={{ height: "500px", overflowY: "auto", overflowX: "hidden" }}
+        >
           <Row>
             {dataCategories.map((catagory) => {
               return (
@@ -226,7 +247,9 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
                       borderRadius: "5px",
                       textAlign: "start",
                       cursor: "pointer",
-                      backgroundColor: `${catagory.id === categoryId ? "#E7EDF6" : "#FFF"}`,
+                      backgroundColor: `${
+                        catagory.id === categoryId ? "#E7EDF6" : "#FFF"
+                      }`,
                     }}
                   >
                     <span style={{ fontSize: "18px", fontWeight: "600" }}>
@@ -235,7 +258,10 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
                     <div className="mt-3">
                       <span
                         className="px-2 py-1"
-                        style={{ backgroundColor: "#AEDDC2", borderRadius: "25px" }}
+                        style={{
+                          backgroundColor: "#AEDDC2",
+                          borderRadius: "25px",
+                        }}
                       >
                         Sisa kuota {catagory.quota - catagory.countUserBooking}
                       </span>
@@ -255,8 +281,13 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
         custom
         style={{ width: 740, borderRadius: "1.25rem" }}
         customButtons={
-          <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
-            <ButtonBlue onClick={onBackToList}>Lanjut ke Data Peserta</ButtonBlue>
+          <span
+            className="d-flex justify-content-center"
+            style={{ gap: "0.5rem", width: "100%" }}
+          >
+            <ButtonBlue onClick={onBackToList}>
+              Lanjut ke Data Peserta
+            </ButtonBlue>
           </span>
         }
       >

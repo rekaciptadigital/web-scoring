@@ -4,7 +4,6 @@ RUN apk update
 RUN apk add git
 RUN git config --global url."https://".insteadOf git://
 RUN apk add curl
-RUN apk add --no-cache python2
 #RUN npm cache clean --force
 
 CMD mkdir myarchery-web-admin
@@ -17,11 +16,11 @@ CMD mkdir log
 
 RUN npm install -g node-gyp
 RUN npm install -g npm
+
 #RUN npm uninstall node-sass --force
-#RUN npm install node-sass@4.14.1 --legacy-peer-deps
-RUN npm rebuild node-sass
 #RUN npm i sass --force
-#RUN npm install --global windows-build-tools --legacy-peer-deps
+RUN npm rebuild node-sass
+
 RUN npm install --legacy-peer-deps #--force
 RUN rm -f /myarchery-web-admin/yarn.lock
 RUN yarn add react-is
@@ -30,10 +29,13 @@ RUN npx browserslist@latest --update-db
 #RUN npm run build
 #RUN npm install -g serve
 
-#RUN rm -f config/.env
+RUN rm -f .env
+RUN rm -f /myarchery-web-admin/package-lock.json
 
 #CMD serve -s build
+
 #CMD npm start >> /root/log/stdout.log 2>> /root/log/stderr.log
 
 #USER docker
 #RUN whoami
+

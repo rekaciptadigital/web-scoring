@@ -31,7 +31,10 @@ function PageEventFaqs() {
   const onCancel = () => setIsAlertOpen(false);
 
   const getListFaq = async () => {
-    const { message, data, errors } = await FAQService.getListFaq({ event_id, limit: 30 });
+    const { message, data, errors } = await FAQService.getListFaq({
+      event_id,
+      limit: 30,
+    });
     if (message === "Success") {
       setData(data);
     }
@@ -56,7 +59,6 @@ function PageEventFaqs() {
   };
 
   const onUpdate = async (data) => {
-    // console.log(data);
     const { message } = await FAQService.updateFaq({
       event_id: event_id,
       question: data.question,
@@ -71,7 +73,9 @@ function PageEventFaqs() {
   };
 
   const getDetailFaq = async (id) => {
-    const { message, data, errors } = await FAQService.getDetailFaq({ qna_id: id });
+    const { message, data, errors } = await FAQService.getDetailFaq({
+      qna_id: id,
+    });
     if (message === "Success") {
       setDetail(data[0]);
       if (detail) {
@@ -83,14 +87,15 @@ function PageEventFaqs() {
   };
 
   const onConfirm = async () => {
-    const { message } = await FAQService.deleteFaq({ event_id: event_id, q_and_a_id: idFaq });
+    const { message } = await FAQService.deleteFaq({
+      event_id: event_id,
+      q_and_a_id: idFaq,
+    });
     if (message) {
       getListFaq();
       setIsAlertOpen(false);
     }
   };
-
-  console.log(detail);
 
   const verfiedAlert = () => {
     return (
@@ -102,7 +107,10 @@ function PageEventFaqs() {
         onConfirm={onConfirm}
         style={{ padding: "1.25rem", width: "800px", borderRadius: "20px" }}
         customButtons={
-          <span className="d-flex w-100 justify-content-center" style={{ gap: "0.5rem" }}>
+          <span
+            className="d-flex w-100 justify-content-center"
+            style={{ gap: "0.5rem" }}
+          >
             <Button onClick={onCancel} style={{ color: "var(--ma-blue)" }}>
               Batalkan
             </Button>
@@ -113,7 +121,12 @@ function PageEventFaqs() {
         <div className="d-flex justify-content-center flex-column">
           <div style={{ width: "30%", margin: "0 auto" }}>
             <div style={{ width: "214px", height: "145px" }}>
-              <img src={logoBuatAkun} width="100%" height="100%" style={{ objectFit: "cover" }} />
+              <img
+                src={logoBuatAkun}
+                width="100%"
+                height="100%"
+                style={{ objectFit: "cover" }}
+              />
             </div>
           </div>
           <span
@@ -123,8 +136,8 @@ function PageEventFaqs() {
             Apakah Anda yakin akan menghapus pertanyaan?
           </span>
           <p>
-            Pertanyaan yang dihapus akan terhapus dari Landing Page. Anda juga dapat menonaktifkan
-            pertanyaan pada bagian edit.
+            Pertanyaan yang dihapus akan terhapus dari Landing Page. Anda juga
+            dapat menonaktifkan pertanyaan pada bagian edit.
           </p>
         </div>
       </SweetAlert>
@@ -161,19 +174,23 @@ function PageEventFaqs() {
             </div>
             {!data ? (
               <div className="content-empty mt-3">
-                <span className="text-header">Pengaturan Frequently Ask Question</span>
+                <span className="text-header">
+                  Pengaturan Frequently Ask Question
+                </span>
                 <div className="text-content">
                   <span>
-                    Atur list pertanyaan dan jawaban yang sering ditanyakan peserta untuk
-                    ditampilkan pada Landing Page Event. Anda dapat mengatur:
+                    Atur list pertanyaan dan jawaban yang sering ditanyakan
+                    peserta untuk ditampilkan pada Landing Page Event. Anda
+                    dapat mengatur:
                   </span>
                   <ol>
                     <li>Jumlah pertanyaan</li>
                     <li>Visibilitas pertanyaan pada landing page</li>
                   </ol>
                   <span>
-                    Klik tombol <span style={{ fontWeight: "600" }}>“Tambah FAQ”</span> di kanan
-                    atas untuk mulai membuat pertanyaan.
+                    Klik tombol{" "}
+                    <span style={{ fontWeight: "600" }}>“Tambah FAQ”</span> di
+                    kanan atas untuk mulai membuat pertanyaan.
                   </span>
                 </div>
                 <div className="pt-4">
@@ -200,7 +217,10 @@ function PageEventFaqs() {
                     </div>
 
                     <div className="d-flex justify-content-end">
-                      <ButtonGhostBlue flexible onClick={() => getDetailFaq(d.id)}>
+                      <ButtonGhostBlue
+                        flexible
+                        onClick={() => getDetailFaq(d.id)}
+                      >
                         <IconEdit size="18" />
                       </ButtonGhostBlue>
 
@@ -250,7 +270,6 @@ function ModalExtraInfoEditor({ showEditor, ...props }) {
 }
 
 function ExtraInfoEditor({ infoData, onSave, onClose, onUpdate }) {
-  console.log(infoData);
   const [title, setTitle] = React.useState(infoData?.question || "");
   const [description, setDescription] = React.useState(infoData?.answer || "");
   const [visible, setVisible] = React.useState(infoData?.isHide || 0);
@@ -260,7 +279,9 @@ function ExtraInfoEditor({ infoData, onSave, onClose, onUpdate }) {
 
   const shouldSubmitAllowed = () => {
     const isRequiredAll = title && description;
-    const isEdited = title !== initialTitle.current || description !== initialDescription.current;
+    const isEdited =
+      title !== initialTitle.current ||
+      description !== initialDescription.current;
     return isRequiredAll && isEdited;
   };
 
@@ -318,9 +339,17 @@ function ExtraInfoEditor({ infoData, onSave, onClose, onUpdate }) {
               Visibilitas
             </span>
             {!visible ? (
-              <img style={{ cursor: "pointer" }} src={eye} onClick={() => setVisible(1)} />
+              <img
+                style={{ cursor: "pointer" }}
+                src={eye}
+                onClick={() => setVisible(1)}
+              />
             ) : (
-              <img style={{ cursor: "pointer" }} src={eyeOff} onClick={() => setVisible(0)} />
+              <img
+                style={{ cursor: "pointer" }}
+                src={eyeOff}
+                onClick={() => setVisible(0)}
+              />
             )}
           </div>
         </div>
@@ -338,16 +367,28 @@ function ExtraInfoEditor({ infoData, onSave, onClose, onUpdate }) {
           </FieldTextArea>
         </div>
 
-        <div className="mt-4 d-flex justify-content-end" style={{ gap: "0.5rem" }}>
-          <Button style={{ color: "var(--ma-blue)" }} onClick={handleCloseModal}>
+        <div
+          className="mt-4 d-flex justify-content-end"
+          style={{ gap: "0.5rem" }}
+        >
+          <Button
+            style={{ color: "var(--ma-blue)" }}
+            onClick={handleCloseModal}
+          >
             Batal
           </Button>
           {!infoData?.id ? (
-            <ButtonBlue onClick={handleClickSave} disabled={!shouldSubmitAllowed()}>
+            <ButtonBlue
+              onClick={handleClickSave}
+              disabled={!shouldSubmitAllowed()}
+            >
               Simpan
             </ButtonBlue>
           ) : (
-            <ButtonBlue onClick={handleClickUpdate} disabled={!shouldSubmitAllowed()}>
+            <ButtonBlue
+              onClick={handleClickUpdate}
+              disabled={!shouldSubmitAllowed()}
+            >
               Simpan
             </ButtonBlue>
           )}

@@ -4,6 +4,8 @@ RUN apk update
 RUN apk add git
 RUN git config --global url."https://".insteadOf git://
 RUN apk add curl
+RUN apk add --update python3 make g++\
+   && rm -rf /var/cache/apk/*
 #RUN npm cache clean --force
 
 CMD mkdir myarchery-web-admin

@@ -65,9 +65,15 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
     });
   }
 
-  function handleRemoveCompetitionCategory(categoryIndex, competitionCategoryIndex) {
+  function handleRemoveCompetitionCategory(
+    categoryIndex,
+    competitionCategoryIndex
+  ) {
     const categoryList = [...formData.eventCategories];
-    categoryList[categoryIndex].competitionCategories.splice(competitionCategoryIndex, 1);
+    categoryList[categoryIndex].competitionCategories.splice(
+      competitionCategoryIndex,
+      1
+    );
     handleChange({
       key: "eventCategories",
       value: categoryList,
@@ -83,7 +89,11 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
               <Label>Kategori Kelas</Label>
 
               <ButtonGroup className="float-end mt-2">
-                <Button onClick={() => handleCopyRow(index)} icon="copy" type="primary" />{" "}
+                <Button
+                  onClick={() => handleCopyRow(index)}
+                  icon="copy"
+                  type="primary"
+                />{" "}
                 {formData.eventCategories.length > 1 && (
                   <Button
                     onClick={(e) => {
@@ -124,7 +134,9 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                         <Row key={competitionCategory.id}>
                           <Col lg={4}>
                             <SelectInput
-                              options={dummyConstants.eventCompetitionCategories}
+                              options={
+                                dummyConstants.eventCompetitionCategories
+                              }
                               name={`eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.competitionCategory`}
                               onChange={handleChange}
                               value={competitionCategory.competitionCategory}
@@ -146,7 +158,10 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                   }
                                 />
                               }
-                              value={_.map(competitionCategory.distances || [], "label")}
+                              value={_.map(
+                                competitionCategory.distances || [],
+                                "label"
+                              )}
                             />
                             <ModalDistances
                               isOpen={competitionCategory.isOpenDistanceModal}
@@ -177,11 +192,15 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                     : "Tambah Kuota"
                                 }
                                 trailingIcon={
-                                  competitionCategory.teamCategories?.length > 0 ? "pencil" : "plus"
+                                  competitionCategory.teamCategories?.length > 0
+                                    ? "pencil"
+                                    : "plus"
                                 }
                               />
                               <ModalTeamCategories
-                                isOpen={competitionCategory.isOpenTeamCategoryModal}
+                                isOpen={
+                                  competitionCategory.isOpenTeamCategoryModal
+                                }
                                 toggle={() => {
                                   handleChange({
                                     key: `eventCategories.${index}.competitionCategories.${competitionCategoryIndex}.isOpenTeamCategoryModal`,
@@ -201,7 +220,8 @@ export const EventFormStep4 = ({ onFormFieldChange, formData }) => {
                                     handleAddCompetitionCategory(index);
                                   }}
                                 />
-                                {eventCategory.competitionCategories.length > 1 && (
+                                {eventCategory.competitionCategories.length >
+                                  1 && (
                                   <Button
                                     icon="trash"
                                     type="danger"

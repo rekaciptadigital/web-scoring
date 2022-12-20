@@ -9,9 +9,15 @@ import { FieldSelectMulti } from "./field-select-multi";
 
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
+// import FieldInputClasification from "./components/field-input-clasification";
 
 function ScreenRegistrationDates({ form }) {
-  const { data: configForm, toggleActiveSetting, initForm, updateFields } = form;
+  const {
+    data: configForm,
+    toggleActiveSetting,
+    initForm,
+    updateFields,
+  } = form;
 
   const rangeRegistration = {
     start: configForm.registrationDateStart,
@@ -80,8 +86,8 @@ function ScreenRegistrationDates({ form }) {
                 info={
                   !configForm.isActive ? (
                     <React.Fragment>
-                      Anda dapat membuat tanggal pendaftaran yang berbeda untuk individu, beregu,
-                      dan beregu campuran.
+                      Anda dapat membuat tanggal pendaftaran yang berbeda untuk
+                      individu, beregu, dan beregu campuran.
                     </React.Fragment>
                   ) : undefined
                 }
@@ -93,6 +99,15 @@ function ScreenRegistrationDates({ form }) {
             {configForm.isActive && <ConfigGroupList form={form} />}
           </VerticalSpaceLoose>
         </Section>
+
+        {/* <Section>
+          <VerticalSpaceLoose>
+            <VerticalSpaceBetween>
+              <h5>Klasifikasi Peserta</h5>
+              <FieldInputClasification />
+            </VerticalSpaceBetween>
+          </VerticalSpaceLoose>
+        </Section> */}
       </VerticalSpaceLoose>
     </CardSheet>
   );
@@ -114,7 +129,8 @@ function ConfigGroupList({ form }) {
     setDateRangeCategory,
   } = form;
 
-  const hasEmptyTeam = data.configs?.some((config) => !config.team?.value) || false;
+  const hasEmptyTeam =
+    data.configs?.some((config) => !config.team?.value) || false;
 
   return (
     <VerticalSpaceLoose>
@@ -123,11 +139,17 @@ function ConfigGroupList({ form }) {
           <ConfigEditor
             form={configItemForm}
             optionsTeamCategory={optionsTeamCategory}
-            onChangeTeamCategory={(option) => setTeamCategory(configIndex, option)}
+            onChangeTeamCategory={(option) =>
+              setTeamCategory(configIndex, option)
+            }
             onChangeDateRange={(range) => setDateRange(configIndex, range)}
-            onToggleConfigByCategories={() => toggleConfigByCategories(configIndex)}
+            onToggleConfigByCategories={() =>
+              toggleConfigByCategories(configIndex)
+            }
             onAddCategoryConfig={() => addCategoryConfig(configIndex)}
-            onRemoveCategoryConfig={(childIndex) => removeCategoryConfig(configIndex, childIndex)}
+            onRemoveCategoryConfig={(childIndex) =>
+              removeCategoryConfig(configIndex, childIndex)
+            }
             optionsCategoryPair={getOptionsCategoryPairByGroupId(
               configItemForm.team?.value,
               configIndex
@@ -185,7 +207,9 @@ function ConfigEditor({
   onRemoveCategoryConfig,
   onChangeDateRangeCategory,
 }) {
-  const hasEmptyCategories = form.categories.some((config) => !config.categories?.length);
+  const hasEmptyCategories = form.categories.some(
+    (config) => !config.categories?.length
+  );
   return (
     <InnerGroup>
       <VerticalSpaceLoose>
@@ -214,7 +238,11 @@ function ConfigEditor({
             labelEnd={{ date: "Tutup Pendaftaran", time: "Jam Tutup" }}
             required={!form.isSpecialActive}
             disabled={form.isSpecialActive}
-            value={!form.isSpecialActive ? { start: form.start, end: form.end } : undefined}
+            value={
+              !form.isSpecialActive
+                ? { start: form.start, end: form.end }
+                : undefined
+            }
             onChange={onChangeDateRange}
           />
         </VerticalSpaceBetween>
@@ -237,11 +265,12 @@ function ConfigEditor({
           info={
             !form.isSpecialActive ? (
               <React.Fragment>
-                Pengaturan ini dapat membuat tanggal pendaftaran yang berbeda untuk satu kategori.
-                Namun, jika tidak diaktifkan maka akan otomatis diterapkan untuk semua kategori
-                (individu putra dan putri). Untuk kategori yang tidak dipilih pada menu ini, maka
-                akan otomatis mengikuti &quot;tanggal event&quot; yang telah Anda atur di menu
-                bagian atas.
+                Pengaturan ini dapat membuat tanggal pendaftaran yang berbeda
+                untuk satu kategori. Namun, jika tidak diaktifkan maka akan
+                otomatis diterapkan untuk semua kategori (individu putra dan
+                putri). Untuk kategori yang tidak dipilih pada menu ini, maka
+                akan otomatis mengikuti &quot;tanggal event&quot; yang telah
+                Anda atur di menu bagian atas.
               </React.Fragment>
             ) : undefined
           }
@@ -263,7 +292,9 @@ function ConfigEditor({
                     isClearable={false}
                     options={optionsCategoryPair}
                     value={item.categories}
-                    onChange={(option) => onChangeSpecialCategories?.(itemIndex, option)}
+                    onChange={(option) =>
+                      onChangeSpecialCategories?.(itemIndex, option)
+                    }
                   />
 
                   <FieldInputDateTimeRange
@@ -271,20 +302,31 @@ function ConfigEditor({
                     labelEnd={{ date: "Tutup Pendaftaran", time: "Jam Tutup" }}
                     required
                     value={{ start: item.start, end: item.end }}
-                    onChange={(range) => onChangeDateRangeCategory?.(itemIndex, range)}
+                    onChange={(range) =>
+                      onChangeDateRangeCategory?.(itemIndex, range)
+                    }
                   />
                 </VerticalSpaceBetween>
 
                 <GroupAction>
-                  <Button flexible onClick={() => onRemoveCategoryConfig?.(itemIndex)}>
+                  <Button
+                    flexible
+                    onClick={() => onRemoveCategoryConfig?.(itemIndex)}
+                  >
                     <IconTrash size="12" />
                   </Button>
 
                   <Button
                     flexible
                     onClick={() => onAddCategoryConfig?.(itemIndex)}
-                    disabled={!optionsCategoryPair?.length || hasEmptyCategories}
-                    title={!optionsCategoryPair?.length ? "Semua kategori telah diatur" : undefined}
+                    disabled={
+                      !optionsCategoryPair?.length || hasEmptyCategories
+                    }
+                    title={
+                      !optionsCategoryPair?.length
+                        ? "Semua kategori telah diatur"
+                        : undefined
+                    }
                   >
                     <IconPlus size="12" />
                   </Button>

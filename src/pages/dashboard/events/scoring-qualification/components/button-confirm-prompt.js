@@ -17,13 +17,17 @@ function ButtonConfirmPrompt({ disabled, title, onConfirm, onCancel }) {
   };
 
   const goNextPrompt = () => {
-    setShowAlertFirst(false);
-    setShowAlertSecond(true);
+    setShowAlertSecond(false);
+    setShowAlertFirst(true);
   };
 
-  const handleConfirm = () => {
+  const hitConfig = () => {
     onConfirm?.();
-    setShowAlertSecond(false);
+  };
+
+  const handleConfirm = async () => {
+    setShowAlertFirst(false);
+    hitConfig();
   };
 
   const LABEL_BUTTON_CANCEL = "Batalkan";

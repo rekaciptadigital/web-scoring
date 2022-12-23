@@ -51,7 +51,11 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
       {isOpen && (
         <Modal
           isOpen
-          size={bracketData.eliminationId || bracketData.eliminationGroupId ? "xl" : "md"}
+          size={
+            bracketData.eliminationId || bracketData.eliminationGroupId
+              ? "xl"
+              : "md"
+          }
           centered
           backdrop="static"
           autoFocus

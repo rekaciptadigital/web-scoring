@@ -9,7 +9,11 @@ import {
   SeedItem as RBSeedItem,
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
-import { ButtonOutlineBlue, LoadingScreen, AlertSubmitError } from "components/ma";
+import {
+  ButtonOutlineBlue,
+  LoadingScreen,
+  AlertSubmitError,
+} from "components/ma";
 import { ErrorBoundary } from "components/ma/error-boundary";
 
 import IconBranch from "components/ma/icons/mono/branch";
@@ -63,7 +67,9 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
               <BodyWrapper>
                 <TopBar>
                   <div>
-                    {Boolean(eliminationNumber) && <Heading>{eliminationNumber} Besar</Heading>}
+                    {Boolean(eliminationNumber) && (
+                      <Heading>{eliminationNumber} Besar</Heading>
+                    )}
                   </div>
 
                   <div>
@@ -75,7 +81,8 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
 
                 <div>
                   <Scrollable>
-                    {bracketData.eliminationId || bracketData.eliminationGroupId ? (
+                    {bracketData.eliminationId ||
+                    bracketData.eliminationGroupId ? (
                       <Bracket
                         rounds={bracketData.rounds || []}
                         renderSeedComponent={(bracketProps) => (
@@ -84,8 +91,11 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
                             configs={{
                               totalRounds: bracketData.rounds.length - 1,
                               eliminationId:
-                                bracketData.eliminationId || bracketData.eliminationGroupId,
-                              isTeam: typeof bracketData.eliminationGroupId !== "undefined",
+                                bracketData.eliminationId ||
+                                bracketData.eliminationGroupId,
+                              isTeam:
+                                typeof bracketData.eliminationGroupId !==
+                                "undefined",
                             }}
                           />
                         )}
@@ -99,8 +109,11 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
                             configs={{
                               totalRounds: bracketData.rounds.length - 1,
                               eliminationId:
-                                bracketData.eliminationId || bracketData.eliminationGroupId,
-                              isTeam: typeof bracketData.eliminationGroupId !== "undefined",
+                                bracketData.eliminationId ||
+                                bracketData.eliminationGroupId,
+                              isTeam:
+                                typeof bracketData.eliminationGroupId !==
+                                "undefined",
                             }}
                           />
                         )}
@@ -130,7 +143,10 @@ function NoBracketAvailable() {
 function SeedPreview({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
   const { totalRounds, isTeam } = configs;
-  const { isFinalRound, isThirdPlaceRound } = _getRoundPositions({ totalRounds, roundIndex });
+  const { isFinalRound, isThirdPlaceRound } = _getRoundPositions({
+    totalRounds,
+    roundIndex,
+  });
 
   return (
     <Seed
@@ -168,19 +184,25 @@ function SeedPreview({ bracketProps, configs }) {
                 >
                   <BoxNameGroup>
                     <BoxName title={team.name || team.team}>
-                      {team.name || team.team || <React.Fragment>&ndash;</React.Fragment>}
+                      {team.name || team.team || (
+                        <React.Fragment>&ndash;</React.Fragment>
+                      )}
                     </BoxName>
 
                     {!isTeam ? (
                       <BoxName title={team.clubName} className="name-club">
-                        {team.clubName || <React.Fragment>&nbsp;</React.Fragment>}
+                        {team.clubName || (
+                          <React.Fragment>&nbsp;</React.Fragment>
+                        )}
                       </BoxName>
                     ) : (
                       <MemberList>
                         {team.teams?.map((member, index) => (
                           <li key={index}>
                             <span className="member-name" title={member.name}>
-                              <span className="member-number">{index + 1}.</span>
+                              <span className="member-number">
+                                {index + 1}.
+                              </span>
                               <span>{member.name}</span>
                             </span>
                           </li>
@@ -192,7 +214,9 @@ function SeedPreview({ bracketProps, configs }) {
 
                 <SeedRank>
                   {team.potition || team.postition ? (
-                    <React.Fragment>#{team.potition || team.postition}</React.Fragment>
+                    <React.Fragment>
+                      #{team.potition || team.postition}
+                    </React.Fragment>
                   ) : (
                     <React.Fragment>&nbsp;</React.Fragment>
                   )}
@@ -209,7 +233,10 @@ function SeedPreview({ bracketProps, configs }) {
 function SeedBagan({ bracketProps, configs }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
   const { totalRounds, isTeam } = configs;
-  const { isFinalRound, isThirdPlaceRound } = _getRoundPositions({ totalRounds, roundIndex });
+  const { isFinalRound, isThirdPlaceRound } = _getRoundPositions({
+    totalRounds,
+    roundIndex,
+  });
 
   return (
     <Seed
@@ -244,7 +271,9 @@ function SeedBagan({ bracketProps, configs }) {
               >
                 <BoxNameGroup>
                   <BoxName title={team.name || team.teamName}>
-                    {team.name || team.teamName || <React.Fragment>&ndash;</React.Fragment>}
+                    {team.name || team.teamName || (
+                      <React.Fragment>&ndash;</React.Fragment>
+                    )}
                   </BoxName>
 
                   {!isTeam ? (
@@ -455,7 +484,6 @@ const BoxName = styled.span`
   white-space: nowrap;
   text-overflow: ellipsis;
   text-align: left;
-
   &.name-club {
     color: var(--ma-gray-500);
     font-size: 0.7em;

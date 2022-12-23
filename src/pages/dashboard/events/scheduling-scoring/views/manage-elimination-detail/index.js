@@ -14,7 +14,11 @@ import {
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
 import { LoadingScreen } from "components";
-import { ButtonOutlineBlue, SpinnerDotBlock, AlertSubmitError } from "components/ma";
+import {
+  ButtonOutlineBlue,
+  SpinnerDotBlock,
+  AlertSubmitError,
+} from "components/ma";
 import { BreadcrumbDashboard } from "../../../components/breadcrumb";
 import { FieldSelectOption } from "./field-select-option";
 import { ScoringEditor } from "./scoring-editor";
@@ -45,7 +49,9 @@ function PageConfigEliminationDetail() {
   const { category } = location.state;
 
   const { data: eventDetail } = useEventDetail(eventId);
-  const [eliminationMemberCount, setEliminationMemberCount] = React.useState(amountOptions[0]);
+  const [eliminationMemberCount, setEliminationMemberCount] = React.useState(
+    amountOptions[0]
+  );
   const [scoringType, setScoringType] = React.useState(null);
   const [formStatus, dispatchFormStatus] = React.useReducer(
     (state, action) => ({ ...state, ...action }),
@@ -90,7 +96,9 @@ function PageConfigEliminationDetail() {
   const handleSuccessSave = () => refetchMatchTemplate();
 
   const isLoadingApply = formStatus.status === "loading";
-  const editIsDisabled = shouldDisableEditing(eventDetail?.publicInformation.eventEnd);
+  const editIsDisabled = shouldDisableEditing(
+    eventDetail?.publicInformation.eventEnd
+  );
 
   return (
     <React.Fragment>
@@ -101,7 +109,10 @@ function PageConfigEliminationDetail() {
       <StyledPageWrapper>
         <Container fluid>
           <BreadcrumbDashboard
-            to={location.state.from || `/dashboard/event/${eventId}/scheduling-scoring`}
+            to={
+              location.state.from ||
+              `/dashboard/event/${eventId}/scheduling-scoring`
+            }
           >
             Kembali
           </BreadcrumbDashboard>
@@ -137,7 +148,11 @@ function PageConfigEliminationDetail() {
                   <FieldSelectOption
                     placeholder="Pilih jumlah peserta"
                     disabled={!matchTemplate?.updated}
-                    value={!matchTemplate?.updated ? defaultEmptyOption : eliminationMemberCount}
+                    value={
+                      !matchTemplate?.updated
+                        ? defaultEmptyOption
+                        : eliminationMemberCount
+                    }
                     options={amountOptions}
                     onChange={(option) => setEliminationMemberCount(option)}
                   >
@@ -147,7 +162,11 @@ function PageConfigEliminationDetail() {
                   <FieldSelectOption
                     placeholder="Pilih jenis sistem scoring"
                     disabled={!matchTemplate?.updated}
-                    value={matchTemplate?.updated && scoringType ? scoringType : defaultEmptyOption}
+                    value={
+                      matchTemplate?.updated && scoringType
+                        ? scoringType
+                        : defaultEmptyOption
+                    }
                     options={scoringTypeOptions}
                     onChange={(option) => setScoringType(option)}
                   >
@@ -225,7 +244,10 @@ function PageConfigEliminationDetail() {
         </Container>
 
         <LoadingScreen loading={isLoadingApply} />
-        <AlertSubmitError isError={formStatus.status === "error"} errors={formStatus.errors} />
+        <AlertSubmitError
+          isError={formStatus.status === "error"}
+          errors={formStatus.errors}
+        />
       </StyledPageWrapper>
     </React.Fragment>
   );
@@ -267,11 +289,16 @@ function SeedBagan({ bracketProps, configs, onSuccess }) {
               key={index}
               className={classnames({
                 "item-active": shouldEnableScoring(),
-                "item-winner": configs.isSettingApplied && parseInt(team.win) === 1 && !isBye,
+                "item-winner":
+                  configs.isSettingApplied &&
+                  parseInt(team.win) === 1 &&
+                  !isBye,
               })}
             >
               <BoxName>{team.name || "-"}</BoxName>
-              {typeof team.result === "number" && <BoxScore>{team.result}</BoxScore>}
+              {typeof team.result === "number" && (
+                <BoxScore>{team.result}</BoxScore>
+              )}
             </SeedTeam>
           ))}
 

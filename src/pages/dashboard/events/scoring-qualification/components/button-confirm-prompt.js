@@ -17,13 +17,17 @@ function ButtonConfirmPrompt({ disabled, title, onConfirm, onCancel }) {
   };
 
   const goNextPrompt = () => {
-    setShowAlertFirst(false);
-    setShowAlertSecond(true);
+    setShowAlertSecond(false);
+    setShowAlertFirst(true);
   };
 
-  const handleConfirm = () => {
+  const hitConfig = () => {
     onConfirm?.();
-    setShowAlertSecond(false);
+  };
+
+  const handleConfirm = async () => {
+    setShowAlertFirst(false);
+    hitConfig();
   };
 
   const LABEL_BUTTON_CANCEL = "Batalkan";
@@ -35,7 +39,8 @@ function ButtonConfirmPrompt({ disabled, title, onConfirm, onCancel }) {
 
   const TEXT_PROMPT_FIRST =
     "Anda tidak dapat merubah data setelah menentukan pemeringkatan eliminasi";
-  const TEXT_DESCRIPTION_FIRST = "Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.";
+  const TEXT_DESCRIPTION_FIRST =
+    "Pemeringkatan eliminasi dapat dilihat dalam bentuk bagan.";
 
   return (
     <React.Fragment>
@@ -49,7 +54,7 @@ function ButtonConfirmPrompt({ disabled, title, onConfirm, onCancel }) {
       </ButtonBlue>
 
       <Alert
-        show={showAlertFirst}
+        show={showAlertSecond}
         onCancel={handleCancel}
         onConfirm={goNextPrompt}
         labelButtonCancel={LABEL_BUTTON_CANCEL}
@@ -59,7 +64,7 @@ function ButtonConfirmPrompt({ disabled, title, onConfirm, onCancel }) {
       />
 
       <Alert
-        show={showAlertSecond}
+        show={showAlertFirst}
         onCancel={handleCancel}
         onConfirm={handleConfirm}
         labelButtonCancel={LABEL_BUTTON_CANCEL}
@@ -90,7 +95,10 @@ function Alert({
       onConfirm={onConfirm}
       style={{ width: 800, padding: "35px 88px", borderRadius: "1.25rem" }}
       customButtons={
-        <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
+        <span
+          className="d-flex justify-content-center"
+          style={{ gap: "0.5rem", width: "100%" }}
+        >
           <Button onClick={onCancel}>{labelButtonCancel}</Button>
           <ButtonBlue onClick={onConfirm}>{labelButtonConfirm}</ButtonBlue>
         </span>

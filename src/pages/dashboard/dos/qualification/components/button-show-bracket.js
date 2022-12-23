@@ -9,7 +9,11 @@ import {
   SeedItem as RBSeedItem,
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
-import { ButtonOutlineBlue, LoadingScreen, AlertSubmitError } from "components/ma";
+import {
+  ButtonOutlineBlue,
+  LoadingScreen,
+  AlertSubmitError,
+} from "components/ma";
 
 import IconBranch from "components/ma/icons/mono/branch";
 import IconX from "components/ma/icons/mono/x";
@@ -111,7 +115,9 @@ function SeedBagan({ bracketProps, configs }) {
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
           {seed.teams.map((team, index) => (
             <SeedTeam key={index}>
-              <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>
+                {team.name || <React.Fragment>&ndash;</React.Fragment>}
+              </BoxName>
             </SeedTeam>
           ))}
         </ItemContainer>

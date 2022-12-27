@@ -55,7 +55,7 @@ function EditorFormShootOff({ viewMode, shootOffData, isLoading, onChange }) {
             <ShootOffGroup>
               {scoresFromProp.map((scoreValue, index) =>
                 viewMode ? (
-                  <DisplayScore value={scoreValue} />
+                  <DisplayScore key={scoreValue} value={scoreValue} />
                 ) : (
                   <SelectScoreShootOff
                     key={index}

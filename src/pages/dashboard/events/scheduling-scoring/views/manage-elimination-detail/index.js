@@ -69,6 +69,51 @@ function PageConfigEliminationDetail() {
   };
 
   React.useEffect(() => {
+    if (matchTemplate) {
+      let arrData = [];
+      let rowTwo = 0;
+      let titleLabel = "";
+      matches.rounds.map((val) => {
+        switch (val.seeds.length) {
+          case 8:
+            titleLabel = "1/16";
+            break;
+          case 4:
+            titleLabel = "1/8";
+            break;
+          case 2:
+            titleLabel = "Semi-Final";
+            break;
+          case 1:
+            if (rowTwo < 1) {
+              rowTwo = 1;
+              titleLabel = "Final";
+            } else {
+              titleLabel = "3rd Place";
+            }
+            break;
+
+          default:
+            titleLabel = "1/32";
+            break;
+        }
+        let obj = {
+          round: val.round,
+          seeds: val.seeds,
+          title: (
+            <span className="badge bg-primary rounded-pill fs-6">
+              {titleLabel}
+            </span>
+          ),
+        };
+
+        return arrData.push(obj);
+      });
+      matchTemplate.rounds = arrData;
+    }
+  }, [matchTemplate]);
+
+  React.useEffect(() => {
     refetchMatchTemplate();
   }, [eliminationMemberCount, scoringType]);
 

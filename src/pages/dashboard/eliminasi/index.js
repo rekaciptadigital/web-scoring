@@ -6,7 +6,11 @@ import { DateInput, TimeInput, SelectInput } from "components";
 import { Bracket, Seed, SeedItem, SeedTeam, SeedTime } from "react-brackets";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { EventsService, EliminationService, ScoringService } from "../../../services";
+import {
+  EventsService,
+  EliminationService,
+  ScoringService,
+} from "../../../services";
 
 import { LoadingScreen } from "components";
 import ModalScoring from "./components/ModalScoring";
@@ -67,7 +71,11 @@ const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
                     // kotak emas, teks putih, yang udah menang
                   >
                     <SeedNameLabel>
-                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
+                      {team?.name || (
+                        <React.Fragment>
+                          &lt;belum ada partisipan&gt;
+                        </React.Fragment>
+                      )}
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
@@ -95,7 +103,11 @@ const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
                     // teks abu-abu, kotak abu-abu, yang belum menang/belum tanding?
                   >
                     <SeedNameLabel>
-                      {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
+                      {team?.name || (
+                        <React.Fragment>
+                          &lt;belum ada partisipan&gt;
+                        </React.Fragment>
+                      )}
                     </SeedNameLabel>
 
                     <SeedScoreLabel bgColor="white" color="black">
@@ -118,7 +130,11 @@ const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
                   // kotak hitam, teks putih, di-bypass ("bye")
                 >
                   <SeedNameLabel style={{ width: "100%", textAlign: "center" }}>
-                    {team?.name || <React.Fragment>&lt;belum ada partisipan&gt;</React.Fragment>}
+                    {team?.name || (
+                      <React.Fragment>
+                        &lt;belum ada partisipan&gt;
+                      </React.Fragment>
+                    )}
                   </SeedNameLabel>
                 </SeedTeamStyled>
               </div>
@@ -126,7 +142,9 @@ const CustomSeed = (seedData, setScoring, updated, maxRounds) => {
           })}
 
           {shouldScoringEnabled() && (
-            <SeedItem style={{ marginTop: 2, backgroundColor: "var(--bs-gray-800)" }}>
+            <SeedItem
+              style={{ marginTop: 2, backgroundColor: "var(--bs-gray-800)" }}
+            >
               <ButtonScoring key={breakpoint} onClick={handleOnClickSetScoring}>
                 <i className="bx bx-edit me-2" />
                 Scoring
@@ -186,6 +204,51 @@ function Eliminasi() {
     getEventEliminationTemplate();
   }, [category, countEliminationMember, type, gender]);
 
+  useEffect(() => {
+    if (bracketData) {
+      let arrData = [];
+      let rowTwo = 0;
+      let titleLabel = "";
+      matches.rounds.map((val) => {
+        switch (val.seeds.length) {
+          case 8:
+            titleLabel = "1/16";
+            break;
+          case 4:
+            titleLabel = "1/8";
+            break;
+          case 2:
+            titleLabel = "Semi-Final";
+            break;
+          case 1:
+            if (rowTwo < 1) {
+              rowTwo = 1;
+              titleLabel = "Final";
+            } else {
+              titleLabel = "3rd Place";
+            }
+            break;
+
+          default:
+            titleLabel = "1/32";
+            break;
+        }
+        let obj = {
+          round: val.round,
+          seeds: val.seeds,
+          title: (
+            <span className="badge bg-primary rounded-pill fs-6">
+              {titleLabel}
+            </span>
+          ),
+        };
+
+        return arrData.push(obj);
+      });
+      matches.rounds = arrData;
+    }
+  }, [matches]);
+
   const getEventDetail = async () => {
     const { message, errors, data } = await EventsService.getEventById({
       id: event_id,
@@ -201,13 +264,14 @@ function Eliminasi() {
   };
 
   const getEventEliminationTemplate = async () => {
-    const { message, errors, data } = await EliminationService.getEventEliminationTemplate({
-      event_id: event_id,
-      match_type: type.id,
-      gender: gender.id,
-      event_category_id: category.id,
-      elimination_member_count: countEliminationMember.id,
-    });
+    const { message, errors, data } =
+      await EliminationService.getEventEliminationTemplate({
+        event_id: event_id,
+        match_type: type.id,
+        gender: gender.id,
+        event_category_id: category.id,
+        elimination_member_count: countEliminationMember.id,
+      });
     if (data) {
       setMatches(data);
     } else console.log(message);
@@ -215,12 +279,13 @@ function Eliminasi() {
   };
 
   const addEliminasiSchedule = async () => {
-    const { message, errors, data } = await EliminationService.setEventEliminationSchedule({
-      event_id: event_id,
-      date: date,
-      start_time: start,
-      end_time: end,
-    });
+    const { message, errors, data } =
+      await EliminationService.setEventEliminationSchedule({
+        event_id: event_id,
+        date: date,
+        start_time: start,
+        end_time: end,
+      });
     if (data) {
       setDate("");
       setEnd("");
@@ -231,13 +296,14 @@ function Eliminasi() {
   };
 
   const setEliminasi = async () => {
-    const { message, errors, data } = await EliminationService.setEventElimination({
-      match_type: type.id,
-      gender: gender.id,
-      event_category_id: category.id,
-      scoring_type: scoringType.id,
-      elimination_member_count: countEliminationMember.id,
-    });
+    const { message, errors, data } =
+      await EliminationService.setEventElimination({
+        match_type: type.id,
+        gender: gender.id,
+        event_category_id: category.id,
+        scoring_type: scoringType.id,
+        elimination_member_count: countEliminationMember.id,
+      });
     if (data) {
       getEventEliminationTemplate();
     } else console.log(message);
@@ -265,16 +331,20 @@ function Eliminasi() {
       openModalScoring();
     } else {
       setCurrentScoringDetail(null);
-      console.error("Error mengambil data detail scoring match ini:", result.error);
+      console.error(
+        "Error mengambil data detail scoring match ini:",
+        result.error
+      );
     }
 
     setLoading(false);
   };
 
   const getEliminasiSchedule = async () => {
-    const { message, errors, data } = await EliminationService.getEventEliminationSchedule({
-      event_id: event_id,
-    });
+    const { message, errors, data } =
+      await EliminationService.getEventEliminationSchedule({
+        event_id: event_id,
+      });
     if (data) {
       setEliminasiSchedule(data);
     } else console.log(message);
@@ -392,7 +462,10 @@ function Eliminasi() {
                       />
                     </div>
                     <div className="float-end mt-2">
-                      <Button disabled={matches.updated ? false : true} onClick={setEliminasi}>
+                      <Button
+                        disabled={matches.updated ? false : true}
+                        onClick={setEliminasi}
+                      >
                         Terapkan
                       </Button>
                     </div>
@@ -418,45 +491,54 @@ function Eliminasi() {
 
                     <BaganView>
                       <Bracket
-                        rounds={matches.rounds != undefined ? matches.rounds : []}
+                        rounds={
+                          matches.rounds != undefined ? matches.rounds : []
+                        }
                         renderSeedComponent={(e) => {
-                          return CustomSeed(e, setScoring, matches.updated, matches.rounds.length);
+                          return CustomSeed(
+                            e,
+                            setScoring,
+                            matches.updated,
+                            matches.rounds.length
+                          );
                         }}
                       />
 
-                      {isModalScoringOpen && currentScoringDetail?.length && currentMatchData && (
-                        <ModalScoring
-                          matchData={{
-                            ...currentMatchData,
-                            ...matches.rounds[currentMatchData.roundIndex].seeds[
-                              currentMatchData.seedIndex
-                            ],
-                            updated: matches.updated,
-                          }}
-                          scoringDetail={currentScoringDetail}
-                          onChangeScoringDetail={(index, ev) => {
-                            setCurrentScoringDetail((currentDetail) => {
-                              const scoringDetailUpdated = [...currentDetail];
-                              scoringDetailUpdated[index].scores = { ...ev };
-                              return scoringDetailUpdated;
-                            });
-                          }}
-                          refetchScoreDetail={async () => {
-                            const result = await ScoringService.findParticipantScoreDetail(
-                              currentMatchData.queryStringRefetch
-                            );
-                            if (result.success && result.data) {
-                              setCurrentScoringDetail(result.data);
-                            }
-                            return result;
-                          }}
-                          isOpen={isModalScoringOpen}
-                          onToggle={toggleModalScoring}
-                          onClosed={closeModalScoring}
-                          onSavePermanent={handleSavePermanent}
-                          scoringTypeOptions={scoringTypeOptions}
-                        />
-                      )}
+                      {isModalScoringOpen &&
+                        currentScoringDetail?.length &&
+                        currentMatchData && (
+                          <ModalScoring
+                            matchData={{
+                              ...currentMatchData,
+                              ...matches.rounds[currentMatchData.roundIndex]
+                                .seeds[currentMatchData.seedIndex],
+                              updated: matches.updated,
+                            }}
+                            scoringDetail={currentScoringDetail}
+                            onChangeScoringDetail={(index, ev) => {
+                              setCurrentScoringDetail((currentDetail) => {
+                                const scoringDetailUpdated = [...currentDetail];
+                                scoringDetailUpdated[index].scores = { ...ev };
+                                return scoringDetailUpdated;
+                              });
+                            }}
+                            refetchScoreDetail={async () => {
+                              const result =
+                                await ScoringService.findParticipantScoreDetail(
+                                  currentMatchData.queryStringRefetch
+                                );
+                              if (result.success && result.data) {
+                                setCurrentScoringDetail(result.data);
+                              }
+                              return result;
+                            }}
+                            isOpen={isModalScoringOpen}
+                            onToggle={toggleModalScoring}
+                            onClosed={closeModalScoring}
+                            onSavePermanent={handleSavePermanent}
+                            scoringTypeOptions={scoringTypeOptions}
+                          />
+                        )}
                     </BaganView>
                   </CardBody>
                 </Card>
@@ -497,7 +579,10 @@ function Eliminasi() {
                                 label="Jam Selesai"
                               />
                             </div>
-                            <div style={{ paddingTop: "1.6rem" }} className="ms-1">
+                            <div
+                              style={{ paddingTop: "1.6rem" }}
+                              className="ms-1"
+                            >
                               <Button onClick={addEliminasiSchedule}>+</Button>
                             </div>
                           </div>
@@ -505,7 +590,13 @@ function Eliminasi() {
                           {eliminasiSchedule.map((d) => {
                             return (
                               <p key={d.id}>
-                                + {d.date + " [" + d.startTime + " - " + d.endTime + "]"}
+                                +{" "}
+                                {d.date +
+                                  " [" +
+                                  d.startTime +
+                                  " - " +
+                                  d.endTime +
+                                  "]"}
                               </p>
                             );
                           })}
@@ -527,7 +618,10 @@ function Eliminasi() {
                       <div style={{ height: "220px", overflowY: "scroll" }}>
                         <div className="w-75">
                           <div>
-                            <SelectInput options={dummyOptions} placeholder="Babak 1" />
+                            <SelectInput
+                              options={dummyOptions}
+                              placeholder="Babak 1"
+                            />
                           </div>
                         </div>
                       </div>

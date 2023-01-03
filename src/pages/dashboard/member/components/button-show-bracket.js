@@ -9,7 +9,11 @@ import {
   SeedItem as RBSeedItem,
   SeedTeam as RBSeedTeam,
 } from "react-brackets";
-import { ButtonOutlineBlue, LoadingScreen, AlertSubmitError } from "components/ma";
+import {
+  ButtonOutlineBlue,
+  LoadingScreen,
+  AlertSubmitError,
+} from "components/ma";
 
 import IconBranch from "components/ma/icons/mono/branch";
 import IconX from "components/ma/icons/mono/x";
@@ -25,6 +29,51 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount }) {
     isError,
     errors,
   } = useEliminationBracketTemplate(categoryDetailId, eliminationMemberCount);
+
+  React.useEffect(() => {
+    if (bracketData) {
+      let arrData = [];
+      let rowTwo = 0;
+      let titleLabel = "";
+      bracketData.rounds.map((val) => {
+        switch (val.seeds.length) {
+          case 8:
+            titleLabel = "1/16";
+            break;
+          case 4:
+            titleLabel = "1/8";
+            break;
+          case 2:
+            titleLabel = "Semi-Final";
+            break;
+          case 1:
+            if (rowTwo < 1) {
+              rowTwo = 1;
+              titleLabel = "Final";
+            } else {
+              titleLabel = "3rd Place";
+            }
+            break;
+
+          default:
+            titleLabel = "1/32";
+            break;
+        }
+        let obj = {
+          round: val.round,
+          seeds: val.seeds,
+          title: (
+            <span className="badge bg-primary rounded-pill fs-6">
+              {titleLabel}
+            </span>
+          ),
+        };
+
+        return arrData.push(obj);
+      });
+      bracketData.rounds = arrData;
+    }
+  }, [bracketData]);
 
   return (
     <React.Fragment>
@@ -111,7 +160,9 @@ function SeedBagan({ bracketProps, configs }) {
           {isThirdPlaceRound && <FinalHeading>Medali Perunggu</FinalHeading>}
           {seed.teams.map((team, index) => (
             <SeedTeam key={index}>
-              <BoxName>{team.name || <React.Fragment>&ndash;</React.Fragment>}</BoxName>
+              <BoxName>
+                {team.name || <React.Fragment>&ndash;</React.Fragment>}
+              </BoxName>
             </SeedTeam>
           ))}
         </ItemContainer>

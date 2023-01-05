@@ -18,7 +18,6 @@ const MemoizedCreatableSelect = React.memo(CreatableSelect);
 function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
   // Buat nampilin sementara value yang diselect sebelum hit API & direfresh datanya
   const [tempSelected, setTempSelected] = React.useState(null);
-  const [showAlert, setShowAlert] = React.useState(false);
 
   // Semua prop value & callback yang dioper ke React Select pelu di-memo juga
   // supaya memo komponen di atas working
@@ -29,17 +28,13 @@ function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
 
   const handleNumberChange = React.useCallback((opt) => {
     setTempSelected(opt);
-    if (!opt.isEmpty) {
-      setShowAlert(true);
-    } else {
-      onSubmit?.(opt);
-    }
+    onSubmit?.(opt);
   }, []);
 
   const handleCreateNumber = React.useCallback((inputValue) => {
     const newOption = { label: inputValue, value: inputValue };
     setTempSelected(newOption);
-    onSubmit?.(newOption);
+    onSubmit?.(tempSelected);
   }, []);
 
   const formatCreateLabel = React.useCallback((inputValue) => `Buat: "${inputValue}"`, []);
@@ -50,16 +45,6 @@ function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
   );
 
   const customComponents = React.useMemo(() => ({ Option }), []);
-
-  const handleCancel = () => {
-    setShowAlert(false);
-    setTempSelected(null);
-  };
-
-  const handleConfirm = () => {
-    setShowAlert(false);
-    onSubmit?.(tempSelected);
-  };
 
   return (
     <React.Fragment>
@@ -76,25 +61,6 @@ function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
           isOptionDisabled={isOptionDisabled}
         />
       </StyledWrapper>
-      <PromptAlert
-        showAlert={showAlert}
-        buttonConfirmLabel="Lanjutkan"
-        onConfirm={handleConfirm}
-        buttonCancelLabel={""}
-        onCancel={handleCancel}
-        messagePrompt={
-          tempSelected?.label
-            ? `Nomor Bantalan "${tempSelected.label}" Sudah Digunakan`
-            : "Nomor Bantalan Ini Sudah Digunakan"
-        }
-        messageDescription={
-          <React.Fragment>
-            Nomor bantalan untuk peserta sebelumnya dengan nomor ini akan kosong.
-            <br />
-            Silakan dapat melanjutkan dengan memasang peserta yang tidak memiliki nomor bantalan.
-          </React.Fragment>
-        }
-      />
     </React.Fragment>
   );
 }
@@ -192,60 +158,6 @@ const customSelectStyles = {
     padding: 7,
   }),
 };
-
-/* ================================== */
-
-function PromptAlert({
-  buttonConfirmLabel,
-  onConfirm,
-  buttonCancelLabel,
-  onCancel,
-  messagePrompt,
-  messageDescription,
-  showAlert,
-}) {
-  const handleCancel = () => {
-    onCancel?.();
-  };
-
-  const handleConfirm = () => {
-    onConfirm?.();
-  };
-
-  return (
-    <SweetAlert
-      show={showAlert}
-      title=""
-      custom
-      btnSize="md"
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-      style={{ width: 800, padding: "35px 88px", borderRadius: "1.25rem" }}
-      customButtons={
-        <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
-          <React.Fragment>
-            <Button onClick={handleCancel}>{buttonCancelLabel || "Batal"}</Button>
-            <ButtonBlue onClick={handleConfirm}>{buttonConfirmLabel || "Konfirmasi"}</ButtonBlue>
-          </React.Fragment>
-        </span>
-      }
-    >
-      <IllustationAlertPrompt />
-      {messagePrompt && <h4>{messagePrompt}</h4>}
-      {messageDescription && <p className="text-muted">{messageDescription}</p>}
-    </SweetAlert>
-  );
-}
-
-const IllustationAlertPrompt = styled.div`
-  margin-bottom: 2rem;
-  width: 100%;
-  min-height: 188px;
-  background-image: url(${illustrationAlert});
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-`;
 
 /* ========================= */
 // utils

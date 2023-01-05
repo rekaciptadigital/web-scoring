@@ -18,7 +18,6 @@ const MemoizedCreatableSelect = React.memo(CreatableSelect);
 function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
   // Buat nampilin sementara value yang diselect sebelum hit API & direfresh datanya
   const [tempSelected, setTempSelected] = React.useState(null);
-  const [showAlert, setShowAlert] = React.useState(false);
 
   // Semua prop value & callback yang dioper ke React Select pelu di-memo juga
   // supaya memo komponen di atas working

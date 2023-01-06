@@ -3,12 +3,8 @@ import styled from "styled-components";
 
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import SweetAlert from "react-bootstrap-sweetalert";
-import { Button, ButtonBlue } from "components/ma";
 
 import IconDot from "components/ma/icons/mono/dot";
-
-import illustrationAlert from "assets/images/events/alert-publication.svg";
 
 // Komponen berat & banyak dipakai di table, perlu di-memoize
 // supaya gak render ulang terus ketika onchange search, berat.

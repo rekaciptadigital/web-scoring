@@ -175,7 +175,7 @@ const MembersTable = styled.table`
       }
 
       &.stats {
-        text-align: right;
+        text-align: center;
       }
     }
   }
@@ -189,7 +189,7 @@ const MembersTable = styled.table`
     }
 
     &.stats {
-      text-align: right;
+      text-align: center;
     }
   }
 

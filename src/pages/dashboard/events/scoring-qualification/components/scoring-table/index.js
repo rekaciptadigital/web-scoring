@@ -300,6 +300,7 @@ function SessionStatsColumnHeadingGroup({ isSelectionType, collapsed, sessionLis
         </th>
       ))}
 
+      <th className="stats">Jumlah Panah</th>
       <th className="stats">Total</th>
 
       {!isSelectionType ? (
@@ -340,6 +341,7 @@ function SessionStatsCellsGroup({
         </td>
       ))}
 
+      <td className="stats">{totalArrow}</td>
       <td className="stats">{total}</td>
 
       {!isSelectionType ? (
@@ -470,7 +472,7 @@ const MembersTable = styled.table`
       }
 
       &.stats {
-        text-align: right;
+        text-align: center;
       }
     }
   }
@@ -484,7 +486,7 @@ const MembersTable = styled.table`
     }
 
     &.stats {
-      text-align: right;
+      text-align: center;
     }
   }
 

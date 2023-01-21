@@ -24,13 +24,11 @@ function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
 
   const handleNumberChange = React.useCallback((opt) => {
     setTempSelected(opt);
-    onSubmit?.(opt);
   }, []);
 
   const handleCreateNumber = React.useCallback((inputValue) => {
     const newOption = { label: inputValue, value: inputValue };
     setTempSelected(newOption);
-    onSubmit?.(tempSelected);
   }, []);
 
   const formatCreateLabel = React.useCallback((inputValue) => `Buat: "${inputValue}"`, []);
@@ -38,9 +36,15 @@ function BudrestNumberChooser({ selectedNumber, options, onSubmit }) {
   const isOptionDisabled = React.useCallback(
     (option) => option.value === selectedNumber,
     [selectedNumber]
-  );
+    );
 
   const customComponents = React.useMemo(() => ({ Option }), []);
+
+  React.useEffect(() => {
+    if (!tempSelected || !onSubmit) return
+
+    onSubmit(tempSelected)
+  }, [tempSelected])
 
   return (
     <React.Fragment>

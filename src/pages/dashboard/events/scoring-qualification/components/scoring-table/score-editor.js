@@ -7,7 +7,6 @@ import { AlertSubmitError } from "components/ma";
 import { toast } from "components/ma/processing-toast";
 import { EditorForm } from "./editor-form";
 import { EditorFormShootOff } from "./editor-form-shootoff";
-import { ConfirmPrompt } from "../confirm-prompt";
 
 import IconX from "components/ma/icons/mono/x";
 
@@ -219,32 +218,15 @@ function ScoreEditorControl({
               <StatsScoreAccumulation>
                 <span>Akumulasi Skor</span>
                 <span>{scoreTotal}</span>
+                <EditorCloseButton onClick={handleSaveScoreData}>
+                  <IconX size="16" />
+                </EditorCloseButton>
               </StatsScoreAccumulation>
             )}
           </EditorHeaderContent>
         ) : (
           <EditorHeaderContent></EditorHeaderContent>
         )}
-
-        <div>
-          <ConfirmPrompt
-            renderButton={({ handlePrompt }) => {
-              return (
-                <EditorCloseButton flexible onClick={handlePrompt}>
-                  <IconX size="16" />
-                </EditorCloseButton>
-              );
-            }}
-            messagePrompt="Ada data skor yang belum tersimpan"
-            messageDescription="Yakin akan menutup editor skor?"
-            reverseButtons
-            buttonConfirmLabel="Tutup Saja"
-            buttonCancelLabel="Simpan"
-            shouldPrompt={isFormDirty || isFormShootOffDirty}
-            onConfirm={onClose}
-            onCancel={handleSaveScoreData}
-          />
-        </div>
       </EditorHeader>
 
       {sessionNumber === 11 ? (

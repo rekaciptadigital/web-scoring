@@ -81,6 +81,7 @@ function switcherReducer(state, action) {
   }
 
   if (action.type === "MOVE_NEXT") {
+    console.log("===>>>>", state)
     const { y, x } = action.payload;
     let targetY;
     let targetX;

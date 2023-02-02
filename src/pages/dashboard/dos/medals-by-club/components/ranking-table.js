@@ -9,15 +9,15 @@ import IconMedalGold from "components/ma/icons/fill/medal-gold";
 import IconMedalSilver from "components/ma/icons/fill/medal-silver";
 import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 
-function RankingTable({ data }) {
+function RankingTable({ data, eventDetail }) {
   const { registerQueue, checkIsPending, onLoad, onError } = useQueueHeavyImageList();
   return (
     <ClubTable className="table table-responsive">
       <thead>
         <tr>
           <th>Peringkat</th>
-          <th className="name">Klub</th>
-          <th className="name">Kota</th>
+          {!eventDetail.withContingent ? <th className="name">Klub</th> : null}
+          <th className="name">{!eventDetail.withContingent ? 'Kota' : 'Kontingen'}</th>
 
           <th>
             <MedalCounter>
@@ -53,29 +53,31 @@ function RankingTable({ data }) {
           <tr key={index}>
             <td>{index + 1}</td>
 
-            <td className="name">
-              <Club>
-                <div title={row.clubLogo}>
-                  {row.clubLogo ? (
-                    <HeavyImage
-                      title={row.clubName}
-                      alt={"Logo " + row.clubName}
-                      src={row.clubLogo}
-                      onRegisterQueue={() => registerQueue(index)}
-                      onLoad={onLoad}
-                      onError={onError}
-                      isPending={checkIsPending(index)}
-                      fallback={<AvatarClubDefault />}
-                    />
-                  ) : (
-                    <AvatarClubDefault />
-                  )}
-                </div>
-                <div>{row.clubName}</div>
-              </Club>
-            </td>
+            {!eventDetail.withContingent ? (
+              <td className="name">
+                <Club>
+                  <div title={row.clubLogo}>
+                    {row.clubLogo ? (
+                      <HeavyImage
+                        title={row.clubName}
+                        alt={"Logo " + row.clubName}
+                        src={row.clubLogo}
+                        onRegisterQueue={() => registerQueue(index)}
+                        onLoad={onLoad}
+                        onError={onError}
+                        isPending={checkIsPending(index)}
+                        fallback={<AvatarClubDefault />}
+                      />
+                    ) : (
+                      <AvatarClubDefault />
+                    )}
+                  </div>
+                  <div>{row.clubName}</div>
+                </Club>
+              </td>
+            ) : null}
 
-            <td className="name">{row.clubCity}</td>
+            {!eventDetail.withContingent ? <td className="name">{row.clubCity}</td> : <td className="name">{row.contingentName}</td>}
             <td>{row.gold}</td>
             <td>{row.silver}</td>
             <td>{row.bronze}</td>

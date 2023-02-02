@@ -94,10 +94,10 @@ function PageDosWinners() {
 
           <SplitSides>
             <div>
-              <WinnerBoxView title="Kualifikasi" data={getTableData("qualification")} />
+              <WinnerBoxView title="Kualifikasi" data={getTableData("qualification")} eventDetail={eventDetail} />
             </div>
             <div>
-              <WinnerBoxView title="Eliminasi" data={getTableData("elimination")} />
+              <WinnerBoxView title="Eliminasi" data={getTableData("elimination")} eventDetail={eventDetail} />
             </div>
           </SplitSides>
         </Content>

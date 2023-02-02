@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
 import { LoadingScreen, SpinnerDotBlock } from "components/ma";
 
-function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, searchName, isTeam }) {
+function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, searchName, isTeam, eventDetail }) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
@@ -34,7 +34,7 @@ function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, sear
               <tr>
                 <th>Peringkat</th>
                 <th className="name">Tim</th>
-                <th className="name">Klub</th>
+                <th className="name">{!eventDetail.withContingent ? 'Klub' : 'Kontingen'}</th>
                 <SessionStatsColumnHeadingGroup sessionList={sessionNumbersList} />
                 <th></th>
               </tr>
@@ -55,7 +55,7 @@ function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, sear
                     </td>
                     <td className="name">{row?.team}</td>
                     <td className="name">
-                      <ClubName>{row?.clubName}</ClubName>
+                      {!eventDetail.withContingent ? <ClubName>{row?.clubName}</ClubName> : <ClubName>{row?.cityName}</ClubName>}
                     </td>
 
                     <SessionStatsCellsGroup

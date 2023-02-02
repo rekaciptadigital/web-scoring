@@ -9,6 +9,7 @@ function ScoringTable({
   searchName,
   isTeam,
   session,
+  eventDetail
 }) {
   const {
     data: scoringMembers,
@@ -46,7 +47,7 @@ function ScoringTable({
               <tr>
                 <th>Peringkat</th>
                 <th className="name">Nama</th>
-                <th className="name">Klub</th>
+                <th className="name">{!eventDetail.withContingent ? 'Klub' : 'Kontingen'}</th>
                 <SessionStatsColumnHeadingGroup sessionList={sessionNumbersList} />
                 <th></th>
               </tr>
@@ -67,7 +68,7 @@ function ScoringTable({
                     </td>
                     <td className="name">{row?.member?.name}</td>
                     <td className="name">
-                      <ClubName>{row?.clubName}</ClubName>
+                      {!eventDetail.withContingent ? <ClubName>{row?.clubName}</ClubName> : <ClubName>{row?.cityName}</ClubName>}
                     </td>
 
                     <SessionStatsCellsGroup

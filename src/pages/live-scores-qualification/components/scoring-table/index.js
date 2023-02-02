@@ -2,6 +2,8 @@ import * as React from "react";
 import styled from "styled-components";
 import { useDisplaySettings } from "../../contexts/display-settings";
 import { useParticipantScorings } from "../../hooks/participant-scorings";
+import { useEventDetail } from "pages/dashboard/dos/hooks/event-detail";
+import { useParams } from "react-router-dom";
 
 import { LoadingFullPage } from "../loading-fullpage";
 import IconLoading from "../icon-loading";
@@ -14,6 +16,10 @@ const PAUSE_DURATION = 2000;
 const TIMER_DURATION = 5000;
 
 function ScoringTable() {
+  const { event_id } = useParams();
+  const eventId = parseInt(event_id);
+  const { data: eventDetail } = useEventDetail(eventId);
+
   const { activeCategoryDetail, sessionNumber, next } = useDisplaySettings();
   const teamType = activeCategoryDetail?.categoryTeam?.toLowerCase?.();
   const { data, isLoading, isFetching } = useParticipantScorings({
@@ -73,7 +79,7 @@ function ScoringTable() {
                 <th>Peringkat</th>
                 <th>Bantalan</th>
                 <th className="text-uppercase">Nama</th>
-                <th className="text-uppercase">Klub</th>
+                <th className="text-uppercase">{!eventDetail.withContingent ? 'Klub' : 'Kontingen'}</th>
                 <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
                 {sessionNumber === 0 && <th className="text-uppercase">Total</th>}
                 <th className="text-uppercase">X+10</th>
@@ -100,7 +106,12 @@ function ScoringTable() {
                     <td>
                       <NameLabel>{scoring.member.name}</NameLabel>
                     </td>
-                    <td>{scoring.member.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
+                    {!eventDetail.withContingent ? (
+                      <td>{scoring.member.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
+                    ) : (
+                      <td>{scoring.member.cityName || <React.Fragment>&ndash;</React.Fragment>}</td>
+                    )
+                    }
 
                     <SessionCellsData sessions={scoring.sessions} />
                     <CountsBySession scoring={scoring} />

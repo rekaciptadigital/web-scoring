@@ -1,7 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
-import { EventsService } from "services";
 import { useScoringMembers } from "../../hooks/scoring-members";
+import { EventsService } from "services";
+import { AlertSubmitError } from "components/ma";
 
 import { Row, Col } from "reactstrap";
 import SweetAlert from "react-bootstrap-sweetalert";
@@ -13,15 +14,9 @@ import {
 } from "components/ma";
 
 import logoUpdate from "assets/images/myachery/update-category.png";
-import { AlertSubmitError } from "components/ma";
 
-function MemberTable({
-  categoryDetail,
-  searchName,
-  eventId,
-  isTeam,
-  paymentStatus,
-}) {
+function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatus, eventDetail }) {
+
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
@@ -110,7 +105,7 @@ function MemberTable({
             <tr>
               <th>No.</th>
               <th className="name">Nama Peserta</th>
-              <th className="name">Nama Klub</th>
+              <th className="name">{!eventDetail.withContingent ? 'Nama Klub' : 'Kontingen'}</th>
               <th className="name">Email</th>
               <th className="name">Telepon</th>
               <th className="name">Status Pembayaran</th>
@@ -125,7 +120,7 @@ function MemberTable({
                   <td>{index + 1}.</td>
                   <td className="name">{row?.member?.name}</td>
                   <td className="name">
-                    <ClubName>{row?.member?.clubName}</ClubName>
+                    {!eventDetail.withContingent ? <ClubName>{row?.member?.clubName}</ClubName> : <ClubName>{row?.member?.cityName}</ClubName>}
                   </td>
                   <td className="name">
                     <ClubName>{row?.member?.email}</ClubName>

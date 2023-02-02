@@ -156,6 +156,7 @@ function PageDosQualification() {
               eliminationParticipantsCount={activeCategory?.defaultEliminationCount}
               isTeam={!isIndividual}
               session={session}
+              eventDetail={eventDetail}
             />
           ) : (
             <ScoringTeamTable
@@ -165,6 +166,7 @@ function PageDosQualification() {
               onChangeParticipantPresence={resetOnChangeCategory}
               eliminationParticipantsCount={activeCategory?.defaultEliminationCount}
               isTeam={!isIndividual}
+              eventDetail={eventDetail}
             />
           )}
         </Content>

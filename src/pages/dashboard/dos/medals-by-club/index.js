@@ -72,6 +72,7 @@ function PageDosMedalsByClub() {
               key={"ranking-" + activeMenu}
               eventId={eventId}
               category={categories[activeMenu]}
+              eventDetail={eventDetail}
             />
           </VerticalSpace>
         </Content>
@@ -80,7 +81,7 @@ function PageDosMedalsByClub() {
   );
 }
 
-function RankingView({ eventId, category }) {
+function RankingView({ eventId, category, eventDetail }) {
   const {
     data: clubRanks,
     isInitialLoading,
@@ -141,7 +142,7 @@ function RankingView({ eventId, category }) {
   return (
     <div>
       <TabelHeading>{category.label}</TabelHeading>
-      <RankingTable data={clubRanks} />
+      <RankingTable data={clubRanks} eventDetail={eventDetail} />
     </div>
   );
 }

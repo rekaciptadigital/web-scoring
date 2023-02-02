@@ -5,7 +5,7 @@ import IconMedalGold from "components/ma/icons/fill/medal-gold";
 import IconMedalSilver from "components/ma/icons/fill/medal-silver";
 import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 
-function WinnerBoxView({ title, data }) {
+function WinnerBoxView({ title, data, eventDetail }) {
   const rowsGroupByCategory = React.useMemo(() => _makeRowData(data), [data]);
 
   if (!rowsGroupByCategory?.length) {
@@ -26,7 +26,7 @@ function WinnerBoxView({ title, data }) {
             <th>Kategori</th>
             <th>Medali</th>
             <th className="name">Nama</th>
-            <th className="name">Klub</th>
+            <th className="name"> {!eventDetail.withContingent ? 'Klub' : 'Kontingen'} </th>
           </tr>
         </thead>
 
@@ -47,7 +47,7 @@ function WinnerBoxView({ title, data }) {
                 </td>
 
                 <td className="name">{row.winnerName}</td>
-                <td className="name">{row.clubName}</td>
+                {!eventDetail.withContingent ? <td className="name">{row.clubName}</td> : <td className="name">{row.cityName}</td>}
               </tr>
             ));
           })}

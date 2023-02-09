@@ -56,6 +56,7 @@ function PageEventScoringQualification() {
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
   const [localCountNumber, setLocalCountNumber] = React.useState(null);
+  const [refectScoringData, setRefectScoringData] = React.useState(false);
   const countNumberInputRef = React.useRef(null);
 
   const [activeCategory, setActiveCategory] = React.useState(null);
@@ -253,6 +254,7 @@ function PageEventScoringQualification() {
                         onSuccess: () => {
                           toast.success("Bagan eliminasi selesai");
                           fetchCategoryDetails();
+                          setRefectScoringData(true);
                         },
                       });
                     }}
@@ -273,6 +275,8 @@ function PageEventScoringQualification() {
               isSelectionType={isSelectionType}
               isLocked={Boolean(!activeCategory || activeCategory?.eliminationLock)}
               searchName={inputSearchQuery}
+              refecthData={refectScoringData}
+              refectchUpdated={() => setRefectScoringData(false)}
               onChangeParticipantPresence={resetOnChangeCategory}
               eliminationParticipantsCount={activeCategory?.defaultEliminationCount}
               eventDetail={eventDetail}

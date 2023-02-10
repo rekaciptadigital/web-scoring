@@ -170,7 +170,31 @@ function ScoreEditorControl({
   const handleSaveScoreData = () => {
     if (sessionNumber === 11) {
       // shoot off
-      const payload = { code: code, shoot_scores: formShootOffValue };
+      if(!isFormShootOffDirty){
+        onClose?.();
+      }else{
+        const payload = { code: code, shoot_scores: formShootOffValue };
+        submitScore(payload, {
+          onSuccess() {
+            toast.success("Berhasil simpan skor");
+            onClose?.();
+            onSaveSuccess?.();
+          },
+          onError() {
+            toast.error("Gagal menyimpan skor");
+            // TODO: prompt retry / switch without saving anyway
+          },
+        });
+      }
+
+      return;
+    }
+
+    // sesi biasa
+    if(!isFormDirty){
+      onClose?.();
+    }else{
+      const payload = { code: code, shoot_scores: formValues };
       submitScore(payload, {
         onSuccess() {
           toast.success("Berhasil simpan skor");
@@ -182,23 +206,7 @@ function ScoreEditorControl({
           // TODO: prompt retry / switch without saving anyway
         },
       });
-
-      return;
     }
-
-    // sesi biasa
-    const payload = { code: code, shoot_scores: formValues };
-    submitScore(payload, {
-      onSuccess() {
-        toast.success("Berhasil simpan skor");
-        onClose?.();
-        onSaveSuccess?.();
-      },
-      onError() {
-        toast.error("Gagal menyimpan skor");
-        // TODO: prompt retry / switch without saving anyway
-      },
-    });
   };
 
   return (

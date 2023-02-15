@@ -221,6 +221,7 @@ function ScoringTable({
                       toast.success('Berhasil simpan peringkat')
                     }
                   })
+                  fetchScoringMembers()
                 }
 
                 const listRank = row.rankCanChange?.map(value => ({value: value, label: value}))
@@ -249,9 +250,12 @@ function ScoringTable({
                     ) : (
                       <td>
                         <SelectRank
-                          placeholder={row.rank}
                           options={listRank}
                           onChange={({value}) => handleChangeOption(value, "rank")}
+                          value={{
+                            value: row.rank,
+                            label: row.rank
+                          }}
                         />
                       </td>
                   )}

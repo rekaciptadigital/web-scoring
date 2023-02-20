@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { ScoringService } from "services";
 import { useScoringMembers } from "../../hooks/scoring-members";
 import { useScoreEditor } from "../../hooks/score-editor";
 import { useParticipantPresence } from "../../hooks/participant-presence";
@@ -10,6 +11,7 @@ import { toast } from "../processing-toast";
 import { LoadingScreen, SpinnerDotBlock, AlertConfirmAction } from "components/ma";
 import { Checkbox } from "../../../components/form-fields";
 import { ScoreEditor } from "./score-editor";
+import { SelectRank } from "./select-rank";
 
 import IconChevronLeft from "components/ma/icons/mono/chevron-left";
 import IconChevronRight from "components/ma/icons/mono/chevron-right";
@@ -18,6 +20,8 @@ import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconMedal from "components/ma/icons/fill/medal-gold";
 import classnames from "classnames";
 
+import CoinTosLogo from "../../../../../../assets/icons/coin-tos.png"
+
 function ScoringTable({
   categoryDetailId,
   isLocked,
@@ -25,15 +29,29 @@ function ScoringTable({
   eliminationParticipantsCount,
   onChangeParticipantPresence,
   searchName,
+  refecthData,
+  refectchUpdated,
   eventDetail
 }) {
   const { event_id } = useParams();
   const eventId = event_id;
   const scoreType = isSelectionType ? 3 : undefined;
 
+  const [rank, setRank] = React.useState([
+    {
+      rank : ''
+    }
+  ])
+
+  React.useEffect(() => {
+    if (refecthData) fetchScoringMembers()
+    if (isSuccess || isErrorScoringMembers) refectchUpdated()
+  }, [refecthData, isSuccess, isErrorScoringMembers])
+
   const {
     data: scoringMembers,
     searchQuery,
+    isSuccess,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
     getSessionNumbersList,
@@ -151,7 +169,7 @@ function ScoringTable({
       <TableContainer>
         <div>
           <LoadingBlocker isLoading={isLoadingScoringMembers} />
-          <MembersTable className="table table-responsive">
+          <MembersTable className="table table-responsive-xl">
             <thead>
               <tr>
                 <th title="Bantalan">
@@ -161,7 +179,7 @@ function ScoringTable({
                   <IconMedal />
                 </th>
                 <th className="name">Nama Peserta</th>
-                {!eventDetail.withContingent ? <th className="name">Nama Klub</th> : <th className="name">Kontingen</th>}
+                <th className="name">{!eventDetail.withContingent ? 'Nama Klub' : 'Kontingen' }</th>
                 <SessionStatsColumnHeadingGroup
                   isSelectionType={isSelectionType}
                   collapsed={isEditorOpen}
@@ -185,6 +203,29 @@ function ScoringTable({
                       ? "Peserta diikutkan dalam pemeringkatan eliminasi"
                       : "Peserta tidak diikutkan dalam pemeringkatan eliminasi";
                 };
+
+                const handleChangeOption = async (value, key) => {
+                  const tempArray = [...rank]
+                  if (!value.type) {
+                    tempArray[key] = value
+                    setRank(tempArray)
+                  }
+
+                  await ScoringService.saveRank({
+                    "member_id" : row.member.id,
+                    "rank" : value
+                  }).then((response) => {
+                    if (!response.success){
+                      toast.error(response.message)
+                    }else{
+                      toast.success('Berhasil simpan peringkat')
+                    }
+                  })
+                  fetchScoringMembers()
+                }
+
+                const listRank = row.rankCanChange?.map(value => ({value: value, label: value}))
+
                 return (
                   <tr
                     key={row.member.id}
@@ -196,18 +237,31 @@ function ScoringTable({
                         targetFace={row.member.targetFace}
                       />
                     </td>
-                    <td>
-                      {row.rank || (
-                        <GrayedOutText style={{ fontSize: "0.75em" }}>
-                          belum
-                          <br />
-                          ada data
-                        </GrayedOutText>
-                      )}
-                    </td>
-                    <td className="name">{row.member.name}</td>
+                    {!row.haveCointTost || isLocked ? (
+                      <td>
+                        {row.rank || (
+                          <GrayedOutText style={{ fontSize: "0.75em" }}>
+                            belum
+                            <br />
+                            ada data
+                          </GrayedOutText>
+                        )}
+                      </td>
+                    ) : (
+                      <td>
+                        <SelectRank
+                          options={listRank}
+                          onChange={({value}) => handleChangeOption(value, "rank")}
+                          value={{
+                            value: row.rank,
+                            label: row.rank
+                          }}
+                        />
+                      </td>
+                  )}
+                    <td className="name" style={{maxWidth: '200px'}}>{row.member.name}</td>
                     {!eventDetail.withContingent ?
-                      <td className="name">
+                      <td className="name" style={{maxWidth: '300px'}}>
                         <ClubName>{row.clubName}</ClubName>
                       </td>
                      :
@@ -225,6 +279,8 @@ function ScoringTable({
                       isSelectionType={isSelectionType}
                       totalArrow={row.totalArrow}
                       totalIrat={row.totalIrat}
+                      checkIsCoinToss={row.haveCointTost}
+                      isLocked={isLocked}
                     />
 
                     <td>
@@ -313,6 +369,7 @@ function SessionStatsColumnHeadingGroup({ isSelectionType, collapsed, sessionLis
         <React.Fragment>
           <th className="stats">X+10</th>
           <th className="stats">X</th>
+          <th></th>
         </React.Fragment>
       ) : (
         <React.Fragment>
@@ -334,6 +391,8 @@ function SessionStatsCellsGroup({
   totalXPlusTen,
   totalArrow,
   totalIrat,
+  checkIsCoinToss,
+  isLocked
 }) {
   if (collapsed) {
     return <td className="stats">{total}</td>;
@@ -352,8 +411,21 @@ function SessionStatsCellsGroup({
 
       {!isSelectionType ? (
         <React.Fragment>
-          <td className="stats">{totalXPlusTen}</td>
-          <td className="stats">{totalX}</td>
+          {!checkIsCoinToss || isLocked ? (
+            <>
+              <td className="stats">{totalXPlusTen}</td>
+              <td className="stats">{totalX}</td>
+              <td></td>
+            </>
+          ) : (
+            <>
+              <td className="stats">{totalXPlusTen}</td>
+              <td className="stats">{totalX}</td>
+              <td className="stats">
+                <img src={CoinTosLogo} height={15} />
+              </td>
+            </>
+          )}
         </React.Fragment>
       ) : (
         <React.Fragment>

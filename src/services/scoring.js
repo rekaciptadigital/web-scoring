@@ -151,4 +151,8 @@ export default {
   getDownloadQualifficationRank(qs) {
     return API.get("/web/v1/archery/events/report-list-qualification-rank-by-category-id", qs);
   },
+
+  saveRank(data = null) {
+    return API.post("/web/v1/archery/scorer/change-rank-member-qualification", data, null, true);
+  },
 };

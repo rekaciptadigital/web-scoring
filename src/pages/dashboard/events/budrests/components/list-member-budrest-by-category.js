@@ -17,7 +17,12 @@ const TOOLTIP_WARNING_TEXT = `Terdapat peserta dari klub yang
 sama dalam satu bantalan. Silakan
 ubah bantalan salah satu peserta.`;
 
-function ListMemberBudrestsByCategory({ group, budrestList, onChangeItem, isUpdatingData }) {
+function ListMemberBudrestsByCategory({
+  group,
+  budrestList,
+  onChangeItem,
+  isUpdatingData,
+}) {
   const { event_id } = useParams();
   const eventId = parseInt(event_id);
   const categoryId = group.id;
@@ -64,7 +69,7 @@ function ListMemberBudrestsByCategory({ group, budrestList, onChangeItem, isUpda
             <tr>
               <th colSpan="2">Bantalan</th>
               <th>Nama</th>
-              <th>Klub</th>
+              <th>Kontingen</th>
             </tr>
           </thead>
 
@@ -73,7 +78,9 @@ function ListMemberBudrestsByCategory({ group, budrestList, onChangeItem, isUpda
               <tr key={memberBudrest.key}>
                 {Boolean(memberBudrest.rowSpan) && (
                   <CenterCenterRow rowSpan={memberBudrest.rowSpan}>
-                    <span>{getNumberFromBudrest(memberBudrest.budRestNumber) || "-"}</span>
+                    <span>
+                      {getNumberFromBudrest(memberBudrest.budRestNumber) || "-"}
+                    </span>
                   </CenterCenterRow>
                 )}
 
@@ -104,14 +111,22 @@ function ListMemberBudrestsByCategory({ group, budrestList, onChangeItem, isUpda
                 <RowTextInTheMiddle>
                   {memberBudrest.hasSameClub ? (
                     <SpaceBetween>
-                      <HighlightedText>{memberBudrest.clubName}</HighlightedText>
+                      <HighlightedText>
+                        {memberBudrest.withContingent
+                          ? memberBudrest.cityName
+                          : memberBudrest.clubName}
+                      </HighlightedText>
 
                       <WarningIconWrapper title={TOOLTIP_WARNING_TEXT}>
                         <IconAlertCircle />
                       </WarningIconWrapper>
                     </SpaceBetween>
                   ) : (
-                    <span>{memberBudrest.clubName}</span>
+                    <span>
+                      {memberBudrest.withContingent
+                        ? memberBudrest.cityName
+                        : memberBudrest.clubName}
+                    </span>
                   )}
                 </RowTextInTheMiddle>
               </tr>

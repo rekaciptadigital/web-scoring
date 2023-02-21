@@ -294,6 +294,7 @@ function SeedBagan({ bracketProps, configs, eventDetail }) {
     totalRounds,
     roundIndex,
   });
+
   return (
     <Seed
       mobileBreakpoint={breakpoint}
@@ -341,8 +342,8 @@ function SeedBagan({ bracketProps, configs, eventDetail }) {
                           )}
                         </BoxName>
                       :
-                        <BoxName title={team.cityName} className="name-club">
-                          {team.cityName || (
+                        <BoxName title={team.city} className="name-club">
+                          {team.city || (
                             <React.Fragment>&nbsp;</React.Fragment>
                           )}
                         </BoxName>

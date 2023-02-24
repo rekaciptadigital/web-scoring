@@ -83,24 +83,50 @@ const eventPublishTime = [
 const fulldayAudience = [
   {
     id: "individual",
-    label: "Individu"
+    label: "Individu",
   },
   // {
   //   id: "team",
   //   label: "Tim"
   // },
-]
+];
 
 const gender = [
   {
     id: "male",
-    label: "Laki-laki"
+    label: "Laki-laki",
   },
   {
     id: "female",
-    label: "Perempuan"
+    label: "Perempuan",
   },
-]
+];
+
+const classificationOption = [
+  {
+    label: "Nama tim disediakan panitia",
+    value: "fromCommitte",
+  },
+  {
+    label: "Peserta input nama tim saat pendaftaran",
+    value: "fromRegistrant",
+  },
+];
+
+const tableClassificationMenuTab = [
+  {
+    id: "indexMenu",
+    label: "No.",
+  },
+  {
+    id: "nameMenu",
+    label: "Nama",
+  },
+  {
+    id: "actionMenu",
+    label: "Aksi",
+  },
+];
 
 export default {
   eventLocationType,
@@ -111,4 +137,6 @@ export default {
   eventPublishTime,
   fulldayAudience,
   gender,
+  classificationOption,
+  tableClassificationMenuTab,
 };

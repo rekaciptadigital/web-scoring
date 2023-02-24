@@ -54,10 +54,14 @@ import { stepId } from "./constants/step-ids";
 import { computeLastUnlockedStep } from "./utils/last-unlocked-step";
 
 import IconPlus from "components/ma/icons/mono/plus";
+import { FieldSettingToggleBar } from "./components/field-setting-toggle-bar";
+import { useFormCheck } from "./hooks/form-check";
+import SelectClassificationSetting from "./components/select-classification-setting";
+import { useCountry } from "./hooks/country";
 
 const { EVENT_TYPES } = eventConfigs;
 
-function PageCreateEventFullday() {
+function PageCreateEventFullday({ classification }) {
   const {
     eventId,
     isManageEvent,
@@ -72,15 +76,36 @@ function PageCreateEventFullday() {
     isPreparing: isPreparingEvent,
     fetchEventDetail,
   } = useEventDetail(eventId);
-  const { data: categoryDetails, fetch: fetchCategoryDetails } = useCategoryDetails(eventId);
-  const { data: categoriesQualification } = useCategoriesQualification(eventDetail);
+  const { data: categoryDetails, fetch: fetchCategoryDetails } =
+    useCategoryDetails(eventId);
+  const { data: categoriesQualification } =
+    useCategoriesQualification(eventDetail);
   const schedulesProvider = useQualificationSchedules(eventDetail);
   const { data: configRegistrationDates, fetch: fetchConfigRegistrationDates } =
     useConfigRegistrationDates(eventId);
   const { data: schedules } = schedulesProvider;
-  const { data: shootSettings, fetchRuleShootSetting } = useShootRuleSetting(eventId);
-  const { data: targetfacegSettings, fetchTargetFaceSetting } = useFaceTargetSetting(eventId);
-  const { data: rankingSettings, fetchRankingSetting } = useClubRankingSetting(eventId);
+  const { data: shootSettings, fetchRuleShootSetting } =
+    useShootRuleSetting(eventId);
+  const { data: targetfacegSettings, fetchTargetFaceSetting } =
+    useFaceTargetSetting(eventId);
+  const { data: rankingSettings, fetchRankingSetting } =
+    useClubRankingSetting(eventId);
+  const classificationCategory = classification;
+  const [countryKeyword, setCountryKeyword] = React.useState("");
+  const [provinceKeyword, setProvinceKeyword] = React.useState("");
+  const [selectedCountry, setSelectedCountry] = React.useState(null);
+  const [selectedProvince, setSelectedProvince] = React.useState(null);
+  const [selectedCity, setSelectedCity] = React.useState(null);
+  const [
+    selectWithoutContigentClassification,
+    setSelectWithoutContigentClassification,
+  ] = React.useState(null);
+  const [countryList, provinceList, cityList] = useCountry(
+    countryKeyword,
+    provinceKeyword,
+    selectedCountry,
+    selectedProvince
+  );
 
   const eventType = _checkEventType(eventDetail, qsEventType);
   const matchType = _checkMatchType(eventDetail, qsMatchType);
@@ -91,32 +116,40 @@ function PageCreateEventFullday() {
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
   const formCategories = useFormCategories(eventDetail);
-  const formRegistrationDates = useFormRegistrationDates(categoryDetails, configRegistrationDates);
+  const formRegistrationDates = useFormRegistrationDates(
+    categoryDetails,
+    configRegistrationDates
+  );
   const formSchedules = useFormSchedules(schedules, {
     eventType,
     eventDetail,
     categoryDetails: categoriesQualification,
   });
   const formRule = useFormRule({ eventDetail, rankingSettings });
+  const {
+    state: checkState,
+    setIsUseVerify,
+    setIsConfigureActive,
+  } = useFormCheck();
 
   const emptyFormSequenceByStep = isTypeSelection
     ? {
-      1: formPublicInfos.isEmpty,
-      2: formFees.isEmpty,
-      3: formCategories.isEmpty,
-      4: formRegistrationDates.isFirstTimeCreatingConfig,
-      5: formSchedules.isEmpty,
-      6: !formSchedules.isEmpty,
-    }
+        1: formPublicInfos.isEmpty,
+        2: formFees.isEmpty,
+        3: formCategories.isEmpty,
+        4: formRegistrationDates.isFirstTimeCreatingConfig,
+        5: formSchedules.isEmpty,
+        6: !formSchedules.isEmpty,
+      }
     : {
-      1: formPublicInfos.isEmpty,
-      2: formFees.isEmpty,
-      3: formCategories.isEmpty,
-      4: formRegistrationDates.isFirstTimeCreatingConfig,
-      5: false, // selalu unlock apapun nilainya (sifatnya gak wajib diset)
-      6: formSchedules.isEmpty,
-      7: !formSchedules.isEmpty,
-    };
+        1: formPublicInfos.isEmpty,
+        2: formFees.isEmpty,
+        3: formCategories.isEmpty,
+        4: formRegistrationDates.isFirstTimeCreatingConfig,
+        5: false, // selalu unlock apapun nilainya (sifatnya gak wajib diset)
+        6: formSchedules.isEmpty,
+        7: !formSchedules.isEmpty,
+      };
 
   const lastUnlockedStep = computeLastUnlockedStep(emptyFormSequenceByStep);
 
@@ -159,7 +192,7 @@ function PageCreateEventFullday() {
     isError: isErrorSubmitRule,
     errors: errorsSubmitRule,
   } = useSubmitRuleSetting(eventDetail?.id, formRule.submitRule);
-  
+
   const {
     submit: submitFaceRuleSetting,
     isLoading: isLoadingSubmitRuleFace,
@@ -168,39 +201,81 @@ function PageCreateEventFullday() {
   } = useSubmitRuleFaceSetting(eventDetail?.id, formRule.submitRuleFace);
 
   const {
-    submit : submitClubRank,
+    submit: submitClubRank,
     isLoading: isLoadingSubmitClubRank,
     isError: isErrorSubmitClubRank,
     errors: errorsSubmitClubRank,
   } = useSubmitClubsRanking(eventDetail?.id, formRule.formPemeringkatan);
 
   const isLoadingSubmit =
-    isSubmitingPublicInfos || isLoadingLogo || isSubmitingCategories || isSubmitRegistrationDates || isLoadingSubmitRule || isLoadingSubmitClubRank || isLoadingSubmitRuleFace;
+    isSubmitingPublicInfos ||
+    isLoadingLogo ||
+    isSubmitingCategories ||
+    isSubmitRegistrationDates ||
+    isLoadingSubmitRule ||
+    isLoadingSubmitClubRank ||
+    isLoadingSubmitRuleFace;
 
+  const onSelectOption = (val) => {
+    setSelectedCountry(val);
+  };
+
+  const onChangeInputCountry = (val) => {
+    setCountryKeyword(val);
+  };
+
+  const onSelectOptionProvince = (val) => {
+    setSelectedProvince(val);
+  };
+
+  const onSelectOptionCity = (val) => {
+    setSelectedCity(val);
+    console.log(selectedCity);
+  };
   return (
     <ContentLayoutWrapper
       pageTitle="Buat Event Baru"
       breadcrumbText="Kembali"
-      breadcrumbLink={isManageEvent ? `/dashboard/event/${eventId}/home` : "/dashboard"}
+      breadcrumbLink={
+        isManageEvent ? `/dashboard/event/${eventId}/home` : "/dashboard"
+      }
     >
       <ProcessingToast />
       <LoadingScreen loading={isLoadingSubmit} />
-      <AlertSubmitError isError={isErrorPublicInfos} errors={publicInfosErrors} />
+      <AlertSubmitError
+        isError={isErrorPublicInfos}
+        errors={publicInfosErrors}
+      />
       <AlertSubmitError isError={isErrorLogo} errors={errorsLogo} />
       <AlertSubmitError isError={isErrorCategories} errors={categoriesErrors} />
-      <AlertSubmitError isError={isErrorRegistrationDates} errors={errorsRegistrationDates} />
+      <AlertSubmitError
+        isError={isErrorRegistrationDates}
+        errors={errorsRegistrationDates}
+      />
       <AlertSubmitError isError={isErrorSubmitRule} errors={errorsSubmitRule} />
-      <AlertSubmitError isError={isErrorSubmitClubRank} errors={errorsSubmitClubRank} />
-      <AlertSubmitError isError={isErrorSubmitRuleFace} errors={errorsSubmitRuleFace} />
+      <AlertSubmitError
+        isError={isErrorSubmitClubRank}
+        errors={errorsSubmitClubRank}
+      />
+      <AlertSubmitError
+        isError={isErrorSubmitRuleFace}
+        errors={errorsSubmitRuleFace}
+      />
 
       <StepByStepScreen lastUnlocked={lastUnlockedStep}>
         <StepListIndicator title="Pertandingan">
           <StepItem id={stepId.INFO_UMUM}>Informasi Umum</StepItem>
           <StepItem id={stepId.BIAYA}>Biaya Registrasi</StepItem>
           <StepItem id={stepId.KATEGORI}>Kategori Lomba</StepItem>
-          <StepItem id={stepId.JADWAL_REGISTRASI}>Informasi Pendaftaran</StepItem>
-          {!isTypeSelection && <StepItem id={stepId.PERATURAN}>Aturan Pertandingan</StepItem>}
-          <StepItem id={stepId.JADWAL_KUALIFIKASI}>Jadwal Pertandingan</StepItem>
+          <StepItem id={stepId.JADWAL_REGISTRASI}>
+            Informasi Pendaftaran
+          </StepItem>
+          {!isTypeSelection && (
+            <StepItem id={stepId.PERATURAN}>Aturan Pertandingan</StepItem>
+          )}
+          <StepItem id={stepId.JADWAL_KUALIFIKASI}>
+            Jadwal Pertandingan
+          </StepItem>
           <StepItem id={stepId.SELESAI}>Selesai</StepItem>
         </StepListIndicator>
 
@@ -242,7 +317,8 @@ function PageCreateEventFullday() {
                       });
                     });
 
-                    const SUCCESS_MESSAGE = "Informasi umum event berhasil disimpan";
+                    const SUCCESS_MESSAGE =
+                      "Informasi umum event berhasil disimpan";
 
                     // 1
                     if (!isCreateMode) {
@@ -335,7 +411,9 @@ function PageCreateEventFullday() {
                   </ButtonOutlineBlue>
 
                   <ButtonOutlineBlue
-                    disabled={formCategories.data?.length >= formCategories.maxLength}
+                    disabled={
+                      formCategories.data?.length >= formCategories.maxLength
+                    }
                     onClick={() => formCategories.createEmptyCategory()}
                   >
                     <IconPlus size="13" /> Tambah Kategori
@@ -384,9 +462,158 @@ function PageCreateEventFullday() {
               </SpacedHeaderBar>
             </StepHeader>
 
+            <CardForm>
+              <div className="card-box">
+                <h5>Verifikasi Peserta</h5>
+
+                <FieldSettingToggleBar
+                  label="Peserta wajib verifikasi dengan mengirimkan KTP/KK"
+                  title={"Peserta wajib verifikasi dengan mengirimkan KTP/KK"}
+                  on={checkState.isUseVerify}
+                  onChange={setIsUseVerify}
+                />
+              </div>
+            </CardForm>
+
             <StepBody>
               <ScreenRegistrationDates form={formRegistrationDates} />
             </StepBody>
+
+            <CardForm>
+              <div className="card-box">
+                <h5>Konfigurasi Pendaftaran</h5>
+
+                <FieldSettingToggleBar
+                  label="Aktifkan Konfigurasi Pendaftaran"
+                  title={"Aktifkan Konfigurasi Pendaftaran"}
+                  info={
+                    "Anda dapat membuat tanggal pendaftaran yang berbeda untuk individu, beregu, dan beregu campuran."
+                  }
+                  on={checkState.isConfigureActive}
+                  onChange={setIsConfigureActive}
+                />
+              </div>
+            </CardForm>
+
+            <CardForm>
+              <div className="card-box-classification">
+                <h5>Klasifikasi Peserta</h5>
+
+                <SubtitleTextClassification>
+                  Peserta Mendaftarkan mewakili
+                </SubtitleTextClassification>
+                {eventDetail?.withContingent === 0 ? (
+                  <SelectContigentWrapper>
+                    <SelectClassificationSetting
+                      eventDetail={eventDetail}
+                      optionsData={countryList}
+                      onInputChange={onChangeInputCountry}
+                      placeholder="Negara"
+                      onSelectOption={onSelectOption}
+                      label="Masukkan Negara"
+                    />
+                    {selectedCountry ? (
+                      <SelectClassificationSetting
+                        eventDetail={eventDetail}
+                        optionsData={provinceList}
+                        onInputChange={(val) => setProvinceKeyword(val)}
+                        placeholder="Provinsi"
+                        onSelectOption={onSelectOptionProvince}
+                        label="Masukkan Provinsi"
+                      />
+                    ) : null}
+                    {selectedProvince ? (
+                      <SelectClassificationSetting
+                        eventDetail={eventDetail}
+                        optionsData={cityList}
+                        // onInputChange={(val) => setProvinceKeyword(val)}
+                        placeholder="City"
+                        onSelectOption={onSelectOptionCity}
+                        label="Masukkan Kota"
+                      />
+                    ) : null}
+                  </SelectContigentWrapper>
+                ) : (
+                  <SelectContigentWrapper>
+                    <SelectClassificationSetting
+                      eventDetail={eventDetail}
+                      initialSelect
+                      classificationCategory={classificationCategory}
+                      onSelectOption={(val) => {
+                        if (val.value === "newClassification") {
+                          classificationCategory.setChangeView(2);
+                          classificationCategory.setNewClassification([]);
+                        } else {
+                          setSelectWithoutContigentClassification(val);
+                        }
+                      }}
+                    />
+                    {selectWithoutContigentClassification &&
+                    selectWithoutContigentClassification?.value ===
+                      "country" ? (
+                      <>
+                        <SelectClassificationSetting
+                          eventDetail={eventDetail}
+                          optionsData={countryList}
+                          onInputChange={onChangeInputCountry}
+                          placeholder="Negara"
+                          onSelectOption={onSelectOption}
+                          label="Masukkan Negara"
+                        />
+                        {selectedCountry ? (
+                          <SelectClassificationSetting
+                            eventDetail={eventDetail}
+                            optionsData={provinceList}
+                            onInputChange={(val) => setProvinceKeyword(val)}
+                            placeholder="Provinsi"
+                            onSelectOption={onSelectOptionProvince}
+                            label="Masukkan Provinsi"
+                          />
+                        ) : null}
+                        {selectedProvince ? (
+                          <SelectClassificationSetting
+                            eventDetail={eventDetail}
+                            optionsData={cityList}
+                            // onInputChange={(val) => setProvinceKeyword(val)}
+                            placeholder="City"
+                            onSelectOption={onSelectOptionCity}
+                            label="Masukkan Kota"
+                          />
+                        ) : null}
+                      </>
+                    ) : selectWithoutContigentClassification?.value ===
+                      "provinsi" ? (
+                      <SelectClassificationSetting
+                        eventDetail={eventDetail}
+                        optionsData={provinceList}
+                        onInputChange={(val) => setProvinceKeyword(val)}
+                        placeholder="Provinsi"
+                        onSelectOption={onSelectOptionProvince}
+                        label="Masukkan Provinsi"
+                      />
+                    ) : selectWithoutContigentClassification?.value ===
+                      "city" ? (
+                      <SelectClassificationSetting
+                        eventDetail={eventDetail}
+                        optionsData={cityList}
+                        // onInputChange={(val) => setProvinceKeyword(val)}
+                        placeholder="City"
+                        onSelectOption={onSelectOptionCity}
+                        label="Masukkan Kota"
+                      />
+                    ) : null}
+                  </SelectContigentWrapper>
+                )}
+                {selectWithoutContigentClassification?.value === "club" &&
+                eventDetail?.withContigent === 0 ? (
+                  <InfoTextClassification>
+                    {eventDetail?.withContigent == 0
+                      ? "Masukkan data klub jika ada"
+                      : "Peserta mendaftar sebagai perwakilan negara"}
+                  </InfoTextClassification>
+                ) : null}
+              </div>
+            </CardForm>
 
             <StepFooterActions>
               <ButtonSave
@@ -446,7 +673,9 @@ function PageCreateEventFullday() {
                   formRule.handleValidation({
                     onInvalid: (errors) => {
                       // TODO: ke depan bisa kasih toast untuk display pesan error
-                      toast.error("Terjadi kesalahan saat menyimpan aturan pertandingan club");
+                      toast.error(
+                        "Terjadi kesalahan saat menyimpan aturan pertandingan club"
+                      );
                       Object.values(errors).forEach((error) =>
                         error.forEach((message) => console.error(message))
                       );
@@ -454,12 +683,14 @@ function PageCreateEventFullday() {
                     onValid: () => {
                       submitClubRank({
                         onSuccess: () => {
-                          toast.success("Pengaturan untuk Pemeringkatan Klub berhasil disimpan");
+                          toast.success(
+                            "Pengaturan untuk Pemeringkatan Klub berhasil disimpan"
+                          );
                           fetchRankingSetting();
                         },
                       });
                     },
-                  })
+                  });
                   // next();
                 }}
               >
@@ -507,7 +738,10 @@ function PageCreateEventFullday() {
 
           <StepContent id={stepId.SELESAI}>
             <StepBody>
-              <ScreenFinish eventDetail={eventDetail} fetchEventDetail={fetchEventDetail} />
+              <ScreenFinish
+                eventDetail={eventDetail}
+                fetchEventDetail={fetchEventDetail}
+              />
             </StepBody>
           </StepContent>
         </StepDisplay>
@@ -515,6 +749,12 @@ function PageCreateEventFullday() {
     </ContentLayoutWrapper>
   );
 }
+
+const SelectContigentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+`;
 
 const SpacedHeaderBar = styled.div`
   display: flex;
@@ -535,6 +775,44 @@ const SpacedHeaderBar = styled.div`
   }
 `;
 
+const CardForm = styled.div`
+  background: white;
+  padding: 35px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  color: #1c1c1c;
+
+  .card-box {
+    padding: 20px;
+    border: 1px solid var(--ma-gray-200);
+    border-radius: 8px;
+    > * + * {
+      margin-top: 1.5rem;
+    }
+  }
+
+  .card-box-classification {
+    padding: 20px;
+    border: 1px solid var(--ma-gray-200);
+    border-radius: 8px;
+    > * + * {
+      margin: 0.5rem 0;
+    }
+  }
+`;
+
+const SubtitleTextClassification = styled.div`
+  font-weight: 400;
+  font-size: 14px;
+  color: #1c1c1c;
+  padding-top: 10px;
+`;
+
+const InfoTextClassification = styled.span`
+  color: #545454;
+  font-weight: 400;
+  font-size: 12px;
+`;
 /* ======================================= */
 // utils
 

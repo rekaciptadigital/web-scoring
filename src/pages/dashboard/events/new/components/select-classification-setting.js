@@ -11,9 +11,10 @@ const SelectClassificationSetting = ({
   onInputChange,
   label,
   classificationCategory,
+  defaultValue,
+  value,
 }) => {
   const [options, setOptions] = React.useState([]);
-  const defaultOptionWithoudContigent = classificationCategory?.classification;
   const defaultOptionWithContigent = [
     { label: "Negara", value: "country" },
     { label: "Provinsi", value: "province" },
@@ -21,13 +22,13 @@ const SelectClassificationSetting = ({
   ];
   React.useEffect(() => {
     if (initialSelect) {
-      if (eventDetail?.withContingent === 0) {
+      if (eventDetail?.withContingent !== 0) {
         setOptions(defaultOptionWithContigent);
       } else {
-        setOptions(defaultOptionWithoudContigent);
+        setOptions([...optionsData, ...classificationCategory?.classification]);
       }
     }
-  }, [eventDetail]);
+  }, [eventDetail, optionsData]);
   return (
     <div>
       {label ? <LabelSelectText>{label}</LabelSelectText> : null}
@@ -35,7 +36,7 @@ const SelectClassificationSetting = ({
         options={initialSelect ? options : optionsData ?? []}
         placeholder={
           initialSelect
-            ? eventDetail?.withContingent !== 0
+            ? eventDetail?.withContingent === 0
               ? "Klub"
               : "Negara"
             : placeholder ?? ""
@@ -48,6 +49,8 @@ const SelectClassificationSetting = ({
             <span style={{ marginLeft: 5 }}>{e.label}</span>
           </div>
         )}
+        defaultValue={defaultValue}
+        value={value}
       />
     </div>
   );

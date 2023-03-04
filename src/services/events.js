@@ -117,6 +117,42 @@ export default {
   getEventMemberTeam(qs = null) {
     return API.get("/web/v2/members/team", qs);
   },
+  getParentClassification(qs = null) {
+    return API.get("/web/v2/classification-member", qs);
+  },
+  getChildrenClassification(qs = null) {
+    return API.get("/web/v2/classification-member/children", qs);
+  },
+  createParentClassification(data = null, qs = null) {
+    return API.post("/web/v2/classification-member/add-admin", data, qs, true);
+  },
+  createChildrenClassification(data = null, qs = null) {
+    return API.postFormData(
+      "/web/v2/classification-member/add-children",
+      data,
+      qs
+    );
+  },
+  deleteParentClassification(qs = null) {
+    return API.deleteByParams(
+      "/web/v2/classification-member/delete-parent",
+      qs
+    );
+  },
+  deleteChildrenClassification(qs = null) {
+    return API.delete("/web/v2/classification-member/delete-children", qs);
+  },
+  updateParentClassification(data = null, qs = null) {
+    return API.put(
+      "/web/v2/classification-member/update-parent",
+      data,
+      qs,
+      true
+    );
+  },
+  updateChildrenClassification(data = null, qs = null) {
+    return API.put("/web/v2/classification-member/update-children", data, qs);
+  },
 
   /**
    * @param {QueryString} qs { event_id }
@@ -202,11 +238,19 @@ export default {
   },
 
   getShootRuleSetting(qs = null) {
-    return API.get("/web/v1/aturan-pertandingan/get-config-aturan-pertandingan", qs);
+    return API.get(
+      "/web/v1/aturan-pertandingan/get-config-aturan-pertandingan",
+      qs
+    );
   },
 
   storeSetConfigShootRule(data) {
-    return API.post("/web/v1/aturan-pertandingan/set-config-aturan-pertandingan", data, null, true);
+    return API.post(
+      "/web/v1/aturan-pertandingan/set-config-aturan-pertandingan",
+      data,
+      null,
+      true
+    );
   },
 
   getTargetFaceSetting(qs = null) {
@@ -214,6 +258,11 @@ export default {
   },
 
   storeSetConfigFaceRule(data) {
-    return API.post("/web/v1/config-target-face/set-config-target-face", data, null, true);
+    return API.post(
+      "/web/v1/config-target-face/set-config-target-face",
+      data,
+      null,
+      true
+    );
   },
 };

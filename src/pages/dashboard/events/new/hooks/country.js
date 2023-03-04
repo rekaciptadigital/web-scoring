@@ -80,7 +80,7 @@ const useCountry = (
     try {
       if (country?.id === 102 || country?.name === "Indonesia") {
         const qs = {
-          limit: 200,
+          limit: province?.id ? 200 : 2000,
           page: 1,
           province_id: province?.id,
         };

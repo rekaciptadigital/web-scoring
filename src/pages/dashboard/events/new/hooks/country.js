@@ -9,7 +9,7 @@ const useCountry = (
 ) => {
   const [countryList, setCountryList] = React.useState([]);
   const [provinceList, setProvinceList] = React.useState([]);
-  const [cityList, setCityList] = React.useState([]);
+  // const [cityList, setCityList] = React.useState([]);
   const [errorMessage, setErrorMessage] = React.useState([]);
   const fetchCountry = async (keyword) => {
     try {
@@ -76,52 +76,52 @@ const useCountry = (
     }
   };
 
-  const fetchCity = async (country, province) => {
-    try {
-      if (country?.id === 102 || country?.name === "Indonesia") {
-        const qs = {
-          limit: province?.id ? 200 : 2000,
-          page: 1,
-          province_id: province?.id,
-        };
-        const data = await GeneralService.getCities(qs);
-        if (!data?.error) {
-          setCityList(
-            data?.data?.map((city) => ({
-              ...city,
-              label: city.name,
-              value: city.name,
-            }))
-          );
-          setErrorMessage("");
-        } else {
-          setErrorMessage(data?.error);
-        }
-      } else {
-        const qs = {
-          limit: 200,
-          country_id: country?.id,
-          page: 1,
-          province_id: province?.id,
-        };
-        const data = await GeneralService.getCitiesCountry(qs);
-        if (!data?.error) {
-          setCityList(
-            data?.data?.map((city) => ({
-              ...city,
-              label: city.name,
-              value: city.name,
-            }))
-          );
-          setErrorMessage("");
-        } else {
-          setErrorMessage(data?.error);
-        }
-      }
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
-  };
+  // const fetchCity = async (country, province) => {
+  //   try {
+  //     if (country?.id === 102 || country?.name === "Indonesia") {
+  //       const qs = {
+  //         limit: province?.id ? 200 : 2000,
+  //         page: 1,
+  //         province_id: province?.id,
+  //       };
+  //       const data = await GeneralService.getCities(qs);
+  //       if (!data?.error) {
+  //         setCityList(
+  //           data?.data?.map((city) => ({
+  //             ...city,
+  //             label: city.name,
+  //             value: city.name,
+  //           }))
+  //         );
+  //         setErrorMessage("");
+  //       } else {
+  //         setErrorMessage(data?.error);
+  //       }
+  //     } else {
+  //       const qs = {
+  //         limit: 200,
+  //         country_id: country?.id,
+  //         page: 1,
+  //         province_id: province?.id,
+  //       };
+  //       const data = await GeneralService.getCitiesCountry(qs);
+  //       if (!data?.error) {
+  //         setCityList(
+  //           data?.data?.map((city) => ({
+  //             ...city,
+  //             label: city.name,
+  //             value: city.name,
+  //           }))
+  //         );
+  //         setErrorMessage("");
+  //       } else {
+  //         setErrorMessage(data?.error);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     setErrorMessage(error.message);
+  //   }
+  // };
 
   React.useEffect(() => {
     fetchCountry(countryInput);
@@ -134,18 +134,18 @@ const useCountry = (
       },
       provinceInput
     );
-    fetchCity(
-      selectedCountry ?? {
-        id: 102,
-        name: "Indonesia",
-        label: "Indonesia",
-        value: "Indonesia",
-      },
-      selectedProvince
-    );
+    // fetchCity(
+    //   selectedCountry ?? {
+    //     id: 102,
+    //     name: "Indonesia",
+    //     label: "Indonesia",
+    //     value: "Indonesia",
+    //   },
+    //   selectedProvince
+    // );
   }, [countryInput, provinceInput, selectedCountry, selectedProvince]);
 
-  return [countryList, provinceList, cityList, errorMessage];
+  return [countryList, provinceList, errorMessage];
 };
 
 export { useCountry };

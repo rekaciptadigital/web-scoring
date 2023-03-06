@@ -7,7 +7,6 @@ function useSubmitRegistrationDates(eventId, formData) {
   const fetcher = useFetcher();
 
   const submit = (options = {}) => {
-    // const submit = (options = {}) => {
     let payload = {
       event_id: eventId,
       default_datetime_start_register: formData.registrationDateStart
@@ -21,40 +20,23 @@ function useSubmitRegistrationDates(eventId, formData) {
       ),
       schedule_end_event: datetime.formatServerDatetime(formData.eventDateEnd),
       is_active_config: 0,
-      is_active_classification: formData.isActiveClassification,
       list_classification: [],
+      withContingent: 1,
+      parentClassification:
+        formData?.classification?.parentClassification?.id ?? 1,
     };
-    if (formData?.classification?.parentClassification?.childrens?.length) {
-      const childrenData = [];
-      formData?.classification?.parentClassification?.childrens?.map((val) => {
-        const parent = {
-          parent_classification_id:
-            formData?.classification?.parentClassification.id,
-          children_classification_id: val.id,
-          archery_club_id: null,
-          country_id: null,
-          states_id: null,
-          city_of_contry_id: null,
-        };
-        childrenData.push(parent);
-      });
-      payload.list_classification = childrenData;
-    } else {
-      const classifiactionData = {
-        parent_classification_id:
-          formData?.classification?.parentClassification.id,
-        children_classification_id: null,
-        archery_club_id: null,
-        country_id: formData?.classification?.setting_country?.id ?? null,
-        states_id:
-          formData?.classification?.parentClassification?.id !== 4
-            ? formData?.classification?.setting_province?.id
-            : formData?.classification?.setting_city?.provinceId ?? null,
-        city_of_contry_id: formData?.classification?.setting_city?.id ?? null,
-      };
-      payload.list_classification = [classifiactionData];
+    if (
+      formData?.classification?.parentClassification?.id === 2 ||
+      formData?.classification?.parentClassification?.id === 3 ||
+      formData?.classification?.parentClassification?.id === 4
+    ) {
+      payload.classificationCountryId =
+        formData?.classification?.setting_country?.id ?? 0;
+      payload.classificationProvinceId =
+        Number(formData?.classification?.setting_province?.id) ?? 0;
+      payload.classificationCityId =
+        Number(formData?.classification?.setting_city?.id) ?? 0;
     }
-
     if (formData.isActive) {
       payload = {
         ...payload,

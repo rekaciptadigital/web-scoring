@@ -13,20 +13,12 @@ const SelectClassificationSetting = ({
   classificationCategory,
   defaultValue,
   value,
+  textDetail,
 }) => {
   const [options, setOptions] = React.useState([]);
-  const defaultOptionWithContigent = [
-    { label: "Negara", value: "country" },
-    { label: "Provinsi", value: "province" },
-    { label: "Kota", value: "city" },
-  ];
   React.useEffect(() => {
     if (initialSelect) {
-      if (eventDetail?.withContingent !== 0) {
-        setOptions(defaultOptionWithContigent);
-      } else {
-        setOptions([...optionsData, ...classificationCategory?.classification]);
-      }
+      setOptions([...optionsData, ...classificationCategory?.classification]);
     }
   }, [eventDetail, optionsData]);
   return (
@@ -34,13 +26,7 @@ const SelectClassificationSetting = ({
       {label ? <LabelSelectText>{label}</LabelSelectText> : null}
       <Select
         options={initialSelect ? options : optionsData ?? []}
-        placeholder={
-          initialSelect
-            ? eventDetail?.withContingent === 0
-              ? "Klub"
-              : "Negara"
-            : placeholder ?? ""
-        }
+        placeholder={initialSelect ? "Klub" : placeholder ?? ""}
         onInputChange={onInputChange}
         onChange={(val) => onSelectOption && onSelectOption(val)}
         getOptionLabel={(e) => (
@@ -52,6 +38,9 @@ const SelectClassificationSetting = ({
         defaultValue={defaultValue}
         value={value}
       />
+      {textDetail?.length ? (
+        <InfoTextClassification>{textDetail}</InfoTextClassification>
+      ) : null}
     </div>
   );
 };
@@ -60,6 +49,12 @@ const LabelSelectText = styled.label`
   font-weight: 400;
   font-size: 12px;
   color: #1c1c1c;
+`;
+
+const InfoTextClassification = styled.span`
+  color: #545454;
+  font-weight: 400;
+  font-size: 12px;
 `;
 
 export default SelectClassificationSetting;

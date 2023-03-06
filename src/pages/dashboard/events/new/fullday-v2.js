@@ -54,8 +54,6 @@ import { stepId } from "./constants/step-ids";
 import { computeLastUnlockedStep } from "./utils/last-unlocked-step";
 
 import IconPlus from "components/ma/icons/mono/plus";
-import { FieldSettingToggleBar } from "./components/field-setting-toggle-bar";
-import { useFormCheck } from "./hooks/form-check";
 import SelectClassificationSetting from "./components/select-classification-setting";
 import { useCountry } from "./hooks/country";
 import { fetchClassification } from "./hooks/form-classification";
@@ -96,10 +94,9 @@ function PageCreateEventFullday({ classification }) {
   const [provinceKeyword, setProvinceKeyword] = React.useState("");
   const [selectedCountry, setSelectedCountry] = React.useState(null);
   const [selectedProvince, setSelectedProvince] = React.useState(null);
-  const [selectedCity, setSelectedCity] = React.useState(null);
   const [selectOptionClassification, setSelectOptionClassification] =
     React.useState(null);
-  const [countryList, provinceList, cityList] = useCountry(
+  const [countryList, provinceList] = useCountry(
     countryKeyword,
     provinceKeyword,
     selectedCountry,
@@ -108,39 +105,14 @@ function PageCreateEventFullday({ classification }) {
   if (selectOptionClassification) {
     classificationSetting.parentClassification = selectOptionClassification;
   }
-  if (selectedCountry && selectOptionClassification?.id === 2) {
+  if (
+    selectOptionClassification?.id === 2 ||
+    selectOptionClassification?.id === 3 ||
+    selectOptionClassification?.id === 4
+  ) {
     classificationSetting.setting_country = selectedCountry;
-    if (selectedProvince) {
-      classificationSetting.setting_province = selectedProvince;
-      if (selectedCity) {
-        classificationSetting.setting_city = selectedCity;
-      }
-    }
-  }
-  if (selectedProvince && selectOptionClassification?.id === 3) {
     classificationSetting.setting_province = selectedProvince;
-    classificationSetting.setting_country = {
-      id: 102,
-      name: "Indonesia",
-      value: "Indonesia",
-      label: "Indonesia",
-    };
-    if (selectedCity) {
-      classificationSetting.setting_city = selectedCity;
-    }
   }
-  if (selectedCity && selectOptionClassification?.id === 4) {
-    classificationSetting.setting_country = {
-      id: 102,
-      name: "Indonesia",
-      value: "Indonesia",
-      label: "Indonesia",
-    };
-    classificationSetting.setting_city = selectedCity;
-  }
-
-  // console.log(selectOptionClassification);
-  console.log(configRegistrationDates);
 
   const eventType = _checkEventType(eventDetail, qsEventType);
   const matchType = _checkMatchType(eventDetail, qsMatchType);
@@ -161,11 +133,6 @@ function PageCreateEventFullday({ classification }) {
     categoryDetails: categoriesQualification,
   });
   const formRule = useFormRule({ eventDetail, rankingSettings });
-  const {
-    state: checkState,
-    // setIsUseVerify,
-    setIsConfigureActive,
-  } = useFormCheck();
   const { parentClassificationList } = fetchClassification(null, "list");
   const emptyFormSequenceByStep = isTypeSelection
     ? {
@@ -221,7 +188,6 @@ function PageCreateEventFullday({ classification }) {
     errors: errorsRegistrationDates,
   } = useSubmitRegistrationDates(eventDetail?.id, {
     ...formRegistrationDates.data,
-    isActiveClassification: checkState.isConfigureActive,
     classification: classificationSetting,
   });
 
@@ -267,9 +233,6 @@ function PageCreateEventFullday({ classification }) {
     setSelectedProvince(val);
   };
 
-  const onSelectOptionCity = (val) => {
-    setSelectedCity(val);
-  };
   const classificationParentList = React.useMemo(() => {
     return parentClassificationList?.data?.map((val) => ({
       ...val,
@@ -291,6 +254,29 @@ function PageCreateEventFullday({ classification }) {
         (val.childrens?.length ? ` (${val.childrens?.length})` : ""),
     }));
   }, [parentClassificationList]);
+
+  React.useEffect(() => {
+    if (configRegistrationDates?.parentClassification !== 0) {
+      setSelectOptionClassification(
+        classificationParentList?.filter(
+          (val) => val.id === configRegistrationDates?.parentClassification
+        )[0]
+      );
+      if (configRegistrationDates?.classificationCountryId !== 0) {
+        setSelectedCountry(
+          countryList?.filter(
+            (val) => val.id === configRegistrationDates?.classificationCountryId
+          )[0]
+        );
+      }
+      setSelectedProvince(
+        provinceList?.filter(
+          (val) =>
+            val.id === Number(configRegistrationDates?.classificationProvinceId)
+        )[0]
+      );
+    }
+  }, [configRegistrationDates, classificationParentList]);
   return (
     <ContentLayoutWrapper
       pageTitle="Buat Event Baru"
@@ -542,159 +528,95 @@ function PageCreateEventFullday({ classification }) {
             </StepBody>
 
             <CardForm>
-              <div className="card-box">
-                <h5>Konfigurasi Pendaftaran</h5>
-
-                <FieldSettingToggleBar
-                  label="Aktifkan Konfigurasi Pendaftaran"
-                  title={"Aktifkan Konfigurasi Pendaftaran"}
-                  info={
-                    "Anda dapat membuat tanggal pendaftaran yang berbeda untuk individu, beregu, dan beregu campuran."
-                  }
-                  on={checkState.isConfigureActive} // response tidak ada yg sesuai
-                  onChange={setIsConfigureActive}
-                />
-              </div>
-            </CardForm>
-
-            <CardForm>
               <div className="card-box-classification">
                 <h5>Klasifikasi Peserta</h5>
 
                 <SubtitleTextClassification>
                   Peserta Mendaftarkan mewakili
                 </SubtitleTextClassification>
-                {eventDetail?.withContingent !== 0 ? (
-                  <SelectContigentWrapper>
-                    <SelectClassificationSetting
-                      eventDetail={eventDetail}
-                      optionsData={countryList}
-                      onInputChange={onChangeInputCountry}
-                      placeholder="Negara"
-                      onSelectOption={onSelectOption}
-                      label="Masukkan Negara"
-                      value={countryList?.filter(
-                        (val) =>
-                          val.id ===
-                            configRegistrationDates?.classificationCountryId ||
-                          val.name?.toLowerCase() ===
-                            configRegistrationDates?.classificationCountryName?.toLowerCase()
-                      )}
-                    />
-                    {selectedCountry ||
-                    configRegistrationDates?.classificationCountryId ? (
-                      <SelectClassificationSetting
-                        eventDetail={eventDetail}
-                        optionsData={provinceList}
-                        onInputChange={(val) => setProvinceKeyword(val)}
-                        placeholder="Provinsi"
-                        onSelectOption={onSelectOptionProvince}
-                        label="Masukkan Provinsi"
-                        value={provinceList?.filter(
-                          (val) =>
-                            val.id ===
-                              configRegistrationDates?.classificationProvinceId ||
-                            val.name?.toLowerCase() ===
-                              configRegistrationDates?.classificationProvinceName?.toLowerCase()
-                        )}
-                      />
-                    ) : null}
-                    {selectedProvince ||
-                    configRegistrationDates?.classificationProvinceId ? (
-                      <SelectClassificationSetting
-                        eventDetail={eventDetail}
-                        optionsData={cityList}
-                        // onInputChange={(val) => setProvinceKeyword(val)}
-                        placeholder="City"
-                        onSelectOption={onSelectOptionCity}
-                        label="Masukkan Kota"
-                      />
-                    ) : null}
-                  </SelectContigentWrapper>
-                ) : (
-                  <SelectContigentWrapper>
-                    <SelectClassificationSetting
-                      eventDetail={eventDetail}
-                      initialSelect
-                      optionsData={classificationParentList}
-                      classificationCategory={classificationCategory}
-                      value={classificationParentList?.filter(
-                        (val) =>
-                          val.id ===
-                            configRegistrationDates?.parentClassification ||
-                          val.title?.toLowerCase() ===
-                            configRegistrationDates?.parentClassificationTitle?.toLowerCase()
-                      )}
-                      onSelectOption={(val) => {
-                        if (val.value === "newClassification") {
-                          classificationCategory.setChangeView(2);
-                          classificationCategory.setNewClassification([]);
-                        } else {
-                          setSelectOptionClassification(val);
-                          if (val?.id !== 3 || val?.id !== 4) {
-                            setSelectedCountry(null);
-                          } else {
-                            setSelectedCountry({
-                              id: 102,
-                              name: "Indonesia",
-                              value: "Indonesia",
-                              label: "Indonesia",
-                            });
-                          }
-                          setSelectedProvince(null);
-                          setSelectedCity(null);
-                        }
-                      }}
-                    />
-                    {(selectOptionClassification &&
-                      selectOptionClassification?.value === "country") ||
-                    configRegistrationDates?.parentClassification ? (
-                      <>
-                        <SelectClassificationSetting
-                          eventDetail={eventDetail}
-                          optionsData={countryList}
-                          onInputChange={onChangeInputCountry}
-                          placeholder="Pilih Negara"
-                          onSelectOption={onSelectOption}
-                          label="Masukkan Negara"
-                          value={countryList?.filter(
+                <SelectContigentWrapper>
+                  <SelectClassificationSetting
+                    eventDetail={eventDetail}
+                    initialSelect
+                    optionsData={classificationParentList}
+                    classificationCategory={classificationCategory}
+                    value={
+                      configRegistrationDates?.parentClassification === 0 ||
+                      selectOptionClassification
+                        ? selectOptionClassification
+                        : classificationParentList?.filter(
                             (val) =>
                               val.id ===
-                                configRegistrationDates?.classificationCountryId ||
-                              val.name?.toLowerCase() ===
-                                configRegistrationDates?.classificationCountryName?.toLowerCase()
-                          )}
-                        />
-                        {selectedCountry ||
-                        configRegistrationDates?.classificationProvinceId ? (
-                          <SelectClassificationSetting
-                            eventDetail={eventDetail}
-                            optionsData={provinceList}
-                            onInputChange={(val) => setProvinceKeyword(val)}
-                            placeholder="Provinsi"
-                            onSelectOption={onSelectOptionProvince}
-                            label="Masukkan Provinsi"
-                            value={provinceList?.filter(
-                              (val) =>
-                                val.id ===
-                                  configRegistrationDates?.classificationProvinceId ||
-                                val.name?.toLowerCase() ===
-                                  configRegistrationDates?.classificationProvinceName?.toLowerCase()
-                            )}
-                          />
-                        ) : null}
-                        {selectedProvince ? (
-                          <SelectClassificationSetting
-                            eventDetail={eventDetail}
-                            optionsData={cityList}
-                            // onInputChange={(val) => setProvinceKeyword(val)}
-                            placeholder="City"
-                            onSelectOption={onSelectOptionCity}
-                            label="Masukkan Kota"
-                          />
-                        ) : null}
-                      </>
-                    ) : selectOptionClassification?.value === "provinsi" ? (
+                                configRegistrationDates?.parentClassification ||
+                              val.title?.toLowerCase() ===
+                                configRegistrationDates?.parentClassificationTitle?.toLowerCase()
+                          )
+                    }
+                    onSelectOption={(val) => {
+                      if (val.value === "newClassification") {
+                        classificationCategory.setChangeView(2);
+                        classificationCategory.setNewClassification([]);
+                      } else {
+                        setSelectOptionClassification(val);
+                        if (val?.id === 3 || val?.id === 4) {
+                          setSelectedCountry({
+                            id: 102,
+                            name: "Indonesia",
+                            value: "Indonesia",
+                            label: "Indonesia",
+                          });
+                        } else {
+                          setSelectedCountry(null);
+                        }
+                        setSelectedProvince(null);
+                      }
+                    }}
+                    // textDetail={
+                    //   selectOptionClassification?.id === 1
+                    //     ? "Peserta mendaftar sebagai perwakilan klub jika ada"
+                    //     : ""
+                    // }
+                  />
+                  <RegionBox
+                    className={`${
+                      selectOptionClassification?.id === 3 ||
+                      selectOptionClassification?.id === 4
+                        ? "reverse-box"
+                        : ""
+                    }`}
+                  >
+                    {selectOptionClassification?.id === 3 ||
+                    selectOptionClassification?.id === 4 ? (
+                      <SelectClassificationSetting
+                        eventDetail={eventDetail}
+                        optionsData={countryList}
+                        onInputChange={onChangeInputCountry}
+                        placeholder="Pilih Negara"
+                        onSelectOption={onSelectOption}
+                        label="Masukkan Negara"
+                        value={
+                          configRegistrationDates?.classificationCountryId ===
+                            0 || selectedCountry
+                            ? selectedCountry
+                            : countryList?.filter(
+                                (val) =>
+                                  val.id ===
+                                    configRegistrationDates?.classificationCountryId ||
+                                  val.name?.toLowerCase() ===
+                                    configRegistrationDates?.classificationCountryName?.toLowerCase()
+                              )
+                        }
+                        // textDetail={
+                        //   selectOptionClassification?.id === 2
+                        //     ? "Peserta mendaftar sebagai perwakilan negara"
+                        //     : ""
+                        // }
+                      />
+                    ) : null}
+
+                    {selectOptionClassification?.id === 4 &&
+                    (selectedCountry ||
+                      configRegistrationDates?.classificationCountryId) ? (
                       <SelectClassificationSetting
                         eventDetail={eventDetail}
                         optionsData={provinceList}
@@ -702,27 +624,27 @@ function PageCreateEventFullday({ classification }) {
                         placeholder="Provinsi"
                         onSelectOption={onSelectOptionProvince}
                         label="Masukkan Provinsi"
-                      />
-                    ) : selectOptionClassification?.value === "city" ? (
-                      <SelectClassificationSetting
-                        eventDetail={eventDetail}
-                        optionsData={cityList}
-                        // onInputChange={(val) => setProvinceKeyword(val)}
-                        placeholder="City"
-                        onSelectOption={onSelectOptionCity}
-                        label="Masukkan Kota"
+                        value={
+                          configRegistrationDates?.classificationProvinceId ===
+                            0 || selectedProvince
+                            ? selectedProvince
+                            : provinceList?.filter(
+                                (val) =>
+                                  val.id ===
+                                    configRegistrationDates?.classificationProvinceId ||
+                                  val.name?.toLowerCase() ===
+                                    configRegistrationDates?.classificationProvinceName?.toLowerCase()
+                              )
+                        }
+                        // textDetail={
+                        //   selectOptionClassification?.id === 3
+                        //     ? "Peserta mendaftar sebagai Wilayah Provinsi"
+                        //     : ""
+                        // }
                       />
                     ) : null}
-                  </SelectContigentWrapper>
-                )}
-                {selectOptionClassification?.value === "club" &&
-                eventDetail?.withContigent === 0 ? (
-                  <InfoTextClassification>
-                    {eventDetail?.withContigent == 0
-                      ? "Masukkan data klub jika ada"
-                      : "Peserta mendaftar sebagai perwakilan negara"}
-                  </InfoTextClassification>
-                ) : null}
+                  </RegionBox>
+                </SelectContigentWrapper>
               </div>
             </CardForm>
 
@@ -740,6 +662,11 @@ function PageCreateEventFullday({ classification }) {
                     },
                   });
                 }}
+                disabled={
+                  selectOptionClassification?.id === 4
+                    ? !selectedProvince?.id
+                    : false
+                }
               >
                 Simpan
               </ButtonSave>
@@ -866,6 +793,15 @@ const SelectContigentWrapper = styled.div`
   gap: 7px;
 `;
 
+const RegionBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  &.reverse-box {
+    flex-direction: column-reverse;
+  }
+`;
+
 const SpacedHeaderBar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -918,11 +854,6 @@ const SubtitleTextClassification = styled.div`
   padding-top: 10px;
 `;
 
-const InfoTextClassification = styled.span`
-  color: #545454;
-  font-weight: 400;
-  font-size: 12px;
-`;
 /* ======================================= */
 // utils
 

@@ -3,12 +3,6 @@ import styled from "styled-components";
 
 import ReactSelect from "react-select";
 
-<<<<<<< Updated upstream
-const optionsScoreNumbers = ["m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map((value) => ({
-  value,
-  label: isNaN(value) ? value.toUpperCase() : value,
-}));
-=======
 const optionsScoreNumbers = ["", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map(
   (value) => ({
     value,
@@ -16,11 +10,17 @@ const optionsScoreNumbers = ["", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map(
     // label: isNaN(value) ? value.toUpperCase() : value,
   })
 );
->>>>>>> Stashed changes
 
 const Select = React.memo(ReactSelect);
 
-function SelectScore({ name, value, onChange, onInputChange, isFocus, onFocus }) {
+function SelectScore({
+  name,
+  value,
+  onChange,
+  onInputChange,
+  isFocus,
+  onFocus,
+}) {
   const covertedValueType = _convertScoreValueType(value);
   const selectedOption = _getOptionFromValue(covertedValueType);
   const refSelect = React.useRef(null);

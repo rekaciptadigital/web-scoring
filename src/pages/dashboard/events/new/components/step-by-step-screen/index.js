@@ -3,11 +3,7 @@ import styled from "styled-components";
 
 import { StepScreenContext } from "./contexts/step-screen";
 
-function StepByStepScreen({
-  children,
-  lastUnlocked,
-  setSelectOptionClassification,
-}) {
+function StepByStepScreen({ children, lastUnlocked }) {
   const steps = useStepScreenNavigation();
   const { currentStepId } = steps;
 
@@ -17,9 +13,6 @@ function StepByStepScreen({
   React.useEffect(() => {
     if (!currentStepId) {
       return;
-    }
-    if (currentStepId !== "step-jadwal-registrasi") {
-      setSelectOptionClassification(null);
     }
     window.scrollTo(0, 0);
   }, [currentStepId]);

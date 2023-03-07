@@ -15,11 +15,7 @@ import {
 } from "./hooks/form-classification";
 
 const CreateNewClassification = ({ classification, userData }) => {
-  const {
-    newClassification,
-    setNewClassification,
-    classification: classificationOption,
-  } = classification;
+  const { newClassification, setNewClassification } = classification;
   const { userProfile } = userData;
   const [showModalAdd, setModalAdd] = React.useState(false);
   const [showError, setShowError] = React.useState("");
@@ -34,27 +30,6 @@ const CreateNewClassification = ({ classification, userData }) => {
   const [selectRadio, setSelectRadio] = React.useState(
     selectConstants.classificationOption[0].value
   );
-  const handleSaveCategory = () => {
-    const checkClassification = classificationOption.filter(
-      (val) =>
-        val.value?.toLowerCase() === newCategoryInput.toLocaleLowerCase() ||
-        val.labe?.toLowerCase() === newCategoryInput.toLocaleLowerCase()
-    );
-    if (!checkClassification?.length) {
-      const data = {
-        id: stringUtil.createRandom(),
-        parentTitleClassification: newCategoryInput,
-        childrenClassification: [
-          { id: stringUtil.createRandom(), title: "", status: 1 },
-        ],
-      };
-      setContentType("addnew");
-      setNewClassification(data);
-      setModalAdd(false);
-    } else {
-      setShowError("Nama klasifikasi telah tersedia");
-    }
-  };
   const { parentClassificationList } = fetchClassification(
     null,
     contentType,
@@ -89,6 +64,25 @@ const CreateNewClassification = ({ classification, userData }) => {
     setOnRefreshData(true);
     onDeleteParent(options, id);
   };
+  const handleSaveCategory = () => {
+    const checkClassification = parentList.filter(
+      (val) => val.title?.toLowerCase() === newCategoryInput.toLocaleLowerCase()
+    );
+    if (!checkClassification?.length) {
+      const data = {
+        id: stringUtil.createRandom(),
+        parentTitleClassification: newCategoryInput,
+        childrenClassification: [
+          { id: stringUtil.createRandom(), title: "", status: 1 },
+        ],
+      };
+      setContentType("addnew");
+      setNewClassification(data);
+      setModalAdd(false);
+    } else {
+      setShowError("Nama klasifikasi telah tersedia");
+    }
+  };
   return (
     <ContainerWrapper>
       <NavigationWrapper onClick={() => classification.setChangeView(1)}>
@@ -103,7 +97,12 @@ const CreateNewClassification = ({ classification, userData }) => {
           <HeadingSubtitle>Pengaturan Klasifikasi Peserta</HeadingSubtitle>
         </HeadingTitleBox>
         {contentType === "list" ? (
-          <ButtonBlue onClick={() => setModalAdd(!showModalAdd)}>
+          <ButtonBlue
+            onClick={() => {
+              setModalAdd(!showModalAdd);
+              setShowError("");
+            }}
+          >
             <IconPlus size={16} /> Tambah Klasifikasi
           </ButtonBlue>
         ) : null}
@@ -285,17 +284,16 @@ const ButtonWrapper = styled.div`
 `;
 
 const DotRadioButtonIndicator = styled.div`
-  width: 26px;
-  height: 22px;
+  padding: 4px;
   border-radius: 50%;
   border: 2px solid #0d47a1;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 
   &.radio-checked {
-    width: 22px;
     background: #0d47a1;
   }
 `;
@@ -312,6 +310,7 @@ const RadioLabel = styled.label`
   align-items: center;
   justify-content: start;
   gap: 12px;
+  width: 100%;
 
   &.disabled-indicator {
     opacity: 0.5;

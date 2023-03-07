@@ -10,12 +10,12 @@ import { useClassificationFormData } from "../hooks/form-classification";
 
 const TableClassification = ({
   data,
-  classification,
+  // classification,
   editMode,
   setContentType,
   setNewDataUpdate,
 }) => {
-  const { setChangeView } = classification;
+  // const { setChangeView } = classification;
   const [classificationData, setClassificationData] = React.useState(null);
   const { createNew, updateParent } = useClassificationFormData();
   const {
@@ -110,11 +110,18 @@ const TableClassification = ({
     }
   }, [data]);
   const checkingData = classificationData?.childrenClassification?.map(
-    (val) => {
+    (val, index) => {
       if (val.title?.length) {
         return true;
       } else {
-        return false;
+        if (
+          classificationData?.childrenClassification?.length > 2 &&
+          index === classificationData?.childrenClassification?.length - 1
+        ) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }
   );
@@ -187,9 +194,9 @@ const TableClassification = ({
           dataFilled === false ? (
             <ErrorText className="danger-text">
               {classificationData?.childrenClassification?.length < 2
-                ? "Buat minimum 2 tipe nama klasifikasi!!!"
+                ? "Buat minimum 2 tipe nama klasifikasi"
                 : dataFilled === false
-                ? "Field harus di isi!!!"
+                ? "Field harus di isi"
                 : ""}
             </ErrorText>
           ) : null}
@@ -205,7 +212,7 @@ const TableClassification = ({
               fontWeight: 600,
               fontSize: "14px",
             }}
-            onClick={() => setChangeView(1)}
+            onClick={() => setContentType("list")}
           >
             Kembali
           </Button>
@@ -228,7 +235,7 @@ const ButtonTableWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 0 20px 20px 0;
+  padding: 40px 20px 20px;
   @media (max-width: 375px) {
     flex-direction: column;
     gap: 10px;
@@ -291,7 +298,7 @@ const TableListParticipant = styled.table`
     background-color: var(--ma-primary-blue-50);
 
     &.input-field {
-      width: 90%;
+      width: 100%;
     }
   }
 

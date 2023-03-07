@@ -12,7 +12,6 @@ const useCountry = (
   // const [cityList, setCityList] = React.useState([]);
   const [errorMessage, setErrorMessage] = React.useState([]);
   const fetchCountry = async (keyword) => {
-    console.log(keyword);
     try {
       const qs = {
         name: keyword.length ? keyword : "Indonesia",

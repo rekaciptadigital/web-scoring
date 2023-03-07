@@ -3,10 +3,11 @@ import styled from "styled-components";
 
 import ReactSelect from "react-select";
 
-const optionsScoreNumbers = ["-", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map(
+const optionsScoreNumbers = ["", "m", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "x"].map(
   (value) => ({
     value,
-    label: isNaN(value) ? value.toUpperCase() : value,
+    label: !value ? "-" : isNaN(value) ? value.toUpperCase() : value,
+    // label: isNaN(value) ? value.toUpperCase() : value,
   })
 );
 

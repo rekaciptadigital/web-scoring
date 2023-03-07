@@ -276,7 +276,8 @@ function PageCreateEventFullday({ classification }) {
         )[0]
       );
     }
-  }, [configRegistrationDates, classificationParentList]);
+  }, [configRegistrationDates, classificationParentList, stepId]);
+  console.log(selectOptionClassification);
   return (
     <ContentLayoutWrapper
       pageTitle="Buat Event Baru"
@@ -544,6 +545,10 @@ function PageCreateEventFullday({ classification }) {
                       configRegistrationDates?.parentClassification === 0 ||
                       selectOptionClassification
                         ? selectOptionClassification
+                          ? selectOptionClassification
+                          : classificationParentList?.filter(
+                              (val) => val.id === 1
+                            )
                         : classificationParentList?.filter(
                             (val) =>
                               val.id ===
@@ -552,6 +557,7 @@ function PageCreateEventFullday({ classification }) {
                                 configRegistrationDates?.parentClassificationTitle?.toLowerCase()
                           )
                     }
+                    defaultValue={"test"}
                     onSelectOption={(val) => {
                       if (val.value === "newClassification") {
                         classificationCategory.setChangeView(2);
@@ -577,14 +583,7 @@ function PageCreateEventFullday({ classification }) {
                     //     : ""
                     // }
                   />
-                  <RegionBox
-                    className={`${
-                      selectOptionClassification?.id === 3 ||
-                      selectOptionClassification?.id === 4
-                        ? "reverse-box"
-                        : ""
-                    }`}
-                  >
+                  <RegionBox>
                     {selectOptionClassification?.id === 3 ||
                     selectOptionClassification?.id === 4 ? (
                       <SelectClassificationSetting

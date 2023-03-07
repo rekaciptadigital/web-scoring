@@ -62,9 +62,20 @@ function ScoreEditorControl({
   const [sessionNumber, setSessionNumber] = React.useState(1);
 
   const code = _makeEliminationCode(memberId, sessionNumber);
-  const { data: scoreDetail, isLoading: isLoadingScore } = useScoringDetail(code);
-  const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
-  const { submitScore, isLoading: isSubmiting, isError, errors: errorsShotoff } = useSubmitScore();
+  const { data: scoreDetail, isLoading: isLoadingScore } =
+    useScoringDetail(code);
+  const {
+    data: formValues,
+    isDirty: isFormDirty,
+    setFormValues,
+    resetForm,
+  } = useForm(scoreDetail);
+  const {
+    submitScore,
+    isLoading: isSubmiting,
+    isError,
+    errors: errorsShotoff,
+  } = useSubmitScore();
 
   const isLoadingForm = isLoadingFromProp || isLoadingScore || isSubmiting;
 
@@ -198,7 +209,9 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
         <li key={sessionNumber}>
           <SessionTabButton
             disabled={_checkIsTabActive(sessionNumber)}
-            className={classnames({ "session-tab-active": _checkIsTabActive(sessionNumber) })}
+            className={classnames({
+              "session-tab-active": _checkIsTabActive(sessionNumber),
+            })}
             onClick={() => onChange?.(parseInt(sessionNumber))}
           >
             Eli-{sessionNumber}
@@ -360,7 +373,8 @@ function useForm(scoreDetail) {
     dispatch({ type: "INIT", payload: scoreDetail.score });
   }, [scoreDetail]);
 
-  const setFormValues = (payload) => dispatch({ type: "CHANGE", payload: payload });
+  const setFormValues = (payload) =>
+    dispatch({ type: "CHANGE", payload: payload });
   const resetForm = () => dispatch({ type: "RESET" });
   const markFormAsDirty = () => dispatch({ type: "FORCE_MARKED_DIRTY" });
 

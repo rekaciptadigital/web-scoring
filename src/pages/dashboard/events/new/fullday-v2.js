@@ -223,10 +223,13 @@ function PageCreateEventFullday({ classification }) {
 
   const onSelectOption = (val) => {
     setSelectedCountry(val);
+    setCountryKeyword(val.label);
   };
 
   const onChangeInputCountry = (val) => {
-    setCountryKeyword(val);
+    if (val.length) {
+      setCountryKeyword(val);
+    }
   };
 
   const onSelectOptionProvince = (val) => {
@@ -262,22 +265,11 @@ function PageCreateEventFullday({ classification }) {
           (val) => val.id === configRegistrationDates?.parentClassification
         )[0]
       );
-      if (configRegistrationDates?.classificationCountryId !== 0) {
-        setSelectedCountry(
-          countryList?.filter(
-            (val) => val.id === configRegistrationDates?.classificationCountryId
-          )[0]
-        );
+      if (configRegistrationDates?.classificationCountryName?.length) {
+        setCountryKeyword(configRegistrationDates?.classificationCountryName);
       }
-      setSelectedProvince(
-        provinceList?.filter(
-          (val) =>
-            val.id === Number(configRegistrationDates?.classificationProvinceId)
-        )[0]
-      );
     }
-  }, [configRegistrationDates, classificationParentList, stepId]);
-  console.log(selectOptionClassification);
+  }, [configRegistrationDates, classificationParentList]);
   return (
     <ContentLayoutWrapper
       pageTitle="Buat Event Baru"
@@ -565,12 +557,17 @@ function PageCreateEventFullday({ classification }) {
                       } else {
                         setSelectOptionClassification(val);
                         if (val?.id === 3 || val?.id === 4) {
-                          setSelectedCountry({
-                            id: 102,
-                            name: "Indonesia",
-                            value: "Indonesia",
-                            label: "Indonesia",
-                          });
+                          if (
+                            configRegistrationDates?.classificationCountryId ===
+                            0
+                          ) {
+                            setSelectedCountry({
+                              id: 102,
+                              name: "Indonesia",
+                              value: "Indonesia",
+                              label: "Indonesia",
+                            });
+                          }
                         } else {
                           setSelectedCountry(null);
                         }
@@ -597,13 +594,13 @@ function PageCreateEventFullday({ classification }) {
                           configRegistrationDates?.classificationCountryId ===
                             0 || selectedCountry
                             ? selectedCountry
-                            : countryList?.filter(
-                                (val) =>
-                                  val.id ===
-                                    configRegistrationDates?.classificationCountryId ||
-                                  val.name?.toLowerCase() ===
-                                    configRegistrationDates?.classificationCountryName?.toLowerCase()
-                              )
+                            : {
+                                label:
+                                  configRegistrationDates?.classificationCountryName,
+                                id: configRegistrationDates?.classificationCountryId,
+                                value:
+                                  configRegistrationDates?.classificationCountryName,
+                              }
                         }
                         // textDetail={
                         //   selectOptionClassification?.id === 2
@@ -627,13 +624,13 @@ function PageCreateEventFullday({ classification }) {
                           configRegistrationDates?.classificationProvinceId ===
                             0 || selectedProvince
                             ? selectedProvince
-                            : provinceList?.filter(
-                                (val) =>
-                                  val.id ===
-                                    configRegistrationDates?.classificationProvinceId ||
-                                  val.name?.toLowerCase() ===
-                                    configRegistrationDates?.classificationProvinceName?.toLowerCase()
-                              )
+                            : {
+                                label:
+                                  configRegistrationDates?.classificationProvinceName,
+                                id: configRegistrationDates?.classificationProvinceId,
+                                value:
+                                  configRegistrationDates?.classificationProvinceName,
+                              }
                         }
                         // textDetail={
                         //   selectOptionClassification?.id === 3

@@ -12,6 +12,7 @@ const useCountry = (
   // const [cityList, setCityList] = React.useState([]);
   const [errorMessage, setErrorMessage] = React.useState([]);
   const fetchCountry = async (keyword) => {
+    console.log(keyword);
     try {
       const qs = {
         name: keyword.length ? keyword : "Indonesia",
@@ -125,15 +126,7 @@ const useCountry = (
 
   React.useEffect(() => {
     fetchCountry(countryInput);
-    fetchProvince(
-      selectedCountry ?? {
-        id: 102,
-        name: "Indonesia",
-        label: "Indonesia",
-        value: "Indonesia",
-      },
-      provinceInput
-    );
+    fetchProvince(selectedCountry, provinceInput);
     // fetchCity(
     //   selectedCountry ?? {
     //     id: 102,

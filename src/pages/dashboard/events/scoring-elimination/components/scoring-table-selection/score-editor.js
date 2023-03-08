@@ -6,7 +6,7 @@ import { useSubmitScore } from "../../hooks/submit-score";
 import { AlertSubmitError } from "components/ma";
 import { toast } from "components/ma/processing-toast";
 import { EditorForm } from "./editor-form";
-import { ConfirmPrompt } from "../confirm-prompt";
+// import { ConfirmPrompt } from "../confirm-prompt";
 
 import IconX from "components/ma/icons/mono/x";
 
@@ -62,9 +62,20 @@ function ScoreEditorControl({
   const [sessionNumber, setSessionNumber] = React.useState(1);
 
   const code = _makeEliminationCode(memberId, sessionNumber);
-  const { data: scoreDetail, isLoading: isLoadingScore } = useScoringDetail(code);
-  const { data: formValues, isDirty: isFormDirty, setFormValues, resetForm } = useForm(scoreDetail);
-  const { submitScore, isLoading: isSubmiting, isError, errors: errorsShotoff } = useSubmitScore();
+  const { data: scoreDetail, isLoading: isLoadingScore } =
+    useScoringDetail(code);
+  const {
+    data: formValues,
+    isDirty: isFormDirty,
+    setFormValues,
+    resetForm,
+  } = useForm(scoreDetail);
+  const {
+    submitScore,
+    isLoading: isSubmiting,
+    isError,
+    errors: errorsShotoff,
+  } = useSubmitScore();
 
   const isLoadingForm = isLoadingFromProp || isLoadingScore || isSubmiting;
 
@@ -148,7 +159,7 @@ function ScoreEditorControl({
         )}
 
         <div>
-          <ConfirmPrompt
+          {/* <ConfirmPrompt
             renderButton={({ handlePrompt }) => {
               return (
                 <EditorCloseButton flexible onClick={handlePrompt}>
@@ -164,7 +175,10 @@ function ScoreEditorControl({
             shouldPrompt={isFormDirty}
             onConfirm={onClose}
             onCancel={handleSaveScoreData}
-          />
+          /> */}
+          <EditorCloseButton flexible onClick={handleSaveScoreData}>
+            <IconX size="16" />
+          </EditorCloseButton>
         </div>
       </EditorHeader>
 
@@ -198,7 +212,9 @@ function SessionTabList({ sessions, currentSession = 1, onChange }) {
         <li key={sessionNumber}>
           <SessionTabButton
             disabled={_checkIsTabActive(sessionNumber)}
-            className={classnames({ "session-tab-active": _checkIsTabActive(sessionNumber) })}
+            className={classnames({
+              "session-tab-active": _checkIsTabActive(sessionNumber),
+            })}
             onClick={() => onChange?.(parseInt(sessionNumber))}
           >
             Eli-{sessionNumber}
@@ -360,7 +376,8 @@ function useForm(scoreDetail) {
     dispatch({ type: "INIT", payload: scoreDetail.score });
   }, [scoreDetail]);
 
-  const setFormValues = (payload) => dispatch({ type: "CHANGE", payload: payload });
+  const setFormValues = (payload) =>
+    dispatch({ type: "CHANGE", payload: payload });
   const resetForm = () => dispatch({ type: "RESET" });
   const markFormAsDirty = () => dispatch({ type: "FORCE_MARKED_DIRTY" });
 

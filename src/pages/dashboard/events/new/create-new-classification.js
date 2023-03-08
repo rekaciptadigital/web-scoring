@@ -167,7 +167,9 @@ const CreateNewClassification = ({ classification, userData }) => {
               onChange={(ev) => setNewCategoryInput(ev.target.value)}
               style={{ borderColor: showError ? "red" : "gray" }}
             />
-            {showError ? <ErrorText>{showError}</ErrorText> : null}
+            {showError ? (
+              <ErrorText className="danger-text">{showError}</ErrorText>
+            ) : null}
             <RadioButtonBox>
               {selectConstants.classificationOption.map((classification) => (
                 <div key={classification.value}>

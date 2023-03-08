@@ -6,7 +6,7 @@ import { useSubmitScore } from "../../hooks/submit-score";
 import { AlertSubmitError } from "components/ma";
 import { toast } from "components/ma/processing-toast";
 import { EditorForm } from "./editor-form";
-import { ConfirmPrompt } from "../confirm-prompt";
+// import { ConfirmPrompt } from "../confirm-prompt";
 
 import IconX from "components/ma/icons/mono/x";
 
@@ -159,7 +159,7 @@ function ScoreEditorControl({
         )}
 
         <div>
-          <ConfirmPrompt
+          {/* <ConfirmPrompt
             renderButton={({ handlePrompt }) => {
               return (
                 <EditorCloseButton flexible onClick={handlePrompt}>
@@ -175,7 +175,10 @@ function ScoreEditorControl({
             shouldPrompt={isFormDirty}
             onConfirm={onClose}
             onCancel={handleSaveScoreData}
-          />
+          /> */}
+          <EditorCloseButton flexible onClick={handleSaveScoreData}>
+            <IconX size="16" />
+          </EditorCloseButton>
         </div>
       </EditorHeader>
 

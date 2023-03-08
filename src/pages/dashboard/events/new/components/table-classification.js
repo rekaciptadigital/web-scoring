@@ -18,6 +18,8 @@ const TableClassification = ({
   // const { setChangeView } = classification;
   const [classificationData, setClassificationData] = React.useState(null);
   const { createNew, updateParent } = useClassificationFormData();
+  const [errorDuplicateChildren, setErrorDuplicateChildren] =
+    React.useState("");
   const {
     submit: submitNewClassification,
     isLoading: isSubmitNewClassification,
@@ -34,8 +36,20 @@ const TableClassification = ({
     };
     setClassificationData(prevData);
   };
+
   const onChangeNameChildrenClassification = (event, value) => {
     const newName = event.target.value;
+
+    const checkedChildrenHasBeenAdded =
+      classificationData?.childrenClassification?.filter(
+        (val) => val.title?.toLowerCase() === newName?.toLowerCase()
+      );
+
+    if (checkedChildrenHasBeenAdded?.length) {
+      setErrorDuplicateChildren(`Nama klasifikasi ${newName} sudah ada`);
+    } else {
+      setErrorDuplicateChildren("");
+    }
     const prevDataCategory = classificationData?.childrenClassification?.map(
       (val) => {
         if (val.id === value.id) {
@@ -167,23 +181,24 @@ const TableClassification = ({
                   />
                 </td>
                 <td>
-                  <IconBox
-                    className={`${
-                      index !==
-                      classificationData?.childrenClassification?.length - 1
-                        ? "delete-icon"
-                        : "plus-icon"
-                    }`}
-                  >
+                  <IconBox className="icon-btn">
                     {index !==
                     classificationData?.childrenClassification?.length - 1 ? (
-                      <div onClick={() => onDeleteItem(value.id)}>
+                      <div
+                        className="delete-icon"
+                        onClick={() => onDeleteItem(value.id)}
+                      >
                         <IconTrash size={16} />
                       </div>
                     ) : (
-                      <div aria-hidden="true" onClick={onAddItem}>
-                        <IconPlus size={16} />
-                      </div>
+                      <>
+                        <div onClick={() => onDeleteItem(value.id)}>
+                          <IconTrash size={16} />
+                        </div>
+                        <div aria-hidden="true" onClick={onAddItem}>
+                          <IconPlus size={16} />
+                        </div>
+                      </>
                     )}
                   </IconBox>
                 </td>
@@ -191,13 +206,14 @@ const TableClassification = ({
             ))}
           </tbody>
           {classificationData?.childrenClassification?.length < 2 ||
-          dataFilled === false ? (
+          dataFilled === false ||
+          errorDuplicateChildren?.length ? (
             <ErrorText className="danger-text">
               {classificationData?.childrenClassification?.length < 2
                 ? "Buat minimum 2 tipe nama klasifikasi"
                 : dataFilled === false
                 ? "Field harus di isi"
-                : ""}
+                : errorDuplicateChildren}
             </ErrorText>
           ) : null}
         </TableListParticipant>
@@ -219,7 +235,8 @@ const TableClassification = ({
           <ButtonBlue
             disabled={
               classificationData?.childrenClassification?.length < 2 ||
-              dataFilled === false
+              dataFilled === false ||
+              errorDuplicateChildren?.length
             }
             onClick={onSaveClassification}
           >
@@ -248,18 +265,25 @@ const IconBox = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  &.delete-icon {
+  gap: 6px;
+
+  > *:nth-child(1) {
     color: red;
   }
-  &.plus-icon {
-    width: 20px;
-    height: 20px;
+
+  > *:nth-child(2) {
+    padding: 1px;
     margin: auto;
     border: 1px solid #afafaf;
     color: #afafaf;
     border-radius: 50%;
   }
-  &.plus-icon:hover {
+
+  > *:nth-child(1):hover {
+    opacity: 0.8;
+  }
+
+  > *:nth-child(2):hover {
     color: gray;
     border: 1px solid gray;
   }

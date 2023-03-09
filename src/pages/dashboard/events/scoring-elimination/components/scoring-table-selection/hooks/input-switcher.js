@@ -20,7 +20,10 @@ function useInputSwitcher(scoringDetails) {
   };
 
   const shouldFocusSelector = (pos) => {
-    const isFocus = Boolean(scoringDetails) && pos.y === switcher.pos.y && pos.x === switcher.pos.x;
+    const isFocus =
+      Boolean(scoringDetails) &&
+      pos.y === switcher.pos.y &&
+      pos.x === switcher.pos.x;
     return isFocus;
   };
 
@@ -89,11 +92,17 @@ function switcherReducer(state, action) {
       // pojok kanan bawah, balik pojok kiri atas
       targetY = 0;
       targetX = 0;
-    } else if (x >= 5) {
+    } else if (x >= state.size.x - 1) {
       // pindah rambahan
       targetY = y + 1;
       targetX = 0;
-    } else {
+    }
+    // else if (x >= 5) {
+    //   // pindah rambahan
+    //   targetY = y + 1;
+    //   targetX = 0;
+    // }
+    else {
       // geser kanan
       targetY = y;
       targetX = x + 1;

@@ -18,7 +18,8 @@ function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
   const rambahanNumbers = scoresFromProp ? Object.keys(scoresFromProp) : [];
   const shotsCount = scoresFromProp[rambahanNumbers[0]]?.length || 0;
   const [selectedScore, setSelectedScore] = React.useState(null);
-  const { shouldFocusSelector, move, setPosition } = useInputSwitcher(scoresData);
+  const { shouldFocusSelector, move, setPosition } =
+    useInputSwitcher(scoresData);
 
   React.useEffect(() => {
     if (!selectedScore) {
@@ -64,7 +65,7 @@ function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
                           name={`shot-score-${rambahanIndex}-${shotIndex}`}
                           value={scoreItem}
                           onChange={(value) => {
-                            if(value === "-") value = "";
+                            if (value === "-") value = "";
                             handleSelectScore({
                               rambahan: rambahanIndex,
                               shot: shotIndex,
@@ -147,7 +148,9 @@ function StatTotal({ children, amount, isLoading }) {
     return (
       <StatItem>
         <span>Total:</span>
-        <SkeletonStatItem className="total">{children || amount || "00"}</SkeletonStatItem>
+        <SkeletonStatItem className="total">
+          {children || amount || "00"}
+        </SkeletonStatItem>
       </StatItem>
     );
   }
@@ -254,12 +257,14 @@ function _makeScoresDataFromProp(scoresData) {
 
 function _makeOutputValue(previousData, selectData) {
   const rambahanNumber = selectData.rambahan + 1;
-  const updatedRambahanScores = previousData[rambahanNumber].map((existingScore, index) => {
-    if (index !== selectData.shot) {
-      return existingScore;
+  const updatedRambahanScores = previousData[rambahanNumber].map(
+    (existingScore, index) => {
+      if (index !== selectData.shot) {
+        return existingScore;
+      }
+      return selectData.score;
     }
-    return selectData.score;
-  });
+  );
 
   return { ...previousData, [rambahanNumber]: updatedRambahanScores };
 }
@@ -342,7 +347,9 @@ function _getValueFromInput(inputString) {
   const numberValue = Number(inputString);
   const checkValue = !isNaN(numberValue) ? numberValue : inputString;
   const value =
-    ["m", "x", 2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(checkValue) > -1 ? checkValue : false;
+    ["m", "x", 2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(checkValue) > -1
+      ? checkValue
+      : false;
   return value;
 }
 

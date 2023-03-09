@@ -101,7 +101,11 @@ function LoadingBlocker({ isLoading = true }) {
 
 function StatTotal({ children, amount, isLoading }) {
   if (isLoading) {
-    return <SkeletonStatItem className="total">{children || amount || "00"}</SkeletonStatItem>;
+    return (
+      <SkeletonStatItem className="total">
+        {children || amount || "00"}
+      </SkeletonStatItem>
+    );
   }
   return <TotalNumber>{children || amount || 0}</TotalNumber>;
 }

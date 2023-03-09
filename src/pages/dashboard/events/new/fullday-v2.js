@@ -658,11 +658,6 @@ function PageCreateEventFullday({ classification }) {
                     },
                   });
                 }}
-                disabled={
-                  selectOptionClassification?.id === 4
-                    ? !selectedProvince?.id
-                    : false
-                }
               >
                 Simpan
               </ButtonSave>

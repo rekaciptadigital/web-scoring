@@ -77,13 +77,15 @@ const TableClassification = ({
     setClassificationData(editDataClassification);
   };
   const onDeleteItem = (id) => {
-    const newData = classificationData?.childrenClassification?.filter(
-      (val) => val.id !== id
-    );
-    setClassificationData({
-      ...classificationData,
-      childrenClassification: newData,
-    });
+    if (classificationData.childrenClassification?.length > 1) {
+      const newData = classificationData?.childrenClassification?.filter(
+        (val) => val.id !== id
+      );
+      setClassificationData({
+        ...classificationData,
+        childrenClassification: newData,
+      });
+    }
   };
   const onSaveClassification = () => {
     const children = classificationData?.childrenClassification
@@ -185,14 +187,27 @@ const TableClassification = ({
                     {index !==
                     classificationData?.childrenClassification?.length - 1 ? (
                       <div
-                        className="delete-icon"
+                        className={`${
+                          classificationData?.childrenClassification?.length <=
+                          1
+                            ? "disable-btn"
+                            : ""
+                        }`}
                         onClick={() => onDeleteItem(value.id)}
                       >
                         <IconTrash size={16} />
                       </div>
                     ) : (
                       <>
-                        <div onClick={() => onDeleteItem(value.id)}>
+                        <div
+                          className={`${
+                            classificationData?.childrenClassification
+                              ?.length <= 1
+                              ? "disable-btn"
+                              : ""
+                          }`}
+                          onClick={() => onDeleteItem(value.id)}
+                        >
                           <IconTrash size={16} />
                         </div>
                         <div aria-hidden="true" onClick={onAddItem}>
@@ -269,6 +284,13 @@ const IconBox = styled.div`
 
   > *:nth-child(1) {
     color: red;
+    &.disable-btn {
+      opacity: 0.5;
+      cursor: auto;
+    }
+  }
+  &.disable-btn:hover {
+    cursor: auto;
   }
 
   > *:nth-child(2) {
@@ -277,10 +299,6 @@ const IconBox = styled.div`
     border: 1px solid #afafaf;
     color: #afafaf;
     border-radius: 50%;
-  }
-
-  > *:nth-child(1):hover {
-    opacity: 0.8;
   }
 
   > *:nth-child(2):hover {

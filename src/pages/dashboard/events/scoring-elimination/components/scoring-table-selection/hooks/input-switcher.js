@@ -39,7 +39,11 @@ function switcherReducer(state, action) {
     // init size
     const rambahanNumbers = Object.keys(action.payload);
     const sizeY = rambahanNumbers.length;
-    const sizeX = action.payload[1].length;
+    console.log("action:", action);
+    let sizeX = 0;
+    if (action.payload.length > 0) {
+      sizeX = action.payload[1].length;
+    }
 
     // init position
     let distance = 0;

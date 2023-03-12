@@ -35,8 +35,9 @@ function ScoringTableSelection({
     false, // bukan beregu
     scoreType
   );
-  const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
-
+  const isSettledScoringMembers =
+    scoringMembers || (!scoringMembers && isErrorScoringMembers);
+  console.log("scoringMembers:", scoringMembers);
   const {
     isEditorOpen,
     activeRow,
@@ -67,7 +68,9 @@ function ScoringTableSelection({
     const payload = {
       code: editorValue.sessionCode,
       shoot_scores: editorValue.value,
-      elimination_template: _getParamEliminationTemplate(eliminationParticipantsCount),
+      elimination_template: _getParamEliminationTemplate(
+        eliminationParticipantsCount
+      ),
     };
 
     submitScore(payload, {
@@ -141,7 +144,9 @@ function ScoringTableSelection({
                 return (
                   <tr
                     key={row.member.id}
-                    className={classnames({ "row-active": checkIsRowActive(row.member.id) })}
+                    className={classnames({
+                      "row-active": checkIsRowActive(row.member.id),
+                    })}
                   >
                     <td>
                       <TargetFaceNumber
@@ -178,7 +183,10 @@ function ScoringTableSelection({
                     <td>
                       <CellExpander>
                         {checkIsRowActive(row.member.id) ? (
-                          <ExpanderButton flexible onClick={handleCollapseEditor}>
+                          <ExpanderButton
+                            flexible
+                            onClick={handleCollapseEditor}
+                          >
                             <IconChevronLeft size="16" />
                           </ExpanderButton>
                         ) : (
@@ -225,7 +233,11 @@ function BudrestColumn() {
   );
 }
 
-function SessionStatsColumnHeadingGroup({ isSelectionType, collapsed, sessionList }) {
+function SessionStatsColumnHeadingGroup({
+  isSelectionType,
+  collapsed,
+  sessionList,
+}) {
   if (collapsed) {
     return <th className="stats">Total</th>;
   }
@@ -274,7 +286,9 @@ function SessionStatsCellsGroup({
     <React.Fragment>
       {sessionNumbersList?.map((sessionNumber) => (
         <td key={sessionNumber} className="stats">
-          {<span>{sessions[sessionNumber]?.total}</span> || <GrayedOutText>&ndash;</GrayedOutText>}
+          {<span>{sessions[sessionNumber]?.total}</span> || (
+            <GrayedOutText>&ndash;</GrayedOutText>
+          )}
         </td>
       ))}
 

@@ -18,6 +18,7 @@ function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
   const rambahanNumbers = scoresFromProp ? Object.keys(scoresFromProp) : [];
   const shotsCount = scoresFromProp[rambahanNumbers[0]]?.length || 0;
   const [selectedScore, setSelectedScore] = React.useState(null);
+  const [moveTrigger, setMoveTrigger] = React.useState(false);
   const { shouldFocusSelector, move, setPosition } =
     useInputSwitcher(scoresData);
 
@@ -28,9 +29,21 @@ function EditorForm({ viewMode, scoresData, isLoading, onChange }) {
     onChange?.(_makeOutputValue(scoresFromProp, selectedScore));
   }, [selectedScore]);
 
+  React.useEffect(() => {
+    if (moveTrigger) {
+      setMoveTrigger(false);
+      move({
+        y: selectedScore.rambahan,
+        x: selectedScore.shot,
+        scoresFromProp,
+      });
+    }
+  }, [moveTrigger, selectedScore, scoresFromProp]);
+
   const handleSelectScore = (selectData) => {
     setSelectedScore(selectData);
-    move({ y: selectData.rambahan, x: selectData.shot });
+    setMoveTrigger(true);
+    // move({ y: selectData.rambahan, x: selectData.shot });
   };
 
   return (

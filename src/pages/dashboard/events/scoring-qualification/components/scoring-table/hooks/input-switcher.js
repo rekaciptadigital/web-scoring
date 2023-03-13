@@ -4,6 +4,7 @@ function useInputSwitcher(scoringDetails) {
   const [switcher, dispatch] = React.useReducer(switcherReducer, {
     size: { y: 0, x: 0 },
     pos: { y: -1, x: -1 },
+    scoringDetails: {},
   });
 
   React.useEffect(() => {
@@ -39,7 +40,6 @@ function switcherReducer(state, action) {
     // init size
     const rambahanNumbers = Object.keys(action.payload);
     const sizeY = rambahanNumbers.length;
-    console.log("action:", action);
     let sizeX = 0;
     if (action.payload.length > 0) {
       sizeX = action.payload[1].length;
@@ -88,20 +88,22 @@ function switcherReducer(state, action) {
   }
 
   if (action.type === "MOVE_NEXT") {
-    const { y, x } = action.payload;
+    const { y, x, scoresFromProp } = action.payload;
     let targetY;
     let targetX;
+    const lengthScoresFromProp = Object.keys(scoresFromProp);
+    const lengthRowScore = scoresFromProp[lengthScoresFromProp[0]];
 
-    if (y >= state.sizeY && x >= state.sizeX) {
-      // pojok kanan bawah, balik pojok kiri atas
+    if (
+      y >= lengthScoresFromProp.length - 1 &&
+      x >= lengthRowScore.length - 1
+    ) {
       targetY = 0;
       targetX = 0;
-    } else if (x >= state.size.x - 1) {
-      // pindah rambahan
+    } else if (x >= lengthRowScore.length - 1) {
       targetY = y + 1;
       targetX = 0;
     } else {
-      // geser kanan
       targetY = y;
       targetX = x + 1;
     }

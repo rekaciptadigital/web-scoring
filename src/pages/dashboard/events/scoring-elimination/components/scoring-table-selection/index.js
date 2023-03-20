@@ -37,7 +37,7 @@ function ScoringTableSelection({
   );
   const isSettledScoringMembers =
     scoringMembers || (!scoringMembers && isErrorScoringMembers);
-
+  console.log("scoringMembers:", scoringMembers);
   const {
     isEditorOpen,
     activeRow,

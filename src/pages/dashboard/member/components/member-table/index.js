@@ -15,8 +15,14 @@ import {
 
 import logoUpdate from "assets/images/myachery/update-category.png";
 
-function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatus, eventDetail }) {
-
+function MemberTable({
+  categoryDetail,
+  searchName,
+  eventId,
+  isTeam,
+  paymentStatus,
+  eventDetail,
+}) {
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
@@ -34,10 +40,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
   const [idParticipant, setIdParticipant] = React.useState(0);
   const [categoryId, setCategoryId] = React.useState(0);
   const [isUpdateCategory, setIsUpdateCategory] = React.useState(false);
-  const [isResponse, setResponse] = React.useState([false,""]);
-
-  const isSettledScoringMembers =
-    scoringMembers || (!scoringMembers && isErrorScoringMembers);
+  const [isResponse, setResponse] = React.useState([false, ""]);
 
   const onConfirm = async (participantId) => {
     const { message, errors, data } = await EventsService.getAccessCategories({
@@ -54,7 +57,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
 
   const onCancel = () => {
     setIsOpenAlert(false);
-    setResponse([false,""]);
+    setResponse([false, ""]);
   };
 
   const onUpdateCategory = async () => {
@@ -64,9 +67,9 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
     });
     if (message === "Success") {
       setIsUpdateCategory(true);
-      setResponse([false,''])
-    }else{
-      setResponse([true,message])
+      setResponse([false, ""]);
+    } else {
+      setResponse([true, message]);
     }
     console.info(errors);
   };
@@ -76,9 +79,11 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
     window.location.reload();
   };
 
-  if (!isSettledScoringMembers) {
-    return <SpinnerDotBlock />;
-  }
+  React.useEffect(() => {
+    if (isErrorScoringMembers) {
+      console.log(isErrorScoringMembers);
+    }
+  }, [isErrorScoringMembers]);
 
   if (!scoringMembers?.length) {
     return (
@@ -105,7 +110,9 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
             <tr>
               <th>No.</th>
               <th className="name">Nama Peserta</th>
-              <th className="name">{!eventDetail.withContingent ? 'Nama Klub' : 'Kontingen'}</th>
+              <th className="name">
+                {!eventDetail.withContingent ? "Nama Klub" : "Kontingen"}
+              </th>
               <th className="name">Email</th>
               <th className="name">Telepon</th>
               <th className="name">Status Pembayaran</th>
@@ -120,7 +127,11 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
                   <td>{index + 1}.</td>
                   <td className="name">{row?.member?.name}</td>
                   <td className="name">
-                    {!eventDetail.withContingent ? <ClubName>{row?.member?.clubName}</ClubName> : <ClubName>{row?.member?.cityName}</ClubName>}
+                    {!eventDetail.withContingent ? (
+                      <ClubName>{row?.member?.clubName}</ClubName>
+                    ) : (
+                      <ClubName>{row?.member?.cityName}</ClubName>
+                    )}
                   </td>
                   <td className="name">
                     <ClubName>{row?.member?.email}</ClubName>
@@ -300,8 +311,7 @@ function MemberTable({ categoryDetail, searchName, eventId, isTeam, paymentStatu
         </div>
       </SweetAlert>
 
-      <AlertSubmitError isError={isResponse[0]} errors={isResponse[1]} />  
-
+      <AlertSubmitError isError={isResponse[0]} errors={isResponse[1]} />
     </React.Fragment>
   );
 }

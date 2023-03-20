@@ -20,8 +20,9 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
   const activeAgeCategory = ageCategories?.[activeCompetitionCategory];
   const activeGenderCategory = genderCategories?.[activeCompetitionCategory];
   const activeCategoryDetail =
-    categoryDetails?.[activeCompetitionCategory]?.[activeAgeCategory]?.[activeGenderCategory] ||
-    null;
+    categoryDetails?.[activeCompetitionCategory]?.[activeAgeCategory]?.[
+      activeGenderCategory
+    ] || null;
   const activePaymentStatus = paymentStatus?.[activeCompetitionCategory];
 
   React.useEffect(() => {
@@ -32,11 +33,18 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
   }, [eventCategories]);
 
   const optionsCompetitionCategory = React.useMemo(() => {
-    return _makeOptionsCompetitionCategory(categoryDetails, activeCompetitionCategory);
+    return _makeOptionsCompetitionCategory(
+      categoryDetails,
+      activeCompetitionCategory
+    );
   }, [categoryDetails, activeCompetitionCategory]);
 
   const optionsAgeCategory = React.useMemo(() => {
-    return _makeOptionsAgeCategory(categoryDetails, activeCompetitionCategory, activeAgeCategory);
+    return _makeOptionsAgeCategory(
+      categoryDetails,
+      activeCompetitionCategory,
+      activeAgeCategory
+    );
   }, [categoryDetails, activeCompetitionCategory, activeAgeCategory]);
 
   const optionsGenderCategory = React.useMemo(() => {
@@ -46,7 +54,12 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
       activeAgeCategory,
       activeGenderCategory
     );
-  }, [categoryDetails, activeCompetitionCategory, activeAgeCategory, activeGenderCategory]);
+  }, [
+    categoryDetails,
+    activeCompetitionCategory,
+    activeAgeCategory,
+    activeGenderCategory,
+  ]);
 
   const optionsPaymentStatus = React.useMemo(
     () => _makeOptionsPaymentStatus(activePaymentStatus),
@@ -54,7 +67,10 @@ function useCategoriesWithFilters({ eventCategories, isTeam = false }) {
   );
 
   const selectOptionCompetitionCategory = (competitionCategory) => {
-    dispatch({ type: "UPDATE_COMPETITION_CATEGORY", payload: competitionCategory });
+    dispatch({
+      type: "UPDATE_COMPETITION_CATEGORY",
+      payload: competitionCategory,
+    });
   };
 
   const selectOptionAgeCategory = (ageCategory) => {
@@ -161,11 +177,17 @@ function _makeFilteringState({
     return;
   }
 
-  const categoryDetailsSortedByID = categoryDetails.sort((first, then) => first.id - then.id);
-  const groupedCategories = _runCategoriesGrouping(categoryDetailsSortedByID, isTeam);
+  const categoryDetailsSortedByID = categoryDetails.sort(
+    (first, then) => first.id - then.id
+  );
+  const groupedCategories = _runCategoriesGrouping(
+    categoryDetailsSortedByID,
+    isTeam
+  );
   const competitionCategoryKeys = Object.keys(groupedCategories);
 
-  const defaultCompetitionCategory = previousCompetitionCategory || competitionCategoryKeys[0];
+  const defaultCompetitionCategory =
+    previousCompetitionCategory || competitionCategoryKeys[0];
 
   const defaultAgeCategories =
     previousAgeCategories ||
@@ -177,14 +199,21 @@ function _makeFilteringState({
 
   const defaultGenderCategories =
     previousGenderCategories ||
-    competitionCategoryKeys.reduce((genderCategoriesInGroups, competitionCategory) => {
-      const ageCategories = Object.keys(groupedCategories[competitionCategory]);
-      ageCategories.forEach((ageCategory) => {
-        const defaultGender = Object.keys(groupedCategories[competitionCategory][ageCategory])[0];
-        genderCategoriesInGroups[competitionCategory] = defaultGender;
-      });
-      return genderCategoriesInGroups;
-    }, {});
+    competitionCategoryKeys.reduce(
+      (genderCategoriesInGroups, competitionCategory) => {
+        const ageCategories = Object.keys(
+          groupedCategories[competitionCategory]
+        );
+        ageCategories.forEach((ageCategory) => {
+          const defaultGender = Object.keys(
+            groupedCategories[competitionCategory][ageCategory]
+          )[0];
+          genderCategoriesInGroups[competitionCategory] = defaultGender;
+        });
+        return genderCategoriesInGroups;
+      },
+      {}
+    );
 
   const defaultPaymentStatus = { [defaultCompetitionCategory]: 1 };
 
@@ -204,49 +233,63 @@ function _getTeamLabelFromCategoryLabel(labelCategoryDetail) {
 }
 
 function _runCategoriesGrouping(categoryDetailsSortedByID, isTeam = false) {
-  const categoriesInGroups = categoryDetailsSortedByID.reduce((groupingResult, categoryDetail) => {
-    if (!categoryDetail.isShow) {
+  const categoriesInGroups = categoryDetailsSortedByID.reduce(
+    (groupingResult, categoryDetail) => {
+      if (!categoryDetail.isShow) {
+        return groupingResult;
+      }
+
+      const competitionCategoryId = categoryDetail.competitionCategoryId;
+      const classCategory = categoryDetail.classCategory;
+      const genderCategory = categoryDetail.teamCategoryId;
+
+      const isIndividualCategory =
+        ["individu male", "individu female"].indexOf(genderCategory) > -1;
+      const isTeamCategory =
+        ["male_team", "female_team", "mix_team"].indexOf(genderCategory) > -1;
+
+      if ((!isTeam && isTeamCategory) || (isTeam && isIndividualCategory)) {
+        return groupingResult;
+      }
+
+      if (!groupingResult[competitionCategoryId]) {
+        groupingResult[competitionCategoryId] = {};
+      }
+
+      if (!groupingResult[competitionCategoryId][classCategory]) {
+        groupingResult[competitionCategoryId][classCategory] = {};
+      }
+
+      groupingResult[competitionCategoryId][classCategory][genderCategory] = {
+        originalCategoryDetail: categoryDetail,
+        categoryDetailId: categoryDetail.id,
+        teamCategoryLabel: _getTeamLabelFromCategoryLabel(
+          categoryDetail.labelCategory
+        ),
+        quota: categoryDetail.quota,
+        totalParticipant: categoryDetail.totalParticipant,
+        remainingQuota: categoryDetail.quota - categoryDetail.totalParticipant,
+        defaultEliminationCount:
+          categoryDetail.defaultEliminationCount || undefined,
+        eliminationLock: categoryDetail.eliminationLock,
+      };
+
       return groupingResult;
-    }
-
-    const competitionCategoryId = categoryDetail.competitionCategoryId;
-    const classCategory = categoryDetail.classCategory;
-    const genderCategory = categoryDetail.teamCategoryId;
-
-    const isIndividualCategory = ["individu male", "individu female"].indexOf(genderCategory) > -1;
-    const isTeamCategory = ["male_team", "female_team", "mix_team"].indexOf(genderCategory) > -1;
-
-    if ((!isTeam && isTeamCategory) || (isTeam && isIndividualCategory)) {
-      return groupingResult;
-    }
-
-    if (!groupingResult[competitionCategoryId]) {
-      groupingResult[competitionCategoryId] = {};
-    }
-
-    if (!groupingResult[competitionCategoryId][classCategory]) {
-      groupingResult[competitionCategoryId][classCategory] = {};
-    }
-
-    groupingResult[competitionCategoryId][classCategory][genderCategory] = {
-      originalCategoryDetail: categoryDetail,
-      categoryDetailId: categoryDetail.id,
-      teamCategoryLabel: _getTeamLabelFromCategoryLabel(categoryDetail.labelCategory),
-      quota: categoryDetail.quota,
-      totalParticipant: categoryDetail.totalParticipant,
-      remainingQuota: categoryDetail.quota - categoryDetail.totalParticipant,
-      defaultEliminationCount: categoryDetail.defaultEliminationCount || undefined,
-      eliminationLock: categoryDetail.eliminationLock,
-    };
-
-    return groupingResult;
-  }, {});
+    },
+    {}
+  );
 
   return categoriesInGroups;
 }
 
-function _makeOptionsCompetitionCategory(groupedCategoryDetails, activeCompetitionCategory) {
-  if (!groupedCategoryDetails) {
+function _makeOptionsCompetitionCategory(
+  groupedCategoryDetails,
+  activeCompetitionCategory
+) {
+  if (
+    !groupedCategoryDetails ||
+    Object.keys(groupedCategoryDetails).length === 0
+  ) {
     return [];
   }
   return Object.keys(groupedCategoryDetails).map((competitionCategoryId) => ({
@@ -260,13 +303,18 @@ function _makeOptionsAgeCategory(
   activeCompetitionCategory,
   activeAgeCategory
 ) {
-  if (!groupedCategoryDetails) {
+  if (
+    !groupedCategoryDetails ||
+    Object.keys(groupedCategoryDetails).length === 0
+  ) {
     return [];
   }
-  return Object.keys(groupedCategoryDetails[activeCompetitionCategory]).map((ageCategoryId) => ({
-    ageCategory: ageCategoryId,
-    isActive: ageCategoryId === activeAgeCategory,
-  }));
+  return Object.keys(groupedCategoryDetails[activeCompetitionCategory]).map(
+    (ageCategoryId) => ({
+      ageCategory: ageCategoryId,
+      isActive: ageCategoryId === activeAgeCategory,
+    })
+  );
 }
 
 function _makeOptionsGenderCategory(
@@ -275,27 +323,30 @@ function _makeOptionsGenderCategory(
   activeAgeCategory,
   activeGenderCategory
 ) {
-  if (!groupedCategoryDetails) {
+  if (
+    !groupedCategoryDetails ||
+    Object.keys(groupedCategoryDetails).length === 0
+  ) {
     return [];
   }
-  return Object.keys(groupedCategoryDetails[activeCompetitionCategory][activeAgeCategory]).map(
-    (teamCategoryId) => {
-      const labels = {
-        "individu male": "Individu Putra",
-        "individu female": "Individu Putri",
-        individu_mix: "Individu",
-        male_team: "Beregu Putra",
-        female_team: "Beregu Putri",
-        mix_team: "Beregu Campuran",
-      };
+  return Object.keys(
+    groupedCategoryDetails[activeCompetitionCategory][activeAgeCategory]
+  ).map((teamCategoryId) => {
+    const labels = {
+      "individu male": "Individu Putra",
+      "individu female": "Individu Putri",
+      individu_mix: "Individu",
+      male_team: "Beregu Putra",
+      female_team: "Beregu Putri",
+      mix_team: "Beregu Campuran",
+    };
 
-      return {
-        genderCategory: teamCategoryId,
-        genderCategoryLabel: labels[teamCategoryId],
-        isActive: teamCategoryId === activeGenderCategory,
-      };
-    }
-  );
+    return {
+      genderCategory: teamCategoryId,
+      genderCategoryLabel: labels[teamCategoryId],
+      isActive: teamCategoryId === activeGenderCategory,
+    };
+  });
 }
 
 function _makeOptionsPaymentStatus(activePaymentStatus = 1) {

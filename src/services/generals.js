@@ -7,6 +7,15 @@ export default {
   getCities(qs = null) {
     return API.get("/api/general/get-city", qs);
   },
+  getCountry(qs = null) {
+    return API.get("/api/general/get-country", qs);
+  },
+  getProvinceCountry(qs = null) {
+    return API.get("/api/general/get-province-country", qs);
+  },
+  getCitiesCountry(qs = null) {
+    return API.get("/api/general/get-city-country", qs);
+  },
 
   // V2
   /**
@@ -33,7 +42,10 @@ export default {
    * @returns {Promise} { success, data, errors, message }
    */
   getClubRankingCategories(queryString = null) {
-    return API.get("/api/general/get-list-tab-category-by-event-id", queryString);
+    return API.get(
+      "/api/general/get-list-tab-category-by-event-id",
+      queryString
+    );
   },
 
   /**

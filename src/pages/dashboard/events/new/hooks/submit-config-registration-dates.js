@@ -15,11 +15,28 @@ function useSubmitRegistrationDates(eventId, formData) {
       default_datetime_end_register: formData.registrationDateEnd
         ? datetime.formatServerDatetime(formData.registrationDateEnd)
         : undefined,
-      schedule_start_event: datetime.formatServerDatetime(formData.eventDateStart),
+      schedule_start_event: datetime.formatServerDatetime(
+        formData.eventDateStart
+      ),
       schedule_end_event: datetime.formatServerDatetime(formData.eventDateEnd),
       is_active_config: 0,
+      list_classification: [],
+      withContingent: 1,
+      parentClassification:
+        formData?.classification?.parentClassification?.id ?? 1,
     };
-
+    if (
+      formData?.classification?.parentClassification?.id === 2 ||
+      formData?.classification?.parentClassification?.id === 3 ||
+      formData?.classification?.parentClassification?.id === 4
+    ) {
+      payload.classificationCountryId =
+        formData?.classification?.setting_country?.id ?? 0;
+      payload.classificationProvinceId =
+        Number(formData?.classification?.setting_province?.id) ?? 0;
+      payload.classificationCityId =
+        Number(formData?.classification?.setting_city?.id) ?? 0;
+    }
     if (formData.isActive) {
       payload = {
         ...payload,
@@ -49,7 +66,6 @@ function useSubmitRegistrationDates(eventId, formData) {
         }),
       };
     }
-
     const postFunction = () => EventsService.setConfigCategoryRegister(payload);
     fetcher.runAsync(postFunction, options);
   };
@@ -63,7 +79,7 @@ function useSubmitRegistrationDates(eventId, formData) {
 function _makePayloadConfigCategories(categories) {
   const payload = categories?.map((item) => {
     const payloadCategories = [];
-    for (const pair of item.categories) {
+    for (const pair of item?.categories) {
       for (const category of pair.categories) {
         payloadCategories.push({
           category_id: category.id,

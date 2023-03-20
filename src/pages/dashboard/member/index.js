@@ -45,7 +45,10 @@ function PageDosQualification() {
     selectOptionAgeCategory,
     selectOptionGenderCategory,
     selectOptionPaymentStatus,
-  } = useCategoriesWithFilters({ eventCategories: categoryDetails, isTeam: isTeam });
+  } = useCategoriesWithFilters({
+    eventCategories: categoryDetails,
+    isTeam: isTeam,
+  });
 
   const [inputSearchQuery, setInputSearchQuery] = React.useState("");
 
@@ -70,17 +73,19 @@ function PageDosQualification() {
     getEventDetail();
   }, []);
 
-  const contentTitle = "Peserta" + (type ? (isTeam ? " Beregu" : " Individu") : "");
+  const contentTitle =
+    "Peserta" + (type ? (isTeam ? " Beregu" : " Individu") : "");
   const pageTitle = contentTitle + " | MyArchery.id";
-  const errorFetchingInitialCategories = !categoryDetails && errorsCategoryDetail;
+  const errorFetchingInitialCategories =
+    !categoryDetails && errorsCategoryDetail;
 
   if (errorFetchingInitialCategories) {
     return (
       <ContentLayoutWrapper pageTitle={pageTitle}>
         <ViewWrapper>
           <p>
-            Terdapat kendala dalam mengambil data. Lihat detail berikut untuk melihat informasi
-            teknis lebih lanjut:
+            Terdapat kendala dalam mengambil data. Lihat detail berikut untuk
+            melihat informasi teknis lebih lanjut:
           </p>
 
           <pre>{JSON.stringify(errorsCategoryDetail)}</pre>
@@ -118,7 +123,9 @@ function PageDosQualification() {
                     className={classnames({ "tab-active": option.isActive })}
                     onClick={() => {
                       resetOnChangeCategory();
-                      selectOptionCompetitionCategory(option.competitionCategory);
+                      selectOptionCompetitionCategory(
+                        option.competitionCategory
+                      );
                     }}
                   >
                     {option.competitionCategory}
@@ -138,7 +145,9 @@ function PageDosQualification() {
                       optionsAgeCategory.map((option) => (
                         <li key={option.ageCategory}>
                           <FilterItemButton
-                            className={classnames({ "filter-item-active": option.isActive })}
+                            className={classnames({
+                              "filter-item-active": option.isActive,
+                            })}
                             onClick={() => {
                               resetOnChangeCategory();
                               selectOptionAgeCategory(option.ageCategory);
@@ -161,7 +170,9 @@ function PageDosQualification() {
                       optionsGenderCategory.map((option) => (
                         <li key={option.genderCategory}>
                           <FilterItemButton
-                            className={classnames({ "filter-item-active": option.isActive })}
+                            className={classnames({
+                              "filter-item-active": option.isActive,
+                            })}
                             onClick={() => {
                               resetOnChangeCategory();
                               selectOptionGenderCategory(option.genderCategory);
@@ -184,7 +195,9 @@ function PageDosQualification() {
                       optionsPaymentStatus.map((option) => (
                         <li key={option.status}>
                           <FilterItemButton
-                            className={classnames({ "filter-item-active": option.isActive })}
+                            className={classnames({
+                              "filter-item-active": option.isActive,
+                            })}
                             onClick={() => {
                               selectOptionPaymentStatus(option.status);
                             }}
@@ -223,7 +236,10 @@ function PageDosQualification() {
                       </span>{" "}
                       <span>Unduh ID Card</span>
                     </ButtonBlue>
-                    <AlertSubmitError isError={isErrorDownloadID} errors={errorsDownloadID} />
+                    <AlertSubmitError
+                      isError={isErrorDownloadID}
+                      errors={errorsDownloadID}
+                    />
                   </HorizontalSpaced>
                 </ToolbarRight>
               )}

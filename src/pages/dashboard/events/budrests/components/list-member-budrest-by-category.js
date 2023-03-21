@@ -75,7 +75,7 @@ function ListMemberBudrestsByCategory({
 
           <tbody>
             {budrestList.map((memberBudrest) => {
-              console.log("memberBudrest:", memberBudrest);
+              // console.log("memberBudrest:", memberBudrest);
               return (
                 <tr key={memberBudrest.key}>
                   {Boolean(memberBudrest.rowSpan) && (

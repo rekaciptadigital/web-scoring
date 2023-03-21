@@ -74,63 +74,85 @@ function ListMemberBudrestsByCategory({
           </thead>
 
           <tbody>
-            {budrestList.map((memberBudrest) => (
-              <tr key={memberBudrest.key}>
-                {Boolean(memberBudrest.rowSpan) && (
-                  <CenterCenterRow rowSpan={memberBudrest.rowSpan}>
-                    <span>
-                      {getNumberFromBudrest(memberBudrest.budRestNumber) || "-"}
-                    </span>
-                  </CenterCenterRow>
-                )}
-
-                <td>
-                  <BudrestNumberChooser
-                    options={optionsBudrestNumber}
-                    selectedNumber={memberBudrest.budRestNumber}
-                    onSubmit={(opt) => {
-                      const params = {
-                        categoryId: categoryId,
-                        scheduleId: memberBudrest.scheduleFullDayId,
-                        budrestNumber: opt.value,
-                      };
-                      submit(params, {
-                        onSuccess() {
-                          fetchBudrestNumbers();
-                          onChangeItem?.();
-                          toast.success("Berhasil menyimpan nomor bantalan");
-                        },
-                        onError() {
-                          toast.error("Gagal menyimpan nomor bantalan");
-                        },
-                      });
-                    }}
-                  />
-                </td>
-                <RowTextInTheMiddle>{memberBudrest.name}</RowTextInTheMiddle>
-                <RowTextInTheMiddle>
-                  {memberBudrest.hasSameClub ? (
-                    <SpaceBetween>
-                      <HighlightedText>
-                        {memberBudrest.withContingent
-                          ? memberBudrest.cityName
-                          : memberBudrest.clubName}
-                      </HighlightedText>
-
-                      <WarningIconWrapper title={TOOLTIP_WARNING_TEXT}>
-                        <IconAlertCircle />
-                      </WarningIconWrapper>
-                    </SpaceBetween>
-                  ) : (
-                    <span>
-                      {memberBudrest.withContingent
-                        ? memberBudrest.cityName
-                        : memberBudrest.clubName}
-                    </span>
+            {budrestList.map((memberBudrest) => {
+              console.log("memberBudrest:", memberBudrest);
+              return (
+                <tr key={memberBudrest.key}>
+                  {Boolean(memberBudrest.rowSpan) && (
+                    <CenterCenterRow rowSpan={memberBudrest.rowSpan}>
+                      <span>
+                        {getNumberFromBudrest(memberBudrest.budRestNumber) ||
+                          "-"}
+                      </span>
+                    </CenterCenterRow>
                   )}
-                </RowTextInTheMiddle>
-              </tr>
-            ))}
+
+                  <td>
+                    <BudrestNumberChooser
+                      options={optionsBudrestNumber}
+                      selectedNumber={memberBudrest.budRestNumber}
+                      onSubmit={(opt) => {
+                        const params = {
+                          categoryId: categoryId,
+                          scheduleId: memberBudrest.scheduleFullDayId,
+                          budrestNumber: opt.value,
+                        };
+                        submit(params, {
+                          onSuccess() {
+                            fetchBudrestNumbers();
+                            onChangeItem?.();
+                            toast.success("Berhasil menyimpan nomor bantalan");
+                          },
+                          onError() {
+                            toast.error("Gagal menyimpan nomor bantalan");
+                          },
+                        });
+                      }}
+                    />
+                  </td>
+                  <RowTextInTheMiddle>{memberBudrest.name}</RowTextInTheMiddle>
+                  <RowTextInTheMiddle>
+                    {memberBudrest.hasSameClub ? (
+                      <SpaceBetween>
+                        <HighlightedText>
+                          {/* {memberBudrest.withContingent
+                            ? memberBudrest.cityName
+                            : memberBudrest.clubName} */}
+                          {memberBudrest.parentClassificationType == 1
+                            ? memberBudrest.clubName
+                            : memberBudrest.parentClassificationType == 2
+                            ? memberBudrest.countryName
+                            : memberBudrest.parentClassificationType == 3
+                            ? memberBudrest.provinceName
+                            : memberBudrest.parentClassificationType == 4
+                            ? memberBudrest.cityName
+                            : memberBudrest.childrenClassificationMembersName}
+                        </HighlightedText>
+
+                        <WarningIconWrapper title={TOOLTIP_WARNING_TEXT}>
+                          <IconAlertCircle />
+                        </WarningIconWrapper>
+                      </SpaceBetween>
+                    ) : (
+                      <span>
+                        {/* {memberBudrest.withContingent
+                          ? memberBudrest.cityName
+                          : memberBudrest.clubName} */}
+                        {memberBudrest.parentClassificationType == 1
+                          ? memberBudrest.clubName
+                          : memberBudrest.parentClassificationType == 2
+                          ? memberBudrest.countryName
+                          : memberBudrest.parentClassificationType == 3
+                          ? memberBudrest.provinceName
+                          : memberBudrest.parentClassificationType == 4
+                          ? memberBudrest.cityName
+                          : memberBudrest.childrenClassificationMembersName}
+                      </span>
+                    )}
+                  </RowTextInTheMiddle>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </ListMemberNumbers>

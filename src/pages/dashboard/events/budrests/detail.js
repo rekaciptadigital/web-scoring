@@ -41,10 +41,14 @@ function PageEventBudRestDetail() {
         <CardSheet>
           <VerticalSpacedBox>
             <div>
-              Tanggal bertanding tidak valid. Silakan terapkan pengaturan bantalan lebih dulu.
+              Tanggal bertanding tidak valid. Silakan terapkan pengaturan
+              bantalan lebih dulu.
             </div>
             <div>
-              <ButtonOutlineBlue as={Link} to={`/dashboard/event/${eventId}/budrests`}>
+              <ButtonOutlineBlue
+                as={Link}
+                to={`/dashboard/event/${eventId}/budrests`}
+              >
                 Ke pengaturan bantalan
               </ButtonOutlineBlue>
             </div>
@@ -75,7 +79,10 @@ function PageEventBudRestDetail() {
           <VerticalSpacedBox>
             <div>Data tidak tersedia.</div>
             <div>
-              <ButtonOutlineBlue as={Link} to={`/dashboard/event/${eventId}/budrests`}>
+              <ButtonOutlineBlue
+                as={Link}
+                to={`/dashboard/event/${eventId}/budrests`}
+              >
                 Ke pengaturan bantalan
               </ButtonOutlineBlue>
             </div>
@@ -88,7 +95,10 @@ function PageEventBudRestDetail() {
   const dateLabel = datetime.formatFullDateLabel(memberBudrests.date);
 
   return (
-    <ContentLayoutWrapper pageTitle="Pengaturan Bantalan" navbar={<SubNavbar eventId={eventId} />}>
+    <ContentLayoutWrapper
+      pageTitle="Pengaturan Bantalan"
+      navbar={<SubNavbar eventId={eventId} />}
+    >
       <ProcessingToast />
       <CardSheet>
         <VerticalSpacedBox>
@@ -118,7 +128,9 @@ function PageEventBudRestDetail() {
                 <ListMemberBudrestsByCategory
                   key={group.id}
                   group={group}
-                  budrestList={memberBudrestsFiltered.budrestsByCategory[group.id]}
+                  budrestList={
+                    memberBudrestsFiltered.budrestsByCategory[group.id]
+                  }
                   onChangeItem={() => fetchMemberBudrests()}
                   isUpdatingData={memberBudrests && isLoadingMemberBudrests}
                 />
@@ -127,10 +139,15 @@ function PageEventBudRestDetail() {
               <SearchResultEmpty>
                 <VerticalSpacedBox>
                   <div>
-                    <img src={IllustrationDataNotFound} alt="Ilustrasi data tidak ditemukan" />
+                    <img
+                      src={IllustrationDataNotFound}
+                      alt="Ilustrasi data tidak ditemukan"
+                    />
                   </div>
                   <div>
-                    <TextHeadingBlue as="h3">Data yang Anda Cari Tidak Tersedia</TextHeadingBlue>
+                    <TextHeadingBlue as="h3">
+                      Data yang Anda Cari Tidak Tersedia
+                    </TextHeadingBlue>
                     <p>Silakan masukkan kata kunci lain.</p>
                   </div>
                 </VerticalSpacedBox>

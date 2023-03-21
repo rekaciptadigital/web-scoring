@@ -159,23 +159,6 @@ function ScoreEditorControl({
         )}
 
         <div>
-          {/* <ConfirmPrompt
-            renderButton={({ handlePrompt }) => {
-              return (
-                <EditorCloseButton flexible onClick={handlePrompt}>
-                  <IconX size="16" />
-                </EditorCloseButton>
-              );
-            }}
-            messagePrompt="Ada data skor yang belum tersimpan"
-            messageDescription="Yakin akan menutup editor skor?"
-            reverseButtons
-            buttonConfirmLabel="Tutup Saja"
-            buttonCancelLabel="Simpan"
-            shouldPrompt={isFormDirty}
-            onConfirm={onClose}
-            onCancel={handleSaveScoreData}
-          /> */}
           <EditorCloseButton flexible onClick={handleSaveScoreData}>
             <IconX size="16" />
           </EditorCloseButton>

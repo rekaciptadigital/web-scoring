@@ -8,6 +8,8 @@ import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 function WinnerBoxView({ title, data, eventDetail }) {
   const rowsGroupByCategory = React.useMemo(() => _makeRowData(data), [data]);
 
+  React.useEffect(() => {}, [eventDetail]);
+
   if (!rowsGroupByCategory?.length) {
     return (
       <WinnerBox>
@@ -26,30 +28,50 @@ function WinnerBoxView({ title, data, eventDetail }) {
             <th>Kategori</th>
             <th>Medali</th>
             <th className="name">Nama</th>
-            <th className="name"> {!eventDetail.withContingent ? 'Klub' : 'Kontingen'} </th>
+            <th className="name">
+              Kontingen
+              {/* {!eventDetail.withContingent ? "Klub" : "Kontingen"}{" "} */}
+            </th>
           </tr>
         </thead>
 
         <tbody>
           {rowsGroupByCategory.map((group) => {
-            return group.rows.map((row, index) => (
-              <tr key={index}>
-                {index === 0 && (
-                  <CategoryCell className="name" rowSpan={group.length}>
-                    {row.categoryLabel}
-                  </CategoryCell>
-                )}
+            return group.rows.map((row, index) => {
+              return (
+                <tr key={index}>
+                  {index === 0 && (
+                    <CategoryCell className="name" rowSpan={group.length}>
+                      {row.categoryLabel}
+                    </CategoryCell>
+                  )}
 
-                <td>
-                  <span title={"Juara " + row.rank}>
-                    <Medal rank={row.rank} />
-                  </span>
-                </td>
+                  <td>
+                    <span title={"Juara " + row.rank}>
+                      <Medal rank={row.rank} />
+                    </span>
+                  </td>
 
-                <td className="name">{row.winnerName}</td>
-                {!eventDetail.withContingent ? <td className="name">{row.clubName}</td> : <td className="name">{row.cityName}</td>}
-              </tr>
-            ));
+                  <td className="name">{row.winnerName}</td>
+                  {/* {!eventDetail.withContingent ? (
+                    <td className="name">{row.clubName} suk</td>
+                  ) : (
+                    <td className="name">{row.cityName} suk</td>
+                  )} */}
+                  {row.parentClassification === 1 ? (
+                    <td className="name">{row.clubName}</td>
+                  ) : row.parentClassification === 2 ? (
+                    <td className="name">{row.countryName}</td>
+                  ) : row.parentClassification === 3 ? (
+                    <td className="name">{row.provinceName}</td>
+                  ) : row.parentClassification === 4 ? (
+                    <td className="name">{row.cityName}</td>
+                  ) : (
+                    <td className="name">{row.childrenClassificationName}</td>
+                  )}
+                </tr>
+              );
+            });
           })}
         </tbody>
       </WinnerTable>

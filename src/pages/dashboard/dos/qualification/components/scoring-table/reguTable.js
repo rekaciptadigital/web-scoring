@@ -3,14 +3,28 @@ import styled from "styled-components";
 import { useScoringMembers } from "../../hooks/scoring-members";
 import { LoadingScreen, SpinnerDotBlock } from "components/ma";
 
-function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, searchName, isTeam, eventDetail }) {
+function ScoringTeamTable({
+  categoryDetailId,
+  eliminationParticipantsCount,
+  searchName,
+  isTeam,
+  eventDetail,
+}) {
+  React.useEffect(() => {}, [eventDetail]);
+
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
     getSessionNumbersList,
-  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, isTeam);
-  const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
+  } = useScoringMembers(
+    categoryDetailId,
+    searchName,
+    eliminationParticipantsCount,
+    isTeam
+  );
+  const isSettledScoringMembers =
+    scoringMembers || (!scoringMembers && isErrorScoringMembers);
 
   const sessionNumbersList = getSessionNumbersList();
 
@@ -34,8 +48,13 @@ function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, sear
               <tr>
                 <th>Peringkat</th>
                 <th className="name">Tim</th>
-                <th className="name">{!eventDetail.withContingent ? 'Klub' : 'Kontingen'}</th>
-                <SessionStatsColumnHeadingGroup sessionList={sessionNumbersList} />
+                <th className="name">
+                  Kontingen
+                  {/* {!eventDetail.withContingent ? "Klub" : "Kontingen"} */}
+                </th>
+                <SessionStatsColumnHeadingGroup
+                  sessionList={sessionNumbersList}
+                />
                 <th></th>
               </tr>
             </thead>
@@ -55,7 +74,24 @@ function ScoringTeamTable({ categoryDetailId, eliminationParticipantsCount, sear
                     </td>
                     <td className="name">{row?.team}</td>
                     <td className="name">
-                      {!eventDetail.withContingent ? <ClubName>{row?.clubName}</ClubName> : <ClubName>{row?.cityName}</ClubName>}
+                      {/* {!eventDetail.withContingent ? (
+                        <ClubName>{row?.clubName}</ClubName>
+                      ) : (
+                        <ClubName>{row?.cityName}</ClubName>
+                      )} */}
+                      {row.parentClassificationType === 1 ? (
+                        <ClubName>{row?.clubName}</ClubName>
+                      ) : row.parentClassificationType === 2 ? (
+                        <ClubName>{row?.countryName}</ClubName>
+                      ) : row.parentClassificationType === 3 ? (
+                        <ClubName>{row?.provinceName}</ClubName>
+                      ) : row.parentClassificationType === 4 ? (
+                        <ClubName>{row?.cityName}</ClubName>
+                      ) : (
+                        <ClubName>
+                          {row?.childrenClassificationMembersName}
+                        </ClubName>
+                      )}
                     </td>
 
                     <SessionStatsCellsGroup
@@ -96,7 +132,13 @@ function SessionStatsColumnHeadingGroup({ sessionList }) {
   );
 }
 
-function SessionStatsCellsGroup({ sessions, sessionNumbersList, total, totalX, totalXPlusTen }) {
+function SessionStatsCellsGroup({
+  sessions,
+  sessionNumbersList,
+  total,
+  totalX,
+  totalXPlusTen,
+}) {
   if (!sessions) {
     return (
       <React.Fragment>
@@ -111,7 +153,9 @@ function SessionStatsCellsGroup({ sessions, sessionNumbersList, total, totalX, t
     <React.Fragment>
       {sessionNumbersList.map((sessionNumber) => (
         <td key={sessionNumber} className="stats">
-          {<span>{sessions[sessionNumber]?.total}</span> || <GrayedOutText>&ndash;</GrayedOutText>}
+          {<span>{sessions[sessionNumber]?.total}</span> || (
+            <GrayedOutText>&ndash;</GrayedOutText>
+          )}
         </td>
       ))}
       <td className="stats">{total}</td>

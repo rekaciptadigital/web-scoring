@@ -8,7 +8,11 @@ import { useParticipantPresence } from "../../hooks/participant-presence";
 import { useSubmitScore } from "../../hooks/submit-score";
 import { toast } from "../processing-toast";
 
-import { LoadingScreen, SpinnerDotBlock, AlertConfirmAction } from "components/ma";
+import {
+  LoadingScreen,
+  SpinnerDotBlock,
+  AlertConfirmAction,
+} from "components/ma";
 import { Checkbox } from "../../../components/form-fields";
 import { ScoreEditor } from "./score-editor";
 import { SelectRank } from "./select-rank";
@@ -20,7 +24,7 @@ import IconBudrest from "components/ma/icons/mono/bud-rest";
 import IconMedal from "components/ma/icons/fill/medal-gold";
 import classnames from "classnames";
 
-import CoinTosLogo from "../../../../../../assets/icons/coin-tos.png"
+import CoinTosLogo from "../../../../../../assets/icons/coin-tos.png";
 
 function ScoringTable({
   categoryDetailId,
@@ -31,22 +35,28 @@ function ScoringTable({
   searchName,
   refecthData,
   refectchUpdated,
-  eventDetail
+  eventDetail,
 }) {
   const { event_id } = useParams();
   const eventId = event_id;
   const scoreType = isSelectionType ? 3 : undefined;
-
   const [rank, setRank] = React.useState([
     {
-      rank : ''
+      rank: "",
+    },
+  ]);
+
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
     }
-  ])
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
 
   React.useEffect(() => {
-    if (refecthData) fetchScoringMembers()
-    if (isSuccess || isErrorScoringMembers) refectchUpdated()
-  }, [refecthData, isSuccess, isErrorScoringMembers])
+    if (refecthData) fetchScoringMembers();
+    if (isSuccess || isErrorScoringMembers) refectchUpdated();
+  }, [refecthData, isSuccess, isErrorScoringMembers]);
 
   const {
     data: scoringMembers,
@@ -63,9 +73,11 @@ function ScoringTable({
     false, // bukan beregu
     scoreType
   );
-  const isSettledScoringMembers = scoringMembers || (!scoringMembers && isErrorScoringMembers);
+  const isSettledScoringMembers =
+    scoringMembers || (!scoringMembers && isErrorScoringMembers);
 
-  const { submitParticipantPresence, isLoading: isLoadingCheckPresence } = useParticipantPresence();
+  const { submitParticipantPresence, isLoading: isLoadingCheckPresence } =
+    useParticipantPresence();
 
   const {
     isEditorOpen,
@@ -80,7 +92,8 @@ function ScoringTable({
   const { submitScore, isLoading: isSaving } = useSubmitScore();
 
   const sessionNumbersList = getSessionNumbersList();
-  const shouldActiveRowRenderShootoff = [1, 2].indexOf(parseInt(activeRow?.haveShootOff)) >= 0;
+  const shouldActiveRowRenderShootoff =
+    [1, 2].indexOf(parseInt(activeRow?.haveShootOff)) >= 0;
 
   const _getParamEliminationTemplate = (count) => {
     if (editorValue.sessionNumber !== 11) {
@@ -98,7 +111,9 @@ function ScoringTable({
     const payload = {
       code: editorValue.sessionCode,
       shoot_scores: editorValue.value,
-      elimination_template: _getParamEliminationTemplate(eliminationParticipantsCount),
+      elimination_template: _getParamEliminationTemplate(
+        eliminationParticipantsCount
+      ),
     };
 
     submitScore(payload, {
@@ -179,7 +194,10 @@ function ScoringTable({
                   <IconMedal />
                 </th>
                 <th className="name">Nama Peserta</th>
-                <th className="name">{!eventDetail.withContingent ? 'Nama Klub' : 'Kontingen' }</th>
+                <th className="name">
+                  {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
+                  {/* {!eventDetail.withContingent ? "Nama Klub" : "Kontingen"} */}
+                </th>
                 <SessionStatsColumnHeadingGroup
                   isSelectionType={isSelectionType}
                   collapsed={isEditorOpen}
@@ -191,7 +209,8 @@ function ScoringTable({
 
             <tbody>
               {scoringMembers?.map((row) => {
-                const shouldRenderShootoffWarning = [1, 2].indexOf(parseInt(row.haveShootOff)) >= 0;
+                const shouldRenderShootoffWarning =
+                  [1, 2].indexOf(parseInt(row.haveShootOff)) >= 0;
                 const getCheckboxTitleText = (row) => {
                   if (!isLocked) {
                     return row.member.isPresent
@@ -205,31 +224,36 @@ function ScoringTable({
                 };
 
                 const handleChangeOption = async (value, key) => {
-                  const tempArray = [...rank]
+                  const tempArray = [...rank];
                   if (!value.type) {
-                    tempArray[key] = value
-                    setRank(tempArray)
+                    tempArray[key] = value;
+                    setRank(tempArray);
                   }
 
                   await ScoringService.saveRank({
-                    "member_id" : row.member.id,
-                    "rank" : value
+                    member_id: row.member.id,
+                    rank: value,
                   }).then((response) => {
-                    if (!response.success){
-                      toast.error(response.message)
-                    }else{
-                      toast.success('Berhasil simpan peringkat')
+                    if (!response.success) {
+                      toast.error(response.message);
+                    } else {
+                      toast.success("Berhasil simpan peringkat");
                     }
-                  })
-                  fetchScoringMembers()
-                }
+                  });
+                  fetchScoringMembers();
+                };
 
-                const listRank = row.rankCanChange?.map(value => ({value: value, label: value}))
+                const listRank = row.rankCanChange?.map((value) => ({
+                  value: value,
+                  label: value,
+                }));
 
                 return (
                   <tr
                     key={row.member.id}
-                    className={classnames({ "row-active": checkIsRowActive(row.member.id) })}
+                    className={classnames({
+                      "row-active": checkIsRowActive(row.member.id),
+                    })}
                   >
                     <td>
                       <TargetFaceNumber
@@ -251,24 +275,26 @@ function ScoringTable({
                       <td>
                         <SelectRank
                           options={listRank}
-                          onChange={({value}) => handleChangeOption(value, "rank")}
+                          onChange={({ value }) =>
+                            handleChangeOption(value, "rank")
+                          }
                           value={{
                             value: row.rank,
-                            label: row.rank
+                            label: row.rank,
                           }}
                         />
                       </td>
-                  )}
-                    <td className="name" style={{maxWidth: '200px'}}>{row.member.name}</td>
-                    {!eventDetail.withContingent ?
-                      <td className="name" style={{maxWidth: '300px'}}>
+                    )}
+                    <td className="name" style={{ maxWidth: "200px" }}>
+                      {row.member.name}
+                    </td>
+                    {!eventDetail.withContingent ? (
+                      <td className="name" style={{ maxWidth: "300px" }}>
                         <ClubName>{row.clubName}</ClubName>
                       </td>
-                     :
-                      <td className="name">
-                        {row.member.cityName}
-                      </td>
-                     }
+                    ) : (
+                      <td className="name">{row.member.cityName}</td>
+                    )}
                     <SessionStatsCellsGroup
                       collapsed={isEditorOpen}
                       sessions={row.sessions}
@@ -301,7 +327,10 @@ function ScoringTable({
                         )}
 
                         {checkIsRowActive(row.member.id) ? (
-                          <ExpanderButton flexible onClick={handleCollapseEditor}>
+                          <ExpanderButton
+                            flexible
+                            onClick={handleCollapseEditor}
+                          >
                             <IconChevronLeft size="16" />
                           </ExpanderButton>
                         ) : (
@@ -349,7 +378,11 @@ function BudrestColumn() {
   );
 }
 
-function SessionStatsColumnHeadingGroup({ isSelectionType, collapsed, sessionList }) {
+function SessionStatsColumnHeadingGroup({
+  isSelectionType,
+  collapsed,
+  sessionList,
+}) {
   if (collapsed) {
     return <th className="stats">Total</th>;
   }
@@ -392,7 +425,7 @@ function SessionStatsCellsGroup({
   totalArrow,
   totalIrat,
   checkIsCoinToss,
-  isLocked
+  isLocked,
 }) {
   if (collapsed) {
     return <td className="stats">{total}</td>;
@@ -402,7 +435,9 @@ function SessionStatsCellsGroup({
     <React.Fragment>
       {sessionNumbersList?.map((sessionNumber) => (
         <td key={sessionNumber} className="stats">
-          {<span>{sessions[sessionNumber]?.total}</span> || <GrayedOutText>&ndash;</GrayedOutText>}
+          {<span>{sessions[sessionNumber]?.total}</span> || (
+            <GrayedOutText>&ndash;</GrayedOutText>
+          )}
         </td>
       ))}
 

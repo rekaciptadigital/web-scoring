@@ -7,7 +7,10 @@ import { useParams } from "react-router-dom";
 
 import { LoadingFullPage } from "../loading-fullpage";
 import IconLoading from "../icon-loading";
-import { SessionCellsDataHeading, SessionCellsData } from "./components/session-cells-data";
+import {
+  SessionCellsDataHeading,
+  SessionCellsData,
+} from "./components/session-cells-data";
 import { CountsBySession } from "./components/counts-by-session";
 
 import { misc } from "utils";
@@ -44,12 +47,24 @@ function ScoringTable() {
     }
   }, [data]);
 
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
+    }
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   // Nge-skip yang gak ada sesinya.
   // Misal gak punya sesi 3.
   const sessions = data?.[0]?.sessions;
   React.useEffect(() => {
     setCheckingSession(true);
-    if (isIndividual && sessionNumber > 0 && sessions && !sessions[sessionNumber]) {
+    if (
+      isIndividual &&
+      sessionNumber > 0 &&
+      sessions &&
+      !sessions[sessionNumber]
+    ) {
       next();
     } else {
       setCheckingSession(false);
@@ -79,9 +94,14 @@ function ScoringTable() {
                 <th>Peringkat</th>
                 <th>Bantalan</th>
                 <th className="text-uppercase">Nama</th>
-                <th className="text-uppercase">{!eventDetail.withContingent ? 'Klub' : 'Kontingen'}</th>
+                <th className="text-uppercase">
+                  {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
+                  {/* {!eventDetail.withContingent ? "Klub" : "Kontingen"} */}
+                </th>
                 <SessionCellsDataHeading sessions={data?.[0]?.sessions} />
-                {sessionNumber === 0 && <th className="text-uppercase">Total</th>}
+                {sessionNumber === 0 && (
+                  <th className="text-uppercase">Total</th>
+                )}
                 <th className="text-uppercase">X+10</th>
                 <th className="text-uppercase">X</th>
               </tr>
@@ -91,7 +111,9 @@ function ScoringTable() {
               {!data?.length ? (
                 <tr>
                   <td colSpan="6">
-                    <ScoringEmptyRow>Belum ada data skor di kategori ini</ScoringEmptyRow>
+                    <ScoringEmptyRow>
+                      Belum ada data skor di kategori ini
+                    </ScoringEmptyRow>
                   </td>
                 </tr>
               ) : (
@@ -107,11 +129,18 @@ function ScoringTable() {
                       <NameLabel>{scoring.member.name}</NameLabel>
                     </td>
                     {!eventDetail.withContingent ? (
-                      <td>{scoring.member.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
+                      <td>
+                        {scoring.member.clubName || (
+                          <React.Fragment>&ndash;</React.Fragment>
+                        )}
+                      </td>
                     ) : (
-                      <td>{scoring.member.cityName || <React.Fragment>&ndash;</React.Fragment>}</td>
-                    )
-                    }
+                      <td>
+                        {scoring.member.cityName || (
+                          <React.Fragment>&ndash;</React.Fragment>
+                        )}
+                      </td>
+                    )}
 
                     <SessionCellsData sessions={scoring.sessions} />
                     <CountsBySession scoring={scoring} />
@@ -148,7 +177,9 @@ function ScoringTable() {
               {!data?.length ? (
                 <tr>
                   <td colSpan="6">
-                    <ScoringEmptyRow>Belum ada data skor di kategori ini</ScoringEmptyRow>
+                    <ScoringEmptyRow>
+                      Belum ada data skor di kategori ini
+                    </ScoringEmptyRow>
                   </td>
                 </tr>
               ) : (
@@ -170,12 +201,18 @@ function ScoringTable() {
                             ))}
                           </ol>
                         ) : (
-                          <EmptyMembers>Belum ada data peserta anggota</EmptyMembers>
+                          <EmptyMembers>
+                            Belum ada data peserta anggota
+                          </EmptyMembers>
                         )}
                       </TeamMembersBlock>
                     </td>
 
-                    <td>{scoring.clubName || <React.Fragment>&ndash;</React.Fragment>}</td>
+                    <td>
+                      {scoring.clubName || (
+                        <React.Fragment>&ndash;</React.Fragment>
+                      )}
+                    </td>
                     <td>{scoring.total}</td>
                     <td>{scoring.totalXPlusTen}</td>
                     <td>{scoring.totalX}</td>

@@ -11,8 +11,6 @@ function ScoringTable({
   session,
   eventDetail,
 }) {
-  React.useEffect(() => {}, [eventDetail]);
-
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
@@ -51,8 +49,7 @@ function ScoringTable({
                 <th>Peringkat</th>
                 <th className="name">Nama</th>
                 <th className="name">
-                  Kontingen
-                  {/* {!eventDetail.withContingent ? "Klub" : "Kontingen"} */}
+                  {eventDetail.parentClassificationTitle}
                 </th>
                 <SessionStatsColumnHeadingGroup
                   sessionList={sessionNumbersList}

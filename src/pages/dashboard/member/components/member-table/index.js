@@ -23,7 +23,6 @@ function MemberTable({
   paymentStatus,
   eventDetail,
 }) {
-  React.useEffect(() => {}, [eventDetail]);
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
@@ -54,6 +53,14 @@ function MemberTable({
       }
     }
     console.info(errors);
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
+    }
+
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   const onCancel = () => {
@@ -112,7 +119,7 @@ function MemberTable({
               <th>No.</th>
               <th className="name">Nama Peserta</th>
               <th className="name">
-                Kontingen
+                {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
                 {/* {!eventDetail.withContingent ? "Nama Klub" : "Kontingen"} */}
               </th>
               <th className="name">Email</th>

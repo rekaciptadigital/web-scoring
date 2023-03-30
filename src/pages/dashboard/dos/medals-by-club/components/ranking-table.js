@@ -12,16 +12,22 @@ import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 function RankingTable({ data, eventDetail }) {
   const { registerQueue, checkIsPending, onLoad, onError } =
     useQueueHeavyImageList();
+
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
+    }
+
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
   return (
     <ClubTable className="table table-responsive">
       <thead>
         <tr>
           <th>Peringkat</th>
-          {/* {!eventDetail.withContingent ? <th className="name">Klub</th> : null}
           <th className="name">
-            {!eventDetail.withContingent ? "Kota" : "Kontingen"}
-          </th> */}
-          <th className="name">Kontingen</th>
+            {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
+          </th>
 
           <th>
             <MedalCounter>

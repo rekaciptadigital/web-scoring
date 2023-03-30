@@ -8,7 +8,13 @@ import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 function WinnerBoxView({ title, data, eventDetail }) {
   const rowsGroupByCategory = React.useMemo(() => _makeRowData(data), [data]);
 
-  React.useEffect(() => {}, [eventDetail]);
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
+    }
+
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
 
   if (!rowsGroupByCategory?.length) {
     return (
@@ -29,7 +35,7 @@ function WinnerBoxView({ title, data, eventDetail }) {
             <th>Medali</th>
             <th className="name">Nama</th>
             <th className="name">
-              Kontingen
+              {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
               {/* {!eventDetail.withContingent ? "Klub" : "Kontingen"}{" "} */}
             </th>
           </tr>

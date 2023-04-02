@@ -8,8 +8,15 @@ import classnames from "classnames";
 
 import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracket.png";
 
-function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
-  const { isError, data } = useEliminationMatches(categoryDetailId, eliminationMemberCounts);
+function ScoringTableTeam({
+  categoryDetailId,
+  categoryDetails,
+  eliminationMemberCounts,
+}) {
+  const { isError, data } = useEliminationMatches(
+    categoryDetailId,
+    eliminationMemberCounts
+  );
 
   const [selectedTab, setSelectedTab] = React.useState(0);
   const isSettled = Boolean(data) || (!data && isError);
@@ -33,8 +40,8 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
             <div>
               <EmptyStateHeading>Data tidak tersedia</EmptyStateHeading>
               <EmptyStateDescription>
-                Maaf tidak ada klasemen dengan kategori yang Anda cari. Silakan cari dengan kategori
-                lain.
+                Maaf tidak ada klasemen dengan kategori yang Anda cari. Silakan
+                cari dengan kategori lain.
               </EmptyStateDescription>
             </div>
           </FloatingEmptyBracketContent>
@@ -83,7 +90,9 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
               !team2?.teamName ||
               !team1?.memberTeam?.length ||
               !team2?.memberTeam?.length;
-            const bothAreBye = row.teams.every((team) => team.status === "wait");
+            const bothAreBye = row.teams.every(
+              (team) => team.status === "wait"
+            );
             const budrestNumber = _getBudrestNumber(row);
 
             return (
@@ -95,10 +104,14 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                 <td>
                   <PlayerLabelContainerLeft>
                     <PlayerNameData>
-                      {team1?.potition && <RankLabel>#{team1?.potition || "-"}</RankLabel>}
+                      {team1?.potition && (
+                        <RankLabel>#{team1?.potition || "-"}</RankLabel>
+                      )}
                       <div>
                         <TeamNameLabel>
-                          {team1?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                          {team1?.teamName || (
+                            <NoArcherTeamLabel isBye={isBye} />
+                          )}
                         </TeamNameLabel>
                         {Boolean(team1?.memberTeam?.length) && (
                           <MembersList>
@@ -118,7 +131,8 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                       <ScoreTotalLabel
                         className={classnames({
                           "score-label-higher":
-                            team1?.status === "win" || team1?.adminTotal > team2?.adminTotal,
+                            team1?.status === "win" ||
+                            team1?.adminTotal > team2?.adminTotal,
                         })}
                       >
                         {team1?.adminTotal || 0}
@@ -126,7 +140,9 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                     </HeadToHeadScoreLabels>
                   ) : (
                     <HeadToHeadScoreLabels>
-                      <ScoreTotalLabel className="score-empty">&ndash;</ScoreTotalLabel>
+                      <ScoreTotalLabel className="score-empty">
+                        &ndash;
+                      </ScoreTotalLabel>
                     </HeadToHeadScoreLabels>
                   )}
                 </td>
@@ -143,7 +159,8 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                       <ScoreTotalLabel
                         className={classnames({
                           "score-label-higher":
-                            team2?.status === "win" || team2?.adminTotal > team1?.adminTotal,
+                            team2?.status === "win" ||
+                            team2?.adminTotal > team1?.adminTotal,
                         })}
                       >
                         {team2?.adminTotal || 0}
@@ -151,7 +168,9 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                     </HeadToHeadScoreLabels>
                   ) : (
                     <HeadToHeadScoreLabels>
-                      <ScoreTotalLabel className="score-empty">&ndash;</ScoreTotalLabel>
+                      <ScoreTotalLabel className="score-empty">
+                        &ndash;
+                      </ScoreTotalLabel>
                     </HeadToHeadScoreLabels>
                   )}
                 </td>
@@ -159,10 +178,14 @@ function ScoringTableTeam({ categoryDetailId, categoryDetails, eliminationMember
                 <td>
                   <PlayerLabelContainerRight>
                     <PlayerNameData>
-                      {team2?.potition && <RankLabel>#{team2?.potition || "-"}</RankLabel>}
+                      {team2?.potition && (
+                        <RankLabel>#{team2?.potition || "-"}</RankLabel>
+                      )}
                       <div>
                         <TeamNameLabel>
-                          {team2?.teamName || <NoArcherTeamLabel isBye={isBye} />}
+                          {team2?.teamName || (
+                            <NoArcherTeamLabel isBye={isBye} />
+                          )}
                         </TeamNameLabel>
                         {Boolean(team2?.memberTeam?.length) && (
                           <MembersList>
@@ -191,7 +214,9 @@ function StagesTabs({ labels, currentTab, onChange }) {
         {labels.map((label, index) => (
           <li key={label}>
             <StageTabButton
-              className={classnames({ "session-tab-active": index === currentTab })}
+              className={classnames({
+                "session-tab-active": index === currentTab,
+              })}
               onClick={() => onChange(index)}
             >
               <span>{label}</span>

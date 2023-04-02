@@ -55,6 +55,14 @@ function MemberTable({
     console.info(errors);
   };
 
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
+    }
+
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   const onCancel = () => {
     setIsOpenAlert(false);
     setResponse([false, ""]);
@@ -111,7 +119,8 @@ function MemberTable({
               <th>No.</th>
               <th className="name">Nama Peserta</th>
               <th className="name">
-                {!eventDetail.withContingent ? "Nama Klub" : "Kontingen"}
+                {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
+                {/* {!eventDetail.withContingent ? "Nama Klub" : "Kontingen"} */}
               </th>
               <th className="name">Email</th>
               <th className="name">Telepon</th>
@@ -127,10 +136,18 @@ function MemberTable({
                   <td>{index + 1}.</td>
                   <td className="name">{row?.member?.name}</td>
                   <td className="name">
-                    {!eventDetail.withContingent ? (
+                    {row.parentClassificationType === 1 ? (
                       <ClubName>{row?.member?.clubName}</ClubName>
-                    ) : (
+                    ) : row.parentClassificationType === 2 ? (
+                      <ClubName>{row?.member?.countryName}</ClubName>
+                    ) : row.parentClassificationType === 3 ? (
+                      <ClubName>{row?.member?.provinceName}</ClubName>
+                    ) : row.parentClassificationType === 4 ? (
                       <ClubName>{row?.member?.cityName}</ClubName>
+                    ) : (
+                      <ClubName>
+                        {row?.member?.childrenClassificationMembersName}
+                      </ClubName>
                     )}
                   </td>
                   <td className="name">

@@ -10,14 +10,24 @@ import IconMedalSilver from "components/ma/icons/fill/medal-silver";
 import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 
 function RankingTable({ data, eventDetail }) {
-  const { registerQueue, checkIsPending, onLoad, onError } = useQueueHeavyImageList();
+  const { registerQueue, checkIsPending, onLoad, onError } =
+    useQueueHeavyImageList();
+
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
+    }
+
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
   return (
     <ClubTable className="table table-responsive">
       <thead>
         <tr>
           <th>Peringkat</th>
-          {!eventDetail.withContingent ? <th className="name">Klub</th> : null}
-          <th className="name">{!eventDetail.withContingent ? 'Kota' : 'Kontingen'}</th>
+          <th className="name">
+            {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
+          </th>
 
           <th>
             <MedalCounter>
@@ -49,40 +59,57 @@ function RankingTable({ data, eventDetail }) {
       </thead>
 
       <tbody>
-        {data.map((row, index) => (
-          <tr key={index}>
-            <td>{index + 1}</td>
+        {data.map((row, index) => {
+          return (
+            <tr key={index}>
+              <td>{index + 1}</td>
 
-            {!eventDetail.withContingent ? (
-              <td className="name">
-                <Club>
-                  <div title={row.clubLogo}>
-                    {row.clubLogo ? (
-                      <HeavyImage
-                        title={row.clubName}
-                        alt={"Logo " + row.clubName}
-                        src={row.clubLogo}
-                        onRegisterQueue={() => registerQueue(index)}
-                        onLoad={onLoad}
-                        onError={onError}
-                        isPending={checkIsPending(index)}
-                        fallback={<AvatarClubDefault />}
-                      />
-                    ) : (
-                      <AvatarClubDefault />
-                    )}
-                  </div>
-                  <div>{row.clubName}</div>
-                </Club>
-              </td>
-            ) : null}
+              {!eventDetail.withContingent ? (
+                <td className="name">
+                  <Club>
+                    <div title={row.clubLogo}>
+                      {row.clubLogo ? (
+                        <HeavyImage
+                          title={row.clubName}
+                          alt={"Logo " + row.clubName}
+                          src={row.clubLogo}
+                          onRegisterQueue={() => registerQueue(index)}
+                          onLoad={onLoad}
+                          onError={onError}
+                          isPending={checkIsPending(index)}
+                          fallback={<AvatarClubDefault />}
+                        />
+                      ) : (
+                        <AvatarClubDefault />
+                      )}
+                    </div>
+                    <div>{row.clubName}</div>
+                  </Club>
+                </td>
+              ) : null}
 
-            {!eventDetail.withContingent ? <td className="name">{row.clubCity}</td> : <td className="name">{row.contingentName}</td>}
-            <td>{row.gold}</td>
-            <td>{row.silver}</td>
-            <td>{row.bronze}</td>
-          </tr>
-        ))}
+              {/* {!eventDetail.withContingent ? (
+                <td className="name">{row.clubCity}</td>
+              ) : (
+                <td className="name">{row.contingentName}</td>
+              )} */}
+              {row.parentClassificationType === 1 ? (
+                <td className="name">{row.clubName}</td>
+              ) : row.parentClassificationType === 2 ? (
+                <td className="name">{row.countryName}</td>
+              ) : row.parentClassificationType === 3 ? (
+                <td className="name">{row.provinceName}</td>
+              ) : row.parentClassificationType === 4 ? (
+                <td className="name">{row.cityName}</td>
+              ) : (
+                <td className="name">{row.childrenClassificationName}</td>
+              )}
+              <td>{row.gold}</td>
+              <td>{row.silver}</td>
+              <td>{row.bronze}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </ClubTable>
   );

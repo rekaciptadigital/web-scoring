@@ -10,15 +10,26 @@ function ScoringTableTeam({
   isLocked,
   eliminationParticipantsCount,
   searchName,
-  eventDetail
+  eventDetail,
 }) {
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return "Kontingen";
+    }
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
   // TODO: refaktor param jadi objek konfig
   const {
     data: scoringMembers,
     isLoading: isLoadingScoringMembers,
     isError: isErrorScoringMembers,
     fetchScoringMembers,
-  } = useScoringMembers(categoryDetailId, searchName, eliminationParticipantsCount, true); // isTeam === true
+  } = useScoringMembers(
+    categoryDetailId,
+    searchName,
+    eliminationParticipantsCount,
+    true
+  ); // isTeam === true
 
   const isSettledScoringMembers =
     Boolean(scoringMembers) || (!scoringMembers && isErrorScoringMembers);
@@ -28,7 +39,9 @@ function ScoringTableTeam({
   }
 
   if (!scoringMembers?.length) {
-    return <EmptyMembers>Tidak ada peserta beregu di kategori ini</EmptyMembers>;
+    return (
+      <EmptyMembers>Tidak ada peserta beregu di kategori ini</EmptyMembers>
+    );
   }
 
   return (
@@ -40,7 +53,9 @@ function ScoringTableTeam({
             <tr>
               <th>Peringkat</th>
               <th className="name">Nama Tim</th>
-              {!eventDetail.withContingent ? <th className="name">Klub</th> : <th className="name">Kontingen</th>}
+              <th>
+                {capitalizeFirstLetter(eventDetail.parentClassificationTitle)}
+              </th>
               <th className="stats">Total</th>
               <th className="stats">X+10</th>
               <th className="stats">X</th>
@@ -76,13 +91,13 @@ function ScoringTableTeam({
                   </div>
                 </td>
 
-                {!eventDetail.withContingent ?
+                {!eventDetail.withContingent ? (
                   <td className="name">
                     <ClubName>{row.clubName || "Club On"}</ClubName>
                   </td>
-                :
+                ) : (
                   <td className="name"> {row.cityName || "City On"}</td>
-                }
+                )}
                 <td className="stats">{row.total || 0}</td>
                 <td className="stats">{row.totalXPlusTen || 0}</td>
                 <td className="stats">{row.totalX || 0}</td>
@@ -95,7 +110,14 @@ function ScoringTableTeam({
   );
 }
 
-function MemberItem({ participantId, categoryId, teamName, teamMember, isLocked, onSuccess }) {
+function MemberItem({
+  participantId,
+  categoryId,
+  teamName,
+  teamMember,
+  isLocked,
+  onSuccess,
+}) {
   return (
     <li>
       <MemberItemWrapper>

@@ -8,8 +8,15 @@ import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracke
 
 import classnames from "classnames";
 
-function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCounts }) {
-  const { isError, data } = useEliminationMatches(categoryDetailId, eliminationMemberCounts);
+function ScoringTable({
+  categoryDetailId,
+  categoryDetails,
+  eliminationMemberCounts,
+}) {
+  const { isError, data } = useEliminationMatches(
+    categoryDetailId,
+    eliminationMemberCounts
+  );
 
   const [selectedTab, setSelectedTab] = React.useState(0);
   const isSettled = Boolean(data) || (!data && isError);
@@ -33,8 +40,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
             <div>
               <EmptyStateHeading>Data tidak tersedia</EmptyStateHeading>
               <EmptyStateDescription>
-                Maaf tidak ada klasemen dengan kategori yang Anda cari. Silakan cari dengan kategori
-                lain.
+                Maaf tidak ada klasemen dengan kategori yang Anda cari. Silakan
+                cari dengan kategori lain.
               </EmptyStateDescription>
             </div>
           </FloatingEmptyBracketContent>
@@ -79,7 +86,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
               row.teams.some((team) => team.status === "bye") ||
               (roundNumber === 1 && row.teams.every((team) => !team.name));
             const noData = !player1?.name || !player2?.name;
-            const bothAreBye = row.teams.every((team) => team.status === "wait");
+            const bothAreBye = row.teams.every(
+              (team) => team.status === "wait"
+            );
 
             const budrestNumber = _getBudrestNumber(row);
 
@@ -92,8 +101,12 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerLeft>
                     <PlayerNameData>
-                      {player1?.potition && <RankLabel>#{player1?.potition || "-"}</RankLabel>}
-                      <NameLabel>{player1?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
+                      {player1?.potition && (
+                        <RankLabel>#{player1?.potition || "-"}</RankLabel>
+                      )}
+                      <NameLabel>
+                        {player1?.name || <NoArcherLabel isBye={isBye} />}
+                      </NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerLeft>
                 </td>
@@ -104,7 +117,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       <ScoreTotalLabel
                         className={classnames({
                           "score-label-higher":
-                            player1?.status === "win" || player1?.adminTotal > player2?.adminTotal,
+                            player1?.status === "win" ||
+                            player1?.adminTotal > player2?.adminTotal,
                         })}
                       >
                         {player1?.adminTotal || 0}
@@ -112,7 +126,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     </HeadToHeadScoreLabels>
                   ) : (
                     <HeadToHeadScoreLabels>
-                      <ScoreTotalLabel className="score-empty">&ndash;</ScoreTotalLabel>
+                      <ScoreTotalLabel className="score-empty">
+                        &ndash;
+                      </ScoreTotalLabel>
                     </HeadToHeadScoreLabels>
                   )}
                 </td>
@@ -127,7 +143,8 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                       <ScoreTotalLabel
                         className={classnames({
                           "score-label-higher":
-                            player2?.status === "win" || player2?.adminTotal > player1?.adminTotal,
+                            player2?.status === "win" ||
+                            player2?.adminTotal > player1?.adminTotal,
                         })}
                       >
                         {player2?.adminTotal || 0}
@@ -135,7 +152,9 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                     </HeadToHeadScoreLabels>
                   ) : (
                     <HeadToHeadScoreLabels>
-                      <ScoreTotalLabel className="score-empty">&ndash;</ScoreTotalLabel>
+                      <ScoreTotalLabel className="score-empty">
+                        &ndash;
+                      </ScoreTotalLabel>
                     </HeadToHeadScoreLabels>
                   )}
                 </td>
@@ -143,8 +162,12 @@ function ScoringTable({ categoryDetailId, categoryDetails, eliminationMemberCoun
                 <td>
                   <PlayerLabelContainerRight>
                     <PlayerNameData>
-                      {player2?.potition && <RankLabel>#{player2?.potition || "-"}</RankLabel>}
-                      <NameLabel>{player2?.name || <NoArcherLabel isBye={isBye} />}</NameLabel>
+                      {player2?.potition && (
+                        <RankLabel>#{player2?.potition || "-"}</RankLabel>
+                      )}
+                      <NameLabel>
+                        {player2?.name || <NoArcherLabel isBye={isBye} />}
+                      </NameLabel>
                     </PlayerNameData>
                   </PlayerLabelContainerRight>
                 </td>
@@ -161,16 +184,20 @@ function StagesTabs({ labels, currentTab, onChange }) {
   return (
     <StagesBarContainer>
       <StageTabsList>
-        {labels.map((label, index) => (
-          <li key={label}>
-            <StageTabButton
-              className={classnames({ "session-tab-active": index === currentTab })}
-              onClick={() => onChange(index)}
-            >
-              <span>{label}</span>
-            </StageTabButton>
-          </li>
-        ))}
+        {labels.map((label, index) => {
+          return (
+            <li key={index}>
+              <StageTabButton
+                className={classnames({
+                  "session-tab-active": index === currentTab,
+                })}
+                onClick={() => onChange(index)}
+              >
+                <span>{label}</span>
+              </StageTabButton>
+            </li>
+          );
+        })}
       </StageTabsList>
     </StagesBarContainer>
   );

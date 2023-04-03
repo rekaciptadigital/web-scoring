@@ -288,13 +288,26 @@ function ScoringTable({
                     <td className="name" style={{ maxWidth: "200px" }}>
                       {row.member.name}
                     </td>
-                    {!eventDetail.withContingent ? (
+                    {/* {!eventDetail.withContingent ? (
                       <td className="name" style={{ maxWidth: "300px" }}>
-                        <ClubName>{row.clubName}</ClubName>
+                        <ClubName>{row.clubName} ss</ClubName>
                       </td>
                     ) : (
                       <td className="name">{row.member.cityName}</td>
-                    )}
+                    )} */}
+                    <td className="name" style={{ maxWidth: "300px" }}>
+                      <ClubName>
+                        {row.parentClassificationType === 1
+                          ? row.clubName
+                          : row.parentClassificationType === 2
+                          ? row.countryName
+                          : row.parentClassificationType === 3
+                          ? row.provinceName
+                          : row.parentClassificationType === 4
+                          ? row.cityName
+                          : row.childrenClassificationMembersName}
+                      </ClubName>
+                    </td>
                     <SessionStatsCellsGroup
                       collapsed={isEditorOpen}
                       sessions={row.sessions}

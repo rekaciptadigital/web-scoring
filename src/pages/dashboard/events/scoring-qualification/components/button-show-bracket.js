@@ -21,7 +21,11 @@ import IconX from "components/ma/icons/mono/x";
 
 import classnames from "classnames";
 
-function ButtonShowBracket({ categoryDetailId, eliminationMemberCount, eventDetail }) {
+function ButtonShowBracket({
+  categoryDetailId,
+  eliminationMemberCount,
+  eventDetail,
+}) {
   const [isOpen, setOpen] = React.useState(false);
   const {
     data: bracketData,
@@ -195,6 +199,8 @@ function SeedPreview({ bracketProps, configs, eventDetail }) {
     roundIndex,
   });
 
+  React.useEffect(() => {}, [eventDetail]);
+
   return (
     <Seed
       mobileBreakpoint={breakpoint}
@@ -209,6 +215,16 @@ function SeedPreview({ bracketProps, configs, eventDetail }) {
           {isThirdPlaceRound && <FinalHeading>Perebutan Juara 3</FinalHeading>}
 
           {seed.teams?.map((team, index) => {
+            let contingent =
+              team.parentClassificationType === 1
+                ? team.clubName
+                : team.parentClassificationType === 2
+                ? team.countryName
+                : team.parentClassificationType === 3
+                ? team.provinceName
+                : team.parentClassificationType === 4
+                ? team.cityName
+                : team.childrenClassificationMembersName;
             const budrestNumber = team.budRestNumber + team.targetFace;
             return (
               <SeedWrapper key={index}>
@@ -219,7 +235,8 @@ function SeedPreview({ bracketProps, configs, eventDetail }) {
                   })}
                   title={budrestNumber}
                 >
-                  {budrestNumber || <React.Fragment>&ndash;</React.Fragment>}
+                  {budrestNumber}
+                  {/* {budrestNumber || <React.Fragment>&ndash;</React.Fragment>} */}
                 </SeedBudrest>
 
                 <SeedTeam
@@ -238,19 +255,25 @@ function SeedPreview({ bracketProps, configs, eventDetail }) {
 
                     {!isTeam ? (
                       <>
-                        {!eventDetail.withContingent ?
+                        {/* {!eventDetail.withContingent ? (
                           <BoxName title={team.clubName} className="name-club">
                             {team.clubName || (
                               <React.Fragment>&nbsp;</React.Fragment>
                             )}
                           </BoxName>
-                        :
+                        ) : (
                           <BoxName title={team.cityName} className="name-club">
                             {team.cityName || (
                               <React.Fragment>&nbsp;</React.Fragment>
                             )}
                           </BoxName>
-                        }
+                        )} */}
+                        <BoxName
+                          title={!contingent ? <>&nbsp;</> : contingent}
+                          className="name-club"
+                        >
+                          {!contingent ? <>&nbsp;</> : contingent}
+                        </BoxName>
                       </>
                     ) : (
                       <MemberList>
@@ -295,6 +318,8 @@ function SeedBagan({ bracketProps, configs, eventDetail }) {
     roundIndex,
   });
 
+  React.useEffect(() => {}, [eventDetail]);
+
   return (
     <Seed
       mobileBreakpoint={breakpoint}
@@ -308,71 +333,94 @@ function SeedBagan({ bracketProps, configs, eventDetail }) {
           {isFinalRound && <FinalHeading>Babak Final</FinalHeading>}
           {isThirdPlaceRound && <FinalHeading>Perebutan Juara 3</FinalHeading>}
 
-          {seed.teams?.map((team, index) => (
-            <SeedWrapper key={index}>
-              <SeedBudrest
-                className={classnames({
-                  "budrest-odd": index === 0,
-                  "budrest-even": index === 1,
-                })}
-                title={team.budrestNumber}
-              >
-                {team.budrestNumber || <React.Fragment>&ndash;</React.Fragment>}
-              </SeedBudrest>
+          {seed.teams?.map((team, index) => {
+            let contingent =
+              team.parentClassificationType === 1
+                ? team.clubName
+                : team.parentClassificationType === 2
+                ? team.countryName
+                : team.parentClassificationType === 3
+                ? team.provinceName
+                : team.parentClassificationType === 4
+                ? team.cityName
+                : team.childrenClassificationMembersName;
 
-              <SeedTeam
-                title={team.name || team.teamName}
-                className={classnames({
-                  "item-even": index === 1,
-                })}
-              >
-                <BoxNameGroup>
-                  <BoxName title={team.name || team.teamName}>
-                    {team.name || team.teamName || (
-                      <React.Fragment>&ndash;</React.Fragment>
-                    )}
-                  </BoxName>
-
-                  {!isTeam ? (
-                    <>
-                      {!eventDetail.withContingent ?
-                        <BoxName title={team.club} className="name-club">
-                          {team.club || (
-                            <React.Fragment>&nbsp;</React.Fragment>
-                          )}
-                        </BoxName>
-                      :
-                        <BoxName title={team.city} className="name-club">
-                          {team.city || (
-                            <React.Fragment>&nbsp;</React.Fragment>
-                          )}
-                        </BoxName>
-                      }
-                    </>
-                  ) : (
-                    <MemberList>
-                      {team.memberTeam?.map((member, index) => (
-                        <li key={index}>
-                          <span className="member-name" title={member.name}>
-                            <span className="member-number">{index + 1}.</span>
-                            <span>{member.name}</span>
-                          </span>
-                        </li>
-                      ))}
-                    </MemberList>
+            return (
+              <SeedWrapper key={index}>
+                <SeedBudrest
+                  className={classnames({
+                    "budrest-odd": index === 0,
+                    "budrest-even": index === 1,
+                  })}
+                  title={team.budrestNumber}
+                >
+                  {team.budrestNumber || (
+                    <React.Fragment>&ndash;</React.Fragment>
                   )}
-                </BoxNameGroup>
-              </SeedTeam>
+                </SeedBudrest>
 
-              <SeedRank>
-                {team.potition ? (
-                  <React.Fragment>#{team.potition}</React.Fragment>
-                ) : (
-                  <React.Fragment>&nbsp;</React.Fragment>
-                )}
-              </SeedRank>
-            </SeedWrapper>
-          ))}
+                <SeedTeam
+                  title={team.name || team.teamName}
+                  className={classnames({
+                    "item-even": index === 1,
+                  })}
+                >
+                  <BoxNameGroup>
+                    <BoxName title={team.name || team.teamName}>
+                      {team.name || team.teamName || (
+                        <React.Fragment>&ndash;</React.Fragment>
+                      )}
+                    </BoxName>
+
+                    {!isTeam ? (
+                      <>
+                        {/* {!eventDetail.withContingent ? (
+                          <BoxName title={team.club} className="name-club">
+                            {team.club || (
+                              <React.Fragment>&nbsp;</React.Fragment>
+                            )}
+                          </BoxName>
+                        ) : (
+                          <BoxName title={team.city} className="name-club">
+                            {team.city || (
+                              <React.Fragment>&nbsp;</React.Fragment>
+                            )}
+                          </BoxName>
+                        )} */}
+                        <BoxName
+                          title={!contingent ? <>&nbsp;</> : contingent}
+                          className="name-club"
+                        >
+                          {!contingent ? <>&nbsp;</> : contingent}
+                        </BoxName>
+                      </>
+                    ) : (
+                      <MemberList>
+                        {team.memberTeam?.map((member, index) => (
+                          <li key={index}>
+                            <span className="member-name" title={member.name}>
+                              <span className="member-number">
+                                {index + 1}.
+                              </span>
+                              <span>{member.name}</span>
+                            </span>
+                          </li>
+                        ))}
+                      </MemberList>
+                    )}
+                  </BoxNameGroup>
+                </SeedTeam>
+
+                <SeedRank>
+                  {team.potition ? (
+                    <React.Fragment>#{team.potition}</React.Fragment>
+                  ) : (
+                    <React.Fragment>&nbsp;</React.Fragment>
+                  )}
+                </SeedRank>
+              </SeedWrapper>
+            );
+          })}
         </ItemContainer>
       </SeedItem>
     </Seed>

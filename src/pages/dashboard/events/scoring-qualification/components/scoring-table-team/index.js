@@ -64,45 +64,62 @@ function ScoringTableTeam({
           </thead>
 
           <tbody>
-            {scoringMembers?.map((row, rowIndex) => (
-              <tr key={row.participantId}>
-                <td>{rowIndex + 1}</td>
+            {scoringMembers?.map((row, rowIndex) => {
+              console.log("row:", row);
+              return (
+                <tr key={row.participantId}>
+                  <td>{rowIndex + 1}</td>
 
-                <td className="name">
-                  <div>
-                    <TeamNameLabel>{row.team}</TeamNameLabel>
-                    {row.teams?.length ? (
-                      <MembersList>
-                        {row.teams?.map((teamMember, index) => (
-                          <MemberItem
-                            key={index}
-                            participantId={row.participantId}
-                            categoryId={categoryDetailId}
-                            teamName={row.team}
-                            teamMember={teamMember}
-                            isLocked={isLocked}
-                            onSuccess={fetchScoringMembers}
-                          />
-                        ))}
-                      </MembersList>
-                    ) : (
-                      <span>Belum ada anggota</span>
-                    )}
-                  </div>
-                </td>
-
-                {!eventDetail.withContingent ? (
                   <td className="name">
-                    <ClubName>{row.clubName || "Club On"}</ClubName>
+                    <div>
+                      <TeamNameLabel>{row.team}</TeamNameLabel>
+                      {row.teams?.length ? (
+                        <MembersList>
+                          {row.teams?.map((teamMember, index) => (
+                            <MemberItem
+                              key={index}
+                              participantId={row.participantId}
+                              categoryId={categoryDetailId}
+                              teamName={row.team}
+                              teamMember={teamMember}
+                              isLocked={isLocked}
+                              onSuccess={fetchScoringMembers}
+                            />
+                          ))}
+                        </MembersList>
+                      ) : (
+                        <span>Belum ada anggota</span>
+                      )}
+                    </div>
                   </td>
-                ) : (
-                  <td className="name"> {row.cityName || "City On"}</td>
-                )}
-                <td className="stats">{row.total || 0}</td>
-                <td className="stats">{row.totalXPlusTen || 0}</td>
-                <td className="stats">{row.totalX || 0}</td>
-              </tr>
-            ))}
+
+                  {/* {!eventDetail.withContingent ? (
+                    <td className="name">
+                      <ClubName>{row.clubName || "Club On"}</ClubName>
+                    </td>
+                  ) : (
+                    <td className="name"> {row.cityName || "City On"}</td>
+                  )} */}
+
+                  <td className="name" style={{ maxWidth: "300px" }}>
+                    <ClubName>
+                      {row.parentClassificationType === 1
+                        ? row.clubName
+                        : row.parentClassificationType === 2
+                        ? row.countryName
+                        : row.parentClassificationType === 3
+                        ? row.provinceName
+                        : row.parentClassificationType === 4
+                        ? row.cityName
+                        : row.childrenClassificationMembersName}
+                    </ClubName>
+                  </td>
+                  <td className="stats">{row.total || 0}</td>
+                  <td className="stats">{row.totalXPlusTen || 0}</td>
+                  <td className="stats">{row.totalX || 0}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </MembersTable>
       </div>

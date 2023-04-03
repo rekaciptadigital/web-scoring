@@ -20,7 +20,11 @@ import IconMedalBronze from "components/ma/icons/fill/medal-bronze";
 
 import classnames from "classnames";
 
-function ButtonShowBracket({ categoryDetailId, eliminationMemberCount, eventDetail }) {
+function ButtonShowBracket({
+  categoryDetailId,
+  eliminationMemberCount,
+  eventDetail,
+}) {
   const [isOpen, setOpen] = React.useState(false);
   const {
     data: bracketData,
@@ -131,7 +135,10 @@ function ButtonShowBracket({ categoryDetailId, eliminationMemberCount, eventDeta
                   {bracketData.eliminationId ||
                   bracketData.eliminationGroupId ? (
                     <Scrollable>
-                      <EliminationBracket data={bracketData} eventDetail={eventDetail} />
+                      <EliminationBracket
+                        data={bracketData}
+                        eventDetail={eventDetail}
+                      />
                     </Scrollable>
                   ) : (
                     <NoBracketAvailable />
@@ -207,6 +214,7 @@ function EliminationBracket({ data, eventDetail }) {
 
 function SeedBagan({ bracketProps, configs, eventDetail }) {
   const { roundIndex, seed, breakpoint } = bracketProps;
+  React.useEffect(() => {}, [eventDetail]);
   const {
     totalRounds,
     isSettingApplied,
@@ -236,6 +244,17 @@ function SeedBagan({ bracketProps, configs, eventDetail }) {
       <SeedItem>
         <ItemContainer>
           {seed.teams?.map((team, index) => {
+            let contingent =
+              team.parentClassificationType === 1
+                ? team.clubName
+                : team.parentClassificationType === 2
+                ? team.countryName
+                : team.parentClassificationType === 3
+                ? team.provinceName
+                : team.parentClassificationType === 4
+                ? team.cityName
+                : team.childrenClassificationMembersName;
+
             const isWinner = isSettingApplied && Boolean(team.win) && !isBye;
             const isThirdPlaceWinner =
               isThirdPlaceRound && index === thirdPlaceWinnerIndex;
@@ -268,7 +287,7 @@ function SeedBagan({ bracketProps, configs, eventDetail }) {
                     <BoxName title={team.name}>
                       {team.name || <ByeLabel isBye={isBye} />}
                     </BoxName>
-                    {!eventDetail.withContingent ? (
+                    {/* {!eventDetail.withContingent ? (
                       <>
                         {team.club && (
                           <BoxName title={team.club} className="name-club">
@@ -284,7 +303,13 @@ function SeedBagan({ bracketProps, configs, eventDetail }) {
                           </BoxName>
                         )}
                       </>
-                    )}
+                    )} */}
+                    <BoxName
+                      title={!contingent ? <>&ndash;</> : contingent}
+                      className="name-club"
+                    >
+                      {!contingent ? <>&ndash;</> : contingent}
+                    </BoxName>
                   </BoxNameGroup>
                   <BoxScore team={team} />
 

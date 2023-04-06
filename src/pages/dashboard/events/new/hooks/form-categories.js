@@ -12,7 +12,9 @@ function useFormCategories(eventDetail) {
   React.useEffect(() => {
     dispatch({
       type: "INIT_FORM",
-      payload: eventDetail?.eventCategories?.length ? eventDetail?.eventCategories : undefined,
+      payload: eventDetail?.eventCategories?.length
+        ? eventDetail?.eventCategories
+        : undefined,
     });
   }, [eventDetail]);
 
@@ -57,7 +59,10 @@ function useFormCategories(eventDetail) {
   };
 
   const removeCategoryDetailByKey = (keyParent, key) => {
-    dispatch({ type: "REMOVE_CATEGORY_DETAIL", key: { parent: keyParent, target: key } });
+    dispatch({
+      type: "REMOVE_CATEGORY_DETAIL",
+      key: { parent: keyParent, target: key },
+    });
   };
 
   return {
@@ -91,12 +96,11 @@ function formReducer(state, action) {
 
     case "CREATE_EMPTY_CATEGORY": {
       const newCategory = makeDefaultCategoryData()[0];
-      newCategory.categoryDetails[0].quotas = newCategory.categoryDetails[0].quotas.map(
-        (quota, index) => ({
+      newCategory.categoryDetails[0].quotas =
+        newCategory.categoryDetails[0].quotas.map((quota, index) => ({
           ...quota,
           isShow: state.data[0].categoryDetails[0].quotas[index].isShow,
-        })
-      );
+        }));
 
       return {
         ...state,
@@ -234,8 +238,10 @@ const makeDefaultCategoryData = () => [
     categoryDetails: [
       {
         key: stringUtil.createRandom(),
-        ageCategoryId: null,
-        distanceId: null,
+        // ageCategoryId: null,
+        // distanceId: null,
+        ageCategoryId: { value: "Umum", label: "Umum" },
+        distanceId: { value: 5, label: "5m" },
         quotas: [
           {
             categoryDetailsId: undefined,

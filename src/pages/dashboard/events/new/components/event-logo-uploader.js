@@ -7,7 +7,11 @@ import { AsyncPhotoUploader } from "components/ma/async-photo-uploader";
 import { toast } from "./processing-toast";
 
 function EventLogoUploader({ eventDetail, previewImage, onChange, onSuccess }) {
-  const { submit, isLoading, isError, errors } = useSubmitEventLogo(eventDetail?.id);
+  const { submit, data, isLoading, isError, errors } = useSubmitEventLogo(
+    eventDetail?.id
+  );
+  console.log("submitEventLogo:", data);
+  console.log("eventDetail:", eventDetail);
   const isPossiblyCreateMode = !eventDetail?.id;
   return (
     <MediaObjectWrapper>
@@ -37,8 +41,8 @@ function EventLogoUploader({ eventDetail, previewImage, onChange, onSuccess }) {
       </UploaderWrapper>
 
       <UploadInstruction>
-        Unggah logo event dengan ukuran 4x3, min. besar file 500kb, format PNG/JPEG untuk keperluan
-        scoresheet, bagan, laporan, dan ID Card.
+        Unggah logo event dengan ukuran 4x3, min. besar file 500kb, format
+        PNG/JPEG untuk keperluan scoresheet, bagan, laporan, dan ID Card.
       </UploadInstruction>
 
       <AlertSubmitError isError={isError} errors={errors} />

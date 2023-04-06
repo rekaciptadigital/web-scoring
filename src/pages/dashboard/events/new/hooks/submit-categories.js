@@ -77,6 +77,10 @@ function makePayloadCategories(formData, formFees, eventId) {
   const flatCategories = [];
   formData.forEach((category) => {
     category.categoryDetails.forEach((detail) => {
+      let ageCategoryId = !detail.ageCategoryId
+        ? ""
+        : detail.ageCategoryId.value;
+      let distanceId = !detail.distanceId ? "" : detail.distanceId.value;
       detail.quotas.forEach((quota) => {
         const teamName = getTeam(quota.teamCategoryId);
         const normalFeeItem = formFees.data.feesByTeam.find(
@@ -94,8 +98,8 @@ function makePayloadCategories(formData, formFees, eventId) {
           category_id: quota.categoryDetailsId,
           team_category_id: quota.teamCategoryId,
           competition_category_id: category.competitionCategoryId.value,
-          age_category_id: detail.ageCategoryId.value,
-          distance_category_id: detail.distanceId.value,
+          age_category_id: ageCategoryId,
+          distance_category_id: distanceId,
           is_show: normalFeeItem.isActive ? 1 : 0,
           quota: normalFeeItem.isActive ? quota.quota || 0 : 0,
           fee: normalFeeItem.isActive ? normalFeeItem.amount || 0 : 0,

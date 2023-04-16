@@ -28,6 +28,7 @@ function ScreenRegistrationDates({ form }) {
     start: configForm.eventDateStart,
     end: configForm.eventDateEnd,
   };
+  console.log("rangeEvent:", rangeEvent);
 
   // Reset form tiap meninggalkan screen step ini
   React.useEffect(() => {

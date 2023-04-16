@@ -10,8 +10,8 @@ function EventLogoUploader({ eventDetail, previewImage, onChange, onSuccess }) {
   const { submit, data, isLoading, isError, errors } = useSubmitEventLogo(
     eventDetail?.id
   );
-  console.log("submitEventLogo:", data);
-  console.log("eventDetail:", eventDetail);
+
+  React.useEffect(() => {}, [data]);
   const isPossiblyCreateMode = !eventDetail?.id;
   return (
     <MediaObjectWrapper>

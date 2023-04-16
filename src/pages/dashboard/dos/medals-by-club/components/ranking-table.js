@@ -83,7 +83,20 @@ function RankingTable({ data, eventDetail }) {
                         <AvatarClubDefault />
                       )}
                     </div>
-                    <div>{row.clubName}</div>
+                    {/* <div>{row.clubName}</div> */}
+                    {row.parentClassificationType === 1 ? (
+                      <div className="name">{row.clubName}</div>
+                    ) : row.parentClassificationType === 2 ? (
+                      <div className="name">{row.countryName}</div>
+                    ) : row.parentClassificationType === 3 ? (
+                      <div className="name">{row.provinceName}</div>
+                    ) : row.parentClassificationType === 4 ? (
+                      <div className="name">{row.cityName}</div>
+                    ) : (
+                      <div className="name">
+                        {row.childrenClassificationName}
+                      </div>
+                    )}
                   </Club>
                 </td>
               ) : null}
@@ -93,17 +106,6 @@ function RankingTable({ data, eventDetail }) {
               ) : (
                 <td className="name">{row.contingentName}</td>
               )} */}
-              {row.parentClassificationType === 1 ? (
-                <td className="name">{row.clubName}</td>
-              ) : row.parentClassificationType === 2 ? (
-                <td className="name">{row.countryName}</td>
-              ) : row.parentClassificationType === 3 ? (
-                <td className="name">{row.provinceName}</td>
-              ) : row.parentClassificationType === 4 ? (
-                <td className="name">{row.cityName}</td>
-              ) : (
-                <td className="name">{row.childrenClassificationName}</td>
-              )}
               <td>{row.gold}</td>
               <td>{row.silver}</td>
               <td>{row.bronze}</td>

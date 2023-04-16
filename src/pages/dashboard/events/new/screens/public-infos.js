@@ -36,8 +36,6 @@ function ScreenPublicInfos({
     }
     const imageRawData = ev.target.files[0];
     const imagePreviewUrl = URL.createObjectURL(imageRawData);
-    console.log("imageRawData:", imageRawData);
-    console.log("imagePreviewUrl:", imagePreviewUrl);
     updateField("poster", { preview: imagePreviewUrl, raw: imageRawData });
   };
 

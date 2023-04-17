@@ -26,6 +26,9 @@ function AsyncPhotoUploader({
     const imageRawData = ev.target.files[0];
     const imageBase64 = await filesUtil.fileToBase64(imageRawData);
 
+    console.log("imageRawData:", URL.createObjectURL(imageRawData));
+    console.log("imageBase64:", imageBase64);
+
     onChange?.({
       raw: imageRawData,
       preview: URL.createObjectURL(imageRawData),
@@ -130,7 +133,8 @@ const UploaderContainer = styled.label`
 
   &:hover ${UploadButton} {
     transform: translateY(-1px);
-    box-shadow: inset 0 0 0 2px var(--ma-gray-200), 0 0.25rem 0.5rem rgb(18 38 63 / 15%);
+    box-shadow: inset 0 0 0 2px var(--ma-gray-200),
+      0 0.25rem 0.5rem rgb(18 38 63 / 15%);
   }
 
   &.upload-disabled {

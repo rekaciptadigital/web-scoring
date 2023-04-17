@@ -21,8 +21,8 @@ import { useFormRule } from "./hooks/form-rule";
 import { useShootRuleSetting } from "./screens/rules/hooks/shoot-rule-settings";
 import { useSubmitClubsRanking } from "./screens/rules/hooks/submit-clubs-ranking";
 import { useClubRankingSetting } from "./screens/rules/hooks/club-ranking-settings";
-import { useFaceTargetSetting } from "./screens/rules/hooks/face-target-settings";
-import { useSubmitRuleFaceSetting } from "./screens/rules/hooks/submit-rule-face-setting";
+// import { useFaceTargetSetting } from "./screens/rules/hooks/face-target-settings";
+// import { useSubmitRuleFaceSetting } from "./screens/rules/hooks/submit-rule-face-setting";
 
 import { AlertSubmitError, ButtonOutlineBlue } from "components/ma";
 import { ContentLayoutWrapper } from "./components/content-layout-wrapper";
@@ -85,8 +85,9 @@ function PageCreateEventFullday({ classification }) {
   const { data: schedules } = schedulesProvider;
   const { data: shootSettings, fetchRuleShootSetting } =
     useShootRuleSetting(eventId);
-  const { data: targetfacegSettings, fetchTargetFaceSetting } =
-    useFaceTargetSetting(eventId);
+  // console.log("shootSettingsFromFullday:", shootSettings);
+  // const { data: targetfacegSettings, fetchTargetFaceSetting } =
+  //   useFaceTargetSetting(eventId);
   const { data: rankingSettings, fetchRankingSetting } =
     useClubRankingSetting(eventId);
   const classificationCategory = classification;
@@ -118,7 +119,6 @@ function PageCreateEventFullday({ classification }) {
   const matchType = _checkMatchType(eventDetail, qsMatchType);
   const isTypeMarathon = eventType === EVENT_TYPES.MARATHON;
   const isTypeSelection = matchType === "Selection";
-
   // Forms
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);
@@ -198,12 +198,12 @@ function PageCreateEventFullday({ classification }) {
     errors: errorsSubmitRule,
   } = useSubmitRuleSetting(eventDetail?.id, formRule.submitRule);
 
-  const {
-    submit: submitFaceRuleSetting,
-    isLoading: isLoadingSubmitRuleFace,
-    isError: isErrorSubmitRuleFace,
-    errors: errorsSubmitRuleFace,
-  } = useSubmitRuleFaceSetting(eventDetail?.id, formRule.submitRuleFace);
+  // const {
+  //   submit: submitFaceRuleSetting,
+  //   isLoading: isLoadingSubmitRuleFace,
+  //   isError: isErrorSubmitRuleFace,
+  //   errors: errorsSubmitRuleFace,
+  // } = useSubmitRuleFaceSetting(eventDetail?.id, formRule.submitRuleFace);
 
   const {
     submit: submitClubRank,
@@ -218,8 +218,9 @@ function PageCreateEventFullday({ classification }) {
     isSubmitingCategories ||
     isSubmitRegistrationDates ||
     isLoadingSubmitRule ||
-    isLoadingSubmitClubRank ||
-    isLoadingSubmitRuleFace;
+    isLoadingSubmitClubRank;
+  // ||
+  //  isLoadingSubmitRuleFace;
 
   const onSelectOption = (val) => {
     setSelectedCountry(val);
@@ -295,10 +296,10 @@ function PageCreateEventFullday({ classification }) {
         isError={isErrorSubmitClubRank}
         errors={errorsSubmitClubRank}
       />
-      <AlertSubmitError
+      {/* <AlertSubmitError
         isError={isErrorSubmitRuleFace}
         errors={errorsSubmitRuleFace}
-      />
+      /> */}
 
       <StepByStepScreen
         lastUnlocked={lastUnlockedStep}
@@ -676,7 +677,7 @@ function PageCreateEventFullday({ classification }) {
                 form={formRule}
                 shootSetting={shootSettings}
                 rankingSettings={rankingSettings}
-                targetfacegSettings={targetfacegSettings}
+                // targetfacegSettings={targetfacegSettings}
               />
             </StepBody>
 
@@ -691,12 +692,12 @@ function PageCreateEventFullday({ classification }) {
                     },
                   });
 
-                  submitFaceRuleSetting({
-                    onSuccess: () => {
-                      toast.success("Data Aturan tersimpan");
-                      fetchTargetFaceSetting();
-                    },
-                  });
+                  // submitFaceRuleSetting({
+                  //   onSuccess: () => {
+                  //     toast.success("Data Aturan tersimpan");
+                  //     fetchTargetFaceSetting();
+                  //   },
+                  // });
 
                   formRule.handleValidation({
                     onInvalid: (errors) => {
@@ -704,9 +705,10 @@ function PageCreateEventFullday({ classification }) {
                       toast.error(
                         "Terjadi kesalahan saat menyimpan aturan pertandingan club"
                       );
-                      Object.values(errors).forEach((error) =>
-                        error.forEach((message) => console.error(message))
-                      );
+                      Object.values(errors).forEach((error) => {
+                        console.log(error),
+                          error.forEach((message) => console.error(message));
+                      });
                     },
                     onValid: () => {
                       submitClubRank({

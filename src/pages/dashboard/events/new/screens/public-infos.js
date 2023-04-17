@@ -4,7 +4,12 @@ import { useSubmitExtraInfo } from "../hooks/submit-extra-info";
 
 import { Modal, ModalBody } from "reactstrap";
 import SweetAlert from "react-bootstrap-sweetalert";
-import { Button, ButtonBlue, ButtonOutlineBlue, AlertSubmitError } from "components/ma";
+import {
+  Button,
+  ButtonBlue,
+  ButtonOutlineBlue,
+  AlertSubmitError,
+} from "components/ma";
 import PosterImagePicker from "../../components/PosterImagePicker";
 import {
   FieldInputText,
@@ -17,7 +22,12 @@ import { EventLogoUploader } from "../components/event-logo-uploader";
 
 import Switch from "react-switch";
 
-function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing }) {
+function ScreenPublicInfos({
+  eventDetail,
+  fetchEventDetail,
+  form,
+  isPreparing,
+}) {
   const { data, updateField } = form;
 
   const handlePickBannerChange = (ev) => {
@@ -42,7 +52,10 @@ function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing })
               Banner Event<span style={{ color: "var(--ma-red)" }}>*</span>
             </h3>
 
-            <PosterImagePicker image={data.poster} onChange={handlePickBannerChange} />
+            <PosterImagePicker
+              image={data.poster}
+              onChange={handlePickBannerChange}
+            />
 
             <hr />
             <h3 className="mb-3">Detail Event</h3>
@@ -151,7 +164,11 @@ function ScreenPublicInfos({ eventDetail, fetchEventDetail, form, isPreparing })
                     accept="application/pdf"
                     type="file"
                     id="file"
-                    style={{ visibility: "hidden", position: "absolute", left: -2000 }}
+                    style={{
+                      visibility: "hidden",
+                      position: "absolute",
+                      left: -2000,
+                    }}
                     onChange={(ev) => {
                       if (!ev.target.files?.[0]) return;
                       updateField("handbook", { raw: ev.target.files[0] });
@@ -263,7 +280,8 @@ function ToggleSwitch({ checked, onChange, disabled }) {
 /* ========================================== */
 
 function ExtraInfos({ eventId, form, onSaveSuccess }) {
-  const { data, addExtraInfoItem, updateExtraInfoItem, removeExtraInfoItem } = form;
+  const { data, addExtraInfoItem, updateExtraInfoItem, removeExtraInfoItem } =
+    form;
 
   const [shouldShowAddExtraInfo, setShowAddExtraInfo] = React.useState(false);
   const [keyExtraInfoEdited, setKeyExtraInfoEdited] = React.useState(null);
@@ -345,7 +363,11 @@ function ExtraInfos({ eventId, form, onSaveSuccess }) {
 
   return (
     <React.Fragment>
-      <ButtonOutlineBlue corner="8" style={{ width: "100%" }} onClick={handleModalAddInfoShow}>
+      <ButtonOutlineBlue
+        corner="8"
+        style={{ width: "100%" }}
+        onClick={handleModalAddInfoShow}
+      >
         + Tambah Informasi
       </ButtonOutlineBlue>
 
@@ -361,11 +383,16 @@ function ExtraInfos({ eventId, form, onSaveSuccess }) {
             <div className="info-body">
               <div className="info-body-content">
                 <h5>{info.title || "Judul tidak tersedia"}</h5>
-                <p className="mb-0">{info.description || "Konten tidak tersedia"}</p>
+                <p className="mb-0">
+                  {info.description || "Konten tidak tersedia"}
+                </p>
               </div>
 
               <div>
-                <a className="info-button-edit" onClick={() => handleModalEditInfoOpen(info.key)}>
+                <a
+                  className="info-button-edit"
+                  onClick={() => handleModalEditInfoOpen(info.key)}
+                >
                   &#10097;
                 </a>
               </div>
@@ -447,14 +474,18 @@ function ModalExtraInfoEditor({ showEditor, ...props }) {
 
 function ExtraInfoEditor({ infoData, onSave, onClose }) {
   const [title, setTitle] = React.useState(infoData?.title || "");
-  const [description, setDescription] = React.useState(infoData?.description || "");
+  const [description, setDescription] = React.useState(
+    infoData?.description || ""
+  );
 
   const initialTitle = React.useRef(title);
   const initialDescription = React.useRef(description);
 
   const shouldSubmitAllowed = () => {
     const isRequiredAll = title && description;
-    const isEdited = title !== initialTitle.current || description !== initialDescription.current;
+    const isEdited =
+      title !== initialTitle.current ||
+      description !== initialDescription.current;
     return isRequiredAll && isEdited;
   };
 
@@ -514,11 +545,20 @@ function ExtraInfoEditor({ infoData, onSave, onClose }) {
           </FieldTextArea>
         </div>
 
-        <div className="mt-4 d-flex justify-content-end" style={{ gap: "0.5rem" }}>
-          <Button style={{ color: "var(--ma-blue)" }} onClick={handleCloseModal}>
+        <div
+          className="mt-4 d-flex justify-content-end"
+          style={{ gap: "0.5rem" }}
+        >
+          <Button
+            style={{ color: "var(--ma-blue)" }}
+            onClick={handleCloseModal}
+          >
             Batal
           </Button>
-          <ButtonBlue onClick={handleClickSave} disabled={!shouldSubmitAllowed()}>
+          <ButtonBlue
+            onClick={handleClickSave}
+            disabled={!shouldSubmitAllowed()}
+          >
             Simpan
           </ButtonBlue>
         </div>
@@ -532,7 +572,10 @@ function AlertDeleteInfo({ showAlert, onConfirm, onCancel }) {
     <SweetAlert
       show={showAlert}
       title={
-        <i className="bx bx-trash font-size-18 align-middle" style={{ color: "var(--ma-red)" }} />
+        <i
+          className="bx bx-trash font-size-18 align-middle"
+          style={{ color: "var(--ma-red)" }}
+        />
       }
       custom
       btnSize="md"

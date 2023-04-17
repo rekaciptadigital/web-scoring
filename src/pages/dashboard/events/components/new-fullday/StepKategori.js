@@ -39,7 +39,9 @@ export function StepKategori({ eventData, updateEventData, validationErrors }) {
           <ButtonOutlineBlue
             corner="8"
             onClick={handleClickAddCategory}
-            disabled={eventData.eventCategories.length === categoryOptions.length}
+            disabled={
+              eventData.eventCategories.length === categoryOptions.length
+            }
           >
             + Tambah Kategori
           </ButtonOutlineBlue>

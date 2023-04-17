@@ -114,8 +114,17 @@ const initialEventData = {
 
 const EventsNewFullday = () => {
   const history = useHistory();
-  const { steps, currentStep, stepsTotal, currentLabel, goToStep, goToPreviousStep, goToNextStep } =
-    useWizardView(stepsData);
+  const {
+    steps,
+    currentStep,
+    stepsTotal,
+    currentLabel,
+    goToStep,
+    goToPreviousStep,
+    goToNextStep,
+  } = useWizardView(stepsData);
+  console.log("currentStep:", currentStep);
+  console.log("currentLabel:", currentLabel);
 
   const [lastActiveStep, setLastActiveStep] = React.useState(1);
 
@@ -127,7 +136,10 @@ const EventsNewFullday = () => {
     setLastActiveStep(nextStepNumber);
   };
 
-  const [eventData, updateEventData] = React.useReducer(eventDataReducer, initialEventData);
+  const [eventData, updateEventData] = React.useReducer(
+    eventDataReducer,
+    initialEventData
+  );
   const { errors: validationErrors } = useEventDataValidation(eventData);
 
   const { sendFakeSubmit, isLoading: isLoadingSubmit } = useFakeServerSubmit();
@@ -145,28 +157,42 @@ const EventsNewFullday = () => {
   const handleSaveEvent = async () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading" }));
 
-    const payload = await makeEventPayload(eventData, { status: PUBLICATION_TYPES.DRAFT });
+    const payload = await makeEventPayload(eventData, {
+      status: PUBLICATION_TYPES.DRAFT,
+    });
     const result = await EventsService.register(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       const eventId = result.data?.id;
-      eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
+      eventId &&
+        history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      setSavingEventStatus((state) => ({
+        ...state,
+        status: "error",
+        errors: result.errors,
+      }));
     }
   };
 
   const handlePublishEvent = async () => {
     setSavingEventStatus((state) => ({ ...state, status: "loading" }));
 
-    const payload = await makeEventPayload(eventData, { status: PUBLICATION_TYPES.PUBLISHED });
+    const payload = await makeEventPayload(eventData, {
+      status: PUBLICATION_TYPES.PUBLISHED,
+    });
     const result = await EventsService.register(payload);
     if (result.success) {
       setSavingEventStatus((state) => ({ ...state, status: "success" }));
       const eventId = result.data?.id;
-      eventId && history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
+      eventId &&
+        history.push(`/dashboard/events/new/prepublish?eventId=${eventId}`);
     } else {
-      setSavingEventStatus((state) => ({ ...state, status: "error", errors: result.errors }));
+      setSavingEventStatus((state) => ({
+        ...state,
+        status: "error",
+        errors: result.errors,
+      }));
     }
   };
 
@@ -279,7 +305,10 @@ const EventsNewFullday = () => {
                     <div className="mx-auto d-flex justify-content-between align-items-center flex-wrap">
                       <div>
                         {currentStep > 1 && (
-                          <ButtonOutlineBlue corner="8" onClick={() => goToPreviousStep()}>
+                          <ButtonOutlineBlue
+                            corner="8"
+                            onClick={() => goToPreviousStep()}
+                          >
                             Sebelumnya
                           </ButtonOutlineBlue>
                         )}
@@ -310,7 +339,10 @@ const EventsNewFullday = () => {
 
       <LoadingScreen loading={isLoadingSubmit} />
 
-      <AlertSubmitError isError={isErrorSubmiting} errors={savingEventStatus.errors} />
+      <AlertSubmitError
+        isError={isErrorSubmiting}
+        errors={savingEventStatus.errors}
+      />
     </React.Fragment>
   );
 };
@@ -361,7 +393,8 @@ function AlertSubmitError({ isError, errors, onConfirm }) {
     if (errors) {
       const fields = Object.keys(errors);
       const messages = fields.map(
-        (field) => `${errors[field].map((message) => `- ${message}\n`).join("")}`
+        (field) =>
+          `${errors[field].map((message) => `- ${message}\n`).join("")}`
       );
       if (messages.length) {
         return `${messages.join("")}`;
@@ -403,10 +436,14 @@ function AlertSubmitError({ isError, errors, onConfirm }) {
         </h4>
         <div className="text-start">
           <p>
-            Terdapat kendala teknis dalam memproses data. Coba kembali beberapa saat lagi, atau
-            silakan berikan pesan error berikut kepada technical support:
+            Terdapat kendala teknis dalam memproses data. Coba kembali beberapa
+            saat lagi, atau silakan berikan pesan error berikut kepada technical
+            support:
           </p>
-          <pre className="p-3" style={{ backgroundColor: "var(--ma-gray-100)" }}>
+          <pre
+            className="p-3"
+            style={{ backgroundColor: "var(--ma-gray-100)" }}
+          >
             {renderErrorMessages()}
           </pre>
         </div>
@@ -434,7 +471,9 @@ async function makeEventPayload(eventData, options) {
   const bannerImageBase64 = eventData.bannerImage?.raw
     ? await imageToBase64(eventData.bannerImage.raw)
     : undefined;
-  const handbookBase64 = eventData.handbook ? await imageToBase64(eventData.handbook) : null;
+  const handbookBase64 = eventData.handbook
+    ? await imageToBase64(eventData.handbook)
+    : null;
 
   const generatedCategories = makeEventCategories(eventData.eventCategories);
   const categoriesWithFees = makeCategoryFees(eventData, generatedCategories);
@@ -451,7 +490,9 @@ async function makeEventPayload(eventData, options) {
       eventLocation: eventData.location,
       eventCity: eventData.city?.value,
       eventLocation_type: eventData.locationType,
-      eventStart_register: formatServerDatetime(eventData.registrationDateStart),
+      eventStart_register: formatServerDatetime(
+        eventData.registrationDateStart
+      ),
       eventEnd_register: formatServerDatetime(eventData.registrationDateEnd),
       eventStart: formatServerDatetime(eventData.eventDateStart),
       eventEnd: formatServerDatetime(eventData.eventDateEnd),
@@ -618,11 +659,14 @@ function useEventDataValidation(eventData) {
           }
         });
 
-        Step2.validate(`${categoryGroup.key}-${detail.key}-teamCategory`, () => {
-          if (!detail.teamCategory?.value) {
-            return "Wajib diisi";
+        Step2.validate(
+          `${categoryGroup.key}-${detail.key}-teamCategory`,
+          () => {
+            if (!detail.teamCategory?.value) {
+              return "Wajib diisi";
+            }
           }
-        });
+        );
 
         Step2.validate(`${categoryGroup.key}-${detail.key}-quota`, () => {
           if (!detail.quota) {
@@ -635,7 +679,10 @@ function useEventDataValidation(eventData) {
     ValidationErrors.addByGroup({ stepGroup: 1, errors: Step1.errors });
     ValidationErrors.addByGroup({ stepGroup: 2, errors: Step2.errors });
 
-    setValidation((state) => ({ ...state, errors: ValidationErrors.nextErrorsState }));
+    setValidation((state) => ({
+      ...state,
+      errors: ValidationErrors.nextErrorsState,
+    }));
 
     if (ValidationErrors.isNextValid()) {
       onValid?.();
@@ -676,9 +723,12 @@ const StepGroupValidation = () => {
 };
 
 function useFakeServerSubmit() {
-  const [state, dispatch] = React.useReducer((state, action) => ({ ...state, ...action }), {
-    status: "idle",
-  });
+  const [state, dispatch] = React.useReducer(
+    (state, action) => ({ ...state, ...action }),
+    {
+      status: "idle",
+    }
+  );
 
   const sendFakeSubmit = ({ loadingTime = 500, onSuccess }) => {
     dispatch({ status: "loading" });

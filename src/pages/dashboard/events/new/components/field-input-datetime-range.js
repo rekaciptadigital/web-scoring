@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { FieldInputDateTimeColumns } from "./field-input-datetime-columns";
 
 import { isBefore, isAfter, isSameDay, endOfDay } from "date-fns";
+// import { FieldInputDateTimeColumnV2 } from "../screens/components/field-input-date-time-column-v2";
 
 function FieldInputDateTimeRange({
   labelStart = { date: "Tanggal Mulai", time: "Jam Mulai" },
@@ -21,6 +22,18 @@ function FieldInputDateTimeRange({
 
   return (
     <SplitFields>
+      {/* <FieldInputDateTimeColumnV2
+        dateLabel={labelStart.date}
+        timeLabel={labelStart.time}
+        required={required}
+        disabled={disabled}
+        datetime={value.start}
+        onChange={(datetime) => handleChange({ start: datetime })}
+        selectsStart
+        startDate={value.start}
+        endDate={value.end}
+        minDate={minDatetime}
+      /> */}
       <FieldInputDateTimeColumns
         dateLabel={labelStart.date}
         timeLabel={labelStart.time}
@@ -28,11 +41,9 @@ function FieldInputDateTimeRange({
         disabled={disabled}
         datetime={value.start}
         onChange={(datetime) => handleChange({ start: datetime })}
-        /* date range configs */
         selectsStart
         startDate={value.start}
         endDate={value.end}
-        /* constraints */
         minDate={minDatetime}
       />
 
@@ -43,11 +54,9 @@ function FieldInputDateTimeRange({
         disabled={disabled}
         datetime={value.end}
         onChange={(datetime) => handleChange({ end: datetime })}
-        /* date range configs */
         selectsEnd
         startDate={value.start}
         endDate={value.end}
-        /* constraints */
         minDate={value.start || minDatetime}
         minTime={_getConstraintMinTimeEnd(value)}
         maxTime={_getConstraintMaxTimeEnd(value)}

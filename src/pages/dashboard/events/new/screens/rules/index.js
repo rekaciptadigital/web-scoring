@@ -1,16 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
 import { SettingShootTheBoard } from "./components/field-setting-shoot-the-board";
-// import { SettingTargetFace } from "./components/field-setting-target-face";
 import { SettingsClubsRanking } from "./components/field-setting-club-ranking";
 
-function ScreenRules({
-  eventDetail,
-  form,
-  shootSetting,
-  rankingSettings,
-  // targetfacegSettings,
-}) {
+function ScreenRules({ eventDetail, form, shootSetting, rankingSettings }) {
   return (
     <CardSheet>
       <Section>
@@ -20,13 +13,6 @@ function ScreenRules({
           shootSettings={shootSetting}
         />
       </Section>
-      {/* <Section>
-        <SettingTargetFace
-          eventDetail={eventDetail}
-          form={form}
-          targetfacegSettings={targetfacegSettings}
-        />
-      </Section> */}
       <Section>
         <SettingsClubsRanking
           eventDetail={eventDetail}

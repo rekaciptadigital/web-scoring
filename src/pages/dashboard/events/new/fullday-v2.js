@@ -119,7 +119,6 @@ function PageCreateEventFullday({ classification }) {
   const matchType = _checkMatchType(eventDetail, qsMatchType);
   const isTypeMarathon = eventType === EVENT_TYPES.MARATHON;
   const isTypeSelection = matchType === "Selection";
-  // console.log("isTypeMarathon:", isTypeMarathon);
   // Forms
   const formPublicInfos = useFormPublicInfos(eventDetail);
   const formFees = useFormFees(eventDetail);

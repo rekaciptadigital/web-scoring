@@ -61,22 +61,8 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
   const [dataOption, setDataOption] = React.useState([]);
   const [dataForm, setFormData] = React.useState(initialData);
   const [originOption, setOriginOption] = React.useState(optionsCategories);
+  const [isDeleteShootSetting, setIsDeleteShootSetting] = React.useState(false);
   useSubmitFormRuleSetting(dataForm, form.setSubmitRule);
-  // const handleSelect = (value, index) => {
-  // let shootRule = dataForm.shootRule;
-  // shootRule[index].category = value;
-  // setFormData({
-  //   ...dataForm,
-  //   value,
-  // });
-  // if (value.length < 1) {
-  //   setDataOption(originOption);
-  // } else {
-  //   value.map((val) => {
-  //     setDataOption(originOption.filter((el) => el !== val));
-  //   });
-  // }
-  // };
 
   const handleSelect = (value, index) => {
     let shootRule = dataForm.shootRule;
@@ -92,45 +78,6 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
         setDataOption(originOption.filter((el) => el !== val));
       });
     }
-    // setFormData({
-    //   ...dataForm,
-    //   value,
-    // });
-    // let shootRule = dataForm.shootRule;
-
-    // if (value.length > 0) {
-    //   let dataOptionSelected = [];
-    //   value.map((valOptionSelect) => {
-    //     let setCategory = {};
-    //     if (!valOptionSelect.data) {
-    //       setCategory = {
-    //         age_category_id: valOptionSelect.age_category_id,
-    //         competition_category_id: valOptionSelect.competition_category_id,
-    //         distance_id: valOptionSelect.distance_id,
-    //         label: valOptionSelect.label,
-    //       };
-    //     } else {
-    //       setCategory = {
-    //         age_category_id: valOptionSelect.data.ageCategoryId,
-    //         competition_category_id: valOptionSelect.data.competitionCategoryId,
-    //         distance_id: valOptionSelect.data.distanceId,
-    //         label: valOptionSelect.data.label,
-    //       };
-    //     }
-    //     dataOptionSelected.push(setCategory);
-    //   });
-    //   shootRule[index].category = dataOptionSelected;
-    // } else {
-    //   shootRule[index].category = [];
-    // }
-
-    // if (value.length < 1) {
-    //   setDataOption(originOption);
-    // } else {
-    //   value.map((val) => {
-    //     setDataOption(originOption.filter((el) => el !== val));
-    //   });
-    // }
   };
 
   const handleAdd = () => {
@@ -153,17 +100,6 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
       shootRule: [...prevData.shootRule.filter((el, i) => i !== index)],
     }));
   };
-
-  // const handleImplemen = (value, index) => {
-  //   console.log("index handle implemen:", index);
-  //   console.log("value handle implemen:", value);
-  //   if (dataForm?.shootRule.length === 1) {
-  //     setFormData((prevState) => ({
-  //       ...prevState,
-  //       implementAll: value ? 0 : 1,
-  //     }));
-  //   }
-  // };
 
   const handleChangeSpecialCategory = (val, index) => {
     if (dataForm) {
@@ -205,38 +141,22 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
     }));
   };
 
+  const checkNextIndex = (index) => {
+    if (dataForm.shootRule.length > 0) {
+      let checkingNextIndex = dataForm.shootRule[index + 1];
+      let getDataFromIndex = dataForm.shootRule[index];
+      if (getDataFromIndex.have_special_category && !checkingNextIndex) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  };
+
   React.useEffect(() => {
     if (shootSettings) {
-      // const optionCategory = shootSettings?.implementAll
-      //   ? [
-      //       {
-      //         session: shootSettings?.session,
-      //         rambahan: shootSettings?.rambahan,
-      //         child_bow: shootSettings?.childBow,
-      //         category: [],
-      //       },
-      //     ]
-      //   : _makeShootRule(shootSettings, optionsCategories);
-      // console.log("optionCategory:", optionCategory);
-
-      // setFormData({
-      //   event_id: eventDetail.id,
-      //   activeSetting: shootSettings?.activeSetting,
-      //   implementAll: shootSettings?.implementAll,
-      //   shootRule: optionCategory,
-      // });
-
-      // if (!shootSettings?.implementAll) {
-      //   let tempCategory = [];
-      //   optionCategory?.map((option) => {
-      //     option?.category.map((val) => {
-      //       tempCategory.push(val);
-      //     });
-      //   });
-
-      //   setDataOption(dataOption.filter((el) => !tempCategory.includes(el)));
-      // }
-
       const mappingOldDataCategories = (paramOldDataCategory) => {
         return {
           data: {
@@ -305,6 +225,14 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
     setDataOption(optionsCategories);
     setOriginOption(optionsCategories);
   }, [optionsCategories]);
+
+  React.useEffect(() => {
+    if (dataForm.shootRule.length > 1) {
+      setIsDeleteShootSetting(false);
+    } else {
+      setIsDeleteShootSetting(true);
+    }
+  }, [dataForm]);
 
   return (
     <SettingContainer>
@@ -422,7 +350,8 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
                     </Section>
                     <div style={{ marginTop: "20px" }}>
                       <Button
-                        disabled={!rule.have_special_category ? true : false}
+                        disabled={checkNextIndex(index)}
+                        // disabled={!rule.have_special_category ? true : false}
                         flexible
                         onClick={handleAdd}
                       >
@@ -430,7 +359,7 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
                       </Button>
                       <br />
                       <Button
-                        disabled={index === 0 ? true : false}
+                        disabled={isDeleteShootSetting}
                         flexible
                         onClick={() => handleDelete(index)}
                       >

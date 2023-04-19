@@ -9,7 +9,10 @@ import { eventConfigs } from "constants/index";
 
 const { EVENT_TYPES } = eventConfigs;
 
-function useFormSchedules(schedules, { eventType, eventDetail, categoryDetails }) {
+function useFormSchedules(
+  schedules,
+  { eventType, eventDetail, categoryDetails }
+) {
   const [state, dispatch] = React.useReducer(formReducer, {
     data: null,
     status: "",
@@ -43,9 +46,12 @@ function formReducer(state, action) {
 
       if (!action.payload.schedules?.length) {
         const data = isMarathon
-          ? makeDefaultFormMarathon(action.payload.categoryDetails, action.payload.eventDetail)
+          ? makeDefaultFormMarathon(
+              action.payload.categoryDetails,
+              action.payload.eventDetail
+            )
           : makeDefaultForm(action.payload.eventDetail);
-
+        console.log("dataInitNotSchedule:", data);
         return { ...state, data, isEmpty: true };
       }
 

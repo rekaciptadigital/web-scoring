@@ -85,7 +85,6 @@ function PageCreateEventFullday({ classification }) {
   const { data: schedules } = schedulesProvider;
   const { data: shootSettings, fetchRuleShootSetting } =
     useShootRuleSetting(eventId);
-  // console.log("shootSettingsFromFullday:", shootSettings);
   // const { data: targetfacegSettings, fetchTargetFaceSetting } =
   //   useFaceTargetSetting(eventId);
   const { data: rankingSettings, fetchRankingSetting } =
@@ -737,17 +736,32 @@ function PageCreateEventFullday({ classification }) {
 
             <StepBody>
               {!isTypeMarathon ? (
+                // <ScreenSchedules
+                //   eventDetail={eventDetail}
+                //   categories={categoriesQualification}
+                //   formSchedules={formSchedules}
+                //   schedulesProvider={schedulesProvider}
+                // />
                 <ScreenSchedules
                   eventDetail={eventDetail}
                   categories={categoriesQualification}
-                  formSchedules={formSchedules}
+                  eventType={eventType}
+                  schedules={schedules}
                   schedulesProvider={schedulesProvider}
                 />
               ) : (
+                // <ScreenSchedulesMarathon
+                //   eventDetail={eventDetail}
+                //   categories={categoriesQualification}
+                //   formSchedules={formSchedules}
+                //   onSuccessSubmit={schedulesProvider.fetchSchedules}
+                // />
+
                 <ScreenSchedulesMarathon
                   eventDetail={eventDetail}
                   categories={categoriesQualification}
-                  formSchedules={formSchedules}
+                  schedules={schedules}
+                  eventType={eventType}
                   onSuccessSubmit={schedulesProvider.fetchSchedules}
                 />
               )}

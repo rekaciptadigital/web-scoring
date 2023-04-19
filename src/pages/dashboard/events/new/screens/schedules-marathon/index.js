@@ -4,15 +4,34 @@ import { toast } from "../../components/processing-toast";
 import { useFormScheduleMarathon } from "./hooks/form-schedule-marathon";
 import { useSubmitSchedules } from "./hooks/submit-schedules";
 
-import { NoticeBarInfo, AlertSubmitError, ButtonBlue, ButtonOutlineBlue } from "components/ma";
-import { FieldInputDateSmall, FieldInputTextSmall } from "../../../components/form-fields";
+import {
+  NoticeBarInfo,
+  AlertSubmitError,
+  ButtonBlue,
+  ButtonOutlineBlue,
+} from "components/ma";
+import {
+  FieldInputDateSmall,
+  FieldInputTextSmall,
+} from "../../../components/form-fields";
 import { LoadingScreen } from "../../components/loading-screen-portal";
 import { ButtonWithConfirmPrompt } from "./components/button-confirm-prompt";
 
 import { setHours, setMinutes } from "date-fns";
 import { datetime } from "utils";
 
-function ScreenSchedulesMarathon({ eventDetail, formSchedules, onSuccessSubmit }) {
+// function ScreenSchedulesMarathon({ eventDetail, formSchedules, onSuccessSubmit }) {
+function ScreenSchedulesMarathon({
+  eventDetail,
+  eventType,
+  categories,
+  onSuccessSubmit,
+}) {
+  const formSchedules = useFormSchedules(schedules, {
+    eventType,
+    eventDetail,
+    categoryDetails: categories,
+  });
   const { data: formData } = formSchedules;
 
   const [indexActiveEditor, setIndexActiveEditor] = React.useState(-1);
@@ -70,7 +89,11 @@ function CategoryGroupEditor({
 
   return (
     <CategoryGroupContainer>
-      <EditorDisplay canOpen={canOpen} onOpen={onOpen} categoryGroup={categoryGroup} />
+      <EditorDisplay
+        canOpen={canOpen}
+        onOpen={onOpen}
+        categoryGroup={categoryGroup}
+      />
     </CategoryGroupContainer>
   );
 }
@@ -137,7 +160,9 @@ function EditorDisplay({ canOpen, onOpen, categoryGroup }) {
 
 function EditorForm({ onClose, categoryGroup, eventDetail, onSuccessSubmit }) {
   const eventId = eventDetail?.id ? parseInt(eventDetail.id) : undefined;
-  const { data: formData, updateField } = useFormScheduleMarathon(categoryGroup?.schedules);
+  const { data: formData, updateField } = useFormScheduleMarathon(
+    categoryGroup?.schedules
+  );
   const {
     submitSchedules,
     isLoading: isLoadingSubmit,
@@ -145,12 +170,18 @@ function EditorForm({ onClose, categoryGroup, eventDetail, onSuccessSubmit }) {
     errors: errorsSubmit,
   } = useSubmitSchedules(eventId);
 
-  const setDateStart = (key, value) => updateField(key, "eventStartDatetime", value);
-  const setDateEnd = (key, value) => updateField(key, "eventEndDatetime", value);
+  const setDateStart = (key, value) =>
+    updateField(key, "eventStartDatetime", value);
+  const setDateEnd = (key, value) =>
+    updateField(key, "eventEndDatetime", value);
 
   const dateConstraint = React.useMemo(() => {
-    const eventStart = datetime.parseServerDatetime(eventDetail.publicInformation.eventStart);
-    const eventEnd = datetime.parseServerDatetime(eventDetail.publicInformation.eventEnd);
+    const eventStart = datetime.parseServerDatetime(
+      eventDetail.publicInformation.eventStart
+    );
+    const eventEnd = datetime.parseServerDatetime(
+      eventDetail.publicInformation.eventEnd
+    );
     return {
       min: eventDetail ? setHours(setMinutes(eventStart, 0), 0) : undefined,
       max: eventDetail ? setHours(setMinutes(eventEnd, 59), 23) : undefined,

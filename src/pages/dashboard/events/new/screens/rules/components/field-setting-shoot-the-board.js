@@ -3,17 +3,9 @@ import styled from "styled-components";
 import Switch from "react-switch";
 import IconPlus from "components/ma/icons/mono/plus";
 import IconTrash from "components/ma/icons/mono/trash";
-import {
-  // FieldInputText,
-  // FieldInputTextSmall,
-  FieldSelect,
-} from "pages/dashboard/events/components/form-fields";
-import {
-  //  SpinnerDotBlock,
-  Button,
-} from "components/ma";
+import { FieldSelect } from "pages/dashboard/events/components/form-fields";
+import { Button } from "components/ma";
 import { FieldSelectCategories } from "./field-select-categories";
-// import { useSubmitFormRuleSetting } from "./hooks/form-rule-shoot-setting";
 import { useSubmitFormRuleSetting } from "../hooks/form-rule-shoot-setting";
 
 function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
@@ -30,19 +22,6 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
     () => _makeOptionsCategory(categoryDetails),
     [categoryDetails]
   );
-  // const dataShootRule = {
-  //   session: null,
-  //   rambahan: null,
-  //   child_bow: null,
-  //   category: [],
-  // };
-
-  // const initialData = {
-  //   event_id: eventDetail.id,
-  //   activeSetting: null,
-  //   implementAll: 1,
-  //   shootRule: [dataShootRule],
-  // };
 
   const dataShootRule = {
     session: 2,
@@ -322,18 +301,6 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
                           menembak hanya akan berlaku pada kategori tertentu
                           yang Anda pilih.
                         </HelpDesk>
-                        {/* {!dataForm?.implementAll ? (
-                          <FieldSelectCategories
-                            label="Kategori"
-                            placeholder="Pilih opsi"
-                            required
-                            options={dataOption}
-                            value={rule?.category}
-                            onChange={(value) =>
-                              handleSelect(value ?? [], index)
-                            }
-                          />
-                        ) : undefined} */}
                         {rule.have_special_category ? (
                           <FieldSelectCategories
                             label="Kategori"
@@ -351,7 +318,6 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
                     <div style={{ marginTop: "20px" }}>
                       <Button
                         disabled={checkNextIndex(index)}
-                        // disabled={!rule.have_special_category ? true : false}
                         flexible
                         onClick={handleAdd}
                       >
@@ -373,8 +339,6 @@ function SettingShootTheBoard({ eventDetail, form, shootSettings }) {
           </Section>
         ) : undefined}
       </SpacedVertical>
-      {/* <AlertSubmitError isError={isErrorFetch} errors={errorsFetch} /> */}
-      {/* <AlertSubmitError isError={isErrorSubmit} errors={errorsSubmit} /> */}
     </SettingContainer>
   );
 }
@@ -524,28 +488,5 @@ function _groupCategory(categoryDetails) {
 
   return grouped;
 }
-// function _makeShootRule(value, optionsCategories) {
-//   const makeShootRule = (option) => ({
-//     session: option.session,
-//     rambahan: option.rambahan,
-//     child_bow: option.arrow,
-//     category: _checkCategoriesValue(optionsCategories, option.categories) || [],
-//   });
-
-//   switch (value.implementAll) {
-//     case 0: {
-//       return value.shootRule.map(makeShootRule);
-//     }
-
-//     case 1: {
-//       return {
-//         session: value.session,
-//         rambahan: value.rambahan,
-//         child_bow: value.childBow,
-//         category: [],
-//       };
-//     }
-//   }
-// }
 
 export { SettingShootTheBoard };

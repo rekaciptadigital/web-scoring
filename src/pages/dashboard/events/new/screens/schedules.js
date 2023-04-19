@@ -28,20 +28,36 @@ import classnames from "classnames";
 import { isSameDay } from "date-fns";
 import id from "date-fns/locale/id";
 import { datetime } from "utils";
+import { useFormSchedules } from "../hooks/form-schedules";
 
-function ScreenSchedules({ eventDetail, categories, formSchedules, schedulesProvider }) {
+// function ScreenSchedules({ eventDetail, categories, formSchedules, schedulesProvider }) {
+function ScreenSchedules({
+  eventDetail,
+  categories,
+  eventType,
+  schedulesProvider,
+  schedules,
+}) {
+  const formSchedules = useFormSchedules(schedules, {
+    eventType,
+    eventDetail,
+    categoryDetails: categories,
+  });
   const [indexActiveEditor, setIndexActiveEditor] = React.useState(-1);
   const { data } = formSchedules;
 
-  const asOptionObject = (type) => ({ value: type.id, label: type.labelCategory });
+  const asOptionObject = (type) => ({
+    value: type.id,
+    label: type.labelCategory,
+  });
   const options = categories?.map(asOptionObject) || [];
 
   return (
     <CardSheet>
       <VerticalSpacedBox>
         <NoticeBarInfo>
-          Jadwal tidak bisa dihapus jika sudah ada peserta. Anda tetap masih bisa merubah jadwal
-          meski sudah ada pendaftar.
+          Jadwal tidak bisa dihapus jika sudah ada peserta. Anda tetap masih
+          bisa merubah jadwal meski sudah ada pendaftar.
         </NoticeBarInfo>
 
         <VerticalSpacedBoxLoose>
@@ -95,7 +111,11 @@ function DayScheduleEditor({
           <React.Fragment>
             <SpacedHeader>
               <CommonSessionInput>
-                <FieldInputDateSmall label="Tanggal" disabled value={sessionsByDate.sessionDate} />
+                <FieldInputDateSmall
+                  label="Tanggal"
+                  disabled
+                  value={sessionsByDate.sessionDate}
+                />
               </CommonSessionInput>
 
               <HorizontalSpacedButtonGroups>
@@ -111,7 +131,10 @@ function DayScheduleEditor({
               </HorizontalSpacedButtonGroups>
             </SpacedHeader>
 
-            <EditorDisplay sessionsByDate={sessionsByDate} schedulesProvider={schedulesProvider} />
+            <EditorDisplay
+              sessionsByDate={sessionsByDate}
+              schedulesProvider={schedulesProvider}
+            />
           </React.Fragment>
         )}
       </VerticalSpacedBox>
@@ -125,7 +148,9 @@ function EditorDisplay({ sessionsByDate, schedulesProvider }) {
 
   return (
     <CategoryList>
-      {isUpdatingEditorData && <UpdatingStateBlocker>Memperbarui data...</UpdatingStateBlocker>}
+      {isUpdatingEditorData && (
+        <UpdatingStateBlocker>Memperbarui data...</UpdatingStateBlocker>
+      )}
       <VerticalSpacedBox>
         {sessionsByDate.sessions.map((session) => (
           <CategoryDetailItem key={session.key}>
@@ -143,9 +168,15 @@ function EditorDisplay({ sessionsByDate, schedulesProvider }) {
               <div>
                 <TimeRangeLabel>Jam Kualifikasi</TimeRangeLabel>
                 <TimeRangeBox>
-                  <FieldInputTimeSmall disabled value={session.eventStartDatetime} />
+                  <FieldInputTimeSmall
+                    disabled
+                    value={session.eventStartDatetime}
+                  />
                   <span>&ndash;</span>
-                  <FieldInputTimeSmall disabled value={session.eventEndDatetime} />
+                  <FieldInputTimeSmall
+                    disabled
+                    value={session.eventEndDatetime}
+                  />
                 </TimeRangeBox>
               </div>
             </SessionDetailInput>
@@ -194,12 +225,16 @@ function EditorForm({
     editorSessions: editorFormData.sessions,
     serverSessions: schedulesData,
   });
-  const showOnlySessions = editorFormData?.sessions.filter((session) => !session.shouldDelete);
+  const showOnlySessions = editorFormData?.sessions.filter(
+    (session) => !session.shouldDelete
+  );
   const notEmptyRows = showOnlySessions.filter((session) => {
     return !session.shouldDelete && session.categoryDetail?.value;
   });
-  const maxRowCountsAllowed = filteredOptionsCategories.length + notEmptyRows.length;
-  const isButtonAddDisabled = isDisabled || showOnlySessions.length >= maxRowCountsAllowed;
+  const maxRowCountsAllowed =
+    filteredOptionsCategories.length + notEmptyRows.length;
+  const isButtonAddDisabled =
+    isDisabled || showOnlySessions.length >= maxRowCountsAllowed;
 
   const handleClickSave = () => {
     submitSchedules({
@@ -218,7 +253,11 @@ function EditorForm({
 
       <SpacedHeader>
         <CommonSessionInput>
-          <FieldInputDateSmall label="Tanggal" disabled value={sessionsByDate.sessionDate} />
+          <FieldInputDateSmall
+            label="Tanggal"
+            disabled
+            value={sessionsByDate.sessionDate}
+          />
         </CommonSessionInput>
 
         <HorizontalSpacedButtonGroups>
@@ -275,8 +314,15 @@ function EditorForm({
                         disabled={isDisabled}
                         value={session.eventStartDatetime}
                         onChange={(value) => {
-                          const datetime = _addTimeToTargetDate(value, session.eventStartDatetime);
-                          updateField(session.key, "eventStartDatetime", datetime);
+                          const datetime = _addTimeToTargetDate(
+                            value,
+                            session.eventStartDatetime
+                          );
+                          updateField(
+                            session.key,
+                            "eventStartDatetime",
+                            datetime
+                          );
                         }}
                       />
                       <span>&ndash;</span>
@@ -284,8 +330,15 @@ function EditorForm({
                         disabled={isDisabled}
                         value={session.eventEndDatetime}
                         onChange={(value) => {
-                          const datetime = _addTimeToTargetDate(value, session.eventEndDatetime);
-                          updateField(session.key, "eventEndDatetime", datetime);
+                          const datetime = _addTimeToTargetDate(
+                            value,
+                            session.eventEndDatetime
+                          );
+                          updateField(
+                            session.key,
+                            "eventEndDatetime",
+                            datetime
+                          );
                         }}
                       />
                     </TimeRangeBox>
@@ -312,10 +365,20 @@ function EditorForm({
                     maxDate={eventDetail?.publicInformation.eventEnd}
                     value={session.eventStartDatetime}
                     onChange={(date) => {
-                      const datetimeStart = _addTimeToTargetDate(session.eventStartDatetime, date);
-                      const datetimeEnd = _addTimeToTargetDate(session.eventEndDatetime, date);
+                      const datetimeStart = _addTimeToTargetDate(
+                        session.eventStartDatetime,
+                        date
+                      );
+                      const datetimeEnd = _addTimeToTargetDate(
+                        session.eventEndDatetime,
+                        date
+                      );
 
-                      updateField(session.key, "eventStartDatetime", datetimeStart);
+                      updateField(
+                        session.key,
+                        "eventStartDatetime",
+                        datetimeStart
+                      );
                       updateField(session.key, "eventEndDatetime", datetimeEnd);
                     }}
                   />
@@ -344,7 +407,15 @@ function EditorForm({
   );
 }
 
-function ScheduleDatePicker({ value, onChange, title, titleOnDirty, disabled, minDate, maxDate }) {
+function ScheduleDatePicker({
+  value,
+  onChange,
+  title,
+  titleOnDirty,
+  disabled,
+  minDate,
+  maxDate,
+}) {
   const isDirty = useDirtyValueChecker(value);
   const computedTitle = titleOnDirty && isDirty ? titleOnDirty : title;
 
@@ -381,7 +452,10 @@ PickerTrigger.displayName = "PickerTrigger";
 
 function useDirtyValueChecker(value) {
   const cleanValue = React.useRef(value);
-  const isDirty = React.useMemo(() => !isSameDay(cleanValue.current, value), [value]);
+  const isDirty = React.useMemo(
+    () => !isSameDay(cleanValue.current, value),
+    [value]
+  );
 
   React.useEffect(() => {
     if (value) return;
@@ -583,15 +657,24 @@ function ButtonWithConfirmPrompt({
         onCancel={handleCancel}
         style={{ width: 800, padding: "35px 88px", borderRadius: "1.25rem" }}
         customButtons={
-          <span className="d-flex justify-content-center" style={{ gap: "0.5rem", width: "100%" }}>
+          <span
+            className="d-flex justify-content-center"
+            style={{ gap: "0.5rem", width: "100%" }}
+          >
             {reverseButtons ? (
               <React.Fragment>
-                <Button onClick={handleConfirm}>{buttonConfirmLabel || "Konfirmasi"}</Button>
-                <ButtonBlue onClick={handleCancel}>{buttonCancelLabel || "Batal"}</ButtonBlue>
+                <Button onClick={handleConfirm}>
+                  {buttonConfirmLabel || "Konfirmasi"}
+                </Button>
+                <ButtonBlue onClick={handleCancel}>
+                  {buttonCancelLabel || "Batal"}
+                </ButtonBlue>
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Button onClick={handleCancel}>{buttonCancelLabel || "Batal"}</Button>
+                <Button onClick={handleCancel}>
+                  {buttonCancelLabel || "Batal"}
+                </Button>
                 <ButtonBlue onClick={handleConfirm}>
                   {buttonConfirmLabel || "Konfirmasi"}
                 </ButtonBlue>
@@ -602,7 +685,9 @@ function ButtonWithConfirmPrompt({
       >
         <IllustationAlertPrompt />
         {messagePrompt && <h4>{messagePrompt}</h4>}
-        {messageDescription && <p className="text-muted">{messageDescription}</p>}
+        {messageDescription && (
+          <p className="text-muted">{messageDescription}</p>
+        )}
       </SweetAlert>
     </React.Fragment>
   );
@@ -620,8 +705,13 @@ const IllustationAlertPrompt = styled.div`
 
 /* ========================================== */
 
-function filterUnselected(categoryOptions, { initialSessions, editorSessions, serverSessions }) {
-  const idsFromServer = serverSessions.map((session) => session.categoryDetailId);
+function filterUnselected(
+  categoryOptions,
+  { initialSessions, editorSessions, serverSessions }
+) {
+  const idsFromServer = serverSessions.map(
+    (session) => session.categoryDetailId
+  );
   const idsInitialEditor = initialSessions
     .map((session) => session.categoryDetail?.value)
     .filter((id) => Boolean(id));
@@ -657,9 +747,15 @@ function filterUnselected(categoryOptions, { initialSessions, editorSessions, se
 }
 
 function _addTimeToTargetDate(valueDatetime, targetDatetime) {
-  const timeString = datetime.formatServerDatetime(valueDatetime)?.split?.(" ")[1];
-  const dateString = datetime.formatServerDatetime(targetDatetime)?.split?.(" ")[0];
-  const resultDatetime = datetime.parseServerDatetime(`${dateString} ${timeString}`);
+  const timeString = datetime
+    .formatServerDatetime(valueDatetime)
+    ?.split?.(" ")[1];
+  const dateString = datetime
+    .formatServerDatetime(targetDatetime)
+    ?.split?.(" ")[0];
+  const resultDatetime = datetime.parseServerDatetime(
+    `${dateString} ${timeString}`
+  );
   return resultDatetime;
 }
 

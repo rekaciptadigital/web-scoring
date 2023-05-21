@@ -1,16 +1,16 @@
-import * as React from "react";
+import React, { useRef, useLayoutEffect } from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import { certificateFields } from "constants/index";
 
 import EditorFieldText from "./EditorFieldText";
-import QrCodeField from "./QrCodeField";
+// import QrCodeField from "./QrCodeField"; // Unused import, commented out
 
 const { LABEL_RANK } = certificateFields;
-// landscape
 const A4_WIDTH = 1287;
 const A4_HEIGHT = 910;
 
-export default function EditorCanvasHTML({
+function EditorCanvasHTML({
   data,
   currentObject,
   onChange,
@@ -18,22 +18,22 @@ export default function EditorCanvasHTML({
   setEditorDirty,
 }) {
   const { backgroundUrl, backgroundPreviewUrl, fields } = data;
-  const containerDiv = React.useRef(null);
-  const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
-  const canvasScale = _getCanvasScale(currentOffsetWidth, A4_WIDTH);
+  const containerDiv = useRef(null);
+  const currentOffsetWidth = useRef(0);
+  const canvasScale = getCanvasScale(currentOffsetWidth.current, A4_WIDTH);
 
-  React.useLayoutEffect(() => {
-    containerDiv.current && setCurrentOffsetWidth(containerDiv.current?.offsetWidth);
-  }, []);
+  useLayoutEffect(() => {
+    if (containerDiv.current) {
+      currentOffsetWidth.current = containerDiv.current.offsetWidth;
+    }
+  }, [data]);
 
   const getBackgroundImage = () => backgroundPreviewUrl || backgroundUrl || "";
 
-  const isSelected = (name) => {
-    return currentObject?.name === name;
-  };
+  const isSelected = (name) => currentObject?.name === name;
 
   const handleSelectField = (name) => {
-    const fieldData = data.fields.find((field) => field.name === name);
+    const fieldData = fields.find((field) => field.name === name);
     onSelect({ ...fieldData });
   };
 
@@ -46,46 +46,56 @@ export default function EditorCanvasHTML({
       <EditorBackground
         width={A4_WIDTH}
         height={A4_HEIGHT}
-        scale={(containerDiv.current?.offsetWidth || A4_WIDTH) / A4_WIDTH}
+        scale={(currentOffsetWidth.current || A4_WIDTH) / A4_WIDTH}
         style={{ "--editor-bg-image": `url(${getBackgroundImage()})` }}
       >
-        <DeselectClickArea onClick={() => handleDeselectField()} />
+        <DeselectClickArea onClick={handleDeselectField} />
 
         {fields?.length ? (
-          fields.map((field) => {
-            if (
-              field.name === LABEL_RANK &&
-              (data.typeCertificate === 1 || data.typeCertificate === 3)
-            ) {
-              return;
-            }
-            return (
+          fields
+            .filter(
+              (field) =>
+                !(field.name === LABEL_RANK && (data.typeCertificate === 1 || data.typeCertificate === 3))
+            )
+            .map((field) => (
               <EditorFieldText
                 key={field.name}
                 name={field.name}
                 data={field}
                 selected={isSelected(field.name)}
-                onChange={(data) => onChange(data)}
+                onChange={onChange}
                 onSelected={() => handleSelectField(field.name)}
                 setEditorDirty={setEditorDirty}
                 canvasScale={canvasScale}
               />
-            );
-          })
+            ))
         ) : (
           <div>Ada error pada data editor</div>
         )}
 
-        <QrCodeField />
+        {/* <QrCodeField /> */}
       </EditorBackground>
     </EditorCanvasContainer>
   );
 }
 
+EditorCanvasHTML.propTypes = {
+  data: PropTypes.shape({
+    backgroundUrl: PropTypes.string,
+    backgroundPreviewUrl: PropTypes.string,
+    fields: PropTypes.arrayOf(PropTypes.object),
+    typeCertificate: PropTypes.number,
+  }),
+  currentObject: PropTypes.object,
+  onChange: PropTypes.func,
+  onSelect: PropTypes.func,
+  setEditorDirty: PropTypes.func,
+};
+
 const EditorCanvasContainer = styled.div`
   position: relative;
   height: 0;
-  padding-bottom: ${({ ratio }) => 100 * ratio}%;
+  padding-bottom: ${({ ratio }) => (ratio * 100).toFixed(2)}%;
   overflow: hidden;
 `;
 
@@ -110,9 +120,11 @@ const DeselectClickArea = styled.div`
   bottom: 0;
 `;
 
-function _getCanvasScale(offsetWidth, actualPaperPixels) {
+function getCanvasScale(offsetWidth, actualPaperPixels) {
   if (!offsetWidth) {
     return 1;
   }
   return offsetWidth / actualPaperPixels;
 }
+
+export default EditorCanvasHTML;

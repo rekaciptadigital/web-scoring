@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { Fragment, useRef, useEffect, useState, useLayoutEffect } from "react";
 import Draggable from "react-draggable";
 
 const boundingStroke = {
@@ -12,8 +12,10 @@ const boundingStroke = {
   },
 };
 
+const A4_WIDTH = 1287;
+
 function PlaceholderString({ children }) {
-  return <React.Fragment>&laquo;{children}&raquo;</React.Fragment>;
+  return <Fragment>&laquo;{children}&raquo;</Fragment>;
 }
 
 export default function EditorFieldText({
@@ -23,75 +25,84 @@ export default function EditorFieldText({
   onChange,
   selected,
   setEditorDirty,
+  canvasScale,
+  align = "right", // Default alignment is right
 }) {
-  const divRef = React.useRef(null);
-  const [currentOffsetWidth, setCurrentOffsetWidth] = React.useState(0);
-  const [activeStrokeColor, setActiveStrokeColor] = React.useState(boundingStroke.idle.color);
-  const [activeStrokeDashArray, setActiveStrokeDashArray] = React.useState(
-    boundingStroke.idle.dashArray
-  );
-  const { y, fontFamily, fontSize, color, fontWeight } = data;
+  const divRef = useRef(null);
+  const [currentOffsetWidth, setCurrentOffsetWidth] = useState(0);
+  const [activeStroke, setActiveStroke] = useState(boundingStroke.idle);
 
-  const translatePosition = { x: 0, y };
+  const { x, y, fontFamily, fontSize, color, fontWeight } = data;
 
-  React.useLayoutEffect(() => {
-    // Perubahan data yang memengaruhi width DOM perlu diupdate di sini,
-    // agar jarak left & transform x bisa dikalkulasi ulang dengan benar
-    divRef.current && setCurrentOffsetWidth(divRef.current.offsetWidth);
-    const data = { offsetWidth: divRef.current.offsetWidth || 0 };
-    onChange?.(data);
+  useLayoutEffect(() => {
+    if (divRef.current) {
+      setCurrentOffsetWidth(divRef.current.offsetWidth);
+      const data = { offsetWidth: divRef.current.offsetWidth || 0 };
+      onChange?.(data);
+    }
   }, [fontSize, fontFamily, fontWeight]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setEditorDirty?.();
-  }, [y, fontSize, fontFamily, fontWeight, color]);
-
-  const highlightOnMouseOver = () => {
-    setActiveStrokeColor(boundingStroke.highlighted.color);
-    setActiveStrokeDashArray(boundingStroke.highlighted.dashArray);
-  };
-
-  const idleOnMouseLeave = () => {
-    setActiveStrokeColor(boundingStroke.idle.color);
-    setActiveStrokeDashArray(boundingStroke.idle.dashArray);
-  };
+  }, [x, y, fontSize, fontFamily, fontWeight, color]);
 
   const handleDrag = () => {
     onSelected?.(name);
   };
 
-  const handleDragStop = (translation) => {
-    onChange?.({ y: translation.y });
-    // const data = {
-    //   x: Math.ceil(translation.x),
-    //   y: Math.ceil(translation.y),
-    //   offsetWidth: currentOffsetWidth,
-    // };
-    // onChange?.(data);
+  const handleDragStop = (ev, { x, y }) => {
+    let finalX = x;
+    const middleCanvas = A4_WIDTH / 2;
+    const diff = Math.abs(middleCanvas - (x + currentOffsetWidth / 2));
+
+    if (diff < 50) {
+      finalX = middleCanvas - currentOffsetWidth / 2;
+    }
+
+    const data = {
+      x: finalX,
+      y,
+      offsetWidth: currentOffsetWidth,
+    };
+
+    onChange?.(data);
+  };
+
+  const handleMouseOver = () => {
+    setActiveStroke(boundingStroke.highlighted);
+  };
+
+  const handleMouseLeave = () => {
+    setActiveStroke(boundingStroke.idle);
+  };
+
+  const getAlignmentStyle = () => {
+    if (align === "left") {
+      return { textAlign: "left" };
+    } else if (align === "center") {
+      return { textAlign: "center" };
+    } else if (align === "right") {
+      return { textAlign: "right" };
+    }
+    return {};
   };
 
   return (
-    <Draggable
-      axis="y"
-      scale={0.5}
-      position={translatePosition}
-      onStart={() => handleDrag()}
-      onStop={(ev, position) => handleDragStop(position)}
-    >
+    <Draggable scale={canvasScale} position={{ x, y }} onStart={handleDrag} onStop={handleDragStop}>
       <div
         ref={divRef}
         style={{
           position: "absolute",
           top: 0,
-          left: 1280 / 2 - currentOffsetWidth / 2 || 0,
+          left: 0,
           fontSize: fontSize || 60,
-          color: color || undefined,
-          fontFamily: fontFamily || undefined,
+          color,
+          fontFamily,
           fontWeight: fontWeight || "normal",
-          textAlign: "right",
+          ...getAlignmentStyle(),
         }}
-        onMouseOver={() => highlightOnMouseOver()}
-        onMouseLeave={() => idleOnMouseLeave()}
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
       >
         <PlaceholderString>{name}</PlaceholderString>
         <span
@@ -102,8 +113,8 @@ export default function EditorFieldText({
             right: 0,
             bottom: 0,
             borderWidth: selected ? 5 : 3,
-            borderStyle: selected ? "solid" : activeStrokeDashArray,
-            borderColor: selected ? "#4F80FF" : activeStrokeColor,
+            borderStyle: selected ? "solid" : activeStroke.dashArray,
+            borderColor: selected ? "#4F80FF" : activeStroke.color,
             opacity: 0.5,
             transition: "all",
           }}

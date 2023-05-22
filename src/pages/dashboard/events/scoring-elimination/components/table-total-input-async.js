@@ -3,8 +3,6 @@ import styled from "styled-components";
 import { useSubmitAdminTotal } from "../hooks/submit-total";
 
 import { AlertSubmitError } from "components/ma";
-import { toast } from "./processing-toast";
-
 import IconLoading from "./icon-loading";
 
 function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSuccess }) {
@@ -13,7 +11,7 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
   const previousValue = React.useRef(null);
   const [inputValue, setInputValue] = React.useState("");
 
-  const { submitAdminTotal, isLoading, isError, errors } = useSubmitAdminTotal({
+  const { submitAdminTotal, isError, errors } = useSubmitAdminTotal({
     categoryId: categoryId,
     participantId: playerDetail?.participantId,
     memberId: playerDetail.id,
@@ -31,32 +29,33 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
     setInputValue(playerDetail.adminTotal);
   }, [playerDetail]);
 
-  // nge-debounce action/event handler submit
-  React.useEffect(() => {
-    if (!isDirty) {
-      return;
-    }
+  const handleInputChange = (ev) => {
+    !isDirty && setDirty(true);
+    setInputValue((previousValue) => {
+      const { value } = ev.target;
+      if (!value) {
+        return "";
+      }
+      if (isNaN(value)) {
+        return previousValue;
+      }
+      return Number(value);
+    });
+  };
 
-    const debounceTimer = setTimeout(() => {
-      toast.loading("Sedang menyimpan skor total...");
+  const handleInputBlur = () => {
+    if (isDirty) {
       submitAdminTotal(inputValue, {
         onSuccess() {
-          toast.dismiss();
-          toast.success("Total berhasil disimpan");
-          inputRef.current?.focus();
+          setInputValue(previousValue.current);
           onSuccess?.();
         },
         onError() {
-          isDirty && setDirty(false);
           setInputValue(previousValue.current);
-          toast.dismiss();
-          toast.error("Gagal menyimpan total");
         },
       });
-    }, 1000);
-
-    return () => clearTimeout(debounceTimer);
-  }, [inputValue]);
+    }
+  };
 
   return (
     <React.Fragment>
@@ -65,24 +64,13 @@ function TotalInputAsync({ categoryId, playerDetail, disabled, scoring, onSucces
           ref={inputRef}
           type="text"
           placeholder="-"
-          disabled={disabled || isLoading}
+          disabled={disabled}
           value={disabled ? "" : inputValue}
-          onChange={(ev) => {
-            !isDirty && setDirty(true);
-            setInputValue((previousValue) => {
-              const { value } = ev.target;
-              if (!value) {
-                return "";
-              }
-              if (isNaN(value)) {
-                return previousValue;
-              }
-              return Number(value);
-            });
-          }}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
           onFocus={(ev) => ev.target.select()}
         />
-        {isLoading && (
+        {isError && (
           <span>
             <IconLoading />
           </span>
@@ -147,4 +135,4 @@ const InputInlineScore = styled.input`
   }
 `;
 
-export { TotalInputAsync };
+export { TotalInputAsync, InputInlineScore };

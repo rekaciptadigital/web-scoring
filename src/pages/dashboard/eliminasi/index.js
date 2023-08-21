@@ -212,10 +212,10 @@ function Eliminasi() {
       matches.rounds.map((val) => {
         switch (val.seeds.length) {
           case 8:
-            titleLabel = "1/16";
+            titleLabel = "1/8";
             break;
           case 4:
-            titleLabel = "1/8";
+            titleLabel = "1/4";
             break;
           case 2:
             titleLabel = "Semi-Final";
@@ -230,7 +230,7 @@ function Eliminasi() {
             break;
 
           default:
-            titleLabel = "1/32";
+            titleLabel = "1/16";
             break;
         }
         let obj = {

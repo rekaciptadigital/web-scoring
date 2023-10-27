@@ -1,9 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useSubmitBudrest } from "../hooks/submit-budrest";
-
 import { AlertSubmitError } from "components/ma";
-import { toast } from "./processing-toast";
 
 function BudrestInputAsync({
   categoryId,
@@ -37,26 +35,19 @@ function BudrestInputAsync({
     setInputValue(playerDetail.budrestNumber);
   }, [playerDetail]);
 
-  // nge-debounce action/event handler submit
   React.useEffect(() => {
     if (!isDirty) {
       return;
     }
 
     const debounceTimer = setTimeout(() => {
-      toast.loading("Sedang menyimpan nomor bantalan...");
       submitBudrest(inputValue, {
         onSuccess() {
-          toast.dismiss();
-          toast.success("Nomor bantalan berhasil disimpan");
-          inputRef.current?.focus();
           onSuccess?.();
         },
         onError() {
           isDirty && setDirty(false);
           setInputValue(previousValue.current);
-          toast.dismiss();
-          toast.error("Gagal menyimpan total");
         },
       });
     }, 1750);
@@ -72,7 +63,7 @@ function BudrestInputAsync({
           type="text"
           placeholder="-"
           disabled={disabled}
-          value={disabled ? "" : inputValue || ""}
+          value={inputValue}
           onChange={(ev) => {
             !isDirty && setDirty(true);
             setInputValue(ev.target.value?.toUpperCase?.());
@@ -89,6 +80,7 @@ function BudrestInputAsync({
     </React.Fragment>
   );
 }
+
 
 const InputAsyncWrapper = styled.span`
   display: inline-block;

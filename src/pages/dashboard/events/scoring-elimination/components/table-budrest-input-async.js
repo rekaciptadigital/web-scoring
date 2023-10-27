@@ -5,8 +5,6 @@ import { useSubmitBudrest } from "../hooks/submit-budrest";
 import { AlertSubmitError } from "components/ma";
 import { toast } from "./processing-toast";
 
-import IconLoading from "./icon-loading";
-
 function BudrestInputAsync({
   categoryId,
   playerDetail,
@@ -21,7 +19,7 @@ function BudrestInputAsync({
   const previousValue = React.useRef(null);
   const [inputValue, setInputValue] = React.useState("");
 
-  const { submitBudrest, isLoading, isError, errors } = useSubmitBudrest({
+  const { submitBudrest, isError, errors } = useSubmitBudrest({
     categoryId: categoryId,
     eliminationId: scoring.elimination_id,
     round: scoring.round,
@@ -73,7 +71,7 @@ function BudrestInputAsync({
           ref={inputRef}
           type="text"
           placeholder="-"
-          disabled={disabled || isLoading}
+          disabled={disabled}
           value={disabled ? "" : inputValue || ""}
           onChange={(ev) => {
             !isDirty && setDirty(true);
@@ -81,11 +79,6 @@ function BudrestInputAsync({
           }}
           onFocus={(ev) => ev.target.select()}
         />
-        {isLoading && (
-          <span>
-            <IconLoading />
-          </span>
-        )}
       </InputAsyncWrapper>
 
       <AlertSubmitError

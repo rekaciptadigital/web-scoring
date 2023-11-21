@@ -8,19 +8,29 @@ import imgEmptyBracket from "assets/images/elimination/illustration-empty-bracke
 
 import classnames from "classnames";
 
+/**
+ * Komponen ScoringTable menampilkan tabel skor untuk pertandingan eliminasi.
+ *
+ * @param {string} categoryDetailId - ID untuk kategori detail yang dipilih.
+ * @param {object} categoryDetails - Detail kategori yang dipilih, termasuk tipe kompetisi.
+ * @param {number} eliminationMemberCounts - Jumlah peserta dalam eliminasi.
+ */
+
 function ScoringTable({
   categoryDetailId,
   categoryDetails,
   eliminationMemberCounts,
 }) {
+  // Hook untuk mengambil data pertandingan eliminasi.
   const { isError, data } = useEliminationMatches(
     categoryDetailId,
     eliminationMemberCounts
   );
-
+  // State untuk menangani tab yang sedang aktif.
   const [selectedTab, setSelectedTab] = React.useState(0);
   const isSettled = Boolean(data) || (!data && isError);
 
+  // Menampilkan spinner saat data sedang dimuat.
   if (!isSettled) {
     return (
       <SectionTableContainer>
@@ -32,6 +42,8 @@ function ScoringTable({
   // Tabel dirender sebagai "state kosong" ketika:
   // 1. belum menentukan jumlah peserta eliminasi di page skoring kualifikasi (belum ada ID eliminasi/`eliminationId`)
   // 2. belum menentukan bagan eliminasi (terlempar error)
+  
+  // Menampilkan state kosong jika belum ada data eliminasi atau terjadi error.
   if (!data?.eliminationId) {
     return (
       <SectionTableContainer>
@@ -50,19 +62,23 @@ function ScoringTable({
     );
   }
 
-  // Happy path
+  // Label untuk tab berdasarkan ronde pertandingan.
   const tabLabels = _getTabLabels(data.rounds);
+  // Data untuk baris tabel saat ini berdasarkan tab yang dipilih.
   const currentRows = data.rounds[selectedTab]?.seeds || [];
+  // Label untuk kolom total berdasarkan detail kategori.
   const thTotalLabel = _getTotalLabel(categoryDetails);
 
+  // Rendering tabel skor utama.
   return (
     <SectionTableContainer>
+      {/* Tab untuk mengubah ronde yang ditampilkan */}
       <StagesTabs
         labels={tabLabels}
         currentTab={selectedTab}
         onChange={(index) => setSelectedTab(index)}
       />
-
+      {/* Tabel yang menampilkan skor dan nama peserta */}
       <MembersTable className="table table-responsive">
         <thead>
           <tr>
@@ -76,6 +92,7 @@ function ScoringTable({
         </thead>
 
         <tbody key={selectedTab}>
+        {/* Iterasi melalui baris data untuk mengisi tabel */}
           {currentRows.map((row, index) => {
             const player1 = row.teams[0];
             const player2 = row.teams[1];
@@ -90,6 +107,7 @@ function ScoringTable({
               (team) => team.status === "wait"
             );
 
+            // Mendapatkan nomor bantalan untuk setiap baris.
             const budrestNumber = _getBudrestNumber(row);
 
             return (
@@ -111,6 +129,9 @@ function ScoringTable({
                   </PlayerLabelContainerLeft>
                 </td>
 
+                {/* ... Kolom skor dan input skor ... */}
+                {/* Kolom nama peserta kedua */}
+                
                 <td>
                   {!noData || (!bothAreBye && isBye) ? (
                     <HeadToHeadScoreLabels>

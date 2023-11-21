@@ -1,3 +1,4 @@
+// Impor library dan komponen yang diperlukan
 import * as React from "react";
 import { useParams, Link } from "react-router-dom";
 import styled from "styled-components";
@@ -5,11 +6,13 @@ import { EventsService } from "services";
 import { useSelector } from "react-redux";
 import * as AuthStore from "store/slice/authentication";
 
+
 import MetaTags from "react-meta-tags";
 import { Container } from "reactstrap";
 import { SpinnerDotBlock } from "components/ma";
 import CardMenu from "../components/CardMenu";
 import CardMenuWithButton from "../components/CardMenuWithButton";
+
 
 import IconCopy from "components/ma/icons/mono/copy";
 import IconInfo from "components/ma/icons/mono/info";
@@ -21,17 +24,31 @@ import { eventMenus } from "./utils/menus";
 import { target, fileText } from "./utils/icon-svgs";
 import { ButtonOutlineBlue } from "components/ma";
 
-
+/**
+ * PageEventDetailHome: Komponen React untuk menampilkan detail sebuah event.
+ * Termasuk berbagai opsi manajemen seperti mengedit detail event, manajemen peserta, dll.
+ */
 function PageEventDetailHome() {
+  // Mengambil event_id dari parameter URL
   const { event_id } = useParams();
+
+  // Deklarasi state untuk detail event dan jadwal kualifikasi
   const [eventDetail, setEventDetail] = React.useState(null);
   const [isQualificationSchedulesSet, setIsQualificationSchedulesSet] = React.useState(false);
+
+  // Mengakses profil pengguna dari Redux store
   const { userProfile } = useSelector(AuthStore.getAuthenticationStore);
 
+  // Menentukan apakah event telah dipublikasikan
   const isEventPublished = Boolean(eventDetail?.publicInformation.eventStatus);
 
+  // Mengambil peran pengguna
   const roles = userProfile.role.role.id;
 
+  /**
+   * renderManageEventMenuBadge: Membuat badge yang menunjukkan status publikasi event.
+   * Mengembalikan komponen badge berdasarkan apakah event dipublikasikan atau masih draft.
+   */
   const renderManageEventMenuBadge = () => {
     if (!isEventPublished) {
       return (
@@ -52,6 +69,10 @@ function PageEventDetailHome() {
     );
   };
 
+  /**
+   * computeHrefScheduleMenu: Menghitung href untuk menu jadwal.
+   * Mengembalikan URL berdasarkan apakah jadwal kualifikasi telah diatur.
+   */
   const computeHrefScheduleMenu = () => {
     if (!isQualificationSchedulesSet) {
       return `/dashboard/events/new/prepublish?eventId=${event_id}`;
@@ -59,6 +80,7 @@ function PageEventDetailHome() {
     return `/dashboard/event/${event_id}/scoring-qualification`;
   };
 
+  // Hook effect untuk mengambil detail event dan jadwal kualifikasi
   React.useEffect(() => {
     const getEventDetail = async () => {
       const result = await EventsService.getEventDetailById({ id: event_id });
@@ -78,6 +100,7 @@ function PageEventDetailHome() {
     getQualificationSchedules();
   }, []);
 
+  // Rendering komponen utama
   return (
     <StyledPageWrapper>
       <MetaTags>
@@ -217,6 +240,7 @@ function PageEventDetailHome() {
   );
 }
 
+// Styled components untuk styling halaman
 const StyledPageWrapper = styled.div`
   margin: 4rem 0;
 `;
@@ -277,7 +301,7 @@ const PublishedBadge = styled.div`
 
 function LandingPageLinkPlaceholder({ url = "" }) {
   return (
-    <StyledLandingPageLink onClick={() => navigator.clipboard.writeText(url)}>
+    <StyledLandingPageLink onClick={() => window.open(url, '_blank')}>
       <StyledLinkInput value={url} placeholder="https://myarchery.id" disabled readOnly />
       <span className="icon-copy">
         <IconCopy size="20" />
@@ -285,6 +309,7 @@ function LandingPageLinkPlaceholder({ url = "" }) {
     </StyledLandingPageLink>
   );
 }
+
 
 const StyledLandingPageLink = styled.div`
   position: relative;

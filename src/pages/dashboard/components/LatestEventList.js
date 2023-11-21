@@ -1,15 +1,23 @@
+// Impor React dan library yang diperlukan
 import * as React from "react";
 import styled from "styled-components";
 import { EventsService } from "services";
 
+// Impor komponen EventThumbnailCard
 import EventThumbnailCard from "./EventThumbnailCard";
 
+/**
+ * Fungsi makeHomeThumbnailList: Menghasilkan daftar thumbnail event untuk tampilan beranda.
+ * @param {Array} initialData - Data awal event.
+ * @param {String} type - Tipe tampilan, misalnya 'home' atau 'all-event'.
+ * @returns {Array} Array yang berisi event atau array kosong jika tidak ada data.
+ */
 function makeHomeThumbnailList(initialData, type) {
   let container = [null];
   if (!initialData?.length) {
     return container;
   }
-  const maxBoxIndex = 2;
+  const maxBoxIndex = 3;
   const lastThreeData = initialData.slice(0, maxBoxIndex);
   switch (type) {
     case "home":
@@ -22,27 +30,30 @@ function makeHomeThumbnailList(initialData, type) {
     default:
       break;
   }
-  
 }
 
+// Styled component untuk indikator loading event
 const EventLoadingIndicator = styled.div`
   position: relative;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   width: 100%;
   height: 240px;
   padding: 1.5rem 1.5rem 0.85rem 1.5rem;
   border-radius: 8px;
-
   background-color: #ffffff;
 `;
 
+/**
+ * Komponen LatestEventList: Menampilkan daftar event terbaru.
+ * @param {String} type - Tipe daftar event, misalnya 'home' atau 'all-event'.
+ */
 function LatestEventList({type}) {
+  // State untuk menyimpan daftar event
   const [events, setEvents] = React.useState(null);
 
+  // Fungsi untuk mengambil data event
   const getEvent = async () => {
     setEvents(null);
     const { success, data } = await EventsService.get();
@@ -52,10 +63,12 @@ function LatestEventList({type}) {
     }
   };
 
+  // Effect hook untuk memuat data event saat komponen dimuat
   React.useEffect(() => {
     getEvent();
   }, []);
 
+  // Menampilkan indikator loading jika event belum dimuat
   if (!events) {
     return (
       <EventGrid>
@@ -64,6 +77,7 @@ function LatestEventList({type}) {
     );
   }
 
+  // Menampilkan daftar event
   return (
     <EventGrid>
       {events &&
@@ -74,6 +88,7 @@ function LatestEventList({type}) {
   );
 }
 
+// Styled component untuk layout grid event
 const EventGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { certificateFields } from "constants/index";
 
 import PreviewFieldText from "./PreviewFieldText";
-import QrCodeField from "../QrCodeField";
+//import QrCodeField from "../QrCodeField";
 
 const { LABEL_RANK } = certificateFields;
 // landscape
@@ -43,7 +43,7 @@ export default function PreviewCanvas({ data }) {
           <div>Ada error pada data editor</div>
         )}
 
-        <QrCodeField preview />
+        {/* <QrCodeField preview /> */}
       </PreviewImage>
 
       <PreviewBlocker />

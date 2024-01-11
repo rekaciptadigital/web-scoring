@@ -67,7 +67,7 @@ function renderTemplateString(editorData) {
     ${renderFieldText(LABEL_MEMBER_NAME)}
     ${isWinnerType ? renderFieldText(LABEL_RANK) : ""}
     ${renderFieldText(LABEL_CATEGORY_NAME)}
-    <!-- ${renderQrCode()} -->
+    ${renderQrCode()}
   </body>
 </html>`;
 }
@@ -114,22 +114,22 @@ function renderFieldText(name) {
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
 }
 
-//function renderQrCode() {
-//  const urlPlaceholder = "{%certificate_verify_url%}";
-//  return `
-//    <div class="qr-code-container">
-//      <div class="qr-code-centering">
-//        <barcode
-//          class="qr-code-img"
-//          code="${urlPlaceholder}"
-//          type="QR"
-//          error="M"
-//          class="barcode"
-//          size="1"
-//          disableborder="1" />
-//      </div>
-//    </div>`;
-//}
+function renderQrCode() {
+  const urlPlaceholder = "{%certificate_verify_url%}";
+  return `
+    <div class="qr-code-container">
+      <div class="qr-code-centering">
+        <barcode
+          class="qr-code-img"
+          code="${urlPlaceholder}"
+          type="QR"
+          error="M"
+          class="barcode"
+          size="1"
+          disableborder="1" />
+      </div>
+    </div>`;
+}
 
 // function _getRightAlignedX(editorObject, templateObject) {
 //   const delta = templateObject.offsetWidth - editorObject.offsetWidth;

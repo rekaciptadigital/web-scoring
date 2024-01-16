@@ -38,25 +38,6 @@ function renderTemplateString(editorData) {
 
       }
 
-      .qr-code-container {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 120px;
-      }
-
-      .qr-code-centering {
-        margin: 0 auto;
-        width: 25mm;
-        height: 25mm;
-        padding: 2mm;
-        background-color: white;
-      }
-
-      .qr-code-img {
-        margin: 0;
-      }
-
       ${renderCssField(LABEL_MEMBER_NAME, editorData.fields[0])}
       ${renderCssField(LABEL_RANK, editorData.fields[1])}
       ${renderCssField(LABEL_CATEGORY_NAME, editorData.fields[2])}
@@ -67,7 +48,6 @@ function renderTemplateString(editorData) {
     ${renderFieldText(LABEL_MEMBER_NAME)}
     ${isWinnerType ? renderFieldText(LABEL_RANK) : ""}
     ${renderFieldText(LABEL_CATEGORY_NAME)}
-    ${renderQrCode()}
   </body>
 </html>`;
 }
@@ -112,23 +92,6 @@ function renderCssField(name, data = {}) {
 function renderFieldText(name) {
   const placeholderString = name === LABEL_RANK ? `Juara {%${name}%}` : `{%${name}%}`;
   return `<div class="field-text" id="field-${name}">${placeholderString}</div>`;
-}
-
-function renderQrCode() {
-  const urlPlaceholder = "{%certificate_verify_url%}";
-  return `
-    <div class="qr-code-container">
-      <div class="qr-code-centering">
-        <barcode
-          class="qr-code-img"
-          code="${urlPlaceholder}"
-          type="QR"
-          error="M"
-          class="barcode"
-          size="1"
-          disableborder="1" />
-      </div>
-    </div>`;
 }
 
 // function _getRightAlignedX(editorObject, templateObject) {

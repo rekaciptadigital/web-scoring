@@ -5,7 +5,7 @@ import { idCardFields } from "constants/index";
 const { LABEL_PLAYER_NAME, LABEL_LOCATION_AND_DATE, LABEL_CATEGORY, LABEL_CLUB_MEMBER, LABEL_STATUS_EVENT } = idCardFields;
 
 const previewTexts = {
-  [LABEL_PLAYER_NAME]: "Morgan Lundin",
+  [LABEL_PLAYER_NAME]: "Laksmana Tri Moerdani",
   [LABEL_LOCATION_AND_DATE]: "Jakarta, 17 Agustus 1945",
   [LABEL_CATEGORY]: "Individu - Umum - Barebow - 50m",
   [LABEL_CLUB_MEMBER]: "Robin Hood",

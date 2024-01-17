@@ -27,7 +27,7 @@ import FontBoldToggle from "../components/FontBoldToggle";
 import ColorPickerContainer from "../components/ColorPickerContainer";
 import PreviewCanvas from "../components/preview/PreviewCanvas";
 
-const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
+const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME } = certificateFields;
 
 function CertificateNew() {
   const event_id = new URLSearchParams(useLocation().search).get("event_id");
@@ -471,7 +471,7 @@ const EditorActionButtons = styled.div`
 `;
 
 const getDefaultEditorData = () => ({
-  paperSize: "A4", // || [1280, 908] || letter
+  paperSize: "A4",
   backgroundUrl: undefined,
   backgroundPreviewUrl: undefined,
   backgroundFileRaw: undefined,
@@ -484,16 +484,9 @@ const getDefaultEditorData = () => ({
       fontSize: 60,
     },
     {
-      name: LABEL_RANK,
-      x: 640,
-      y: 370,
-      fontFamily: DEJAVU_SANS,
-      fontSize: 36,
-    },
-    {
       name: LABEL_CATEGORY_NAME,
       x: 640,
-      y: 430,
+      y: 370,
       fontFamily: DEJAVU_SANS,
       fontSize: 36,
     },

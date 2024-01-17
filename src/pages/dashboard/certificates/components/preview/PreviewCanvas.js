@@ -1,11 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
-import { certificateFields } from "constants/index";
-
 import PreviewFieldText from "./PreviewFieldText";
 //import QrCodeField from "../QrCodeField";
 
-const { LABEL_RANK } = certificateFields;
 // landscape
 const A4_WIDTH = 1287;
 const A4_HEIGHT = 910;
@@ -30,15 +27,9 @@ export default function PreviewCanvas({ data }) {
         scale={offsetWidth ? offsetWidth / A4_WIDTH : 1}
       >
         {fields?.length ? (
-          fields.map((field) => {
-            if (
-              field.name === LABEL_RANK &&
-              (data.typeCertificate === 1 || data.typeCertificate === 3)
-            ) {
-              return;
-            }
-            return <PreviewFieldText key={field.name} name={field.name} data={field} />;
-          })
+          fields.map((field) => (
+            <PreviewFieldText key={field.name} name={field.name} data={field} />
+          ))
         ) : (
           <div>Ada error pada data editor</div>
         )}

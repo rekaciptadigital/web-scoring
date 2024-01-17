@@ -2,11 +2,10 @@ import * as React from "react";
 import styled from "styled-components";
 import { certificateFields } from "constants/index";
 
-const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME, LABEL_RANK } = certificateFields;
+const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME } = certificateFields;
 
 const previewTexts = {
   [LABEL_MEMBER_NAME]: "Morgan Lundin",
-  [LABEL_RANK]: "Juara 1",
   [LABEL_CATEGORY_NAME]: "Individu - Umum - Barebow - 50m",
 };
 

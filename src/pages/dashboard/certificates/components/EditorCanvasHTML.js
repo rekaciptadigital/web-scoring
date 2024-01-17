@@ -1,12 +1,11 @@
 import React, { useRef, useLayoutEffect } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import { certificateFields } from "constants/index";
+// import { certificateFields } from "constants/index";
 
 import EditorFieldText from "./EditorFieldText";
 // import QrCodeField from "./QrCodeField"; // Unused import, commented out
 
-const { LABEL_RANK } = certificateFields;
 const A4_WIDTH = 1287;
 const A4_HEIGHT = 910;
 
@@ -52,23 +51,18 @@ function EditorCanvasHTML({
         <DeselectClickArea onClick={handleDeselectField} />
 
         {fields?.length ? (
-          fields
-            .filter(
-              (field) =>
-                !(field.name === LABEL_RANK && (data.typeCertificate === 1 || data.typeCertificate === 3))
-            )
-            .map((field) => (
-              <EditorFieldText
-                key={field.name}
-                name={field.name}
-                data={field}
-                selected={isSelected(field.name)}
-                onChange={onChange}
-                onSelected={() => handleSelectField(field.name)}
-                setEditorDirty={setEditorDirty}
-                canvasScale={canvasScale}
-              />
-            ))
+          fields.map((field) => (
+            <EditorFieldText
+              key={field.name}
+              name={field.name}
+              data={field}
+              selected={isSelected(field.name)}
+              onChange={onChange}
+              onSelected={() => handleSelectField(field.name)}
+              setEditorDirty={setEditorDirty}
+              canvasScale={canvasScale}
+            />
+          ))
         ) : (
           <div>Ada error pada data editor</div>
         )}

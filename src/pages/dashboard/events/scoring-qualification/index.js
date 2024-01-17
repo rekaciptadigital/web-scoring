@@ -26,10 +26,10 @@ import IconCheck from "components/ma/icons/fill/check";
 import { useQualificationDownload } from "./hooks/qualification-download";
 
 const optionsParticipantsCount = [
-  { value: 4, label: "4 Besar" },
-  { value: 8, label: "8 Besar" },
-  { value: 16, label: "16 Besar" },
-  { value: 32, label: "32 Besar" },
+  { value: 4, label: "4 Besar (Semi)" },
+  { value: 8, label: "8 Besar (1/4)" },
+  { value: 16, label: "16 Besar (1/8)" },
+  { value: 32, label: "32 Besar (1/16)" },
 ];
 
 function _getSelectedFromValue(countValue) {

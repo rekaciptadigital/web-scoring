@@ -1,78 +1,55 @@
-import React, { Component } from "react"
-import { withRouter } from "react-router-dom"
+import React, { useState, useEffect } from "react";
+import { withRouter } from "react-router-dom";
 
-// Other Layout related Component
-import Navbar from "./Navbar"
-import Header from "./Header"
-import Footer from "./Footer"
+// Import komponen lain yang terkait dengan Layout
+import Navbar from "./Navbar";
+import Header from "./Header";
+import Footer from "./Footer";
 
-class Layout extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isMenuOpened: false,
-    }
-  }
+// Functional Component untuk Layout
+const Layout = (props) => {
+  // State untuk mengelola apakah menu terbuka atau tidak
+  const [isMenuOpened, setIsMenuOpened] = useState(false);
 
-  componentDidMount() {
-    if (document.body) document.body.setAttribute('data-layout', 'horizontal')
-    if (this.props.isPreloader === true) {
-      document.getElementById("preloader").style.display = "block"
-      document.getElementById("status").style.display = "block"
+  // Menggunakan useEffect untuk mensimulasikan componentDidMount
+  useEffect(() => {
+    // Mengatur layout body menjadi horizontal
+    if (document.body) document.body.setAttribute('data-layout', 'horizontal');
 
-      setTimeout(function () {
-        document.getElementById("preloader").style.display = "none"
-        document.getElementById("status").style.display = "none"
-      }, 2500)
+    // Logika untuk preloader
+    if (props.isPreloader === true) {
+      // Menampilkan elemen preloader
+      document.getElementById("preloader").style.display = "block";
+      document.getElementById("status").style.display = "block";
+
+      // Menyembunyikan preloader setelah 2.5 detik
+      setTimeout(() => {
+        document.getElementById("preloader").style.display = "none";
+        document.getElementById("status").style.display = "none";
+      }, 2500);
     } else {
-      document.getElementById("preloader").style.display = "none"
-      document.getElementById("status").style.display = "none"
+      // Jika preloader tidak diaktifkan, langsung sembunyikan elemen preloader
+      document.getElementById("preloader").style.display = "none";
+      document.getElementById("status").style.display = "none";
     }
 
-    // Scrollto 0,0
-    window.scrollTo(0, 0)
+    // Menggulir halaman ke atas saat komponen dimuat atau saat path berubah
+    window.scrollTo(0, 0);
+  }, [props.isPreloader]); // Menggunakan isPreloader sebagai dependensi
 
-    // const title = this.props.location.pathname
-    // let currentage = title.charAt(1).toUpperCase() + title.slice(2)
-    document.title =
-      "Dashboard" + " | MyArchery"
-  }
+  return (
+    <React.Fragment>
+      {/* Menampilkan Header */}
+      <Header />
+      {/* Menampilkan Navbar */}
+      <Navbar isMenuOpened={isMenuOpened} toggleMenu={() => setIsMenuOpened(!isMenuOpened)} />
+      {/* Menampilkan anak komponen yang dikirim melalui props */}
+      {props.children}
+      {/* Menampilkan Footer */}
+      <Footer />
+    </React.Fragment>
+  );
+};
 
-  /**
-   * Opens the menu - mobile
-   */
-  openMenu = () => {
-    this.setState({ isMenuOpened: !this.state.isMenuOpened })
-  }
-  render() {
-    return (
-      <React.Fragment>
-        <div id="preloader">
-          <div id="status">
-            <div className="spinner-chase">
-              <div className="chase-dot" />
-              <div className="chase-dot" />
-              <div className="chase-dot" />
-              <div className="chase-dot" />
-              <div className="chase-dot" />
-              <div className="chase-dot" />
-            </div>
-          </div>
-        </div>
-
-        <div id="layout-wrapper">
-          <Header
-            theme={this.props.topbarTheme}
-            isMenuOpened={this.state.isMenuOpened}
-            openLeftMenuCallBack={this.openMenu}
-          />
-          <Navbar menuOpen={this.state.isMenuOpened} />
-          <div className="main-content">{this.props.children}</div>
-          <Footer />
-        </div>
-      </React.Fragment>
-    )
-  }
-}
-
-export default (withRouter(Layout))
+// Membungkus komponen dengan withRouter untuk mendapatkan akses ke props history
+export default withRouter(Layout);

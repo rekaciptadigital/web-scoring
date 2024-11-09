@@ -1,191 +1,113 @@
-import React, { Component } from "react"
-import { Row, Col, Card, CardBody } from "reactstrap"
+import React, { useState } from "react";
+import { Row, Col, Card, CardBody } from "reactstrap";
 
-// datatable related plugins
+// Plugin terkait datatable
 import BootstrapTable from 'react-bootstrap-table-next';
-import paginationFactory, {
-  PaginationProvider, PaginationListStandalone,
-  SizePerPageDropdownStandalone
-} from 'react-bootstrap-table2-paginator';
-
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
-// Data for dummy
-import { dummyConstants } from '../../../../constants'
+// Data untuk dummy
+import { dummyConstants } from '../../../../constants';
 
-//Import Breadcrumb
-import './sass/datatables.scss'
+// Import stylesheet untuk datatables
+import './sass/datatables.scss';
 
-class TableScoring extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      page: 1,
-      sizePerPage: 10,
-      productData: dummyConstants.scoring
-    }
+// Functional Component untuk TableScoring
+const TableScoring = () => {
+  // State untuk pagination dan data scoring
+  const [page, setPage] = useState(1);
+  const [sizePerPage, setSizePerPage] = useState(10);
+  const [productData] = useState(dummyConstants.scoring);  // Data scoring dari dummy
 
-  }
-
-  render() {
-
-    const columns = [{
+  // Definisi kolom untuk tabel
+  const columns = [
+    {
       dataField: 'id',
       text: 'Id',
       sort: true,
-    }, {
+    },
+    {
       dataField: 'class',
       text: 'Kelas',
-      sort: true
-    }, {
+      sort: true,
+    },
+    {
       dataField: 'arange',
       text: 'Jarak',
-      sort: true
-    }, {
+      sort: true,
+    },
+    {
       dataField: 'session',
-      text: 'Jumlah Sesi',
-      sort: true
-    }, {
-      dataField: 'rambahan',
-      text: 'Rambahan',
-      sort: true
-    }, {
-      dataField: 'shoot',
-      text: 'Jumlah Shoot',
-      sort: true
-    }, {
-      dataField: 'target_face',
-      text: 'Target Face',
-      sort: true
-    }, {
+      text: 'Sesi',
+      sort: true,
+    },
+    {
+      dataField: 'score',
+      text: 'Score',
+      sort: true,
+    },
+    {
       dataField: 'status',
       text: 'Status',
+      // Formatter untuk kolom status
+      formatter: (cell, row) => {
+        return (
+          <span className={`${row.status ? "bg-success" : "bg-danger"} text-white rounded-3 px-2`}>
+            {row.status ? "Completed" : "Pending"}
+          </span>
+        );
+      },
+    },
+    {
+      dataField: 'action',
+      text: 'Action',
+      // Formatter untuk kolom action
       formatter: () => {
         return (
-          <div>
-            <span><i className="bx bx-edit"></i></span>
-          </div>
-        )
-      }
-    }
-];
+          <button className="btn btn-sm btn-primary">
+            Edit
+          </button>
+        );
+      },
+    },
+  ];
 
-    const defaultSorted = [{
-      dataField: 'id',
-      order: 'asc'
-    }];
+  return (
+    <Row>
+      <Col>
+        <Card>
+          <CardBody>
+            <ToolkitProvider
+              keyField="id"
+              data={productData}
+              columns={columns}
+              search
+            >
+              {(props) => (
+                <div>
+                  {/* Komponen BootstrapTable dengan konfigurasi yang diperbarui */}
+                  <BootstrapTable
+                    {...props.baseProps}
+                    pagination={paginationFactory({
+                      page,
+                      sizePerPage,
+                      onPageChange: setPage,
+                      onSizePerPageChange: (sizePerPage, page) => {
+                        setSizePerPage(sizePerPage);
+                        setPage(page);
+                      },
+                    })}
+                    striped
+                    hover
+                  />
+                </div>
+              )}
+            </ToolkitProvider>
+          </CardBody>
+        </Card>
+      </Col>
+    </Row>
+  );
+};
 
-    const pageOptions = {
-      sizePerPage: 10,
-      totalSize: dummyConstants.scoring.length, // replace later with size(customers),
-      custom: true,
-    }
-
-    // Custom Pagination Toggle
-    // const sizePerPageList = [
-    //   { text: '5', value: 5 },
-    //   { text: '10', value: 10 },
-    //   { text: '15', value: 15 },
-    //   { text: '20', value: 20 },
-    //   { text: '25', value: 25 },
-    //   { text: 'All', value: (this.state.productData).length }];
-
-  
-    // Select All Button operation
-    const selectRow = {
-      mode: 'checkbox'
-    }
-
-    // const { SearchBar } = Search;
-
-    return (
-      <React.Fragment>
-        <div>
-          <div>
-            <Row>
-              <Col>
-                <Card>
-                  <CardBody>
-                    <PaginationProvider
-                      pagination={paginationFactory(pageOptions)}
-                      keyField='id'
-                      columns={columns}
-                      data={this.state.productData}
-                    >
-                      {({ paginationProps, paginationTableProps }) => (
-                        <ToolkitProvider
-                          keyField='id'
-                          columns={columns}
-                          data={this.state.productData}
-                          search
-                        >
-                          {toolkitProps => (
-                            <React.Fragment>
-
-                              <Row className="mb-2">
-                                <Col>
-                                  <div className="search-box me-2 mb-2 d-inline-block">
-                                    <div className="position-relative">
-                                      {/* <SearchBar
-                                        {...toolkitProps.searchProps}
-                                      /> */}
-                                      {/* <i className="bx bx-search-alt search-icon" /> */}
-                                    </div>
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row>
-                                <Col>
-                                  <div className="table-responsive">
-                                    <BootstrapTable
-                                      keyField={"id"}
-                                      responsive
-                                      bordered={false}
-                                      striped={false}
-                                      defaultSorted={defaultSorted}
-                                      selectRow={selectRow}
-                                      classes={
-                                        "table align-middle table-nowrap"
-                                      }
-                                      headerWrapperClasses={"thead-light"}
-                                      {...toolkitProps.baseProps}
-                                      {...paginationTableProps}
-                                    />
-
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row className="align-items-md-center mt-30">
-                                <Col className="inner-custom-pagination d-flex">
-                                  <div className="d-inline">
-                                    <SizePerPageDropdownStandalone
-                                      {...paginationProps}
-                                    />
-                                  </div>
-                                  <div className="text-md-right ms-auto">
-                                    <PaginationListStandalone
-                                      {...paginationProps}
-                                    />
-                                  </div>
-                                </Col>
-                              </Row>
-                            </React.Fragment>
-                          )
-                          }
-                        </ToolkitProvider>
-                      )
-                      }</PaginationProvider>
-                  </CardBody>
-                </Card>
-              </Col>
-            </Row>
-          </div>
-        </div>
-      </React.Fragment>
-    )
-  }
-}
-
-export default TableScoring
+export default TableScoring;

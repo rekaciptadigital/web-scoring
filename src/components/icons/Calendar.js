@@ -1,6 +1,7 @@
-import * as React from "react";
+import React from "react";
 
-export default function Calendar({ size }) {
+// Functional Component untuk Calendar
+const Calendar = ({ size }) => {
   return (
     <svg
       width={size || "24"}
@@ -49,4 +50,7 @@ export default function Calendar({ size }) {
       </g>
     </svg>
   );
-}
+};
+
+// Membungkus komponen dengan React.memo untuk mencegah rerendering yang tidak perlu
+export default React.memo(Calendar);

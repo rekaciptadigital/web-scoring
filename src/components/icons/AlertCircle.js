@@ -1,8 +1,15 @@
 import * as React from "react";
 
-export default function AlertCircle() {
+// Functional Component untuk AlertCircle
+const AlertCircle = () => {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <g id="icons/alert-circle" clipPath="url(#clip0_20116_149166)">
         <path
           id="Vector"
@@ -32,11 +39,9 @@ export default function AlertCircle() {
           strokeLinejoin="round"
         />
       </g>
-      <defs>
-        <clipPath id="clip0_20116_149166">
-          <rect width="24" height="24" fill="white" />
-        </clipPath>
-      </defs>
     </svg>
   );
-}
+};
+
+// Membungkus komponen dengan React.memo untuk mencegah rerendering yang tidak perlu
+export default React.memo(AlertCircle);

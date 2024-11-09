@@ -1,6 +1,7 @@
 import * as React from "react";
 
-export default function Del() {
+// Functional Component untuk Del
+const Del = () => {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g id="del">
@@ -25,4 +26,7 @@ export default function Del() {
       </g>
     </svg>
   );
-}
+};
+
+// Membungkus komponen dengan React.memo untuk mencegah rerendering yang tidak perlu
+export default React.memo(Del);

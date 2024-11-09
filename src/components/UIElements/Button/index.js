@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback } from "react";
 
-const Button = ({
+// Functional Component untuk Button
+const Button = React.memo(({
   label,
   onClick,
   type = "primary",
@@ -11,17 +12,16 @@ const Button = ({
   size = "normal",
   outline = false,
 }) => {
-  const handleClick = () => {
+  // Menggunakan useCallback untuk memoization fungsi handleClick
+  const handleClick = useCallback(() => {
     if (onClick) onClick();
-  };
+  }, [onClick]);
 
   return (
     <button
       type="button"
       className={`btn btn${outline ? "-outline-" : "-"}${type} btn-${size}`}
-      onClick={() => {
-        handleClick();
-      }}
+      onClick={handleClick}  // Langsung menggunakan handleClick yang di-memoize
     >
       {icon && (
         <i
@@ -36,6 +36,6 @@ const Button = ({
       )}
     </button>
   );
-};
+});
 
 export default Button;

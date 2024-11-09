@@ -1,7 +1,7 @@
-import React, { Component } from "react"
-import { Row, Col, Card, CardBody } from "reactstrap"
+import React, { useMemo, useState } from "react";
+import { Row, Col, Card, CardBody } from "reactstrap";
 
-// datatable related plugins
+// Datatable related plugins
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory, {
   PaginationProvider, PaginationListStandalone,
@@ -11,49 +11,48 @@ import paginationFactory, {
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
 // Data for dummy
-import { dummyConstants } from '../../../../constants'
+import { dummyConstants } from '../../../../constants';
 
-//Import Breadcrumb
-import './sass/datatables.scss'
-// import '../../member/components/sass/datatables.scss'
+// Import Breadcrumb
+import './sass/datatables.scss';
 
-class TableCategory extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      page: 1,
-      sizePerPage: 10,
-      productData: dummyConstants.category
-    }
+const TableCategory = React.memo(() => {
+  const [page, setPage] = useState(1);
+  const [sizePerPage, setSizePerPage] = useState(10);
+  const [productData] = useState(dummyConstants.category);
 
-  }
-
-  render() {
-
-    const columns = [{
+  // Memoize columns definition to avoid unnecessary re-renders
+  const columns = useMemo(() => [
+    {
       dataField: 'id',
       text: 'Id',
       sort: true,
-    }, {
+    },
+    {
       dataField: 'class',
       text: 'Kelas',
-      sort: true
-    }, {
+      sort: true,
+    },
+    {
       dataField: 'death_bird',
       text: 'Batas Lahir',
-      sort: true
-    }, {
+      sort: true,
+    },
+    {
       dataField: 'arange',
       text: 'Jarak',
-      sort: true
-    }, {
+      sort: true,
+    },
+    {
       dataField: 'kuota',
       text: 'Kuota Terisi',
-      sort: true
-    }, {
+      sort: true,
+    },
+    {
       dataField: 'registrasi',
       text: 'Biaya Registrasi',
-    }, {
+    },
+    {
       dataField: 'status',
       text: 'Status',
       formatter: (cell, row) => {
@@ -61,127 +60,38 @@ class TableCategory extends Component {
           <div>
             <span className={`${row.status ? "bg-danger" : "bg-success"} text-white rounded-3 px-2`}>{row.status ? "Full Booked" : "On Sale"}</span>
           </div>
-        )
-      }
+        );
+      },
     }
-];
+  ], []);
 
-    const defaultSorted = [{
-      dataField: 'id',
-      order: 'asc'
-    }];
+  return (
+    <Card>
+      <CardBody>
+        <ToolkitProvider
+          keyField="id"
+          data={productData}
+          columns={columns}
+          search
+        >
+          {toolkitProps => (
+            <div>
+              <BootstrapTable
+                {...toolkitProps.baseProps}
+                pagination={paginationFactory({
+                  page,
+                  sizePerPage,
+                  onPageChange: setPage,
+                  onSizePerPageChange: setSizePerPage
+                })}
+                wrapperClasses="table-responsive"
+              />
+            </div>
+          )}
+        </ToolkitProvider>
+      </CardBody>
+    </Card>
+  );
+});
 
-    const pageOptions = {
-      sizePerPage: 10,
-      totalSize: dummyConstants.category.length, // replace later with size(customers),
-      custom: true,
-    }
-
-    // Custom Pagination Toggle
-    // const sizePerPageList = [
-    //   { text: '5', value: 5 },
-    //   { text: '10', value: 10 },
-    //   { text: '15', value: 15 },
-    //   { text: '20', value: 20 },
-    //   { text: '25', value: 25 },
-    //   { text: 'All', value: (this.state.productData).length }];
-
-  
-    // Select All Button operation
-    const selectRow = {
-      mode: 'checkbox'
-    }
-
-    // const { SearchBar } = Search;
-
-    return (
-      <React.Fragment>
-        <div>
-          <div>
-            <Row>
-              <Col className="col-12">
-                <Card>
-                  <CardBody>
-                    <PaginationProvider
-                      pagination={paginationFactory(pageOptions)}
-                      keyField='id'
-                      columns={columns}
-                      data={this.state.productData}
-                    >
-                      {({ paginationProps, paginationTableProps }) => (
-                        <ToolkitProvider
-                          keyField='id'
-                          columns={columns}
-                          data={this.state.productData}
-                          search
-                        >
-                          {toolkitProps => (
-                            <React.Fragment>
-
-                              <Row className="mb-2">
-                                <Col md="4">
-                                  <div className="search-box me-2 mb-2 d-inline-block">
-                                    <div className="position-relative">
-                                      {/* <SearchBar
-                                        {...toolkitProps.searchProps}
-                                      /> */}
-                                      {/* <i className="bx bx-search-alt search-icon" /> */}
-                                    </div>
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row>
-                                <Col xl="12">
-                                  <div className="table-responsive">
-                                    <BootstrapTable
-                                      keyField={"id"}
-                                      responsive
-                                      bordered={false}
-                                      striped={false}
-                                      defaultSorted={defaultSorted}
-                                      selectRow={selectRow}
-                                      classes={
-                                        "table align-middle table-nowrap"
-                                      }
-                                      headerWrapperClasses={"thead-light"}
-                                      {...toolkitProps.baseProps}
-                                      {...paginationTableProps}
-                                    />
-
-                                  </div>
-                                </Col>
-                              </Row>
-
-                              <Row className="align-items-md-center mt-30">
-                                <Col className="inner-custom-pagination d-flex">
-                                  <div className="d-inline">
-                                    <SizePerPageDropdownStandalone
-                                      {...paginationProps}
-                                    />
-                                  </div>
-                                  <div className="text-md-right ms-auto">
-                                    <PaginationListStandalone
-                                      {...paginationProps}
-                                    />
-                                  </div>
-                                </Col>
-                              </Row>
-                            </React.Fragment>
-                          )
-                          }
-                        </ToolkitProvider>
-                      )
-                      }</PaginationProvider>
-                  </CardBody>
-                </Card>
-              </Col>
-            </Row>
-          </div>
-        </div>
-      </React.Fragment>
-    )
-  }
-}
-
-export default TableCategory
+export default TableCategory;

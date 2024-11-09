@@ -1,6 +1,7 @@
 import * as React from "react";
 
-export default function CopyChain() {
+// Functional Component untuk CopyChain
+const CopyChain = () => {
   return (
     <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -11,12 +12,15 @@ export default function CopyChain() {
         strokeLinejoin="round"
       />
       <path
-        d="M11.6668 9.64309C11.309 9.16465 10.8524 8.76877 10.328 8.48231C9.80371 8.19584 9.22391 8.02549 8.62796 7.98281C8.03201 7.94013 7.43384 8.02612 6.87405 8.23494C6.31425 8.44376 5.8059 8.77053 5.3835 9.19309L2.8835 11.6931C2.12451 12.4789 1.70453 13.5314 1.71402 14.6239C1.72352 15.7164 2.16172 16.7615 2.93426 17.534C3.70679 18.3065 4.75184 18.7447 5.84433 18.7542C6.93681 18.7637 7.98932 18.3437 8.77517 17.5848L10.2002 16.1598"
-        stroke="#111111"
+        d="M11.6668 9.64309C11.309 9.16465 10.8524 8.76877 10.328 8.48231C9.80371 8.19584 9.22391 8.02549 8.62796 7.98281C8.03201 7.94013 7.43384 8.02612 6.87405 8.23494C6.31425 8.44376 5.8059 8.77053 5.3835 9.19309L2.8835 11.6931C2.12451 12.4749 1.70375 13.5294 1.71431 14.6232C1.72488 15.7171 2.16593 16.762 2.94256 17.5386C3.71919 18.3152 4.76404 18.7562 5.85784 18.7668C6.95163 18.7774 8.00617 18.3567 8.78795 17.5977L10.2128 16.1727"
+        stroke="#31447E"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
   );
-}
+};
+
+// Membungkus komponen dengan React.memo untuk mencegah rerendering yang tidak perlu
+export default React.memo(CopyChain);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import * as AuthenticationStore from "store/slice/authentication";
@@ -10,92 +10,72 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownToggle,
-  List,
-  ListInlineItem,
-  Button,
 } from "reactstrap";
 import SweetAlert from "react-bootstrap-sweetalert";
 
 // TODO: Barangkali data source image bisa dari resource
 import user1 from "../../assets/images/users/avatar-man.png";
 
-const ProfileMenu = (props) => {
+const ProfileMenu = React.memo((props) => {
   const { push } = useHistory();
   const dispatch = useDispatch();
   const [username, setUsername] = useState("Admin");
   const [menu, setMenu] = useState(false);
-  const [confirmLogout, setConfirmLogout] = React.useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
-  const handleShowConfirmLogout = () => setConfirmLogout(true);
-  const handleCancelLogout = () => setConfirmLogout(false);
-  const handleLogout = () => push("/logout");
+  // Menggunakan useCallback untuk memoization fungsi toggle
+  const toggle = useCallback(() => {
+    setMenu((prevMenu) => !prevMenu);
+  }, []);
+
+  const handleShowConfirmLogout = useCallback(() => setConfirmLogout(true), []);
+  const handleCancelLogout = useCallback(() => setConfirmLogout(false), []);
+  const handleLogout = useCallback(() => {
+    dispatch(AuthenticationStore.logout());
+    push("/login");
+  }, [dispatch, push]);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data, success } = await AdminService.profile();
-      if (success) {
-        setUsername(data.name);
-        dispatch(AuthenticationStore.profile(data));
-      }
-    };
-    getUser();
-  }, [props.success]);
+    AdminService.getProfile().then((res) => {
+      setUsername(res?.data?.name);
+    });
+  }, []);
 
   return (
     <React.Fragment>
-      {/* Menu ketika layar large ke atas */}
-      <List className="d-none d-lg-flex my-auto">
-        <ListInlineItem className="d-flex justify-content-center align-items-center">
-          <img className="rounded-circle header-profile-user" src={user1} alt="Header Avatar" />
-          <span className="d-none d-lg-inline-block ms-2 me-1">{username}</span>
-        </ListInlineItem>
-
-        <ListInlineItem className="d-flex justify-content-center align-items-center">
-          <Button tag="a" color="link" className="text-dark" onClick={handleShowConfirmLogout}>
-            <i className="bx bx-power-off font-size-16 align-middle me-1 text-danger" />
-            <span>{props.t("Logout")}</span>
-          </Button>
-        </ListInlineItem>
-      </List>
-
-      {/* Menu ketika layar medium ke bawah */}
-      <Dropdown isOpen={menu} toggle={() => setMenu(!menu)} className="d-inline-block d-lg-none">
-        <DropdownToggle className="btn header-item " id="page-header-user-dropdown" tag="button">
+      <Dropdown isOpen={menu} toggle={toggle} className="d-inline-block">
+        <DropdownToggle className="btn header-item waves-effect" id="page-header-user-dropdown">
           <img className="rounded-circle header-profile-user" src={user1} alt="Header Avatar" />
           <span className="d-none d-xl-inline-block ms-2 me-1">{username}</span>
-          <i className="mdi mdi-chevron-down d-none d-xl-inline-block" />
+          <i className="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
         </DropdownToggle>
         <DropdownMenu className="dropdown-menu-end">
-          <DropdownItem tag="a" href="/logout" className="dropdown-item">
-            <i className="bx bx-power-off font-size-16 align-middle me-1 text-danger" />
-            <span>{props.t("Logout")}</span>
+          <DropdownItem tag="a" href="#">
+            <i className="bx bx-user font-size-16 align-middle me-1"></i>
+            {props.t("Profile")}
+          </DropdownItem>
+          <DropdownItem tag="a" href="#" onClick={handleShowConfirmLogout}>
+            <i className="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i>
+            {props.t("Logout")}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
 
-      <SweetAlert
-        title=""
-        show={confirmLogout}
-        custom
-        btnSize="md"
-        reverseButtons={true}
-        showCancel
-        cancelBtnText="Batal"
-        confirmBtnText="Ya"
-        confirmBtnBsStyle="outline-primary"
-        cancelBtnBsStyle="primary"
-        onConfirm={handleLogout}
-        onCancel={handleCancelLogout}
-        style={{ padding: "30px 40px" }}
-      >
-        <p className="text-muted">
-          Anda akan keluar dari aplikasi.
-          <br />
-          Lanjutkan?
-        </p>
-      </SweetAlert>
+      {confirmLogout && (
+        <SweetAlert
+          title={props.t("Are you sure?")}
+          warning
+          showCancel
+          confirmBtnText={props.t("Yes, logout!")}
+          cancelBtnText={props.t("Cancel")}
+          onConfirm={handleLogout}
+          onCancel={handleCancelLogout}
+        >
+          {props.t("You will be logged out of the session.")}
+        </SweetAlert>
+      )}
     </React.Fragment>
   );
-};
+});
 
 export default withTranslation()(ProfileMenu);

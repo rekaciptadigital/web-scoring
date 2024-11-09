@@ -1,27 +1,25 @@
-import PropTypes from 'prop-types'
-import React, { Component } from "react"
-import { withRouter } from "react-router-dom"
-import "toastr/build/toastr.min.css"
+import PropTypes from 'prop-types';
+import React from "react";
+import { withRouter } from "react-router-dom";
+import "toastr/build/toastr.min.css";
 
-class LandingPageLayout extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {}
-    this.capitalizeFirstLetter.bind(this)
-  }
+// Functional Component untuk LandingPageLayout
+const LandingPageLayout = (props) => {
+  // Fungsi capitalizeFirstLetter tidak digunakan, jadi kita menghapusnya
 
-  capitalizeFirstLetter = string => {
-    return string.charAt(1).toUpperCase() + string.slice(2)
-  }
+  return (
+    <React.Fragment>
+      {/* Menampilkan anak komponen yang dikirim melalui props */}
+      {props.children}
+    </React.Fragment>
+  );
+};
 
-  render() {
-    return <React.Fragment>{this.props.children}</React.Fragment>
-  }
-}
-
+// Definisi prop types untuk komponen
 LandingPageLayout.propTypes = {
   children: PropTypes.any,
-  location: PropTypes.object
-}
+  location: PropTypes.object,
+};
 
-export default withRouter(LandingPageLayout)
+// Membungkus komponen dengan withRouter untuk mendapatkan akses ke props history
+export default withRouter(LandingPageLayout);

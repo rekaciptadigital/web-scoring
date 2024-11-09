@@ -1,6 +1,7 @@
 import * as React from "react";
 
-export default function Copy() {
+// Functional Component untuk Copy
+const Copy = () => {
   return (
     <svg width="16" height="16" viewBox="0 0 23 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g id="copy">
@@ -16,7 +17,7 @@ export default function Copy() {
         <path
           id="Vector_2"
           className="svg-icon-path"
-          d="M4.87879 14.9305H3.92635C3.42115 14.9305 2.93664 14.7298 2.57941 14.3726C2.22218 14.0153 2.02148 13.5308 2.02148 13.0256V4.4537C2.02148 3.9485 2.22218 3.46398 2.57941 3.10675C2.93664 2.74952 3.42115 2.54883 3.92635 2.54883H12.4983C13.0035 2.54883 13.488 2.74952 13.8452 3.10675C14.2024 3.46398 14.4031 3.9485 14.4031 4.4537V5.40613"
+          d="M4.87879 14.9305H3.92635C3.42115 14.9305 2.93664 14.7298 2.57941 14.3726C2.22218 14.0153 2.02148 13.5308 2.02148 13.0256V4.4537C2.02148 3.9485 2.22218 3.46398 2.57941 3.10675C2.93664 2.74952 3.42115 2.54883 3.92635 2.54883H12.4983C13.0035 2.54883 13.488 2.74952 13.8453 3.10675C14.2025 3.46398 14.4032 3.9485 14.4032 4.4537V5.40614"
           stroke="black"
           strokeWidth="1.62916"
           strokeLinecap="round"
@@ -25,4 +26,7 @@ export default function Copy() {
       </g>
     </svg>
   );
-}
+};
+
+// Membungkus komponen dengan React.memo untuk mencegah rerendering yang tidak perlu
+export default React.memo(Copy);

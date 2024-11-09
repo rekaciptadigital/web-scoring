@@ -1,26 +1,31 @@
-import React, { useState } from "react"
-import PropTypes from 'prop-types'
-import { Link } from "react-router-dom"
-import { Dropdown, DropdownToggle, DropdownMenu, Row, Col } from "reactstrap"
-import SimpleBar from "simplebar-react"
+import React, { useState, useCallback } from "react";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+import { Dropdown, DropdownToggle, DropdownMenu, Row, Col } from "reactstrap";
+import SimpleBar from "simplebar-react";
 
-//i18n
-import { withTranslation } from "react-i18next"
+// i18n
+import { withTranslation } from "react-i18next";
 
-const NotificationDropdown = props => {
+const NotificationDropdown = React.memo((props) => {
   // Declare a new state variable, which we'll call "menu"
-  const [menu, setMenu] = useState(false)
+  const [menu, setMenu] = useState(false);
+
+  // Menggunakan useCallback untuk memoization fungsi toggle
+  const toggle = useCallback(() => {
+    setMenu((prevMenu) => !prevMenu);
+  }, []);
 
   return (
     <React.Fragment>
       <Dropdown
         isOpen={menu}
-        toggle={() => setMenu(!menu)}
+        toggle={toggle}
         className="dropdown d-inline-block"
         tag="li"
       >
         <DropdownToggle
-          className="btn header-item noti-icon "
+          className="btn header-item noti-icon"
           tag="button"
           id="page-header-notifications-dropdown"
         >
@@ -35,34 +40,45 @@ const NotificationDropdown = props => {
                 <h6 className="m-0"> {props.t("Notifications")} </h6>
               </Col>
               <div className="col-auto">
-                <a href="#!" className="small">
-                  {" "}
-                  View All
-                </a>
+                <Link to="#" className="small">
+                  {props.t("View All")}
+                </Link>
               </div>
             </Row>
           </div>
 
-          <SimpleBar style={{ height: "230px" }}>
-          </SimpleBar>
-          <div className="p-2 border-top d-grid">
-            <Link
-              className="btn btn-sm btn-link font-size-14 btn-block text-center"
-              to="#"
-            >
-              <i className="mdi mdi-arrow-right-circle me-1"></i>
-              {" "}
-              {props.t("View all")}{" "}
+          <SimpleBar style={{ maxHeight: "230px" }}>
+            {/* Contoh item notifikasi */}
+            <Link to="#" className="text-reset notification-item">
+              <div className="d-flex">
+                <div className="flex-shrink-0 me-3">
+                  <img
+                    src="/images/users/avatar-1.jpg"
+                    className="rounded-circle avatar-sm"
+                    alt="user-pic"
+                  />
+                </div>
+                <div className="flex-grow-1">
+                  <h6 className="mt-0 mb-1">{props.t("Your order is placed")}</h6>
+                  <div className="font-size-12 text-muted">
+                    <p className="mb-1">{props.t("If several languages coalesce the grammar")}</p>
+                    <p className="mb-0">
+                      <i className="mdi mdi-clock-outline" /> 3 min ago
+                    </p>
+                  </div>
+                </div>
+              </div>
             </Link>
-          </div>
+            {/* Tambahkan item notifikasi lainnya sesuai kebutuhan */}
+          </SimpleBar>
         </DropdownMenu>
       </Dropdown>
     </React.Fragment>
-  )
-}
-
-export default withTranslation()(NotificationDropdown)
+  );
+});
 
 NotificationDropdown.propTypes = {
-  t: PropTypes.any
-}
+  t: PropTypes.any,
+};
+
+export default withTranslation()(NotificationDropdown);

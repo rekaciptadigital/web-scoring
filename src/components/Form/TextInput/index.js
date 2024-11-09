@@ -2,10 +2,10 @@ import * as React from "react";
 import _ from "lodash";
 import stringUtil from "utils/stringUtil";
 import { useFieldValidation } from "utils/hooks/field-validation";
-
 import { Input, InputGroup, Label } from "reactstrap";
 
-const TextInput = ({
+// Functional Component untuk TextInput
+const TextInput = React.memo(({
   name,
   id = stringUtil.createRandom(),
   label,
@@ -18,18 +18,20 @@ const TextInput = ({
 }) => {
   const { errors, handleFieldValidation } = useFieldValidation(name);
 
-  const handleChange = (e) => {
+  // Menggunakan useCallback untuk memoization fungsi handleChange
+  const handleChange = React.useCallback((e) => {
     if (onChange) {
       onChange({
         key: name,
         value: e.target.value,
       });
     }
-  };
+  }, [name, onChange]);
 
-  const handleBlur = () => {
+  // Menggunakan useCallback untuk memoization fungsi handleBlur
+  const handleBlur = React.useCallback(() => {
     handleFieldValidation(value);
-  };
+  }, [handleFieldValidation, value]);
 
   return (
     <div>
@@ -42,19 +44,14 @@ const TextInput = ({
           onChange={handleChange}
           onBlur={handleBlur}
           value={value}
-          placeholder={placeholder || label}
+          placeholder={placeholder}
           readOnly={readOnly}
           disabled={disabled}
         />
         {accessoryRight}
       </InputGroup>
-      {_.get(errors, name)?.map((message) => (
-        <div className="invalid-feedback" key={message}>
-          {message}
-        </div>
-      ))}
     </div>
   );
-};
+});
 
 export default TextInput;

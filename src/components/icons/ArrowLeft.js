@@ -1,5 +1,6 @@
 import React from "react";
 
+// Functional Component untuk ArrowLeft
 const ArrowLeft = () => {
   return (
     <svg
@@ -20,4 +21,5 @@ const ArrowLeft = () => {
   );
 };
 
-export default ArrowLeft;
+// Membungkus komponen dengan React.memo untuk mencegah rerendering yang tidak perlu
+export default React.memo(ArrowLeft);

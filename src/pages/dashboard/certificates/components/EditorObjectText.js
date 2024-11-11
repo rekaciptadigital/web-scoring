@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import Draggable from "react-draggable";
 
 const defaultTextAttributes = {
@@ -63,7 +64,7 @@ export default function EditorObjectText({ name, data = {}, onSelected, onChange
   };
 
   return (
-    <g onMouseOver={() => highlightOnMouseOver()} onMouseLeave={() => idleOnMouseLeave()}>
+    <g onMouseOver={highlightOnMouseOver} onMouseLeave={idleOnMouseLeave}>
       {/* Indikator objek field */}
       {!selected && (
         <rect
@@ -102,8 +103,8 @@ export default function EditorObjectText({ name, data = {}, onSelected, onChange
           axis="y"
           scale={0.5}
           position={{ x: 0, y: currentTranslationY }}
-          onDrag={(ev, position) => handleDrag(ev, position)}
-          onStop={(ev, position) => handleDragStop(ev, position)}
+          onDrag={handleDrag}
+          onStop={handleDragStop}
         >
           <rect
             ref={selectorRef}
@@ -122,3 +123,27 @@ export default function EditorObjectText({ name, data = {}, onSelected, onChange
     </g>
   );
 }
+
+EditorObjectText.propTypes = {
+  name: PropTypes.string.isRequired,
+  data: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    fontSize: PropTypes.number,
+    fontFamily: PropTypes.string,
+    color: PropTypes.string,
+    fontWeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  }),
+  onSelected: PropTypes.func,
+  onChange: PropTypes.func,
+  selected: PropTypes.bool
+};
+
+EditorObjectText.defaultProps = {
+  data: {},
+  onSelected: () => {},
+  onChange: () => {},
+  selected: false
+};

@@ -10,6 +10,7 @@ const colorPickerStyle = {
   display: 'inline-block',
   cursor: 'pointer',
   textAlign: 'center',
+  border: 'none',  // Add this for button styling
 };
 
 const textStyle = {
@@ -20,29 +21,40 @@ const textStyle = {
 export default function ColorPickerContainer({ children, color = '#495057' }) {
   const [isShowPicker, setShowPicker] = React.useState(false);
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setShowPicker((show) => !show);
+    }
+  };
+
   return (
     <React.Fragment>
-      <div
+      <button
         style={colorPickerStyle}
         onClick={() => setShowPicker((show) => !show)}
+        onKeyDown={handleKeyDown}
       >
         <h5 style={{ ...textStyle, color: color }}>
           A
         </h5>
         <div />
-      </div>
+      </button>
 
       {isShowPicker && (
         <div style={{ position: 'absolute' }}>
-          <div
+          <button
             style={{
               position: 'fixed',
               top: '0px',
               right: '0px',
               bottom: '0px',
               left: '0px',
+              border: 'none',
+              background: 'transparent',
             }}
             onClick={() => setShowPicker(false)}
+            onKeyDown={(e) => e.key === 'Enter' && setShowPicker(false)}
           />
           {children}
         </div>

@@ -55,6 +55,176 @@ const Register = () => {
     return () => toast.dismiss();
   }, []);
 
+  const renderRegistrationScreen = () => {
+    if (screen === 0) {
+      return (
+        <div className="p-2" key="step-1">
+          <AvForm
+            className="form-horizontal"
+            onValidSubmit={(e, values) => {
+              toast.success("Lanjut ke langkah kedua");
+              setFormStep1(values);
+              setScreen(1);
+            }}
+          >
+            <div className="mb-3">
+              <AvField
+                name="name"
+                label="Nama Penyelengara"
+                className="form-control"
+                placeholder="Masukkan nama"
+                type="text"
+                required
+                errorMessage="Nama penyelenggara wajib diisi"
+                defaultValue={formStep1?.name}
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="email"
+                label="Email"
+                className="form-control"
+                placeholder="Masukkan email (digunakan untuk masuk)"
+                type="email"
+                required
+                errorMessage="Email wajib diisi"
+                defaultValue={formStep1?.email}
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="phone"
+                label="Nomor Telepon"
+                className="form-control"
+                placeholder="Masukkan nomor telepon (nomor WhatsApp)"
+                type="text"
+                required
+                errorMessage="Nomor telepon wajib diisi"
+                defaultValue={formStep1?.phone}
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="password"
+                label="Kata Sandi"
+                type="password"
+                required
+                placeholder="Masukkan kata sandi"
+                errorMessage="Kata sandi wajib diisi"
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="password_confirmation"
+                label="Konfirmasi Kata Sandi"
+                type="password"
+                required
+                placeholder="Masukkan ulang kata sandi di atas"
+                errorMessage="Kata sandi wajib dikonfirmasi"
+              />
+            </div>
+
+            <div className="mt-3 d-grid">
+              <ButtonBlue type="submit">Selanjutnya</ButtonBlue>
+            </div>
+          </AvForm>
+        </div>
+      );
+    }
+    
+    if (screen === 1) {
+      return (
+        <div className="p-2" key="step-2">
+          <div className="mb-3">
+            <ButtonBack flexible onClick={() => setScreen(0)}>
+              <IconArrowLeft size="16" />
+            </ButtonBack>
+          </div>
+
+          <AvForm
+            className="form-horizontal"
+            onValidSubmit={(e, values) => handleValidSubmit(values)}
+          >
+            <div className="mb-3">
+              <AvField
+                name="province"
+                label="Provinsi"
+                className="form-control"
+                placeholder="Pilih provinsi"
+                tag={SelectProvince}
+                onChange={(value) => setProvinceId(value)}
+                required
+                errorMessage="Provinsi wajib diisi"
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="city"
+                label="Kota"
+                className="form-control"
+                placeholder="Pilih kota"
+                provinceId={provinceId}
+                tag={SelectCity}
+                required
+                errorMessage="Kota wajib diisi"
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="questionnaire_source"
+                label="Dari mana Anda mengetahui MyArchery?"
+                placeholder="Pilih opsi"
+                type="text"
+                tag={SelectInfoSource}
+                required
+                errorMessage="Silakan isi sesuai pertanyaan di atas"
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="questionnaire_motive"
+                label="Mengapa Anda ingin menggunakan MyArchery?"
+                className="form-control"
+                placeholder="Sebutkan alasan"
+                type="text"
+                required
+                errorMessage="Silakan isi sesuai pertanyaan di atas"
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="questionnaire_event_name"
+                label="Event terdekat apa yang ingin Anda selenggarakan?"
+                className="form-control"
+                placeholder="Sebutkan nama event"
+                type="text"
+                required
+                errorMessage="Silakan isi sesuai pertanyaan di atas"
+              />
+            </div>
+            <div className="mb-3">
+              <AvField
+                name="questionnaire_event_description"
+                label="Deskripsikan event yang akan Anda selenggarakan?"
+                className="form-control"
+                placeholder="Masukkan deskripsi singkat"
+                type="textarea"
+                required
+                errorMessage="Silakan isi sesuai pertanyaan di atas"
+              />
+            </div>
+
+            <div className="mt-3 d-grid">
+              <ButtonBlue type="submit">Buat Akun</ButtonBlue>
+            </div>
+          </AvForm>
+        </div>
+      );
+    }
+
+    return <div className="p-2">Tidak ada screen</div>;
+  };
+
   return (
     <React.Fragment>
       <MetaTags>
@@ -101,167 +271,7 @@ const Register = () => {
                       </div>
                     </Link>
                   </div>
-                  {screen === 0 ? (
-                    <div className="p-2" key="step-1">
-                      <AvForm
-                        className="form-horizontal"
-                        onValidSubmit={(e, values) => {
-                          toast.success("Lanjut ke langkah kedua");
-                          setFormStep1(values);
-                          setScreen(1);
-                        }}
-                      >
-                        <div className="mb-3">
-                          <AvField
-                            name="name"
-                            label="Nama Penyelengara"
-                            className="form-control"
-                            placeholder="Masukkan nama"
-                            type="text"
-                            required
-                            errorMessage="Nama penyelenggara wajib diisi"
-                            defaultValue={formStep1?.name}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="email"
-                            label="Email"
-                            className="form-control"
-                            placeholder="Masukkan email (digunakan untuk masuk)"
-                            type="email"
-                            required
-                            errorMessage="Email wajib diisi"
-                            defaultValue={formStep1?.email}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="phone"
-                            label="Nomor Telepon"
-                            className="form-control"
-                            placeholder="Masukkan nomor telepon (nomor WhatsApp)"
-                            type="text"
-                            required
-                            errorMessage="Nomor telepon wajib diisi"
-                            defaultValue={formStep1?.phone}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="password"
-                            label="Kata Sandi"
-                            type="password"
-                            required
-                            placeholder="Masukkan kata sandi"
-                            errorMessage="Kata sandi wajib diisi"
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="password_confirmation"
-                            label="Konfirmasi Kata Sandi"
-                            type="password"
-                            required
-                            placeholder="Masukkan ulang kata sandi di atas"
-                            errorMessage="Kata sandi wajib dikonfirmasi"
-                          />
-                        </div>
-
-                        <div className="mt-3 d-grid">
-                          <ButtonBlue type="submit">Selanjutnya</ButtonBlue>
-                        </div>
-                      </AvForm>
-                    </div>
-                  ) : screen === 1 ? (
-                    <div className="p-2" key="step-2">
-                      <div className="mb-3">
-                        <ButtonBack flexible onClick={() => setScreen(0)}>
-                          <IconArrowLeft size="16" />
-                        </ButtonBack>
-                      </div>
-
-                      <AvForm
-                        className="form-horizontal"
-                        onValidSubmit={(e, values) => handleValidSubmit(values)}
-                      >
-                        <div className="mb-3">
-                          <AvField
-                            name="province"
-                            label="Provinsi"
-                            className="form-control"
-                            placeholder="Pilih provinsi"
-                            tag={SelectProvince}
-                            onChange={(value) => setProvinceId(value)}
-                            required
-                            errorMessage="Provinsi wajib diisi"
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="city"
-                            label="Kota"
-                            className="form-control"
-                            placeholder="Pilih kota"
-                            provinceId={provinceId}
-                            tag={SelectCity}
-                            required
-                            errorMessage="Kota wajib diisi"
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="questionnaire_source"
-                            label="Dari mana Anda mengetahui MyArchery?"
-                            placeholder="Pilih opsi"
-                            type="text"
-                            tag={SelectInfoSource}
-                            required
-                            errorMessage="Silakan isi sesuai pertanyaan di atas"
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="questionnaire_motive"
-                            label="Mengapa Anda ingin menggunakan MyArchery?"
-                            className="form-control"
-                            placeholder="Sebutkan alasan"
-                            type="text"
-                            required
-                            errorMessage="Silakan isi sesuai pertanyaan di atas"
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="questionnaire_event_name"
-                            label="Event terdekat apa yang ingin Anda selenggarakan?"
-                            className="form-control"
-                            placeholder="Sebutkan nama event"
-                            type="text"
-                            required
-                            errorMessage="Silakan isi sesuai pertanyaan di atas"
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <AvField
-                            name="questionnaire_event_description"
-                            label="Deskripsikan event yang akan Anda selenggarakan?"
-                            className="form-control"
-                            placeholder="Masukkan deskripsi singkat"
-                            type="textarea"
-                            required
-                            errorMessage="Silakan isi sesuai pertanyaan di atas"
-                          />
-                        </div>
-
-                        <div className="mt-3 d-grid">
-                          <ButtonBlue type="submit">Buat Akun</ButtonBlue>
-                        </div>
-                      </AvForm>
-                    </div>
-                  ) : (
-                    <div className="p-2">Tidak ada screen</div>
-                  )}
+                  {renderRegistrationScreen()}
                 </CardBody>
               </Card>
               <div className="mt-5 text-center">

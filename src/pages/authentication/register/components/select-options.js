@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import PropTypes from "prop-types";
 import Select from "react-select";
 
 function SelectOptions({
@@ -28,6 +28,34 @@ function SelectOptions({
     />
   );
 }
+
+SelectOptions.propTypes = {
+  placeholder: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      label: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.arrayOf(PropTypes.object),
+  ]),
+  isMulti: PropTypes.bool,
+  isClearable: PropTypes.bool,
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  noOptionsMessage: PropTypes.string,
+  disabled: PropTypes.bool,
+};
+
+SelectOptions.defaultProps = {
+  placeholder: "Select...",
+  isMulti: false,
+  isClearable: false,
+  noOptionsMessage: "No options available",
+  disabled: false,
+};
 
 /* ================================== */
 // styles

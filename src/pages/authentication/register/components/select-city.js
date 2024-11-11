@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import { GeneralService } from "services";
 
 import { AsyncPaginate } from "react-select-async-paginate";
@@ -51,6 +52,26 @@ function SelectCity({ name, placeholder, value, provinceId, onChange, errors, di
     />
   );
 }
+
+SelectCity.propTypes = {
+  name: PropTypes.string,
+  placeholder: PropTypes.string,
+  value: PropTypes.number,
+  provinceId: PropTypes.number,
+  onChange: PropTypes.func,
+  errors: PropTypes.arrayOf(PropTypes.string),
+  disabled: PropTypes.bool,
+};
+
+SelectCity.defaultProps = {
+  name: "",
+  placeholder: "Pilih Kota",
+  value: null,
+  provinceId: null,
+  onChange: () => {},
+  errors: [],
+  disabled: false,
+};
 
 const computeCustomStylesWithValidation = (errors) => {
   if (errors?.length) {

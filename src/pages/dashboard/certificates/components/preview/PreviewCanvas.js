@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import PreviewFieldText from "./PreviewFieldText";
 //import QrCodeField from "../QrCodeField";
@@ -42,6 +43,18 @@ export default function PreviewCanvas({ data }) {
   );
 }
 
+PreviewCanvas.propTypes = {
+  data: PropTypes.shape({
+    backgroundUrl: PropTypes.string,
+    backgroundPreviewUrl: PropTypes.string,
+    fields: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+      })
+    ),
+  }).isRequired,
+};
+
 function PreviewImage({ children, width, height, backgroundImage, scale }) {
   const variableStyles = {
     "--cert-pre-width": width ? width + "px" : undefined,
@@ -51,6 +64,14 @@ function PreviewImage({ children, width, height, backgroundImage, scale }) {
   };
   return <PreviewImageWrapper style={variableStyles}>{children}</PreviewImageWrapper>;
 }
+
+PreviewImage.propTypes = {
+  children: PropTypes.node,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  backgroundImage: PropTypes.string,
+  scale: PropTypes.number,
+};
 
 const PreviewCanvasContainer = styled.div`
   position: relative;

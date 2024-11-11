@@ -1,11 +1,12 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import { certificateFields } from "constants/index";
 
 const { LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME } = certificateFields;
 
 const previewTexts = {
-  [LABEL_MEMBER_NAME]: "Morgan Lundin",
+  [LABEL_MEMBER_NAME]: "Laksmana Tri Moerdani",
   [LABEL_CATEGORY_NAME]: "Individu - Umum - Barebow - 50m",
 };
 
@@ -34,6 +35,21 @@ export default function PreviewFieldText({ name, data = {} }) {
     </FieldTextContainer>
   );
 }
+
+PreviewFieldText.propTypes = {
+  name: PropTypes.oneOf([LABEL_MEMBER_NAME, LABEL_CATEGORY_NAME]).isRequired,
+  data: PropTypes.shape({
+    y: PropTypes.number,
+    fontFamily: PropTypes.string,
+    fontSize: PropTypes.number,
+    color: PropTypes.string,
+    fontWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  })
+};
+
+PreviewFieldText.defaultProps = {
+  data: {}
+};
 
 const FieldTextContainer = styled.div`
   position: absolute;

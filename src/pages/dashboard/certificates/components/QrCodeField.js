@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 
 import qrPreviewSvg from "assets/images/editor-qr-preview.svg";
@@ -12,6 +13,14 @@ export default function QrCodeField({ preview }) {
     </QrCodeContainer>
   );
 }
+
+QrCodeField.propTypes = {
+  preview: PropTypes.bool
+};
+
+QrCodeField.defaultProps = {
+  preview: false
+};
 
 const QrCodeContainer = styled.div`
   position: absolute;

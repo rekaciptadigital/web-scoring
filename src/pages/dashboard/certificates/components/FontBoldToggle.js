@@ -1,8 +1,17 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 
 export default function FontBoldToggle({ onChange, bold = false }) {
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onChange?.();
+    }
+  };
+
   return (
-    <div
+    <button
+      type="button"
       style={{
         padding: 5,
         width: 42,
@@ -12,7 +21,9 @@ export default function FontBoldToggle({ onChange, bold = false }) {
         display: "inline-block",
         cursor: "pointer",
         textAlign: "center",
+        border: "none",
       }}
+      onKeyDown={handleKeyDown}
       onClick={() => onChange?.()}
     >
       <h5
@@ -23,7 +34,11 @@ export default function FontBoldToggle({ onChange, bold = false }) {
       >
         B
       </h5>
-      <div />
-    </div>
+    </button>
   );
 }
+
+FontBoldToggle.propTypes = {
+  onChange: PropTypes.func,
+  bold: PropTypes.bool
+};

@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import PropTypes from "prop-types";
 import Select from "react-select/creatable";
 import { customSelectStyles } from "./select-options";
 
@@ -49,6 +49,16 @@ function SelectInfoSource({ value, onChange }) {
     />
   );
 }
+
+SelectInfoSource.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func
+};
+
+SelectInfoSource.defaultProps = {
+  value: "",
+  onChange: () => {}
+};
 
 /* ========================= */
 // utils

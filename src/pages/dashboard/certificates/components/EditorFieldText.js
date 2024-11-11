@@ -1,5 +1,6 @@
 import React, { Fragment, useRef, useEffect, useState, useLayoutEffect } from "react";
 import Draggable from "react-draggable";
+import PropTypes from 'prop-types';
 
 const boundingStroke = {
   idle: {
@@ -17,6 +18,10 @@ const A4_WIDTH = 1287;
 function PlaceholderString({ children }) {
   return <Fragment>&laquo;{children}&raquo;</Fragment>;
 }
+
+PlaceholderString.propTypes = {
+  children: PropTypes.node.isRequired
+};
 
 export default function EditorFieldText({
   name,
@@ -76,6 +81,40 @@ export default function EditorFieldText({
     setActiveStroke(boundingStroke.idle);
   };
 
+  const handleFocus = () => {
+    setActiveStroke(boundingStroke.highlighted);
+  };
+
+  const handleBlur = () => {
+    setActiveStroke(boundingStroke.idle);
+  };
+
+  const handleKeyDown = (event) => {
+    const STEP = 1;
+    let newX = x;
+    let newY = y;
+
+    switch (event.key) {
+      case "ArrowLeft":
+        newX -= STEP;
+        break;
+      case "ArrowRight":
+        newX += STEP;
+        break;
+      case "ArrowUp":
+        newY -= STEP;
+        break;
+      case "ArrowDown":
+        newY += STEP;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    onChange?.({ x: newX, y: newY, offsetWidth: currentOffsetWidth });
+  };
+
   const getAlignmentStyle = () => {
     if (align === "left") {
       return { textAlign: "left" };
@@ -89,8 +128,15 @@ export default function EditorFieldText({
 
   return (
     <Draggable scale={canvasScale} position={{ x, y }} onStart={handleDrag} onStop={handleDragStop}>
-      <div
+      <button
         ref={divRef}
+        type="button"
+        aria-label={`Draggable text field ${name}`}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
         style={{
           position: "absolute",
           top: 0,
@@ -100,9 +146,17 @@ export default function EditorFieldText({
           fontFamily,
           fontWeight: fontWeight || "normal",
           ...getAlignmentStyle(),
+          // Reset button styles
+          border: "none",
+          background: "none",
+          padding: 0,
+          margin: 0,
+          cursor: "move",
+          outline: "none",
+          boxShadow: "none",
         }}
-        onMouseOver={handleMouseOver}
-        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleDrag}
+        onTouchEnd={(e) => handleDragStop(e, { x, y })}
       >
         <PlaceholderString>{name}</PlaceholderString>
         <span
@@ -117,9 +171,37 @@ export default function EditorFieldText({
             borderColor: selected ? "#4F80FF" : activeStroke.color,
             opacity: 0.5,
             transition: "all",
+            outline: "none",
+            boxShadow: document.activeElement === divRef.current ? "0 0 0 3px rgba(79, 128, 255, 0.5)" : "none",
+            pointerEvents: "none", // Ensure span doesn't interfere with button interactions
           }}
         />
-      </div>
+      </button>
     </Draggable>
   );
 }
+
+EditorFieldText.propTypes = {
+  name: PropTypes.string.isRequired,
+  data: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+    fontFamily: PropTypes.string,
+    fontSize: PropTypes.number,
+    color: PropTypes.string,
+    fontWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  }),
+  onSelected: PropTypes.func,
+  onChange: PropTypes.func,
+  selected: PropTypes.bool,
+  setEditorDirty: PropTypes.func,
+  canvasScale: PropTypes.number,
+  align: PropTypes.oneOf(['left', 'center', 'right'])
+};
+
+EditorFieldText.defaultProps = {
+  data: {},
+  align: 'right',
+  canvasScale: 1,
+  selected: false
+};

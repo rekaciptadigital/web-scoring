@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import PropTypes from "prop-types";
 import { Button } from "reactstrap";
 
 export default function EditorBgImagePicker({
@@ -66,3 +66,12 @@ export default function EditorBgImagePicker({
     </div>
   );
 }
+
+EditorBgImagePicker.propTypes = {
+  image: PropTypes.shape({
+    preview: PropTypes.string,
+    raw: PropTypes.any
+  }),
+  onSelectImage: PropTypes.func.isRequired,
+  onRemoveImage: PropTypes.func.isRequired
+};

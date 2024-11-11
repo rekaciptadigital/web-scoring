@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useSubmitArchiveAgeCategory } from "../hooks/submit-archive-age-category";
 
@@ -56,9 +57,24 @@ function ClassCategoryItem({ classCategory, onSuccessSubmit }) {
   );
 }
 
+ClassCategoryItem.propTypes = {
+  classCategory: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    label: PropTypes.string.isRequired,
+    eoId: PropTypes.number,
+    canUpdate: PropTypes.bool,
+  }).isRequired,
+  onSuccessSubmit: PropTypes.func.isRequired,
+};
+
 function Show({ when, children }) {
   return when ? children : null;
 }
+
+Show.propTypes = {
+  when: PropTypes.bool.isRequired,
+  children: PropTypes.node,
+};
 
 function ArchiveClassCategory({ classCategory, onSuccessArchive }) {
   const { submit, isLoading, isError, errors, isSuccess } = useSubmitArchiveAgeCategory(
@@ -89,10 +105,25 @@ function ArchiveClassCategory({ classCategory, onSuccessArchive }) {
   );
 }
 
+ArchiveClassCategory.propTypes = {
+  classCategory: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    label: PropTypes.string.isRequired,
+  }).isRequired,
+  onSuccessArchive: PropTypes.func.isRequired,
+};
+
 function ClassDescription({ classCategory }) {
   const desc = React.useMemo(() => getClassDescription(classCategory), [classCategory]);
   return <ClassDescriptionWrapper>{desc}</ClassDescriptionWrapper>;
 }
+
+ClassDescription.propTypes = {
+  classCategory: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    label: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 /* ==================================== */
 // styles

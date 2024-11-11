@@ -1,6 +1,6 @@
 import * as React from "react";
 import _ from "lodash";
-
+import PropTypes from "prop-types";
 import { Input, Label } from "reactstrap";
 import CurrencyInput from "../CurrencyInput";
 
@@ -114,6 +114,30 @@ const CheckboxWithCurrencyInput = ({
       ))}
     </div>
   );
+};
+
+CheckboxWithCurrencyInput.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      fixed: PropTypes.bool,
+      price: PropTypes.number,
+    })
+  ),
+  onChange: PropTypes.func,
+  error: PropTypes.object,
+  disabled: PropTypes.bool,
+  readOnly: PropTypes.bool,
+  value: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    })
+  ),
+  textInputName: PropTypes.string,
 };
 
 export default CheckboxWithCurrencyInput;

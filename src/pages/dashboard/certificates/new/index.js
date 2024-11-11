@@ -359,8 +359,9 @@ function CertificateNew() {
                 {currentObject?.name && (
                   <div className="mt-5">
                     <div>
-                      <label>Font family:</label>
+                      <label htmlFor="font-family">Font family:</label>
                       <Select
+                        id="font-family"
                         options={optionsFontFamily}
                         placeholder="Font Family"
                         value={getSelectedFontFamily(optionsFontFamily, currentObject)}
@@ -369,8 +370,9 @@ function CertificateNew() {
                     </div>
 
                     <div className="mt-2">
-                      <label>Font size:</label>
+                      <label htmlFor="font-size">Font size:</label>
                       <Select
+                        id="font-size"
                         options={optionsFontSize}
                         placeholder="font size"
                         value={{
@@ -382,9 +384,9 @@ function CertificateNew() {
                     </div>
 
                     <div className="mt-2">
-                      <label>Font color:</label>
+                      <label htmlFor="font-color">Font color:</label>
                       <div>
-                        <ColorPickerContainer color={currentObject?.color}>
+                        <ColorPickerContainer id="font-color" color={currentObject?.color}>
                           <CompactPicker
                             color={currentObject?.color}
                             onChange={(color) => handleFontColorChange(color)}
@@ -394,9 +396,10 @@ function CertificateNew() {
                     </div>
 
                     <div className="mt-2">
-                      <label>Bold?</label>
+                      <label htmlFor="font-bold">Bold?</label>
                       <div>
                         <FontBoldToggle
+                          id="font-bold"
                           bold={currentObject?.fontWeight}
                           onChange={() => handleFontBoldChange()}
                         />

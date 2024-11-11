@@ -1,5 +1,5 @@
 import React from "react"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 import { BrowserRouter } from "react-router-dom"
 import { persistStore } from "redux-persist"
@@ -11,7 +11,10 @@ import { store } from "./store"
 
 let persistor = persistStore(store)
 
-const app = (
+const container = document.getElementById("root")
+const root = createRoot(container)
+
+const AppWrapper = () => (
   <Provider store={store}>
     <BrowserRouter>
       <PersistGate loading={null} persistor={persistor}>
@@ -21,5 +24,6 @@ const app = (
   </Provider>
 )
 
-ReactDOM.render(app, document.getElementById("root"))
+root.render(<AppWrapper />)
+
 serviceWorker.unregister()

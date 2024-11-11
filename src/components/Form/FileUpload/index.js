@@ -4,6 +4,7 @@ import { Card, Col, Label, Row } from "reactstrap";
 import stringUtil from "utils/stringUtil";
 import Dropzone from "react-dropzone";
 import _ from "lodash";
+import PropTypes from "prop-types";
 
 const FileUpload = ({
   id = stringUtil.createRandom(),
@@ -15,7 +16,7 @@ const FileUpload = ({
   disabled,
   readOnly,
 }) => {
-  const [selectedFiles, setselectedFiles] = useState([]);
+  const [files, setFiles] = useState([]);
 
   const handleChange = files => {
     files.map(file =>
@@ -23,7 +24,7 @@ const FileUpload = ({
         formattedSize: formatBytes(file.size),
       })
     );
-    setselectedFiles(files);
+    setFiles(files);
     if (onChange)
       onChange({
         key: name,
@@ -32,7 +33,7 @@ const FileUpload = ({
   };
 
   const handleDelete = () => {
-    setselectedFiles([]);
+    setFiles([]);
     if (onChange)
       onChange({
         key: name,
@@ -77,7 +78,7 @@ const FileUpload = ({
         )}
       </Dropzone>
       <div className="dropzone-previews mt-3" id="file-previews">
-        {selectedFiles.map((f, i) => {
+        {files.map((f, i) => {
           return (
             <Card
               className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete"
@@ -117,6 +118,17 @@ const FileUpload = ({
       ))}
     </div>
   );
+};
+
+FileUpload.propTypes = {
+  id: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  onChange: PropTypes.func,
+  multiple: PropTypes.bool,
+  error: PropTypes.object,
+  disabled: PropTypes.bool,
+  readOnly: PropTypes.bool
 };
 
 export default FileUpload;

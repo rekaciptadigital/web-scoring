@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Avatar from "../../assets/images/users/avatar-man.png";
 import { Row, Col, ModalBody, Button, Modal } from "reactstrap";
 
@@ -51,5 +52,20 @@ const ModalParticipantMemberProfile = React.memo((props) => {
     </Modal>
   );
 });
+
+ModalParticipantMemberProfile.propTypes = {
+  participant: PropTypes.shape({
+    member: PropTypes.shape({
+      name: PropTypes.string
+    }),
+    club: PropTypes.string,
+    phoneNumber: PropTypes.string,
+    email: PropTypes.string,
+    birthdate: PropTypes.string,
+    gender: PropTypes.string
+  }),
+  toggle: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool.isRequired
+};
 
 export default ModalParticipantMemberProfile;

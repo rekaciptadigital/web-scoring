@@ -14,9 +14,10 @@ const Breadcrumb = React.memo((props) => {
     const pathParts = path.slice(1).split("/");
 
     // Menghitung item breadcrumb berdasarkan path URL
-    const breadcrumbItems = pathParts.map((e) => {
+    const breadcrumbItems = pathParts.map((part, index) => {
       return {
-        title: e.charAt(0).toUpperCase() + e.slice(1),
+        title: part.charAt(0).toUpperCase() + part.slice(1),
+        path: pathParts.slice(0, index + 1).join("/"),
       };
     });
 
@@ -34,12 +35,15 @@ const Breadcrumb = React.memo((props) => {
           <h4 className="mb-0 font-size-18">{title}</h4>
           <div className="page-title-right">
             <ol className="breadcrumb m-0">
-              {memoizedBreadcrumbItems.map((item, key) => (
-                <BreadcrumbItem key={key} active={key + 1 === memoizedBreadcrumbItems.length}>
-                  {key + 1 === memoizedBreadcrumbItems.length ? (
+              {memoizedBreadcrumbItems.map((item, index) => (
+                <BreadcrumbItem 
+                  key={`breadcrumb-${item.path}`} 
+                  active={index + 1 === memoizedBreadcrumbItems.length}
+                >
+                  {index + 1 === memoizedBreadcrumbItems.length ? (
                     item.title
                   ) : (
-                    <Link to="#">{item.title}</Link>
+                    <Link to={`/${item.path}`}>{item.title}</Link>
                   )}
                 </BreadcrumbItem>
               ))}

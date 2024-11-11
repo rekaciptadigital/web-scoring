@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import PropTypes from 'prop-types';
 import { EventsService } from "services";
 import { Row, Col, Card, Button, CardBody } from "reactstrap";
 
@@ -59,5 +60,19 @@ const BoxSetScoring = React.memo((props) => {
     </Card>
   );
 });
+
+BoxSetScoring.propTypes = {
+  memberScore: PropTypes.shape({
+    participant: PropTypes.shape({
+      scheduleId: PropTypes.number,
+    }),
+    no_target: PropTypes.string,
+    scors: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+      value: PropTypes.number
+    }))),
+  }),
+  setMemberScore: PropTypes.func,
+  callback: PropTypes.func,
+};
 
 export default BoxSetScoring;

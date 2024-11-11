@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 
 import SweetAlert from "react-bootstrap-sweetalert";
@@ -49,6 +50,14 @@ function AlertSuccess({
     </SweetAlert>
   );
 }
+
+AlertSuccess.propTypes = {
+  isSuccess: PropTypes.bool,
+  onConfirm: PropTypes.func,
+  buttonLabel: PropTypes.string,
+  prompt: PropTypes.string,
+  description: PropTypes.string,
+};
 
 const IllustationAlertPrompt = styled.div`
   margin-bottom: 2rem;

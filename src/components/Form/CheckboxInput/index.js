@@ -1,5 +1,6 @@
 import * as React from "react";
 import _ from "lodash";
+import PropTypes from "prop-types";
 import { useFieldValidation } from "utils/hooks/field-validation";
 
 import { Input, Label } from "reactstrap";
@@ -63,7 +64,7 @@ const CheckboxInput = ({
                     option.checked ||
                     value.includes(option.id) ||
                     _.findIndex(value, ["id", option.id]) != -1 ||
-                    value === true
+                    value
                   }
                 />
                 <Label className="form-check-label" htmlFor={option.id}>
@@ -108,6 +109,23 @@ const CheckboxInput = ({
       })}
     </div>
   );
+};
+
+CheckboxInput.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      label: PropTypes.string,
+      checked: PropTypes.bool
+    })
+  ),
+  onChange: PropTypes.func,
+  inline: PropTypes.bool,
+  disabled: PropTypes.bool,
+  readOnly: PropTypes.bool,
+  value: PropTypes.array
 };
 
 export default CheckboxInput;

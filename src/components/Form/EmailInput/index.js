@@ -1,5 +1,6 @@
 import _ from "lodash";
 import React from "react";
+import PropTypes from "prop-types";
 import { Input, InputGroup, Label } from "reactstrap";
 import stringUtil from "utils/stringUtil";
 
@@ -45,6 +46,18 @@ const EmailInput = ({
       ))}
     </div>
   );
+};
+
+EmailInput.propTypes = {
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string,
+  label: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  accessoryRight: PropTypes.node,
+  error: PropTypes.object,
+  readOnly: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export default EmailInput;

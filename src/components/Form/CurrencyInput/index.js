@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import _ from "lodash";
 import stringUtil from "utils/stringUtil";
 import { useFieldValidation } from "utils/hooks/field-validation";
@@ -85,6 +86,17 @@ const CurrencyInput = ({
       ))}
     </div>
   );
+};
+
+CurrencyInput.propTypes = {
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string,
+  label: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  onChange: PropTypes.func,
+  horizontal: PropTypes.bool,
+  disabled: PropTypes.bool,
+  readOnly: PropTypes.bool
 };
 
 export default CurrencyInput;

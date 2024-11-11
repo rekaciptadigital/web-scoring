@@ -3,10 +3,9 @@ import { renderTemplateString, convertBase64 } from "../utils";
 async function prepareSaveData(editorData, qs) {
   const dataCopy = { ...editorData };
 
-  let imageBase64ForUpload = undefined;
-  if (dataCopy.backgroundFileRaw) {
-    imageBase64ForUpload = await convertBase64(dataCopy.backgroundFileRaw);
-  }
+  let imageBase64ForUpload = dataCopy.backgroundFileRaw 
+    ? await convertBase64(dataCopy.backgroundFileRaw)
+    : undefined;
 
   const certificateHtmlTemplate = renderTemplateString(dataCopy);
   const templateInBase64 = btoa(certificateHtmlTemplate);

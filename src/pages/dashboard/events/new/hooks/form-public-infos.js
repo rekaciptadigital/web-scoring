@@ -1,6 +1,5 @@
 import * as React from "react";
 import { makeStatePublicInfos } from "../utils/event-public-infos";
-
 import { setHours, setMinutes } from "date-fns";
 import { stringUtil } from "utils";
 

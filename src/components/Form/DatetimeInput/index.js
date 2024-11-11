@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import _ from "lodash";
 import moment from "moment";
 import stringUtil from "utils/stringUtil";
@@ -67,6 +68,16 @@ const DatetimeInput = ({
       ))}
     </div>
   );
+};
+
+DatetimeInput.propTypes = {
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string,
+  label: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+  onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  readOnly: PropTypes.bool
 };
 
 export default DatetimeInput;

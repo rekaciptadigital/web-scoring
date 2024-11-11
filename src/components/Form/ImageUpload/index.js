@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import _ from "lodash";
 import stringUtil from "utils/stringUtil";
 import { useFieldValidation } from "utils/hooks/field-validation";
@@ -42,11 +43,9 @@ const ImageUpload = ({
         <div className="input-file-thumbnail">
           <label className={`label ${_.get(errors, name) ? "is-invalid" : ""}`} htmlFor={id}>
             {uploadedImage ? (
-              <img src={uploadedImage} width="100%" className="icon" />
+              <img src={uploadedImage} width="100%" className="icon" alt="Upload preview" />
             ) : (
-              <>
-                <i className="bx bx-camera icon" />
-              </>
+              <i className="bx bx-camera icon" />
             )}
           </label>
         </div>
@@ -66,6 +65,18 @@ const ImageUpload = ({
       ))}
     </div>
   );
+};
+
+ImageUpload.propTypes = {
+  id: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  onChange: PropTypes.func,
+  multiple: PropTypes.bool,
+  thumbnail: PropTypes.bool,
+  disabled: PropTypes.bool,
+  readOnly: PropTypes.bool,
+  base64: PropTypes.func.isRequired
 };
 
 export default ImageUpload;
